@@ -28,7 +28,7 @@ export default {
 .manage {
   display: flex;
   .view-content {
-    width: calc(100% - 140px);
+    width: calc(100% - 140px - 16px);
     padding: 24px;
     background: #ffffff;
     border-radius: 4px;

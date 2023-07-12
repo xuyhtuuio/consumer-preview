@@ -18,6 +18,7 @@ export default {
 .el-menu {
   width: 140px;
   margin-right: 16px;
+  border-right: none;
   .el-menu-item {
     height: 40px;
     line-height: 40px;
