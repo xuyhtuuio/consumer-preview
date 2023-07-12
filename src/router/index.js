@@ -15,24 +15,36 @@ const router = new Router({
       path: '/',
       redirect: '/index'
     },
+    // 首页
     {
       path: "/index",
       name: "index",
       component: () => import("@/views/Index.vue"),
       meta: {title: 'OA工作流', viewport: viewport}
     },
+    // 后台管理
     {
-      path: "/workspace",
-      name: "workspace",
-      component: () => import("@/views/workspace/WorkSpace.vue"),
-      meta: {title: '工作区', viewport: viewport}
+      path: '/admin/manage',
+      name: 'manage',
+      component: () => import("@/views/admin/manage/index.vue"),
+      meta: {title: '后台管理', viewport: viewport},
+      redirect: '/admin/manage/userManage',
+      children: [
+        {
+          path: "userManage",
+          name: "UserManage",
+          component: () => import("@/views/admin/manage/userManage.vue"),
+          meta: {title: '用户管理'}
+        },
+        {
+          path: "formManage",
+          name: "FormManage",
+          component: () => import("@/views/admin/manage/formManage.vue"),
+          meta: {title: '表单管理'}
+        }
+      ]
     },
-    {
-      path: "/formsPanel",
-      name: "formsPanel",
-      component: () => import("@/views/admin/FormsPanel.vue"),
-      meta: {title: '表单列表', viewport: viewport}
-    },
+    // 工作流设计
     {
       path: "/admin/design",
       name: "design",
@@ -61,7 +73,14 @@ const router = new Router({
           meta: {title: '高级设置'}
         }
       ]
-    }
+    },
+    // 工作台
+    {
+      path: "/workspace",
+      name: "workspace",
+      component: () => import("@/views/workspace/WorkSpace.vue"),
+      meta: {title: '工作区', viewport: viewport}
+    },
   ]
 })
 

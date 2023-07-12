@@ -1,7 +1,7 @@
 <template>
 	<div id="app">
 		<transition name="router-fade" mode="out-in">
-			<router-view v-if="!$route.meta.keepAlive"/>
+			<router-view v-if="!$route.meta.keepAlive" class="view-box"/>
 		</transition>
 	</div>
 </template>
@@ -30,6 +30,9 @@
 	:focus {
 		outline: -webkit-focus-ring-color auto 0px;
 	}
+  .view-box {
+    padding: 24px 80px;
+  }
 	body {
 		margin: 0;
 		min-width: 500px;
