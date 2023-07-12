@@ -1,0 +1,236 @@
+// el-form
+.el-form.required-right {
+  .el-form-item.is-required {
+    position: relative;
+    .el-form-item__label:before {
+      position: absolute;
+      right: -15px;
+    }
+  }
+}
+// 按钮宽度 
+.view-config.el-button {
+  color: #1d2128;
+  height: 36px;
+  background: #FFFFFF;
+  border: 1px solid #E5E6EB;
+  color: #1D2128;
+  font-weight: 400;
+}
+.el-button.submit,
+.el-button.cancel {
+  width: 140px;
+  font-size: 14px;
+  line-height: 24px;
+  padding: 6px 50px;
+}
+.dialog-cancel {
+  width: 140px;
+  color: #1d2128;
+  border-color: #e5e6eb;
+  font-weight: 400;
+  border: 1px solid #e5e6eb;
+}
+.el-button.test {
+  background: #FFFFFF;
+  border-color: #2D5CF6;
+  color: #2D5CF6;
+  font-weight: 400;
+}
+// dialog
+.el-dialog__footer {
+  padding: 0 20px 30px;
+}
+
+.el-breadcrumb .el-breadcrumb__inner {
+  font-size: 12px;
+}
+// el-form
+.el-form.is-dark {
+  .el-form-item__content {
+    .el-input__inner {
+      background: #F3F3F5;
+      border-radius: 4px;
+      border: none;
+    }
+  }
+}
+.input.is-dark {
+  .el-input__inner {
+    background: #F3F3F5;
+    border-radius: 4px;
+    border: none;
+  }
+}
+// 搜索input
+.search-input {
+  input {
+    border: none;
+  }
+  .el-input-group__append {
+    border: none !important;
+    background: #ffffff;
+    .el-button {
+      padding: 6px 12px;
+      color: #88909B !important;
+      border: none !important;
+    }
+  }
+}
+// 排序select
+.order-select-box {
+  // margin: 15px 0 !important;
+  text-align: left;
+  .el-select {
+    width: 160px;
+    margin-right: 12px;
+    .el-input {
+      .el-input-group__append {
+        border-color: #ffffff;
+        .el-button {
+          width: auto;
+          background: #ffffff !important;
+          border-color: #ffffff;
+          color: #88909b !important;
+          border-radius: 0 4px 4px 0;
+        }
+      }
+    }
+  }
+  .el-input__inner {
+    height: 36px;
+    line-height: 36px;
+    border: none;
+  }
+  .order-select.el-select {
+    margin: 0;
+    width: 110px;
+    .el-input--mini {
+      .el-input__inner {
+        background: none;
+        color: #505968;
+        height: 36px;
+        line-height: 36px;
+        padding-left: 0;
+      }
+      .el-input__icon {
+        line-height: 36px;
+      }
+    }
+  }
+}
+// el-popover
+.el-popover {
+  .search-list {
+    li {
+      padding: 6px;
+    }
+    li:hover {
+      background: #f6f7fb;
+    }
+  }
+}
+
+// 下拉框
+.el-input__icon,.el-input--small .el-input__icon {
+  line-height: 100%;
+}
+
+// table
+
+// 表格文本溢出处理，表格文本内容过多鼠标滑过显示全部,添加属性：:show-overflow-tooltip="true" 
+// 斑马线纹表格样式：waring-row 添加属性 :row-class-name=""  在method返回对应class样式 return waring-row  勿与stripe共存
+.TRS-table {
+  .el-table__body td > .cell:empty::before{
+    content: '-';
+    display: inline-block;
+  }
+  .el-table {
+    border: 1px solid #E8F1FF;
+    border-bottom: none;
+    border-radius: 6px;
+    .el-table__body, .el-table__footer, .el-table__header {
+      border-collapse: collapse!important;
+    }
+    .el-table__body td > .cell:empty::before{
+        content: '-';
+        display: inline-block;
+       }
+    .waring-row {
+      background: #F9FBFF;
+    }
+    .el-table__cell {
+      border-right: 1px solid #E8F1FF;
+      border-bottom: 1px solid #E8F1FF;
+    }
+
+    .el-table__body tr:hover>td {
+      background-color: #E8F1FF;
+      }
+      th {
+        background: #F9FBFF;
+      }
+      thead {
+        color: #505968;
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 22px;
+        .el-table__cell {
+          height: 40px;
+          padding: 0;
+        }
+      }
+      tbody {
+        .el-table__cell {
+          font-size: 14px;
+          color: #1D2128;
+          font-weight: 400;
+          line-height: 22px;
+          height: 40px;
+          padding: 4px 0;
+        }
+      }
+    }
+  }
+.table {
+  overflow-x: auto;
+}
+
+/* ************自定义组件的通用样式***************************** */
+// trs-descriptions
+.descriptions {
+  &-header-title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px;
+  }
+}
+.el-table-filter {
+  max-height: 500px;
+  overflow: auto;
+}
+// el-dropdown
+.header-dropdown {
+  max-height: 300px;
+  overflow-y: auto;
+  .el-dropdown-menu__item {
+    position: relative;
+    padding: 0 20px 0 30px;
+    &:hover {
+      color: #2d5cf6;
+      span {
+        color: #2d5cf6;
+      }
+    }
+    .el-icon-check {
+      position: absolute;
+      left: 10px;
+      top: 11px;
+      color: #2d5cf6;
+      font-weight: 700;
+    }
+  }
+  .el-dropdown-menu__item--divided {
+    padding: 0 20px;
+  }
+}

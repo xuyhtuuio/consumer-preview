@@ -1,7 +1,9 @@
 <template>
   <div class="manage">
     <LeftMenu/>
-    <components :is="$route.name"></components>
+    <div class="view-content">
+      <components :is="$route.name"></components>
+    </div>
   </div>
 </template>
 <script>
@@ -25,5 +27,11 @@ export default {
 <style lang="less" scoped>
 .manage {
   display: flex;
+  .view-content {
+    width: calc(100% - 140px);
+    padding: 24px;
+    background: #ffffff;
+    border-radius: 4px;
+  }
 }
 </style>

@@ -3,6 +3,31 @@ module.exports = {
   outputDir: "dist",
   // 开发环境显示报错位置 生产环境设置为false减少打包体积
   productionSourceMap: true,
+  chainWebpack: (config) => {
+    config.resolve.alias
+      // src定义成@
+      .set('@', resolve('src'))
+      // components定义成_c
+      .set('_c', resolve('src/components'));
+    config.resolve.extensions
+      .add('.js')
+      .add('.json')
+      .add('.jsx');
+    // 移除 prefetch 插件
+    config.plugins.delete('prefetch');
+    // 移除 preload 插件
+    config.plugins.delete('preload');
+
+    // 支持vue template 可选链和空值合并
+    config.module
+      .rule('vue')
+      .use('vue-loader')
+      .tap((options) => {
+        // eslint-disable-next-line
+        options.compiler = require('vue-template-babel-compiler');
+        return options;
+      });
+  },
   devServer: {
     host: 'localhost',
     port: '8082',

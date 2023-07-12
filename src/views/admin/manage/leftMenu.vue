@@ -17,6 +17,7 @@ export default {
 <style lang="less" scoped>
 .el-menu {
   width: 140px;
+  margin-right: 16px;
   .el-menu-item {
     height: 40px;
     line-height: 40px;
