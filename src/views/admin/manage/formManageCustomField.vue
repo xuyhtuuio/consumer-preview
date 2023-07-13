@@ -6,35 +6,35 @@
       </el-form-item>
       <el-form-item label="所属模块" prop="belong">
         <el-select v-model="ruleForm.belong" placeholder="请选择所属模块" class="is-dark input" style="width: 100%">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
+          <el-option v-for="item in belongModules" :label="item.label" :value="item.value" :key="item.value"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="字段类型" prop="type">
         <el-select v-model="ruleForm.type" placeholder="请选择字段类型" class="is-dark input" style="width: 100%">
-          <el-option label="文本输入框" value="input"></el-option>
-          <el-option label="级联选择" value="cascader"></el-option>
-          <el-option label="时间范围选择" value="dateRange"></el-option>
-          <el-option label="时间选择" value="date"></el-option>
-          <el-option label="单选框" value="radio"></el-option>
-          <el-option label="多选框" value="checkbox"></el-option>
-          <el-option label="数字输入框" value="number"></el-option>
-          <el-option label="人员选择-多选" value="user"></el-option>
-          <el-option label="部门选择-多选" value="dept"></el-option>
+          <el-option v-for="item in feildTypes" :label="item.label" :value="item.value" :key="item.value"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="提示文字" prop="placeholder" class="is-dark input">
+      <el-form-item v-if="ruleForm.type !== 'dateRange'" label="提示文字" prop="placeholder" class="is-dark input">
         <el-input v-model="ruleForm.placeholder" placeholder="请输入提示文字"></el-input>
       </el-form-item>
+      <el-form-item v-if="ruleForm.type === 'dateRange'" label="提示文字1" prop="placeholder" class="is-dark input">
+        <el-input v-model="ruleForm.placeholder" placeholder="请输入开始时间提示文字"></el-input>
+      </el-form-item>
+      <el-form-item v-if="ruleForm.type === 'dateRange'" label="提示文字2" prop="placeholder" class="is-dark input">
+        <el-input v-model="ruleForm.placeholder" placeholder="请输入结束时间提示文字"></el-input>
+      </el-form-item>
       <el-form-item v-if="ruleForm.type === 'cascader'" label="选项设置" prop="cascaderItem" class="is-dark input">
-        <el-button icon="el-icon-plus" type="text" size="mini" style="position: relative;left:260px;" @click="cascaderOptions.push('新选项')">新增选项</el-button>
-        <div v-for="(op, index) in cascaderOptions" :key="index">
-          <i class="el-icon-rank" style="margin-right: 6px;"></i>
-          <el-input v-model="cascaderOptions[index]" size="small" style="width: 260px;"
-                    placeholder="请设置选项值">
-            <i slot="suffix" class="el-input__icon el-icon-delete"></i>
-          </el-input>
-        </div>
+        <el-button icon="el-icon-plus" type="text" size="mini" style="position: relative;left:260px;" @click="addCascaderOptions">新增选项</el-button>
+        <CascaderField :leval="1" :data="cascaderOptions"/>
+      </el-form-item>
+      <el-form-item v-if="ruleForm.type === 'input' || ruleForm.type === 'textarea'" label="文字个数" prop="maxLength" class="is-dark input">
+        <el-input v-model="ruleForm.maxLength" placeholder="请输入文字个数" oninput="value=value.replace(/^0|[^0-9]/g, '')" class="is-dark input"></el-input>
+      </el-form-item>
+      <el-form-item label="独占一行" prop="inline" class="is-dark input">
+        <el-switch v-model="ruleForm.inline"></el-switch>
+      </el-form-item>
+      <el-form-item v-if="ruleForm.type === 'radio' || ruleForm.type === 'checkbox'" label="选项展开" prop="isExpse" class="is-dark input">
+        <el-switch v-model="ruleForm.isExpse"></el-switch>
       </el-form-item>
       <el-form-item label="是否必填" prop="isRequire" class="is-dark input">
         <el-switch v-model="ruleForm.isRequire"></el-switch>
@@ -60,7 +60,12 @@
   </div>
 </template>
 <script>
+  import { feildTypes, belongModules } from '@/utils/dict'
+  import CascaderField from './cascaderField'
   export default {
+    components: {
+      CascaderField
+    },
     data() {
       return {
         ruleForm: {
@@ -90,11 +95,28 @@
             { type: 'date', required: true, message: '请选择时间', trigger: 'change' }
           ]
         },
-        cascaderOptions: ['']
+        feildTypes,
+        belongModules,
+        cascaderOptions: [
+          {
+            id: '0',
+            value: '',
+            children: [
+            ]
+          }
+        ]
       };
     },
     methods: {
+      addCascaderOptions() {
+        this.cascaderOptions.push({
+          id: this.cascaderOptions.length + '',
+          value: '',
+          children: []
+        })
+      },
       submitForm(formName) {
+        console.log(this.cascaderOptions)
         this.$refs[formName].validate((valid) => {
           if (valid) {
             alert('submit!');
