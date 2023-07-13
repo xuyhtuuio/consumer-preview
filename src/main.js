@@ -7,9 +7,10 @@ import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 import '@/assets/css/common.less';
 import '@/assets/css/element.less';
-import '@/assets/icon/iconfont.css';
 import "@/assets/theme.less";
 import "@/assets/global.css";
+import '@/assets/icon/iconfont.css';
+import '@/assets/icon/iconfont.js';
 
 Vue.use(ElementUI);
 
