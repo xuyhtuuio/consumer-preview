@@ -4,6 +4,7 @@ import router from "./router";
 import store from './store'
 
 import ElementUI from "element-ui";
+import TrsWebComponents from 'trs-web-components'
 import "element-ui/lib/theme-chalk/index.css";
 import '@/assets/css/common.less';
 import '@/assets/css/element.less';
@@ -11,8 +12,12 @@ import "@/assets/theme.less";
 import "@/assets/global.css";
 import '@/assets/icon/iconfont.css';
 import '@/assets/icon/iconfont.js';
+import 'trs-web-components/lib/common.less';
+import 'trs-web-components/lib/element.less';
+
 
 Vue.use(ElementUI);
+Vue.use(TrsWebComponents);
 
 Vue.config.productionTip = false
 
