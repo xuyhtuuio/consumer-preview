@@ -1,3 +1,4 @@
+var path =require('path')
 module.exports = {
   lintOnSave: false,
   outputDir: "dist",
@@ -6,9 +7,9 @@ module.exports = {
   chainWebpack: (config) => {
     config.resolve.alias
       // src定义成@
-      .set('@', resolve('src'))
+      .set('@', path.resolve('src'))
       // components定义成_c
-      .set('_c', resolve('src/components'));
+      .set('_c', path.resolve('src/components'));
     config.resolve.extensions
       .add('.js')
       .add('.json')

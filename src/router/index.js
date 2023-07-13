@@ -20,27 +20,27 @@ const router = new Router({
       path: "/index",
       name: "index",
       component: () => import("@/views/Index.vue"),
-      meta: {title: 'OA工作流', viewport: viewport}
+      meta: { title: 'OA工作流', viewport: viewport }
     },
     // 后台管理
     {
       path: '/admin/manage',
       name: 'manage',
       component: () => import("@/views/admin/manage/index.vue"),
-      meta: {title: '后台管理', viewport: viewport},
+      meta: { title: '后台管理', viewport: viewport },
       redirect: '/admin/manage/userManage',
       children: [
         {
           path: "userManage",
           name: "UserManage",
           component: () => import("@/views/admin/manage/userManage.vue"),
-          meta: {title: '用户管理'}
+          meta: { title: '用户管理' }
         },
         {
           path: "formManage",
           name: "FormManage",
           component: () => import("@/views/admin/manage/formManage.vue"),
-          meta: {title: '表单管理'}
+          meta: { title: '表单管理' }
         }
       ]
     },
@@ -49,28 +49,28 @@ const router = new Router({
       path: "/admin/design",
       name: "design",
       component: () => import("@/views/admin/FormProcessDesign.vue"),
-      meta: {title: '表单流程设计', viewport: viewport},
+      meta: { title: '表单流程设计', viewport: viewport },
       children: [
         {
           path: "baseSetting",
           name: "baseSetting",
           component: () => import("@/views/admin/layout/FormBaseSetting.vue"),
-          meta: {title: '基础设置'}
+          meta: { title: '基础设置' }
         }, {
           path: "formSetting",
           name: "formSetting",
           component: () => import("@/views/admin/layout/FormDesign.vue"),
-          meta: {title: '表单设计'}
+          meta: { title: '表单设计' }
         }, {
           path: "processDesign",
           name: "processDesign",
           component: () => import("@/views/admin/layout/ProcessDesign.vue"),
-          meta: {title: '流程设计'}
+          meta: { title: '流程设计' }
         }, {
           path: "proSetting",
           name: "proSetting",
           component: () => import("@/views/admin/layout/FormProSetting.vue"),
-          meta: {title: '高级设置'}
+          meta: { title: '高级设置' }
         }
       ]
     },
@@ -79,8 +79,20 @@ const router = new Router({
       path: "/workspace",
       name: "workspace",
       component: () => import("@/views/workspace/WorkSpace.vue"),
-      meta: {title: '工作区', viewport: viewport}
+      meta: { title: '工作区', viewport: viewport }
     },
+    {
+      path: "/applycenter",
+      name: "applycenter",
+      component: () => import("@/views/applycenter/index.vue"),
+      meta: { title: '申请中心', viewport: viewport },
+    },
+    {
+      path: "/approvalCenter",
+      name: "approvalCenter",
+      component: () => import("@/views/applycenter/approvalCenter.vue"),
+      meta: { title: '申请中心', viewport: viewport },
+    }
   ]
 })
 
