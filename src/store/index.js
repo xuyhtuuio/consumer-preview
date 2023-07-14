@@ -2,12 +2,11 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
-
-
 export default new Vuex.Store({
   state: {
     nodeMap: new Map(),
     isEdit: null,
+    breadcrumbList: [],
     selectedNode: {},
     design:{},
   },
@@ -20,9 +19,13 @@ export default new Vuex.Store({
     },
     setIsEdit(state, val){
       state.isEdit = val
+    },
+    setBreadcrumbList(state,val) {
+      state.breadcrumbList= val
     }
   },
-  getters: {},
+  getters: {
+  },
   actions: {},
   modules: {}
 })

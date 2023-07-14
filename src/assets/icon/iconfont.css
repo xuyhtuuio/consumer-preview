@@ -1,10 +1,9 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4165130 */
-  src: url('iconfont.woff2?t=1689233267522') format('woff2'),
-       url('iconfont.woff?t=1689233267522') format('woff'),
-       url('iconfont.ttf?t=1689233267522') format('truetype');
+  src: url('iconfont.woff2?t=1689303192712') format('woff2'),
+       url('iconfont.woff?t=1689303192712') format('woff'),
+       url('iconfont.ttf?t=1689303192712') format('truetype');
 }
-
 .icon {
   width: 1em;
   height: 1em;
@@ -12,13 +11,16 @@
   fill: currentColor;
   overflow: hidden;
 }
-
 .iconfont {
   font-family: "iconfont" !important;
   font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-chanpin1:before {
+  content: "\e62d";
 }
 
 .icon-baocuo1:before {

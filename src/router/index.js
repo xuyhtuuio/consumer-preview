@@ -1,12 +1,14 @@
 import Vue from "vue";
 import Router from "vue-router";
-
+import store from "@/store/index"
 Vue.use(Router);
 
 const viewport = {
   content: "width=device-width, initial-scale=1.0, user-scalable=no"
 }
 
+
+// meta: { title: '新增详情' ,viewport: viewport ,pTitle: "首页",pPath: "/home"}
 const router = new Router({
   //mode: 'history',
   base: __dirname,
@@ -92,11 +94,37 @@ const router = new Router({
       name: "approvalCenter",
       component: () => import("@/views/applycenter/approvalCenter.vue"),
       meta: { title: '申请中心', viewport: viewport },
+    },
+    {
+      path: "/front",
+      name: "front",
+      component: () => import("@/views/front/index.vue"),
+      meta: { title: '消保管控平台', viewport: viewport },
+      children: [
+        {
+          path: "/home",
+          name: "UserManage",
+          component: () => import("@/views/front/home.vue"),
+          meta: { title: '首页' ,viewport: viewport },
+        },
+        {
+          path: "/addApply",
+          name: "addApply",
+          component: () => import("@/views/front/addApply.vue"),
+          parent: "/home",
+          meta: { title: '新增详情' ,viewport: viewport ,pTitle: "首页",pPath: "/home"}
+        },
+      ]
     }
   ]
 })
 
 router.beforeEach((to, from, next) => {
+  if(to.meta.pPath) {
+    const data = [{path: to.meta.pPath.slice(1),title:to.meta.pTitle},{path: to.path.slice(1),title:to.meta.title}]
+    store.commit("setBreadcrumbList",data)
+  }
+
   if (to.meta.title) {
     document.title = to.meta.title
   }

@@ -1,7 +1,7 @@
 <template>
 	<div id="app">
 		<transition name="router-fade" mode="out-in">
-			<router-view v-if="!$route.meta.keepAlive" class="view-box"/>
+			<router-view v-if="!$route.meta.keepAlive"/>
 		</transition>
 	</div>
 </template>
@@ -60,5 +60,6 @@
     font-size: small;
     color: #5e5e5e;
   }
+
 
 </style>
