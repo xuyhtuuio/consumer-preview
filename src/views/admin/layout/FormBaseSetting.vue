@@ -1,77 +1,21 @@
 <template>
   <div class="base-setup" @click="showIconSelect = false">
     <el-form label-position="top" label-width="80px">
-      <el-form-item label="表单图标">
-        <i :class="setup.logo.icon" :style="'background:' + setup.logo.background"></i>
-        <span class="change-icon">
-					<span>
-						<span>选择背景色</span>
-						<el-color-picker v-model="setup.logo.background" show-alpha size="small" :predefine="colors"></el-color-picker>
-					</span>
-					<span>
-						<span>选择图标</span>
-						<el-popover placement="bottom-start" width="200" trigger="click">
-							<div class="icon-select">
-								<i :class="i" v-for="(i, id) in icons" :key="id" @click="setup.logo.icon = i"></i>
-							</div>
-              <i slot="reference" :class="setup.logo.icon"></i>
-            </el-popover>
-            <!--<i :class="setup.icon" @click.stop="showIconSelect = true"></i>-->
-					</span>
-				</span>
-
-
+      <el-form-item>
+        <template slot="label">表单名称<span style="color: red">*</span></template>
+        <el-input v-model="setup.formName" placeholder="请输入表单名称" class="is-dark input" size="medium"></el-input>
       </el-form-item>
-      <el-form-item label="表单名称">
-        <el-input v-model="setup.formName" size="medium"></el-input>
-      </el-form-item>
-      <el-form-item label="所在分组" class="group">
-        <el-select v-model="setup.groupId" placeholder="请选择分组" size="medium">
+      <el-form-item class="group">
+        <template slot="label">关联表单</template>
+        <el-select v-model="setup.groupId" placeholder="请选择关联表单" size="medium" class="is-dark input" style="width: 100%">
           <el-option v-for="(op, index) in fromGroup" :key="index" v-show="op.id > 1"
                      :label="op.name" :value="op.id"></el-option>
         </el-select>
-        <el-popover placement="bottom-end" title="新建表单分组" width="300" trigger="click">
-          <el-input size="medium" v-model="newGroup" placeholder="请输入新的分组名">
-            <el-button slot="append" size="medium" type="primary" @click="addGroup">提交</el-button>
-          </el-input>
-          <el-button icon="el-icon-plus" slot="reference" size="medium" type="primary">新建分组</el-button>
-        </el-popover>
       </el-form-item>
       <el-form-item label="表单说明">
-        <el-input placeholder="请输入表单说明" v-model="setup.remark" type="textarea" show-word-limit
-                  :autosize="{ minRows: 2, maxRows: 5}" maxlength="500"></el-input>
+        <el-input placeholder="请输入表单说明" v-model="setup.remark" type="textarea" class="is-dark input" show-word-limit
+                  :autosize="{ minRows: 3, maxRows: 8}"></el-input>
       </el-form-item>
-
-      <el-form-item label="消息通知方式">
-        <el-select v-model="setup.settings.notify.types" value-key="name"
-                   placeholder="选择消息通知方式" style="width: 30%;"
-                   size="medium" clearable multiple collapse-tags>
-          <el-option v-for="(wc, index) in notifyTypes" :label="wc.name" :key="index" :value="wc"></el-option>
-        </el-select>
-        <el-input size="medium" v-model="setup.settings.notify.title" style="width: 68%; float:right;" placeholder="消息通知标题"></el-input>
-      </el-form-item>
-
-      <el-form-item label="谁可以发起提交">
-        <el-select v-model="setup.settings.commiter" @click.native="selectUser('commiter')" value-key="name"
-                   class="select-u" placeholder="请选择可以发起提交的人员"
-                   size="medium" clearable multiple>
-          <el-option v-for="(wc, index) in setup.settings.commiter" :label="wc.name" :key="index" :value="wc"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="谁可以管理此表单">
-        <el-select v-model="setup.settings.admin" @click.native="selectUser('admin')" value-key="name"
-                   class="select-u" placeholder="请选择可以管理此表单的人员"
-                   size="medium" clearable multiple>
-          <el-option v-for="(wc, index) in setup.settings.admin" :label="wc.name" :key="index" :value="wc"></el-option>
-        </el-select>
-      </el-form-item>
-<!--      <el-form-item label="谁可以查看并导出数据">
-        <el-select v-model="setup.whoExport" @click.native="selectUser('whoExport')" value-key="name"
-                   class="select-u" placeholder="请选择可以查看并导出数据的人员"
-                   size="medium" clearable multiple>
-          <el-option v-for="(wc, index) in setup.whoExport" :label="wc.name" :key="index" :value="wc"></el-option>
-        </el-select>
-      </el-form-item>-->
     </el-form>
     <org-picker :show="showUserSelect" @close="closeSelect" :selected="select" @selectOver="selected"></org-picker>
   </div>
@@ -178,6 +122,10 @@ export default {
 <style lang="less" scoped>
 /deep/ .el-select-dropdown {
   display: none;
+}
+/deep/.is-dark.el-textarea .el-textarea__inner{
+  background: #F3F3F5;
+  border: none;
 }
 
 .icon-select {

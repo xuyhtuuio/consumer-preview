@@ -2,32 +2,38 @@
 export const feildTypes = [
   {
     label: '单行输入框',
-    value: 'input'
+    value: 'TextInput',
+    valueType: 'String'
   },
   {
     label: '多行输入框',
-    value: 'textarea'
+    value: 'TextareaInput',
+    valueType: 'String'
   },
   {
     label: '单选框',
-    value: 'radio'
+    value: 'SelectInput',
+    valueType: 'String'
   },
   {
     label: '多选框',
-    value: 'checkbox'
+    value: 'MultipleSelect',
+    valueType: 'Array'
   },
   {
     label: '级联选择框',
-    value: 'cascader'
+    value: 'Cascader',
+    valueType: 'Tree',
   },
   {
     label: '时间选择框',
-    value: 'date'
+    value: 'TimePicker',
+    valueType: 'Date'
   },
-  {
-    label: '时间范围选择框',
-    value: 'dateRange'
-  },
+  // {
+  //   label: '时间范围选择框',
+  //   value: 'dateRange'
+  // },
 ]
 // 所属模块
 export const belongModules = [
