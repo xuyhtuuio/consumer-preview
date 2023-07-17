@@ -12,10 +12,10 @@ import "@/assets/theme.less";
 import "@/assets/global.css";
 import '@/assets/icon/iconfont.css';
 import '@/assets/icon/iconfont.js';
-import 'trs-web-components/lib/common.less';
-import 'trs-web-components/lib/element.less';
 import '@/assets/css/common.less';
 import '@/assets/css/element.less';
+import 'trs-web-components/lib/common.less';
+import 'trs-web-components/lib/element.less';
 
 Vue.use(ElementUI);
 Vue.use(TrsWebComponents);

@@ -6,33 +6,12 @@
     </div>
     <div class="title" v-else>
       <div>
-        <span @click="goBack" class="breadcrumb">{{ isEdit ? '编辑管理' : '新增管理' }}</span>/{{ currentRow.title }}
+        <span @click="goBack" class="breadcrumb">{{ isEdit ? '编辑管理' : '新增管理' }}</span>/{{ currentRow.typesOfReviewItemsName }}
       </div>
     </div>
-    <div class="TRS-table">
+    <div>
       <!-- 表单管理一级表格 -->
-      <!-- <el-table :data="data" @sort-change="changeSort" v-if="level === 1">
-        <el-table-column label="审查类型" prop="type">
-        </el-table-column>
-        <el-table-column label="图标" prop="icon">
-          <template slot-scope="scope">
-            <i class="icon-chanpin1"></i>
-          </template>
-        </el-table-column>
-        <el-table-column label="提单时限（加急单）" prop="limitTime">
-        </el-table-column>
-        <el-table-column label="更新时间" prop="utime" sortable="custom"  align="center">
-        </el-table-column>
-        <el-table-column label="操作" align="center">
-          <template slot-scope="scope">
-            <el-button type="text" @click="copyForm(scope.row)">复制</el-button>
-            <el-button type="text" @click="editForm(scope.row)">编辑</el-button>
-            <el-button type="text" @click="editSelfForm(scope.row)">修改</el-button>
-            <el-button type="text" class="red" @click="stopApllay(scope.row)">停用</el-button>
-          </template>
-        </el-table-column>
-      </el-table> -->
-      <TrsTable :data="data" :colConfig="colConfig" @sort-change="changeSort" v-if="level === 1" @submitEdit="submitEdit">
+      <TrsTable theme="TRS-table-gray" :data="data" :colConfig="colConfig" @sort-change="changeSort" v-if="level === 1" @submitEdit="submitEdit">
         <template #icon="scope">
           <img v-if="scope.row.icon" :src="scope.row.icon"/>
           <span v-else>--</span>
@@ -60,7 +39,18 @@
           </el-select>
           <el-button type="primary" @click="addFormItem" size="small" style="margin-left: 16px;">新增字段</el-button>
         </div>
-        <el-table :data="data1" @sort-change="changeSort1" :row-class-name="tableRowClassName">
+        <TrsTable theme="TRS-table-gray" :data="data1" :colConfig="colConfig1" @sort-change="changeSort" @submitEdit="submitEdit" :row-class-name="tableRowClassName">
+          <template #operate="scope">
+            <el-button type="text" v-if="readonlyField.includes(scope.row.title)">查看</el-button>
+            <template v-else>
+              <el-button type="text" v-if="scope.row.status === '0'">恢复</el-button>
+              <el-button type="text" v-else @click="editFormItem(scope.row)">编辑</el-button>
+              <el-button type="text" class="red" :style="{ visibility: scope.row.status !== '0' ? 'visible' : 'hidden' }">停用</el-button>
+              <el-button type="text" class="red" v-if="!['下线时间'].includes(scope.row.title)">删除</el-button>
+            </template>
+          </template>
+        </TrsTable>
+        <!-- <el-table :data="data1" @sort-change="changeSort1" :row-class-name="tableRowClassName">
           <el-table-column label="字段名称" prop="title">
           </el-table-column>
           <el-table-column label="字段类型" prop="type">
@@ -82,7 +72,7 @@
               </template>
             </template>
           </el-table-column>
-        </el-table>
+        </el-table> -->
       </div>
       <Pagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
           v-if="page.total">
@@ -140,6 +130,7 @@
 </template>
 <script>
 import { feildTypes, belongModules } from '@/utils/dict'
+import { obtainExamineTypeList } from '@/api/manage'
 import Pagination from '@/components/common/pagination'
 import FormManageCustomField from './formManageCustomField'
 export default {
@@ -207,36 +198,71 @@ export default {
       data1: [
         {
           title: '项目名称',
-          type: '单行文本框',
+          name: '单行文本框',
           module: '基本信息',
           require: true,
-          utime: '2023-07-17: 00:00:00',
+          updateTime: '2023-07-17: 00:00:00',
           status: '1'
         },
         {
           title: '上线时间',
-          type: '时间选择器',
+          name: '时间选择器',
           module: '基本信息',
           require: true,
-          utime: '2023-07-17: 00:00:00',
+          updateTime: '2023-07-17: 00:00:00',
           status: '1'
         },
         {
           title: '审查材料',
-          type: '上传',
+          name: '上传',
           module: '宣传渠道',
           require: true,
-          utime: '2023-07-17: 00:00:00',
+          updateTime: '2023-07-17: 00:00:00',
           status: '1'
         },
         {
           title: '产品代码',
-          type: '多选框',
+          name: '多选框',
           module: '宣传渠道',
           require: true,
-          utime: '2023-07-17: 00:00:00',
+          updateTime: '2023-07-17: 00:00:00',
           status: '0'
         }
+      ],
+      colConfig1: [
+        {
+          label: '字段名称',
+          prop: 'title',
+          edit: true
+        },
+        {
+          label: '字段类型',
+          prop: 'name'
+        },
+        {
+          label: '所属模块',
+          prop: 'module'
+        },
+        {
+          label: '是否必填',
+          prop: 'require'
+        },
+        {
+          label: '更新时间',
+          prop: 'updateTime',
+          bind: {
+            align: 'center',
+            sortable: "custom"
+          }
+        },
+        {
+          label: '操作',
+          prop: 'operate',
+          bind: {
+            width: 250,
+            align: 'center'
+          }
+        },
       ],
       currentRow: {},
       search: {
@@ -262,7 +288,7 @@ export default {
   },
   methods: {
     async getObtainExamineTypeList(params) {
-      const res = await this.obtainExamineTypeList({
+      const res = await obtainExamineTypeList({
         pageNow: 10,
         pageSize: 1,
         ...params
