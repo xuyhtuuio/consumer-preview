@@ -103,7 +103,7 @@ export default {
   }
 }
 .node{
-  padding: 0 50px;
+  // padding: 0 50px;
   width: 220px;
   position: relative;
   &:before{
@@ -178,6 +178,7 @@ export default {
     }
     /deep/ .el-button{
       height: 32px;
+      line-height: 14px;
     }
     &::before{
       content: "";

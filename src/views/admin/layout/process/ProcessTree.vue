@@ -366,7 +366,7 @@ export default {
  margin: 0 auto;
 }
 .process-end{
-  width: 60px;
+  width: 80px;
   margin: 0 auto;
   margin-bottom: 20px;
   border-radius: 15px;
