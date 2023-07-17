@@ -73,7 +73,7 @@
             </div>
             <div class="list" v-if="list.length">
                 <div v-for="(item, index) in list" :key="index">
-                    <applyEventCard :item="item"></applyEventCard>
+                    <approvalEventCard :item="item"></approvalEventCard>
                 </div>
                 <trs-pagination :total="list.length"></trs-pagination>
             </div>

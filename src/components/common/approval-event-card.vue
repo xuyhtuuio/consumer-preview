@@ -18,8 +18,15 @@
                 <span class="id">202307075091985</span>
                 <span class="sDate date">发起时间：2023-07-07</span>
                 <span class="sDate date">更新时间：2023-07-07</span>
-                <span class="sDate date">上线时间：2023-08-08</span>
-                <span class="handler date">当前处理人：王明明</span>
+                <span  class="sDate date">上线时间：2023-08-08</span>
+
+
+                <!-- <span class="handler date">当前处理人：王明明</span> -->
+                <el-popover placement="bottom" trigger="hover" popper-class="popper-persons">
+                    <div>财富平台部门 | 财富客群团队</div>
+                    <span slot="reference" class="handler date">当前处理人：王明明</span>
+                </el-popover>
+
                 <span class="handler">
                     <svg class="icon urgent-icon" aria-hidden="true">
                         <use xlink:href="#icon-xianxingtubiao1"></use>
@@ -55,6 +62,7 @@
 </template>
 <script>
 export default {
+    name:'applyEventCard',
     props: {
         item: {
             type: Object,
