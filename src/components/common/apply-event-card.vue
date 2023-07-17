@@ -254,7 +254,8 @@ export default {
 
         .urgent-icon {
             margin-right: 8px;
-            font-size: 16px;
+            width: 16px;
+            height: 16px;
         }
 
         .event-name {
@@ -287,7 +288,8 @@ export default {
                 align-items: center;
 
                 .icon {
-                    font-size: 20px;
+                   width: 20px;
+                   height: 20px;
                     line-height: 22px;
                     margin-right: 4px;
                 }
@@ -395,7 +397,8 @@ export default {
         justify-content: flex-end;
 
         .icon {
-            font-size: 20px;
+            width: 20px;
+            height: 20px;
             margin-right: 2px;
         }
 

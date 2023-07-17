@@ -100,7 +100,8 @@ export default {
 
         .urgent-icon {
             margin-right: 8px;
-            font-size: 16px;
+            width: 16px;
+            height: 16px;
         }
 
         .event-name {
@@ -227,7 +228,8 @@ export default {
         justify-content: flex-end;
 
         .icon {
-            font-size: 20px;
+            width: 20px !important;
+            height: 20px !important;
             margin-right: 2px;
         }
 

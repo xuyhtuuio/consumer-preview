@@ -5,7 +5,7 @@
                 <el-checkbox v-for="(item, index) in fileList" :key="item.fileId" :label="item.fileId">
                     <span class="sort">{{ index + 1 }}.</span>
                     <svg class="icon" aria-hidden="true" v-if="item.type == 'pdf'">
-                        <use xlink:href="#icon-mind-mapping"></use>
+                        <use xlink:href="#icon-stamp"></use>
                     </svg>
                     <svg class="icon" aria-hidden="true" v-if="item.type == 'xls'">
                         <use xlink:href="#icon-mianxingtubiao-1"></use>
@@ -32,7 +32,7 @@ export default {
     name: 'addFileSource',
     data() {
         return {
-            addFileDialog: true,
+            addFileDialog: false,
             fileList: [
                 {
                     type: 'pdf',
@@ -162,13 +162,13 @@ export default {
                     width: 100%;
 
                     .icon {
-                        font-size: 20px;
+                        width: 20px;
+                        height: 20px;
                         margin: 0 10px;
                     }
 
                     display: flex;
                     align-items: center;
-
                     margin-bottom: 8px;
                     padding: 8px 12px;
 
@@ -181,6 +181,18 @@ export default {
                         font-style: normal;
                         font-weight: 400;
                         line-height: 22px;
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    .el-checkbox__inner {
+                        width: 20px;
+                        height: 20px;
+
+                        .el-checkbox__label {
+                            width: 20px;
+                            height: 20px;
+                        }
                     }
                 }
 
@@ -229,5 +241,4 @@ export default {
 
         }
     }
-}
-</style>
+}</style>

@@ -1,10 +1,5 @@
 <template>
   <div class="container">
-     <el-button @click="init">添加审查意见</el-button>
-    <el-button @click="initFile">添加文件來源</el-button>
-
-    <add-review ref="addReview"></add-review>
-    <add-file-source ref="addFileSource"></add-file-source>
     <div class="tools"></div>
     <div class="content">
       <div class="content-header">
@@ -21,6 +16,8 @@
         <editorial></editorial>
       </div>
     </div>
+    <add-review ref="addReview"></add-review>
+    <add-file-source ref="addFileSource"></add-file-source>
   </div>
 </template>
 
@@ -32,11 +29,11 @@ import addFileSource from './dialogs/add-file-source.vue'
 import addReview from './dialogs/add-review.vue'
 export default {
   name: 'aiApproval',
-  components: { filePreview, orcTxt, editorial,addReview, addFileSource },
+  components: { filePreview, orcTxt, editorial, addReview, addFileSource },
   data() {
     return {}
   },
-  methods:{
+  methods: {
     init() {
       this.$refs['addReview'].init()
 
@@ -72,34 +69,38 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+
   .el-button {
     line-height: 22px;
     padding: 6px 16px;
     border: none;
   }
 }
-.content-title{
+
+.content-title {
   font-size: 16px;
   font-weight: 700;
 
-  i{
+  i {
     color: #EB5D78;
     margin-right: 12px;
   }
 }
-.content-btns{
+
+.content-btns {
   margin-left: 20px;
   white-space: pre;
 }
-.content-cont{
+
+.content-cont {
   flex: 1;
   display: flex;
   gap: 12px;
-  >div{
+
+  >div {
     background: #ffffff;
     flex: 1;
     border-radius: 10px;
     box-shadow: 0px 0px 10px 0px #4343430D;
   }
-}
-</style>
+}</style>
