@@ -5,7 +5,7 @@
                 <el-checkbox v-for="(item, index) in fileList" :key="item.fileId" :label="item.fileId">
                     <span class="sort">{{ index + 1 }}.</span>
                     <svg class="icon" aria-hidden="true" v-if="item.type == 'pdf'">
-                        <use xlink:href="#icon-mianxingtubiao"></use>
+                        <use xlink:href="#icon-mind-mapping"></use>
                     </svg>
                     <svg class="icon" aria-hidden="true" v-if="item.type == 'xls'">
                         <use xlink:href="#icon-mianxingtubiao-1"></use>

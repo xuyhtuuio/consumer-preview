@@ -19,6 +19,82 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-stamp:before {
+  content: "\e602";
+}
+
+.icon-user:before {
+  content: "\e603";
+}
+
+.icon-mind-mapping:before {
+  content: "\e601";
+}
+
+.icon-xiazai:before {
+  content: "\e62e";
+}
+
+.icon-quanping:before {
+  content: "\e62f";
+}
+
+.icon-zip:before {
+  content: "\e630";
+}
+
+.icon-shouqi:before {
+  content: "\e631";
+}
+
+.icon-zhankai:before {
+  content: "\e632";
+}
+
+.icon-fanhui:before {
+  content: "\e633";
+}
+
+.icon-tijiao:before {
+  content: "\e634";
+}
+
+.icon-shenqingdan:before {
+  content: "\e635";
+}
+
+.icon-zhuanfa:before {
+  content: "\e636";
+}
+
+.icon-tuihui:before {
+  content: "\e637";
+}
+
+.icon-yijianshu:before {
+  content: "\e638";
+}
+
+.icon-ciku:before {
+  content: "\e639";
+}
+
+.icon-jilumingxi:before {
+  content: "\e63b";
+}
+
+.icon-xiangsianli:before {
+  content: "\e63c";
+}
+
+.icon-tishi:before {
+  content: "\e63d";
+}
+
+.icon-shenpixinxi:before {
+  content: "\e63e";
+}
+
 .icon-chanpin1:before {
   content: "\e62d";
 }
@@ -126,4 +202,3 @@
 .icon-xianxingtubiao1:before {
   content: "\e620";
 }
-
