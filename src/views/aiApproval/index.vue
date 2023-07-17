@@ -18,6 +18,7 @@
     </div>
     <add-review ref="addReview"></add-review>
     <add-file-source ref="addFileSource"></add-file-source>
+    <submit-review></submit-review>
   </div>
 </template>
 
@@ -27,9 +28,10 @@ import orcTxt from './components/ocr-txt'
 import editorial from './components/editorial'
 import addFileSource from './dialogs/add-file-source.vue'
 import addReview from './dialogs/add-review.vue'
+import submitReview from './dialogs/submit-review.vue'
 export default {
   name: 'aiApproval',
-  components: { filePreview, orcTxt, editorial, addReview, addFileSource },
+  components: { filePreview, orcTxt, editorial, addReview, addFileSource,submitReview },
   data() {
     return {}
   },
