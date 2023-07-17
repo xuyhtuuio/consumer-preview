@@ -1,11 +1,11 @@
 <template>
   <el-main>
-    <div class="scale">
+    <!-- <div class="scale">
       <el-button icon="el-icon-plus" size="small" @click="scale += 10" :disabled="scale >= 150" circle></el-button>
       <span>{{ scale }}%</span>
       <el-button icon="el-icon-minus" size="small" @click="scale -= 10" :disabled="scale <= 40" circle></el-button>
       <el-button @click="validate">校验流程</el-button>
-    </div>
+    </div> -->
     <div class="design" :style="'transform: scale('+ scale / 100 +');'">
       <process-tree ref="process-tree" @selectedNode="nodeSelected"/>
     </div>
@@ -73,6 +73,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-main {
+  overflow: auto;
+  max-height: calc(100vh - 100px);
+}
 .design {
   margin-top: 100px;
   display: flex;

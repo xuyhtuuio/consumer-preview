@@ -59,7 +59,7 @@ export default {
     loadInitFrom(){
       this.$store.commit('loadForm', {
         formId: null,
-        formName:"未命名表单",
+        formName:"",
         logo:{
           icon:"el-icon-eleme",
           background:"#1e90ff"
@@ -87,7 +87,7 @@ export default {
           },
           children: {}
         },
-        remark: "备注说明"
+        remark: ""
       })
     },
     publishProcess(){

@@ -1,21 +1,36 @@
 <template>
   <div :style="{ 'margin-left': leval * 10 + 'px' }">
-    <div v-for="(op, index) in data" :key="op.id">
-      <!-- <i class="el-icon-rank" style="margin-right: 6px;"></i> -->
-      <el-input v-model="data[index].value" size="small" style="width: 160px;"
-                placeholder="请设置选项值">
-        <i slot="suffix" class="el-input__icon el-icon-delete" @click="deleteOptions(data, index)"></i>
-      </el-input>
-      <el-button icon="el-icon-plus" type="text" size="mini" @click="addCascaderChildOptions(op)">新增子选项</el-button>
-      <template v-if="op.children?.length">
-        <CascaderField :leval="leval+1" :data="op.children"/>
-      </template>
-    </div>
+    <draggable :list="data" group="option" handler=".el-icon-rank" :options="{animation: 300, sort: true}">
+      <div v-for="(op, index) in data" :key="op.id">
+        <i class="el-icon-rank" style="margin-right: 6px;color:#bbb;"></i>
+        <el-input v-model="data[index].value" size="small" style="width: 160px;"
+                  placeholder="请设置选项值">
+          <i slot="suffix" class="el-input__icon el-icon-delete" @click="deleteOptions(data, index)"></i>
+        </el-input>
+        <el-popover
+          placement="bottom-start"
+          width="140"
+          trigger="hover">
+          <ul class="cascader-field-popover">
+            <li @click="addCascaderOptions">新建选项</li>
+            <li @click="addCascaderChildOptions(op)">新建子选项</li>
+          </ul>
+          <i slot="reference" class="el-icon-plus" style="color:#1e80ff; margin-left: 4px;"></i>
+        </el-popover>
+        <template v-if="op.children?.length">
+          <CascaderField :leval="leval+1" :data="op.children"/>
+        </template>
+      </div>
+    </draggable>
   </div>
 </template>
 <script>
+import draggable from 'vuedraggable';
 export default {
   name: 'CascaderField',
+  components: {
+    draggable
+  },
   props: {
     leval: Number,
     data: Array
@@ -28,9 +43,35 @@ export default {
         children: []
       })
     },
+    addCascaderOptions() {
+      const ids = this.data[this.data.length - 1].id.split('-')
+      ids[ids.length - 1] = +ids[ids.length -1] + 1 + ''
+      this.data.push({
+        id: ids.join('-'),
+        value: '',
+        children: []
+      })
+    },
     deleteOptions(data, index) {
+      if (data.length <= 1) {
+        this.$message.warning('至少有一个选项')
+        return;
+      }
       data.splice(index, 1)
-    }
+    },
   }
 }
 </script>
+<style lang="less">
+.cascader-field-popover {
+  li {
+    padding-left: 10px;
+    height: 26px;
+    line-height: 26px;
+    cursor: pointer;
+  }
+  li:hover {
+    background: #F7F8FA;
+  }
+}
+</style>

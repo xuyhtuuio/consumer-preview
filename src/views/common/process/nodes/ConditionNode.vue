@@ -97,7 +97,7 @@ export default {
   }
 }
 .node{
-  padding: 30px 55px 0;
+  margin: 30px 55px 0;
   width: 220px;
   .node-body{
     cursor: pointer;
@@ -208,6 +208,7 @@ export default {
     }
     /deep/ .el-button{
       height: 32px;
+      line-height: 14px;
     }
     &::before{
       content: "";
