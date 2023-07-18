@@ -2,7 +2,7 @@
   <div class="file-preview">
     <div class="header">
       <p class="header-total">
-        <span class="header-count">共 2/5</span>
+        <span class="header-count">共 {{ activeIndex + 1 }}/{{ files.length }}</span>
         <span class="header-btns">
           <i class="iconfont">&#xe62e;</i>
           <i class="iconfont">&#xe62f;</i>
@@ -11,17 +11,18 @@
       <div class="file-header-swiper">
         <div class="swiper swiper-container">
           <div class="swiper-wrapper">
-            <div class="swiper-slide" v-for="(file, i) in files" :key="i" @click="changeFile(i)" :class="{
+            <div class="swiper-slide" v-for="(file, i) in files" :key="i" :class="{
               'swiper-slide-img': ['jpeg', 'jpg', 'png'].includes(fileType(file.fileName)),
               'swiper-slide-active': i === activeIndex,
               'swiper-slide-split': showSplit(i)
             }">
-              <div class="slide">
-                <i class="iconfont icon-mianxingtubiao" v-if="fileType(file.fileName) === 'pdf'"></i>
-                <i class="iconfont icon-mianxingtubiao-1"
-                  v-else-if="['xls', 'xlsx'].includes(fileType(file.fileName))"></i>
-                <i class="iconfont icon-mianxingtubiao-2"
-                  v-else-if="['doc', 'docx'].includes(fileType(file.fileName))"></i>
+              <div class="slide" @click="changeFile(i)">
+                <img src="@/assets/image/ai-approval/Approval_fileType_pdf.png"
+                  v-if="fileType(file.fileName) === 'pdf'" />
+                <img src="@/assets/image/ai-approval/Approval_fileType_xls.png"
+                  v-else-if="['xls', 'xlsx'].includes(fileType(file.fileName))" />
+                <img src="@/assets/image/ai-approval/Approval_fileType_doc.png"
+                  v-else-if="['doc', 'docx'].includes(fileType(file.fileName))" />
                 <el-image v-else-if="['jpeg', 'jpg', 'png'].includes(fileType(file.fileName))" :src="file.url"></el-image>
                 <!-- 是否为压缩包 -->
                 <i class="iconfont icon-zip" v-if="file.zip"></i>
@@ -31,8 +32,9 @@
             </div>
           </div>
         </div>
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-prev" :class="{ 'disabled': activeIndex === 0 }" @click="swiperTo(activeIndex - 1)"></div>
+        <div class="swiper-button-next" :class="{ 'disabled': activeIndex === files.length - 1 }"
+          @click="swiperTo(activeIndex + 1)"></div>
       </div>
     </div>
     <div class="preview">
@@ -51,6 +53,10 @@ export default {
   components: { imgaePreview },
   name: 'file-preview',
   props: {
+    approval: {
+      type: Object,
+      default: () => ({})
+    },
     files: {
       type: Array,
       default: () => ([])
@@ -81,16 +87,22 @@ export default {
     // 初始化
     init() {
       this.swiper = new Swiper('.swiper-container', {
-        navigation: { // 如果需要前进后退按钮
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev'
-        },
+        // navigation: { // 如果需要前进后退按钮
+        //   nextEl: '.swiper-button-next',
+        //   prevEl: '.swiper-button-prev'
+        // },
         slidesPerView: 'auto',
       })
     },
     // 切换审批文件
     changeFile(i) {
       this.activeIndex = i;
+    },
+    swiperTo(i) {
+      if (i >= 0 && i <= this.files.length - 1) {
+        this.swiper.slideTo(i);
+        this.changeFile(i)
+      }
     }
   }
 }
@@ -150,13 +162,18 @@ export default {
   .swiper-button-next,
   .swiper-button-prev {
     position: absolute;
-    background: #CACDD3;
+    background: #707EA8;
     border-radius: 50%;
     color: #ffffff;
     top: 30px;
     width: 24px;
     height: 24px;
     cursor: pointer;
+  }
+
+  .swiper-button-disabled {
+    background: #CACDD3;
+    cursor: not-allowed;
   }
 
   .swiper-button-next:after,
@@ -168,10 +185,20 @@ export default {
 
   .swiper-button-next {
     right: 0;
+
+    &.disabled {
+      background: #CACDD3;
+      cursor: not-allowed;
+    }
   }
 
   .swiper-button-prev {
     left: 0;
+
+    &.disabled {
+      background: #CACDD3;
+      cursor: not-allowed;
+    }
   }
 
   .swiper-slide {
@@ -263,5 +290,4 @@ export default {
 .preview {
   background: #ffffff;
   flex: 1;
-}
-</style>
+}</style>
