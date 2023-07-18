@@ -12,13 +12,15 @@
                 <span class="event-name">景顺长城集英成长7月报景顺长城集英成长7月报景顺长城集英成长7月报景顺长城集英成长7月报</span>
                 <span class="event-status">
                     <i class="tag in-approval">审批中>消保中心审批</i>
+                    <i class="tag in-analysis">智能解析中，请您耐心等待...</i>
+
                 </span>
             </div>
             <div class="event-infos">
                 <span class="id">202307075091985</span>
                 <span class="sDate date">发起时间：2023-07-07</span>
                 <span class="sDate date">更新时间：2023-07-07</span>
-                <span  class="sDate date">上线时间：2023-08-08</span>
+                <span class="sDate date">上线时间：2023-08-08</span>
 
 
                 <!-- <span class="handler date">当前处理人：王明明</span> -->
@@ -62,7 +64,7 @@
 </template>
 <script>
 export default {
-    name:'applyEventCard',
+    name: 'applyEventCard',
     props: {
         item: {
             type: Object,
@@ -167,6 +169,13 @@ export default {
                 border-radius: 4px;
                 background: #FFF7E6;
                 color: #FA8C16;
+
+            }
+
+            .in-analysis {
+                border-radius: 4px;
+                background: #FFF1F0;
+                color: #F76560;
 
             }
         }

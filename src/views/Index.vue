@@ -19,7 +19,7 @@
             您可以发起、处理及查看审批，进行日常工作任务
           </p>
         </div>
-        <div class="panel-item" @click="to('formsPanel')">
+        <div class="panel-item" @click="to('baseSetting')">
           <div>
             <i class="el-icon-s-custom"></i>
             <span>进入管理后台</span>
@@ -62,11 +62,13 @@ export default {
       this.showUserSelect = false
       sessionStorage.setItem("user", JSON.stringify(this.loginUser))
     },
-    to(path){
+    to(name){
       if (this.loginUser === null || this.loginUser === ''){
         this.$message.warning("请先选择一个人员身份进行登录")
       }else {
-        this.$router.push(path)
+        this.$router.push({
+          name
+        })
       }
     }
   }

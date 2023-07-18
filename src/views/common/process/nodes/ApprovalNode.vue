@@ -1,7 +1,7 @@
 <template>
   <node :title="config.name" :show-error="showError" :content="content" :error-info="errorInfo"
         @selected="$emit('selected')" @delNode="$emit('delNode')" @insertNode="type => $emit('insertNode', type)"
-        placeholder="请设置审批人" header-bgc="#ff943e" header-icon="el-icon-s-check"/>
+        :placeholder="config.name === '二次会签' ? '指定节点审批人' : '请设置审批人'" :header-bgc="config.name === '二次会签' ? '#505968' : '#ff943e'" header-icon="#icon-shenpi"/>
 </template>
 
 <script>
