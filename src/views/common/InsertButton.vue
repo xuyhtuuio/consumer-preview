@@ -6,25 +6,36 @@
         <span>审批人</span>
       </div>
       <div @click="addCcNode">
-        <i class="el-icon-s-promotion" style="color:rgb(50, 150, 250);"></i>
+        <i class="el-icon-s-promotion" style="color:#2D5CF6;"></i>
         <span>抄送人</span>
       </div>
+      <div @click="addRtNode" class="has-svg">
+        <i class="el-icon-success" style="color:#2D5CF6;"></i>
+        <span>确认人</span>
+      </div>
       <div @click="addConditionsNode">
-        <i class="el-icon-share" style="color:rgb(21, 188, 131);"></i>
+        <svg class="icon" aria-hidden="true">
+          <use xlink:href="#icon-tiaojian-fenzhi"></use>
+        </svg>
+        <!-- <i class="el-icon-share" style="color:rgb(21, 188, 131);"></i> -->
         <span>条件分支</span>
       </div>
-      <div @click="addConcurrentsNode">
+      <div @click="addApprovalTwoNode" class="has-svg">
+        <i class="el-icon-s-check" style="color:#505968;"></i>
+        <span>二次会签</span>
+      </div>
+      <!-- <div @click="addConcurrentsNode">
         <i class="el-icon-s-operation" style="color:#718dff;"></i>
         <span>并行分支</span>
-      </div>
-      <div @click="addDelayNode">
+      </div> -->
+      <!-- <div @click="addDelayNode">
         <i class="el-icon-time" style="color:#f25643;"></i>
         <span>延迟等待</span>
-      </div>
-      <div @click="addTriggerNode">
+      </div> -->
+      <!-- <div @click="addTriggerNode">
         <i class="el-icon-set-up" style="color:#15BC83;"></i>
         <span>触发器</span>
-      </div>
+      </div> -->
     </div>
     <el-button icon="el-icon-plus" slot="reference" type="primary" size="small" circle></el-button>
   </el-popover>
@@ -46,8 +57,14 @@ export default {
     addApprovalNode(){
       this.$emit('insertNode', "APPROVAL")
     },
+    addApprovalTwoNode() {
+      this.$emit('insertNode', "APPROVAL-TWO")
+    },
     addCcNode(){
       this.$emit('insertNode', "CC")
+    },
+    addRtNode() {
+      this.$emit('insertNode', "ROOT") // 发起人/确认人
     },
     addDelayNode(){
       this.$emit('insertNode', "DELAY")
@@ -75,7 +92,7 @@ export default {
     border: 1px solid #F8F9F9;
     background-color: #F8F9F9;
     border-radius: 10px;
-    width: 130px;
+    width: 145px;
     position: relative;
     span{
       position: absolute;
@@ -92,6 +109,18 @@ export default {
       border: 1px solid #dedfdf;
       border-radius: 14px;
     }
+    svg {
+      display: inline-block;
+      width: 37px;
+      height: 37px;
+      padding: 5px;
+      border: 1px solid #dedfdf;
+      border-radius: 14px;
+    }
+  }
+  .has-svg {
+    position: relative;
+    bottom: 6px;
   }
 }
 </style>

@@ -119,7 +119,7 @@ export default {
 
       .node-body-main-header{
         padding: 10px 0px 5px;
-        font-size: xx-small;
+        font-size: 14px;
         position: relative;
         .title{
           color: #718dff;

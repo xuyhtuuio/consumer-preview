@@ -1,6 +1,7 @@
 <template>
   <div>
-    <el-tabs v-model="active" v-if="name && formConfig.length > 0">
+    <!-- <el-tabs v-model="active" v-if="name && formConfig.length > 0"> -->
+    <el-tabs v-model="active" v-if="name">
       <el-tab-pane :label="name" name="properties">
         <component :is="(selectNode.type||'').toLowerCase()" :config="selectNode.props"/>
       </el-tab-pane>
@@ -25,6 +26,7 @@ export default {
   name: "NodeConfig",
   components: {
     Approval,
+    ApprovalTwo: Approval,
     Condition,
     Trigger,
     Delay,
@@ -34,7 +36,7 @@ export default {
   },
   data() {
     return {
-      active: 'properties',
+      active: 'properties'
     }
   },
   computed: {
@@ -50,15 +52,31 @@ export default {
           return '设置发起人';
         case 'APPROVAL':
           return '设置审批人';
+        case 'APPROVAL-TWO':
+          return '二次会签';
         default:
           return null;
       }
     }
   },
-  methods: {}
+  methods: {
+    getIsActive(active) {
+      this.active = active
+    }
+  }
 }
 </script>
 
 <style lang="less" scoped>
-
+/deep/.el-tabs__header {
+  .el-tabs__item.is-active {
+    color: #2D5CF6;
+  }
+  .el-tabs__item:hover {
+    color: #2D5CF6;
+  }
+  .el-tabs__active-bar {
+    background-color: #2D5CF6;
+  }
+}
 </style>

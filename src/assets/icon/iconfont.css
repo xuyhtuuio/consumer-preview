@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4165130 */
-  src: url('iconfont.woff2?t=1689585765828') format('woff2'),
-       url('iconfont.woff?t=1689585765828') format('woff'),
-       url('iconfont.ttf?t=1689585765828') format('truetype');
+  src: url('iconfont.woff2?t=1689660124398') format('woff2'),
+       url('iconfont.woff?t=1689660124398') format('woff'),
+       url('iconfont.ttf?t=1689660124398') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,54 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-tiaojian-fenzhi:before {
+  content: "\e60e";
+}
+
+.icon-xitong-juese:before {
+  content: "\e60d";
+}
+
+.icon-clear:before {
+  content: "\e60c";
+}
+
+.icon-qixian:before {
+  content: "\e60b";
+}
+
+.icon-wenhao:before {
+  content: "\e60a";
+}
+
+.icon-shenpi-tongyi:before {
+  content: "\e607";
+}
+
+.icon-form-desc:before {
+  content: "\e608";
+}
+
+.icon-form-name:before {
+  content: "\e609";
+}
+
+.icon-zhuanban:before {
+  content: "\e606";
+}
+
+.icon-multiple-user:before {
+  content: "\e605";
+}
+
+.icon-reject:before {
+  content: "\e604";
+}
+
+.icon-setting-user:before {
+  content: "\e602";
 }
 
 .icon-shenpi:before {

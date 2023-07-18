@@ -2,17 +2,33 @@
   <div class="base-setup" @click="showIconSelect = false">
     <el-form label-position="top" label-width="80px">
       <el-form-item>
-        <template slot="label">表单名称<span style="color: red">*</span></template>
+        <template slot="label">
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#icon-form-name"></use>
+          </svg>
+          表单名称<span style="color: red">*</span>
+        </template>
         <el-input v-model="setup.formName" placeholder="请输入表单名称" class="is-dark input" size="medium"></el-input>
       </el-form-item>
       <el-form-item class="group">
-        <template slot="label">关联表单</template>
-        <el-select v-model="setup.groupId" placeholder="请选择关联表单" size="medium" class="is-dark input" style="width: 100%">
+        <template slot="label">
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#icon-form-desc"></use>
+          </svg>
+          关联表单
+        </template>
+        <el-select v-model="setup.groupId" placeholder="请选择关联表单(多选)" size="medium" class="is-dark input" style="width: 100%">
           <el-option v-for="(op, index) in fromGroup" :key="index" v-show="op.id > 1"
                      :label="op.name" :value="op.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="表单说明">
+      <el-form-item>
+        <template slot="label">
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#icon-form-desc"></use>
+          </svg>
+          表单说明
+        </template>
         <el-input placeholder="请输入表单说明" v-model="setup.remark" type="textarea" class="is-dark input" show-word-limit
                   :autosize="{ minRows: 3, maxRows: 8}"></el-input>
       </el-form-item>
@@ -180,7 +196,7 @@ export default {
 
   /deep/ .el-form-item__label {
     padding: 0;
-    font-weight: bold;
+    font-weight: normal;
   }
 
   /deep/ .el-form-item {

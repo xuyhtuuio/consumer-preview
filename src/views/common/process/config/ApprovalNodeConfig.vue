@@ -2,11 +2,38 @@
   <div>
     <el-form label-position="top" label-width="90px">
       <el-form-item label="选择审批对象" prop="text" class="user-type">
+        <template slot="label">
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#icon-setting-user"></use>
+          </svg>
+          选择审批对象
+        </template>
         <el-radio-group v-model="nodeProps.assignedType">
           <el-radio v-for="t in approvalTypes" :label="t.type" :key="t.type">{{ t.name }}</el-radio>
         </el-radio-group>
+        <svg class="icon" aria-hidden="true">
+          <use xlink:href="#icon-wenhao"></use>
+        </svg>
         <div v-if="nodeProps.assignedType === 'ASSIGN_USER'">
           <el-button size="mini" icon="el-icon-plus" type="primary" @click="selectUser" round>选择人员</el-button>
+        </div>
+        <div v-else-if="nodeProps.assignedType === 'DEPT_USER_ROLE'">
+          <div class="select-user">
+            <el-button size="mini" @click="selectUser" icon="el-icon-plus" type="primary">选择部门/人员/角色</el-button>
+            <org-picker :show="showOrgSelect" @close="closeSelect" :selected="select" @selectOver="selected"></org-picker>
+            <div class="tag-action" >
+              <div class="tag-box" v-for="(item, index) in select" :key="index">
+                <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else-if="nodeProps.assignedType === 'SELECT_NODE'">
+          选择节点
+          <el-select v-model="nodeProps.nodeId" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
+            <el-option v-for="(op, index) in []" :key="index" :label="op.name" :value="op.id"></el-option>
+          </el-select>
+          <p style="color:#86909C;font-size: 12px;line-height:24px;">可以选择前序节点名称，如名称重复建议先修改节点名称<br/>如果是多人，最后一个提交审批的人</p>
         </div>
         <div v-else-if="nodeProps.assignedType === 'SELF_SELECT'">
           <el-radio-group size="mini" v-model="nodeProps.selfSelect.multiple">
@@ -52,29 +79,43 @@
         <div v-else>
           <span class="item-desc">发起人自己作为审批人进行审批</span>
         </div>
-
+        <!-- 人员选择框 -->
+        <div class="select-user grag" v-if="nodeProps.assignedType === 'SELF_SELECT'">
+          <p>自选范围（可选择发起人自选时的用户可选范围）</p>
+          <el-button size="mini" @click="selectUser" icon="el-icon-plus" type="primary">选择部门/人员/角色</el-button>
+          <org-picker :show="showOrgSelect" @close="closeSelect" :selected="select" @selectOver="selected"></org-picker>
+          <div class="tag-action" >
+            <div class="tag-box" v-for="(item, index) in select" :key="index">
+              <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
+            </div>
+          </div>
+        </div>
       </el-form-item>
 
-      <el-divider></el-divider>
-      <el-form-item label="审批人为空时" prop="text" class="line-mode">
+      <!-- <el-divider></el-divider> -->
+      <!-- <el-form-item v-if="!['SELF_SELECT'].includes(nodeProps.assignedType)" label="审批人为空时" prop="text" class="line-mode">
         <el-radio-group v-model="nodeProps.nobody.handler">
           <el-radio label="TO_PASS">自动通过</el-radio>
           <el-radio label="TO_REFUSE">自动驳回</el-radio>
           <el-radio label="TO_ADMIN">转交审批管理员</el-radio>
           <el-radio label="TO_USER">转交到指定人员</el-radio>
         </el-radio-group>
-
         <div style="margin-top: 10px" v-if="nodeProps.nobody.handler === 'TO_USER'">
           <el-button size="mini" icon="el-icon-plus" type="primary" @click="selectUser" round>选择人员</el-button>
         </div>
-
-      </el-form-item>
+      </el-form-item> -->
 
       <div v-if="showMode">
-        <el-divider/>
-        <el-form-item label="多人审批时审批方式" prop="text" class="approve-mode">
+        <!-- <el-divider/> -->
+        <el-form-item prop="text" class="approve-mode">
+          <template slot="label">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#icon-multiple-user"></use>
+            </svg>
+            多人审批时审批方式
+          </template>
           <el-radio-group v-model="nodeProps.mode">
-            <el-radio label="NEXT">按选择顺序依次审批</el-radio>
+            <el-radio label="NEXT">顺序审批（按选择顺序审批，每个人必须同意）</el-radio>
             <el-radio label="AND">会签（可同时审批，每个人必须同意）</el-radio>
             <el-radio label="OR">或签（有一人同意即可）</el-radio>
           </el-radio-group>
@@ -82,13 +123,56 @@
       </div>
 
       <el-divider>高级设置</el-divider>
-      <el-form-item label="审批同意时是否需要签字" prop="text">
+      <el-form-item label="目标页面配置" prop="target" v-if="nodeProps.assignedType === 'DEPT_USER_ROLE'">
+        <el-radio-group v-model="nodeProps.target">
+          <el-radio label="PASS">领导审批</el-radio>
+          <el-radio label="REFUSE">消保审批</el-radio>
+          <el-radio label="NOTIFY">确认意见</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <div class="zhuanban" v-if="!['SELECT_NODE'].includes(nodeProps.assignedType)">
+        <svg class="icon" aria-hidden="true">
+          <use xlink:href="#icon-zhuanban"></use>
+        </svg>
+        是否启用转办，启用后审批人有权选择转办给指定人员再次审批。
+      </div>
+      <el-form-item label="" prop="text1" v-if="!['SELECT_NODE'].includes(nodeProps.assignedType)">
+        <el-switch active-text="启用转办" v-model="nodeProps.zhuanban"></el-switch>
+        <div class="select-user" style="margin-top: 10px;">
+          <p>请选择【被转办人】可选用户范围</p>
+          <el-button size="mini" @click="selectUser" icon="el-icon-plus" type="primary">选择部门/人员/角色</el-button>
+          <org-picker :show="showOrgSelect" @close="closeSelect" :selected="select" @selectOver="selected"></org-picker>
+          <div class="tag-action" >
+            <div class="tag-box" v-for="(item, index) in select" :key="index">
+              <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
+            </div>
+          </div>
+        </div>
+      </el-form-item>
+      <el-form-item prop="text" class="line-mode">
+        <template slot="label">
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#icon-reject"></use>
+          </svg>
+          如果申请被驳回
+        </template>
+        <el-radio-group v-model="nodeProps.nobody.handler">
+          <el-radio label="TO_PASS">驳回到指定节点</el-radio>
+          <el-radio label="TO_REFUSE">审批人自选（前序节点）</el-radio>
+        </el-radio-group>
+        <div style="margin-top: 10px" v-if="nodeProps.nobody.handler === 'TO_PASS'">
+          <el-select v-model="nodeProps.nodeId" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
+            <el-option v-for="(op, index) in []" :key="index" :label="op.name" :value="op.id"></el-option>
+          </el-select>
+        </div>
+      </el-form-item>
+      <el-form-item v-if="!['SELF_SELECT', 'DEPT_USER_ROLE', 'SELECT_NODE'].includes(nodeProps.assignedType)" label="审批同意时是否需要签字" prop="text">
         <el-switch inactive-text="不用" active-text="需要" v-model="nodeProps.sign"></el-switch>
         <el-tooltip class="item" effect="dark" content="如果全局设置了需要签字，则此处不生效" placement="top-start">
           <i class="el-icon-question" style="margin-left: 10px; font-size: medium; color: #b0b0b1"></i>
         </el-tooltip>
       </el-form-item>
-      <el-form-item label="审批期限（为 0 则不生效）" prop="timeLimit">
+      <el-form-item v-if="!['SELF_SELECT', 'DEPT_USER_ROLE', 'SELECT_NODE'].includes(nodeProps.assignedType)" label="审批期限（为 0 则不生效）" prop="timeLimit">
         <el-input style="width: 180px;" placeholder="时长" size="small" type="number" v-model="nodeProps.timeLimit.timeout.value">
           <el-select style="width: 75px;" v-model="nodeProps.timeLimit.timeout.unit" slot="append" placeholder="请选择">
             <el-option label="天" value="D"></el-option>
@@ -134,22 +218,37 @@ export default {
     return {
       showOrgSelect: false,
       approvalTypes: [
-        {name: '指定人员', type: 'ASSIGN_USER'},
+        // {name: '指定人员', type: 'ASSIGN_USER'},
         {name: '发起人自选', type: 'SELF_SELECT'},
-        {name: '连续多级主管', type: 'LEADER_TOP'},
-        {name: '主管', type: 'LEADER'},
-        {name: '角色', type: 'ROLE'},
-        {name: '发起人自己', type: 'SELF'},
-        {name: '表单内联系人', type: 'FORM_USER'}
-      ]
+        {name: '指定部门/人员/角色', type: 'DEPT_USER_ROLE'},
+        {name: '节点审批人', type: 'SELECT_NODE'},
+        // {name: '连续多级主管', type: 'LEADER_TOP'},
+        // {name: '主管', type: 'LEADER'},
+        // {name: '角色', type: 'ROLE'},
+        // {name: '发起人自己', type: 'SELF'},
+        // {name: '表单内联系人', type: 'FORM_USER'}
+      ],
+      tagConfig: {
+        background: '#f0f6ff',
+        color: '#2d5cf6',
+        borderColor: '#5784FF',
+        borderRadius: '4px',
+        closable: true,
+        size: 'medium'
+      }
     }
   },
   computed: {
     nodeProps() {
       return this.$store.state.selectedNode.props
     },
-    select() {
-      return this.config.assignedUser || []
+    select: {
+      get() {
+        return this.config.assignedUser || []
+      },
+      set() {
+
+      }
     },
     forms(){
       return this.$store.state.design.formItems.map(f => {
@@ -168,6 +267,8 @@ export default {
           return this.nodeProps.formUser !== '';
         case "FORM_USER":
           return true;
+        case "DEPT_USER_ROLE":
+          return true;
         case "ROLE":
           return true;
         default:
@@ -177,7 +278,7 @@ export default {
   },
   methods: {
     closeSelect() {
-
+      this.showOrgSelect = false
     },
     selectUser() {
       this.showOrgSelect = true
@@ -185,7 +286,12 @@ export default {
     selected(select) {
       console.log(select)
       this.showOrgSelect = false
-      select.forEach(val => this.select.push(val))
+      this.select = []
+      select.forEach(val => this.select.push({
+        ...val,
+        label: val.name,
+        ...this.tagConfig
+      }))
     },
     removeOrgItem(index) {
       this.select.splice(index, 1)
@@ -197,7 +303,7 @@ export default {
 <style lang="less" scoped>
 .user-type {
   /deep/ .el-radio {
-    width: 110px;
+    min-width: 110px;
     margin-top: 10px;
     margin-bottom: 20px;
   }
@@ -211,7 +317,16 @@ export default {
 }
 
 /deep/ .el-form-item__label{
+  display: flex;
+  align-items: center;
   line-height: 25px;
+}
+svg {
+  width: 24px;
+  height: 24px;
+}
+/deep/.el-radio .el-radio__label {
+  font-weight: normal;
 }
 
 /deep/ .approve-mode {
@@ -244,5 +359,47 @@ export default {
 
 /deep/ .el-divider--horizontal {
   margin: 10px 0;
+}
+/deep/.el-radio-group {
+  .is-active .el-radio-button__inner {
+    color: #FFFFFF;
+    background: #2D5CF6;
+    border-color: #2D5CF6;
+  }
+  .el-radio-button:not(.is-active) .el-radio-button__inner:hover {
+    color: #2D5CF6;
+  }
+}
+.select-user {
+  padding: 0 12px;
+}
+.select-user.grag {
+  margin-top: 20px;
+  border-radius: 4px;
+  background: #F7F8FA;
+}
+.el-button--mini {
+  border-radius: 17px;
+  margin-bottom: 16px;
+}
+.tag-action {
+  text-align: left;
+}
+.tag-box {
+  display: inline-block;
+  margin-bottom: 8px;
+}
+.zhuanban {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin-top: 24px;
+}
+/deep/.el-switch {
+  .is-active {
+    span {
+      color: #2D5CF6;
+    }
+  }
 }
 </style>

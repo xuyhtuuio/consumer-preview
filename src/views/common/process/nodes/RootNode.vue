@@ -1,7 +1,7 @@
 <template>
-  <node title="发起人" :is-root="true" :content="content"
+  <node :title="config.name" :is-root="true" :content="content"
         @selected="$emit('selected')" @insertNode="type => $emit('insertNode', type)"
-        placeholder="所有人" header-bgc="#576a95" header-icon="el-icon-user-solid"/>
+        :placeholder="config.name === '确认人' ? '发起人' : '所有人'" header-bgc="#576a95" header-icon="#icon-user"/>
 </template>
 
 <script>
@@ -20,7 +20,16 @@ export default {
   },
   data() {
     return {
-      content: '所有人'
+    }
+  },
+  computed:{
+    content(){
+      this.config
+    }
+  },
+  watch: {
+    config(val) {
+      console.log(val)
     }
   },
   methods: {}

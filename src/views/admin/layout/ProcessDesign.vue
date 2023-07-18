@@ -10,15 +10,22 @@
       <process-tree ref="process-tree" @selectedNode="nodeSelected"/>
     </div>
     <el-drawer :title="selectedNode.name" :visible.sync="showConfig"
-               :size="selectedNode.type === 'CONDITION' ? '600px':'500px'"
+               :size="selectedNode.type === 'CONDITION' ? '600px':'550px'"
                direction="rtl" :modal="false" destroy-on-close>
       <div slot="title">
-        <el-input v-model="selectedNode.name" size="medium" v-show="showInput"
-                  style="width: 300px" @blur="showInput = false"></el-input>
-        <el-link v-show="!showInput" @click="showInput = true" style="font-size: medium">
-          <i class="el-icon-edit" style="margin-right: 10px"></i>
-          {{selectedNode.name}}
-        </el-link>
+        <template v-if="selectedNode.name !== '二次会签'">
+          <el-input v-model="selectedNode.name" size="medium" v-show="showInput"
+                    style="width: 300px" @blur="showInput = false"></el-input>
+          <el-link v-show="!showInput" @click="showInput = true" style="font-size: medium">
+            {{selectedNode.name}}
+            <i class="el-icon-edit" style="margin-right: 10px"></i>
+          </el-link>
+        </template>
+        <template v-else>
+          <span style="font-size:medium;font-weight:700">
+            {{selectedNode.name}}
+          </span>
+        </template> 
       </div>
       <div class="node-config-content">
         <node-config/>
@@ -103,5 +110,12 @@ export default {
 
 /deep/ .el-drawer__body{
   overflow-y: auto;
+}
+/deep/ .el-link--inner:hover {
+  color: #2D5CF6;
+  &::after {
+    color: #2D5CF6;
+    border-bottom: 1px solid #2D5CF6;
+  }
 }
 </style>
