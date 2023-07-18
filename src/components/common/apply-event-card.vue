@@ -46,7 +46,7 @@
                 </span>
 
             </div>
-            <div class="event-infos">
+            <div class="event-infos" v-if="item.status !== 5">
                 <span class="id">202307075091985</span>
                 <span class="sDate date">发起时间：2023-07-07</span>
                 <span class="sDate date">更新时间：2023-07-07</span>
@@ -61,6 +61,12 @@
                     <span slot="reference" class="handler">当前处理人：王明明 <i>+3</i></span>
                 </el-popover>
 
+            </div>
+            <div class="event-infos error" v-else>
+                    <svg class="icon urgent-icon" aria-hidden="true">
+                        <use xlink:href="#icon-baocuo1"></use>
+                    </svg>
+                    文件未上传成功，请检查文件名是否包含特殊符号，并重新提交
             </div>
         </div>
         <div class="right-operation">
@@ -247,7 +253,7 @@ export default {
         flex: 1;
 
         .event-name-status {
-            margin-bottom: 17px;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
         }
@@ -379,6 +385,19 @@ export default {
             }
 
 
+        }
+        .error{
+            display: flex;
+            align-items: center;
+            border-radius: 2px;
+background: #F9F9FB;
+color: #EB5D78;
+font-size: 12px;
+font-style: normal;
+font-weight: 400;
+line-height: 20px; 
+padding: 2px 10px;
+margin-top: -3px;
         }
 
         .tips {
