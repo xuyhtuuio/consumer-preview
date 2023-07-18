@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading="loading">
     <div class="tools"></div>
     <div class="content">
       <div class="content-header">
@@ -11,9 +11,9 @@
         </span>
       </div>
       <div class="content-cont">
-        <file-preview></file-preview>
-        <orcTxt></orcTxt>
-        <editorial></editorial>
+        <file-preview ref="filePreview" :files="files"></file-preview>
+        <orcTxt ref="ocrTxt"></orcTxt>
+        <editorial ref="editorial"></editorial>
       </div>
     </div>
   </div>
@@ -23,12 +23,26 @@
 import filePreview from './components/file-preview'
 import orcTxt from './components/ocr-txt'
 import editorial from './components/editorial'
+import { files, pngOcr } from "./files";
 export default {
   name: 'aiApproval',
   components: { filePreview, orcTxt, editorial },
   data() {
-    return {}
+    return {
+      loading: false,
+      files: [], // 文件相关信息
+      comments: [], // 编辑意见
+    }
   },
+  mounted() {
+    this.loading = true;
+    setTimeout(() => {
+      this.files = files;
+      this.loading = false;
+      this.$refs.filePreview.init()
+    }, 1000);
+  },
+  methods: {}
 }
 </script>
 
@@ -80,9 +94,13 @@ export default {
   gap: 12px;
   >div{
     background: #ffffff;
-    flex: 1;
     border-radius: 10px;
     box-shadow: 0px 0px 10px 0px #4343430D;
+    flex: 1;
+    width: 30%;
+    &:first-child{
+      width: calc(100% - 60% - 24px);
+    }
   }
 }
 </style>

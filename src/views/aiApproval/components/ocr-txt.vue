@@ -32,7 +32,7 @@ export default {
 }
 .header{
   background: #F7F8FA;
-  padding: 15px 20px;
+  padding: 12px 20px;
   display: flex;
   gap: 10px;
   align-items: center;
