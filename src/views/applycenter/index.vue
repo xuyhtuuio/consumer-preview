@@ -29,33 +29,39 @@
             <div class="filters">
                 <div class="filters-content">
                     <div class="floor1">
-                        <el-select v-model="search.approvalType" placeholder="事项类型" @click="searchList">
-                            <el-option v-for="(item, index) in transactionTypes" :key='index' :label="item.label"
-                                :value="item.value"></el-option>
-                        </el-select>
-                        <el-select v-model="search.approvalStage" placeholder="审批阶段" @click="searchList">
-                            <el-option v-for="(item, index) in approvalPhases" :key='index' :label="item.label"
-                                :value="item.value"></el-option></el-select>
-                        <el-select v-model="search.urgent" placeholder="是否加急" @click="searchList">
-                            <el-option v-for="(item, index) in isUrgents" :key='index' :label="item.label"
-                                :value="item.value"></el-option>
-                        </el-select>
-                        <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @click="searchList">
-                            <el-option v-for="(item, index) in isOpinions" :key='index' :label="item.label"
-                                :value="item.value"></el-option>
-                        </el-select>
-                        <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @click="searchList">
-                            <el-option v-for="(item, index) in adoptionSituations" :key='index' :label="item.label"
-                                :value="item.value"></el-option>
-                        </el-select>
-                        <el-select v-model="search.updateTime2" placeholder="排序" multiple @click="searchList"
-                            :class="search.updateTime2[1] == 'desc' ? 'arrow-select descArrow' : 'arrow-select ascArrow'">
-                            <el-option-group v-for="group in updateTimeGroup" :key="group.label">
-                                <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                                    :value="item.value">
-                                </el-option>
-                            </el-option-group>
-                        </el-select>
+                        <div class="floor1-item">
+                            <el-select v-model="search.approvalType" placeholder="事项类型" @click="searchList">
+                                <el-option v-for="(item, index) in transactionTypes" :key='index' :label="item.label"
+                                    :value="item.value"></el-option>
+                            </el-select>
+                            <el-select v-model="search.approvalStage" placeholder="审批阶段" @click="searchList">
+                                <el-option v-for="(item, index) in approvalPhases" :key='index' :label="item.label"
+                                    :value="item.value"></el-option></el-select>
+                        </div>
+                        <div class="floor1-item ">
+                            <el-select v-model="search.urgent" placeholder="是否加急" @click="searchList">
+                                <el-option v-for="(item, index) in isUrgents" :key='index' :label="item.label"
+                                    :value="item.value"></el-option>
+                            </el-select>
+                            <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @click="searchList">
+                                <el-option v-for="(item, index) in isOpinions" :key='index' :label="item.label"
+                                    :value="item.value"></el-option>
+                            </el-select>
+                        </div>
+                        <div class="floor1-item">
+                            <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @click="searchList">
+                                <el-option v-for="(item, index) in adoptionSituations" :key='index' :label="item.label"
+                                    :value="item.value"></el-option>
+                            </el-select>
+                            <el-select v-model="search.updateTime2" placeholder="排序" multiple @click="searchList"
+                                :class="search.updateTime2[1] == 'desc' ? 'arrow-select descArrow' : 'arrow-select ascArrow'">
+                                <el-option-group v-for="group in updateTimeGroup" :key="group.label">
+                                    <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-option-group>
+                            </el-select>
+                        </div>
                     </div>
                     <div class="floor2">
                         <el-input v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
@@ -451,6 +457,7 @@ export default {
 
         .new-apply:hover {
             background: linear-gradient(90deg, rgba(123, 97, 255, 0.07) 0%, rgba(97, 160, 255, 0.07) 100%);
+
             img {
                 width: 36px;
                 height: 36px;
@@ -495,10 +502,6 @@ export default {
                 padding-right: 16px;
                 display: flex;
                 justify-content: space-between;
-
-                .el-select {
-                    margin-right: 16px;
-                }
 
                 .el-select:last-of-type {
                     margin-right: 0;
@@ -557,6 +560,23 @@ export default {
                         z-index: 10;
                         font-size: 20px;
                     }
+                }
+
+                .floor1-item {
+                    flex: 1;
+                    display: flex;
+                    margin-right: 16px;
+                    justify-content: space-between;
+
+                    .el-select {
+                        width: 49%;
+
+
+                    }
+                }
+
+                .floor1-item:last-of-type {
+                    margin-right: 0;
                 }
             }
 

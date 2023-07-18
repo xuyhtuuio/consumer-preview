@@ -188,10 +188,14 @@ export default {
             const text = this.search.updateTime[0] == 1 ? '发起时间' : '更新时间'
             dom.innerText = text
         })
-        let floor2 = document.querySelectorAll('.floor2')[0]
-        floor2.style.paddingRight = floor2.offsetWidth * (1 / 7) + 16 + 'px'
+        this.resize()
+        window.addEventListener('resize', () => {
+            this.resize()
+        })
+
     },
     watch: {
+
         'search.updateTime2'(val) {
             const lastKey = val[val.length - 1]
             if (val.length < 2) {
@@ -215,6 +219,10 @@ export default {
         }
     },
     methods: {
+        resize() {
+            let floor2 = document.querySelectorAll('.floor2')[0]
+            floor2.style.paddingRight = floor2.offsetWidth * (1 / 7) + 16 + 'px'
+        },
         searchList() {
             console.log('search', this.search.updateTime)
         },
@@ -419,10 +427,11 @@ export default {
                 margin-bottom: 12px;
                 padding-right: 16px;
                 display: flex;
-                justify-content: space-evenly;
+                justify-content: space-between;
 
                 .el-select {
                     margin-right: 16px;
+                    flex: 1;
                 }
 
                 .el-select:last-of-type {
