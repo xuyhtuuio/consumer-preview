@@ -1,240 +1,255 @@
 <template>
-  <div class="watchMap">
-    <div class="imgBox" ref="maskBox" @mousedown="onmousedownHandle">
-      <img :src="imageUrl" alt="" :style="{
-        width: imgW + 'px',
-        height: imgH + 'px',
-        top: top + 'px',
-        left: left + 'px',
-        transform: scale,
-      }" />
-    </div>
+  <div class="preview" ref="contentDom" v-loading="!loaded">
+    <img id="picture" src="../img.png" @load="handleImageLoaded" ref="imgDom" />
+    <!-- <div class="mask"
+      :style="{ top: BoundingClientRect.y + 'px', left: BoundingClientRect.x + 'px', width: BoundingClientRect.width + 'px', height: BoundingClientRect.height + 'px' }">
+    </div> -->
+    <div class="light" ref="light"></div>
   </div>
 </template>
 
 <script>
+const paramsInit = {
+  zoomVal: 1,
+  left: 0,
+  top: 0,
+  currentX: 0,
+  currentY: 0,
+  flag: false,
+  border_left: 0,
+  border_right: 0,
+  border_top: 0,
+  border_bottom: 0,
+  moved: false
+}
 export default {
-  name: 'imgae-preview',
   data() {
     return {
-      imageUrl: "https://img2.baidu.com/it/u=1395980100,2999837177&fm=253&fmt=auto&app=120&f=JPEG?w=1200&h=675",
-      imgW: 0,
-      imgH: 0,
-      deg: 0,
-      top: 0,
-      left: 0,
-      scale: "scale(1)",
-      size: 0,
-      mousewheelevt: null,
-    };
+      loaded: false,
+      params: JSON.parse(JSON.stringify(paramsInit)),
+      // BoundingClientRect: {}
+    }
   },
-
   mounted() {
-    //初始化图片
-    this.initImage();
-
-    // 兼容火狐浏览器
-    this.mousewheelevt = /Firefox/i.test(navigator.userAgent)
-      ? "DOMMouseScroll"
-      : "mousewheel";
-    // 为空间区域绑定鼠标滚轮事件 =》 处理函数是wheelHandle
-    // 如果你监听了window的scroll或者touchmove事件，你应该把passive设置为true，这样滚动就会流畅很多
-    this.$refs.maskBox.addEventListener(this.mousewheelevt, this.wheelHandle);
-  },
-  beforeDestroy() {
-    //取消监听
-    this.$refs.maskBox.removeEventListener(
-      this.mousewheelevt,
-      this.wheelHandle
-    );
-  },
-  created() {
-    this.handleReset();
+    // const Dom = this.$refs.light
+    // this.BoundingClientRect = Dom.getBoundingClientRect()
   },
   methods: {
-    /**
-     *
-     * 下載圖片
-     * **/
-
-    downloadByBlob(url, name) {
-      let image = new Image();
-      image.setAttribute("crossOrigin", "anonymous");
-      image.src = url;
-      image.onload = () => {
-        let canvas = document.createElement("canvas");
-        canvas.width = image.width;
-        canvas.height = image.height;
-        let ctx = canvas.getContext("2d");
-        ctx.drawImage(image, 0, 0, image.width, image.height);
-        canvas.toBlob((blob) => {
-          let url = URL.createObjectURL(blob);
-          this.download(url, name);
-          // 用完释放URL对象
-          URL.revokeObjectURL(url);
-        });
-      };
+    handleImageLoaded() {
+      this.loaded = true;
+      this.naturalWidth = this.$refs.imgDom.naturalWidth;
+      this.naturalHeight = this.$refs.imgDom.naturalHeight;
+      this.scale = this.$refs.imgDom.clientWidth / this.$refs.imgDom.naturalWidth;
+      this.getMaxPosition()
+      this.initCenter()
+      // 绑定缩放事件
+      const content = this.$refs.contentDom
+      content.addEventListener('wheel', this.handleWheel)
+      // 绑定拖拽
+      this.startDrag()
     },
-    download(href, name) {
-      let eleLink = document.createElement("a");
-      eleLink.download = name;
-      eleLink.href = href;
-      eleLink.click();
-      eleLink.remove();
-    },
-
-    /**
-     * 重置
-     */
-    handleReset() {
-      this.imgW = 0;
-      this.imgH = 0;
-      this.top = 0;
-      this.left = 0;
-      this.deg = 0;
-      this.scale = "scale(1)";
-      this.size = 0;
-      this.initImage();
-    },
-    /**
-     * 获取图片的url
-     * @param {string} url
-     */
-    getImgSize(url) {
-      return new Promise((resolve, reject) => {
-        let imgObj = new Image();
-        imgObj.src = url;
-        imgObj.onload = () => {
-          resolve({
-            width: imgObj.width,
-            height: imgObj.height,
-          });
-        };
-      });
-    },
-    /**
-     * 初始化图片
-     */
-    async initImage() {
-      if (!this.imageUrl) {
+    // 计算出允许拖拽的最大偏移量
+    getMaxPosition() {
+      const params = this.params;
+      if (this.$refs.imgDom.clientHeight <= 0) {
         return;
       }
-      let { width, height } = await this.getImgSize(this.imageUrl);
-      // 设置原始图片的大小
-      let realWidth = width;
-      let realHeight = height;
+      // 左右边距
+      let border_left = ((params.zoomVal - 1) * this.$refs.imgDom.clientWidth) / 2;;
+      let border_right = this.$refs.contentDom.clientWidth - this.$refs.imgDom.clientWidth - border_left;
+      let topArr = [border_left, border_right];
+      this.params.border_left = Math.max.apply(null, topArr)
+      this.params.border_right = Math.min.apply(null, topArr)
+      // 上下边距
+      let border_top = ((this.params.zoomVal - 1) * this.$refs.imgDom.clientHeight) / 2;
+      let border_bottom = this.$refs.contentDom.clientHeight - this.$refs.imgDom.clientHeight - border_top;
+      topArr = [border_top, border_bottom];
+      this.params.border_top = Math.max.apply(null, topArr)
+      this.params.border_bottom = Math.min.apply(null, topArr)
+    },
+    // 初始化图片中心
+    initCenter() {
+      let params = this.params;
+      let target = this.$refs.imgDom;
+      if (params.border_left == params.border_right) {
+        //调整上下位置
+        target.style.top = (params.border_top / 2) + "px";
+      } else {
+        // 调整左右位置
+        target.style.left = (params.border_left / 2) + "px";
+      }
+      if (this.getCss(target, "left") !== "auto") {
+        this.params.left = this.getCss(target, "left");
+      }
+      if (this.getCss(target, "top") !== "auto") {
+        this.params.top = this.getCss(target, "top");
+      }
+      target.style.transform = "scale(1)";
+    },
+    //获取相关CSS属性
+    getCss(o, key) {
+      return o.currentStyle
+        ? o.currentStyle[key]
+        : document.defaultView.getComputedStyle(o, false)[key];
+    },
+    // 滚轮缩放事件
+    handleWheel(event) {
+      this.getMaxPosition()
+      let params = this.params;
+      this.params.zoomVal += -event.deltaY / 1200;
+      if (params.zoomVal >= 0.2) {
+        this.$refs.imgDom.style.transform = "scale(" + params.zoomVal + ")";
+      } else {
+        params.zoomVal = 0.2;
+        this.$refs.imgDom.style.transform = "scale(" + params.zoomVal + ")";
+      }
+      this.getMaxPosition();
+      let target = this.$refs.imgDom;
+      let left = parseInt(this.getCss(target, "left"), 10);
+      let top = parseInt(this.getCss(target, "top"), 10);
 
-      // 获取高宽比例
-      const whRatio = realWidth / realHeight;
-      const hwRatio = realHeight / realWidth;
+      left = left > params.border_left ? params.border_left : left < (params.border_right) ? params.border_right : left;
+      top = top > params.border_top ? params.border_top : top < params.border_bottom ? params.border_bottom : top;
+      target.style.left = left + "px";
+      target.style.top = top + "px";
 
-      //获取盒子的大小
-      const boxW = this.$refs.maskBox.clientWidth;
-      const boxH = this.$refs.maskBox.clientHeight;
-
-      if (realWidth >= realHeight) {
-        this.imgH = hwRatio * boxW;
-        const nih = this.imgH;
-        if (nih > boxH) {
-          this.imgH = boxH;
-          this.imgW = whRatio * boxH;
-        } else {
-          this.imgW = boxW;
+      if (this.getCss(target, "left") !== "auto") {
+        this.params.left = this.getCss(target, "left");
+      }
+      if (this.getCss(target, "top") !== "auto") {
+        this.params.top = this.getCss(target, "top");
+      }
+      // this.changeHightPos()
+      return false;
+    },
+    // 实现图片拖拽功能
+    startDrag() {
+      const bar = this.$refs.imgDom
+      const target = this.$refs.imgDom
+      let params = this.params;
+      if (this.getCss(target, "left") !== "auto") {
+        this.params.left = this.getCss(target, "left");
+      }
+      if (this.getCss(target, "top") !== "auto") {
+        this.params.top = this.getCss(target, "top");
+      }
+      //o是移动对象
+      bar.onmousedown = event => {
+        this.getMaxPosition()
+        this.params.flag = true;
+        if (!event) {
+          event = window.event;
+          //防止IE文字选中
+          bar.onselectstart = () => {
+            return false;
+          };
         }
-        this.top = (boxH - this.imgH) / 2;
-        this.left = (boxW - this.imgW) / 2;
-      } else {
-        this.imgW = (boxH / realHeight) * realWidth;
-        this.imgH = boxH;
-        this.left = (boxW - this.imgW) / 2;
-      }
-    },
-    imgScaleHandle(zoom) {
-      this.size += zoom;
-      if (this.size < -0.5) {
-        this.size = -0.5;
-      }
-      this.scale = `scale(${1 + this.size}) rotateZ(${this.deg}deg)`;
-    },
-    /**
-     * 鼠标滚动 实现放大缩小
-     */
-    wheelHandle(e) {
-      e.preventDefault();
-      const ev = e || window.event; // 兼容性处理 => 火狐浏览器判断滚轮的方向是属性 detail，谷歌和ie浏览器判断滚轮滚动的方向是属性 wheelDelta
-      // dir = -dir; // dir > 0 => 表示的滚轮是向上滚动，否则是向下滚动 => 范围 (-120 ~ 120)
-      const dir = ev.detail ? ev.detail * -120 : ev.wheelDelta;
-      //滚动的数值 / 2000 => 表示滚动的比例，用此比例作为图片缩放的比例
-      this.imgScaleHandle(dir / 2000);
-    },
-    /**
-     * 处理图片拖动
-     */
-    onmousedownHandle(e) {
-      const that = this;
-      this.$refs.maskBox.onmousemove = function (el) {
-        const ev = el || window.event; // 阻止默认事件
-        ev.preventDefault();
-        that.left += ev.movementX;
-        that.top += ev.movementY;
+        var e = event;
+        this.params.currentX = e.clientX;
+        this.params.currentY = e.clientY;
       };
-      this.$refs.maskBox.onmouseup = function () {
-        // 鼠标抬起时将操作区域的鼠标按下和抬起事件置为null 并初始化
-        that.$refs.maskBox.onmousemove = null;
-        that.$refs.maskBox.onmouseup = null;
-      };
-      if (e.preventDefault) {
-        e.preventDefault();
-      } else {
-        return false;
-      }
-    },
-  },
-};
-</script>
 
+      document.onmouseup = (event) => {
+        if (this.params.flag) {
+          this.params.flag = false;
+          if (this.getCss(target, "left") !== "auto") {
+            this.params.left = this.getCss(target, "left");
+          }
+          if (this.getCss(target, "top") !== "auto") {
+            this.params.top = this.getCss(target, "top");
+          }
+        }
+        // 限制图片拖拽不能超出  范围内
+        // var e = event ? event : window.event;
+        // if (params.flag && params.moved) {
+        //   var nowX = e.clientX,
+        //     nowY = e.clientY;
+        //   var disX = nowX - params.currentX,
+        //     disY = nowY - params.currentY;
+
+        //   let left = parseInt(params.left, 10) + disX;
+        //   let top = parseInt(params.top, 10) + disY;
+
+        //   left = left > params.border_left ? params.border_left : left < (params.border_right) ? params.border_right : left;
+        //   top = top > params.border_top ? params.border_top : top < params.border_bottom ? params.border_bottom : top;
+        //   target.style.left = left + "px";
+        //   target.style.top = top + "px";
+        //   this.params.moved = false;
+        // }
+        // this.params.flag = false;
+        // if (this.getCss(target, "left") !== "auto") {
+        //   this.params.left = this.getCss(target, "left");
+        // }
+        // if (this.getCss(target, "top") !== "auto") {
+        //   this.params.top = this.getCss(target, "top");
+        // }
+        // this.changeHightPos()
+      };
+
+      document.onmousemove = event => {
+        var e = event ? event : window.event;
+        if (params.flag) {
+          var nowX = e.clientX,
+            nowY = e.clientY;
+          var disX = nowX - params.currentX,
+            disY = nowY - params.currentY;
+          let left = parseInt(params.left, 10) + disX;
+          let top = parseInt(params.top, 10) + disY;
+
+          target.style.left = left + "px";
+          target.style.top = top + "px";
+          // this.changeHightPos()
+          this.params.moved = true;
+
+          if (event.preventDefault) {
+            event.preventDefault();
+          }
+          return false;
+        }
+      };
+    }
+  }
+}
+</script>
 <style lang="less" scoped>
-.watchMap {
+.preview {
   width: 100%;
   height: 100%;
+  overflow: hidden;
   position: relative;
+  -webkit-user-select: none;
+  user-select: none;
 
-  .imgBox {
+  img {
+    position: absolute;
+    left: 0;
+    height: auto;
+    cursor: move;
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+.mask {
+  position: absolute;
+  box-shadow: 0 0 0px 100vh rgba(51, 51, 51, 0.4);
+  z-index: 99999;
+
+  &::before {
+    content: ' ';
+    display: block;
     width: 100%;
     height: 100%;
-    overflow: hidden;
-    position: relative;
-
-    img {
-      cursor: move;
-      position: absolute;
-    }
-  }
-
-  .Tools {
-    width: 43px;
-    min-height: 100px;
     position: absolute;
-    right: -50px;
     top: 0;
-    user-select: none;
-
-    .Tools-item {
-      width: 100%;
-      height: 44px;
-      background: pink;
-      margin-bottom: 5px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-
-    }
-
-    .Tools-item:hover {
-      background-color: red;
-      color: #fff;
-    }
+    left: 0;
   }
+}
+.light{
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  z-index: 1;
+  position: relative;
 }
 </style>

@@ -20,8 +20,8 @@
       </div>
       <div class="content-cont">
         <file-preview ref="filePreview" :files="files"></file-preview>
-        <orcTxt ref="ocrTxt"></orcTxt>
-        <editorial ref="editorial"></editorial>
+        <orcTxt ref="ocrTxt" :approval="approval"></orcTxt>
+        <editorial ref="editorial" :approval="approval"></editorial>
       </div>
     </div>
     <add-review ref="addReview"></add-review>
@@ -34,7 +34,7 @@
 import filePreview from './components/file-preview'
 import orcTxt from './components/ocr-txt'
 import editorial from './components/editorial'
-import { files, pngOcr } from "./files";
+import { files, pngOcr, recommends } from "./files";
 import addFileSource from './dialogs/add-file-source.vue'
 import addReview from './dialogs/add-review.vue'
 import submitReview from './dialogs/submit-review.vue'
@@ -53,7 +53,6 @@ export default {
       files: [], // 文件相关信息
       comments: [], // 编辑意见
       crtTools: '',//当前侧边工具栏激活项
-
       tools: [
         {
           component: 'applyForm',
@@ -82,6 +81,7 @@ export default {
         }
       ],
       crtToolComponent:'',
+      approval: {}, // 当前审批文件的相关内容
     }
   },
   mounted() {
@@ -89,7 +89,12 @@ export default {
     setTimeout(() => {
       this.files = files;
       this.loading = false;
-      this.$refs.filePreview.init()
+      this.$nextTick(() => {
+        this.$refs.filePreview.init();
+        this.files[0].ocr = pngOcr;
+        this.files[0].recommends = recommends;
+        this.approval = this.files[0];
+      })
     }, 1000);
   },
   methods: {
@@ -201,7 +206,7 @@ export default {
   flex: 1;
   display: flex;
   gap: 12px;
-
+  overflow: hidden;
   >div {
     background: #ffffff;
     border-radius: 10px;
@@ -210,6 +215,8 @@ export default {
     width: 30%;
 
     &:first-child {
+    overflow: hidden;
+    &:first-child{
       width: calc(100% - 60% - 24px);
     }
   }

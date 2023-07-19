@@ -114,7 +114,6 @@ export default {
 /deep/ .header {
   min-width: 980px;
   position: relative;
-  margin: 0 -100px;
   height: 60px;
   background: #ffffff;
 

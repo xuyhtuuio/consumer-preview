@@ -79,7 +79,7 @@ export default {
           id: "root",
           parentId: null,
           type: "ROOT",
-          name: "发起人",
+          name: "申请人",
           desc: "任何人",
           props:{
             assignedUser: [],

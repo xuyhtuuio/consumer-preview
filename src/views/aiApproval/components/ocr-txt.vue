@@ -1,42 +1,195 @@
 <template>
   <div class="ocr-txt">
     <div class="header">
-      <span>禁用词</span>
-      <span>敏感词</span>
-      <el-input v-model="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" size="medium">
+      <span :class="{ active: activeWordType === 1 }" @click="changeWorkType(1)">禁用词</span>
+      <span :class="{ active: activeWordType === 2 }" @click="changeWorkType(2)">敏感词</span>
+      <el-input v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search" size="medium">
         <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
       </el-input>
     </div>
-    <div class="results"></div>
+    <div class="results" ref="results" :key="resultKey">
+      <!-- <template v-if="keyWords">关键词</template>
+      <template v-else> -->
+      <p v-for="(ocr, i) in html" :key="i">
+        <template v-for="(item, j) in ocr">
+          <template v-if="typeof item === 'string'">{{ item }}</template>
+          <span v-else :key="i + '_' + j" :wordType="item.wordType"
+            :class="{ active: activeWordType === item.wordType || activeWordType === 0 }" @click="showLine(item)">{{ item.word }}</span>
+        </template>
+      </p>
+      <!-- </template> -->
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'ocr-txt',
+  props: {
+    approval: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data() {
     return {
       keyWords: '',
+      contentShow: '',
+      html: [],
+      activeWordType: 0, // 高亮禁用词或敏感词, 1 禁用词,  2 敏感词
+      resultKey: 0,
+    }
+  },
+  watch: {
+    approval: {
+      handler(val) {
+        // console.log(val)
+        this.getInitContent(val)
+      },
+      deep: true
     }
   },
   methods: {
-    search() {}
+    // 点击命中词,显示连线
+    showLine(item) {
+      console.log(item)
+    },
+    // 修改高亮  关键词类型
+    changeWorkType(type) {
+      this.activeWordType = this.activeWordType === type ? 0 : type;
+    },
+    // 标记命中关键词(敏感词,禁用词)
+    getInitContent(approval) {
+      const html = []
+      approval.ocr.forEach((ocr) => {
+        const { text, location } = ocr;
+        let newOcr = [text];
+        approval.recommends.forEach((recommend, i) => {
+          const { word, wordType } = recommend
+          if (newOcr.join().includes(word)) {
+            const temp = [];
+            for (let index = 0; index < newOcr.length; index++) {
+              if (typeof newOcr[index] === 'string' && newOcr[index].includes(word)) {
+                let a = newOcr[index].split(word)
+                a.splice(1, 0, {
+                  word,
+                  wordType,
+                  location,
+                  recommendI: i
+                });
+                temp.push(...a.filter(b => b !== ''))
+              } else {
+                temp.push(newOcr[index])
+              }
+            }
+            newOcr = temp
+          }
+        })
+        html.push(newOcr)
+      });
+      // console.log(html)
+      this.html = html
+    },
+    // 清除
+    clean() {
+      if (!this.keyWords) {
+        this.resultKey++;
+      }
+    },
+    // 高亮检索的关键词
+    search() {
+      if (!this.keyWords) {
+        this.resultKey++;
+        return;
+      }
+      // this.$refs.results.innerHTML;
+      const textNodes = this.getTextNodeList(this.$refs.results);
+      const textList = this.getTextInfoList(textNodes);
+      const content = textList.map(({ text }) => text).join('');
+      const matchList = this.getMatchList(content, this.keyWords);
+      this.replaceMatchResult(textNodes, textList, matchList);
+    },
+    getTextNodeList(dom) {
+      const nodeList = [...dom.childNodes]
+      const textNodes = []
+      while (nodeList.length) {
+        const node = nodeList.shift()
+        if (node.nodeType === node.TEXT_NODE) {
+          node.wholeText && textNodes.push(node)
+        } else {
+          nodeList.unshift(...node.childNodes)
+        }
+      }
+      return textNodes
+    },
+    getTextInfoList(textNodes) {
+      let length = 0
+      const textList = textNodes.map(node => {
+        let startIdx = length, endIdx = length + node.wholeText.length
+        length = endIdx
+        return {
+          text: node.wholeText,
+          startIdx,
+          endIdx
+        }
+      })
+      return textList
+    },
+    getMatchList(content, keyword) {
+      if (!this.regExp) {
+        // eslint-disable-next-line 
+        const characters = [...'\\[](){}?.+*^$:|'].reduce((r, c) => (r[c] = true, r), {})
+        keyword = keyword.split('').map(s => characters[s] ? `\\${s}` : s).join('[\\s\\n]*')
+      }
+      const reg = new RegExp(keyword, 'gmi')
+      const matchList = []
+      let match = reg.exec(content)
+      while (match) {
+        matchList.push(match)
+        match = reg.exec(content)
+      }
+      return matchList
+    },
+    replaceMatchResult(textNodes, textList, matchList) {
+      // 对于每一个匹配结果，可能分散在多个标签中，找出这些标签，截取匹配片段并用font标签替换出
+      for (let i = matchList.length - 1; i >= 0; i--) {
+        const match = matchList[i]
+        const matchStart = match.index, matchEnd = matchStart + match[0].length // 匹配结果在拼接字符串中的起止索引
+        // 遍历文本信息列表，查找匹配的文本节点
+        for (let textIdx = 0; textIdx < textList.length; textIdx++) {
+          const { text, startIdx, endIdx } = textList[textIdx] // 文本内容、文本在拼接串中开始、结束索引
+          if (endIdx < matchStart) continue // 匹配的文本节点还在后面
+          if (startIdx >= matchEnd) break // 匹配文本节点已经处理完了
+          let textNode = textNodes[textIdx] // 这个节点中的部分或全部内容匹配到了关键词，将匹配部分截取出来进行替换
+          const nodeMatchStartIdx = Math.max(0, matchStart - startIdx) // 匹配内容在文本节点内容中的开始索引
+          const nodeMatchLength = Math.min(endIdx, matchEnd) - startIdx - nodeMatchStartIdx // 文本节点内容匹配关键词的长度
+          if (nodeMatchStartIdx > 0) textNode = textNode.splitText(nodeMatchStartIdx) // textNode取后半部分
+          if (nodeMatchLength < textNode.wholeText.length) textNode.splitText(nodeMatchLength)
+          const font = document.createElement('font')
+          font.style.color = '#2D5CF6';
+          font.innerText = text.substr(nodeMatchStartIdx, nodeMatchLength)
+          textNode.parentNode.replaceChild(font, textNode)
+        }
+      }
+    },
   }
 }
 </script>
 
 <style lang="less" scoped>
-.ocr-txt{
+.ocr-txt {
   display: flex;
   flex-direction: column;
 }
-.header{
+
+.header {
   background: #F7F8FA;
-  padding: 12px 20px;
+  padding: 6px 20px;
   display: flex;
   gap: 10px;
   align-items: center;
-  >span{
+
+  >span {
     padding: 3px 16px;
     border-radius: 4px;
     line-height: 24px;
@@ -46,25 +199,59 @@ export default {
     color: #EB5D78;
     cursor: pointer;
     height: fit-content;
-    +span{
+
+    &.active {
+      background: #FFF1F0;
+    }
+
+    +span {
       color: #FDB123;
+
+      &.active {
+        background: #FFF7E6;
+      }
     }
   }
-  .el-input{
-    /deep/ input{
+
+  .el-input {
+    /deep/ input {
       border: none;
       border-radius: 18px;
       font-size: 12px;
       color: #1D2128;
     }
-    /deep/ .el-icon-search{
+
+    /deep/ .el-icon-search {
       color: #86909C;
       font-size: 16px;
     }
   }
 }
-.results{
+
+.results {
   background: #ffffff;
   flex: 1;
+  margin: 20px;
+  color: #333333;
+  line-height: 22px;
+  font-size: 14px;
+  font-weight: 400;
+  overflow-y: auto;
+  word-break: break-all;
+
+  [wordType] {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    cursor: pointer;
+  }
+
+  .active[wordtype="1"] {
+    color: #F76560;
+  }
+
+  .active[wordtype="2"] {
+    color: #FDB123;
+  }
 }
 </style>

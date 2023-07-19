@@ -197,6 +197,7 @@ export default {
       readonlyField: ['项目名称', '上线时间', '审查材料'],
       data1: [
         {
+          index: 1,
           title: '项目名称',
           name: '单行文本框',
           module: '基本信息',
@@ -205,6 +206,7 @@ export default {
           status: '1'
         },
         {
+          index: 2,
           title: '上线时间',
           name: '时间选择器',
           module: '基本信息',
@@ -213,6 +215,7 @@ export default {
           status: '1'
         },
         {
+          index: 3,
           title: '审查材料',
           name: '上传',
           module: '宣传渠道',
@@ -221,6 +224,7 @@ export default {
           status: '1'
         },
         {
+          index: 4,
           title: '产品代码',
           name: '多选框',
           module: '宣传渠道',
@@ -230,6 +234,11 @@ export default {
         }
       ],
       colConfig1: [
+        {
+          label: '序号',
+          prop: 'index',
+          edit: true
+        },
         {
           label: '字段名称',
           prop: 'title',

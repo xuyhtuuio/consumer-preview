@@ -133,7 +133,7 @@ export default {
         }
       })
       if (conditionItems.length === 0 || conditionItems[0].id !== 'root'){
-        conditionItems.unshift({id: 'root', title: '发起人', valueType: 'User'})
+        conditionItems.unshift({id: 'root', title: '申请人', valueType: 'User'})
       }
       return conditionItems
     }
