@@ -21,30 +21,30 @@
             <div class="filters">
                 <div class="filters-content">
                     <div class="floor1">
-                        <el-select v-model="search.transactionType" placeholder="审批类型">
+                        <el-select v-model="search.transactionType" placeholder="审批类型" @change="searchList">
                             <el-option v-for="(item, index) in transactionTypes" :key='index' :label="item.label"
                                 :value="item.value"></el-option>
                         </el-select>
-                        <el-select v-model="search.approvalPhase" placeholder="审批阶段">
+                        <el-select v-model="search.approvalPhase" placeholder="审批阶段" @change="searchList">
                             <el-option v-for="(item, index) in approvalPhases" :key='index' :label="item.label"
                                 :value="item.value"></el-option></el-select>
-                        <el-select v-model="search.isUrgent" placeholder="是否加急">
+                        <el-select v-model="search.isUrgent" placeholder="是否加急" @change="searchList">
                             <el-option v-for="(item, index) in isUrgents" :key='index' :label="item.label"
                                 :value="item.value"></el-option>
                         </el-select>
-                        <el-select v-model="search.isOpinion" placeholder="有/无实质意见">
+                        <el-select v-model="search.isOpinion" placeholder="有/无实质意见" @change="searchList">
                             <el-option v-for="(item, index) in isOpinions" :key='index' :label="item.label"
                                 :value="item.value"></el-option>
                         </el-select>
-                        <el-select v-model="search.adoptionSituation" placeholder="采纳情况">
+                        <el-select v-model="search.adoptionSituation" placeholder="采纳情况" @change="searchList">
                             <el-option v-for="(item, index) in adoptionSituations" :key='index' :label="item.label"
                                 :value="item.value"></el-option>
                         </el-select>
-                        <el-select v-model="search.billOrganization" placeholder="提单机构">
+                        <el-select v-model="search.billOrganization" placeholder="提单机构" @change="searchList">
                             <el-option v-for="(item, index) in adoptionSituations" :key='index' :label="item.label"
                                 :value="item.value"></el-option>
                         </el-select>
-                        <el-select v-model="search.updateTime2" placeholder="排序" multiple
+                        <el-select v-model="search.updateTime2" placeholder="排序" multiple @change="changeSort"
                             :class="search.updateTime2[1] == 'desc' ? 'arrow-select descArrow' : 'arrow-select ascArrow'">
                             <el-option-group v-for="group in updateTimeGroup" :key="group.label">
                                 <el-option v-for="item in group.options" :key="item.value" :label="item.label"
@@ -58,15 +58,15 @@
                             @keyup.enter.native="searchList">
                             <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
                         </el-input>
-                        <el-date-picker v-model="search.sdate" clearable type="date" placeholder="请选择发起时间">
+                        <el-date-picker v-model="search.sdate" clearable type="date" placeholder="请选择发起时间" @change="searchList" @clear="searchList">
                         </el-date-picker>
-                        <el-date-picker v-model="search.onlinedate" clearable type="date" placeholder="请选择产品上线时间">
+                        <el-date-picker v-model="search.onlinedate" clearable type="date" placeholder="请选择产品上线时间" @change="searchList" @clear="searchList">
                         </el-date-picker>
                     </div>
                 </div>
                 <div class="export-reset">
                     <el-button type="text">导出</el-button>
-                    <el-button type="text">重置</el-button>
+                    <el-button type="text" >重置</el-button>
 
                 </div>
 
@@ -196,9 +196,11 @@ export default {
     },
     watch: {
 
-        'search.updateTime2'(val) {
-            const lastKey = val[val.length - 1]
-            if (val.length < 2) {
+    },
+    methods: {
+        changeSort() {
+            const lastKey = this.search.updateTime2[this.search.updateTime2.length - 1]
+            if (this.search.updateTime2.length < 2) {
                 this.search.updateTime2 = this.search.updateTime
             } else {
                 if (!isNaN(lastKey)) {
@@ -214,13 +216,12 @@ export default {
             this.$nextTick(() => {
                 const text = this.search.updateTime[0] == 1 ? '发起时间' : '更新时间'
                 dom.innerText = text
+                this.searchList()
             })
-            this.searchList()
-        }
-    },
-    methods: {
+
+        },
         resize() {
-            let floor2 = document.querySelectorAll('.floor2')[0]
+            let floor2 = document.querySelectorAll('.approval-center  .floor2')[0]
             floor2.style.paddingRight = floor2.offsetWidth * (1 / 7) + 16 + 'px'
         },
         searchList() {

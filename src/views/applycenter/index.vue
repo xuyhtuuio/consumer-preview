@@ -1,8 +1,8 @@
 <template>
     <div class="apply-center">
         <p class="welcoming">欢迎来到消保管控平台！</p>
-        <p class="tips">
-            {{ tipsMsg }}
+        <p class="tips" v-if="tipsMsg">
+            <i class="iconfont icon-xiaoxi-tongzhi"></i>{{ tipsMsg }}
         </p>
         <div class="data-statistics">
             <div v-for="(item, index) in dataStatistics" :key="index" @click="changeStatis(item)"
@@ -11,9 +11,6 @@
                     <img src="@/assets/image/apply-center/attention.png" alt="" v-if="item.value == crtSign"
                         class="active-icon">
                     <img src="@/assets/image/apply-center/no-attention.png" v-else alt="" class="default-icon">
-
-
-
                 </div>
                 <div class="name-count">
                     <span class="name">{{ item.name }}</span>
@@ -30,30 +27,30 @@
                 <div class="filters-content">
                     <div class="floor1">
                         <div class="floor1-item">
-                            <el-select v-model="search.approvalType" placeholder="事项类型" @click="searchList">
+                            <el-select v-model="search.approvalType" placeholder="事项类型" @change="searchList">
                                 <el-option v-for="(item, index) in transactionTypes" :key='index' :label="item.label"
                                     :value="item.value"></el-option>
                             </el-select>
-                            <el-select v-model="search.approvalStage" placeholder="审批阶段" @click="searchList">
+                            <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList">
                                 <el-option v-for="(item, index) in approvalPhases" :key='index' :label="item.label"
                                     :value="item.value"></el-option></el-select>
                         </div>
                         <div class="floor1-item ">
-                            <el-select v-model="search.urgent" placeholder="是否加急" @click="searchList">
+                            <el-select v-model="search.urgent" placeholder="是否加急" @change="searchList">
                                 <el-option v-for="(item, index) in isUrgents" :key='index' :label="item.label"
                                     :value="item.value"></el-option>
                             </el-select>
-                            <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @click="searchList">
+                            <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @change="searchList">
                                 <el-option v-for="(item, index) in isOpinions" :key='index' :label="item.label"
                                     :value="item.value"></el-option>
                             </el-select>
                         </div>
                         <div class="floor1-item">
-                            <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @click="searchList">
+                            <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @change="searchList">
                                 <el-option v-for="(item, index) in adoptionSituations" :key='index' :label="item.label"
                                     :value="item.value"></el-option>
                             </el-select>
-                            <el-select v-model="search.updateTime2" placeholder="排序" multiple @click="searchList"
+                            <el-select v-model="search.updateTime2" placeholder="排序" multiple @change="changeSort"
                                 :class="search.updateTime2[1] == 'desc' ? 'arrow-select descArrow' : 'arrow-select ascArrow'">
                                 <el-option-group v-for="group in updateTimeGroup" :key="group.label">
                                     <el-option v-for="item in group.options" :key="item.value" :label="item.label"
@@ -68,38 +65,36 @@
                             @keyup.enter.native="searchList">
                             <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
                         </el-input>
-                        <el-date-picker v-model="search.startDate" clearable type="date" placeholder="请选择发起时间"
-                            @clear="searchList" @click="searchList">
+                        <el-date-picker v-model="search.startDate" value-format="yyyy-MM-dd" clearable type="date" placeholder="请选择发起时间"
+                            @clear="searchList" @change="searchList">
                         </el-date-picker>
-                        <el-date-picker v-model="search.productLaunchDate" clearable type="date" placeholder="请选择产品上线时间"
-                            @clear="searchList" @click="searchList">
+                        <el-date-picker v-model="search.productLaunchDate"  value-format="yyyy-MM-dd" clearable type="date" placeholder="请选择产品上线时间"
+                            @clear="searchList" @change="searchList">
                         </el-date-picker>
                     </div>
                 </div>
                 <div class="export-reset">
                     <el-button type="text">导出</el-button>
                     <el-button type="text" @click="reset">重置</el-button>
-
                 </div>
-
-
             </div>
-            <div class="list" v-if="list.length">
+            <div class="list" v-if="list.length" v-loading="search.loading">
                 <div v-for="(item, index) in list" :key="index">
-                    <applyEventCard :item="item"></applyEventCard>
+                    <applyEventCard :item="item" @del="del" @quash="quash"></applyEventCard>
                 </div>
-                <trs-pagination :total="list.length"></trs-pagination>
+                <trs-pagination :total="search.total" @getList="getApplicationList"></trs-pagination>
             </div>
-            <div v-else>
+            <div v-else v-loading="search.loading">
                 <el-empty :image="require('../../assets/image/empty.png')" :image-size="imageSize">
                 </el-empty>
             </div>
         </div>
-
-
     </div>
 </template>
 <script>
+import {
+    getDataStatistics, getUserStatus, getApprovalType, getApprovalStage, getApplicationList, delApplication, quashApplication
+} from '@/api/applyCenter'
 import applyEventCard from '@/components/common/apply-event-card'
 export default {
     components: {
@@ -108,28 +103,28 @@ export default {
     data() {
         return {
             imageSize: 292,
-            tipsMsg: [],
+            tipsMsg: null,
             crtSign: 'applyAll',
             dataStatistics: [{
                 name: '全部申请',
-                count: 10,
+                count: 0,
                 value: 'applyAll',
             },
-            {
-                name: '我的关注',
-                count: 10,
-                value: 'all',
+            // {
+            //     name: '我的关注',
+            //     count: 0,
+            //     value: 'myAttention',
 
-            },
+            // },
             {
                 name: '待修改',
-                count: 1,
+                count: 0,
                 value: 'toModified',
 
             }, {
                 name: '待确认',
                 count: 0,
-                value: 'toConfirm',
+                value: 'toConfirmed',
 
             }, {
                 name: '审批中',
@@ -160,29 +155,23 @@ export default {
                 keywords: '',
                 releaseTime: '',
                 productLaunchDate: '',
+                total: 0,
+                loading: false
 
             },
-            transactionTypes: [
-                { label: '产品类', value: '1' },
-                { label: '活动类', value: '2' },
-                { label: '客户类', value: '3' },
-            ],
-            approvalPhases: [
-                { label: '负责人审批', value: '1' },
-                { label: '负责人复核', value: '2' },
-                { label: '消保审批', value: '3' },
-            ],
+            transactionTypes: [],
+            approvalPhases: [],
             isUrgents: [
-                { label: '是', value: '1' },
-                { label: '否', value: '2' },
+                { label: '不加急', value: '0' },
+                { label: '加急', value: '1' },
             ],
             isOpinions: [
+                { label: '无', value: '0' },
                 { label: '有', value: '1' },
-                { label: '无', value: '2' },
             ],
             adoptionSituations: [
-                { label: '有', value: '1' },
-                { label: '无', value: '2' },
+                { label: '未采纳', value: '0' },
+                { label: '已采纳', value: '1' },
             ],
             updateTimeGroup: [
                 {
@@ -204,11 +193,7 @@ export default {
                     }]
                 },
             ],
-            list: [{ status: 1 },
-            { status: 2 },
-            { status: 3 },
-            { status: 4 },
-            { status: 5 }]
+            list: []
             // list: []
         }
     },
@@ -218,16 +203,54 @@ export default {
             const text = this.search.updateTime[0] == 1 ? '发起时间' : '更新时间'
             dom.innerText = text
         })
-        this.handleTopTips()
-        // // tips的提示
-        // let newDataStatistics = JSON.parse(JSON.stringify(this.dataStatistics))
-        // newDataStatistics = newDataStatistics.splice(2)
-        // this.tipsValue = newDataStatistics.filter(v => { return v.count > 0 })[0]
+        let floor2 = document.querySelectorAll('.apply-center .floor2')[0]
+        floor2.style.paddingRight = 16 + 'px'
+        window.addEventListener('resize', () => {
+            let floor2 = document.querySelectorAll('.apply-center .floor2')[0]
+            floor2.style.paddingRight = 16 + 'px'
+        })
+        this.userStatus()
+        this.getDataStatistic()
     },
-    watch: {
-        'search.updateTime2'(val) {
-            const lastKey = val[val.length - 1]
-            if (val.length < 2) {
+    watch: {},
+    created() {
+        this.getApprovalType()
+        this.getApprovalStage()
+        this.getApplicationList(1)
+    },
+    methods: {
+        getApprovalStage() {
+            getApprovalStage().then(res => {
+                this.approvalPhases = res.data.data.map(v => {
+                    return {
+                        label: v,
+                        value: v
+                    }
+                })
+            })
+        }
+        ,
+        getApprovalType() {
+            getApprovalType().then(res => {
+                this.transactionTypes = res.data.data.map(v => {
+                    return {
+                        label: v,
+                        value: v
+                    }
+                })
+            })
+        },
+        getDataStatistic() {
+            getDataStatistics().then((res) => {
+                const { data } = res.data
+                this.dataStatistics.forEach(v => {
+                    v.count = data[v.value]
+                })
+            })
+        },
+        changeSort() {
+            const lastKey = this.search.updateTime2[this.search.updateTime2.length - 1]
+            if (this.search.updateTime2.length < 2) {
                 this.search.updateTime2 = this.search.updateTime
             } else {
                 if (!isNaN(lastKey)) {
@@ -243,43 +266,97 @@ export default {
             this.$nextTick(() => {
                 const text = this.search.updateTime[0] == 1 ? '发起时间' : '更新时间'
                 dom.innerText = text
+                this.searchList()
             })
-            this.searchList()
-        }
-    },
-    methods: {
+
+        },
+        getApplicationList(pageNow) {
+            // 关于排序
+            const param = {
+                pageNow,
+                pageSize: 10,
+                ...this.search,
+                taskStatus:this.crtSign
+            }
+            let sortType = ''
+            // desc:降序 asc 升序 1 发起时间 2 更新时间
+            // 1：创建时间：升序 2：创建时间：降序 3：更新时间：升序 4：更新时间：降序
+            if (this.search.updateTime2[0] == 1) {
+                sortType = this.search.updateTime2[1] == 'desc' ? 2 : 1
+            } else if (this.search.updateTime2[0] == 2) {
+                sortType = this.search.updateTime2[1] == 'desc' ? 4 : 3
+            }
+            param.sortType = sortType
+            Reflect.deleteProperty(param, 'updateTime')
+            Reflect.deleteProperty(param, 'updateTime2')
+            Reflect.deleteProperty(param, 'total')
+            Reflect.deleteProperty(param, 'loading')
+
+            this.search.loading = true
+            getApplicationList(param).then(res => {
+                const { data } = res.data
+                this.search.total = data.totalCount
+                this.list = data.list
+                this.search.loading = false
+            })
+        },
+        del(id) {
+            const param = {
+                recordId: id
+            }
+            delApplication(param).then(res => {
+                const { data } = res.data
+                if (data.status === 0) {
+                    this.$message.success('删除成功')
+                    this.getApplicationList(1)
+                }
+            })
+        },
+        quash(item) {
+            // 0 代表不能撤销 1代表可以撤销
+            const param = {
+                recordId: item.id,
+                Revocable: 1,
+            }
+            quashApplication(param).then(res => {
+                const { data } = res.data
+                if (data.status === 0) {
+                    this.$message.success('撤销成功')
+                    this.getApplicationList(1)
+                }
+            })
+        },
+        userStatus() {
+            getUserStatus().then(res => {
+                this.tipsMsg = res.data
+            }).catch(err => {
+                this.tipsMsg = false
+            })
+
+        },
         changeStatis(item) {
             if (item.value == this.crtSign) return
             this.crtSign = item.value
-
-        },
-        handleTopTips() {
-            // 待修改
-            const modifiedValue = this.dataStatistics.filter(m => { return m.value == 'toModified' })[0]
-            const confirmValue = this.dataStatistics.filter(m => { return m.value == 'toConfirm' })[0]
-
-            if (modifiedValue.count > 0) {
-                return this.tipsMsg = `您有 ${modifiedValue.count} 笔申请单待修改哦，请尽快修改。`
-            }
-            if (confirmValue.count <= 5) {
-                return this.tipsMsg = `您有 ${confirmValue.count} 笔申请单待确认哦，请尽快确认。`
-            }
         },
         searchList() {
+            this.getApplicationList(1)
         },
         reset() {
             this.search = {
-                transactionType: '',
-                approvalPhase: '',
-                isUrgent: '',
-                isOpinion: '',
+                approvalType: '',
+                approvalStage: '',
+                urgent: '',
+                hasOpinions: '',
                 adoptionSituation: '',
                 updateTime: [1, 'asc'],
                 updateTime2: [1, 'asc'],
-                searchKey: '',
-                sdate: '',
-                onlinedate: '',
+                keywords: '',
+                releaseTime: '',
+                productLaunchDate: '',
+                total: 0,
+                loading: false
             }
+            this.searchList()
         },
     }
 }
@@ -312,6 +389,11 @@ export default {
         background: #FFFCE8;
         margin-bottom: 8px;
         cursor: default;
+
+        i {
+            margin-right: 8px;
+            font-size: 16px;
+        }
 
     }
 
