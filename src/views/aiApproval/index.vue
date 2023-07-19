@@ -219,7 +219,7 @@ export default {
     &:first-child{
       width: calc(100% - 60% - 24px);
     }
-  }
+  }}
 }
 </style>
 <style lang="less">
