@@ -3,7 +3,10 @@
     <div v-if="show" @click="$emit('selected')" :class="{'node-body': true, 'error': showError}" >
       <div>
         <div class="node-body-header" :style="{'background-color': headerBgc}">
-          <i :class="headerIcon" style="margin-right: 5px" v-if="(headerIcon || '') !== ''"></i>
+          <!-- <i :class="headerIcon" style="margin-right: 5px" v-if="(headerIcon || '') !== ''"></i> -->
+          <svg class="icon" aria-hidden="true" style="width: 16px;height: 16px;margin-right: 5px;position: relative;top:2px;">
+            <use :xlink:href="headerIcon"></use>
+          </svg>
           <span>{{title}}</span>
           <i class="el-icon-close" v-if="!isRoot" style="float:right;" @click="$emit('delNode')"></i>
         </div>
@@ -103,7 +106,7 @@ export default {
   }
 }
 .node{
-  padding: 0 50px;
+  // padding: 0 50px;
   width: 220px;
   position: relative;
   &:before{
@@ -123,7 +126,7 @@ export default {
     cursor: pointer;
     max-height: 120px;
     position: relative;
-    border-radius: 5px;
+    border-radius: 10px;
     background-color: white;
     box-shadow: 0px 0px 5px 0px #d8d8d8;
     &:hover{
@@ -136,17 +139,21 @@ export default {
       }
     }
     .node-body-header{
-      border-top-left-radius: 5px;
-      border-top-right-radius: 5px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
       padding: 5px 15px;
       color: white;
-      font-size: xx-small;
+      font-size: 14px;
       .el-icon-close{
         display: none;
       }
     }
     .node-body-content{
+      display: inline-block;
       padding: 18px;
+      line-height: 22px;
+      max-height: 90px;
+      overflow-y: auto;
       color: #656363;
       font-size: 14px;
       i{
@@ -178,6 +185,7 @@ export default {
     }
     /deep/ .el-button{
       height: 32px;
+      line-height: 14px;
     }
     &::before{
       content: "";

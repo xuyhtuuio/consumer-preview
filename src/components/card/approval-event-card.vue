@@ -12,6 +12,8 @@
                 <span class="event-name">景顺长城集英成长7月报景顺长城集英成长7月报景顺长城集英成长7月报景顺长城集英成长7月报</span>
                 <span class="event-status">
                     <i class="tag in-approval">审批中>消保中心审批</i>
+                    <i class="tag in-analysis">智能解析中，请您耐心等待...</i>
+
                 </span>
             </div>
             <div class="event-infos">
@@ -19,7 +21,14 @@
                 <span class="sDate date">发起时间：2023-07-07</span>
                 <span class="sDate date">更新时间：2023-07-07</span>
                 <span class="sDate date">上线时间：2023-08-08</span>
-                <span class="handler date">当前处理人：王明明</span>
+
+
+                <!-- <span class="handler date">当前处理人：王明明</span> -->
+                <el-popover placement="bottom" trigger="hover" popper-class="popper-persons">
+                    <div>财富平台部门 | 财富客群团队</div>
+                    <span slot="reference" class="handler date">当前处理人：王明明</span>
+                </el-popover>
+
                 <span class="handler">
                     <svg class="icon urgent-icon" aria-hidden="true">
                         <use xlink:href="#icon-xianxingtubiao1"></use>
@@ -55,6 +64,7 @@
 </template>
 <script>
 export default {
+    name: 'applyEventCard',
     props: {
         item: {
             type: Object,
@@ -92,7 +102,8 @@ export default {
 
         .urgent-icon {
             margin-right: 8px;
-            font-size: 16px;
+            width: 16px;
+            height: 16px;
         }
 
         .event-name {
@@ -160,6 +171,13 @@ export default {
                 color: #FA8C16;
 
             }
+
+            .in-analysis {
+                border-radius: 4px;
+                background: #FFF1F0;
+                color: #F76560;
+
+            }
         }
 
         .event-infos {
@@ -219,7 +237,8 @@ export default {
         justify-content: flex-end;
 
         .icon {
-            font-size: 20px;
+            width: 20px !important;
+            height: 20px !important;
             margin-right: 2px;
         }
 

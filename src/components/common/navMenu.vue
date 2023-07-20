@@ -1,7 +1,7 @@
 <template>
-  <div class="menu">
-    <div class="left menu-item">
-      <g-icon class="right-icon"  stylePx="32" href="#icon-xianxingtubiao1"/>
+  <div class="nav">
+    <div class="left flex">
+      <img src="@/assets/image/logo.png" alt="" class="logo">
       消保管控平台
     </div>
     <div class="center menu-item">
@@ -22,9 +22,9 @@
       return {
         currentIndex:0,
         list : [
-          {name: "首页",path: "home"},
-          {name: "申请中心",},
-          {name: "审批中心"},
+             { name: "首页", path: "home" },
+        { name: "申请中心", path: "applyCenter" },
+        { name: "审批中心", path: 'approvalCenter' },
           {name: "人员中心"},
           {name: "产业图谱"},
         ],
@@ -41,31 +41,67 @@
       this.$router.push(item)
       this.currentIndex = idx
     }
+  },
+  watch: {
+    $route: {
+      handler: function (val) {
+        const { fullPath } = val
+        if (fullPath.indexOf('home') !== -1) {
+          this.activeMenu = 'home'
+        }
+        if (fullPath.indexOf('applyCenter') !== -1) {
+          this.activeMenu = 'applyCenter'
+        }
+        if (fullPath.indexOf('approvalCenter') !== -1) {
+          this.activeMenu = 'approvalCenter'
+        }
+      },
+      // 深度观察监听
+      deep: true
+    }
+
+  },
+  methods: {
+    handleItem(url) {
+      this.activeMenu = url
+      this.$router.push(url)
     }
   }
+}
 </script>
 
 <style lang="less" scoped>
- .menu {
-   display: flex;
-   align-items: center;
+.nav {
+  display: flex;
+  align-items: center;
   padding: 0 24px;
   height: 48px;
   background: #374160;
-  font-size:14px;
+  font-size: 14px;
   color: #fff;
+
   .icon-my {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+  }
+
+  .flex {
+    display: flex;
+    align-items: center;
+    align-items: center;
+  }
+
+  .left {
+    font-weight: 700;
+
+    .logo {
       width: 32px;
       height: 32px;
       margin-right: 10px;
     }
-    .menu-item {
-      display: flex;
-      align-items: center;
-    }
-  .left {
-    font-weight: 700;
   }
+
   .center {
     flex: 1;
     display: flex;
@@ -97,11 +133,48 @@
   }
   }
   .right {
+    display: flex;
     .right-icon {
       &:not(:last-child) {
         margin-right: 32px;
       }
+
+    }
+
+    .active-menu {
+      position: relative;
+      width: 100%;
+      font-weight: 700;
+
+    }
+
+    .active-menu::after {
+      content: '';
+      width: 100%;
+      height: 2px;
+      border-radius: 10px;
+      background: var(--unnamed, #FFF);
+      position: absolute;
+      left: 0;
+      bottom: -14px;
+
+
     }
   }
- }
+
+  .right {
+    .iconfont {
+      margin-left: 32px;
+      font-size: 24px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .icon3 {
+      font-size: 21px !important;
+    }
+  }
+}
+
+
 </style>

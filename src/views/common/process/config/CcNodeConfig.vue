@@ -1,17 +1,22 @@
 <template>
   <div>
-    <el-button size="mini" icon="el-icon-plus" type="primary" @click="selectOrg" round>选择抄送人</el-button>
-    <div class="option">
-      允许发起人添加抄送人:
-      <el-switch v-model="config.shouldAdd"/>
+    <p class="desc">
+      <svg class="icon" aria-hidden="true">
+        <use xlink:href="#icon-setting-user"></use>
+      </svg>
+      <span>
+        选择{{ nodeName }}，<span style="color: #86909C;font-size: 12px;">配置抄送的人员范围</span>
+      </span>
+    </p>
+    <el-button size="mini" @click="selectOrg" icon="el-icon-plus" type="primary">选择部门/人员/系统角色</el-button>
+    <div style="margin-top: 16px">
+      <div class="tag-action" >
+        <div class="tag-box" v-for="(item, index) in select" :key="index">
+          <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
+        </div>
+      </div>
     </div>
-    <div style="margin-top: 20px">
-      <el-tag class="org-item" :type="org.type === 'dept'?'':'info'"
-              v-for="(org, index) in select" :key="index + '_org'"
-              closable size="mini" @close="removeOrgItem(index)">
-        {{org.name}}
-      </el-tag>
-    </div>
+    <p style="color: #86909C;font-size: 12px;margin-top:20px">抄送对象仅可查看申请单，无其他操作权限</p>
     <org-picker :show="showOrgSelect" @close="closeSelect" :selected="select" @selectOver="selected"></org-picker>
   </div>
 </template>
@@ -19,7 +24,7 @@
 <script>
 import orgPicker from '@/components/common/organizationPicker'
 export default {
-  name: "CcNodeConfig.vue",
+  name: "CcNodeConfig",
   components: {orgPicker},
   props:{
     config:{
@@ -27,49 +32,94 @@ export default {
       default: ()=>{
         return {}
       }
-    }
-  },
-  computed:{
-    select(){
-      return this.config.assignedUser || []
+    },
+    nodeName: {
+      type: String,
+      default: undefined
     }
   },
   data() {
     return {
-      showOrgSelect: false
+      showOrgSelect: false,
+      tagConfig: {
+        background: '#f0f6ff',
+        color: '#2d5cf6',
+        borderColor: '#5784FF',
+        borderRadius: '4px',
+        closable: true,
+        size: 'medium'
+      }
+    }
+  },
+  computed:{
+    select: {
+      get() {
+        return this.config.assignedUser
+      },
+      set() {
+
+      }
     }
   },
   methods: {
     closeSelect(){
-
+      this.showOrgSelect = false
     },
     selectOrg() {
       this.showOrgSelect = true
     },
     selected(select) {
-      console.log(select)
       this.showOrgSelect = false
-      select.forEach(val => this.select.push(val))
+      this.select = []
+      for (let key in select) {
+        select[key].forEach(val => this.select.push({
+          ...val,
+          label: val.label,
+          ...this.tagConfig
+        }))
+      }
+      // select.forEach(val => this.select.push({
+      //   ...val,
+      //   label: val.name,
+      //   ...this.tagConfig
+      // }))
     },
     removeOrgItem(index){
+      console.log(index)
       this.select.splice(index, 1)
+      console.log(this.select)
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.option{
-  color: #606266;
-  margin-top: 20px;
-  font-size: small;
+.icon {
+  width: 24px;
+  height: 24px;
 }
-
 .desc{
-  font-size: small;
-  color: #8c8c8c;
+  display: flex;
+  align-items: center;
+  padding-top: 10px;
+  font-size: 14px;
+  color: #1D2128;
 }
 .org-item{
   margin: 5px;
+}
+.el-button--mini {
+  margin-top: 16px;
+  border-radius: 17px;
+}
+/deep/.el-radio .el-radio__label {
+  font-weight: normal;
+}
+.tag-action {
+  text-align: left;
+}
+.tag-box {
+  display: inline-block;
+  margin-bottom: 8px;
 }
 </style>

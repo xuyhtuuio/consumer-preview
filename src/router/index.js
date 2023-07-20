@@ -15,7 +15,7 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      redirect: '/index'
+      redirect: '/front'
     },
     // 首页
     {
@@ -23,6 +23,13 @@ const router = new Router({
       name: "index",
       component: () => import("@/views/Index.vue"),
       meta: { title: 'OA工作流', viewport: viewport }
+    },
+    // ocr审批页
+    {
+      path: "/aiApproval",
+      name: "aiApproval",
+      component: () => import("@/views/aiApproval/index.vue"),
+      meta: { title: '智能审批', viewport: viewport }
     },
     // 后台管理
     {
@@ -52,18 +59,21 @@ const router = new Router({
       name: "design",
       component: () => import("@/views/admin/FormProcessDesign.vue"),
       meta: { title: '表单流程设计', viewport: viewport },
+      redirect: '/admin/design/baseSetting',
       children: [
         {
           path: "baseSetting",
           name: "baseSetting",
           component: () => import("@/views/admin/layout/FormBaseSetting.vue"),
           meta: { title: '基础设置' }
-        }, {
-          path: "formSetting",
-          name: "formSetting",
-          component: () => import("@/views/admin/layout/FormDesign.vue"),
-          meta: { title: '表单设计' }
-        }, {
+        },
+        // {
+        //   path: "formSetting",
+        //   name: "formSetting",
+        //   component: () => import("@/views/admin/layout/FormDesign.vue"),
+        //   meta: { title: '表单设计' }
+        // },
+        {
           path: "processDesign",
           name: "processDesign",
           component: () => import("@/views/admin/layout/ProcessDesign.vue"),
@@ -92,18 +102,19 @@ const router = new Router({
     {
       path: "/approvalCenter",
       name: "approvalCenter",
-      component: () => import("@/views/applycenter/approvalCenter.vue"),
+      component: () => import("@/views/approvalCenter/index.vue"),
       meta: { title: '申请中心', viewport: viewport },
     },
     {
       path: "/front",
       name: "front",
+      redirect: '/home',
       component: () => import("@/views/front/index.vue"),
       meta: { title: '消保管控平台', viewport: viewport },
       children: [
         {
           path: "/home",
-          name: "UserManage",
+          name: "home",
           component: () => import("@/views/front/home.vue"),
           meta: { title: '首页' ,viewport: viewport },
         },

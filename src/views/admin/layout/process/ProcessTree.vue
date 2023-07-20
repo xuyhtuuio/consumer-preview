@@ -14,7 +14,7 @@ import DefaultProps, {TRIGGER_PROPS} from "./DefaultNodeProps"
 
 export default {
   name: "ProcessTree",
-  components: {Node, Root, Approval, Cc, Trigger, Concurrent, Condition, Delay, Empty},
+  components: {Node, Root, Approval, ApprovalTwo: Approval, Cc, Trigger, Concurrent, Condition, Delay, Empty},
   data() {
     return {
       valid: true
@@ -34,7 +34,7 @@ export default {
     let processTrees = this.getDomTree(h, this.dom)
     //插入末端节点
     processTrees.push(h('div', {style:{'text-align': 'center'}}, [
-      h('div', {class:{'process-end': true}, domProps: {innerHTML:'流程结束'}})
+      h('div', {class:{'process-end': true}, domProps: {innerHTML:'结束'}})
     ]))
     return h('div', {class:{'_root': true}, ref:'_root'}, processTrees)
   },
@@ -136,6 +136,7 @@ export default {
     isPrimaryNode(node){
       return node &&
           (node.type === 'ROOT' || node.type === 'APPROVAL'
+           || node.type === 'APPROVAL-TWO'
           || node.type === 'CC' || node.type === 'DELAY'
               || node.type === 'TRIGGER');
     },
@@ -173,7 +174,9 @@ export default {
         type: type
       }
       switch (type){
+        case 'ROOT': this.insertRootNode(parentNode, afterNode); break; // 确认人
         case 'APPROVAL': this.insertApprovalNode(parentNode, afterNode); break;
+        case 'APPROVAL-TWO': this.insertApprovalTWONode(parentNode, afterNode); break;
         case 'CC': this.insertCcNode(parentNode); break;
         case 'DELAY': this.insertDelayNode(parentNode); break;
         case 'TRIGGER': this.insertTriggerNode(parentNode); break;
@@ -192,6 +195,14 @@ export default {
     insertApprovalNode(parentNode){
       this.$set(parentNode.children, "name", "审批人")
       this.$set(parentNode.children, "props", this.$deepCopy(DefaultProps.APPROVAL_PROPS))
+    },
+    insertApprovalTWONode(parentNode) {
+      this.$set(parentNode.children, "name", "二次会签")
+      this.$set(parentNode.children, "props", this.$deepCopy(DefaultProps.APPROVAL_PROPS))
+    },
+    insertRootNode(parentNode) {
+      this.$set(parentNode.children, "name", "确认人")
+      this.$set(parentNode.children, "props", this.$deepCopy(DefaultProps.ROOT_PROPS))
     },
     insertCcNode(parentNode){
       this.$set(parentNode.children, "name", "抄送人")
@@ -366,15 +377,15 @@ export default {
  margin: 0 auto;
 }
 .process-end{
-  width: 60px;
+  width: 88px;
+  padding: 6px 16px;
   margin: 0 auto;
   margin-bottom: 20px;
-  border-radius: 15px;
-  padding: 5px 10px;
+  line-height: 22px;
+  border-radius: 17px;
   font-size: small;
-  color: #747474;
-  background-color: #f2f2f2;
-  box-shadow: 0 0 10px 0 #bcbcbc;
+  color: #FFFFFF;
+  background-color: #2D5CF6;
 }
 .primary-node{
   display: flex;
@@ -430,9 +441,14 @@ export default {
 }
 .add-branch-btn{
   position: absolute;
-  width: 80px;
+  width: 96px;
   .add-branch-btn-el{
     z-index: 999;
+    line-height: 22px;
+    padding: 6px 20px;
+    border: none;
+    border-radius: 17px;
+    box-shadow: 0px 0px 8px 0px rgba(67, 67, 67, 0.04);
     position: absolute;
     top: -15px;
   }

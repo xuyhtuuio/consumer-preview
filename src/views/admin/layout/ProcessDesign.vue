@@ -1,24 +1,45 @@
 <template>
   <el-main>
-    <div class="scale">
+    <!-- <div class="scale">
       <el-button icon="el-icon-plus" size="small" @click="scale += 10" :disabled="scale >= 150" circle></el-button>
       <span>{{ scale }}%</span>
       <el-button icon="el-icon-minus" size="small" @click="scale -= 10" :disabled="scale <= 40" circle></el-button>
       <el-button @click="validate">校验流程</el-button>
-    </div>
+    </div> -->
     <div class="design" :style="'transform: scale('+ scale / 100 +');'">
       <process-tree ref="process-tree" @selectedNode="nodeSelected"/>
     </div>
     <el-drawer :title="selectedNode.name" :visible.sync="showConfig"
-               :size="selectedNode.type === 'CONDITION' ? '600px':'500px'"
+               :size="selectedNode.type === 'CONDITION' ? '600px':'550px'"
                direction="rtl" :modal="false" destroy-on-close>
       <div slot="title">
-        <el-input v-model="selectedNode.name" size="medium" v-show="showInput"
-                  style="width: 300px" @blur="showInput = false"></el-input>
-        <el-link v-show="!showInput" @click="showInput = true" style="font-size: medium">
-          <i class="el-icon-edit" style="margin-right: 10px"></i>
-          {{selectedNode.name}}
-        </el-link>
+        <template v-if="selectedNode.name !== '二次会签'">
+          <el-input v-model="selectedNode.name" size="medium" v-show="showInput"
+                    style="width: 300px" @blur="showInput = false">
+            <i
+              class="el-icon-success el-input__icon"
+              style="color: #2D5CF6;"
+              slot="suffix"
+              @click="showInput = false">
+            </i>
+          </el-input>
+          <div @mouseover="isHover = true" @mouseout="isHover=false">
+            <div class="header-title" v-show="!showInput" @click="showInput = true" style="font-size: medium">
+              {{selectedNode.name}}
+              <svg v-if="isHover" class="icon" aria-hidden="true">
+                <use xlink:href="#icon-bi"></use>
+              </svg>
+              <svg v-else class="icon" aria-hidden="true">
+                <use xlink:href="#icon-bi1"></use>
+              </svg>
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <span style="font-size:medium;font-weight:700">
+            {{selectedNode.name}}
+          </span>
+        </template> 
       </div>
       <div class="node-config-content">
         <node-config/>
@@ -40,7 +61,8 @@ export default {
       scale: 100,
       selected: {},
       showInput: false,
-      showConfig: false
+      showConfig: false,
+      isHover: false
     }
   },
   computed:{
@@ -73,6 +95,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-main {
+  overflow: auto;
+  max-height: calc(100vh - 100px);
+}
 .design {
   margin-top: 100px;
   display: flex;
@@ -99,5 +125,12 @@ export default {
 
 /deep/ .el-drawer__body{
   overflow-y: auto;
+}
+/deep/ .el-input__inner {
+  border: 1px solid #2D5CF6;
+}
+/deep/ .header-title:hover {
+  color: #2D5CF6;
+  cursor: pointer;
 }
 </style>

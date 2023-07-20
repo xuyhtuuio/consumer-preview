@@ -3,13 +3,13 @@
         <div class="event-info">
             <div class="event-name-status">
                 <!-- 加急 -->
-                <svg class="icon urgent-icon" aria-hidden="true">
+                <svg class="icon urgent-icon" aria-hidden="true" v-if="item.urgent == 1">
                     <use xlink:href="#icon-shenpiyemiantubiao"></use>
                 </svg>
                 <svg class="icon urgent-icon" aria-hidden="true">
                     <use xlink:href="#icon-tongyongtubiao2"></use>
                 </svg>
-                <span class="event-name">景顺长城集英成长7月报景顺长城集英成长7月报景顺长城集英成长7月报景顺长城集英成长7月报</span>
+                <span class="event-name">{{ item.name }}</span>
                 <span class="event-status">
                     <i v-if="item.status === 1" class="end">
                         <i class="tag end-sign">
@@ -23,13 +23,13 @@
 
                     <!-- 有无意见 -->
                     <i v-if="item.status === 1 || item.status === 3 || item.status === 4" class="flex">
-                        <i class="tag has-opinion">
+                        <i class="tag has-opinion" v-if="item.hasOpinions == 1">
                             <svg class="icon" aria-hidden="true">
                                 <use xlink:href="#icon-guanzhu2"></use>
                             </svg>
                             有实质性意见
                         </i>
-                        <i class="tag has-opinion" v-if="Math.random() > 0.5">
+                        <i class="tag has-opinion" v-if="item.adoptionStatus == 0">
                             <svg class="icon" aria-hidden="true">
                                 <use xlink:href="#icon-tubiao2"></use>
                             </svg>
@@ -46,11 +46,11 @@
                 </span>
 
             </div>
-            <div class="event-infos">
-                <span class="id">202307075091985</span>
-                <span class="sDate date">发起时间：2023-07-07</span>
-                <span class="sDate date">更新时间：2023-07-07</span>
-                <span class="sDate date">上线时间：2023-08-08</span>
+            <div class="event-infos" v-if="item.status !== 5">
+                <span class="id">{{ item.id }}</span>
+                <span class="sDate date">发起时间：{{ item.releaseTime ||'--'}}</span>
+                <span class="sDate date">更新时间：{{ item.updateDate ||'--'}}</span>
+                <span class="sDate date">上线时间：{{ item.launchDate||'--' }}</span>
                 <el-popover placement="bottom" trigger="click" popper-class="popper-persons">
                     <div>
                         <div v-for="(child, index) in persons" :key="index" class="person-item">
@@ -58,9 +58,15 @@
                         </div>
 
                     </div>
-                    <span slot="reference" class="handler">当前处理人：王明明 <i>+3</i></span>
+                    <span slot="reference" class="handler">当前处理人：{{ item.currentAssignee }} <i>+3</i></span>
                 </el-popover>
 
+            </div>
+            <div class="event-infos error" v-else>
+                <svg class="icon urgent-icon" aria-hidden="true">
+                    <use xlink:href="#icon-baocuo1"></use>
+                </svg>
+                文件未上传成功，请检查文件名是否包含特殊符号，并重新提交
             </div>
         </div>
         <div class="right-operation">
@@ -147,12 +153,12 @@
             </div>
             <!-- 已结束 -->
             <div v-if="item.status === 1">
-                <span class="attention no-attention icon-op" v-if="Math.random() > 0.5">
+                <span class="attention no-attention icon-op" v-if="Math.random() > 0.5" @click="concern(item)">
                     <svg class="icon urgent-icon" aria-hidden="true">
                         <use xlink:href="#icon-tubiao-1"></use>
                     </svg>
                     关注</span>
-                <span class="attention has-attention icon-op" v-else>
+                <span class="attention has-attention icon-op" v-else @click="concern(item)">
                     <svg class="icon urgent-icon" aria-hidden="true">
                         <use xlink:href="#icon-guanzhu-1"></use>
                     </svg>已关注</span>
@@ -171,6 +177,7 @@
     </div>
 </template>
 <script>
+import { concernApplication } from '@/api/applyCenter'
 export default {
     props: {
         item: {
@@ -181,27 +188,24 @@ export default {
     data() {
         return {
             reminderDialog: false,
+            allowConcernClick: true,
             persons: [
                 { name: '杨晨格/300592/总行/消费者权益保护监督部/消费者权益保护监督部' },
                 { name: '杨晨格/300592/总行/消费者权益保护监督部/消费者权益保护监督部' },
                 { name: '杨晨格/300592/总行/消费者权益保护监督部/消费者权益保护监督部' }
-
             ]
 
         }
     },
     methods: {
-        cancel(item){
+        cancel(item) {
             this.$confirm('确定撤销该申请吗？', '', {
                 customClass: 'confirmBox',
                 confirmButtonText: '撤销',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                this.$message({
-                    type: 'success',
-                    message: '撤销成功!'
-                });
+                this.$emit(quash, item)
             }).catch(() => {
                 this.$message({
                     type: 'info',
@@ -216,16 +220,37 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                this.$message({
-                    type: 'success',
-                    message: '删除成功!'
-                });
+                this.$emit(del, item.id)
             }).catch(() => {
                 this.$message({
                     type: 'info',
                     message: '已取消删除'
                 });
             });
+        },
+
+        concern(item) {
+            if (!this.allowConcernClick) return
+            const param = {
+                recordId: item.id
+            }
+            concernApplication(param).then(res => {
+                const { data } = res.data
+                if (data.status == 200) {
+                    if (item.concernId == 1) {
+                        this.$message.success('取消关注成功')
+                    } else {
+                        this.$message.success('关注成功')
+                    }
+                    item.concernId = item.concernId == 1 ? 0 : 1
+                } else {
+                    if (item.concernId == 1) {
+                        this.$message.error('取消关注失败')
+                    } else {
+                        this.$message.error('关注失败')
+                    }
+                }
+            })
         }
     }
 }
@@ -247,14 +272,15 @@ export default {
         flex: 1;
 
         .event-name-status {
-            margin-bottom: 17px;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
         }
 
         .urgent-icon {
             margin-right: 8px;
-            font-size: 16px;
+            width: 16px;
+            height: 16px;
         }
 
         .event-name {
@@ -287,7 +313,8 @@ export default {
                 align-items: center;
 
                 .icon {
-                    font-size: 20px;
+                    width: 20px;
+                    height: 20px;
                     line-height: 22px;
                     margin-right: 4px;
                 }
@@ -379,6 +406,20 @@ export default {
 
         }
 
+        .error {
+            display: flex;
+            align-items: center;
+            border-radius: 2px;
+            background: #F9F9FB;
+            color: #EB5D78;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 20px;
+            padding: 2px 10px;
+            margin-top: -3px;
+        }
+
         .tips {
             color: #EB5757;
             margin-left: 12px;
@@ -395,7 +436,8 @@ export default {
         justify-content: flex-end;
 
         .icon {
-            font-size: 20px;
+            width: 20px;
+            height: 20px;
             margin-right: 2px;
         }
 

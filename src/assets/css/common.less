@@ -702,7 +702,7 @@ i {
       font-size: 20px;
 
       &::before {
-        content: "\e623";
+        content: "\e62c";
       }
     }
   }
@@ -1195,4 +1195,67 @@ i {
   background: #2d5cf6;
   border-radius: 4px;
   margin-right: 8px;
+}
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
+.confirmBox {
+  width: 500px;
+
+  padding: 0px 0px 24px;
+  border-radius: 10px;
+
+  .el-message-box__content {
+      height: 160px;
+
+      .el-message-box__container {
+          height: 100%;
+      }
+  }
+
+  .el-message-box__status {
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+
+  }
+
+  .el-message-box__message {
+      position: absolute;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+  }
+
+  .el-message-box__status::before {
+      font-size: 54px;
+  }
+
+  .el-message-box__btns {
+      .el-button--default {
+          border-radius: 6px;
+          border: 1px solid #CACDD3 !important;
+          color: #1D2128;
+          text-align: center;
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 22px;
+          /* 157.143% */
+
+      }
+
+      .el-button--primary {
+          color: #FFF;
+          border: none !important;
+          border-radius: 6px;
+          background: linear-gradient(90deg, #2F54EB 0%, #5196FF 100%);
+      }
+  }
+
+
 }

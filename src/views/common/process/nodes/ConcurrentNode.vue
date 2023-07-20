@@ -69,7 +69,7 @@ export default {
 @import "@/assets/theme";
 
 .node{
-  padding: 30px 55px 0;
+  margin: 30px 55px 0;
   width: 220px;
   .node-body{
     overflow: hidden;
@@ -119,7 +119,7 @@ export default {
 
       .node-body-main-header{
         padding: 10px 0px 5px;
-        font-size: xx-small;
+        font-size: 14px;
         position: relative;
         .title{
           color: #718dff;
@@ -161,6 +161,7 @@ export default {
     }
     /deep/ .el-button{
       height: 32px;
+      line-height: 14px;
     }
     &::before{
       content: "";

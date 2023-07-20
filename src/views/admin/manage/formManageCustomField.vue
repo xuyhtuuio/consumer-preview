@@ -1,57 +1,53 @@
 <template>
   <div>
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-      <el-form-item label="字段名称" prop="name">
-        <el-input v-model="ruleForm.name" placeholder="请输入字段名称" class="is-dark input"></el-input>
+      <el-form-item label="字段名称" prop="title">
+        <el-input v-model="ruleForm.title" placeholder="请输入字段名称" class="is-dark input"></el-input>
       </el-form-item>
-      <el-form-item label="所属模块" prop="belong">
-        <el-select v-model="ruleForm.belong" placeholder="请选择所属模块" class="is-dark input" style="width: 100%">
+      <el-form-item label="所属模块" prop="module">
+        <el-select v-model="ruleForm.module" placeholder="请选择所属模块" class="is-dark input" style="width: 100%">
           <el-option v-for="item in belongModules" :label="item.label" :value="item.value" :key="item.value"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="字段类型" prop="type">
-        <el-select v-model="ruleForm.type" placeholder="请选择字段类型" class="is-dark input" style="width: 100%">
+      <el-form-item label="字段类型" prop="name">
+        <el-select v-model="ruleForm.name" placeholder="请选择字段类型" class="is-dark input" style="width: 100%">
           <el-option v-for="item in feildTypes" :label="item.label" :value="item.value" :key="item.value"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item v-if="ruleForm.type !== 'dateRange'" label="提示文字" prop="placeholder" class="is-dark input">
+      <el-form-item v-if="ruleForm.name === 'TimePicker'" label="时间格式" prop="dateFormat" class="is-dark input">
+        <el-select v-model="ruleForm.dateFormat" placeholder="请选择字段类型" class="is-dark input" style="width: 100%">
+          <!-- <el-option label="yyyy-MM-dd hh:mm:ss" value="yyyy-MM-dd hh:mm:ss"></el-option> -->
+          <el-option label="yyyy-MM-dd" value="yyyy-MM-dd"></el-option>
+          <!-- <el-option label="yyyy/MM/dd hh:mm:ss" value="yyyy/MM/dd hh:mm:ss"></el-option> -->
+          <el-option label="yyyy/MM/dd" value="yyyy/MM/dd"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="提示文字" prop="placeholder" class="is-dark input">
         <el-input v-model="ruleForm.placeholder" placeholder="请输入提示文字"></el-input>
       </el-form-item>
-      <el-form-item v-if="ruleForm.type === 'dateRange'" label="提示文字1" prop="placeholder" class="is-dark input">
-        <el-input v-model="ruleForm.placeholder" placeholder="请输入开始时间提示文字"></el-input>
+      <el-form-item v-if="ruleForm.name === 'Cascader'" label="选项设置" prop="cascaderItem" class="is-dark input">
+        <!-- <el-button icon="el-icon-plus" type="text" size="mini" style="position: relative;left:260px;" @click="addCascaderOptions">新增选项</el-button> -->
+        <CascaderField :leval="1" :data="cascaderOptions" class="cascader-content" style="position: relative;top: 35px;margin-bottom: 30px"/>
       </el-form-item>
-      <el-form-item v-if="ruleForm.type === 'dateRange'" label="提示文字2" prop="placeholder" class="is-dark input">
-        <el-input v-model="ruleForm.placeholder" placeholder="请输入结束时间提示文字"></el-input>
+      <el-form-item v-if="ruleForm.name === 'SelectInput' || ruleForm.name === 'MultipleSelect'" label="选项设置" prop="cascaderItem" class="is-dark input">
+        <el-button icon="el-icon-plus" type="text" size="mini" style="position: relative;left:260px;" @click="addSelectOptions">新增选项</el-button>
+        <SelectField :data="selectOptions" class="cascader-content"/>
       </el-form-item>
-      <el-form-item v-if="ruleForm.type === 'cascader'" label="选项设置" prop="cascaderItem" class="is-dark input">
-        <el-button icon="el-icon-plus" type="text" size="mini" style="position: relative;left:260px;" @click="addCascaderOptions">新增选项</el-button>
-        <CascaderField :leval="1" :data="cascaderOptions"/>
+      <el-form-item v-if="ruleForm.name === 'TextInput' || ruleForm.name === 'TextareaInput'" label="文字个数" prop="numberOfWords" class="is-dark input">
+        <el-input v-model="ruleForm.numberOfWords" placeholder="请输入文字个数" oninput="value=value.replace(/^0|[^0-9]/g, '')" class="is-dark input"></el-input>
       </el-form-item>
-      <el-form-item v-if="ruleForm.type === 'input' || ruleForm.type === 'textarea'" label="文字个数" prop="maxLength" class="is-dark input">
-        <el-input v-model="ruleForm.maxLength" placeholder="请输入文字个数" oninput="value=value.replace(/^0|[^0-9]/g, '')" class="is-dark input"></el-input>
+      <el-form-item v-if="ruleForm.name === 'TextInput'" label="独占一行" prop="exclusiveRowOrNot" class="is-dark input">
+        <el-switch v-model="ruleForm.exclusiveRowOrNot"></el-switch>
       </el-form-item>
-      <el-form-item label="独占一行" prop="inline" class="is-dark input">
-        <el-switch v-model="ruleForm.inline"></el-switch>
+      <el-form-item v-if="ruleForm.name === 'SelectInput' || ruleForm.name === 'MultipleSelect'" label="选项展开" prop="expanding" class="is-dark input">
+        <el-switch v-model="ruleForm.expanding"></el-switch>
       </el-form-item>
-      <el-form-item v-if="ruleForm.type === 'radio' || ruleForm.type === 'checkbox'" label="选项展开" prop="isExpse" class="is-dark input">
-        <el-switch v-model="ruleForm.isExpse"></el-switch>
-      </el-form-item>
-      <el-form-item label="是否必填" prop="isRequire" class="is-dark input">
-        <el-switch v-model="ruleForm.isRequire"></el-switch>
-      </el-form-item>
-      <!-- <el-form-item label="活动时间" required>
-        <el-col :span="11">
-          <el-form-item prop="date1">
-            <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1" style="width: 100%;"></el-date-picker>
-          </el-form-item>
-        </el-col>
-        <el-col class="line" :span="2">-</el-col>
-        <el-col :span="11">
-          <el-form-item prop="date2">
-            <el-time-picker placeholder="选择时间" v-model="ruleForm.date2" style="width: 100%;"></el-time-picker>
-          </el-form-item>
-        </el-col>
+      <!-- <el-form-item label="是否多选" v-if="ruleForm.name === 'Cascader'" prop="isMultiple" class="is-dark input">
+        <el-switch v-model="ruleForm.isMultiple"></el-switch>
       </el-form-item> -->
+      <el-form-item label="是否必填" prop="required" class="is-dark input">
+        <el-switch v-model="ruleForm.required"></el-switch>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
         <el-button @click="resetForm('ruleForm')">重置</el-button>
@@ -61,38 +57,43 @@
 </template>
 <script>
   import { feildTypes, belongModules } from '@/utils/dict'
+  import { addFormField } from '@/api/manage'
   import CascaderField from './cascaderField'
+  import SelectField from './selectField'
+  let id = 0
   export default {
     components: {
-      CascaderField
+      CascaderField,
+      SelectField
     },
     data() {
       return {
         ruleForm: {
-          name: '',
-          belong: '',
-          isRequire: false,
+          title: '',
+          module: '',
+          required: false,
           placeholder: '',
-          type: '',
-          date1: '',
-          date2: ''
+          name: '',
+          exclusiveRowOrNot: false,
+          numberOfWords: null,
+          options: [],
+          expanding: false,
+          isMultiple: false,
+          dateFormat: ''
         },
         rules: {
-          name: [
+          title: [
             { required: true, message: '请输入字段名称', trigger: 'blur' },
             { min: 2, max: 6, message: '长度在 2 到 6 个字符', trigger: 'blur' }
           ],
-          belong: [
+          module: [
             { required: true, message: '请选择所属模块', trigger: 'change' }
           ],
-          type: [
+          name: [
             { required: true, message: '请选择字段类型', trigger: 'change' }
           ],
-          date1: [
-            { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
-          ],
-          date2: [
-            { type: 'date', required: true, message: '请选择时间', trigger: 'change' }
+          dateFormat: [
+            { required: true, message: '请选择时间格式', trigger: 'change' }
           ]
         },
         feildTypes,
@@ -101,34 +102,145 @@
           {
             id: '0',
             value: '',
-            children: [
-            ]
+            children: []
           }
-        ]
+        ],
+        selectOptions: [{
+          id: 0,
+          value: ''
+        }]
       };
     },
     methods: {
-      addCascaderOptions() {
-        this.cascaderOptions.push({
-          id: this.cascaderOptions.length + '',
-          value: '',
-          children: []
+      addSelectOptions() {
+        this.selectOptions.push({
+          id: ++id,
+          value: ''
         })
       },
+      async addFormField() {
+
+      },
       submitForm(formName) {
-        console.log(this.cascaderOptions)
-        this.$refs[formName].validate((valid) => {
+        this.$refs[formName].validate(async (valid) => {
           if (valid) {
-            alert('submit!');
+            const form = this.handleForm()
+            console.log(JSON.stringify(form))
+            addFormField(form)
           } else {
             console.log('error submit!!');
             return false;
           }
         });
       },
+
       resetForm(formName) {
         this.$refs[formName].resetFields();
-      }
+      },
+      handleForm() {
+        const {
+          title,
+          name,
+          module,
+          required,
+          placeholder,
+          numberOfWords,
+          exclusiveRowOrNot,
+          expanding,
+          options,
+          isMultiple,
+          dateFormat
+        } = this.ruleForm
+        let form = {
+          TextInput: {
+            id: this.getId(),
+            title,
+            name,
+            module,
+            value: '',
+            valueType: 'String',
+            props: {
+              required,
+              placeholder,
+              numberOfWords,
+              exclusiveRowOrNot
+            }
+          },
+          TextareaInput: {
+            id: this.getId(),
+            title,
+            name,
+            module,
+            value: '',
+            valueType: 'String',
+            props: {
+              required,
+              placeholder,
+              numberOfWords
+            }
+          },
+          SelectInput: {
+            id: this.getId(),
+            title,
+            name,
+            module,
+            value: '',
+            valueType: 'String',
+            props: {
+              required,
+              placeholder,
+              expanding,
+              options: this.selectOptions
+            }
+          },
+          MultipleSelect: {
+            id: this.getId(),
+            title,
+            name,
+            module,
+            value: [],
+            valueType: 'Array',
+            props: {
+              required,
+              placeholder,
+              expanding,
+              options: this.selectOptions
+            }
+          },
+          Cascader: {
+            id: this.getId(),
+            title,
+            name,
+            module,
+            value: [],
+            valueType: 'Tree',
+            props: {
+              required,
+              placeholder,
+              multiple: isMultiple,
+              options: this.cascaderOptions
+            }
+          },
+          TimePicker: {
+            id: this.getId(),
+            title,
+            name,
+            module,
+            value: '',
+            valueType: 'String',
+            props: {
+              required,
+              placeholder,
+              format: dateFormat,
+            }
+          }
+        }
+        return form[this.ruleForm.name]
+      },
+      getId() {
+      return 'field' + (Math.floor(Math.random() * (99999 - 10000)) + 10000).toString()
+            + new Date().getTime().toString().substring(5);
+      },
     }
   }
 </script>

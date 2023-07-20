@@ -1,7 +1,6 @@
 <template>
   <div style="text-align: center">
     <h4>先选择本次登录人员的身份，再进入相应的系统 😅</h4>
-
     <div class="work-panel">
       <div class="user">
         <el-button type="primary" round size="small" @click="showUserSelect = true" icon="el-icon-user">选择本次登录者</el-button>
@@ -19,7 +18,7 @@
             您可以发起、处理及查看审批，进行日常工作任务
           </p>
         </div>
-        <div class="panel-item" @click="to('formsPanel')">
+        <div class="panel-item" @click="to('baseSetting')">
           <div>
             <i class="el-icon-s-custom"></i>
             <span>进入管理后台</span>
@@ -30,7 +29,6 @@
         </div>
       </div>
     </div>
-
     <org-picker :show="showUserSelect" single onlyUser @close="showUserSelect = false" :selected="select" @selectOver="selected"></org-picker>
   </div>
 </template>
@@ -62,11 +60,13 @@ export default {
       this.showUserSelect = false
       sessionStorage.setItem("user", JSON.stringify(this.loginUser))
     },
-    to(path){
+    to(name){
       if (this.loginUser === null || this.loginUser === ''){
         this.$message.warning("请先选择一个人员身份进行登录")
       }else {
-        this.$router.push(path)
+        this.$router.push({
+          name
+        })
       }
     }
   }

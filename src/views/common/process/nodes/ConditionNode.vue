@@ -1,28 +1,34 @@
 <template>
   <div :class="{'node': true, 'node-error-state': showError}">
     <div :class="{'node-body': true, 'error': showError}">
-      <div class="node-body-left" @click="$emit('leftMove')" v-if="level > 1">
+      <!-- <div class="node-body-left" @click="$emit('leftMove')" v-if="level > 1">
         <i class="el-icon-arrow-left"></i>
-      </div>
+      </div> -->
       <div class="node-body-main"  @click="$emit('selected')">
         <div class="node-body-main-header">
+          <svg class="icon" aria-hidden="true" style="width: 16px;height: 16px;margin-right: 5px;position: relative;top:2px;">
+            <use xlink:href="#icon-mind-mapping"></use>
+          </svg>
+          <!-- <i class="mind-mapping"></i> -->
           <span class="title">{{config.name ? config.name:('条件' + level)}}</span>
-          <span class="level">优先级{{level}}</span>
           <span class="option">
-            <el-tooltip effect="dark" content="复制条件" placement="top">
+            <!-- <el-tooltip effect="dark" content="复制条件" placement="top">
               <i class="el-icon-copy-document" @click.stop="$emit('copy')"></i>
-            </el-tooltip>
+            </el-tooltip> -->
             <i class="el-icon-close" @click.stop="$emit('delNode')"></i>
           </span>
         </div>
         <div class="node-body-main-content">
-          <span class="placeholder" v-if="(content || '').trim() === ''">{{placeholder}}</span>
-          <span v-else>{{content}}</span>
+          <span class="placeholder" v-if="(config.props.expression || '').trim() === ''">{{placeholder}}</span>
+          <span v-else>{{config.props.expression}}</span>
+        </div>
+        <div class="node-body-main-footer">
+          <span class="level">优先级{{level}}</span>
         </div>
       </div>
-      <div class="node-body-right" @click="$emit('rightMove')" v-if="level < size">
+      <!-- <div class="node-body-right" @click="$emit('rightMove')" v-if="level < size">
         <i class="el-icon-arrow-right"></i>
-      </div>
+      </div> -->
       <div class="node-error" v-if="showError">
         <el-tooltip effect="dark" :content="errorInfo" placement="top-start">
           <i class="el-icon-warning-outline"></i>
@@ -68,9 +74,18 @@ export default {
       showError: false
     }
   },
-  computed:{
-    content(){
-      this.config
+  // computed:{
+  //   content(){
+  //     this.config
+  //   }
+  // },
+  watch: {
+    config: {
+      handler(val) {
+        console.log(val)
+      },
+      immediate: true,
+      deep: true
     }
   },
   methods: {
@@ -97,12 +112,12 @@ export default {
   }
 }
 .node{
-  padding: 30px 55px 0;
+  margin: 30px 55px 0;
   width: 220px;
   .node-body{
     cursor: pointer;
-    min-height: 80px;
-    max-height: 120px;
+    min-height: 118px;
+    max-height: 158px;
     position: relative;
     border-radius: 5px;
     background-color: white;
@@ -114,9 +129,9 @@ export default {
         }
       }
       .node-body-main {
-        .level{
-          display: none !important;
-        }
+        // .level{
+        //   display: none !important;
+        // }
         .option{
           display: inline-block !important;
         }
@@ -142,22 +157,12 @@ export default {
       right: 0;
     }
     .node-body-main {
-      position: absolute;
-      width: 188px;
-      left: 17px;
-      display: inline-block;
-
       .node-body-main-header{
-        padding: 10px 0px 5px;
-        font-size: xx-small;
+        padding: 10px 16px 5px;
+        font-size: 14px;
         position: relative;
         .title{
-          color: #15bca3;
-        }
-        .level{
-          position: absolute;
-          right: 15px;
-          color: #888888;
+          color: #505968;
         }
         .option{
           position: absolute;
@@ -170,8 +175,23 @@ export default {
           }
         }
       }
+      .node-body-main-footer {
+        position: absolute;
+        width: 100%;
+        height: 30px;
+        line-height: 30px;
+        bottom: 0;
+        background: #20CE5B;
+        text-align: center;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        .level{
+          font-size: 14px;
+          color: #FFFFFF;
+        }
+      }
       .node-body-main-content {
-        padding: 6px;
+        padding: 6px 16px;
         color: #656363;
         font-size: 14px;
 
@@ -208,6 +228,7 @@ export default {
     }
     /deep/ .el-button{
       height: 32px;
+      line-height: 14px;
     }
     &::before{
       content: "";

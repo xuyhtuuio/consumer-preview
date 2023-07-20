@@ -6,6 +6,7 @@ export const ValueType = {
   date: 'Date',
   user: 'User',
   dept: 'Dept',
+  cascader: 'Tree',
   dateRange: 'DateRange'
 }
 //导出所有组件及配置

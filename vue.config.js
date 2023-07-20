@@ -71,6 +71,14 @@ module.exports = {
         pathRewrite: {
           '^/test/': '',
         }
+      },
+      '/cpr': {
+        target: 'http://192.168.210.57:31602',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          '^/cpr/': '/cpr/',
+        }
       }
     }
   }

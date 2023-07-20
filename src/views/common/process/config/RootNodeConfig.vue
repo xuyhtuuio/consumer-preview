@@ -1,13 +1,34 @@
 <template>
   <div>
-    <p class="desc">选择能发起该审批的人员/部门，不选则默认开放给所有人</p>
-    <el-button size="mini" @click="selectOrg" icon="el-icon-plus" type="primary" round>请选择</el-button>
-    <div style="margin-top: 20px">
-      <el-tag class="org-item" :type="org.type === 'dept'?'':'info'"
-              v-for="(org, index) in select" :key="index + '_org'"
-              closable size="mini" @close="removeOrgItem(index)">
-        {{org.name}}
-      </el-tag>
+    <p class="desc">
+      <svg class="icon" aria-hidden="true">
+        <use xlink:href="#icon-setting-user"></use>
+      </svg>
+      <span>
+        选择{{ nodeName }}，<span style="color: #86909C;font-size: 12px;">配置可发起审批任务的人员范围</span>
+      </span>
+    </p>
+    <el-radio-group v-model="radio">
+      <el-radio label="所有人">所有人</el-radio>
+      <el-radio label="指定部门/人员/角色">
+        指定部门/人员/角色
+      </el-radio>
+    </el-radio-group>
+    <br/>
+    <div v-if="radio === '指定部门/人员/角色'">
+      <el-button size="mini" @click="selectOrg" icon="el-icon-plus" type="primary">选择部门/人员/系统角色</el-button>
+      <div style="margin-top: 20px">
+        <div class="tag-action" >
+          <div class="tag-box" v-for="(item, index) in select" :key="index">
+            <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
+          </div>
+        </div>
+        <!-- <el-tag class="org-item" :type="org.type === 'dept'?'':'info'"
+                v-for="(org, index) in select" :key="index + '_org'"
+                closable size="mini" @close="removeOrgItem(index)">
+          {{org.name}}
+        </el-tag> -->
+      </div>
     </div>
     <org-picker :show="showOrgSelect" @close="closeSelect" :selected="select" @selectOver="selected"></org-picker>
   </div>
@@ -24,43 +45,101 @@ export default {
       default: ()=>{
         return {}
       }
+    },
+    nodeName: {
+      type: String,
+      default: undefined
     }
   },
   data() {
     return {
-      showOrgSelect: false
+      showOrgSelect: false,
+      radio: '所有人',
+      tagConfig: {
+        background: '#f0f6ff',
+        color: '#2d5cf6',
+        borderColor: '#5784FF',
+        borderRadius: '4px',
+        closable: true,
+        size: 'medium'
+      }
     }
   },
   computed:{
-    select(){
-      return this.config.assignedUser
+    select: {
+      get() {
+        return this.config.assignedUser
+      },
+      set() {
+
+      }
+    }
+  },
+  watch: {
+    config: {
+      handler(val) {
+        if (val.assignedUser.length) {
+          this.radio = '指定部门/人员/角色'
+        }
+      },
+      immediate: true,
+      deep: true
     }
   },
   methods: {
     closeSelect(){
-
+      this.showOrgSelect = false
     },
     selectOrg() {
       this.showOrgSelect = true
     },
     selected(select) {
-      console.log(select)
       this.showOrgSelect = false
-      select.forEach(val => this.select.push(val))
+      this.select = []
+      for (let key in select) {
+        select[key].forEach(val => this.select.push({
+          ...val,
+          label: val.label,
+          ...this.tagConfig
+        }))
+      }
     },
     removeOrgItem(index){
+      console.log(index)
       this.select.splice(index, 1)
+      console.log(this.select)
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+.icon {
+  width: 24px;
+  height: 24px;
+}
 .desc{
-  font-size: small;
-  color: #8c8c8c;
+  display: flex;
+  align-items: center;
+  padding: 10px 0 17px;
+  font-size: 14px;
+  color: #1D2128;
 }
 .org-item{
   margin: 5px;
+}
+.el-button--mini {
+  margin-top: 16px;
+  border-radius: 17px;
+}
+/deep/.el-radio .el-radio__label {
+  font-weight: normal;
+}
+.tag-action {
+  text-align: left;
+}
+.tag-box {
+  display: inline-block;
+  margin-bottom: 8px;
 }
 </style>

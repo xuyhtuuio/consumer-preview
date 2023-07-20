@@ -43,3 +43,6 @@ body{
 .tr{
     text-align: right;
 }
+#app{
+    height: 100%;
+}

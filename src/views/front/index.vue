@@ -10,23 +10,21 @@
 </template>
 
 <script>
-import NavMenu from "@/components/common/navMenu"
-  export default {
-    components: {
-      NavMenu
-    },
-    data() {
-      return {
-      }
-    },
-    methods: {
-      handleItem(item) {
+
+export default {
+  components: {
+    
+  },
+  data() {
+    return {
+    }
+  },
+  methods: {
+    handleItem(item) {
       console.log(item);
     }
-    }
   }
+}
 </script>
 
-<style lang="less" scoped>
-
-</style>
+<style lang="less" scoped></style>

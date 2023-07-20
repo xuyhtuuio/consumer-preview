@@ -1,23 +1,24 @@
 <template>
   <div>
     <div class="header">
-      <el-menu :default-active="activeIndex" active-text-color="#409eff" class="el-menu-demo" mode="horizontal"
+      <el-menu :default-active="activeIndex" active-text-color="#165DFF" class="el-menu-demo" mode="horizontal"
                @select="handleSelect">
-        <el-menu-item index="/admin/design/baseSetting" @click="to('/admin/design/baseSetting')">① 基础设置</el-menu-item>
-        <el-menu-item index="/admin/design/formSetting" @click="to('/admin/design/formSetting')">② 表单设计</el-menu-item>
-        <el-menu-item index="/admin/design/processDesign" @click="to('/admin/design/processDesign')">③ 流程设计
+        <el-menu-item index="/admin/design/baseSetting" @click="to('/admin/design/baseSetting')"><span class="num">1</span> 基础设置</el-menu-item>
+        <span style="position: relative; top: 20px;">></span>
+        <!-- <el-menu-item index="/admin/design/formSetting" @click="to('/admin/design/formSetting')">④ 表单设计</el-menu-item> -->
+        <el-menu-item index="/admin/design/processDesign" @click="to('/admin/design/processDesign')"><span class="num">2</span> 流程设计
         </el-menu-item>
-        <el-menu-item index="/admin/design/proSetting" @click="to('/admin/design/proSetting')">④ 高级设置</el-menu-item>
+        <span style="position: relative; top: 20px;">></span>
+        <el-menu-item index="/admin/design/proSetting" @click="to('/admin/design/proSetting')"><span class="num">3</span> 高级设置</el-menu-item>
       </el-menu>
       <div class="publish">
-        <el-button size="mini" @click="preview"><i class="el-icon-view"></i>预览</el-button>
+        <el-button size="mini" @click="preview"><i class="el-icon-folder-opened"></i>保存</el-button>
         <el-button size="mini" type="primary" @click="publish"><i class="el-icon-s-promotion"></i>发布</el-button>
       </div>
       <div class="back">
-        <el-button @click="exit" size="medium" icon="el-icon-arrow-left" circle></el-button>
+        <el-button @click="exit" size="small" icon="el-icon-arrow-left" circle style="line-height: 12px;padding: 7px;background: #F7F8FA;border:none;margin-right: 12px;"></el-button>
         <span>
-          <i :class="setup.logo.icon" :style="'background:' + setup.logo.background"></i>
-          <span>{{ setup.formName }}</span>
+          <span>消保审批</span>
         </span>
       </div>
     </div>
@@ -74,6 +75,7 @@ export default {
       this.$confirm('未发布的内容将不会被保存，是否直接退出 ?', '提示', {
         confirmButtonText: '退出',
         cancelButtonText: '取消',
+        customClass: 'back-confim',
         type: 'warning'
       }).then(() => {
         //window.location.reload()
@@ -110,8 +112,11 @@ export default {
 @import "@/assets/global";
 
 /deep/ .header {
+  margin: 0 -100px;
   min-width: 980px;
   position: relative;
+  height: 60px;
+  background: #ffffff;
 
   .el-menu {
     top: 0;
@@ -119,6 +124,26 @@ export default {
     display: flex;
     justify-content: center;
     width: 100%;
+    border-bottom: none;
+    .el-menu-item {
+      height: 50px !important;
+      line-height: 50px !important;
+      .num {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        text-align: center;
+        border-radius: 100%;
+        background: #F2F3F5;
+      }
+    }
+    .el-menu-item.is-active {
+      .num {
+        background: #165DFF;
+        color: #ffffff;
+      }
+    }
   }
 
   .publish {
@@ -139,7 +164,7 @@ export default {
   .back {
     position: absolute;
     z-index: 1000;
-    top: 10px;
+    top: 16px;
     left: 20px;
     font-size: small;
 
@@ -153,6 +178,13 @@ export default {
       }
     }
 
+  }
+}
+</style>
+<style lang="less">
+.back-confim {
+  .el-message-box__status.el-icon-warning {
+    left: 32px;
   }
 }
 </style>

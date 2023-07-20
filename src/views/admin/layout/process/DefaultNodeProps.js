@@ -1,6 +1,6 @@
 //审批节点默认属性
 export const APPROVAL_PROPS = {
-  assignedType: "ASSIGN_USER",
+  assignedType: "SELF_SELECT",
   mode: "AND",
   sign: false,
   nobody: {
@@ -58,7 +58,8 @@ export const CONDITION_PROPS = {
 //抄送节点默认属性
 export const CC_PROPS = {
   shouldAdd: false,
-  assignedUser: []
+  assignedUser: [],
+  formPerms:[]
 }
 
 //触发器节点默认属性
