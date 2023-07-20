@@ -112,6 +112,7 @@ export default {
 @import "@/assets/global";
 
 /deep/ .header {
+  margin: 0 -100px;
   min-width: 980px;
   position: relative;
   height: 60px;

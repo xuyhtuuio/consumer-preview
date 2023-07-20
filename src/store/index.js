@@ -8,7 +8,7 @@ export default new Vuex.Store({
     isEdit: null,
     breadcrumbList: [],
     selectedNode: {},
-    design:{},
+    design: {}
   },
   mutations: {
     selectedNode(state, val) {

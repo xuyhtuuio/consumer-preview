@@ -24,14 +24,18 @@ export default {
   },
   computed:{
     content(){
-      this.config
+      return this.config.props.assignedUser.map(item => item.label).join('、') || ''
     }
   },
-  watch: {
-    config(val) {
-      console.log(val)
-    }
-  },
+  // watch: {
+  //   config: {
+  //     handler(val) {
+  //       console.log(val)
+  //     },
+  //     immediate: true,
+  //     deep: true
+  //   }
+  // },
   methods: {}
 }
 </script>

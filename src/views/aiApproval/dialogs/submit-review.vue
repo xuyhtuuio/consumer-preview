@@ -23,19 +23,19 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="产品要点" prop="productEssentials">
-                    <el-checkbox-group v-model="params.productEssentials" >
+                    <el-checkbox-group v-model="params.productEssentials">
                         <div class="floor1">
-                            <el-checkbox :label="item.value" v-for="item in productEssentialList.slice(0,2)" :key="item.value"
-                            :value="item.value">
-                            {{ item.label }}
-                        </el-checkbox>
+                            <el-checkbox :label="item.value" v-for="item in productEssentialList.slice(0, 2)"
+                                :key="item.value" :value="item.value">
+                                {{ item.label }}
+                            </el-checkbox>
                         </div>
-                        <div class="floor2 reviewPoints"> 
-                        <el-checkbox :label="item.value" v-for="item in productEssentialList.slice(2,5)" :key="item.value"
-                            :value="item.value">
-                            {{ item.label }}
-                        </el-checkbox>
-                    </div>
+                        <div class="floor2 reviewPoints">
+                            <el-checkbox :label="item.value" v-for="item in productEssentialList.slice(2, 5)"
+                                :key="item.value" :value="item.value">
+                                {{ item.label }}
+                            </el-checkbox>
+                        </div>
                     </el-checkbox-group>
                 </el-form-item>
                 <el-form-item label="审查要点" prop="reviewPoints" class="reviewPoints">
@@ -61,11 +61,13 @@
                         </div>
                         <div class="submission-op">
                             <!-- <i>无实质意见</i> -->
-                            <span v-if="item.opinion" class="opinion has-opinion">
+                            <span v-if="item.opinion" class="opinion has-opinion"
+                                @click="() => { item.opinion = !item.opinion }">
                                 <i class="iconfont icon icon-guanzhu"></i>
                                 有实质意见
                             </span>
-                            <span v-if="!item.opinion" class="opinion no-opinion">
+                            <span v-if="!item.opinion" class="opinion no-opinion"
+                                @click="() => { item.opinion = !item.opinion }">
                                 <i class="iconfont icon icon-guanzhu2"></i>
                                 无实质意见
                             </span>
@@ -74,10 +76,10 @@
                             <span style="width:20px;"><i class="el-icon-bottom move"
                                     v-if="index !== submission.length - 1 && mousePoint == index"
                                     @click='moveDown(index)'></i></span>
-                            <i class="iconfont icon  icon-xianxingtubiao-1 del"></i>
+                            <span style="width:20px;">
+                                <i class="iconfont icon  icon-xianxingtubiao-1 del" v-if="mousePoint == index" @click="del(item,index)"></i></span>
                         </div>
                     </div>
-
                 </div>
                 <p class="submission-name">
                     以上为{{ params.organization }}建议，请酌情考虑。
@@ -95,7 +97,7 @@ export default {
     data() {
         return {
             showClose: false,
-            submitReviewDialog: true,
+            submitReviewDialog: false,
             passlist: [
                 { name: '通过', id: '1' },
                 { name: '不通过', id: '2' },
@@ -177,6 +179,22 @@ export default {
             const copyNextValue = this.submission[index + 1]
             this.$set(this.submission, index, copyNextValue)
             this.$set(this.submission, index + 1, copyCrtValue)
+        },
+        del(item,index){
+            this.$confirm('确定删除该条意见吗？', '', {
+                customClass: 'confirmBox',
+                confirmButtonText: '删除',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+              this.submission.splice(index,1)
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });
+            });
+
         }
     }
 }
@@ -234,10 +252,12 @@ export default {
                 font-weight: 400;
                 // line-height: 22px;
             }
-            .el-form-item__label::before{
+
+            .el-form-item__label::before {
                 display: none;
             }
-           .is-required .el-form-item__label::after {
+
+            .is-required .el-form-item__label::after {
                 content: "*";
                 color: #F76560;
                 margin-left: 5px;
@@ -249,10 +269,11 @@ export default {
                 background: #F7F8FA;
                 padding: 0 16px;
             }
-            .reviewPoints{
-          .el-checkbox{
-            width: 30%;
-          }
+
+            .reviewPoints {
+                .el-checkbox {
+                    width: 30%;
+                }
             }
         }
 
@@ -417,5 +438,4 @@ export default {
 
     }
 
-}
-</style>
+}</style>

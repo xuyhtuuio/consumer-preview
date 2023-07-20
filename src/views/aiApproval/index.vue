@@ -1,6 +1,14 @@
 <template>
   <div class="container" v-loading="loading">
-    <div class="tools"></div>
+    <div class="tools">
+      <el-popover placement="right" trigger="click" popper-class="sidebar-popper" @after-leave="hiddenPopover" v-for="(item,index) in tools" :key="index">
+         <component :is="crtToolComponent"></component>
+        <span slot="reference" :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
+          @click="changeTools(item)">
+          <i :class="['iconfont',item.icon]"></i>
+        </span>
+      </el-popover>
+    </div>
     <div class="content">
       <div class="content-header">
         <span class="content-title">
@@ -36,14 +44,49 @@ import editorial from './components/editorial'
 import { files, pngOcr, recommends } from "./files";
 import addReview from './dialogs/add-review.vue'
 import submitReview from './dialogs/submit-review.vue'
+import applyForm from './sidebar/apply-form.vue'
+import approvalRecordDetail from './sidebar/approval-record-detail'
+import similarCase from './sidebar/similar-case.vue'
+import approvedOpinion from './sidebar/approved-opinion'
+import aiKnowledgeBase from './sidebar/ai-knowledge-base'
+
 export default {
   name: 'aiApproval',
-  components: { filePreview, orcTxt, editorial, addReview, submitReview },
+  components: { filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase },
   data() {
     return {
       loading: false,
       files: [], // 文件相关信息
-      comments: [], // 总编辑意见
+      comments: [], // 编辑意见
+      crtTools: '',//当前侧边工具栏激活项
+      tools: [
+        {
+          component: 'applyForm',
+          toolSign: 'apply-form',
+          icon: 'icon-shenqingdan'
+        },
+        {
+          component: 'approvalRecordDetail',
+          toolSign: 'approval-record',
+          icon: 'icon-jilumingxi'
+        },
+        {
+          component: 'similarCase',
+          toolSign: 'similar-case',
+          icon: 'icon-xiangsianli'
+        },
+        {
+          component: 'approvedOpinion',
+          toolSign: 'approved-opinion',
+          icon: 'icon-yijianshu'
+        },
+        {
+          component: 'aiKnowledgeBase',
+          toolSign: 'ai',
+          icon: 'icon-ciku'
+        }
+      ],
+      crtToolComponent:'',
       approval: {}, // 当前审批文件的相关内容
       activeIndex: null,
       word_lines: [], // 连线
@@ -62,6 +105,13 @@ export default {
     }, 1000);
   },
   methods: {
+    changeTools(item) {
+      this.crtTools = item.toolSign,
+      this.crtToolComponent=item.component
+    },
+    hiddenPopover() {
+      this.crtTools = ''
+    },
     init() {
       this.$refs['addReview'].init()
     },
@@ -288,6 +338,45 @@ export default {
   .tools {
     background: #ffffff;
     width: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 60px;
+
+    .iconfont {
+      font-size: 22px;
+
+    }
+
+    span {
+      display: inline-block;
+      cursor: pointer;
+
+      .el-popover__reference {
+        padding: 6px !important;
+        margin-bottom: 24px;
+      }
+    }
+
+    span:hover {
+      .el-popover__reference {
+        background: #F2F3F5;
+        border-radius: 4px;
+        padding: 6px;
+
+      }
+
+    }
+
+    .active-tools {
+      background: #F2F3F5;
+      border-radius: 4px;
+      padding: 6px;
+
+
+
+    }
+
   }
 
   .content {
@@ -337,13 +426,26 @@ export default {
     border-radius: 10px;
     box-shadow: 0px 0px 10px 0px #4343430D;
     width: 380px;
+    flex: 1;
+    &:first-child {
     overflow: hidden;
 
     &:first-child {
       flex: 1;
       // width: calc(100% - 60% - 24px);
     }
-  }
+  }}
+}
+</style>
+<style lang="less">
+.sidebar-popper {
+  border-radius: 10px;
+  background: #FFF;
+  padding: 24px;
+  height: 96%;
+  /* 投影/10% */
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.15);
+  left: 64px !important;
 }
 </style>
 <style lang="less">

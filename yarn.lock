@@ -9572,6 +9572,11 @@ posix-character-classes@^0.1.0:
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
   integrity sha512-xTgYBc3fuo7Yt7JbiuFxSYGToMoz8fLoE6TC9Wx1P/u+LfeThMOAqmuyECnlBaaJb+u1m9hHiXUEtwW4OzfUJg==
 
+posix-character-classes@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmmirror.com/posix-character-classes/-/posix-character-classes-1.0.0.tgz#86917ab2d252f7ea78e157bf009b9b6ea35c6cad"
+  integrity sha512-YXx/VWf+oJ08fmz0nwXPAQ7lxUe/HgQO2gmT0KLaX9oAWEYclXUOuZD+jDaTlqMED5OMoqOzeyOpSEt83D0HDA==
+
 postcss-attribute-case-insensitive@^5.0.2:
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/postcss-attribute-case-insensitive/-/postcss-attribute-case-insensitive-5.0.2.tgz#03d761b24afc04c09e757e92ff53716ae8ea2741"
@@ -12211,10 +12216,10 @@ trim-canvas@^0.1.2:
   resolved "https://registry.yarnpkg.com/trim-canvas/-/trim-canvas-0.1.2.tgz#620457f5fecf564b521d35c5fcd4da58304d6e45"
   integrity sha512-nd4Ga3iLFV94mdhW9JFMLpQbHUyCQuhFOD71PEAt1NjtMD5wbZctzhX8c3agHNybMR5zXD1XTGoIEWk995E6pQ==
 
-trs-web-components@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/trs-web-components/-/trs-web-components-0.1.0.tgz#730e2e5408d70a7cf79ea418d8b6aa8ff1d3e3a1"
-  integrity sha512-VxBXdCYkd05Kur7YGjWuh81Eb8juJMqb4x3krYIcfeNNl4okiRW2eBodIHt6pM59x8xG1ymWwLCudIPv9c4x7g==
+trs-web-components@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.npmmirror.com/trs-web-components/-/trs-web-components-0.1.3.tgz#38ec43dd99bcec5549986acef31e7f10bcbeb7a5"
+  integrity sha512-msIDzZjQzveO72GtI28onpJ6ow8PIxnwSn36XhW/LddIpYCSaxDOTmhumZReWDpvpDAZWNNjtK5K/aIQxquCLA==
   dependencies:
     "@better-scroll/observe-dom" "^2.5.0"
     "@element-plus/icons-vue" "^2.0.4"
@@ -12861,8 +12866,10 @@ watchpack@^1.7.4:
   resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-1.7.5.tgz#1267e6c55e0b9b5be44c2023aed5437a2c26c453"
   integrity sha512-9P3MWk6SrKjHsGkLT2KHXdQ/9SNkyoJbabxnKOoJepsvJjJG8uYTR3yTPxPQvNDI3w4Nz1xnE0TLHK4RIVe/MQ==
   dependencies:
+    chokidar "^3.4.1"
     graceful-fs "^4.1.2"
     neo-async "^2.5.0"
+    watchpack-chokidar2 "^2.0.1"
   optionalDependencies:
     chokidar "^3.4.1"
     watchpack-chokidar2 "^2.0.1"
@@ -13091,6 +13098,7 @@ worker-farm@^1.7.0:
     errno "~0.1.7"
 
 "wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+  name wrap-ansi-cjs
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==

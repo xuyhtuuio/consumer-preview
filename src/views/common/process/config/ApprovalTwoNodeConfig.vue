@@ -5,19 +5,14 @@
         <use xlink:href="#icon-setting-user"></use>
       </svg>
       <span>
-        选择{{ nodeName }}，<span style="color: #86909C;font-size: 12px;">配置抄送的人员范围</span>
+        选择{{ nodeName }}人员
       </span>
     </p>
-    <el-button size="mini" @click="selectOrg" icon="el-icon-plus" type="primary">选择部门/人员/系统角色</el-button>
-    <div style="margin-top: 16px">
-      <div class="tag-action" >
-        <div class="tag-box" v-for="(item, index) in select" :key="index">
-          <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
-        </div>
-      </div>
-    </div>
-    <p style="color: #86909C;font-size: 12px;margin-top:20px">抄送对象仅可查看申请单，无其他操作权限</p>
-    <org-picker :show="showOrgSelect" @close="closeSelect" :selected="select" @selectOver="selected"></org-picker>
+    <p style="color: #86909C;font-size: 12px;margin:20px 0 0 6px;">注：二次会签时，仅支持指定之前某一节点对应的审批人（包含发起人），仅选择审批节点即可</p>
+    <span style="display: inline-block;font-size:14px;margin: 24px 10px 0 0;">指定节点 </span>
+    <el-select v-model="nodeProps.nodeId" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
+      <el-option v-for="(op, index) in nodes" :key="index" :label="op.name" :value="op.id"></el-option>
+    </el-select>
   </div>
 </template>
 
@@ -36,7 +31,7 @@ export default {
     nodeName: {
       type: String,
       default: undefined
-    }
+    },
   },
   data() {
     return {
@@ -52,14 +47,24 @@ export default {
     }
   },
   computed:{
-    select: {
-      get() {
-        return this.config.assignedUser
-      },
-      set() {
-
-      }
-    }
+    nodeProps() {
+      return this.$store.state.selectedNode.props
+    },
+    nodeMap() {
+      return this.$store.state.nodeMap
+    },
+    nodes() {
+      const tempNodes = []
+      this.nodeMap.forEach(value => {
+        if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO'].includes(value?.type)) {
+          tempNodes.push({
+            name: value.name,
+            id: value.id
+          })
+        }
+      })
+      return tempNodes
+    },
   },
   methods: {
     closeSelect(){
@@ -83,6 +88,7 @@ export default {
       //   label: val.name,
       //   ...this.tagConfig
       // }))
+      // console.log(this.select)
     },
     removeOrgItem(index){
       console.log(index)
