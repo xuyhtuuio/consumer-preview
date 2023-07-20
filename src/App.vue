@@ -2,7 +2,7 @@
   <div id="app">
     <NavMenu></NavMenu>
     <transition name="router-fade" mode="out-in" >
-      <router-view v-if="!$route.meta.keepAlive" class="view-box"/>
+      <router-view v-if="!$route.meta.keepAlive" class="view-box" :style="{padding: noPaddingRoute.indexOf($route.name) !== -1 ? '0':'16px 80px'}"/>
     </transition>
   </div>
 </template>
@@ -13,7 +13,9 @@ import NavMenu from "@/components/common/navMenu"
 export default {
   components: { NavMenu},
   data() {
-    return {}
+    return {
+      noPaddingRoute:['aiApproval']
+    }
   },
   mounted() {
     let beforeUrl = sessionStorage.getItem('router-path')
