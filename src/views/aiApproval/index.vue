@@ -227,7 +227,9 @@ export default {
   border-radius: 10px;
   background: #FFF;
   padding: 24px;
+  height: 96%;
   /* 投影/10% */
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.15);
+  left: 64px !important;
 }
 </style>

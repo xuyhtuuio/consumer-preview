@@ -182,7 +182,7 @@ export default {
 <style lang="less" scoped>
 .approval-record-detail {
     width: 600px;
-    max-height: 752px;
+    height: 100%;
     overflow-y: auto;
 
     .poppver-title {

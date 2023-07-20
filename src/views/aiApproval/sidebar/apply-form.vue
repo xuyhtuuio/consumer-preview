@@ -190,7 +190,7 @@ export default {
 <style lang="less" scoped>
 .ocr-apply-form {
     width: 600px;
-    max-height: 752px;
+    height: 100%;
     overflow-y: auto;
 
     .user-info {

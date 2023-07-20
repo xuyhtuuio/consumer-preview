@@ -144,7 +144,8 @@ export default {
 <style lang="less" scoped>
 .similar-case {
     width: 600px;
-    height: 752px;
+   height: 100%;
+    overflow:hidden;
 
     .poppver-title {
         color: #1D2128;

@@ -142,8 +142,10 @@ export default {
 <style lang="less" scoped>
 .approved-opinion {
     width: 600px;
-    max-height: 752px;
-    overflow-y: auto;
+    height: 100%;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
 
     .poppver-title {
         color: #1D2128;
@@ -152,6 +154,7 @@ export default {
         font-weight: 400;
         line-height: 24px;
         margin-bottom: 16px;
+        height: 24px;
 
         .icon {
             font-size: 20px;
@@ -160,6 +163,8 @@ export default {
     }
 
     .opinion-content {
+   flex: 1;
+        overflow: auto;
         .opinion-box {
             margin-bottom: 12px;
             .stuff {
