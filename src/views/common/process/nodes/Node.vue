@@ -149,8 +149,11 @@ export default {
       }
     }
     .node-body-content{
+      display: inline-block;
       padding: 18px;
       line-height: 22px;
+      max-height: 90px;
+      overflow-y: auto;
       color: #656363;
       font-size: 14px;
       i{

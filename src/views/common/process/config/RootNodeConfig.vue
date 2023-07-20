@@ -12,9 +12,6 @@
       <el-radio label="所有人">所有人</el-radio>
       <el-radio label="指定部门/人员/角色">
         指定部门/人员/角色
-        <svg class="icon" aria-hidden="true" style="position: relative; top: 4px;">
-          <use xlink:href="#icon-wenhao"></use>
-        </svg>
       </el-radio>
     </el-radio-group>
     <br/>
@@ -76,6 +73,17 @@ export default {
       set() {
 
       }
+    }
+  },
+  watch: {
+    config: {
+      handler(val) {
+        if (val.assignedUser.length) {
+          this.radio = '指定部门/人员/角色'
+        }
+      },
+      immediate: true,
+      deep: true
     }
   },
   methods: {

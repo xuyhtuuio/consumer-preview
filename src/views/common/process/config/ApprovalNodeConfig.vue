@@ -11,9 +11,20 @@
         <el-radio-group v-model="nodeProps.assignedType">
           <el-radio v-for="t in approvalTypes" :label="t.type" :key="t.type">{{ t.name }}</el-radio>
         </el-radio-group>
-        <svg class="icon" aria-hidden="true">
-          <use xlink:href="#icon-wenhao"></use>
-        </svg>
+        <el-popover
+          placement="bottom"
+          title=""
+          width="300"
+          trigger="hover">
+          <b>什么是节点审批人？</b>
+          <p>1.通过选择前面已经配置的节点进行关联，流程执行时自动获取所有关联审批节点中的实际审批人作为当前节点的审批人</p>
+          <p>2.当前节点为节点审批人时，同一审批人重复审批将不会触发自动通过</p>
+          <b>如何关联节点？ </b>
+          <p>可以选择前序节点的名称进行关联 </p>
+          <svg slot="reference" class="icon" aria-hidden="true">
+            <use xlink:href="#icon-wenhao"></use>
+          </svg>
+        </el-popover>
         <div v-if="nodeProps.assignedType === 'ASSIGN_USER'">
           <el-button size="mini" icon="el-icon-plus" type="primary" @click="selectUser" round>选择人员</el-button>
         </div>

@@ -200,10 +200,11 @@ export default {
       })
     },
     publishProcess(){
-      this.$confirm('您确定审批流程已配置完毕,并需要将其发布，发布后立即生效，是否继续?', '提示', {
+      this.$confirm('<div><div><i class="el-alert__icon el-icon-warning" style="color: #e6a23c;font-size: 26px;"></i></div>您确定审批流程已配置完毕,并需要将其发布，发布后立即生效，是否继续?</div>', '提示', {
         confirmButtonText: '发布',
         cancelButtonText: '取消',
-        type: 'warning'
+        dangerouslyUseHTMLString: true,
+        // type: 'warning'
       }).then(() => {
         console.log(this.setup)
         let template = {
@@ -218,15 +219,15 @@ export default {
         }
         if (this.isNew || this.$isEmpty(this.setup.formId)){
           createForm(template).then(rsp => {
-           this.$message.success("创建表单成功")
-            this.$router.push("/formsPanel")
+            this.$message.success("创建表单成功")
+            // this.$router.push("/formsPanel")
           }).catch(err => {
             this.$message.error(err)
           })
         }else {
           updateFormDetail(template).then(rsp => {
             this.$message.success("更新表单成功")
-            this.$router.push("/formsPanel")
+            // this.$router.push("/formsPanel")
           }).catch(err => {
             this.$message.error(err)
           })

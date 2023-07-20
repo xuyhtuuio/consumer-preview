@@ -15,11 +15,25 @@
       <div slot="title">
         <template v-if="selectedNode.name !== '二次会签'">
           <el-input v-model="selectedNode.name" size="medium" v-show="showInput"
-                    style="width: 300px" @blur="showInput = false"></el-input>
-          <el-link v-show="!showInput" @click="showInput = true" style="font-size: medium">
-            {{selectedNode.name}}
-            <i class="el-icon-edit" style="margin-right: 10px"></i>
-          </el-link>
+                    style="width: 300px" @blur="showInput = false">
+            <i
+              class="el-icon-success el-input__icon"
+              style="color: #2D5CF6;"
+              slot="suffix"
+              @click="showInput = false">
+            </i>
+          </el-input>
+          <div @mouseover="isHover = true" @mouseout="isHover=false">
+            <div class="header-title" v-show="!showInput" @click="showInput = true" style="font-size: medium">
+              {{selectedNode.name}}
+              <svg v-if="isHover" class="icon" aria-hidden="true">
+                <use xlink:href="#icon-bi"></use>
+              </svg>
+              <svg v-else class="icon" aria-hidden="true">
+                <use xlink:href="#icon-bi1"></use>
+              </svg>
+            </div>
+          </div>
         </template>
         <template v-else>
           <span style="font-size:medium;font-weight:700">
@@ -47,7 +61,8 @@ export default {
       scale: 100,
       selected: {},
       showInput: false,
-      showConfig: false
+      showConfig: false,
+      isHover: false
     }
   },
   computed:{
@@ -111,11 +126,11 @@ export default {
 /deep/ .el-drawer__body{
   overflow-y: auto;
 }
-/deep/ .el-link--inner:hover {
+/deep/ .el-input__inner {
+  border: 1px solid #2D5CF6;
+}
+/deep/ .header-title:hover {
   color: #2D5CF6;
-  &::after {
-    color: #2D5CF6;
-    border-bottom: 1px solid #2D5CF6;
-  }
+  cursor: pointer;
 }
 </style>
