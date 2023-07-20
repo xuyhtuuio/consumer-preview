@@ -55,6 +55,22 @@ module.exports = {
         pathRewrite: {
           '^/uaa/': '/uaa/',
         }
+      },
+      '/upload/': {
+        target: 'http://192.168.210.57:31602/',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          '^/upload/': '',
+        }
+      },
+      '/test/': {
+        target:"http://192.168.161.39:8324/",
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          '^/test/': '',
+        }
       }
     }
   }

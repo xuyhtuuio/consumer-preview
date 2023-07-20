@@ -241,3 +241,71 @@
 .el-breadcrumb .el-breadcrumb__inner  {
   font-size: 14px;
 }
+
+.my-form {
+  .el-input__inner{
+    background: rgba(247, 248, 250, 1);
+    border: 0;
+    padding: 0;
+  }
+  
+  .el-textarea__inner,.el-form-item__content  {
+    padding-left: 0;
+    background: rgba(247, 248, 250, 1);
+    border: 0;
+
+    .warn {
+      background:transparent
+    }
+  }
+  .el-textarea {
+    .el-textarea__inner {
+     
+    }
+    
+   
+  }
+  .el-form-item {
+    margin-bottom: 16px;
+  }
+  .el-form-item__content {
+    padding-left: 16px;
+
+    .el-select {
+      width: 100%;
+    }
+    .el-select .el-input .el-select__caret.el-input__icon::before {
+      content: "\e790";
+      position: absolute;
+      width: 100%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotateZ(180deg);
+    }    
+  }
+
+  .el-date-editor {
+    .el-input__prefix {
+      left: -6px;
+    }
+    .el-input__inner {
+      padding-left: 15px;
+    }
+  }
+
+  .el-radio__input.is-checked+.el-radio__label {
+    color: black;
+  }
+
+  .el-checkbox {
+    // min-width: 160px;
+    margin-right: 24px;
+  }
+  .el-checkbox__input.is-checked+.el-checkbox__label {
+    color: black;
+  }
+
+  .el-cascader {
+    display: block;
+  }
+}

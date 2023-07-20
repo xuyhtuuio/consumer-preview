@@ -4,6 +4,13 @@ body{
 }
 .view-box {
     padding: 24px 80px;
+    height: calc(100vh - 48px);
+    overflow-y: auto;
+  }
+
+  .df {
+    display: flex;
+    align-items: center;
   }
 /*路由切换动画*/
 .router-fade-enter-active {

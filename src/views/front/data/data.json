@@ -1,0 +1,432 @@
+{"status":200,
+"success":true,
+"msg":"成功返回",
+"timestamp":"1689233958146",
+"exception":null,
+"data":{
+    "basicInformation":[
+        {
+            "title":"项目名称",
+            "name":"TextInput",
+            "module":"基本信息",
+            "icon":"el-icon-edit",
+            "value":"",
+            "valueType":"String",
+            "props":{
+                "required":true,
+                "placeholder":"提示文字",
+                "numberOfWords":"10",
+                "exclusiveRowOrNot":true
+            },
+            "id":"field65499995296741"
+        },
+        {
+            "title":"审批类型",
+            "name":"SelectInput",
+            "module":"基本信息",
+            "value":"",
+            "valueType":"String",
+            "props":{
+                "required":true,
+                "placeholder":"2fwewe",
+                "expanding":true,
+                "options":[
+                    {
+                        "id":0,
+                        "value":"新产品"
+                    },
+                    {
+                        "id":1,
+                        "value":"产品营销类"
+                    }
+                ]
+            },
+            "id":"field5061116014807"
+        },
+        {
+            "title":"产品类型",
+            "name":"MultipleSelect",
+            "module":"基本信息",
+            "value":[
+
+            ],
+            "valueType":"Array",
+            "props":{
+                "required":true,
+                "placeholder":"2fwewe23",
+                "expanding":false,
+                "options":[
+                    {
+                        "id":0,
+                        "value":"理财"
+                    },
+                    {
+                        "id":1,
+                        "value":"基金"
+                    }
+                ]
+            },
+            "id":"field4156010529612"
+        },
+        {
+          "title":"审批类型1",
+          "name":"SelectInput",
+          "module":"基本信息",
+          "value":"",
+          "valueType":"String",
+          "props":{
+              "required":true,
+              "placeholder":"2fwewe",
+              "expanding":false,
+              "options":[
+                  {
+                      "id":0,
+                      "value":"新产品1"
+                  },
+                  {
+                      "id":1,
+                      "value":"产品营销类1"
+                  }
+              ]
+          },
+          "id":"fiel1160148071"
+      },
+
+        {
+          "title":"产品类1型",
+          "name":"MultipleSelect",
+          "module":"基本信息",
+          "value":[],
+          "valueType":"Array",
+          "props":{
+              "required":true,
+              "placeholder":"2fwewe23",
+              "expanding":true,
+              "options":[
+                  {
+                      "id":0,
+                      "value":"理财1"
+                  },
+                  {
+                      "id":1,
+                      "value":"基金2"
+                  },
+                  {
+                    "id":9999,
+                    "value":"其他"
+                    }
+              ]
+          },
+          "id":"field4156017231"
+      },
+        {
+            "title":"产品名称",
+            "name":"TextInput",
+            "module":"基本信息",
+            "value":"",
+            "valueType":"String",
+            "props":{
+                "required":true,
+                "placeholder":"提示文字",
+                "numberOfWords":"50",
+                "exclusiveRowOrNot":true
+            },
+            "id":"field6549999529674"
+        },
+        {
+            "title":"上线时间",
+            "name":"TimePicker",
+            "module":"基本信息",
+            "value":"",
+            "valueType":"Date",
+            "props":{
+                "required":true,
+                "enablePrint":false,
+                "format":"yyyy-MM-dd HH:mm",
+                "placeholder": "请选择上线时间",
+                "gl":"field1408916034940",
+                "orderId":0
+            },
+            "id":"field14089160349401"
+            
+        },
+        {
+            "title":"下线时间",
+            "name":"TimePicker",
+            "module":"基本信息",
+            "value":"",
+            "valueType":"Date",
+            "props":{
+                "required":false,
+                "enablePrint":false,
+                "format":"yyyy-MM-dd HH:mm",
+                "placeholder": "请选择上线时间",
+                "gl":"field14089160349401",
+                "orderId":1
+            },
+            "id":"field1408916034940",
+            "gl":"field14089160349401"
+        },
+        {
+          "id": "field670271806795zxczxc6",
+          "title": "区域",
+          "name": "Cascader",
+          "module": "核对要点",
+          "value": [],
+          "valueType": "Tree",
+          "props": {
+            "required": true,
+            "placeholder": "是大法师的",
+            "multiple": false,
+            "options": [{
+              "value": "0",
+              "label": "1111",
+              "children": [{
+                "value": "0-0",
+                "label": "1-111"
+              }, {
+                "value": "0-1",
+                "label": "1-222"
+              }]
+            }, {
+              "value": "1",
+              "label": "222",
+              "children": [{
+                "value": "1-0",
+                "label": "2-111"
+              }]
+            }]
+          }
+        },
+        {
+            "title":"多行文本输入",
+            "name":"TextareaInput",
+            "module":"基本信息",
+            "value":"",
+            "valueType":"String",
+            "props":{
+                "required":false,
+                "placeholder":"233",
+                "numberOfWords":"450"
+            },
+            "id":"field5058916058197"
+        }
+    ],
+    "promotionChannels":[
+        {
+            "title":"线上渠道",
+            "name":"MultipleSelect",
+            "module":"宣传渠道",
+            "value":[
+
+            ],
+            "valueType":"Array",
+            "props":{
+                "required":true,
+                "placeholder":"2fwewe23",
+                "expanding":false,
+                "options":[
+                    {
+                        "id":0,
+                        "value":"网点"
+                    },
+                    {
+                        "id":1,
+                        "value":"官网"
+                    },
+                    {
+                        "id":2,
+                        "value":"手机银行"
+                    }
+                ]
+            },
+            "id":"field4156012705296"
+        },
+        {
+            "title":"线下渠道",
+            "name":"MultipleSelect",
+            "module":"宣传渠道",
+            "value":[
+
+            ],
+            "valueType":"Array",
+            "props":{
+                "required":true,
+                "placeholder":"2fwewe23",
+                "expanding":false,
+                "options":[
+                    {
+                        "id":0,
+                        "value":"线下网点布置"
+                    },
+                    {
+                        "id":1,
+                        "value":"线下投递"
+                    }
+                ]
+            },
+            "id":"field4156012705296"
+        },
+        {
+            "title":"外部渠道",
+            "name":"MultipleSelect",
+            "module":"宣传渠道",
+            "value":[
+
+            ],
+            "valueType":"Array",
+            "props":{
+                "required":true,
+                "placeholder":"2fwewe23",
+                "expanding":false,
+                "options":[
+                    {
+                        "id":0,
+                        "value":"线上媒体"
+                    },
+                    {
+                        "id":1,
+                        "value":"纸质媒体"
+                    },
+                    {
+                        "id":2,
+                        "value":"线下媒体"
+                    }
+                ]
+            },
+            "id":"field4156012705296"
+        },
+        {
+            "title":"个人渠道",
+            "name":"MultipleSelect",
+            "module":"宣传渠道",
+            "value":[
+
+            ],
+            "valueType":"Array",
+            "props":{
+                "required":true,
+                "placeholder":"2fwewe23",
+                "expanding":false,
+                "options":[
+                    {
+                        "id":0,
+                        "value":"外部APP账号"
+                    },
+                    {
+                        "id":1,
+                        "value":"员工电话"
+                    },
+                    {
+                        "id":2,
+                        "value":"员工自行投递宣传资料"
+                    }
+                ]
+            },
+            "id":"field4156012705296"
+        }
+    ],
+    "keyPointsForVerification":[
+        {
+            "title":"产品要点",
+            "name":"MultipleSelect",
+            "module":"核心要点",
+            "value":[
+
+            ],
+            "valueType":"Array",
+            "props":{
+                "required":true,
+                "placeholder":"2fwewe23",
+                "expanding":false,
+                "options":[
+                    {
+                        "id":0,
+                        "value":"产品基本信息:起购金额、起购时间、销售渠道、年化利率(含历史)、起息方式、投资方式(存款)"
+                    },
+                    {
+                        "id":1,
+                        "value":"免责条款"
+                    },
+                    {
+                        "id":2,
+                        "value":"重要提示(理财有风险、投资需谨慎等)"
+                    },
+                    {
+                        "id":3,
+                        "value":"信息披露:咨询方式、投诉方式等"
+                    },
+                    {
+                        "id":4,
+                        "value":"重要提示(理财有风险、投资需谨慎等)123"
+                    }
+                ]
+            },
+            "id":"field4156012705296123"
+        },
+        {
+            "title":"审查要点",
+            "name":"MultipleSelect",
+            "module":"核心要点",
+            "value":[
+
+            ],
+            "valueType":"Array",
+            "props":{
+                "required":true,
+                "placeholder":"2fwewe23",
+                "expanding":false,
+                "options":[
+                    {
+                        "id":0,
+                        "value":"承担义务不得低于宣传所承诺的标准"
+                    },
+                    {
+                        "id":1,
+                        "value":"不得虚假欺诈隐或者误导宣传"
+                    },
+                    {
+                        "id":2,
+                        "value":"资料真实准确、不得隐限制条件"
+                    },
+                    {
+                        "id":3,
+                        "value":"无其他违反消保法律法规的营销行为"
+                    },
+                    {
+                        "id":4,
+                        "value":"不得利用上级审核备案程序误导客户"
+                    }
+                ]
+            },
+            "id":"field4156012705296"
+        }
+    ],
+    "reviewMaterials":[
+        {
+            "title":"点击上传",
+            "name":"FileUpload",
+            "module":"审查材料",
+            "value":[
+
+            ],
+            "valueType":"Array",
+            "props":{
+                "required":false,
+                "onlyRead":false,
+                "maxSize":100,
+                "maxNumber":10,
+                "fileTypes":[
+                    "zip",
+                    "jpg",
+                    "pdf",
+                    "doc",
+                    "xlsx",
+                    "docx"
+                ]
+            },
+            "id":"field5646617498294"
+        }
+    ]
+}
+}

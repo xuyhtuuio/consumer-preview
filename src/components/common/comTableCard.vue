@@ -2,7 +2,7 @@
   <div class="tableCard">
     <div class="head">
        <div class="left">
-        <g-icon class="right-icon" :key="index" :wProp="20" :hProp="32" :href="iconHref"/>
+        <g-icon class="right-icon" :wProp="20" :hProp="32" :href="iconHref"/>
        <span class="content">{{title}}</span>
        </div>
       <slot name="cardInfo"></slot>
@@ -34,8 +34,9 @@
 
 <style lang="less" scoped>
 .tableCard {
-  background: rgba(255, 255, 255, 1);
-padding: 16px 24px;
+  padding: 16px 24px;
+  // background: rgba(255, 255, 255, 1);
+  // border-radius: 10px;
   .head {
     display: flex;
     align-items: center;
