@@ -8,7 +8,7 @@
           </svg>
           选择审批对象
         </template>
-        <el-radio-group v-model="nodeProps.assignedType">
+        <el-radio-group class="radio-group" v-model="nodeProps.assignedType">
           <el-radio v-for="t in approvalTypes" :label="t.type" :key="t.type">{{ t.name }}</el-radio>
         </el-radio-group>
         <el-popover
@@ -46,7 +46,7 @@
           <p style="color:#86909C;font-size: 12px;line-height:24px;">可以选择前序节点名称，如名称重复建议先修改节点名称<br/>如果是多人，最后一个提交审批的人</p>
         </div>
         <div v-else-if="nodeProps.assignedType === 'SELF_SELECT'">
-          <el-radio-group size="mini" v-model="nodeProps.selfSelect.multiple">
+          <el-radio-group class="radio-group" size="mini" v-model="nodeProps.selfSelect.multiple">
             <el-radio-button :label="false">自选一个人</el-radio-button>
             <el-radio-button :label="true">自选多个人</el-radio-button>
           </el-radio-group>
@@ -124,7 +124,7 @@
             </svg>
             多人审批时审批方式
           </template>
-          <el-radio-group v-model="nodeProps.mode">
+          <el-radio-group class="radio-group" v-model="nodeProps.mode">
             <el-radio label="NEXT">顺序审批（按选择顺序审批，每个人必须同意）</el-radio>
             <el-radio label="AND">会签（可同时审批，每个人必须同意）</el-radio>
             <el-radio label="OR">或签（有一人同意即可）</el-radio>
@@ -134,7 +134,7 @@
 
       <el-divider>高级设置</el-divider>
       <el-form-item label="目标页面配置" prop="target" v-if="nodeProps.assignedType === 'DEPT_USER_ROLE'">
-        <el-radio-group v-model="nodeProps.target">
+        <el-radio-group class="radio-group" v-model="nodeProps.target">
           <el-radio label="PASS">领导审批</el-radio>
           <el-radio label="REFUSE">消保审批</el-radio>
           <el-radio label="NOTIFY">确认意见</el-radio>
@@ -166,7 +166,7 @@
           </svg>
           如果申请被驳回
         </template>
-        <el-radio-group v-model="nodeProps.nobody.handler">
+        <el-radio-group class="radio-group" v-model="nodeProps.nobody.handler">
           <el-radio label="TO_PASS">驳回到指定节点</el-radio>
           <el-radio label="TO_REFUSE">审批人自选（前序节点）</el-radio>
         </el-radio-group>
@@ -350,7 +350,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.user-type {
+.user-type .radio-group {
   /deep/ .el-radio {
     min-width: 110px;
     margin-top: 10px;

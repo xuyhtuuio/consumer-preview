@@ -25,15 +25,15 @@
           </div>
 					<div>
             <div class="right-item-box" v-if="active === 'role'">
-              <span style="font-size: 12px;">请选择该节点对应角色可审批任务的数据权限：
+              <div style="font-size: 12px;margin-bottom: 11px;line-height: 1em;">请选择该节点对应角色可审批任务的数据权限：
                 <el-tooltip placement="bottom" effect="light">
                   <div slot="content">若选择【本部门】后，当前节点配置的角色用户可审批自己【所在部门】的任务单；（二级机构）<br/>选择【本行】后，当前节点配置的角色可审批自己【所在分行】的任务单；（一级机构）</div>
                   <svg class="icon" aria-hidden="true" style="font-size: 16px;">
                     <use xlink:href="#icon-wenhao"></use>
                   </svg>
                 </el-tooltip>
-              </span>
-              <el-radio-group v-model="roleRange">
+              </div>
+              <el-radio-group v-model="roleRange" style="display: block;">
                 <el-radio label="全行">全行</el-radio>
                 <el-radio label="本行">本行</el-radio>
                 <el-radio label="本部门">本部门</el-radio>

@@ -8,8 +8,7 @@ export default new Vuex.Store({
     isEdit: null,
     breadcrumbList: [],
     selectedNode: {},
-    design: {},
-    nodeArr: [] // 指定节点数组，流程图中所有的节点（包含，申请人，审核人，抄送人，二次会签）
+    design: {}
   },
   mutations: {
     selectedNode(state, val) {
