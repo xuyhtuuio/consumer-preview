@@ -15,7 +15,7 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      redirect: '/index'
+      redirect: '/front'
     },
     // 首页
     {
@@ -102,18 +102,19 @@ const router = new Router({
     {
       path: "/approvalCenter",
       name: "approvalCenter",
-      component: () => import("@/views/applycenter/approvalCenter.vue"),
+      component: () => import("@/views/approvalCenter/index.vue"),
       meta: { title: '申请中心', viewport: viewport },
     },
     {
       path: "/front",
       name: "front",
+      redirect: '/home',
       component: () => import("@/views/front/index.vue"),
       meta: { title: '消保管控平台', viewport: viewport },
       children: [
         {
           path: "/home",
-          name: "UserManage",
+          name: "home",
           component: () => import("@/views/front/home.vue"),
           meta: { title: '首页' ,viewport: viewport },
         },

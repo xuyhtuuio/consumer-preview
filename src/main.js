@@ -7,6 +7,7 @@ import ElementUI from "element-ui";
 import TrsWebComponents from 'trs-web-components'
 import gloCptsFn from "@/utils/globalCmps"
 import "element-ui/lib/theme-chalk/index.css";
+import Empty from '@/components/common/empty'
 
 import "@/assets/theme.less";
 import "@/assets/global.css";
@@ -20,6 +21,8 @@ import 'trs-web-components/lib/element.less';
 Vue.use(ElementUI);
 Vue.use(TrsWebComponents);
 Vue.use(gloCptsFn);
+Vue.component('Empty',Empty)
+
 
 Vue.config.productionTip = false
 

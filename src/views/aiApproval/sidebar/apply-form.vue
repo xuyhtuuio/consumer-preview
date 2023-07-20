@@ -1,7 +1,7 @@
 <template>
     <div class="ocr-apply-form">
         <div class="user-info">
-            <img src="@/assets/image/ocr-avatar.png" alt="" v-if="Math.random()>0.5">
+            <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" v-if="Math.random()>0.5">
             <div class="avatar" v-else>谭</div>
             <span class="nickname">
                 谭新宇 / 300592

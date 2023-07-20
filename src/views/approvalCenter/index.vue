@@ -8,7 +8,7 @@
             <div v-for="(item, index) in dataStatistics" :key="index"
                 :class="index !== 0 ? 'data-statistics-item' : 'data-statistics-item active-item'">
                 <div class="icon">
-                    <img src="@/assets/image/apply-center/attention.png" alt="" v-if="index !== 0" class="active-icon">
+                    <img src="@/assets/image/apply-center/attention.png" alt="" v-if="index == 0" class="active-icon">
                     <img src="@/assets/image/apply-center/no-attention.png" v-else alt="" class="default-icon">
                 </div>
                 <div class="name-count">
@@ -78,16 +78,13 @@
                 <trs-pagination :total="list.length"></trs-pagination>
             </div>
             <div v-else>
-                <el-empty :image="require('../../assets/image/empty.png')" image-size="292">
-                </el-empty>
+               <Empty></Empty>
             </div>
         </div>
-
-
     </div>
 </template>
 <script>
-import approvalEventCard from '@/components/common/approval-event-card'
+import approvalEventCard from '@/components/card/approval-event-card'
 export default {
     components: {
         approvalEventCard
@@ -232,6 +229,8 @@ export default {
 </script>
 <style lang="less" scoped>
 .approval-center {
+    background: #F9FBFF;
+    overflow-y: auto;
     .welcoming {
         font-size: 14px;
         font-weight: 400;
@@ -265,8 +264,10 @@ export default {
         &-item {
             margin-right: 32px;
             padding: 12px;
+            padding-left: 24px;
             display: flex;
             cursor: pointer;
+             width: 180px;
 
             .icon {
                 box-sizing: border-box;
@@ -358,15 +359,11 @@ export default {
             content: '';
             top: 70px;
             left: 50%;
-            background-image: url('../../assets//image/triangle.svg');
+            background-image: url('../../assets/image/apply-center/triangle.svg');
             transform: translateX(-50%);
             width: 18px;
             height: 18px;
             background-size: 100% 100%;
-            // display: inline-block;
-            // border: 9px solid;
-            // border-color: #707FFF transparent transparent transparent;
-
         }
 
         .new-apply {

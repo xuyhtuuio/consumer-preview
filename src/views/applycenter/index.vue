@@ -17,9 +17,9 @@
                     <span class="count"><i>{{ item.count }}</i> 个</span>
                 </div>
             </div>
-            <div class="data-statistics-item new-apply  pointer">
-                <img src="@/assets/image/newApply.svg" alt="">
-                新建申请
+            <div class=" new-apply  pointer">
+                <img src="@/assets/image/apply-center/newApply.svg" alt="">
+                <p>新建申请</p>
             </div>
         </div>
         <div class="apply-content">
@@ -85,8 +85,7 @@
                 <trs-pagination :total="search.total" @getList="getApplicationList"></trs-pagination>
             </div>
             <div v-else v-loading="search.loading">
-                <el-empty :image="require('../../assets/image/empty.png')" :image-size="imageSize">
-                </el-empty>
+                <Empty></Empty>
             </div>
         </div>
     </div>
@@ -95,7 +94,7 @@
 import {
     getDataStatistics, getUserStatus, getApprovalType, getApprovalStage, getApplicationList, delApplication, quashApplication
 } from '@/api/applyCenter'
-import applyEventCard from '@/components/common/apply-event-card'
+import applyEventCard from '@/components/card/apply-event-card'
 export default {
     components: {
         applyEventCard
@@ -110,12 +109,12 @@ export default {
                 count: 0,
                 value: 'applyAll',
             },
-            // {
-            //     name: '我的关注',
-            //     count: 0,
-            //     value: 'myAttention',
+            {
+                name: '我的关注',
+                count: 0,
+                value: 'myAttention',
 
-            // },
+            },
             {
                 name: '待修改',
                 count: 0,
@@ -130,11 +129,6 @@ export default {
                 name: '审批中',
                 count: 0,
                 value: 'Approval',
-
-            }, {
-                name: '已撤销',
-                count: 0,
-                value: 'Revoked',
 
             }, {
                 name: '草稿箱',
@@ -367,6 +361,7 @@ export default {
     background: #F9FBFF;
     height: 100vh;
 
+
     .welcoming {
         font-size: 14px;
         font-weight: 400;
@@ -405,10 +400,14 @@ export default {
 
 
         &-item {
-            margin-right: 32px;
+            margin-right: 24px;
+            flex: 1;
             padding: 12px;
+            padding-left: 24px;
+
             display: flex;
             cursor: pointer;
+            // justify-content: center;
 
             .icon {
                 box-sizing: border-box;
@@ -504,7 +503,7 @@ export default {
             content: '';
             top: 70px;
             left: 50%;
-            background-image: url('../../assets//image/triangle.svg');
+            background-image: url('../../assets/image/apply-center/triangle.svg');
             transform: translateX(-50%);
             width: 18px;
             height: 18px;
@@ -514,6 +513,8 @@ export default {
         }
 
         .new-apply {
+            width: 120px !important;
+
             img {
                 margin-bottom: 8px;
                 width: 32px;
@@ -552,9 +553,6 @@ export default {
         border-radius: 10px;
         background: #FFF;
         padding: 24px;
-        padding-left: 0;
-        padding-right: 0;
-
         margin-top: 16px;
     }
 

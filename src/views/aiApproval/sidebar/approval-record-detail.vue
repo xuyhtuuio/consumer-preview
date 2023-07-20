@@ -11,7 +11,7 @@
                 <div v-for="(activity, index) in recordList" :key="index" class="task-item pointer">
                     <div class="left">
                         <div class="top-line"></div>
-                        <img src="@/assets/image/timeline-ellipse.svg" alt="" class="dot">
+                        <img src="@/assets/image/ai-approval/timeline-ellipse.svg" alt="" class="dot">
                         <div class="bottom-line"> </div>
                     </div>
                     <div class="right">
@@ -20,7 +20,7 @@
                             <span class="staff">
                                 <i>{{ activity.initiator }}</i>
                                 <i class="post">（{{ activity.post }}）</i>
-                                <img src="@/assets/image/record-avatar.svg" alt="" v-if="Math.random() > 0.5">
+                                <img src="@/assets/image/ai-approval/record-avatar.svg" alt="" v-if="Math.random() > 0.5">
                                 <div class="avatar" v-else>谭</div>
                             </span>
                         </p>
@@ -211,7 +211,7 @@ export default {
         }
 
         .el-timeline-item__tail {
-            background: url(../../../assets/image/record-line.svg);
+            background: url(../../../assets/image/ai-approval/record-line.svg);
             background-repeat: no-repeat;
             width: 2px;
 
@@ -226,7 +226,7 @@ export default {
 
         .el-timeline-item__node {
             // content:'xx';
-            background: url(../../../assets/image/timeline-ellipse.svg);
+            background: url(../../../assets/image/ai-approval/timeline-ellipse.svg);
         }
 
     }
@@ -427,7 +427,7 @@ export default {
                 width: 1px;
                 background-repeat: no-repeat;
                 background-repeat-y: inherit;
-                background-image: url(../../../assets//image/record-line.svg);
+                background-image: url(../../../assets//image/ai-approval/record-line.svg);
             }
 
             .bottom-line {
@@ -435,7 +435,7 @@ export default {
                 width: 1px;
                 background-repeat: no-repeat;
                 background-repeat-y: inherit;
-                background-image: url(../../../assets//image/record-line.svg);
+                background-image: url(../../../assets//image/ai-approval/record-line.svg);
             }
         }
 

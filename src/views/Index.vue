@@ -1,7 +1,6 @@
 <template>
   <div style="text-align: center">
     <h4>先选择本次登录人员的身份，再进入相应的系统 😅</h4>
-
     <div class="work-panel">
       <div class="user">
         <el-button type="primary" round size="small" @click="showUserSelect = true" icon="el-icon-user">选择本次登录者</el-button>
@@ -30,7 +29,6 @@
         </div>
       </div>
     </div>
-
     <org-picker :show="showUserSelect" single onlyUser @close="showUserSelect = false" :selected="select" @selectOver="selected"></org-picker>
   </div>
 </template>
