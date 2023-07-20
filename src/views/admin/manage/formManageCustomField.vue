@@ -16,9 +16,9 @@
       </el-form-item>
       <el-form-item v-if="ruleForm.name === 'TimePicker'" label="时间格式" prop="dateFormat" class="is-dark input">
         <el-select v-model="ruleForm.dateFormat" placeholder="请选择字段类型" class="is-dark input" style="width: 100%">
-          <el-option label="yyyy-MM-dd hh:mm:ss" value="yyyy-MM-dd hh:mm:ss"></el-option>
+          <!-- <el-option label="yyyy-MM-dd hh:mm:ss" value="yyyy-MM-dd hh:mm:ss"></el-option> -->
           <el-option label="yyyy-MM-dd" value="yyyy-MM-dd"></el-option>
-          <el-option label="yyyy/MM/dd hh:mm:ss" value="yyyy/MM/dd hh:mm:ss"></el-option>
+          <!-- <el-option label="yyyy/MM/dd hh:mm:ss" value="yyyy/MM/dd hh:mm:ss"></el-option> -->
           <el-option label="yyyy/MM/dd" value="yyyy/MM/dd"></el-option>
         </el-select>
       </el-form-item>

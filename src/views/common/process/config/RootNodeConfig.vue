@@ -4,8 +4,9 @@
       <svg class="icon" aria-hidden="true">
         <use xlink:href="#icon-setting-user"></use>
       </svg>
-      选择申请人，
-      <span style="color: #86909C;font-size: 12px;">配置可发起审批任务的人员范围</span>
+      <span>
+        选择{{ nodeName }}，<span style="color: #86909C;font-size: 12px;">配置可发起审批任务的人员范围</span>
+      </span>
     </p>
     <el-radio-group v-model="radio">
       <el-radio label="所有人">所有人</el-radio>
@@ -17,18 +18,20 @@
       </el-radio>
     </el-radio-group>
     <br/>
-    <el-button size="mini" @click="selectOrg" icon="el-icon-plus" type="primary">选择部门/人员/系统角色</el-button>
-    <div style="margin-top: 20px">
-      <div class="tag-action" >
-        <div class="tag-box" v-for="(item, index) in select" :key="index">
-          <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
+    <div v-if="radio === '指定部门/人员/角色'">
+      <el-button size="mini" @click="selectOrg" icon="el-icon-plus" type="primary">选择部门/人员/系统角色</el-button>
+      <div style="margin-top: 20px">
+        <div class="tag-action" >
+          <div class="tag-box" v-for="(item, index) in select" :key="index">
+            <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
+          </div>
         </div>
+        <!-- <el-tag class="org-item" :type="org.type === 'dept'?'':'info'"
+                v-for="(org, index) in select" :key="index + '_org'"
+                closable size="mini" @close="removeOrgItem(index)">
+          {{org.name}}
+        </el-tag> -->
       </div>
-      <!-- <el-tag class="org-item" :type="org.type === 'dept'?'':'info'"
-              v-for="(org, index) in select" :key="index + '_org'"
-              closable size="mini" @close="removeOrgItem(index)">
-        {{org.name}}
-      </el-tag> -->
     </div>
     <org-picker :show="showOrgSelect" @close="closeSelect" :selected="select" @selectOver="selected"></org-picker>
   </div>
@@ -45,6 +48,10 @@ export default {
       default: ()=>{
         return {}
       }
+    },
+    nodeName: {
+      type: String,
+      default: undefined
     }
   },
   data() {
@@ -81,12 +88,13 @@ export default {
     selected(select) {
       this.showOrgSelect = false
       this.select = []
-      select.forEach(val => this.select.push({
-        ...val,
-        label: val.name,
-        ...this.tagConfig
-      }))
-      console.log(this.select)
+      for (let key in select) {
+        select[key].forEach(val => this.select.push({
+          ...val,
+          label: val.label,
+          ...this.tagConfig
+        }))
+      }
     },
     removeOrgItem(index){
       console.log(index)

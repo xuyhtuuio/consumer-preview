@@ -202,9 +202,7 @@ export default {
     },
     insertRootNode(parentNode) {
       this.$set(parentNode.children, "name", "确认人")
-      console.log(this.$deepCopy(DefaultProps.ROOT_PROPS))
       this.$set(parentNode.children, "props", this.$deepCopy(DefaultProps.ROOT_PROPS))
-      console.log(parentNode)
     },
     insertCcNode(parentNode){
       this.$set(parentNode.children, "name", "抄送人")

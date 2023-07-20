@@ -19,8 +19,8 @@
           </span>
         </div>
         <div class="node-body-main-content">
-          <span class="placeholder" v-if="(content || '').trim() === ''">{{placeholder}}</span>
-          <span v-else>{{content}}</span>
+          <span class="placeholder" v-if="(config.props.expression || '').trim() === ''">{{placeholder}}</span>
+          <span v-else>{{config.props.expression}}</span>
         </div>
         <div class="node-body-main-footer">
           <span class="level">优先级{{level}}</span>
@@ -74,9 +74,18 @@ export default {
       showError: false
     }
   },
-  computed:{
-    content(){
-      this.config
+  // computed:{
+  //   content(){
+  //     this.config
+  //   }
+  // },
+  watch: {
+    config: {
+      handler(val) {
+        console.log(val)
+      },
+      immediate: true,
+      deep: true
     }
   },
   methods: {

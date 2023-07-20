@@ -20,7 +20,6 @@
         <div v-else-if="nodeProps.assignedType === 'DEPT_USER_ROLE'">
           <div class="select-user">
             <el-button size="mini" @click="selectUser" icon="el-icon-plus" type="primary">选择部门/人员/角色</el-button>
-            <org-picker :show="showOrgSelect" @close="closeSelect" :selected="select" @selectOver="selected"></org-picker>
             <div class="tag-action" >
               <div class="tag-box" v-for="(item, index) in select" :key="index">
                 <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
@@ -140,10 +139,10 @@
         <el-switch active-text="启用转办" v-model="nodeProps.zhuanban"></el-switch>
         <div class="select-user" style="margin-top: 10px;">
           <p>请选择【被转办人】可选用户范围</p>
-          <el-button size="mini" @click="selectUser" icon="el-icon-plus" type="primary">选择部门/人员/角色</el-button>
-          <org-picker :show="showOrgSelect" @close="closeSelect" :selected="select" @selectOver="selected"></org-picker>
+          <el-button size="mini" @click="selectUser1" icon="el-icon-plus" type="primary">选择部门/人员/角色</el-button>
+          <org-picker :show="showOrgSelect1" @close="closeSelect1" :selected="select1" @selectOver="selected1"></org-picker>
           <div class="tag-action" >
-            <div class="tag-box" v-for="(item, index) in select" :key="index">
+            <div class="tag-box" v-for="(item, index) in select1" :key="index">
               <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
             </div>
           </div>
@@ -162,7 +161,7 @@
         </el-radio-group>
         <div style="margin-top: 10px" v-if="nodeProps.nobody.handler === 'TO_PASS'">
           <el-select v-model="nodeProps.nodeId" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
-            <el-option v-for="(op, index) in []" :key="index" :label="op.name" :value="op.id"></el-option>
+            <el-option v-for="(op, index) in nodes" :key="index" :label="op.name" :value="op.id"></el-option>
           </el-select>
         </div>
       </el-form-item>
@@ -217,6 +216,9 @@ export default {
   data() {
     return {
       showOrgSelect: false,
+      showOrgSelect1: false,
+      select: [],
+      select1: [],
       approvalTypes: [
         // {name: '指定人员', type: 'ASSIGN_USER'},
         {name: '发起人自选', type: 'SELF_SELECT'},
@@ -242,13 +244,28 @@ export default {
     nodeProps() {
       return this.$store.state.selectedNode.props
     },
-    select: {
-      get() {
-        return this.config.assignedUser || []
-      },
-      set() {
+    // select: {
+    //   get() {
+    //     return this.config.assignedUser || []
+    //   },
+    //   set() {
 
-      }
+    //   }
+    // },
+    nodeMap() {
+      return this.$store.state.nodeMap
+    },
+    nodes() {
+      const tempNodes = []
+      this.nodeMap.forEach(value => {
+        if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO'].includes(value?.type)) {
+          tempNodes.push({
+            name: value.name,
+            id: value.id
+          })
+        }
+      })
+      return tempNodes
     },
     forms(){
       return this.$store.state.design.formItems.map(f => {
@@ -280,21 +297,42 @@ export default {
     closeSelect() {
       this.showOrgSelect = false
     },
+    closeSelect1() {
+      this.showOrgSelect1 = false
+    },
     selectUser() {
       this.showOrgSelect = true
     },
+    selectUser1() {
+      this.showOrgSelect1 = true
+    },
     selected(select) {
-      console.log(select)
       this.showOrgSelect = false
       this.select = []
-      select.forEach(val => this.select.push({
-        ...val,
-        label: val.name,
-        ...this.tagConfig
-      }))
+      for (let key in select) {
+        select[key].forEach(val => this.select.push({
+          ...val,
+          label: val.label,
+          ...this.tagConfig
+        }))
+      }
+    },
+    selected1(select) {
+      this.showOrgSelect1 = false
+      this.select1 = []
+      for (let key in select) {
+        select[key].forEach(val => this.select1.push({
+          ...val,
+          label: val.label,
+          ...this.tagConfig
+        }))
+      }
     },
     removeOrgItem(index) {
       this.select.splice(index, 1)
+    },
+    removeOrgItem1(index) {
+      this.select1.splice(index, 1)
     }
   }
 }

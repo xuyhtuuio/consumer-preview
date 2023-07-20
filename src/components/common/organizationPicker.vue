@@ -1,55 +1,145 @@
 <template>
 	<el-dialog
-					:title="title" :destroy-on-close="true"
-					:close-on-click-modal="false" :modal="false"
-					:visible.sync="show" :before-close="close"
-					width="700px" center>
+    :title="title" :destroy-on-close="true"
+    :close-on-click-modal="false" :modal="false"
+    :visible.sync="show" :before-close="close"
+    width="730px" center>
 		<div class="picker">
 			<div style="float:left;">
-				<p>选择</p>
-				<div class="box">
+				<div class="box left-box">
+          <div class="tabs">
+            <div class="user tab" :class="{ 'is-active': active === 'user' }" @click="changeTabType('user')">
+              <svg class="icon" aria-hidden="true">
+                <use v-if="active === 'user'" xlink:href="#icon-xianxingtubiao1"></use>
+                <use v-else xlink:href="#icon-dept"></use>
+              </svg>
+              部门/人员
+            </div>
+            <div v-if="!hidden.includes('系统角色')" class="role tab" :class="{ 'is-active': active === 'role' }" @click="changeTabType('role')">
+              <svg class="icon" aria-hidden="true">
+                <use v-if="active === 'role'" xlink:href="#icon-xitong-juese"></use>
+                <use v-else xlink:href="#icon-xitong-juese1"></use>
+              </svg>
+              系统角色
+            </div>
+          </div>
 					<div>
-						<el-input v-if="type !== 'dept'" placeholder="搜索人员" prefix-icon="el-icon-search" size="medium"
-						          v-model="search" :maxlength="50" @input="searchUser" clearable>
+            <div class="right-item-box" v-if="active === 'role'">
+              <span style="font-size: 12px;">请选择该节点对应角色可审批任务的数据权限：
+                <el-tooltip placement="bottom" effect="light">
+                  <div slot="content">若选择【本部门】后，当前节点配置的角色用户可审批自己【所在部门】的任务单；（二级机构）<br/>选择【本行】后，当前节点配置的角色可审批自己【所在分行】的任务单；（一级机构）</div>
+                  <svg class="icon" aria-hidden="true" style="font-size: 16px;">
+                    <use xlink:href="#icon-wenhao"></use>
+                  </svg>
+                </el-tooltip>
+              </span>
+              <el-radio-group v-model="roleRange">
+                <el-radio label="全行">全行</el-radio>
+                <el-radio label="本行">本行</el-radio>
+                <el-radio label="本部门">本部门</el-radio>
+              </el-radio-group>
+            </div>
+						<el-input v-if="type !== 'dept'" :placeholder="active === 'user' ? '搜索部门/人员' : '搜索系统角色'" prefix-icon="el-icon-search" size="medium"
+						          v-model="search" :maxlength="50" clearable>
 						</el-input>
-						<el-breadcrumb separator-class="el-icon-arrow-right" style="overflow-x: hidden">
+						<!-- <el-breadcrumb separator-class="el-icon-arrow-right" style="overflow-x: hidden">
 							<el-breadcrumb-item>通讯录</el-breadcrumb-item>
 							<el-breadcrumb-item style="color:#38adff;" v-for="(node, index) in navNodes" :key="index">
 								{{node.name}}
 							</el-breadcrumb-item>
-						</el-breadcrumb>
-						<el-checkbox v-model="checkAll" @change="handleCheckAllChange" v-show="!single">全选</el-checkbox>
-						<span style="margin-left: 20px; cursor: pointer; color:#38adff;" @click="beforeNode">上一级</span>
+						</el-breadcrumb> -->
+						<!-- <el-checkbox v-model="checkAll" @change="handleCheckAllChange" v-show="!single">全选</el-checkbox> -->
+						<!-- <span style="margin-left: 20px; cursor: pointer; color:#38adff;" @click="beforeNode">上一级</span> -->
 					</div>
-					<div style="margin-top: 8px; width: 100%;">
-						<div style="margin-top: 8px; overflow-y: auto; height: calc(100% - 90px);">
-							<div v-for="(node, index) in (search === '' ? nodes : searchUsers)" :key="index" class="line"
-							     :style="node.type === 'user' && type === 'dept' ? 'display: none':''" @click="selectChange(node)">
-								<el-checkbox v-model="node.selected" :disabled="disableDept(node)"></el-checkbox>
-								<span style="margin-left: 10px">
-                    <i class="el-icon-folder-opened" v-if="node.type === 'dept'"></i>
-                    <div class="avt" :style="'background: ' + getAvatarColor()" v-else-if="$isEmpty(node.avatar)">
-                      {{getShortName(node.name)}}
-                    </div>
-										<img :src="node.avatar" style="border-radius: 50%; display:inline-block;" width="35" height="35" v-else/>
-                    <span style="margin-left: 10px">{{node.name}}</span>
-                    <span :class="{'next-dept-disable': node.selected, 'next-dept': !node.selected,}"
-                          v-if="node.type === 'dept'" @click.stop="nextNode(node)">
-                      <i class="el-icon-coin"></i>下级
-                    </span>
+					<div style="margin-top: 8px; width: 100%;height: 400px;">
+						<div style="margin-top: 8px; overflow-y: auto; height: calc(100% - 100px);">
+              <el-tree
+                v-show="active === 'user'"
+                :data="data"
+                show-checkbox
+                default-expand-all
+                :filter-node-method="filterNode"
+                node-key="id"
+                ref="user"
+                highlight-current
+                :props="defaultProps"
+                @check="checkChange">
+              </el-tree>
+              <el-tree
+                v-show="active === 'role'"
+                :data="roleData"
+                show-checkbox
+                default-expand-all
+                :filter-node-method="filterNode"
+                node-key="id"
+                ref="role"
+                highlight-current
+                :props="defaultProps"
+                @check="checkRoleChange">
+                <span class="custom-tree-node" slot-scope="{ node, data }">
+                  <span>
+                    <svg class="icon" aria-hidden="true" style="position: relative;top:1px;width:18px;height:18px;">
+                      <use xlink:href="#icon-multiple-user"></use>
+                    </svg>
+                    {{ data.label }}
                   </span>
-							</div>
+                </span>
+              </el-tree>
+							<!-- <div v-for="(node, index) in (search === '' ? nodes : searchUsers)" :key="index" class="line" :style="node.type === 'user' && type === 'dept' ? 'display: none':''">
+								<el-checkbox v-model="node.selected" :disabled="disableDept(node)" @click="selectChange(node)"></el-checkbox>
+								<span style="margin-left: 10px">
+                  <i class="el-icon-folder-opened" v-if="node.type === 'dept'"></i>
+                  <div class="avt" :style="'background: ' + getAvatarColor()" v-else-if="$isEmpty(node.avatar)">
+                    {{getShortName(node.name)}}
+                  </div>
+                  <img :src="node.avatar" style="border-radius: 50%; display:inline-block;" width="35" height="35" v-else/>
+                  <span style="margin-left: 10px">{{node.name}}</span>
+                  <span :class="{'next-dept-disable': node.selected, 'next-dept': !node.selected,}"
+                        v-if="node.type === 'dept'" @click.stop="nextNode(node)">
+                    <i class="el-icon-coin"></i>下级
+                  </span>
+                </span>
+							</div> -->
 						</div>
 					</div>
-
 				</div>
 			</div>
 
 			<div style="float:right;">
-				<p>已选</p>
-				<div class="box">
-					<div style="overflow-x: hidden; overflow-y: auto; height:100%">
-						<div v-for="(node, index) in select" :key="index" class="line">
+				<div class="box right-box">
+          <p class="check-desc">
+            <span>已选 {{ checkedTotal }} 项</span>
+            <span @click="clearAll" class="clear" :class="{ 'can-clear': !checkedTotal }">
+              <svg class="icon" aria-hidden="true">
+                <use v-if="checkedTotal" xlink:href="#icon-clear"></use>
+                <use v-else xlink:href="#icon-clear1"></use>
+              </svg>清空
+            </span>
+          </p>
+					<div style="overflow-x: hidden; overflow-y: auto; height: calc(100% - 36px);">
+            <div class="right-item-box" v-show="rightCheckedList.user.length">
+              <span class="title">人员</span>
+              <div v-for="(node, index) in rightCheckedList.user" :key="node.label + index" class="line">
+                <span>{{ node.label }}</span>
+              </div>
+            </div>
+            <div class="right-item-box" v-show="rightCheckedList.dept.length">
+              <span class="title">部门</span>
+              <div v-for="(node, index) in rightCheckedList.dept" :key="node.label + index" class="line">
+                <span>{{ node.label }}</span>
+              </div>
+            </div>
+            <div class="right-item-box" v-show="rightCheckedList.role.length">
+              <span class="title">系统角色</span>
+              <div v-for="(node, index) in rightCheckedList.role" :key="node.label + index" class="line">
+                <span>{{ node.label }}</span>
+              </div>
+            </div>
+            <div v-if="checkedTotal === 0" style="text-align: center;color:#86909C;margin-top:80px;">
+              <img src="../../assets/image/empty.png" style="width: 151px;" />
+              <p>请点击左侧列表选择数据</p>
+            </div>
+						<!-- <div v-for="(node, index) in select" :key="index" class="line">
                 <span style="margin-left: 10px">
                     <i class="el-icon-folder-opened" v-if="node.type === 'dept'"></i>
                      <div class="avt" :style="'background: ' + getAvatarColor()"
@@ -62,14 +152,14 @@
                       <i class="el-icon-close" @click="noSelected(index)"></i>
                     </span>
                   </span>
-						</div>
+						</div> -->
 					</div>
 				</div>
 			</div>
 		</div>
 		<span slot="footer" class="dialog-footer">
-      <el-button @click="close" size="small">取 消</el-button>
-      <el-button type="primary" @click="selectOk" size="small">确 定</el-button>
+      <el-button @click="close" size="mini" style="width: 140px;">取 消</el-button>
+      <el-button type="primary" @click="selectOk" size="mini" style="width: 140px;">确 定</el-button>
     </span>
 	</el-dialog>
 
@@ -96,6 +186,11 @@
         default: 'user',
         type: String
       },
+      // 隐藏tab
+      hidden: {
+        type: Array,
+        default: () => ([])
+      },
 	    //是否单选
 	    single:{
         default: false,
@@ -103,7 +198,7 @@
 	    },
       //已经选中的
       selected: {
-        default: ()=>{return[]},
+        default: () => ([]),
         type: Array
       },
 	    onlyUser:{
@@ -113,6 +208,8 @@
     },
     data() {
       return {
+        active: 'user',
+        roleRange: '全行',
         checkAll: false,
         nowDeptId: null,
         isIndeterminate: false,
@@ -133,15 +230,149 @@
           'rgba(255, 69, 0, 0.68)',
           'rgb(255, 120, 0)',
           'hsl(181, 100%, 37%)',
-        ]
+        ],
+        data: [{
+          id: 1,
+          label: '部门1',
+          children: [{
+            id: 4,
+            label: '二级部门1',
+            children: [{
+              id: 91,
+              label: '张三',
+            }, {
+              id: 101,
+              label: '李思',
+            }]
+          }]
+        }, {
+          id: 2,
+          label: '部门2',
+          children: [{
+            id: 5,
+            label: '二级部门2',
+            children: [{
+              id: 91223,
+              label: '周杰伦'
+            }, {
+              id: 102233,
+              label: '迪丽热巴'
+            }]
+          }, {
+            id: 6,
+            label: '二级部门3',
+            children: [{
+              id: 9223,
+              label: '王维'
+            }, {
+              id: 1034556,
+              label: '李白'
+            }]
+          },{
+            id: 16,
+            label: '二级部门4',
+            children: [{
+              id: 19111,
+              label: '杜甫'
+            }, {
+              id: 1102222,
+              label: '高适'
+            }]
+          }]
+        }],
+        roleData: [
+          {
+            id: '审批管理员',
+            label: '审批管理员',
+            type: 'role'
+          },
+          {
+            id: '内审审批人员',
+            label: '内审审批人员',
+            type: 'role'
+          },
+          {
+            id: '内审审批复核人员',
+            label: '内审审批复核人员',
+            type: 'role'
+          },
+          {
+            id: '消保审批人员',
+            label: '消保审批人员',
+            type: 'role'
+          },
+          {
+            id: '消保审批复核人员',
+            label: '消保审批复核人员',
+            type: 'role'
+          }
+        ],
+        defaultProps: {
+          children: 'children',
+          label: 'label'
+        },
+        rightCheckedList: {
+          user: [],
+          dept: [],
+          role: []
+        }
+      }
+    },
+    computed:{
+      checkedTotal() {
+        return this.rightCheckedList.user.length + this.rightCheckedList.dept.length + this.rightCheckedList.role.length
+      }
+	  },
+    watch: {
+      show() {
+        if (this.show) {
+          this.init()
+          this.getOrgList()
+        }
+      },
+      search(val) {
+        this.$refs[this.active].filter(val);
       }
     },
     mounted() {
     },
-	  computed:{
-
-	  },
     methods: {
+      filterNode(value, data) {
+        if (!value) return true;
+        return data.label.indexOf(value) !== -1;
+      },
+      clearAll() {
+        this.rightCheckedList = this.$options.data().rightCheckedList
+        this.$refs.user.setCheckedKeys([])
+        this.$refs.role.setCheckedKeys([])
+      },
+      // 树选择的回调
+      checkChange(node, data) {
+        const dept = data.checkedNodes.filter(e => e.children).map(item => {
+          item.type = 'dept'
+          return item;
+        })
+        const user = data.checkedNodes.filter(e => !e.children).map(item => {
+          item.type = 'user'
+          return item;
+        })
+        this.rightCheckedList = {
+          ...this.rightCheckedList,
+          dept,
+          user
+        }
+      },
+      checkRoleChange(node, data) {
+        this.rightCheckedList = {
+          ...this.rightCheckedList,
+          role: data.checkedNodes
+        }
+      },
+      changeTabType(type) {
+        if (type !== this.active) {
+          this.active = type
+        }
+      },
       disableDept(node){
         return this.onlyUser && 'dept' === node.type
       },
@@ -157,14 +388,14 @@
         }
         return '**'
       },
-      searchUser() {
-        let userName = this.search.trim()
-        this.searchUsers = []
-        getUserByName({userName: userName}).then(rsp => {
-          this.searchUsers = rsp.data
-          this.selectToLeft()
-        }).catch(err => this.$message.error("接口异常"))
-      },
+      // searchUser() {
+      //   let userName = this.search.trim()
+      //   this.searchUsers = []
+      //   getUserByName({userName: userName}).then(rsp => {
+      //     this.searchUsers = rsp.data
+      //     this.selectToLeft()
+      //   }).catch(err => this.$message.error("接口异常"))
+      // },
       selectToLeft() {
         let nodes = this.search.trim() === '' ? this.nodes : this.searchUsers;
         nodes.forEach(node => {
@@ -268,11 +499,12 @@
         this.getOrgList()
       },
       recover() {
-        this.select = []
-        this.nodes.forEach(nd => nd.selected = false)
+        // this.select = []
+        // this.nodes.forEach(nd => nd.selected = false)
+        this.clearAll()
       },
       selectOk() {
-        this.$emit('selectOver', Object.assign([], this.select))
+        this.$emit('selectOver', Object.assign({}, this.rightCheckedList))
         this.recover()
       },
       close() {
@@ -284,16 +516,17 @@
         this.nowDeptId = null;
         this.navNodes = [];
         this.navNodePointer = null;
-        this.select = Object.assign([], this.selected)
-        this.selectToLeft()
-      }
-    },
-    watch: {
-      show() {
-        if (this.show) {
-          this.init()
-          this.getOrgList()
-        }
+        // this.select = Object.assign([], this.selected)
+        this.$nextTick(() => {
+          this.$refs.user.setCheckedNodes(this.selected)
+          this.$refs.role.setCheckedNodes(this.selected)
+          this.rightCheckedList = {
+            dept: this.selected.filter(e => e.type === 'dept'),
+            user: this.selected.filter(e => e.type === 'user'),
+            role: this.selected.filter(e => e.type === 'role')
+          }
+        })
+        // this.selectToLeft()
       }
     }
   }
@@ -302,11 +535,12 @@
 <style lang="less" scoped>
 	/deep/ .el-dialog {
 		z-index: 99999;
-		border-radius: 13px;
+    border-radius: 10px;
 		overflow: hidden;
+    box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.10);
 
 		.el-dialog__header {
-			background: #f7f7f7;
+			background: #ffffff;
 		}
 
 		.el-dialog__body {
@@ -314,19 +548,15 @@
 		}
 
 		.el-dialog__footer {
-			margin-top: 450px;
+			margin-top: 400px;
 		}
 	}
 
 	.line {
+    margin-left: 10px;
 		width: 290px;
 		height: 35px;
 		line-height: 35px;
-
-		&:hover {
-			background: #e9e9ea;
-		}
-
 		.avt {
 			width: 33px;
 			height: 33px;
@@ -356,24 +586,82 @@
 	}
 
 	.picker {
-		p {
-			font-size: larger;
+		.check-desc {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      height: 30px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--gray-gray-4, #E5E6EB);
+      margin-bottom: 8px;
+      .clear {
+        display: flex;
+        align-items: center;
+        color: #2D5CF6;
+        cursor: pointer;
+      }
+      .can-clear {
+        color: #86909C;
+      }
+      svg {
+        width: 18px;
+        height: 18px;
+      }
 		}
 
 		/deep/ .box {
-			overflow-y: auto;
-			overflow-x: hidden;
 			padding: 10px;
 			height: 400px;
-			width: 290px;
+			width: 340px;
 			border-radius: 5px;
 			border: 1px solid #d4d4d5;
-			background: #f7f7f7;
 
 			.el-breadcrumb {
 				margin: 10px 0;
 			}
+      .is-active {
+        color: #2D5CF6;
+      }
+      .tabs {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        height: 22px;
+        margin-bottom: 10px;
+        .tab {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+        }
+        svg {
+          width: 22px;
+          height: 22px;
+          color: #505968;
+        }
+      }
+      .el-checkbox .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+        background: #2D5CF6;
+      }
+      .right-item-box {
+        padding: 4px 8px;
+        border-radius: 4px;
+        background: #F7F8FA;
+        margin-bottom: 8px;
+        .title {
+          font-weight: 700;
+        }
+      }
 		}
+    .right-box {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-left: none;
+    }
+    .left-box {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
 	}
 
 	::-webkit-scrollbar {
