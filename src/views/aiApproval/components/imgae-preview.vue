@@ -1,10 +1,8 @@
 <template>
   <div class="preview" ref="contentDom" v-loading="!loaded">
     <img id="picture" src="../img.png" @load="handleImageLoaded" ref="imgDom" />
-    <!-- <div class="mask"
-      :style="{ top: BoundingClientRect.y + 'px', left: BoundingClientRect.x + 'px', width: BoundingClientRect.width + 'px', height: BoundingClientRect.height + 'px' }">
-    </div> -->
-    <div class="light" ref="light"></div>
+    <div class="light" id="imgLight" ref="light" v-if="lineWordItem?.word" :style="this.BoundingClientRect">
+    </div>
   </div>
 </template>
 
@@ -23,30 +21,68 @@ const paramsInit = {
   moved: false
 }
 export default {
+  props: {
+    lineWordItem: {
+      type: Object,
+      default: () => ({})
+    },
+  },
   data() {
     return {
       loaded: false,
       params: JSON.parse(JSON.stringify(paramsInit)),
-      // BoundingClientRect: {}
+      naturalHeight: 0,
+      naturalWidth: 0,
+      scale: 1,
+      BoundingClientRect: {}
     }
   },
-  mounted() {
-    // const Dom = this.$refs.light
-    // this.BoundingClientRect = Dom.getBoundingClientRect()
+  mounted() { },
+  watch: {
+    lineWordItem: {
+      handler(val) {
+        this.setBoundingClientRect(val)
+      },
+      // deep: true
+    }
   },
   methods: {
+    linePosition() {
+      this.setBoundingClientRect(this.lineWordItem)
+      this.$nextTick(() => {
+        this.$emit('linePosition')
+      })
+    },
+    // 获取局部高亮样式(当前缩放时定位不准)
+    setBoundingClientRect(val) {
+      if (val?.word) {
+        // const positionZoom = this.params.zoomVal - this.$refs.imgDom.clientWidth / this.$refs.imgDom.naturalWidth
+        this.BoundingClientRect = {
+          width: val?.location.w * this.scale + 'px',
+          height: val?.location.h * this.scale + 'px',
+          left: (val?.location.x * this.scale * this.params.zoomVal + parseInt(this.params.left, 10)) + 'px',
+          top: (val?.location.y * this.scale * this.params.zoomVal  + parseInt(this.params.top, 10)) + 'px',
+          // left: parseInt(this.params.left, 10) * positionZoom + 'px',
+          // top: parseInt(this.params.top, 10) * positionZoom + 'px',
+          transform: `scale(${this.params.zoomVal})`
+        }
+      }
+    },
+    // 图片加载完后,初始化
     handleImageLoaded() {
-      this.loaded = true;
-      this.naturalWidth = this.$refs.imgDom.naturalWidth;
-      this.naturalHeight = this.$refs.imgDom.naturalHeight;
-      this.scale = this.$refs.imgDom.clientWidth / this.$refs.imgDom.naturalWidth;
-      this.getMaxPosition()
-      this.initCenter()
-      // 绑定缩放事件
-      const content = this.$refs.contentDom
-      content.addEventListener('wheel', this.handleWheel)
-      // 绑定拖拽
-      this.startDrag()
+      setTimeout(() => {
+        this.loaded = true;
+        this.naturalWidth = this.$refs.imgDom.naturalWidth;
+        this.naturalHeight = this.$refs.imgDom.naturalHeight;
+        this.scale = this.$refs.imgDom.clientWidth / this.$refs.imgDom.naturalWidth;
+        this.getMaxPosition()
+        this.initCenter()
+        // 绑定缩放事件
+        const content = this.$refs.contentDom
+        content.addEventListener('wheel', this.handleWheel)
+        // 绑定拖拽
+        this.startDrag()
+      }, 1000);
     },
     // 计算出允许拖拽的最大偏移量
     getMaxPosition() {
@@ -119,12 +155,13 @@ export default {
       if (this.getCss(target, "top") !== "auto") {
         this.params.top = this.getCss(target, "top");
       }
+      this.linePosition()
       // this.changeHightPos()
       return false;
     },
     // 实现图片拖拽功能
     startDrag() {
-      const bar = this.$refs.imgDom
+      const bar = this.$refs.contentDom
       const target = this.$refs.imgDom
       let params = this.params;
       if (this.getCss(target, "left") !== "auto") {
@@ -158,6 +195,7 @@ export default {
           if (this.getCss(target, "top") !== "auto") {
             this.params.top = this.getCss(target, "top");
           }
+          this.linePosition()
         }
         // 限制图片拖拽不能超出  范围内
         // var e = event ? event : window.event;
@@ -204,6 +242,7 @@ export default {
           if (event.preventDefault) {
             event.preventDefault();
           }
+          this.linePosition()
           return false;
         }
       };
@@ -219,21 +258,21 @@ export default {
   position: relative;
   -webkit-user-select: none;
   user-select: none;
+  cursor: move;
 
   img {
     position: absolute;
     left: 0;
     height: auto;
-    cursor: move;
     max-width: 100%;
     max-height: 100%;
   }
 }
 
-.mask {
+.light {
   position: absolute;
   box-shadow: 0 0 0px 100vh rgba(51, 51, 51, 0.4);
-  z-index: 99999;
+  z-index: 1;
 
   &::before {
     content: ' ';
@@ -244,12 +283,5 @@ export default {
     top: 0;
     left: 0;
   }
-}
-.light{
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  z-index: 1;
-  position: relative;
 }
 </style>

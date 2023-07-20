@@ -7,17 +7,19 @@
         <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
       </el-input>
     </div>
-    <div class="results" ref="results" :key="resultKey">
-      <!-- <template v-if="keyWords">关键词</template>
-      <template v-else> -->
+    <div class="results" ref="results" :key="resultKey" :class="{light: lineWordItem?.word}">
       <p v-for="(ocr, i) in html" :key="i">
         <template v-for="(item, j) in ocr">
           <template v-if="typeof item === 'string'">{{ item }}</template>
           <span v-else :key="i + '_' + j" :wordType="item.wordType"
-            :class="{ active: activeWordType === item.wordType || activeWordType === 0 }" @click="showLine(item)">{{ item.word }}</span>
+            :id="`word_${i}_${j}`"
+            :class="{ active: activeWordType === item.wordType || activeWordType === 0 ,
+            gray: lineWordItem?.word && lineWordItem?.word !== item.word}"
+            :word="item.word"
+            @click="showLine(item, `word_${i}_${j}`)">{{
+              item.word }}</span>
         </template>
       </p>
-      <!-- </template> -->
     </div>
   </div>
 </template>
@@ -29,7 +31,11 @@ export default {
     approval: {
       type: Object,
       default: () => ({})
-    }
+    },
+    lineWordItem: {
+      type: Object,
+      default: () => ({})
+    },
   },
   data() {
     return {
@@ -51,8 +57,8 @@ export default {
   },
   methods: {
     // 点击命中词,显示连线
-    showLine(item) {
-      console.log(item)
+    showLine(item, ocrWordId) {
+      this.$emit('showLine', { ...item, ocrWordId })
     },
     // 修改高亮  关键词类型
     changeWorkType(type) {
@@ -90,24 +96,19 @@ export default {
       // console.log(html)
       this.html = html
     },
-    // 清除
-    clean() {
-      if (!this.keyWords) {
-        this.resultKey++;
-      }
-    },
     // 高亮检索的关键词
     search() {
+      this.resultKey++;
       if (!this.keyWords) {
-        this.resultKey++;
         return;
       }
-      // this.$refs.results.innerHTML;
-      const textNodes = this.getTextNodeList(this.$refs.results);
-      const textList = this.getTextInfoList(textNodes);
-      const content = textList.map(({ text }) => text).join('');
-      const matchList = this.getMatchList(content, this.keyWords);
-      this.replaceMatchResult(textNodes, textList, matchList);
+      this.$nextTick(() => {
+        const textNodes = this.getTextNodeList(this.$refs.results);
+        const textList = this.getTextInfoList(textNodes);
+        const content = textList.map(({ text }) => text).join('');
+        const matchList = this.getMatchList(content, this.keyWords);
+        this.replaceMatchResult(textNodes, textList, matchList);
+      })
     },
     getTextNodeList(dom) {
       const nodeList = [...dom.childNodes]
@@ -238,7 +239,6 @@ export default {
   font-weight: 400;
   overflow-y: auto;
   word-break: break-all;
-
   [wordType] {
     user-select: none;
     -webkit-user-select: none;
@@ -252,6 +252,12 @@ export default {
 
   .active[wordtype="2"] {
     color: #FDB123;
+  }
+  &.light{
+    color: #86909C;
+    .gray{
+      color: #86909C;
+    }
   }
 }
 </style>

@@ -2,50 +2,60 @@
 export const files = [
   {
     zip: '压缩包1',
-    fileName: '图片.png',
+    fileName: '图片图片图片图片图片图.png',
     url: 'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg',
+    id:1
   },
   {
     zip: '压缩包1',
-    fileName: '图片.pdf',
+    fileName: '图片图片图片图片图片图片图片.pdf',
     url: '文件地址',
+    id:2
   },
   {
     fileName: '图片.doc',
     url: '文件地址',
+    id:3
   },
   {
     zip: '压缩包2',
     fileName: '图片.xls',
     url: '文件地址',
+    id:4
+  },
+  {
+    fileName: '图片.mp4',
+    url: '文件地址',
+    id:5
+  },
+  {
+    fileName: '图片.ppt',
+    url: '文件地址',
+  },
+  {
+    fileName: '图片.txt',
+    url: '文件地址',
+    id:6
   },
   {
     fileName: '图片.doc',
     url: '文件地址',
+    id:7
   },
   {
     fileName: '图片.doc',
     url: '文件地址',
+    id:8
   },
   {
     fileName: '图片.doc',
     url: '文件地址',
+    id:9
   },
   {
     fileName: '图片.doc',
     url: '文件地址',
-  },
-  {
-    fileName: '图片.doc',
-    url: '文件地址',
-  },
-  {
-    fileName: '图片.doc',
-    url: '文件地址',
-  },
-  {
-    fileName: '图片.doc',
-    url: '文件地址',
+    id:10
   },
 ]
 // 图片示例1
@@ -697,6 +707,7 @@ export const  recommends = [
   {
     word: '理财',
     wordType: 1,
+    id: 1,
     totalPage: 3,
     pageNow: 1,
     list: [{
@@ -715,6 +726,7 @@ export const  recommends = [
     word: '未来',
     wordType: 2,
     totalPage: 2,
+    id: 2,
     pageNow: 1,
     list: [{
       str: '12312313123',
@@ -729,6 +741,7 @@ export const  recommends = [
     word: '招银',
     wordType: 2,
     totalPage: 1,
+    id: 3,
     pageNow: 1,
     list: [{
       str: 1,

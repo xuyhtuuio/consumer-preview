@@ -11,35 +11,33 @@
       <div class="file-header-swiper">
         <div class="swiper swiper-container">
           <div class="swiper-wrapper">
-            <div class="swiper-slide" v-for="(file, i) in files" :key="i" :class="{
+            <div class="swiper-slide" v-for="(file, i) in files" :key="file.fileName + i" :class="{
               'swiper-slide-img': ['jpeg', 'jpg', 'png'].includes(fileType(file.fileName)),
-              'swiper-slide-active': i === activeIndex,
               'swiper-slide-split': showSplit(i)
             }">
-              <div class="slide" @click="changeFile(i)">
-                <img src="@/assets/image/ai-approval/Approval_fileType_pdf.png"
-                  v-if="fileType(file.fileName) === 'pdf'" />
-                <img src="@/assets/image/ai-approval/Approval_fileType_xls.png"
-                  v-else-if="['xls', 'xlsx'].includes(fileType(file.fileName))" />
-                <img src="@/assets/image/ai-approval/Approval_fileType_doc.png"
-                  v-else-if="['doc', 'docx'].includes(fileType(file.fileName))" />
-                <el-image v-else-if="['jpeg', 'jpg', 'png'].includes(fileType(file.fileName))" :src="file.url"></el-image>
+              <div class="slide" @click="changeFile(i)" :class="{ active: i === activeIndex }">
+                <el-image v-if="['jpeg', 'jpg', 'png'].includes(fileType(file.fileName))" :src="file.url"></el-image>
+                <file-type v-else :fileName="file.fileName"></file-type>
                 <!-- 是否为压缩包 -->
-                <i class="iconfont icon-zip" v-if="file.zip"></i>
+                <svg class="icon icon-zip" aria-hidden="true" v-if="file.zip">
+                  <use xlink:href="#icon-zip"></use>
+                </svg>
+                <!-- <i class="iconfont icon-zip" v-if="file.zip"></i> -->
               </div>
               <!-- 是否显示分割线 -->
               <label class="swiper-split" v-if="showSplit(i)"></label>
             </div>
           </div>
         </div>
-        <div class="swiper-button-prev" :class="{ 'disabled': activeIndex === 0 }" @click="swiperTo(activeIndex - 1)"></div>
+        <div class="swiper-button-prev" :class="{ 'disabled': activeIndex === 0 }" @click="swiperTo(activeIndex - 1)">
+        </div>
         <div class="swiper-button-next" :class="{ 'disabled': activeIndex === files.length - 1 }"
           @click="swiperTo(activeIndex + 1)"></div>
       </div>
     </div>
     <div class="preview">
       <!-- 图片 -->
-      <imgae-preview></imgae-preview>
+      <imgae-preview :lineWordItem="lineWordItem" @linePosition="linePosition"></imgae-preview>
       <!-- 其他类型文件 -->
     </div>
   </div>
@@ -49,8 +47,9 @@
 import 'swiper/css/swiper.css'
 import Swiper from 'swiper'
 import imgaePreview from './imgae-preview'
+import fileType from './file-type'
 export default {
-  components: { imgaePreview },
+  components: { imgaePreview, fileType },
   name: 'file-preview',
   props: {
     approval: {
@@ -60,12 +59,19 @@ export default {
     files: {
       type: Array,
       default: () => ([])
-    }
+    },
+    activeIndex: {
+      type: Number,
+      default: 0
+    },
+    lineWordItem: {
+      type: Object,
+      default: () => ({})
+    },
   },
   data() {
     return {
       swiper: null,
-      activeIndex: 0,
     }
   },
   computed: {
@@ -93,16 +99,22 @@ export default {
         // },
         slidesPerView: 'auto',
       })
+      this.swiper.on('slideChange', () => {
+        this.changeFile(this.activeIndex)
+      });
     },
     // 切换审批文件
     changeFile(i) {
-      this.activeIndex = i;
+      this.$emit('changeFile', i)
     },
     swiperTo(i) {
       if (i >= 0 && i <= this.files.length - 1) {
         this.swiper.slideTo(i);
         this.changeFile(i)
       }
+    },
+    linePosition() {
+      this.$emit('linePosition')
     }
   }
 }
@@ -240,6 +252,7 @@ export default {
 
       .el-image {
         height: 100%;
+        width: 100%;
       }
 
       &.swiper-slide-split {
@@ -251,7 +264,7 @@ export default {
       }
     }
 
-    &-active .slide {
+    .active.slide {
       border: 1px solid #306EF5;
       box-shadow: 0px 0px 10px 0px #3E72EF66;
       opacity: 1;
@@ -260,13 +273,17 @@ export default {
     &+.swiper-slide {
       margin-left: 6px;
     }
-
+    .icon{
+      width: 100%;
+      height: 100%;
+    }
     .icon-zip {
       position: absolute;
       left: 0;
       top: 0;
-      color: #2D5CF6;
       font-size: 10px;
+      width: 20px;
+      height: 10px;
     }
   }
 
@@ -290,4 +307,5 @@ export default {
 .preview {
   background: #ffffff;
   flex: 1;
-}</style>
+}
+</style>
