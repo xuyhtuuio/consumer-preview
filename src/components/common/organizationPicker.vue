@@ -3,10 +3,10 @@
     :title="title" :destroy-on-close="true"
     :close-on-click-modal="false" :modal="false"
     :visible.sync="show" :before-close="close"
-    width="700px" center>
+    width="730px" center>
 		<div class="picker">
 			<div style="float:left;">
-				<div class="box">
+				<div class="box left-box">
           <div class="tabs">
             <div class="user tab" :class="{ 'is-active': active === 'user' }" @click="changeTabType('user')">
               <svg class="icon" aria-hidden="true">
@@ -24,6 +24,21 @@
             </div>
           </div>
 					<div>
+            <div class="right-item-box" v-if="active === 'role'">
+              <span style="font-size: 12px;">请选择该节点对应角色可审批任务的数据权限：
+                <el-tooltip placement="bottom" effect="light">
+                  <div slot="content">若选择【本部门】后，当前节点配置的角色用户可审批自己【所在部门】的任务单；（二级机构）<br/>选择【本行】后，当前节点配置的角色可审批自己【所在分行】的任务单；（一级机构）</div>
+                  <svg class="icon" aria-hidden="true" style="font-size: 16px;">
+                    <use xlink:href="#icon-wenhao"></use>
+                  </svg>
+                </el-tooltip>
+              </span>
+              <el-radio-group v-model="roleRange">
+                <el-radio label="全行">全行</el-radio>
+                <el-radio label="本行">本行</el-radio>
+                <el-radio label="本部门">本部门</el-radio>
+              </el-radio-group>
+            </div>
 						<el-input v-if="type !== 'dept'" :placeholder="active === 'user' ? '搜索部门/人员' : '搜索系统角色'" prefix-icon="el-icon-search" size="medium"
 						          v-model="search" :maxlength="50" clearable>
 						</el-input>
@@ -61,6 +76,14 @@
                 highlight-current
                 :props="defaultProps"
                 @check="checkRoleChange">
+                <span class="custom-tree-node" slot-scope="{ node, data }">
+                  <span>
+                    <svg class="icon" aria-hidden="true" style="position: relative;top:1px;width:18px;height:18px;">
+                      <use xlink:href="#icon-multiple-user"></use>
+                    </svg>
+                    {{ data.label }}
+                  </span>
+                </span>
               </el-tree>
 							<!-- <div v-for="(node, index) in (search === '' ? nodes : searchUsers)" :key="index" class="line" :style="node.type === 'user' && type === 'dept' ? 'display: none':''">
 								<el-checkbox v-model="node.selected" :disabled="disableDept(node)" @click="selectChange(node)"></el-checkbox>
@@ -83,11 +106,13 @@
 			</div>
 
 			<div style="float:right;">
-				<div class="box">
+				<div class="box right-box">
           <p class="check-desc">
             <span>已选 {{ checkedTotal }} 项</span>
-            <span @click="clearAll" class="clear"><svg class="icon" aria-hidden="true">
-                <use xlink:href="#icon-clear"></use>
+            <span @click="clearAll" class="clear" :class="{ 'can-clear': !checkedTotal }">
+              <svg class="icon" aria-hidden="true">
+                <use v-if="checkedTotal" xlink:href="#icon-clear"></use>
+                <use v-else xlink:href="#icon-clear1"></use>
               </svg>清空
             </span>
           </p>
@@ -133,8 +158,8 @@
 			</div>
 		</div>
 		<span slot="footer" class="dialog-footer">
-      <el-button @click="close" size="small">取 消</el-button>
-      <el-button type="primary" @click="selectOk" size="small">确 定</el-button>
+      <el-button @click="close" size="mini" style="width: 140px;">取 消</el-button>
+      <el-button type="primary" @click="selectOk" size="mini" style="width: 140px;">确 定</el-button>
     </span>
 	</el-dialog>
 
@@ -184,6 +209,7 @@
     data() {
       return {
         active: 'user',
+        roleRange: '全行',
         checkAll: false,
         nowDeptId: null,
         isIndeterminate: false,
@@ -522,7 +548,7 @@
 		}
 
 		.el-dialog__footer {
-			margin-top: 450px;
+			margin-top: 400px;
 		}
 	}
 
@@ -575,6 +601,9 @@
         color: #2D5CF6;
         cursor: pointer;
       }
+      .can-clear {
+        color: #86909C;
+      }
       svg {
         width: 18px;
         height: 18px;
@@ -584,7 +613,7 @@
 		/deep/ .box {
 			padding: 10px;
 			height: 400px;
-			width: 290px;
+			width: 340px;
 			border-radius: 5px;
 			border: 1px solid #d4d4d5;
 
@@ -624,6 +653,15 @@
         }
       }
 		}
+    .right-box {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-left: none;
+    }
+    .left-box {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
 	}
 
 	::-webkit-scrollbar {
