@@ -1,11 +1,11 @@
 <template>
   <div>
-    <el-form inline label-width="100px">
+    <el-form label-width="100px">
       <el-form-item label="调整优先级" prop="level">
         <el-popover placement="right" title="拖拽条件调整优先级顺序" width="250" trigger="click">
           <draggable style="width: 100%; min-height:25px" :list="prioritySortList" group="from" :options="sortOption">
             <div :class="{'drag-no-choose': true, 'drag-hover': cd.id === selectedNode.id}"
-                 v-for="(cd, index) in prioritySortList">
+                 v-for="(cd, index) in prioritySortList" :key="cd.id">
               <div>{{ cd.name }}</div>
               <div>优先级 {{ index + 1 }}</div>
             </div>
@@ -13,14 +13,14 @@
           <el-button icon="el-icon-sort" size="small" slot="reference">第{{ nowNodeLeave + 1 }}级</el-button>
         </el-popover>
       </el-form-item>
-      <el-form-item label="条件组关系" label-width="150px">
+      <el-form-item label="条件组关系">
         <el-switch v-model="config.groupsType" active-color="#409EFF"
                    inactive-color="#c1c1c1" active-value="AND" inactive-value="OR"
                    active-text="且" inactive-text="或">
         </el-switch>
       </el-form-item>
       <el-form-item label="条件组表达式">
-        <el-input size="mini" v-model="config.expression" placeholder="输入条件组关系表达式  &为与，|为或"/>
+        <el-input size="mini" class="is-dark input" v-model="config.expression" placeholder="输入条件组关系表达式  &为与，|为或"/>
         <span class="item-desc">使用表达式构建复杂逻辑，例如: (A & B) | C</span>
       </el-form-item>
     </el-form>
@@ -96,7 +96,15 @@ export default {
     selected(select) {
       console.log(select)
       this.showOrgSelect = false
-      select.forEach(val => this.select.push(val))
+      // this.users = []
+      for (let key in select) {
+        select[key].forEach(val => this.users.push({
+          ...val,
+          label: val.label,
+          ...this.tagConfig
+        }))
+      }
+      // select.forEach(val => this.select.push(val))
     },
     removeOrgItem(index) {
       this.select.splice(index, 1)
@@ -110,14 +118,26 @@ export default {
   border-radius: 5px;
   margin-top: 2px;
   background: #f4f4f4;
-  border: 1px dashed #1890FF !important;
+  border: 1px dashed #2D5CF6 !important;
 }
 
 .drag-hover {
   background: #79bbff;
-  color: #1890FF
+  color: #2D5CF6
 }
-
+/deep/.el-switch {
+  .is-active {
+    span {
+      color: #2D5CF6;
+    }
+  }
+}
+/deep/.el-switch.is-checked {
+  .el-switch__core {
+    border-color: #2D5CF6 !important;
+    background-color: #2D5CF6 !important;
+  }
+}
 .drag-no-choose {
   cursor: move;
   background: #f4f4f4;
@@ -125,8 +145,8 @@ export default {
   position: relative;
   margin-top: 2px;
   padding: 5px 10px;
-  border: 1px solid #bcbcbc;
-  height: 20px;
+  // border: 1px solid #bcbcbc;
+  height: 28px;
 
   div:nth-child(1) {
     font-size: x-small;
@@ -141,5 +161,11 @@ export default {
     position: absolute;
     right: 10px;
   }
+}
+.item-desc {
+  color: #505968;
+  font-size: 12px;
+  line-height: 20px;
+  opacity: 0.8;
 }
 </style>
