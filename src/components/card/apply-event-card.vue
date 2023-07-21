@@ -48,9 +48,9 @@
             </div>
             <div class="event-infos" v-if="item.status !== 5">
                 <span class="id">{{ item.id }}</span>
-                <span class="sDate date">发起时间：{{ item.releaseTime ||'--'}}</span>
-                <span class="sDate date">更新时间：{{ item.updateDate ||'--'}}</span>
-                <span class="sDate date">上线时间：{{ item.launchDate||'--' }}</span>
+                <span class="sDate date">发起时间：{{ item.releaseTime || '--' }}</span>
+                <span class="sDate date">更新时间：{{ item.update_time || '--' }}</span>
+                <span class="sDate date">上线时间：{{ item.launchDate || '--' }}</span>
                 <el-popover placement="bottom" trigger="click" popper-class="popper-persons">
                     <div>
                         <div v-for="(child, index) in persons" :key="index" class="person-item">
@@ -85,38 +85,14 @@
                     </svg>
                     催单
                 </span>
-                <span class="attention no-attention icon-op" v-if="Math.random() > 0.5">
-                    <svg class="icon urgent-icon" aria-hidden="true">
-                        <use xlink:href="#icon-tubiao-1"></use>
-                    </svg>
-                    关注</span>
-                <span class="attention has-attention icon-op" v-else>
-                    <svg class="icon urgent-icon" aria-hidden="true">
-                        <use xlink:href="#icon-guanzhu-1"></use>
-                    </svg>
-                    已关注
-                </span>
             </div>
             <!-- 待确认 -->
             <div v-if="item.status === 4" class="flex">
                 <span class="check icon-op">
-                    <!-- <svg class="icon urgent-icon" aria-hidden="true" style="color:#14C9C9 !important;">
-                        <use xlink:href="#icon-tubiao"></use>
-                    </svg> -->
                     <span class="iconfont icon icon-tubiao"></span>
                     确认
                 </span>
-                <span class="attention no-attention icon-op" v-if="Math.random() > 0.5">
-                    <svg class="icon urgent-icon" aria-hidden="true">
-                        <use xlink:href="#icon-tubiao-1"></use>
-                    </svg>
-                    关注</span>
-                <span class="attention has-attention icon-op" v-else>
-                    <svg class="icon urgent-icon" aria-hidden="true">
-                        <use xlink:href="#icon-guanzhu-1"></use>
-                    </svg>
-                    已关注
-                </span>
+
             </div>
             <!-- 待修改 -->
             <div v-if="item.status === 3" class="flex">
@@ -126,17 +102,7 @@
                     </svg>
                     修改
                 </span>
-                <span class="attention no-attention icon-op" v-if="Math.random() > 0.5">
-                    <svg class="icon urgent-icon" aria-hidden="true">
-                        <use xlink:href="#icon-tubiao-1"></use>
-                    </svg>
-                    关注</span>
-                <span class="attention has-attention icon-op" v-else>
-                    <svg class="icon urgent-icon" aria-hidden="true">
-                        <use xlink:href="#icon-guanzhu-1"></use>
-                    </svg>
-                    已关注
-                </span>
+
             </div>
             <!-- 草稿 -->
             <div v-if="item.status === 2" class="flex">
@@ -152,7 +118,7 @@
                 </span>
             </div>
             <!-- 已结束 -->
-            <div v-if="item.status === 1">
+            <div v-if="item.status !== 2">
                 <span class="attention no-attention icon-op" v-if="Math.random() > 0.5" @click="concern(item)">
                     <svg class="icon urgent-icon" aria-hidden="true">
                         <use xlink:href="#icon-tubiao-1"></use>
@@ -234,6 +200,7 @@ export default {
             const param = {
                 recordId: item.id
             }
+            this.allowConcernClick = false
             concernApplication(param).then(res => {
                 const { data } = res.data
                 if (data.status == 200) {
@@ -250,6 +217,7 @@ export default {
                         this.$message.error('关注失败')
                     }
                 }
+                this.allowConcernClick = true
             })
         }
     }
