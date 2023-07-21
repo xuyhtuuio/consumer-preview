@@ -21,7 +21,7 @@ export default {
     return {
       list: [
         { name: "首页", path: "home" },
-        { name: "申请中心", path: "applyCenter" },
+        { name: "申请中心", path: "apply-list" },
         { name: "审批中心", path: 'approvalCenter' },
         { name: "人员中心" },
         { name: "产业图谱" },
@@ -38,11 +38,12 @@ export default {
     $route: {
       handler: function (val) {
         const { fullPath } = val
+        this.activeMenu = ''
         if (fullPath.indexOf('home') !== -1) {
           this.activeMenu = 'home'
         }
-        if (fullPath.indexOf('applyCenter') !== -1) {
-          this.activeMenu = 'applyCenter'
+        if (fullPath.indexOf('apply-list') !== -1) {
+          this.activeMenu = 'apply-list'
         }
         if (fullPath.indexOf('approvalCenter') !== -1) {
           this.activeMenu = 'approvalCenter'
@@ -56,7 +57,9 @@ export default {
   methods: {
     handleItem(url) {
       this.activeMenu = url
-      this.$router.push(url)
+      this.$router.push({
+        name:url
+      })
     },
     toManagePage(item) {
       if (item.name) {
