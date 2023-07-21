@@ -16,35 +16,50 @@
             <el-input type="textarea" placeholder="请输入审查话术内容" v-model="params.content" resize="none"></el-input>
         </div>
         <span slot="footer" class="dialog-footer">
-            <el-button @click="addReviewDialog = false">取 消</el-button>
-            <el-button type="primary" @click="addReviewDialog = false"> 确 定</el-button>
+            <el-button @click="handleClose">取 消</el-button>
+            <el-button type="primary" @click="addRecommend"> 确 定</el-button>
         </span>
     </el-dialog>
 </template>
 <script>
 export default {
-    name:'addReviewDialog',
+    name: 'addReviewDialog',
     data() {
         return {
             addReviewDialog: false,
             showClose: false,
             params: {
-                keywords: '你好',
-                type: 1,
+                keywords: '',
+                type: '',
                 content: ''
             }
-
         }
     },
     methods: {
-        init() {
-            this.addReviewDialog = true
+        init(word) {
+            this.addReviewDialog = true;
+            this.params.keywords = word;
             this.params.type = 1
             this.params.content = ''
         },
         handleClose() {
-            this.addReviewDialog = false
-
+            this.addReviewDialog = false;
+        },
+        addRecommend() {
+            const newId = Date.parse(new Date());
+            this.$emit('addRecommend', {
+                word: this.params.keywords,
+                wordType: this.params.type,
+                id: this.params.keywords,
+                totalPage: 1,
+                pageNow: 1,
+                list: [{
+                    str: this.params.content,
+                    id: newId
+                }],
+                selected: newId
+            }, this.params.keywords, newId)
+            this.handleClose();
         }
     }
 }

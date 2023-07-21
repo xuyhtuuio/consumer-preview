@@ -3,14 +3,14 @@ import request from '@/api/request.js'
 // 表单管理-获取审查事项类型列表
 export function getDataStatistics(param) {
   return request({
-    url: '/cpr/header',
+    url: '/cpr/applicationcenter/header',
     method: 'get',
     params: param
   })
 }
 export function getUserStatus(param) {
   return request({
-    url: '/cpr/user-status',
+    url: '/cpr/applicationcenter/user-status',
     method: 'get',
     params: param
   })
@@ -18,7 +18,7 @@ export function getUserStatus(param) {
 // 审批类型下拉列表
 export function getApprovalType(param) {
   return request({
-    url: '/cpr/approvalType',
+    url: '/cpr/applicationcenter/approvalType',
     method: 'get',
     params: param
   })
@@ -26,7 +26,7 @@ export function getApprovalType(param) {
 // 审批阶段下拉列表
 export function getApprovalStage(param) {
   return request({
-    url: '/cpr/approvalStage',
+    url: '/cpr/applicationcenter/approvalStage',
     method: 'get',
     params: param
   })
@@ -34,7 +34,7 @@ export function getApprovalStage(param) {
 // 获取申请列表
 export function getApplicationList(param) {
   return request({
-    url: '/cpr/applicationList',
+    url: '/cpr/applicationcenter/applicationList',
     method: 'post',
     data: param
   })

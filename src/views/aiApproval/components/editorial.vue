@@ -16,7 +16,8 @@
             :class="{ active: item.id === recommend.selected, edit: item.showEdit }">
             <p style="cursor: pointer;" @dblclick="showEdit(a, i)" v-if="!item.showEdit">{{ item.str }}</p>
             <el-input v-else :ref="`input_${a}_${i}`" @blur="hideEdit(a, i)" v-model.trim="input" placeholder="请输入意见"
-              type="textarea" :rows="3" class="edit-input" resize="none" @keyup.enter.native="hideEdit(a, i, true)"></el-input>
+              type="textarea" :rows="3" class="edit-input" resize="none"
+              @keyup.enter.native="hideEdit(a, i, true)"></el-input>
             <i class="checkbox" @click="changeSelect(a, i)" :class="{ active: item.id === recommend.selected }"></i>
           </div>
           <!-- 展开收起 -->
@@ -91,23 +92,6 @@ export default {
       default: () => ([])
     },
   },
-  watch: {
-    approval: {
-      handler(val) {
-        const ocrType = ['pdf', 'jpeg', 'jpg', 'png'].includes(val.fileName.split('.')[1])
-        this.showRecommend = ocrType;
-        this.active = ocrType ? 1 : 2;
-        this.recommends = val.recommends.map(item => {
-          item.hideMore = item.hideMore || false;
-          item.selected = item.selected || null;
-          return item
-        });
-        this.newFiles = [val.id]
-        this.$emit('changeEditorialType', this.active)
-      },
-      // deep: true
-    }
-  },
   data() {
     return {
       active: 1,
@@ -121,7 +105,27 @@ export default {
       newFocus: false,
     }
   },
+  watch: {
+    approval: {
+      handler(val) {
+        this.init(val)
+      },
+      // deep: true
+    }
+  },
   methods: {
+    init(val) {
+      const ocrType = ['pdf', 'jpeg', 'jpg', 'png'].includes(val.fileName.split('.')[1])
+      this.showRecommend = ocrType;
+      this.active = ocrType ? 1 : 2;
+      this.recommends = val.recommends.map(item => {
+        item.hideMore = item.hideMore || false;
+        item.selected = item.selected || null;
+        return item
+      });
+      this.newFiles = [val.id]
+      this.$emit('changeEditorialType', this.active)
+    },
     inputFocus() {
       this.newFocus = true;
     },
@@ -158,7 +162,9 @@ export default {
       if (item.files.length === 1) {
         this.$message.info('请至少选择一个文件来源')
       } else {
-        item.files = item.files.filter(file => file !== id)
+        const newFiles = [...item.files.filter(file => file !== id)];
+        this.$emit('upDateComments', 'editFiles', item, newFiles)
+        item.files = newFiles;
       }
     },
     // 更新绑定的关联文件
@@ -474,4 +480,5 @@ export default {
     padding: 3px;
     cursor: pointer;
   }
-}</style>
+}
+</style>

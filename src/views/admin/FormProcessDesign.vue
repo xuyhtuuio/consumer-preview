@@ -39,15 +39,15 @@ export default {
       this.isNew = false
       this.loadFormInfo(formId)
     }
-    let group = this.$route.query.group
-    this.setup.groupId = this.$isEmpty(group) ? null : parseInt(group)
+    // let group = this.$route.query.group
+    // this.setup.groupId = this.$isEmpty(group) ? null : parseInt(group)
   },
   methods:{
     loadFormInfo(formId){
       getFormDetail(formId).then(rsp => {
         console.log(rsp.data)
         let form = rsp.data;
-        form.logo = JSON.parse(form.logo)
+        // form.logo = JSON.parse(form.logo)
         form.settings = JSON.parse(form.settings)
         form.formItems = JSON.parse(form.formItems)
         form.process = JSON.parse(form.process)
@@ -60,20 +60,22 @@ export default {
       this.$store.commit('loadForm', {
         formId: null,
         formName:"",
-        logo:{
-          icon:"el-icon-eleme",
-          background:"#1e90ff"
-        },
+        // logo:{
+        //   icon:"el-icon-eleme",
+        //   background:"#1e90ff"
+        // },
         settings:{
-          commiter: [],
-          admin:[],
-          sign: false,
-          notify:{
-            types: ["APP"],
-            title: "消息通知标题"
-          }
+          undo: false,
+          nodeId: []
+          // commiter: [],
+          // admin:[],
+          // sign: false,
+          // notify:{
+          //   types: ["APP"],
+          //   title: "消息通知标题"
+          // }
         },
-        groupId: undefined,
+        // groupId: undefined,
         // TODO 暂时处理
         formItems: [{
         "id": "field1843713764987",
@@ -210,9 +212,9 @@ export default {
         let template = {
           formId: this.setup.formId,
           formName: this.setup.formName,
-          logo: JSON.stringify(this.setup.logo),
+          // logo: JSON.stringify(this.setup.logo),
           settings: JSON.stringify(this.setup.settings),
-          groupId: this.setup.groupId,
+          // groupId: this.setup.groupId,
           formItems: JSON.stringify(this.setup.formItems),
           process: JSON.stringify(this.setup.process),
           remark: this.setup.remark

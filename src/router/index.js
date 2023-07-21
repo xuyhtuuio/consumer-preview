@@ -10,7 +10,7 @@ const viewport = {
 
 // meta: { title: '新增详情' ,viewport: viewport ,pTitle: "首页",pPath: "/home"}
 const router = new Router({
-  //mode: 'history',
+  // mode: 'history',
   base: __dirname,
   routes: [
     {
@@ -102,9 +102,25 @@ const router = new Router({
     {
       path: "/applycenter",
       name: "applycenter",
-      component: () => import("@/views/applycenter/index.vue"),
+      component: () => import("@/views/applycenter/home"),
       meta: { title: '申请中心', viewport: viewport },
+      redirect: '/applycenter/apply-list',
+      children: [
+        {
+          path: "apply-list",
+          name: "apply-list",
+          component: () => import("@/views/applycenter/index"),
+          meta: { title: '申请中心',}
+        },
+        {
+          path: "details",
+          name: "details",
+          component: () => import("@/views/applycenter/details"),
+          meta: { title: '申请单详情', }
+        },
+      ]
     },
+
     {
       path: "/approvalCenter",
       name: "approvalCenter",
@@ -122,7 +138,7 @@ const router = new Router({
           path: "/home",
           name: "home",
           component: () => import("@/views/front/home.vue"),
-          meta: { title: '首页' ,viewport: viewport },
+          meta: { title: '首页', viewport: viewport },
         },
       ]
     },
@@ -137,9 +153,9 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  if(to.meta.pPath) {
-    const data = [{path: to.meta.pPath.slice(1),title:to.meta.pTitle},{path: to.path.slice(1),title:to.meta.title}]
-    store.commit("setBreadcrumbList",data)
+  if (to.meta.pPath) {
+    const data = [{ path: to.meta.pPath.slice(1), title: to.meta.pTitle }, { path: to.path.slice(1), title: to.meta.title }]
+    store.commit("setBreadcrumbList", data)
   }
 
   if (to.meta.title) {
@@ -155,5 +171,7 @@ router.beforeEach((to, from, next) => {
   next();
   sessionStorage.setItem('router-path', to.path)
 })
+
+
 
 export default router;
