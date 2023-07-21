@@ -1,5 +1,5 @@
 <template>
-  <div class="base-setup" @click="showIconSelect = false">
+  <div class="base-setup">
     <el-form label-position="top" label-width="80px">
       <el-form-item>
         <template slot="label">
@@ -15,10 +15,10 @@
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#icon-form-desc"></use>
           </svg>
-          关联表单
+          关联表单<span style="color: red">*</span>
         </template>
-        <el-select v-model="setup.groupId" placeholder="请选择关联表单(多选)" size="medium" class="is-dark input" style="width: 100%">
-          <el-option v-for="(op, index) in fromGroup" :key="index" v-show="op.id > 1"
+        <el-select v-model="setup.formId" multiple placeholder="请选择关联表单(多选)" size="medium" class="is-dark input" style="width: 100%">
+          <el-option v-for="(op, index) in fromGroup" :key="index"
                      :label="op.name" :value="op.id"></el-option>
         </el-select>
       </el-form-item>
@@ -48,50 +48,14 @@ export default {
     return {
       nowUserSelect: null,
       showUserSelect: false,
-      showIconSelect: false,
       select: [],
-      newGroup: '',
-      fromGroup: [],
-      notifyTypes:[
-        {type:'APP',name:'应用内通知'},
-        {type:'EMAIL',name:'邮件通知'},
-        {type:'SMS',name:'短信通知'},
-        {type:'WX',name:'微信通知'},
-        {type:'DING',name:'钉钉通知'},
-      ],
-      colors: [
-        '#ff4500',
-        '#ff8c00',
-        '#ffd700',
-        '#90ee90',
-        '#00ced1',
-        '#1e90ff',
-        '#c71585',
-        'rgba(255, 69, 0, 0.68)',
-        'rgb(255, 120, 0)',
-        'hsl(181, 100%, 37%)',
-        'hsla(209, 100%, 56%, 0.73)',
-        '#c7158577'
-      ],
-      icons: [
-        'el-icon-eleme',
-        'el-icon-delete-solid',
-        'el-icon-s-tools',
-        'el-icon-phone',
-        'el-icon-s-goods',
-        'el-icon-warning',
-        'el-icon-circle-plus',
-        'el-icon-s-help',
-        'el-icon-camera-solid',
-        'el-icon-s-promotion',
-        'el-icon-s-cooperation',
-        'el-icon-s-platform',
-        'el-icon-s-custom',
-        'el-icon-s-data',
-        'el-icon-s-check',
-        'el-icon-s-claim',
-        'el-icon-location'
-      ]
+      fromGroup: [{
+        name: '表单1',
+        id: 'form-1111'
+      }, {
+        name: '表单2',
+        id: 'form-2222'
+      }],
     }
   },
   computed: {
@@ -100,22 +64,8 @@ export default {
     }
   },
   mounted(){
-    this.getGroups()
   },
   methods: {
-    getGroups(){
-      getFormGroups().then(rsp => {
-        this.fromGroup = rsp.data
-      }).catch(err => this.$message.error('获取分组异常'))
-    },
-    addGroup() {
-      if (this.newGroup.trim() !== '') {
-        updateGroup({name: this.newGroup.trim()}, 'post').then(rsp => {
-          this.$message.success(rsp.data)
-          this.getGroups()
-        }).catch(err => this.$message.error(err.response.data))
-      }
-    },
     closeSelect() {
       this.showUserSelect = false
       //this.nowUserSelect = null
@@ -123,11 +73,11 @@ export default {
     selected(select) {
       console.log(select)
       this.showUserSelect = false
-      this.$set(this.setup.settings, this.nowUserSelect, select)
+      // this.$set(this.setup.settings, this.nowUserSelect, select)
       //this.setup[this.nowUserSelect] = select
     },
     selectUser(key) {
-      this.select = this.setup.settings[key]
+      // this.select = this.setup.settings[key]
       this.nowUserSelect = key
       this.showUserSelect = true
     },

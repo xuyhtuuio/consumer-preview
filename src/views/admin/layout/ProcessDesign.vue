@@ -26,12 +26,7 @@
           <div @mouseover="isHover = true" @mouseout="isHover=false">
             <div class="header-title" v-show="!showInput" @click="showInput = true" style="font-size: medium">
               {{selectedNode.name}}
-              <svg v-if="isHover" class="icon" aria-hidden="true">
-                <use xlink:href="#icon-bi"></use>
-              </svg>
-              <svg v-else class="icon" aria-hidden="true">
-                <use xlink:href="#icon-bi1"></use>
-              </svg>
+              <i class="iconfont icon-bi"></i>
             </div>
           </div>
         </template>

@@ -30,9 +30,7 @@
                 </el-popover>
 
                 <span class="handler">
-                    <svg class="icon urgent-icon" aria-hidden="true">
-                        <use xlink:href="#icon-xianxingtubiao1"></use>
-                    </svg>
+                    <i class="iconfont icon-dept"></i>
                     北京银行XX分行</span>
 
             </div>
