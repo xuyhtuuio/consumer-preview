@@ -9,17 +9,11 @@
 				<div class="box left-box">
           <div class="tabs">
             <div class="user tab" :class="{ 'is-active': active === 'user' }" @click="changeTabType('user')">
-              <svg class="icon" aria-hidden="true">
-                <use v-if="active === 'user'" xlink:href="#icon-xianxingtubiao1"></use>
-                <use v-else xlink:href="#icon-dept"></use>
-              </svg>
+              <i class="iconfont icon-dept"></i>
               部门/人员
             </div>
             <div v-if="!hidden.includes('系统角色')" class="role tab" :class="{ 'is-active': active === 'role' }" @click="changeTabType('role')">
-              <svg class="icon" aria-hidden="true">
-                <use v-if="active === 'role'" xlink:href="#icon-xitong-juese"></use>
-                <use v-else xlink:href="#icon-xitong-juese1"></use>
-              </svg>
+              <i class="iconfont icon-xitong-juese"></i>
               系统角色
             </div>
           </div>
@@ -634,10 +628,8 @@
           align-items: center;
           cursor: pointer;
         }
-        svg {
-          width: 22px;
-          height: 22px;
-          color: #505968;
+        i {
+          font-size: 18px;
         }
       }
       .el-checkbox .el-checkbox__input.is-indeterminate .el-checkbox__inner {
