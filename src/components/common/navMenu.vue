@@ -10,7 +10,7 @@
       </div>
     </div>
     <div class="right flex">
-      <i v-for="(item, index) in iconList" :key="index" :class="['iconfont', item.href, `icon${index + 1}`]"></i>
+      <i v-for="(item, index) in iconList" :key="index" @click="toManagePage(item)" :class="['iconfont', item.href, `icon${index + 1}`]"></i>
     </div>
   </div>
 </template>
@@ -29,7 +29,7 @@ export default {
       activeMenu: 'home',
       iconList: [
         { href: "icon-tongyongtubiao3" },
-        { href: "icon-tongyongtubiao5" },
+        { href: "icon-tongyongtubiao5", name: 'manage' },
         { href: "icon-gerenyonghutouxiang2" },
       ]
     }
@@ -57,6 +57,13 @@ export default {
     handleItem(url) {
       this.activeMenu = url
       this.$router.push(url)
+    },
+    toManagePage(item) {
+      if (item.name) {
+        this.$router.push({
+          name: item.name
+        })
+      }
     }
   }
 }
