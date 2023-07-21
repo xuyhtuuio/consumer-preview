@@ -5,8 +5,8 @@
             您有 2 笔【消保审查】任务待确认哦。请尽快确认！
         </p>
         <div class="data-statistics">
-            <div v-for="(item, index) in dataStatistics" :key="index"
-                :class="index !== 0 ? 'data-statistics-item' : 'data-statistics-item active-item'">
+            <div v-for="(item, index) in dataStatistics" :key="index" @click="changeStatis(item)"
+                :class="item.value !== crtSign ? 'data-statistics-item' : 'data-statistics-item active-item'">
                 <div class="icon">
                     <img src="@/assets/image/apply-center/attention.png" alt="" v-if="index == 0" class="active-icon">
                     <img src="@/assets/image/apply-center/no-attention.png" v-else alt="" class="default-icon">
@@ -44,7 +44,7 @@
                             <el-option v-for="(item, index) in adoptionSituations" :key='index' :label="item.label"
                                 :value="item.value"></el-option>
                         </el-select>
-                        <el-select v-model="search.updateTime2" placeholder="排序" multiple @change="changeSort"
+                        <el-select v-model="search.updateTime2" placeholder="排序" ref="multiSelect" multiple @change="changeSort"
                             :class="search.updateTime2[1] == 'desc' ? 'arrow-select descArrow' : 'arrow-select ascArrow'">
                             <el-option-group v-for="group in updateTimeGroup" :key="group.label">
                                 <el-option v-for="item in group.options" :key="item.value" :label="item.label"
@@ -100,19 +100,19 @@ export default {
 
                 }, {
                     name: '已审批',
-                    count: 10,
+                    count: 10,              value: 'hasApproval'
 
                 }, {
                     name: '待修改',
-                    count: 10,
+                    count: 10,              value: 'toModified'
 
                 }, {
                     name: '我的关注',
-                    count: 10,
+                    count: 10,              value: 'myAttention'
 
                 }, {
                     name: '全部任务',
-                    count: 10,
+                    count: 10,              value: 'applyAll'
                 },
 
             ],
@@ -195,6 +195,10 @@ export default {
 
     },
     methods: {
+        changeStatis(item) {
+            if (item.value == this.crtSign) return
+            this.crtSign = item.value
+        },
         changeSort() {
             const lastKey = this.search.updateTime2[this.search.updateTime2.length - 1]
             if (this.search.updateTime2.length < 2) {
@@ -213,6 +217,9 @@ export default {
             this.$nextTick(() => {
                 const text = this.search.updateTime[0] == 1 ? '发起时间' : '更新时间'
                 dom.innerText = text
+                setTimeout(() => {
+                    this.$refs.multiSelect.blur()
+                }, 50)
                 this.searchList()
             })
 

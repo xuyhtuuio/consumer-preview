@@ -50,7 +50,7 @@
                                 <el-option v-for="(item, index) in adoptionSituations" :key='index' :label="item.label"
                                     :value="item.value"></el-option>
                             </el-select>
-                            <el-select v-model="search.updateTime2" placeholder="排序" multiple @change="changeSort"
+                            <el-select v-model="search.updateTime2"  ref='multiSelect' placeholder="排序" multiple @change="changeSort"
                                 :class="search.updateTime2[1] == 'desc' ? 'arrow-select descArrow' : 'arrow-select ascArrow'">
                                 <el-option-group v-for="group in updateTimeGroup" :key="group.label">
                                     <el-option v-for="item in group.options" :key="item.value" :label="item.label"
@@ -65,11 +65,11 @@
                             @keyup.enter.native="searchList">
                             <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
                         </el-input>
-                        <el-date-picker v-model="search.startDate" value-format="yyyy-MM-dd" clearable type="date" placeholder="请选择发起时间"
-                            @clear="searchList" @change="searchList">
+                        <el-date-picker v-model="search.startDate" value-format="yyyy-MM-dd" clearable type="date"
+                            placeholder="请选择发起时间" @clear="searchList" @change="searchList">
                         </el-date-picker>
-                        <el-date-picker v-model="search.productLaunchDate"  value-format="yyyy-MM-dd" clearable type="date" placeholder="请选择产品上线时间"
-                            @clear="searchList" @change="searchList">
+                        <el-date-picker v-model="search.productLaunchDate" value-format="yyyy-MM-dd" clearable type="date"
+                            placeholder="请选择产品上线时间" @clear="searchList" @change="searchList">
                         </el-date-picker>
                     </div>
                 </div>
@@ -260,6 +260,10 @@ export default {
             this.$nextTick(() => {
                 const text = this.search.updateTime[0] == 1 ? '发起时间' : '更新时间'
                 dom.innerText = text
+                setTimeout(() => {
+                    this.$refs.multiSelect.blur()
+                }, 50)
+
                 this.searchList()
             })
 
@@ -270,7 +274,7 @@ export default {
                 pageNow,
                 pageSize: 10,
                 ...this.search,
-                taskStatus:this.crtSign
+                taskStatus: this.crtSign
             }
             let sortType = ''
             // desc:降序 asc 升序 1 发起时间 2 更新时间

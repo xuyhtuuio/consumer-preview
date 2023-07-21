@@ -50,7 +50,7 @@
                 </svg>
                 修改
             </span>
-            <span class="attention no-attention icon-op" v-if="Math.random() > 0.5">
+            <span class="attention no-attention icon-op" v-if="Math.random() > 0.5" @click="concern(item)">
                 <svg class="icon urgent-icon" aria-hidden="true">
                     <use xlink:href="#icon-tubiao-1"></use>
                 </svg>
@@ -73,7 +73,35 @@ export default {
     },
     data() {
         return {
+            allowConcernClick: true
 
+        }
+    },
+    methods: {
+        concern(item) {
+            if (!this.allowConcernClick) return
+            const param = {
+                recordId: item.id
+            }
+            this.allowConcernClick=true
+            concernApplication(param).then(res => {
+                const { data } = res.data
+                if (data.status == 200) {
+                    if (item.concernId == 1) {
+                        this.$message.success('取消关注成功')
+                    } else {
+                        this.$message.success('关注成功')
+                    }
+                    item.concernId = item.concernId == 1 ? 0 : 1
+                } else {
+                    if (item.concernId == 1) {
+                        this.$message.error('取消关注失败')
+                    } else {
+                        this.$message.error('关注失败')
+                    }
+                }
+                this.allowConcernClick=false
+            })
         }
     }
 }
