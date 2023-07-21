@@ -4,42 +4,34 @@
       <img src="@/assets/image/logo.png" alt="" class="logo">
       消保管控平台
     </div>
-    <div class="center menu-item">
-      <div :class="['center-item',currentIndex === index?'center-item-hover':'']" v-for="item,index in list"  :key="index" @click="handleItem(item.path,index)">
-      <span :class="['item-main',currentIndex === index?'item-main-hover':'']">{{item.name}}</span>
+    <div class="center flex">
+      <div class="nav-item" v-for="item, index in list" :key="index" @click="handleItem(item.path)">
+        <span :class="[activeMenu == item.path ? 'active-menu' : '']">{{ item.name }}</span>
+      </div>
     </div>
-    </div>
-    <div class="right menu-item">
-      <g-icon class="right-icon"  v-for="item,index in iconList" :key="index" :style="{color:item.color}" stylePx="32" :href="item.href"/>
+    <div class="right flex">
+      <i v-for="(item, index) in iconList" :key="index" :class="['iconfont', item.href, `icon${index + 1}`]"></i>
     </div>
   </div>
 </template>
 
 <script>
-  export default {
-
-    data() {
-      return {
-        currentIndex:0,
-        list : [
-             { name: "首页", path: "home" },
+export default {
+  data() {
+    return {
+      list: [
+        { name: "首页", path: "home" },
         { name: "申请中心", path: "applyCenter" },
         { name: "审批中心", path: 'approvalCenter' },
-          {name: "人员中心"},
-          {name: "产业图谱"},
-        ],
-        iconList: [
-          {href: "#icon-tongyongtubiao" ,color: "#fff"},
-          {href: "#icon-tongyongtubiao1",color: "#fff"},
-          {href: "#icon-tongyongtubiao-1",color: "#fff"},
-        ]
-      }
-    },
-    methods: {
-      handleItem(item,idx) {
-      console.log(item);
-      this.$router.push(item)
-      this.currentIndex = idx
+        { name: "人员中心" },
+        { name: "产业图谱" },
+      ],
+      activeMenu: 'home',
+      iconList: [
+        { href: "icon-tongyongtubiao3" },
+        { href: "icon-tongyongtubiao5" },
+        { href: "icon-gerenyonghutouxiang2" },
+      ]
     }
   },
   watch: {
@@ -106,37 +98,19 @@
     flex: 1;
     display: flex;
     align-items: center;
-    .center-item {
-    padding: 0px 20px 0px 20px;
-    width: 104px;
-    height: 48px;
-    line-height: 48px;
-    text-align: center;
-    border-radius: 10px;
-    gap: 8px;
-    cursor: pointer;
-    &.center-item-hover {
-      font-weight: 700;
-    }
-    &:first-child {
-      margin-left: 10px;
-    }
-    .item-main {
-      display: inline-block;
-      // justify-content: center;
-      height: 100%;
-    }
-    .item-main-hover {
-      border-bottom: 2px solid rgba(255, 255, 255, 1);
-    }
-     
-  }
-  }
-  .right {
-    display: flex;
-    .right-icon {
-      &:not(:last-child) {
-        margin-right: 32px;
+
+    .nav-item {
+      padding: 0px 20px 0px 20px;
+      width: 104px;
+      height: 48px;
+      line-height: 48px;
+      text-align: center;
+      border-radius: 10px;
+      gap: 8px;
+      cursor: pointer;
+
+      &:hover {
+        background: gray;
       }
 
     }
@@ -175,6 +149,4 @@
     }
   }
 }
-
-
 </style>
