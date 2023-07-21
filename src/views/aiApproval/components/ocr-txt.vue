@@ -1,25 +1,29 @@
 <template>
   <div class="ocr-txt">
     <div class="header">
+      {{ approval?.recommends?.length }}
       <span :class="{ active: activeWordType === 1 }" @click="changeWorkType(1)">禁用词</span>
       <span :class="{ active: activeWordType === 2 }" @click="changeWorkType(2)">敏感词</span>
       <el-input v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search" size="medium">
         <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
       </el-input>
     </div>
-    <div class="results" ref="results" :key="resultKey" :class="{light: lineWordItem?.word}">
+    <div class="results" ref="results" :key="resultKey" :class="{ light: lineWordItem?.word }"
+      @mousedown="statrGetSelection" @mouseup="getSelection">
       <p v-for="(ocr, i) in html" :key="i">
         <template v-for="(item, j) in ocr">
           <template v-if="typeof item === 'string'">{{ item }}</template>
-          <span v-else :key="i + '_' + j" :wordType="item.wordType"
-            :id="`word_${i}_${j}`"
-            :class="{ active: activeWordType === item.wordType || activeWordType === 0 ,
-            gray: lineWordItem?.word && lineWordItem?.word !== item.word}"
-            :word="item.word"
-            @click="showLine(item, `word_${i}_${j}`)">{{
-              item.word }}</span>
+          <span v-else :key="i + '_' + j" :wordType="item.wordType" :id="`word_${i}_${j}`" :class="{
+            active: activeWordType === item.wordType || activeWordType === 0,
+            gray: lineWordItem?.word && lineWordItem?.word !== item.word
+          }" :word="item.word" @click="showLine(item, `word_${i}_${j}`)">{{
+  item.word }}</span>
         </template>
       </p>
+    </div>
+    <div class="isAdd" ref="isAdd" v-if="seletTxt" :style="askIsAddPosition">
+      <p>针对该词添加审查意见</p>
+      <el-button size="small" @click="addWord">添加</el-button>
     </div>
   </div>
 </template>
@@ -44,6 +48,11 @@ export default {
       html: [],
       activeWordType: 0, // 高亮禁用词或敏感词, 1 禁用词,  2 敏感词
       resultKey: 0,
+      seletTxt: '',
+      askIsAddPosition: {
+        left: '',
+        right: ''
+      }
     }
   },
   watch: {
@@ -55,7 +64,36 @@ export default {
       deep: true
     }
   },
+  mounted() {
+    document.addEventListener('click', this.hideAdd)
+  },
   methods: {
+    addWord() {
+      this.$emit('addWord', this.seletTxt.trim());
+      this.seletTxt = '';
+    },
+    hideAdd(e) {
+      var e = e || window.event;
+      var elem = e.target;
+      if (this.$refs?.isAdd && !this.$refs.isAdd.contains(elem) && this.seletTxt) {
+        this.seletTxt = '';
+      }
+    },
+    statrGetSelection() {
+      window.getSelection ? window.getSelection().removeAllRanges() : document.selection.empty();
+    },
+    getSelection(event) {
+      const seletTxt = window.getSelection ? window.getSelection().toString() : document.selection.createRange().text;
+      if (!!seletTxt) {
+        setTimeout(() => {
+          this.seletTxt = seletTxt;
+          this.askIsAddPosition = {
+            left: (event.clientX + 10) + 'px',
+            top: (event.clientY - 100) + 'px'
+          }
+        }, 300);
+      }
+    },
     // 点击命中词,显示连线
     showLine(item, ocrWordId) {
       this.$emit('showLine', { ...item, ocrWordId })
@@ -239,6 +277,7 @@ export default {
   font-weight: 400;
   overflow-y: auto;
   word-break: break-all;
+
   [wordType] {
     user-select: none;
     -webkit-user-select: none;
@@ -253,11 +292,32 @@ export default {
   .active[wordtype="2"] {
     color: #FDB123;
   }
-  &.light{
+
+  &.light {
     color: #86909C;
-    .gray{
+
+    .gray {
       color: #86909C;
     }
+  }
+}
+
+.isAdd {
+  position: fixed;
+  padding: 16px 24px;
+  border-radius: 4PX;
+  box-shadow: 0px 0px 10px 0px #4343431A;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 22px;
+  background: #ffffff;
+
+  .el-button {
+    margin-top: 16px;
+    background: linear-gradient(90deg, #2F54EB 0%, #5196FF 100%);
+    border-radius: 6px;
+    color: #ffffff;
+    border: none;
   }
 }
 </style>
