@@ -1,6 +1,6 @@
 <template>
   <div class="warn-info">
-      <g-icon v-if="info.length" class="right-icon" stylePx="20" href="#icon-guanzhu1"/>
+      <g-icon v-if="info.length" class="right-icon" stylePx="20" href="#icon-a-tubiao1"/>
        <slot>
         {{info}}
        </slot>

@@ -12,15 +12,22 @@
       <span class="item">财富客群团队</span>
     </div>
     <div class="right">
-      <g-button class="btn" >保存草稿</g-button>
-      <g-button class="btn"  type="primary">提交</g-button>
+      <g-button class="btn" @click="save">保存草稿</g-button>
+      <g-button class="btn"  type="primary" @click="submit">提交</g-button>
     </div>
   </div>
 </template>
 
 <script>
   export default {
-    
+    methods: {
+      submit() {
+        this.$emit("submit")
+      },
+      save() {
+        this.$emit("save")
+      }
+    }
   }
 </script>
 

@@ -5,8 +5,8 @@
       消保管控平台
     </div>
     <div class="center flex">
-      <div class="nav-item" v-for="item, index in list" :key="index" @click="handleItem(item.path)">
-        <span :class="[activeMenu == item.path ? 'active-menu' : '']">{{ item.name }}</span>
+      <div class="nav-item" v-for="item, index in list" :key="index" @click="handleItem(item)">
+        <span :class="[activeMenu == item.name ? 'active-menu' : '']">{{ item.title }}</span>
       </div>
     </div>
     <div class="right flex">
@@ -20,11 +20,11 @@ export default {
   data() {
     return {
       list: [
-        { name: "首页", path: "home" },
-        { name: "申请中心", path: "applyCenter" },
-        { name: "审批中心", path: 'approvalCenter' },
-        { name: "人员中心" },
-        { name: "产业图谱" },
+        { title: "首页", name: "home" },
+        { title: "申请中心", name: "applycenter" },
+        { title: "审批中心", name: 'approvalCenter' },
+        { title: "人员中心" },
+        { title: "产业图谱" },
       ],
       activeMenu: 'home',
       iconList: [
@@ -54,9 +54,11 @@ export default {
 
   },
   methods: {
-    handleItem(url) {
-      this.activeMenu = url
-      this.$router.push(url)
+    handleItem(item) {
+      this.activeMenu = item.name
+      this.$router.push({
+        name: item.name
+      })
     },
     toManagePage(item) {
       if (item.name) {
@@ -115,11 +117,6 @@ export default {
       border-radius: 10px;
       gap: 8px;
       cursor: pointer;
-
-      &:hover {
-        background: gray;
-      }
-
     }
 
     .active-menu {
@@ -156,4 +153,13 @@ export default {
     }
   }
 }
+
+
+
+
+
+
+
+
+
 </style>

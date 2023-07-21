@@ -124,15 +124,15 @@ const router = new Router({
           component: () => import("@/views/front/home.vue"),
           meta: { title: '首页' ,viewport: viewport },
         },
-        {
-          path: "/addApply",
-          name: "addApply",
-          component: () => import("@/views/front/addApply.vue"),
-          parent: "/home",
-          meta: { title: '新增详情' ,viewport: viewport ,pTitle: "首页",pPath: "/home"}
-        },
       ]
-    }
+    },
+    {
+      path: "/addApply",
+      name: "addApply",
+      component: () => import("@/views/front/addApply.vue"),
+      parent: "/home",
+      meta: { title: '新增详情' ,viewport: viewport ,pTitle: "首页",pPath: "/home"}
+    },
   ]
 })
 

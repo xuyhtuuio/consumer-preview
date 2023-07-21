@@ -1,161 +1,261 @@
 <template>
-
-  <div class="review-material"> 
+  <div class="review-material" ref="globalRef" v-if="list.length">
     <g-table-card :title="title">
       <template v-slot:cardInfo>
-          <div class="cardInfo">
-            {{cardInfo}}
-          </div>
+        <div class="cardInfo">
+          {{ cardInfo }}
+        </div>
+        <div class="warn" v-if="judgeWarnFlag">
+          <warn-info :info="warnInfo"> </warn-info>
+        </div>
       </template>
       <template v-slot:content>
         <div class="content">
-           <el-upload
-        class="upload"
-        drag
-        :action="action"
-        multiple
-        :http-request="uploadBpmn"
-       :file-list="fileList"
-       :on-change="handleChange"
-       :on-success="handleSuccess"
-       :before-upload ="handleBefore"
-       :on-error="handleError"
-        >
-        <i class="el-icon-upload"></i>
-        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em>
-        <div class="el-upload__tip" slot="tip">{{uploadTip}}</div>
-        </div>
-      </el-upload>
-      <div class="upload-list">
-        <div class="item" v-for="item,index in fileList" :key="index">
-          <div class="left">{{`${index+1}.`}}</div>
-          <div class="center">
-            <g-icon class="left-icon" stylePx="16" href="#icon-mianxingtubiao"/>附件附件附件1.png
-          </div>
-          <div class="right">
-             <div class="r-item progress" v-if="item.status === -1" >上传中...</div>
-             <div class="r-item success" v-if="item.status === 1">
-              <span class="s-item" @click="handleUploadLook(item.url)">预览</span>
-              <span class="s-item" @click="handleUploadDelete(item)">删除</span>
+          <el-upload
+            class="upload"
+            drag
+            :action="action"
+            :multiple="false"
+            :http-request="uploadBpmn"
+            :file-list="fileList"
+            :on-success="handleSuccess"
+            :before-upload="handleBefore"
+            :on-error="handleError"
+          >
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">
+              将文件拖到此处，或<em>点击上传</em>
+              <div class="el-upload__tip" slot="tip">{{ uploadTip }}</div>
             </div>
-          <div class="r-item error" v-if="item.status === 0">
-              上传失败
+          </el-upload>
+          <div class="upload-list">
+            <div
+              class="item"
+              v-for="(item, index) in fileList"
+              :key="index"
+              @mouseenter="handleMouseEnter(item)"
+              @mouseleave="handleMouseLeave(item)"
+            >
+              <div class="left">{{ `${index + 1}.` }}</div>
+              <div class="center">
+                <g-icon class="left-icon" stylePx="16" :href="fileSuffix[item.type]" />{{
+                  item.name
+                }}
+              </div>
+              <div class="right">
+                <div class="r-item progress" v-if="item.status === -1">上传中...</div>
+                <div class="r-item progress" v-if="item.status === 1 && !item.isClick">
+                  上传完成
+                </div>
+                <div class="r-item error" v-if="item.status === -2 && !item.isClick">上传失败</div>
+                <div class="r-item success" v-if="item.status === 1 && item.isClick">
+                  <span class="s-item" @click="handleUploadLook(item.url)">预览</span>
+                  <span class="s-item" @click="handleUploadDelete(item)">删除</span>
+                </div>
+                <div class="r-item error" v-if="item.status === -2 && item.isClick">
+                  <span class="s-item success" @click="handleUploadDelete(item)">删除</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-        </div>
-     
       </template>
     </g-table-card>
   </div>
 </template>
 
 <script>
-import {getFormGroups,deleteFormGroups} from "@/api/front.js"
+import WarnInfo from './warn-info.vue';
+import { getFormGroups, deleteFormGroups } from '@/api/front.js';
 // 核对要点
-  export default {
-    data(){
-      return {
-        title: '审查材料',
-        cardInfo: "（上传的文件必须为同一个产品或活动的材料）",
-        uploadTip:"支持zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/格式的文件，压缩包中文件名不得包含*&^%$_-+=等特殊字",
-        uploadTip1:"*&^%$_-+=",
-        judgment:"zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/",
-        action: 'http://192.168.210.57:31602/cpr/file/upload',
-        fileList: [],
+export default {
+  components: {
+    WarnInfo
+  },
+  props: {
+    list: {
+      typeof: Array,
+      required: true
+    }
+  },
+  data() {
+    return {
+      title: '审查材料',
+      cardInfo: '（上传的文件必须为同一个产品或活动的材料）',
+      warnInfo: '至少上传一个附件材料才可提交申请',
+      judgeWarnFlag: false,
+      uploadTip:
+        '支持zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/格式的文件，压缩包中文件名不得包含*&^%$_-+=等特殊字',
+      uploadTip1: '*&^%$_-+=',
+      judgment: 'zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/',
+      // judgment:this.list
+      action: 'http://192.168.210.57:31602/cpr/file/upload',
+      fileList: [],
+      info: {
+        err: '您当前存在上传失败的材料，可能是文件名中包含特殊字符，请重新上传后再提交',
+        errT: '您当前存在正在上传的材料，请等待文件上传成功后再提交'
+      },
+      fileSuffix: {
+        zip: '#icon-zip',
+        pdf: 'icon-mianxingtubiao',
+        doc: '#icon-mianxingtubiao-2',
+        docx: '#icon-mianxingtubiao-2',
+        xls: '#icon-mianxingtubiao-1',
+        xlsx: '#icon-mianxingtubiao-1',
+        mp4: '#icon-mp4',
+        ppt: '#icon-file-ppt',
+        pptx: '##icon-file-ppt',
+        txt: '#icon-file-txt',
+        jpeg: '#icon-picture',
+        jpg: '#icon-picture',
+        png: '#icon-picture'
+      }
+    };
+  },
+  watch: {
+    list(newVal) {
+      this.fileList = newVal[0].value
+    },
+    'fileList.length'() {
+      if (this.judgeWarnFlag) this.judgeWarnFlag = false;
+    }
+  },
+  methods: {
+    handleSuccess(data, id) {
+      console.log('handleSuccess', data);
+      this.fileList.forEach(item => {
+        if (item.id === id) {
+          item.key = data.key;
+          item.url = data.url;
+          item.status = 1;
+        }
+      });
+    },
+    handleError(id, file, fileList) {
+      this.fileList.forEach(item => {
+        if (item.id === id) {
+          item.status = -2;
+          console.log('handleError', id, item);
+        }
+      });
+    },
+    handleBefore(file) {
+      // 上传文件之前钩子
+      const type = file.name.replace(/.+\./, '');
+      const judgeArr = this.judgment.split('/');
+      const judgeRes = judgeArr.includes(type);
+      // const judgeName = file.name.replace(`.${type}`,"")
+      // const pattern = new RegExp(`${this.uploadTip1}`);
+        // if(pattern.test(judgeName)){
+        //   this.$message({
+        //     type: 'error',
+        //     message: '只支持zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/格式的文件！'
+        //   });
+        // }
+      this.fileList.push({
+        name: file.name,
+        id: file.uid,
+        status: -1,
+        isClick: false,
+        type: type
+      });
+      if (!judgeRes) {
+        this.$message({
+          type: 'error',
+          message: '只支持zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/格式的文件！'
+        });
+        return false;
       }
     },
-    methods: {
-      handleChange(file,fileList) {
-  // this.fileList = fileList
-      },
-      handleSuccess(data,id) {
-        console.log(data);
-        this.fileList.forEach(item => {
-          if(item.id === id) {
-            item.key = data.key
-            item.url = data.url
-            item.status = 1
-          }
-        })
-        
-      },
-      handleError (err,file,fileList) {
-        console.log('handleError',err,file,fileList);
-        file.status = 0
-         this.fileList.forEach(item => {
-          if(item.id === file.id) {
-            item.status = 0
-          }
-        })
-      },
-      handleBefore (file) { // 上传文件之前钩子
-        const type = file.name.replace(/.+\./, "")
-        const judgeArr = this.judgment.split("/")
-        const judgeRes = judgeArr.includes(type)
-       this.fileList.push({
-        name:file.name,
-        id:file.uid,
-        status:-1
-        })
-        if (!judgeRes) {
-          this.$message({ type: 'error', message: '只支持zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/格式的文件！' })
-          return false
-        }
-      },
-      uploadBpmn(param) {
-        const formData = new FormData()
-        console.log(param);
-        formData.append('mf', param.file) // 传入bpmn文件
-        getFormGroups(formData).then(res => {
+    // 上传文件
+    uploadBpmn(param) {
+      const formData = new FormData();
+      console.log(param);
+      formData.append('mf', param.file); // 传入bpmn文件
+      getFormGroups(formData)
+        .then(res => {
           console.log(res.data.data);
           // param.onSuccess(res.data.data)
-          this.handleSuccess(res.data.data,param.file.uid)
-        }).catch(err => {
-           param.onError(data)
+          this.handleSuccess(res.data.data, param.file.uid);
         })
-      },
-      handleUploadLook(url) {
-        window.open(url)
-      },
-      handleUploadDelete(item) {
-        deleteFormGroups({key: item.key}).then(res=> {
-          console.log(res.data.data);
-        // this.fileList.splice()
-        })
+        .catch(err => {
+          param.onError(param.file.uid);
+        });
+    },
+    handleUploadLook(url) {
+      window.open(url);
+    },
+    //删除图片
+    handleUploadDelete(item) {
+      deleteFormGroups({ key: item.key }).then(res => {
+        const idx = this.fileList.findIndex(iten => iten.key === item.key);
+        this.fileList.splice(idx, 1);
+        this.$message({ type: 'success', message: res.data.data });
+      });
+    },
+    handleMouseEnter(item) {
+      item.isClick = true;
+    },
+    handleMouseLeave(item) {
+      item.isClick = false;
+    },
+
+    judgeWarn() {
+      const offsetTop = this.$refs['globalRef'].offsetTop;
+      if (this.fileList.some(item => item.status === -2)) {
+        this.$message({ type: 'error', message: this.info.err });
+        this.judgeWarnFlag = true;
+        return [false, offsetTop];
       }
+      if (this.fileList.some(item => item.status === -1)) {
+        this.$message({ type: 'error', message: this.info.errT });
+        this.judgeWarnFlag = true;
+        return [false, offsetTop];
+      }
+      if (!this.fileList.length) {
+        this.judgeWarnFlag = true;
+        return [false, offsetTop];
+      }
+      return [true];
     }
   }
+};
 </script>
 
 <style lang="less" scoped>
-
-
 .review-material {
+  .warn {
+    display: flex;
+    align-items: center;
+    margin-left: 14px;
+    font-size: 12px;
+    color: rgba(235, 87, 87, 1);
+    .right-icon {
+      margin-right: 8px;
+    }
+  }
   .content {
     padding: 16px 72px 0;
     .upload {
-    /deep/.el-upload {
+      /deep/.el-upload {
         width: 100%;
-      .el-upload-dragger {
-        width: 100%;
-        background: #f7f8fa;
-      }  
-
-    }
-     /deep/.el-upload-list {
+        .el-upload-dragger {
+          width: 100%;
+          background: #f7f8fa;
+        }
+      }
+      /deep/.el-upload-list {
         display: none;
         .el-upload-list__item {
           margin-top: 10px;
           border-bottom: 1px dashed rgba(229, 230, 235, 1);
           &:hover {
-          border-bottom: 1px dashed transparent;
+            border-bottom: 1px dashed transparent;
           }
         }
       }
-  }
-  .upload-list {
+    }
+    .upload-list {
       display: flex;
       justify-content: space-between;
       flex-wrap: wrap;
@@ -167,27 +267,26 @@ import {getFormGroups,deleteFormGroups} from "@/api/front.js"
         min-width: 48%;
         max-width: 48%;
         height: 38px;
-        padding:0 12px;
+        padding: 0 12px;
         border-radius: 4px;
         border-bottom: 1px dotted rgba(229, 230, 235, 1);
         &:hover {
           background: rgba(247, 248, 250, 1);
-           border-bottom: 1px dotted transparent;
-        
+          border-bottom: 1px dotted transparent;
         }
         &:nth-child(2n-1) {
           margin-right: 24px;
         }
         .center {
-          flex:1;
+          flex: 1;
           display: flex;
           align-items: center;
           .left-icon {
-            margin:0 10px ;
+            margin: 0 10px;
           }
         }
         .right {
-          .r-item  {
+          .r-item {
             display: flex;
           }
           .progress {
@@ -197,18 +296,17 @@ import {getFormGroups,deleteFormGroups} from "@/api/front.js"
             color: rgba(247, 101, 96, 1);
           }
           .success {
-            .s-item {
-              color: rgba(45, 92, 246, 1);
-              cursor: pointer;
-              &:first-child {
-                margin-right: 10px;
-              }
+            color: rgba(45, 92, 246, 1);
+          }
+          .s-item {
+            cursor: pointer;
+            &:first-child {
+              margin-right: 10px;
             }
           }
         }
       }
     }
   }
-  
 }
 </style>

@@ -15,7 +15,7 @@ export function getFormGroups(formData) {
 // 删除图片
 export function deleteFormGroups(params) {
   return request({
-    url: '/upload/cpr/file/upload',
+    url: '/upload/cpr/file/remove',
     method: 'post',
     params,
   })
@@ -23,7 +23,7 @@ export function deleteFormGroups(params) {
 
 export function getFormCategoryArray(params) {
   return request({
-    url: '/upload/cpr/applicationForm/getFormCategoryArray',
+    url: '/test/cpr/applicationForm/getFormCategoryArray',
     method: 'get',
     params
   })
@@ -31,7 +31,7 @@ export function getFormCategoryArray(params) {
 
 export function getApplyForm(params) {
   return request({
-    url: '/upload/cpr/applicationForm/getApplyForm',
+    url: '/test/cpr/applicationForm/getApplyForm',
     method: 'get',
     params
   })
@@ -40,7 +40,15 @@ export function getApplyForm(params) {
 // 提交表单
 export function submit(data) {
   return request({
-    url: '/upload/cpr/applicationForm/submit',
+    url: '/test/cpr/applicationForm/submit',
+    method: 'post',
+    data
+  })
+}
+// 保存草稿
+export function saveDraft(data) {
+  return request({
+    url: '/test/cpr/applicationForm/saveDraft',
     method: 'post',
     data
   })

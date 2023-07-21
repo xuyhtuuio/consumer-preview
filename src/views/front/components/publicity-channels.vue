@@ -1,13 +1,13 @@
 <template>
-  <div class="publicity-channels" ref="globalRef"> 
+  <div class="publicity-channels" ref="globalRef" v-if="list.length"> 
     <g-table-card :title="title">
       <template v-slot:cardInfo> 
         <div class="cardInfo">
             {{cardInfo}}
           </div>
           <div class="warn" v-if="judgeWarnFlag">
-             <g-icon class="right-icon" stylePx="20" href="#icon-guanzhu1"/>
-             {{warnInfo}}
+            <warn-info :info="warnInfo">
+            </warn-info>
           </div>
       </template>
       <template v-slot:content>
@@ -25,7 +25,9 @@
 </template>
 
 <script>
-  export default {
+  import WarnInfo from './warn-info'
+export default {
+  components: { WarnInfo },
     props: {
       list: {
         typeof: Array,

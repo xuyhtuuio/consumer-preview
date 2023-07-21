@@ -17,7 +17,7 @@
                     <span class="count"><i>{{ item.count }}</i> 个</span>
                 </div>
             </div>
-            <div class=" new-apply  pointer">
+            <div class=" new-apply  pointer" @click="$router.push({name:'addApply'})">
                 <img src="@/assets/image/apply-center/newApply.svg" alt="">
                 <p>新建申请</p>
             </div>
@@ -725,5 +725,8 @@ export default {
         // margin-top: 16px;
     }
 }
+
+
+
 </style>
 
