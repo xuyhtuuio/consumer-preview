@@ -1,6 +1,7 @@
 <template>
   <el-menu router :default-active="$route.path">
     <el-menu-item index="/admin/manage/userManage" :class="{'is-active': $route.name === 'UserManage'}" >用户管理</el-menu-item>
+    <el-menu-item index="/admin/manage/FlowManage" :class="{'is-active': $route.name === 'FlowManage'}" >流程管理</el-menu-item>
     <el-menu-item index="/admin/manage/formManage" :class="{'is-active': $route.name === 'FormManage'}" >表单管理</el-menu-item>
   </el-menu>
 

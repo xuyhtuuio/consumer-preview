@@ -46,6 +46,12 @@ const router = new Router({
           meta: { title: '用户管理' }
         },
         {
+          path: "flowManage",
+          name: "FlowManage",
+          component: () => import("@/views/admin/manage/flowManage.vue"),
+          meta: { title: '用户管理' }
+        },
+        {
           path: "formManage",
           name: "FormManage",
           component: () => import("@/views/admin/manage/formManage.vue"),

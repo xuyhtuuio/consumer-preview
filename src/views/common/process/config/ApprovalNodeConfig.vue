@@ -228,7 +228,7 @@ export default {
     return {
       showOrgSelect: false,
       showOrgSelect1: false,
-      select: [],
+      // select: [],
       select1: [],
       approvalTypes: [
         // {name: '指定人员', type: 'ASSIGN_USER'},
@@ -255,14 +255,14 @@ export default {
     nodeProps() {
       return this.$store.state.selectedNode.props
     },
-    // select: {
-    //   get() {
-    //     return this.config.assignedUser || []
-    //   },
-    //   set() {
+    select: {
+      get() {
+        return this.config.assignedUser || []
+      },
+      set() {
 
-    //   }
-    // },
+      }
+    },
     nodeMap() {
       return this.$store.state.nodeMap
     },

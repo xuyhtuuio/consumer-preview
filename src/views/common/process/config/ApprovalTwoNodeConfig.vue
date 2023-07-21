@@ -65,6 +65,14 @@ export default {
       })
       return tempNodes
     },
+    select: {
+      get() {
+        return this.config.assignedUser || []
+      },
+      set() {
+
+      }
+    },
   },
   methods: {
     closeSelect(){
