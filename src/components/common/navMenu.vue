@@ -10,14 +10,13 @@
     </div>
     </div>
     <div class="right menu-item">
-      <g-icon class="right-icon"  v-for="item,index in iconList" :key="index" :style="{color:item.color}" stylePx="32" :href="item.href"/>
+      <g-icon class="right-icon"  v-for="item,index in iconList" :key="index" @click="toNewPage(item)" :style="{color:item.color}" stylePx="32" :href="item.href"/>
     </div>
   </div>
 </template>
 
 <script>
   export default {
-
     data() {
       return {
         currentIndex:0,
@@ -30,44 +29,23 @@
         ],
         iconList: [
           {href: "#icon-tongyongtubiao" ,color: "#fff"},
-          {href: "#icon-tongyongtubiao1",color: "#fff"},
+          {href: "#icon-tongyongtubiao1",color: "#fff", name: 'manage'},
           {href: "#icon-tongyongtubiao-1",color: "#fff"},
         ]
       }
     },
     methods: {
       handleItem(item,idx) {
-      console.log(item);
-      this.$router.push(item)
-      this.currentIndex = idx
-    }
-  },
-  watch: {
-    $route: {
-      handler: function (val) {
-        const { fullPath } = val
-        if (fullPath.indexOf('home') !== -1) {
-          this.activeMenu = 'home'
-        }
-        if (fullPath.indexOf('applyCenter') !== -1) {
-          this.activeMenu = 'applyCenter'
-        }
-        if (fullPath.indexOf('approvalCenter') !== -1) {
-          this.activeMenu = 'approvalCenter'
-        }
+        this.$router.push(item)
+        this.currentIndex = idx
       },
-      // 深度观察监听
-      deep: true
-    }
-
-  },
-  methods: {
-    handleItem(url) {
-      this.activeMenu = url
-      this.$router.push(url)
+      toNewPage(item) {
+        if (item.name) {
+          this.$router.push({ name: item.name })
+        }
+      }
     }
   }
-}
 </script>
 
 <style lang="less" scoped>

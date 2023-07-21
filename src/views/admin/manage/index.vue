@@ -9,12 +9,14 @@
 <script>
 import LeftMenu from './leftMenu'
 import UserManage from './userManage'
+import FlowManage from './flowManage'
 import FormManage from './formManage'
 export default {
   name: 'manage',
   components: {
     LeftMenu,
     UserManage,
+    FlowManage,
     FormManage
   },
   data() {

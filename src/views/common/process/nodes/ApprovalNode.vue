@@ -26,7 +26,7 @@ export default {
   },
   computed:{
     content(){
-      this.config
+      return this.config.props.assignedUser.map(item => item.label).join('、') || ''
     }
   },
   methods: {
