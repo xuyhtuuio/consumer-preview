@@ -1,14 +1,15 @@
 import Vue from "vue";
 import axios from "axios";
 import Qs from "qs";
+import router from "@/router";
 
 import { Notification, MessageBox, Message } from "element-ui";
-
 // 第三方插件
 import "element-ui/lib/theme-chalk/index.css";
 
 Vue.prototype.$axios = axios;
 // 字体图标
+const noToken = [`uaa/oauth/token`, `uaa/captcha`, `uaa/loginByPwd`, `uaa/validCodeSms`, `uaa/user/getToken`];
 
 const service = axios.create({
 	baseURL: process.env.BASE_API,
@@ -19,6 +20,12 @@ service.defaults.withCredentials = true; // 让ajax携带cookie
 service.interceptors.request.use(
 	// 每次请求都自动携带Cookie
 	config => {
+		let {
+      url,
+      isCancel,
+      params,
+      data,
+    } = config;
 		//config.headers.Cookie = document.cookie
 		if (
       config.contentType === "application/x-www-form-urlencoded;charset=utf-8"
@@ -47,11 +54,20 @@ service.interceptors.request.use(
         "Content-Type": "application/json",
       };
     }
+
+		if (noToken.indexOf(url) === -1) {
+      // 产业大脑会话保持
+      const satoken = window.localStorage.getItem('AI_token');
+      satoken && (config.headers.Authorization = `bearer ${satoken}`)
+      // 风控请求
+      const Authorization = window.localStorage.getItem("Authorization");
+      (Authorization && config.url.indexOf('/consumer_test/') === 0) && (config.headers.Authorization = `bearer ${Authorization}`)
+    }
+
 		return config;
 	},
 	// eslint-disable-next-line handle-callback-err
 	error => {
-		debugger
 		return Promise.reject(error);
 	}
 );
@@ -66,7 +82,9 @@ service.interceptors.response.use(
 		console.log("请求", err);
 		switch (err.response.status) {
 			case 401:
-				MessageBox.alert("登陆已过期，请关闭当前窗口重新登陆");
+				router.push({
+					name: 'login',
+				});
 				break;
 			case 403:
 				//Message.warning("抱歉，您无权访问！")
@@ -82,11 +100,9 @@ service.interceptors.response.use(
 				});
 				break;
 			default:
-				//throw 'request error'
-				return Promise.reject(err);
+				return Promise.reject(err.response ? err.response : {});
 		}
-		//throw 'request error'
-		return Promise.reject(err);
+		return Promise.reject(err.response ? err.response : {});
 	}
 );
 
