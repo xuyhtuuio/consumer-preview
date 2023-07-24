@@ -1,5 +1,6 @@
 import Vue from "vue";
 import axios from "axios";
+import Qs from "qs";
 
 import { Notification, MessageBox, Message } from "element-ui";
 
@@ -19,11 +20,38 @@ service.interceptors.request.use(
 	// 每次请求都自动携带Cookie
 	config => {
 		//config.headers.Cookie = document.cookie
-
+		if (
+      config.contentType === "application/x-www-form-urlencoded;charset=utf-8"
+    ) {
+      config.headers = {
+        "Content-Type": config.contentType,
+      };
+      config.data = Qs.stringify(config.data);
+    } else if (config.contentType === "application/x-www-form-urlencoded") {
+      config.headers = {
+        "Content-Type": config.contentType,
+      };
+      config.data = Qs.stringify(config.data);
+    } else if (config.contentType === "multipart/form-data") {
+      config.headers = {
+        "Content-Type": config.contentType,
+      };
+    } else if (
+      config.contentType === "application/octet-stream;charset=utf-8"
+    ) {
+      config.headers = {
+        "Content-Type": config.contentType,
+      };
+    } else {
+      config.headers = {
+        "Content-Type": "application/json",
+      };
+    }
 		return config;
 	},
 	// eslint-disable-next-line handle-callback-err
 	error => {
+		debugger
 		return Promise.reject(error);
 	}
 );
@@ -38,7 +66,7 @@ service.interceptors.response.use(
 		console.log("请求", err);
 		switch (err.response.status) {
 			case 401:
-				MessageBox.alert("登陆已过期，请关闭当前窗口重新进入-能臣工作台");
+				MessageBox.alert("登陆已过期，请关闭当前窗口重新登陆");
 				break;
 			case 403:
 				//Message.warning("抱歉，您无权访问！")

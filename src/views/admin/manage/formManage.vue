@@ -74,9 +74,9 @@
           </el-table-column>
         </el-table> -->
       </div>
-      <Pagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
+      <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
           v-if="page.total">
-        </Pagination>
+        </TrsPagination>
     </div>
     <el-drawer
       :size="600"
@@ -131,12 +131,10 @@
 <script>
 import { feildTypes, belongModules } from '@/utils/dict'
 import { obtainExamineTypeList } from '@/api/manage'
-import Pagination from '@/components/common/pagination'
 import FormManageCustomField from './formManageCustomField'
 export default {
   name: 'FormManage',
   components: {
-    Pagination,
     FormManageCustomField,
   },
   data() {
@@ -453,7 +451,6 @@ export default {
     }
   }
   .el-button--primary {
-    // background: linear-gradient(90deg, #2F54EB 0%, #5196FF 100%);
     border: none;
   }
 }

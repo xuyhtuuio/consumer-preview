@@ -24,6 +24,11 @@ const router = new Router({
       component: () => import("@/views/Index.vue"),
       meta: { title: 'OA工作流', viewport: viewport }
     },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/login/login'),
+    },
     // ocr审批页
     {
       path: "/aiApproval",

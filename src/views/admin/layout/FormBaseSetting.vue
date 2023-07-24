@@ -6,9 +6,9 @@
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#icon-form-name"></use>
           </svg>
-          表单名称<span style="color: red">*</span>
+          流程名称<span style="color: red">*</span>
         </template>
-        <el-input v-model="setup.formName" placeholder="请输入表单名称" class="is-dark input" size="medium"></el-input>
+        <el-input v-model="setup.formName" placeholder="请输入流程名称" class="is-dark input" size="medium"></el-input>
       </el-form-item>
       <el-form-item class="group">
         <template slot="label">
@@ -85,7 +85,7 @@ export default {
       this.$refs.baseSetting.validate()
       let err = []
       if (!this.$isNotEmpty(this.setup.formName)){
-        err.push('表单名称未设置')
+        err.push('流程名称未设置')
       }
       if (!this.$isNotEmpty(this.setup.formId) || this.setup.formId.length === 0){
         err.push('关联表单未设置')

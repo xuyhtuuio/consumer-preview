@@ -56,9 +56,9 @@
           <el-table-column prop="currentActivityName" show-overflow-tooltip label="节点名称">
           </el-table-column>
         </el-table>
-        <Pagination :pageSize="10" :pageNow="myProcess.pageNo" :total="myProcess.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
+        <TrsPagination :pageSize="10" :pageNow="myProcess.pageNo" :total="myProcess.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
           v-if="myProcess.total">
-        </Pagination>
+        </TrsPagination>
       </el-tab-pane>
       <el-tab-pane label="关于我的">
         <div class="no-data">暂无数据 😀</div>
@@ -83,14 +83,12 @@ import {
   processStart
 } from '@/api/process'
 import moment from 'moment'
-import Pagination from '../../components/common/pagination'
 import InitiateProcess from "./InitiateProcess";
 
 export default {
   name: "workSpace",
   components: {
-    InitiateProcess,
-    Pagination
+    InitiateProcess
   },
   data() {
     return {

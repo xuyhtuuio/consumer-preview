@@ -63,11 +63,6 @@ export default {
       this.$emit('save')
     },
     valid() {
-      if (!this.$isNotEmpty(this.setup.group)) {
-        this.$message.warning('请选择分组')
-        this.$router.push('/layout/baseSetup')
-        return false;
-      }
       return true;
     },
     exit() {
@@ -77,9 +72,7 @@ export default {
         customClass: 'back-confim',
         type: 'warning'
       }).then(() => {
-        //window.location.reload()
-        //this.$store.commit('clearTemplate')
-        this.$router.push('/formsPanel')
+        this.$router.push({ name: 'FlowManage' })
       })
     },
     to(name) {
