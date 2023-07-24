@@ -37,7 +37,10 @@
           >
         </div>
       </div>
-      <div class="new-apply pointer" @click="$router.push({name: 'addApply'})">
+      <div
+        class="new-apply pointer"
+        @click="$router.push({ name: 'addApply' })"
+      >
         <img src="@/assets/image/apply-center/newApply.svg" alt="" />
         <p>新建申请</p>
       </div>
@@ -333,10 +336,10 @@ export default {
       dom.innerText = text;
     });
     let floor2 = document.querySelectorAll(".apply-center .floor2")[0];
-    floor2.style.paddingRight = 16 + "px";
+    floor2 ? (floor2.style.paddingRight = 16 + "px") : "";
     window.addEventListener("resize", () => {
       let floor2 = document.querySelectorAll(".apply-center .floor2")[0];
-      floor2.style.paddingRight = 16 + "px";
+      floor2 ? (floor2.style.paddingRight = 16 + "px") : "";
     });
     this.userStatus();
     this.getApprovalType();
@@ -459,8 +462,9 @@ export default {
           this.search.total = data.totalCount;
           this.list = data.list;
           this.search.loading = false;
-        }).catch(err=>{
-          this.list =[];
+        })
+        .catch((err) => {
+          this.list = [];
           this.search.loading = false;
         })
         .finally(() => {
