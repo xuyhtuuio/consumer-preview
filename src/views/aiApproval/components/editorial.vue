@@ -27,6 +27,12 @@
             <i class="iconfont icon-shouqi" @click="hideList(a)" v-if="recommend.pageNow > 1 && !recommend.hideMore"></i>
           </p>
         </div>
+        <div v-if="recommends.length === 0" class="nodata">
+          <img src="@/assets/image/ai-approval/nodata.svg" alt="" class="暂无推荐的意见">
+          <p>暂无推荐的意见</p>
+          <p>可在 <span class="underline">识别结果</span> 中选中认为敏感词汇添加关键词和意见。</p>
+          <p>也可点击 <span class="underline" style="cursor: pointer;" @click="changeType(2)">已编辑意见</span> 手动输入意见。</p>
+        </div>
       </template>
       <!-- 编辑意见 -->
       <div v-else class="recommend">
@@ -118,7 +124,7 @@ export default {
       const ocrType = ['pdf', 'jpeg', 'jpg', 'png'].includes(val.fileName.split('.')[1])
       this.showRecommend = ocrType;
       this.active = ocrType ? 1 : 2;
-      this.recommends = val.recommends.map(item => {
+      this.recommends = val.recommends?.map(item => {
         item.hideMore = item.hideMore || false;
         item.selected = item.selected || null;
         return item
@@ -479,6 +485,22 @@ export default {
     font-size: 15px;
     padding: 3px;
     cursor: pointer;
+  }
+}
+
+.nodata {
+  padding: 8px 0;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 28px;
+  color: #86909C;
+  img{
+    margin-bottom: 32px;
+  }
+  .underline{
+    color: #1D2128;
+    text-decoration: underline;
   }
 }
 </style>

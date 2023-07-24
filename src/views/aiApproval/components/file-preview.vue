@@ -2,21 +2,22 @@
   <div class="file-preview">
     <div class="header">
       <p class="header-total">
-        <span class="header-count">共 {{ activeIndex + 1 }}/{{ files.length }}</span>
+        <span class="header-count">共 {{ activeIndex + 1 }}/<label style="font-size: 12px;">{{ files.length }}</label>
+        </span>
         <span class="header-btns">
           <i class="iconfont">&#xe62e;</i>
-          <i class="iconfont">&#xe62f;</i>
+          <i class="iconfont" @click="fullScreen">&#xe62f;</i>
         </span>
       </p>
       <div class="file-header-swiper">
         <div class="swiper swiper-container">
           <div class="swiper-wrapper">
             <div class="swiper-slide" v-for="(file, i) in files" :key="file.fileName + i" :class="{
-              'swiper-slide-img': ['jpeg', 'jpg', 'png'].includes(fileType(file.fileName)),
+              'swiper-slide-img': ['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName)),
               'swiper-slide-split': showSplit(i)
             }">
               <div class="slide" @click="changeFile(i)" :class="{ active: i === activeIndex }">
-                <el-image v-if="['jpeg', 'jpg', 'png'].includes(fileType(file.fileName))" :src="file.url"></el-image>
+                <el-image v-if="['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))" :src="file.url"></el-image>
                 <file-type v-else :fileName="file.fileName"></file-type>
                 <!-- 是否为压缩包 -->
                 <svg class="icon icon-zip" aria-hidden="true" v-if="file.zip">
@@ -35,9 +36,12 @@
           @click="swiperTo(activeIndex + 1)"></div>
       </div>
     </div>
-    <div class="preview">
+    <div class="preview" :class="{ fullScreen: showFullScreen }">
+      <!-- 全屏关闭按钮 -->
+      <i class="el-icon-circle-close" v-show="showFullScreen" @click="fullScreen"></i>
       <!-- 图片 -->
-      <imgae-preview :lineWordItem="lineWordItem" @linePosition="linePosition"></imgae-preview>
+      <imgae-preview ref="imgPreview" v-if="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))"
+        :lineWordItem="lineWordItem" @linePosition="linePosition"></imgae-preview>
       <!-- 其他类型文件 -->
     </div>
   </div>
@@ -72,12 +76,13 @@ export default {
   data() {
     return {
       swiper: null,
+      showFullScreen: false,
     }
   },
   computed: {
-    fileType() {
+    getfileType() {
       return val => {
-        return val.split('.')[1]
+        return val?.split('.')[val.split('.').length - 1]
       }
     },
     showSplit() {
@@ -115,6 +120,10 @@ export default {
     },
     linePosition() {
       this.$emit('linePosition')
+    },
+    fullScreen() {
+      this.showFullScreen = !this.showFullScreen;
+      this.$refs.imgPreview.handleImageLoaded()
     }
   }
 }
@@ -273,10 +282,12 @@ export default {
     &+.swiper-slide {
       margin-left: 6px;
     }
-    .icon{
+
+    .icon {
       width: 100%;
       height: 100%;
     }
+
     .icon-zip {
       position: absolute;
       left: 0;
@@ -308,4 +319,27 @@ export default {
   background: #ffffff;
   flex: 1;
 }
-</style>
+
+.fullScreen {
+  position: fixed;
+  z-index: 10;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background: rgb(0 0 0 / 23%);
+
+  .preview {
+    background: rgb(0 0 0 / 23%);
+  }
+
+  .el-icon-circle-close {
+    position: absolute;
+    font-size: 30px;
+    color: #ffffff;
+    right: 20px;
+    top: 20px;
+    z-index: 1;
+    cursor: pointer;
+  }
+}</style>

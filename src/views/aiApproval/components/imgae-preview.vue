@@ -37,7 +37,6 @@ export default {
       BoundingClientRect: {}
     }
   },
-  mounted() { },
   watch: {
     lineWordItem: {
       handler(val) {
