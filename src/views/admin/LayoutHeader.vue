@@ -1,18 +1,18 @@
 <template>
   <div>
     <div class="header">
-      <el-menu :default-active="activeIndex" active-text-color="#165DFF" class="el-menu-demo" mode="horizontal"
+      <el-menu :default-active="value" active-text-color="#165DFF" class="el-menu-demo" mode="horizontal"
                @select="handleSelect">
-        <el-menu-item index="/admin/design/baseSetting" @click="to('/admin/design/baseSetting')"><span class="num">1</span> 基础设置</el-menu-item>
+        <el-menu-item index="baseSetting" @click="to('baseSetting')"><span class="num">1</span> 基础设置</el-menu-item>
         <span style="position: relative; top: 20px;">></span>
         <!-- <el-menu-item index="/admin/design/formSetting" @click="to('/admin/design/formSetting')">④ 表单设计</el-menu-item> -->
-        <el-menu-item index="/admin/design/processDesign" @click="to('/admin/design/processDesign')"><span class="num">2</span> 流程设计
+        <el-menu-item index="processDesign" @click="to('processDesign')"><span class="num">2</span> 流程设计
         </el-menu-item>
         <span style="position: relative; top: 20px;">></span>
-        <el-menu-item index="/admin/design/proSetting" @click="to('/admin/design/proSetting')"><span class="num">3</span> 高级设置</el-menu-item>
+        <el-menu-item index="proSetting" @click="to('proSetting')"><span class="num">3</span> 高级设置</el-menu-item>
       </el-menu>
       <div class="publish">
-        <el-button size="mini" @click="preview"><i class="el-icon-folder-opened"></i>保存</el-button>
+        <el-button size="mini" @click="save"><i class="el-icon-folder-opened"></i>保存</el-button>
         <el-button size="mini" type="primary" @click="publish"><i class="el-icon-s-promotion"></i>发布</el-button>
       </div>
       <div class="back">
@@ -22,10 +22,6 @@
         </span>
       </div>
     </div>
-
-    <el-dialog title="请使用手机扫码预览" :visible.sync="viewCode" width="300px" :close-on-click-modal="false" center>
-      <img src="../../assets/image/code.png" width="250" height="250">
-    </el-dialog>
   </div>
 </template>
 
@@ -33,9 +29,14 @@
 
 export default {
   name: "LayoutHeader",
+  props:{
+    value: {
+      type: String,
+      default: 'baseSetting'
+    }
+  },
   data() {
     return {
-      activeIndex: '/layout/baseSetup',
       viewCode: false,
     };
   },
@@ -48,7 +49,6 @@ export default {
     this.check()
   },
   mounted() {
-    this.activeIndex = this.$route.path
     console.log(document.body.offsetWidth)
     if (document.body.offsetWidth <= 970) {
       this.$msgbox.alert("本设计器未适配中小屏幕，建议您在PC电脑端浏览器进行操作")
@@ -59,16 +59,10 @@ export default {
     publish() {
       this.$emit('publish')
     },
-    preview() {
-      //this.
-      this.viewCode = true;
+    save() {
+      this.$emit('save')
     },
     valid() {
-      if (!this.$isNotEmpty(this.setup.group)) {
-        this.$message.warning('请选择分组')
-        this.$router.push('/layout/baseSetup')
-        return false;
-      }
       return true;
     },
     exit() {
@@ -78,14 +72,14 @@ export default {
         customClass: 'back-confim',
         type: 'warning'
       }).then(() => {
-        //window.location.reload()
-        //this.$store.commit('clearTemplate')
-        this.$router.push('/formsPanel')
+        this.$router.push({ name: 'FlowManage' })
       })
     },
-    to(path) {
-      if (path !== this.$route.path) {
-        this.$router.push(path);
+    to(name) {
+      console.log(name, this.$route.name)
+      if (name !== this.$route.name) {
+        this.$router.push({ name });
+        this.$emit('changeRoute', name)
       }
     },
     handleSelect(key, keyPath) {

@@ -30,7 +30,7 @@
     "moment": "^2.29.4",
     "npm": "^8.18.0",
     "posix-character-classes": "^1.0.0",
-    "qs": "^6.11.0",
+    "qs": "^6.11.2",
     "query-string": "^7.1.1",
     "signature_pad": "^3.0.0-beta.4",
     "sortablejs": "^1.14.0",

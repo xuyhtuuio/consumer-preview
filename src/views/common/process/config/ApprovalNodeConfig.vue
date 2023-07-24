@@ -41,7 +41,7 @@
         <div v-else-if="nodeProps.assignedType === 'SELECT_NODE'">
           选择节点
           <el-select v-model="nodeProps.nodeId" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
-            <el-option v-for="(op, index) in []" :key="index" :label="op.name" :value="op.id"></el-option>
+            <el-option v-for="(op, index) in nodes" :key="index" :label="op.name" :value="op.id"></el-option>
           </el-select>
           <p style="color:#86909C;font-size: 12px;line-height:24px;">可以选择前序节点名称，如名称重复建议先修改节点名称<br/>如果是多人，最后一个提交审批的人</p>
         </div>
@@ -87,11 +87,11 @@
           </el-form-item>
         </div>
         <div v-else>
-          <span class="item-desc">发起人自己作为审批人进行审批</span>
+          <span class="item-desc">上一审批人选择作为审批人进行审批</span>
         </div>
         <!-- 人员选择框 -->
         <div class="select-user grag" v-if="nodeProps.assignedType === 'SELF_SELECT'">
-          <p>自选范围（可选择发起人自选时的用户可选范围）</p>
+          <p>自选范围（上一审批人选择时的用户可选范围）</p>
           <el-button size="mini" @click="selectUser" icon="el-icon-plus" type="primary">选择部门/人员/角色</el-button>
           <org-picker :show="showOrgSelect" @close="closeSelect" :selected="select" @selectOver="selected"></org-picker>
           <div class="tag-action" >
@@ -232,7 +232,7 @@ export default {
       select1: [],
       approvalTypes: [
         // {name: '指定人员', type: 'ASSIGN_USER'},
-        {name: '发起人自选', type: 'SELF_SELECT'},
+        {name: '上一审批人选择', type: 'SELF_SELECT'},
         {name: '指定部门/人员/角色', type: 'DEPT_USER_ROLE'},
         {name: '节点审批人', type: 'SELECT_NODE'},
         // {name: '连续多级主管', type: 'LEADER_TOP'},

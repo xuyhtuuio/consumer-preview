@@ -1,6 +1,6 @@
 <template>
-  <div id="app" v-cloak>
-    <NavMenu class="nav-menu"></NavMenu>
+  <div id="app">
+    <NavMenu v-if="$route.name !== 'login'"></NavMenu>
     <transition name="router-fade" mode="out-in" >
       <router-view v-if="!$route.meta.keepAlive" class="view-box" :style="{padding: noPaddingRoute.indexOf($route.name) !== -1 ? '0':'16px 80px'}"/>
     </transition>
