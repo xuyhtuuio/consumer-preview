@@ -421,6 +421,9 @@ export default {
   margin-bottom: 20px;
   border-bottom: 1px solid #E5E6EB;
   .el-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 80px;
     height: 34px;
   }
