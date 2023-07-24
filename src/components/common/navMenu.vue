@@ -6,7 +6,7 @@
     </div>
     <div class="center flex">
       <div class="nav-item" v-for="item, index in list" :key="index" @click="handleItem(item)">
-        <span :class="[activeMenu == item.name ? 'active-menu' : '']">{{ item.title }}</span>
+        <span :class="[activeMenu == item.sign ? 'active-menu' : '']">{{ item.title }}</span>
       </div>
     </div>
     <div class="right flex">
@@ -20,9 +20,9 @@ export default {
   data() {
     return {
       list: [
-        { title: "首页", name: "home" },
-        { title: "申请中心", name: "apply-list" },
-        { title: "审批中心", name: 'approvalCenter' },
+        { title: "首页", name: "home",sign:'home' },
+        { title: "申请中心", name: "apply-list",sign:'applycenter' },
+        { title: "审批中心", name: 'approval-list' ,sign:'approvalcenter'},
         { title: "人员中心" },
         { title: "产业图谱" },
       ],
@@ -42,11 +42,11 @@ export default {
         if (fullPath.indexOf('home') !== -1) {
           this.activeMenu = 'home'
         }
-        if (fullPath.indexOf('apply-list') !== -1) {
-          this.activeMenu = 'apply-list'
+        if (fullPath.indexOf('applycenter') !== -1) {
+          this.activeMenu = 'applycenter'
         }
-        if (fullPath.indexOf('approvalCenter') !== -1) {
-          this.activeMenu = 'approvalCenter'
+        if (fullPath.indexOf('approvalcenter') !== -1) {
+          this.activeMenu = 'approvalcenter'
         }
       },
       // 深度观察监听

@@ -85,6 +85,15 @@
 </template>
 <script>
 import approvalEventCard from '@/components/card/approval-event-card'
+import {
+  getDataStatistics,
+  getUserStatus,
+  getApprovalType,
+  getApprovalStage,
+  getApplicationList,
+  delApplication,
+  quashApplication,
+} from "@/api/applyCenter";
 export default {
     components: {
         approvalEventCard
@@ -131,14 +140,8 @@ export default {
 
             },
             transactionTypes: [
-                { label: '产品类', value: '1' },
-                { label: '活动类', value: '2' },
-                { label: '客户类', value: '3' },
             ],
             approvalPhases: [
-                { label: '负责人审批', value: '1' },
-                { label: '负责人复核', value: '2' },
-                { label: '消保审批', value: '3' },
             ],
             isUrgents: [
                 { label: '是', value: '1' },
@@ -194,7 +197,20 @@ export default {
     watch: {
 
     },
+    mounted(){
+        this.getApprovalType();
+    },
     methods: {
+        getApprovalType() {
+      getApprovalType().then((res) => {
+        this.transactionTypes = res.data.data.map((v) => {
+          return {
+            label: v,
+            value: v,
+          };
+        });
+      });
+    },
         changeStatis(item) {
             if (item.value == this.crtSign) return
             this.crtSign = item.value

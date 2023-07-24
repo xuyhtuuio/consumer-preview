@@ -122,10 +122,25 @@ const router = new Router({
     },
 
     {
-      path: "/approvalCenter",
-      name: "approvalCenter",
-      component: () => import("@/views/approvalCenter/index.vue"),
-      meta: { title: '申请中心', viewport: viewport },
+      path: "/approvalcenter",
+      name: "approvalcenter",
+      component: () => import("@/views/approvalCenter/home.vue"),
+      meta: { title: '审批中心', viewport: viewport },
+      redirect: '/approvalcenter/approval-list',
+      children: [
+        {
+          path: "approval-list",
+          name: "approval-list",
+          component: () => import("@/views/approvalCenter/index"),
+          meta: { title: '审批中心',}
+        },
+        {
+          path: "details",
+          name: "details",
+          component: () => import("@/views/approvalCenter/details"),
+          meta: { title: '申请单详情', }
+        },
+      ]
     },
     {
       path: "/front",

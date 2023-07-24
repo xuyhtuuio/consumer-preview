@@ -344,11 +344,9 @@ export default {
   watch: {
     "search.approvalType": {
       handler(val) {
-        console.log("ff", val);
         if (val == "") {
           this.approvalPhases = [];
         }
-        console.log(val);
       },
       immediate: true,
       deep: true,
@@ -455,12 +453,19 @@ export default {
       Reflect.deleteProperty(param, "total");
       Reflect.deleteProperty(param, "loading");
       this.search.loading = true;
-      getApplicationList(param).then((res) => {
-        const { data } = res.data;
-        this.search.total = data.totalCount;
-        this.list = data.list;
-        this.search.loading = false;
-      });
+      getApplicationList(param)
+        .then((res) => {
+          const { data } = res.data;
+          this.search.total = data.totalCount;
+          this.list = data.list;
+          this.search.loading = false;
+        }).catch(err=>{
+          this.list =[];
+          this.search.loading = false;
+        })
+        .finally(() => {
+          this.search.loading = false;
+        });
     },
     del(id) {
       const param = {
@@ -521,6 +526,7 @@ export default {
         total: 0,
         loading: false,
       };
+      this.approvalPhases = [];
       this.searchList();
     },
   },
@@ -884,9 +890,5 @@ export default {
     // margin-top: 16px;
   }
 }
-
-
-
-
 </style>
 

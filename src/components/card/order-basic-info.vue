@@ -15,26 +15,18 @@
                 </svg>
                 基本信息</span>
         </p>
-        <!-- 项目 -->
-        <div v-for="item, index in orderInfo.newBaseInfo" :key="index">
-            <div v-for="child, idx in item" :key="idx" :class="item.length > 1 ? `proj-info${item.length}` : proj - info">
-                <div class="item">
-                    <span class="label">{{ child.label }}</span>
-                    <span class="value">{{ child.value }}</span>
+        <!-- 项目基本信息-->
+        <div v-if="orderInfo.newBaseInfo && orderInfo.newBaseInfo.length" >
+            <div v-for="item, index in orderInfo.newBaseInfo" :key="index" class="proj-info">
+                <div v-for="child, idx in item" :key="idx"
+                    class="proj-info-item">
+                    <div class="item">
+                        <span class="label">{{ child.label }}</span>
+                        <span class="value">{{ child.value }}</span>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- <div class="proj-info">
-            <div class="item">
-                <span class="label">上线时间</span>
-                <span class="value">2023-08-26</span>
-            </div>
-            <div class="item">
-                <span class="label">下线时间</span>
-                <span class="value">2023-08-26</span>
-            </div>
-        </div> -->
         <div class="proj-info">
             <div class="item">
                 <span class="label">申请说明</span>
@@ -359,6 +351,15 @@ export default {
     .proj-info {
         display: flex;
         margin-bottom: 12px;
+        flex-wrap: wrap;
+
+        .proj-info-item{
+            flex: 1;
+            margin-right: 13px;
+        }
+        .proj-info-item:last-of-type{
+            margin-right: 0;
+        }
     }
 
     .channel-info {
