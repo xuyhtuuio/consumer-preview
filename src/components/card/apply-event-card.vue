@@ -6,7 +6,7 @@
                 <svg class="icon urgent-icon" aria-hidden="true" v-if="item.urgent == 1">
                     <use xlink:href="#icon-shenpiyemiantubiao"></use>
                 </svg>
-                <svg class="icon urgent-icon" aria-hidden="true">
+                <svg class="icon urgent-icon" aria-hidden="true"  v-if="item.dismissalMark == 1">
                     <use xlink:href="#icon-tongyongtubiao2"></use>
                 </svg>
                 <span class="event-name">{{ item.name }}</span>
@@ -17,10 +17,9 @@
                         </i>
                     </i>
                     <i v-if="item.status === 2" class="tag draft">草稿</i>
-                    <i v-if="item.status === 3" class="tag has-opinion">待修改>意见确认</i>
-                    <i v-if="item.status === 4" class="tag check">待确认>意见确认</i>
-                    <i v-if="item.status === 5" class="tag in-approval">审批中>消保中心审批</i>
-
+                    <i v-if="item.status === 3" class="tag has-opinion">待修改>{{ item.approvalStage }}</i>
+                    <i v-if="item.status === 4" class="tag check">待确认>{{ item.approvalStage }}</i>
+                    <i v-if="item.status === 5" class="tag in-approval">审批中>{{ item.approvalStage }}</i>
                     <!-- 有无意见 -->
                     <i v-if="item.status === 1 || item.status === 3 || item.status === 4" class="flex">
                         <i class="tag has-opinion" v-if="item.hasOpinions == 1">
@@ -42,13 +41,13 @@
                             采纳
                         </i>
                     </i>
-                    <i v-if="item.status === 5" class="tips">已滞留23小时</i>
+                    <!-- <i v-if="item.status === 5" class="tips">已滞留23小时</i> -->
                 </span>
 
             </div>
             <div class="event-infos" v-if="item.status !== 5">
                 <span class="id">{{ item.id }}</span>
-                <span class="sDate date">发起时间：{{ item.releaseTime || '--' }}</span>
+                <span class="sDate date">发起时间：{{ item.create_time || '--' }}</span>
                 <span class="sDate date">更新时间：{{ item.update_time || '--' }}</span>
                 <span class="sDate date">上线时间：{{ item.launchDate || '--' }}</span>
                 <el-popover placement="bottom" trigger="click" popper-class="popper-persons">

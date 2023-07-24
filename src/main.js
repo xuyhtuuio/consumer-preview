@@ -13,14 +13,14 @@ import WDialog from '@/components/common/WDialog'
 import $GLOBAL from '@/utils/const';
 import http from '@/api/request.js'; /* eslint-disable */
 
+import 'trs-web-components/lib/common.less';
+import 'trs-web-components/lib/element.less';
 import "@/assets/theme.less";
 import "@/assets/global.css";
 import '@/assets/icon/iconfont.css';
 import '@/assets/icon/iconfont.js';
 import '@/assets/css/common.less';
 import '@/assets/css/element.less';
-import 'trs-web-components/lib/common.less';
-import 'trs-web-components/lib/element.less';
 import onceClick from './utils/click-once';
 
 Vue.use(ElementUI);

@@ -29,7 +29,7 @@
             "props":{
                 "required":true,
                 "placeholder":"2fwewe",
-                "expanding":true,
+                "expanding":false,
                 "options":[
                     {
                         "id":0,
@@ -77,7 +77,7 @@
           "props":{
               "required":true,
               "placeholder":"2fwewe",
-              "expanding":false,
+              "expanding":true,
               "options":[
                   {
                       "id":0,

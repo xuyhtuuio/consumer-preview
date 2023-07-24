@@ -1,8 +1,8 @@
 <template>
   <div class="addApply">
-    <g-breadcrunm :title="title" />
+    <g-breadcrunm />
     <div class="tag">
-      <add-tag @submit="submit" @save="save"/>
+      <add-tag @submit="submit" @save="save" />
     </div>
     <div class="content" v-loading="isLoading">
       <review-matters class="cnt-head" :list="reviewList" @handleTo="handleReviewClick" />
@@ -16,9 +16,8 @@
         />
         <review-material class="cnt-item" ref="reviewMaterialRef" :list="reviewMaterials" />
       </div>
-
       <div class="footer">
-        <g-button class="btn" >流程总览</g-button>
+        <g-button class="btn">流程总览</g-button>
         <g-button class="btn" @click.native="save">保存草稿</g-button>
         <g-button class="btn" type="primary" @click.native="submit">提交</g-button>
       </div>
@@ -34,7 +33,7 @@ import PublicityChannels from './components/publicity-channels.vue';
 import ReconciliationPoint from './components/reconciliation-point.vue';
 import ReviewMaterial from './components/review-material.vue';
 import { timestampToDateTime } from '@/utils/utils.js';
-import { getFormCategoryArray, getApplyForm, submit,saveDraft } from '@/api/front.js';
+import { getFormCategoryArray, getApplyForm, submit, saveDraft } from '@/api/front.js';
 export default {
   components: {
     AddTag,
@@ -62,11 +61,8 @@ export default {
   methods: {
     initialData() {
       getFormCategoryArray({ userId: this.userId }).then(res => {
-        this.isLoading = true
-        // console.log(123,res.data.data[0]);
+        this.isLoading = true;
         this.reviewList = res.data.data[0];
-        console.log(res.data.data[0]);
-        this.handleReviewClick(res.data.data[0][0].recordId);
       });
     },
     // 审查事项类型
@@ -81,14 +77,15 @@ export default {
         this.promotionChannels = promotionChannels;
         this.keyPointsForVerification = keyPointsForVerification;
         this.reviewMaterials = reviewMaterials;
-        this.isLoading = false
+        this.isLoading = false;
       });
     },
     // 提交
     submit() {
       if (!this.$refs['basicInformationRef'].judgeWarn()) {
         return this.$nextTick(() => {
-          const offsetTop = this.$refs['basicInformationRef'].offsetTop;
+          const offsetTop =
+            this.$refs['basicInformationRef'].$refs['refWarn'][0].$el.offsetParent.offsetTop;
           this.rollTo(offsetTop);
         });
       }
@@ -115,31 +112,19 @@ export default {
         userId: this.userId
       };
       const formItemDataList = [];
-      this.basicInformation.forEach(item => {
-        if (item.props.order == 0) {
-          result.uptime = timestampToDateTime(item.value);
-        }
-        formItemDataList.push({
-          formItemId: item.id,
-          value: item.value,
-          valueType: item.valueType
-        });
-      });
-      this.promotionChannels.forEach(item => {
-        formItemDataList.push({
-          formItemId: item.id,
-          value: item.value,
-          valueType: item.valueType
-        });
-      }),
-        this.keyPointsForVerification.forEach(item => {
+      const list = ['basicInformation', 'promotionChannels', 'keyPointsForVerification'];
+      list.forEach(item => {
+        this[item].forEach(iten => {
+          if (iten.props.order == 0) {
+            result.uptime = timestampToDateTime(iten.value);
+          }
           formItemDataList.push({
-            formItemId: item.id,
-            value: item.value,
-            valueType: item.valueType
+            formItemId: iten.id,
+            value: iten.value,
+            valueType: iten.valueType
           });
         });
-
+      });
       const reviewMaterialsData = {
         formItemId: this.reviewMaterials[0].id,
         valueType: this.reviewMaterials[0].valueType,
@@ -154,31 +139,32 @@ export default {
       });
       formItemDataList.push(reviewMaterialsData);
       result.formItemDataList = formItemDataList;
-      flag && submit(result).then(res => {
-        this.initialData()
-        this.$message({ type: 'success', message: res.data.data });
-      });
-      !flag && saveDraft(result).then(res => {
-        this.initialData()
-        this.$message({ type: 'success', message: res.data.data });
-      });
+      flag &&
+        submit(result).then(res => {
+          this.initialData();
+          this.$message({ type: 'success', message: res.data.data });
+        });
+      !flag &&
+        saveDraft(result).then(res => {
+          this.initialData();
+          this.$message({ type: 'success', message: res.data.data });
+        });
     },
     rollTo(offsetTop) {
-      console.log('offsetTop', Number(offsetTop - 100));
       document
         .querySelector('.addApply')
         .scrollTo({ top: Number(offsetTop - 100), behavior: 'smooth' });
     },
     // 保存草稿
-    save(){
-   
+    save() {
       if (!this.$refs['basicInformationRef'].judgeWarnSave()) {
         return this.$nextTick(() => {
-          const offsetTop = this.$refs['basicInformationRef'].offsetTop;
+          const offsetTop =
+            this.$refs['basicInformationRef'].$refs['refWarn'][0].$el.offsetParent.offsetTop;
           this.rollTo(offsetTop);
         });
       }
-      this.submitTrue(false)
+      this.submitTrue(false);
     }
   },
   computed: {}
@@ -188,7 +174,10 @@ export default {
 <style lang="less" scoped>
 .addApply {
   .tag {
+    display: flex;
+    align-items: center;
     margin: 16px 0;
+    height: 66px;
   }
   .content {
     .cnt-head {

@@ -51,6 +51,12 @@ html {
   margin: 0;
   height: 100%;
 }
+.nav-menu{
+  position: sticky;
+  width: 100%;
+  z-index: 10;
+  height: 48px;
+}
 
 ul {
   padding: 0;

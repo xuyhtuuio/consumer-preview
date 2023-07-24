@@ -1,5 +1,5 @@
 <template>
-  <div class="apply-center">
+  <div class="apply-center" v-cloak>
     <el-button @click="to('/applycenter/details')">xx</el-button>
     <p class="welcoming">欢迎来到消保管控平台！</p>
     <p class="tips" v-if="tipsMsg">
@@ -37,7 +37,10 @@
           >
         </div>
       </div>
-      <div class="new-apply pointer">
+      <div
+        class="new-apply pointer"
+        @click="$router.push({ name: 'addApply' })"
+      >
         <img src="@/assets/image/apply-center/newApply.svg" alt="" />
         <p>新建申请</p>
       </div>
@@ -50,7 +53,9 @@
               <el-select
                 v-model="search.approvalType"
                 placeholder="事项类型"
-                @change="searchList"
+                @change="changeArrrovalType"
+                clearable
+                @clear="searchList"
               >
                 <el-option
                   v-for="(item, index) in transactionTypes"
@@ -63,6 +68,8 @@
                 v-model="search.approvalStage"
                 placeholder="审批阶段"
                 @change="searchList"
+                clearable
+                @clear="searchList"
               >
                 <el-option
                   v-for="(item, index) in approvalPhases"
@@ -77,6 +84,7 @@
                 v-model="search.urgent"
                 placeholder="是否加急"
                 @change="searchList"
+                clearable
               >
                 <el-option
                   v-for="(item, index) in isUrgents"
@@ -89,6 +97,7 @@
                 v-model="search.hasOpinions"
                 placeholder="有/无实质意见"
                 @change="searchList"
+                clearable
               >
                 <el-option
                   v-for="(item, index) in isOpinions"
@@ -103,6 +112,7 @@
                 v-model="search.adoptionStatus"
                 placeholder="采纳情况"
                 @change="searchList"
+                clearable
               >
                 <el-option
                   v-for="(item, index) in adoptionSituations"
@@ -179,21 +189,23 @@
           <el-button type="text" @click="reset">重置</el-button>
         </div>
       </div>
-      <div class="list" v-if="list.length" v-loading="search.loading">
-        <div v-for="(item, index) in list" :key="index">
-          <applyEventCard
-            :item="item"
-            @del="del"
-            @quash="quash"
-          ></applyEventCard>
+      <div class="list" v-loading="search.loading">
+        <div v-if="list.length">
+          <div v-for="(item, index) in list" :key="index">
+            <applyEventCard
+              :item="item"
+              @del="del"
+              @quash="quash"
+            ></applyEventCard>
+          </div>
+          <trs-pagination
+            :total="search.total"
+            @getList="getApplicationList"
+          ></trs-pagination>
         </div>
-        <trs-pagination
-          :total="search.total"
-          @getList="getApplicationList"
-        ></trs-pagination>
-      </div>
-      <div v-else v-loading="search.loading">
-        <Empty></Empty>
+        <div v-else v-loading="search.loading">
+          <Empty></Empty>
+        </div>
       </div>
     </div>
   </div>
@@ -218,7 +230,7 @@ export default {
       imageSize: 292,
       tipsMsg: null,
       crtSign: "applyAll",
-      crtId:0,
+      crtId: 0,
       dataStatistics: [
         {
           name: "全部申请", // (1：我的关注 2：已撤销 3：草稿箱 4:待修改 5：待确认 6：审批中)
@@ -236,25 +248,25 @@ export default {
           name: "待修改",
           count: 0,
           value: "toModified",
-          id:4
+          id: 4,
         },
         {
           name: "待确认",
           count: 0,
           value: "toConfirmed",
-          id:5
+          id: 5,
         },
         {
           name: "审批中",
           count: 0,
           value: "Approval",
-          id:6,
+          id: 6,
         },
         {
           name: "草稿箱",
           count: 0,
           value: "draftBin",
-          id:2
+          id: 2,
         },
       ],
       search: {
@@ -315,7 +327,7 @@ export default {
       // list: []
     };
   },
-  mounted() {
+  async mounted() {
     let dom = document
       .querySelectorAll(".arrow-select")[0]
       .querySelector(".el-select__tags");
@@ -324,18 +336,27 @@ export default {
       dom.innerText = text;
     });
     let floor2 = document.querySelectorAll(".apply-center .floor2")[0];
-    floor2.style.paddingRight = 16 + "px";
+    floor2 ? (floor2.style.paddingRight = 16 + "px") : "";
     window.addEventListener("resize", () => {
       let floor2 = document.querySelectorAll(".apply-center .floor2")[0];
-      floor2.style.paddingRight = 16 + "px";
+      floor2 ? (floor2.style.paddingRight = 16 + "px") : "";
     });
     this.userStatus();
+    this.getApprovalType();
   },
-  watch: {},
+  watch: {
+    "search.approvalType": {
+      handler(val) {
+        if (val == "") {
+          this.approvalPhases = [];
+        }
+      },
+      immediate: true,
+      deep: true,
+    },
+  },
   created() {
     this.getDataStatistic();
-    this.getApprovalType();
-    this.getApprovalStage();
     this.getApplicationList(1);
   },
   methods: {
@@ -344,9 +365,19 @@ export default {
         this.$router.push(path);
       }
     },
-    getApprovalStage() {
-      getApprovalStage().then((res) => {
-        this.approvalPhases = res.data.data.map((v) => {
+    changeArrrovalType() {
+      if (this.search.approvalType) {
+        this.getApprovalStage();
+      } else {
+        this.search.approvalStage = "";
+        this.approvalPhases = [];
+      }
+
+      this.searchList();
+    },
+    getApprovalType() {
+      getApprovalType().then((res) => {
+        this.transactionTypes = res.data.data.map((v) => {
           return {
             label: v,
             value: v,
@@ -354,9 +385,12 @@ export default {
         });
       });
     },
-    getApprovalType() {
-      getApprovalType().then((res) => {
-        this.transactionTypes = res.data.data.map((v) => {
+    getApprovalStage() {
+      let params = {
+        approvalPhases: this.search.approvalType,
+      };
+      getApprovalStage(params).then((res) => {
+        this.approvalPhases = res.data.data.map((v) => {
           return {
             label: v,
             value: v,
@@ -421,14 +455,21 @@ export default {
       Reflect.deleteProperty(param, "updateTime2");
       Reflect.deleteProperty(param, "total");
       Reflect.deleteProperty(param, "loading");
-
       this.search.loading = true;
-      getApplicationList(param).then((res) => {
-        const { data } = res.data;
-        this.search.total = data.totalCount;
-        this.list = data.list;
-        this.search.loading = false;
-      });
+      getApplicationList(param)
+        .then((res) => {
+          const { data } = res.data;
+          this.search.total = data.totalCount;
+          this.list = data.list;
+          this.search.loading = false;
+        })
+        .catch((err) => {
+          this.list = [];
+          this.search.loading = false;
+        })
+        .finally(() => {
+          this.search.loading = false;
+        });
     },
     del(id) {
       const param = {
@@ -468,7 +509,8 @@ export default {
     changeStatis(item) {
       if (item.value == this.crtSign) return;
       this.crtSign = item.value;
-      this.crtId=item.id
+      this.crtId = item.id;
+      this.getApplicationList(1);
     },
     searchList() {
       this.getApplicationList(1);
@@ -488,16 +530,19 @@ export default {
         total: 0,
         loading: false,
       };
+      this.approvalPhases = [];
       this.searchList();
     },
   },
 };
 </script>
 <style lang="less" scoped>
+[v-cloak] {
+  display: none;
+}
 .apply-center {
   overflow-y: auto;
   background: #f9fbff;
-  height: 100vh;
 
   .welcoming {
     font-size: 14px;
@@ -717,7 +762,7 @@ export default {
           margin-right: 0;
         }
 
-        /deep/ .el-select .el-input .el-select__caret::before {
+        /deep/ .el-select .el-input .el-icon-arrow-up::before {
           font-family: element-icons !important;
           content: "\e78f";
         }
@@ -849,9 +894,5 @@ export default {
     // margin-top: 16px;
   }
 }
-
-
-
-
 </style>
 

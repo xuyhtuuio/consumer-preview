@@ -157,9 +157,11 @@ export default {
       color: #86909C;
     }
     .el-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: 80px;
       height: 34px;
-      line-height: 26px;
       border-radius: 6px;
       span {
         position: relative;

@@ -5,7 +5,7 @@
       <div class="left_content">
         <div class="content_desc">
           <img src="../../assets/image/login_logo.png"/>
-          <span>欢迎使用数星产业大脑</span>
+          <span>欢迎使用消保管控平台</span>
         </div>
         <div class="login_insert">
           <!-- <i class="iconfont Vector2" ></i> -->
@@ -317,7 +317,7 @@ export default {
     async getUserRole() {
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.uaa + 'oauth/check_token',
+        url: '/cpr/oauth/check_token',
         contentType: 'application/x-www-form-urlencoded',
         data: {
           token: window.localStorage.getItem('AI_token')

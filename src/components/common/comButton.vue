@@ -33,11 +33,11 @@
       border-radius: 6px;
       cursor: pointer;
       &.size-normal {
-        width: 88px;
+        min-width: 88px;
         height: 34px;
       }
       &.size-big {
-        width: 118px;
+        min-width: 118px;
         height: 40px;
       }
       &.btn-normal{
@@ -48,6 +48,10 @@
       &.btn-primary {
         background: linear-gradient(180deg, #2F54EB 0%, #2D5CF6 100%);
         color: rgba(255, 255, 255, 1);
+      }
+      &.btn-primary-active {
+        background: rgba(240, 246, 255, 1);
+        color: rgba(45, 92, 246, 1);
       }
     }
 }
