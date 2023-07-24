@@ -48,7 +48,7 @@
             </div>
             <div class="event-infos" v-if="item.status !== 5">
                 <span class="id">{{ item.id }}</span>
-                <span class="sDate date">发起时间：{{ item.releaseTime || '--' }}</span>
+                <span class="sDate date">发起时间：{{ item.create_time || '--' }}</span>
                 <span class="sDate date">更新时间：{{ item.update_time || '--' }}</span>
                 <span class="sDate date">上线时间：{{ item.launchDate || '--' }}</span>
                 <el-popover placement="bottom" trigger="click" popper-class="popper-persons">
