@@ -8,6 +8,8 @@ import TrsWebComponents from 'trs-web-components'
 import gloCptsFn from "@/utils/globalCmps"
 import "element-ui/lib/theme-chalk/index.css";
 import Empty from '@/components/common/empty'
+import Ellipsis from '@/components/common/Ellipsis'
+import WDialog from '@/components/common/WDialog'
 
 import "@/assets/theme.less";
 import "@/assets/global.css";
@@ -22,6 +24,8 @@ Vue.use(ElementUI);
 Vue.use(TrsWebComponents);
 Vue.use(gloCptsFn);
 Vue.component('Empty',Empty)
+Vue.use(Ellipsis);
+Vue.use(WDialog);
 
 
 Vue.config.productionTip = false

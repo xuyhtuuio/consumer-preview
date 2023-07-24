@@ -1,6 +1,6 @@
 <template>
   <div class="base-setup">
-    <el-form label-position="top" label-width="80px">
+    <el-form ref="baseSetting" :model="setup" label-position="top" label-width="80px">
       <el-form-item>
         <template slot="label">
           <svg class="icon" aria-hidden="true">
@@ -81,6 +81,18 @@ export default {
       this.nowUserSelect = key
       this.showUserSelect = true
     },
+    validate(){
+      this.$refs.baseSetting.validate()
+      let err = []
+      if (!this.$isNotEmpty(this.setup.formName)){
+        err.push('表单名称未设置')
+      }
+      if (!this.$isNotEmpty(this.setup.formId) || this.setup.formId.length === 0){
+        err.push('关联表单未设置')
+      }
+      console.log(this.setup)
+      return err
+    }
   }
 }
 </script>

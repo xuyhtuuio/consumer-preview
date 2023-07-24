@@ -280,7 +280,7 @@
         }
     },
     "assignedUser":[], //指定审批人员 ASSIGN_USER 时不为空
-    //发起人自选
+    //发起人自选（上一审批人选择）
     "selfSelect": {
     	"multiple": true // 是否多选 true/false
 	},
