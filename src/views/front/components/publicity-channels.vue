@@ -79,6 +79,10 @@ export default {
     }
      .ruleForm {
       padding: 16px 72px 0;
+
+      /deep/.el-checkbox {
+        min-width: 160px;
+      }
     }
 }
 </style>

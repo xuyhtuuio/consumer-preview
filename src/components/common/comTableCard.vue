@@ -34,7 +34,7 @@
 
 <style lang="less" scoped>
 .tableCard {
-  padding: 16px 24px;
+  padding: 16px 24px 12px;
   // background: rgba(255, 255, 255, 1);
   // border-radius: 10px;
   .head {

@@ -2,7 +2,7 @@
   <div class="add-tag">
     <div class="left">
       <img class="img" src="" alt="">
-      <span class="text">贪心与</span>
+      <span class="text">谭新宇</span>
     </div>
     <div class="center">
       <span class="item"> 总行</span>
@@ -35,6 +35,7 @@
 .add-tag {
   display: flex;
   align-items: center;
+  width: 100%;
   .left {
      display: flex;
     align-items: center;

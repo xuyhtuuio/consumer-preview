@@ -118,6 +118,13 @@ const router = new Router({
           component: () => import("@/views/applycenter/details"),
           meta: { title: '申请单详情', }
         },
+        {
+          path: "addApply",
+          name: "addApply",
+          component: () => import("@/views/front/addApply.vue"),
+          parent: "/home",
+          meta: { title: '新的申请' ,viewport: viewport ,pTitle: "申请中心"}
+        },
       ]
     },
 
@@ -142,19 +149,14 @@ const router = new Router({
         },
       ]
     },
-    {
-      path: "/addApply",
-      name: "addApply",
-      component: () => import("@/views/front/addApply.vue"),
-      parent: "/home",
-      meta: { title: '新增详情' ,viewport: viewport ,pTitle: "首页",pPath: "/home"}
-    },
+    
   ]
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.pPath) {
-    const data = [{ path: to.meta.pPath.slice(1), title: to.meta.pTitle }, { path: to.path.slice(1), title: to.meta.title }]
+  console.log();
+  if (to.path.split("/").length>1) {
+    const data = [{ name: to.path.split("/")[1], title: to.meta.pTitle }, { name: to.path.split("/")[2], title: to.meta.title }]
     store.commit("setBreadcrumbList", data)
   }
 
