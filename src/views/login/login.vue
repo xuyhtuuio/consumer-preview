@@ -317,7 +317,7 @@ export default {
     async getUserRole() {
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.uaa + 'oauth/check_token',
+        url: '/cpr/oauth/check_token',
         contentType: 'application/x-www-form-urlencoded',
         data: {
           token: window.localStorage.getItem('AI_token')
