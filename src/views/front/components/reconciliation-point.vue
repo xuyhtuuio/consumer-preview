@@ -1,14 +1,14 @@
 <template>
 
-  <div class="reconciliation-point" ref="globalRef"> 
+  <div class="reconciliation-point" ref="globalRef" v-if="list.length"> 
     <g-table-card :title="title">
       <template v-slot:cardInfo>
           <div class="cardInfo">
             {{cardInfo}}
           </div>
           <div class="warn" v-if="judgeWarnFlag">
-             <g-icon class="right-icon" stylePx="20" href="#icon-guanzhu1"/>
-             {{warnInfo}}
+              <warn-info :info="warnInfo">
+            </warn-info>
           </div>
       </template>
       <template #content>
@@ -33,8 +33,12 @@
 </template>
 
 <script>
+import WarnInfo  from "./warn-info"
 // 核对要点
   export default {
+    components: {
+      WarnInfo
+    },
     props :{
       list: {
         typeof: Array,

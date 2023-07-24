@@ -1,11 +1,13 @@
 <template>
   <div class="container" v-loading="loading">
     <div class="tools">
-      <el-popover placement="right" trigger="click" popper-class="sidebar-popper" @after-leave="hiddenPopover" v-for="(item,index) in tools" :key="index">
-         <component :is="crtToolComponent"></component>
-        <span slot="reference" :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
+      <el-popover placement="right" trigger="click" popper-class="sidebar-popper" @after-leave="hiddenPopover"
+        v-for="(item, index) in tools" :key="index">
+        <component :is="crtToolComponent"></component>
+        <span slot="reference"
+          :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
           @click="changeTools(item)">
-          <i :class="['iconfont',item.icon]"></i>
+          <i :class="['iconfont', item.icon]"></i>
         </span>
       </el-popover>
     </div>
@@ -15,13 +17,13 @@
           <i class="iconfont icon-shenpiyemiantubiao"></i>审查项目名称显审查项目名称显示审查项目名称显示</span>
         <span class="content-btns">
           <el-button>返回</el-button>
-          <el-button type="primary">提交</el-button>
+          <el-button type="primary" @click="showSubmit">提交</el-button>
         </span>
       </div>
       <div class="content-cont">
         <file-preview ref="filePreview" :files="files" :activeIndex="activeIndex" @changeFile="changeFile"
           :lineWordItem="lineWordItem" @linePosition="linePosition"></file-preview>
-        <orcTxt ref="ocrTxt" :approval="approval"
+        <orcTxt ref="ocrTxt" :approval="approval" @addWord="addWord"
           v-show="['jpeg', 'jpg', 'png', 'pdf'].includes(approval?.fileName?.split('.')[1])" @showLine="showLine"
           :lineWordItem="lineWordItem">
         </orcTxt>
@@ -31,8 +33,8 @@
         </editorial>
       </div>
     </div>
-    <add-review ref="addReview"></add-review>
-    <!-- <submit-review></submit-review> -->
+    <add-review ref="addReview" @addRecommend="addRecommend"></add-review>
+    <submit-review ref="submitReview"></submit-review>
   </div>
 </template>
 
@@ -86,11 +88,15 @@ export default {
           icon: 'icon-ciku'
         }
       ],
-      crtToolComponent:'',
+      crtToolComponent: '',
       approval: {}, // 当前审批文件的相关内容
       activeIndex: null,
       word_lines: [], // 连线
       lineWordItem: {}, // 当前展示连线的词的基本信息
+      increasedIds: {
+        words: [],
+        strIds: []
+      },
     }
   },
   mounted() {
@@ -105,15 +111,27 @@ export default {
     }, 1000);
   },
   methods: {
+    showSubmit() {
+      this.$refs.submitReview.submitReviewDialog = true;
+      this.getComments();
+      this.$refs.submitReview.submission = JSON.parse(JSON.stringify(
+        this.comments.map(comment => {
+          comment.opinion = false
+          return comment;
+        })
+      ))
+    },
+    // 添加关键词
+    addWord(word) {
+      this.$refs.addReview.init(word)
+      window.getSelection().removeAllRanges();
+    },
     changeTools(item) {
       this.crtTools = item.toolSign,
-      this.crtToolComponent=item.component
+        this.crtToolComponent = item.component
     },
     hiddenPopover() {
       this.crtTools = ''
-    },
-    init() {
-      this.$refs['addReview'].init()
     },
     // 初始化文件
     initFile() {
@@ -235,7 +253,7 @@ export default {
         }
       })
       this.comments = setArr;
-      // console.log(this.comments)
+      console.log('comments', this.comments)
     },
     // 编辑意见后,同步更新  文件的推荐意见状态
     upDateComments(type, item, newVal) {
@@ -253,7 +271,7 @@ export default {
         // 删除意见,找到意见关联的所有文件, 如果意见存在关联 关键词,则取消关键词 选择 的 意见,如果 comments下包含,则移除 该意见
         case 'remove':
           filterFiles.map(file => {
-            const matchWord = file?.recommends.filter(word => item.words.includes(word.id));
+            const matchWord = file?.recommends?.filter(word => item.words.includes(word.id));
             matchWord && matchWord.forEach(word => {
               if (type === 'remove') {
                 word.selected = null;
@@ -321,8 +339,16 @@ export default {
         default:
           break;
       }
-      // console.log('files', this.files)
+      console.log('files', this.files)
     },
+    // 新增的关键词和新增的话术
+    addRecommend(recommend, wordId, strId) {
+      this.increasedIds.words.push(wordId)
+      this.increasedIds.strIds.push(strId)
+      this.approval.recommends.push(recommend);
+      this.$refs.ocrTxt.getInitContent(this.approval)
+      this.$refs.editorial.init(this.approval)
+    }
   },
   beforeDestroy() {
     this.lineRemove()
@@ -333,8 +359,8 @@ export default {
 <style lang="less" scoped>
 .container {
   display: flex;
-  height: 100%;
 
+  // height: 100%;
   .tools {
     background: #ffffff;
     width: 60px;
@@ -427,14 +453,16 @@ export default {
     box-shadow: 0px 0px 10px 0px #4343430D;
     width: 380px;
     flex: 1;
-    &:first-child {
-    overflow: hidden;
 
     &:first-child {
-      flex: 1;
-      // width: calc(100% - 60% - 24px);
+      overflow: hidden;
+
+      &:first-child {
+        flex: 1;
+        // width: calc(100% - 60% - 24px);
+      }
     }
-  }}
+  }
 }
 </style>
 <style lang="less">

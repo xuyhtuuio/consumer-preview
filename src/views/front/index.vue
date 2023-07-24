@@ -2,7 +2,7 @@
   <div class="front">
     <div>
       <transition name="router-fade" mode="out-in">
-			<router-view v-if="!$route.meta.keepAlive" class="view-box "/>
+			<!-- <router-view v-if="!$route.meta.keepAlive" class="view-box "/> -->
 		</transition>
     </div>
   </div>

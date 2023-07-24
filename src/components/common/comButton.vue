@@ -1,5 +1,5 @@
 <template>
-  <div class="g-button">
+  <div class="g-button" @click="$emit('click')">
     <div :class="['btn',`size-${size}`, `btn-${type}`]">
       <slot>
         提交
@@ -20,7 +20,7 @@
         typeof: String,
         default: "normal"
       }
-    }
+    },
   }
 </script>
 

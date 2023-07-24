@@ -57,17 +57,17 @@
                     <div class="submission-item" v-for="(item, index) in submission" :key="index" @mouseleave="mouseleave"
                         @mouseenter="mouseenter(item, index)">
                         <div class="submission-text">
-                            <span class="sort">{{ index + 1 }}.</span> <span>{{ item.text }}</span>
+                            <span class="sort">{{ index + 1 }}.</span> <span>{{ item.str }}</span>
                         </div>
                         <div class="submission-op">
                             <!-- <i>无实质意见</i> -->
                             <span v-if="item.opinion" class="opinion has-opinion"
-                                @click="() => { item.opinion = !item.opinion }">
+                                @click="item.opinion = !item.opinion">
                                 <i class="iconfont icon icon-guanzhu"></i>
                                 有实质意见
                             </span>
                             <span v-if="!item.opinion" class="opinion no-opinion"
-                                @click="() => { item.opinion = !item.opinion }">
+                                @click="item.opinion = !item.opinion">
                                 <i class="iconfont icon icon-guanzhu2"></i>
                                 无实质意见
                             </span>
@@ -77,7 +77,7 @@
                                     v-if="index !== submission.length - 1 && mousePoint == index"
                                     @click='moveDown(index)'></i></span>
                             <span style="width:20px;">
-                                <i class="iconfont icon  icon-xianxingtubiao-1 del" v-if="mousePoint == index" @click="del(item,index)"></i></span>
+                                <i class="iconfont icon  icon-xianxingtubiao-1 del"  @click="del(item,index)"></i></span>
                         </div>
                     </div>
                 </div>
@@ -127,24 +127,7 @@ export default {
                     { required: true, message: '请选择审查要点', trigger: 'change' },
                 ],
             },
-            submission: [
-                {
-                    text: '根据《中国人民银行金融消费者权益保护实施办法》要求，银行在进行营销宣传活动时，不得进行夸大表述，不得有引人误解的宣传。',
-                    opinion: true,
-                },
-                {
-                    text: '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因、测算依据或计算方法的业绩比较基准，单独或突出使用绝对数值、区间数值展示业绩比较基准。不得预测理财产品的投资业绩，或者出具、宣传理财产品预期收益率。请修改。',
-                    opinion: false,
-                },
-                {
-                    text: '根据《中国人民银行金融消费者权益保护实施办法》要求，银行在进行营销宣传活动时，不得进行夸大表述，不得有引人误解的宣传。',
-                    opinion: false,
-                },
-                {
-                    text: '根据《中国人民银行金融消费者权益保护实施办法》要求，银行在进行营销宣传活动时，不得进行夸大表述，不得有引人误解的宣传。',
-                    opinion: false,
-                },
-            ],
+            submission: [],
             mousePoint: -1,
             params: {
                 isPasses: '2',
@@ -152,9 +135,7 @@ export default {
                 reviewPoints: [],
                 submissionName: 'xxxxx',
                 organization: '消保审查办公室'
-
             }
-
         }
     },
     methods: {

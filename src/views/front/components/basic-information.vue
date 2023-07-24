@@ -1,9 +1,10 @@
 <template>
-  <div class="basic-information"> 
+  <div class="basic-information" v-if="list.length"> 
     <g-table-card :title="title">
       <template v-slot:cardInfo>
           <div class="cardInfo">
-            <g-icon class="right-icon" stylePx="20" href="#icon-guanzhu1"/>
+            <!-- <g-icon class="right-icon" stylePx="20" href="#icon-guanzhu1"/> -->
+            <img src="@/assets/image/apply-center/focus.svg" alt="">
             {{cardInfo}}
           </div>
       </template>
@@ -164,13 +165,6 @@ function rulesFn(data) {
       }
     },
     created() {
-       this.list.forEach(item =>  {
-         if(item.props.required) {
-          item.warnInfo = rulesFn(item)
-          this.$set(item,'isWarning',false)
-         }
-          
-        })
     },
     computed: {
       rulesCpt() {
@@ -186,6 +180,11 @@ function rulesFn(data) {
         return result
       },
     },
+    watch: {
+    list(newVal) {
+      this.initWarn()
+    }
+  },
     methods: {
       pickerTime(id, order) {
         if(order == 0) {return this.startTime(id)}
@@ -225,8 +224,8 @@ function rulesFn(data) {
           }
       }
        },
+       // 判断警告出现
       judgementWarnCpt(item) {
-        console.log(String(item.value));
         const offsetTop = this.$refs[`${item.id}Ref`][0].$el.offsetTop
         let flag
         if(item.valueType == 'Date') {
@@ -269,6 +268,26 @@ function rulesFn(data) {
         }
         return result
       },
+      judgeWarnSave() {
+      if(this.list[0].value.length === 0) {
+        this.$set(this.list[0],'isWarning',true)
+        return false
+      }else {
+        return true
+      }
+    },
+      initWarn() {
+        this.list.forEach(item =>  {
+         if(item.props.required == true) {
+          // item.isWarning = false
+          // item.warnInfo = rulesFn(item)
+          this.$set(item,'isWarning',false)
+          this.$set(item,'warnInfo',rulesFn(item))
+         }
+        })
+      },
+
+
       // 其他输入框
       checkRow(check,item) {
         console.log(check,item);
