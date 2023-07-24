@@ -48,6 +48,9 @@ export default {
     }
   },
   methods: {
+    validate(){
+      return []
+    }
   }
 }
 </script>

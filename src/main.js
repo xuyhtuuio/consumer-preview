@@ -8,6 +8,10 @@ import TrsWebComponents from 'trs-web-components'
 import gloCptsFn from "@/utils/globalCmps"
 import "element-ui/lib/theme-chalk/index.css";
 import Empty from '@/components/common/empty'
+import Ellipsis from '@/components/common/Ellipsis'
+import WDialog from '@/components/common/WDialog'
+import $GLOBAL from '@/utils/const';
+import http from '@/api/request.js'; /* eslint-disable */
 
 import 'trs-web-components/lib/common.less';
 import 'trs-web-components/lib/element.less';
@@ -17,12 +21,17 @@ import '@/assets/icon/iconfont.css';
 import '@/assets/icon/iconfont.js';
 import '@/assets/css/common.less';
 import '@/assets/css/element.less';
-
+import onceClick from './utils/click-once';
 
 Vue.use(ElementUI);
 Vue.use(TrsWebComponents);
 Vue.use(gloCptsFn);
 Vue.component('Empty',Empty)
+Vue.use(Ellipsis);
+Vue.use(WDialog);
+Vue.use(onceClick);
+Vue.prototype.$GLOBAL = $GLOBAL; // 全局常量
+Vue.prototype.$http = http; // 请求库
 
 
 Vue.config.productionTip = false

@@ -1,0 +1,214 @@
+.login {
+  margin: -16px;
+  display: flex;
+  min-height: 500px;
+  height: 100vh;
+  padding: 0 !important;
+  .login_left {
+    width: 58%;
+    height: 100%;
+    background: #2d5cf6;
+    .left_content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      .content_desc {
+        display: flex;
+        img {
+          margin-left: 50px;
+          margin-right: 30px;
+          margin-top: 64px;
+          width: 40px;
+          height: 38px;
+        }
+        span {
+          margin-top: 64px;
+          // width: 291px;
+          color: #ffffff;
+          font-size: 32px;
+          font-weight: bold;
+        }
+      }
+      .login_insert {
+        margin-top: 8%;
+        margin-left: 20%;
+        overflow: hidden;
+        text-align: left;
+        img {
+          height: 100%;
+        }
+      }
+    }
+  }
+  .login_left_dhsz {
+    position: relative;
+    opacity: 0;
+    .bg1 {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 0;
+      background-size: 100% 100% !important;
+    }
+    .left_content {
+      position:relative;
+      z-index:10;
+    }
+  }
+  .rmsz .content_desc span{
+    color:#000 !important;
+  }
+  .login_right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 42%;
+    //padding-right: 90px;
+    background: #ffffff;
+    span {
+      display: block;
+      text-align: left;
+      margin: 0 0px 20px 71px;
+      color: #1d2128;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .login_form {
+      margin-left: 61px;
+      margin-right: 60px;
+      /deep/.el-form-item {
+        margin-top: 28px;
+        .el-form-item__content {
+          position: relative;
+          .verify_code {
+            cursor: pointer;
+            position: absolute;
+            top: -25px;
+            right: 137px;
+            img{
+              width: 140px;
+              height: 50px;
+            }
+          }
+          .get_code {
+            top: 0;
+            right: 10px;
+            span {
+              font-size: 16px;
+              color: #2d5cf6 !important;
+            }
+
+          }
+          i {
+            position: absolute;
+            // top: 10px;
+            left: 0;
+            width: 18px;
+            height: 18px;
+            z-index: 9999;
+            color: #88909B;
+          }
+          img{
+            position: absolute;
+            top: 10px;
+            width: 18px;
+            height: 18px;
+            z-index: 9999;
+          }
+          .pwdPic {
+            cursor: pointer;
+            width: 20px;
+            height: 13.32px;
+            position: absolute;
+            right: 0px;
+            top: 15px;
+          }
+          .el-input {
+            .el-input__inner {
+              width: 100%;
+              border-radius: 0px;
+              font-size: 16px;
+              border: none;
+              border-bottom: 1px solid #88909b;
+              height: 32px;
+              line-height: 32px;
+              padding: 16px 41px;
+            }
+          }
+        }
+      }
+    }
+    .btns{
+      display: flex;
+      justify-content: center;
+      .resign{
+        margin-left: 20px;
+        color: #2D5CF6;
+        display: inline-block;
+        cursor: pointer;
+        width: 120px;
+        background: #F0F6FF;
+        color: #2D5CF6;
+      }
+    }
+    .el-button {
+      width: 300px;
+      height: 44px;
+      background: #2d5cf6;
+      border-radius: 40px;
+      text-align: center;
+      color: #ffffff;
+      font-weight: bold;
+    }
+  }
+}
+.pwd_operate {
+  margin: 0 60px 76px 61px;
+  display: flex;
+  justify-content: space-between;
+  .el-checkbox {
+    /deep/.el-checkbox__input {
+      .el-checkbox__inner {
+        border-color: #88909b;
+        border-radius: 3px;
+        width: 15px;
+        height: 15px;
+      }
+    /deep/.el-checkbox__inner is-checked{
+      border-color: #2D5CF6 !important;
+    }
+    }
+    /deep/.el-checkbox__label {
+      color: #88909b;
+      font-size: 16px;
+    }
+  }
+  .remember{
+    color:#88909B;
+    font-size: 16px;
+    font-weight: 400;
+  }
+    .forget{
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+    color:#88909B;
+    font-size: 16px;
+    font-weight: 400;
+    cursor: pointer;
+    .line{
+      border-bottom:1px solid #88909B;
+      margin-top: -4px;
+    }
+}
+  .remember.is-bordered.is-checked{
+      border-color: #2D5CF6 !important;
+  }
+  a {
+    font-size: 16px;
+    color: #88909b;
+    text-decoration: underline;
+  }
+}
