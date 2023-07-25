@@ -90,10 +90,11 @@ service.interceptors.response.use(
 				//Message.warning("抱歉，您无权访问！")
 				break;
 			case 500:
-				Notification.error({ title: "提醒", message: "服务器出了点小错误" });
+				Message.error({ offset: 40, title: "提醒", message: "服务器出了点小错误" });
 				break;
 			case 404:
-				Notification({
+				Message({
+					offset: 40,
 					title: "提醒",
 					message: "未找到，检查参数",
 					type: "warning"
