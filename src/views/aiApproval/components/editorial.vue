@@ -27,7 +27,7 @@
             <i class="iconfont icon-shouqi" @click="hideList(a)" v-if="recommend.pageNow > 1 && !recommend.hideMore"></i>
           </p>
         </div>
-        <div v-if="recommends.length === 0" class="nodata">
+        <div v-if="recommends?.length === 0" class="nodata">
           <img src="@/assets/image/ai-approval/nodata.svg" alt="" class="暂无推荐的意见">
           <p>暂无推荐的意见</p>
           <p>可在 <span class="underline">识别结果</span> 中选中认为敏感词汇添加关键词和意见。</p>
