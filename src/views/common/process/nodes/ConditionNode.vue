@@ -91,13 +91,14 @@ export default {
   methods: {
     //校验数据配置的合法性
     validate(){
-      if(this.config.assignedUser && this.config.assignedUser.length > 0){
-        this.showError = false
-      }else {
-        this.showError = true
-        this.errorInfo = '请选择需要抄送的人员'
-      }
-      return !this.showError
+      // if(this.config.assignedUser && this.config.assignedUser.length > 0){
+      //   this.showError = false
+      // }else {
+      //   this.showError = true
+      //   this.errorInfo = '请选择需要抄送的人员'
+      // }
+      // return !this.showError
+      return true
     }
   }
 }

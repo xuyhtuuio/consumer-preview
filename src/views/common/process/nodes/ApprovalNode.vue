@@ -25,7 +25,26 @@ export default {
     }
   },
   computed:{
+    nodeMap() {
+      return this.$store.state.nodeMap
+    },
+    nodes() {
+      const tempNodes = []
+      this.nodeMap.forEach(value => {
+        if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO', 'APPROVAL-CONFIRM'].includes(value?.type)) {
+          tempNodes.push({
+            name: value.name,
+            id: value.id
+          })
+        }
+      })
+      return tempNodes
+    },
     content(){
+      // console.log(this.config.name, this.config.props.assignedUser)
+      if (this.config.name === '二次会签') {
+        return this.nodes.find(n => (n.id === this.config.props.nodeId))?.name
+      }
       return this.config.props.assignedUser.map(item => item.label).join('、') || ''
     }
   },
@@ -42,7 +61,10 @@ export default {
     // 上一个审批人选中
     validate_SELF_SELECT(err){
       console.log('this.config.props.assignedUser', this.config.props.assignedUser)
-      if(this.config.props.assignedUser.length > 0){
+      if (this.config.name === '二次会签' && this.config.props.nodeId) {
+        return true;
+      }
+      if(this.config.name !== '二次会签' && this.config.props.assignedUser.length > 0){
         return true;
       }else {
         this.errorInfo = '请指定审批人员'

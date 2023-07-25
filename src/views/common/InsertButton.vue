@@ -64,7 +64,7 @@ export default {
       this.$emit('insertNode', "CC")
     },
     addRtNode() {
-      this.$emit('insertNode', "ROOT") // 发起人/确认人
+      this.$emit('insertNode', "APPROVAL-CONFIRM") // 确认人
     },
     addDelayNode(){
       this.$emit('insertNode', "DELAY")
