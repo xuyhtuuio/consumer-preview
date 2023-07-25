@@ -263,6 +263,11 @@
        "handler": "PASS", //PASS 直接通过、 TO_ADMIN 转交主管理员、TO_USER 转交指定人员
         "assignedUser":[] //TO_USER 时的指定人员
     },
+    // 驳回处理
+    "refuse": {
+        "type": "TO_NODE",
+        "target": ""
+    },
     //审批超时限制设置
     "timeLimit":{
         //超时时间限制

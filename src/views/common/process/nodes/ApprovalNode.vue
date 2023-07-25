@@ -78,7 +78,6 @@ export default {
     },
     // 上一个审批人选中
     validate_SELF_SELECT(err){
-      console.log('this.config.props.assignedUser', this.config.props.assignedUser)
       if (this.config.name === '二次会签' && this.config.props.nodeId) {
         return true;
       }

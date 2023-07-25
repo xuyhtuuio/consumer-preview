@@ -166,12 +166,12 @@
           </svg>
           如果申请被驳回
         </template>
-        <el-radio-group class="radio-group" v-model="nodeProps.nobody.handler">
-          <el-radio label="TO_PASS">驳回到指定节点</el-radio>
-          <el-radio label="TO_REFUSE">审批人自选（前序节点）</el-radio>
+        <el-radio-group class="radio-group" v-model="nodeProps.refuse.type">
+          <el-radio label="TO_NODE">驳回到指定节点</el-radio>
+          <el-radio label="TO_BEFORE">审批人自选（前序节点）</el-radio>
         </el-radio-group>
-        <div style="margin-top: 10px" v-if="nodeProps.nobody.handler === 'TO_PASS'">
-          <el-select v-model="nodeProps.nodeId" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
+        <div style="margin-top: 10px" v-if="nodeProps.refuse.type === 'TO_NODE'">
+          <el-select v-model="nodeProps.refuse.target" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
             <el-option v-for="(op, index) in nodes" :key="index" :label="op.name" :value="op.id"></el-option>
           </el-select>
         </div>
