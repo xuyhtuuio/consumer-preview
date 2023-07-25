@@ -8,7 +8,7 @@
           </svg>
           选择审批对象
         </template>
-        <el-radio-group class="radio-group" v-model="nodeProps.assignedType">
+        <el-radio-group class="radio-group" v-model="nodeProps.assignedType" @input="changeAssignedType">
           <el-radio v-for="t in approvalTypes" :label="t.type" :key="t.type">{{ t.name }}</el-radio>
         </el-radio-group>
         <el-popover
@@ -29,14 +29,14 @@
           <el-button size="mini" icon="el-icon-plus" type="primary" @click="selectUser" round>选择人员</el-button>
         </div>
         <div v-else-if="nodeProps.assignedType === 'DEPT_USER_ROLE'">
-          <div class="select-user">
+          <!-- <div class="select-user">
             <el-button size="mini" @click="selectUser" icon="el-icon-plus" type="primary">选择部门/人员/角色</el-button>
             <div class="tag-action" >
               <div class="tag-box" v-for="(item, index) in select" :key="index">
                 <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
         <div v-else-if="nodeProps.assignedType === 'SELECT_NODE'">
           选择节点
@@ -90,8 +90,8 @@
           <span class="item-desc">上一审批人选择作为审批人进行审批</span>
         </div>
         <!-- 人员选择框 -->
-        <div class="select-user grag" v-if="nodeProps.assignedType === 'SELF_SELECT'">
-          <p>自选范围（上一审批人选择时的用户可选范围）</p>
+        <div class="select-user grag" v-if="nodeProps.assignedType === 'SELF_SELECT' || nodeProps.assignedType === 'DEPT_USER_ROLE'">
+          <p v-if="nodeProps.assignedType === 'SELF_SELECT'">自选范围（上一审批人选择时的用户可选范围）</p>
           <el-button size="mini" @click="selectUser" icon="el-icon-plus" type="primary">选择部门/人员/角色</el-button>
           <org-picker :show="showOrgSelect" @close="closeSelect" :selected="select" @selectOver="selected"></org-picker>
           <div class="tag-action" >
@@ -305,6 +305,11 @@ export default {
     }
   },
   methods: {
+    changeAssignedType() {
+      this.showOrgSelect = false
+      this.select = []
+      this.$store.state.selectedNode.props.assignedUser = []
+    },
     closeSelect() {
       this.showOrgSelect = false
     },
@@ -327,6 +332,7 @@ export default {
           ...this.tagConfig
         }))
       }
+      this.$store.state.selectedNode.props.assignedUser = this.select
     },
     selected1(select) {
       this.showOrgSelect1 = false

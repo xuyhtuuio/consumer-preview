@@ -1,7 +1,7 @@
 <template>
   <node :title="config.name" :show-error="showError" :content="content" :error-info="errorInfo"
         @selected="$emit('selected')" @delNode="$emit('delNode')" @insertNode="type => $emit('insertNode', type)"
-        placeholder="请设置抄送人" header-bgc="#2D5CF6" header-icon="#icon-shenpi"/>
+        placeholder="请设置抄送人" header-bgc="#2D5CF6" header-icon="#icon-stamp"/>
 </template>
 
 <script>
@@ -22,12 +22,25 @@ export default {
     return {
       showError: false,
       errorInfo: '',
+      content: ''
     }
   },
   computed:{
-    content(){
-      this.config
+    assignedUser() {
+      return this.$store.state.selectedNode?.props?.assignedUser
     }
+  },
+  watch: {
+    assignedUser: {
+      handler(val) {
+        if (this.$store.state.selectedNode.id !== this.config.id || this.config.name === '二次会签') {
+          return;
+        }
+        this.content = (val || []).map(item => item.label).join('、') || ''
+      },
+      immediate: true,
+      deep: true
+    },
   },
   methods: {
     //校验数据配置的合法性

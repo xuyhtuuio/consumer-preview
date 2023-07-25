@@ -1,5 +1,5 @@
 <template>
-  <node :title="config.name" :show-error="showError" :content="content" :error-info="errorInfo"
+  <node :key="Math.random() + ''" :title="config.name" :show-error="showError" :content="content" :error-info="errorInfo"
         @selected="$emit('selected')" @delNode="$emit('delNode')" @insertNode="type => $emit('insertNode', type)"
         :placeholder="config.name === '二次会签' ? '指定节点审批人' : '请设置审批人'" :header-bgc="config.name === '二次会签' ? '#505968' : '#ff943e'" header-icon="#icon-shenpi"/>
 </template>
@@ -22,6 +22,7 @@ export default {
     return {
       showError: false,
       errorInfo: '',
+      content: ''
     }
   },
   computed:{
@@ -40,12 +41,29 @@ export default {
       })
       return tempNodes
     },
-    content(){
-      // console.log(this.config.name, this.config.props.assignedUser)
-      if (this.config.name === '二次会签') {
-        return this.nodes.find(n => (n.id === this.config.props.nodeId))?.name
-      }
-      return this.config.props.assignedUser.map(item => item.label).join('、') || ''
+    assignedUser() {
+      return this.$store.state.selectedNode?.props?.assignedUser
+    }
+  },
+  watch: {
+    assignedUser: {
+      handler(val) {
+        if (this.$store.state.selectedNode.id !== this.config.id || this.config.name === '二次会签') {
+          return;
+        }
+        this.content = (val || []).map(item => item.label).join('、') || ''
+      },
+      immediate: true,
+      deep: true
+    },
+    config: {
+      handler() {
+        if (this.config.name === '二次会签') {
+          this.content = this.nodes.find(n => (n.id === this.config.props.nodeId))?.name
+        }
+      },
+      immediate: true,
+      deep: true
     }
   },
   methods: {
