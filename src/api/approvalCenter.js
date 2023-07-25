@@ -3,14 +3,14 @@ import request from '@/api/request.js'
 // 表单管理-获取审查事项类型列表
 export function getDataStatistics(param) {
   return request({
-    url: '/cpr/applicationcenter/header',
+    url: '/cpr/censor/header',
     method: 'get',
     params: param
   })
 }
 export function getUserStatus(param) {
   return request({
-    url: '/cpr/applicationcenter/user-status',
+    url: '/cpr/censor/user-status',
     method: 'get',
     params: param
   })
@@ -32,43 +32,33 @@ export function getApprovalStage(param) {
   })
 }
 // 获取申请列表
-export function getApplicationList(param) {
+export function censorList(param) {
   return request({
-    url: '/cpr/applicationcenter/applicationList',
+    url: '/cpr/censor/censorList',
     method: 'post',
     data: param
   })
 }
-// 删除
 
-export function delApplication(param) {
-  return request({
-    url: '/cpr/applicationcenter/del',
-    method: 'post',
-    contentType:'application/x-www-form-urlencoded',
-    data: param
-  })
-}
-// 撤销
-
-export function quashApplication(param) {
-  return request({
-    url: '/cpr/applicationcenter/quash',
-    method: 'post',
-    contentType:'application/x-www-form-urlencoded',
-    data: param
-  })
-}
 //关注
 
 export function concernApplication(param) {
   return request({
-    url: '/cpr/applicationcenter/concern',
+    url: '/cpr/censor/concern',
     method: 'post',
     contentType:'application/x-www-form-urlencoded',
     data: param
   })
 }
 
+// 驳回
+ export function overrule(param){
+    return request({
+        url: '/cpr/censor/overrule',
+        method: 'post',
+        contentType:'application/x-www-form-urlencoded',
+        data: param
+      })
+ }
 
 

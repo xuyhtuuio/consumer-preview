@@ -1,6 +1,6 @@
 <template>
   <div class="apply-center" v-cloak>
-    <el-button @click="to('/applycenter/details')">xx</el-button>
+
     <p class="welcoming">欢迎来到消保管控平台！</p>
     <p class="tips" v-if="tipsMsg">
       <i class="iconfont icon-xiaoxi-tongzhi"></i>{{ tipsMsg }}
@@ -55,7 +55,6 @@
                 placeholder="事项类型"
                 @change="changeArrrovalType"
                 clearable
-                @clear="searchList"
               >
                 <el-option
                   v-for="(item, index) in transactionTypes"
@@ -372,7 +371,6 @@ export default {
         this.search.approvalStage = "";
         this.approvalPhases = [];
       }
-
       this.searchList();
     },
     getApprovalType() {
@@ -460,7 +458,17 @@ export default {
         .then((res) => {
           const { data } = res.data;
           this.search.total = data.totalCount;
-          this.list = data.list;
+          this.list = data.list&&data.list.length?data.list.map(v=>{
+            return {
+                ...v,
+                currentAssignee:v.currentAssignee&&v.currentAssignee.length?v.currentAssignee.map(m=>{
+                    return {
+                        ...m,
+                        hasReminder:false
+                    }
+                }):[]
+            }
+          }):[]
           this.search.loading = false;
         })
         .catch((err) => {
@@ -487,12 +495,11 @@ export default {
     quash(item) {
       // 0 代表不能撤销 1代表可以撤销
       const param = {
-        recordId: item.id,
+        recordId: item.taskNumber,
         Revocable: 1,
       };
       quashApplication(param).then((res) => {
-        const { data } = res.data;
-        if (data.status === 0) {
+        if (res.status === 200) {
           this.$message.success("撤销成功");
           this.getApplicationList(1);
         }
@@ -566,6 +573,8 @@ export default {
     background: #fffce8;
     margin-bottom: 8px;
     cursor: default;
+    display: flex;
+    align-items: center;
 
     i {
       margin-right: 8px;
