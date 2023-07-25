@@ -472,12 +472,13 @@ export default {
         });
     },
     del(id) {
+      console.log('ffff')
       const param = {
         recordId: id,
       };
       delApplication(param).then((res) => {
-        const { data } = res.data;
-        if (data.status === 0) {
+
+        if (res.status === 200) {
           this.$message.success("删除成功");
           this.getApplicationList(1);
         }

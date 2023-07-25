@@ -56,7 +56,7 @@ export default {
   },
   methods: {
     handleItem(item) {
-      this.activeMenu = item.name
+      this.activeMenu = item.sign
       this.$router.push({
         name: item.name
       })

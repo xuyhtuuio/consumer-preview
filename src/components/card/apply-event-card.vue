@@ -41,11 +41,10 @@
                             采纳
                         </i>
                     </i>
-                    <!-- <i v-if="item.status === 5" class="tips">已滞留23小时</i> -->
                 </span>
 
             </div>
-            <div class="event-infos" v-if="item.status !== 5">
+            <div class="event-infos" v-if="!item.errorinfo">
                 <span class="id">{{ item.id }}</span>
                 <span class="sDate date">发起时间：{{ item.create_time || '--' }}</span>
                 <span class="sDate date">更新时间：{{ item.update_time || '--' }}</span>
@@ -104,7 +103,7 @@
 
             </div>
             <!-- 草稿 -->
-            <div v-if="item.status === 2" class="flex">
+            <div  class="flex">
                 <span class="modify icon-op">
                     <svg class="icon urgent-icon" aria-hidden="true">
                         <use xlink:href="#icon-xianxingtubiao"></use>
@@ -185,7 +184,7 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                this.$emit(del, item.id)
+                this.$emit('del', item.taskNumber)
             }).catch(() => {
                 this.$message({
                     type: 'info',

@@ -147,8 +147,8 @@ const router = new Router({
           meta: { title: '审批中心',}
         },
         {
-          path: "details",
-          name: "details",
+          path: "approval-details",
+          name: "approval-details",
           component: () => import("@/views/approvalCenter/details"),
           meta: { title: '申请单详情', }
         },

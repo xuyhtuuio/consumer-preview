@@ -43,8 +43,9 @@ export function getApplicationList(param) {
 
 export function delApplication(param) {
   return request({
-    url: '/cpr/del',
+    url: '/cpr/applicationcenter/del',
     method: 'post',
+    contentType:'application/x-www-form-urlencoded',
     data: param
   })
 }
