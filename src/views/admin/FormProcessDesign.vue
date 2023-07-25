@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header style="background: white">
+    <el-header>
       <layout-header
         v-model="activeSelect"
         @changeRoute="(active) => activeSelect = active"
