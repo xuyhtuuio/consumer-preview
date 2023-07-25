@@ -7,6 +7,10 @@ export const APPROVAL_PROPS = {
     handler: "TO_PASS",
     assignedUser:[]
   },
+  refuse: {
+    type: 'TO_NODE',
+    target: ''
+  },
   timeLimit:{
     timeout:{
       unit: "H",

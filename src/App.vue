@@ -2,7 +2,10 @@
   <div id="app">
     <NavMenu v-if="$route.name !== 'login'"></NavMenu>
     <transition name="router-fade" mode="out-in" >
-      <router-view v-if="!$route.meta.keepAlive" class="view-box" :style="{padding: noPaddingRoute.indexOf($route.name) !== -1 ? '0':'16px 80px'}"/>
+      <router-view v-if="!$route.meta.keepAlive" class="view-box" :style="{
+        padding: noPaddingRoute.indexOf($route.name) !== -1 ? '0':'16px 80px',
+        'overflow-y': noBodyScroll.includes($route.name) ? 'hidden' : 'auto'
+      }"/>
     </transition>
   </div>
 </template>
@@ -14,7 +17,8 @@ export default {
   components: { NavMenu},
   data() {
     return {
-      noPaddingRoute:['aiApproval']
+      noPaddingRoute:['aiApproval'],
+      noBodyScroll: ['baseSetting', 'processDesign', 'proSetting']
     }
   },
   mounted() {

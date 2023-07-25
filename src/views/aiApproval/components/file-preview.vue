@@ -41,8 +41,9 @@
       <i class="el-icon-circle-close" v-show="showFullScreen" @click="fullScreen"></i>
       <!-- 图片 -->
       <imgae-preview ref="imgPreview" v-if="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))"
-        :lineWordItem="lineWordItem" @linePosition="linePosition"></imgae-preview>
+        :lineWordItem="lineWordItem" @linePosition="linePosition" :url="approval.url"></imgae-preview>
       <!-- 其他类型文件 -->
+      <filePreview v-else :url="approval.url"></filePreview>
     </div>
   </div>
 </template>
@@ -52,8 +53,9 @@ import 'swiper/css/swiper.css'
 import Swiper from 'swiper'
 import imgaePreview from './imgae-preview'
 import fileType from './file-type'
+import filePreview from '@/components/filePreview'
 export default {
-  components: { imgaePreview, fileType },
+  components: { imgaePreview, fileType, filePreview },
   name: 'file-preview',
   props: {
     approval: {
@@ -123,7 +125,9 @@ export default {
     },
     fullScreen() {
       this.showFullScreen = !this.showFullScreen;
-      this.$refs.imgPreview.handleImageLoaded()
+      this.$nextTick(() => {
+        this.$refs.imgPreview.handleImageLoaded()
+      })
     }
   }
 }

@@ -105,10 +105,10 @@ export default {
     // 标记命中关键词(敏感词,禁用词)
     getInitContent(approval) {
       const html = []
-      approval.ocr.forEach((ocr) => {
+      approval?.ocr?.forEach((ocr) => {
         const { text, location } = ocr;
         let newOcr = [text];
-        approval.recommends.forEach((recommend, i) => {
+        approval?.recommends?.forEach((recommend, i) => {
           const { word, wordType } = recommend
           if (newOcr.join().includes(word)) {
             const temp = [];

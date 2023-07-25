@@ -1,5 +1,5 @@
 <template>
-  <node :title="config.name" :show-error="showError" :content="content" :error-info="errorInfo"
+  <node :key="Math.random() + ''" :title="config.name" :show-error="showError" :content="content" :error-info="errorInfo"
         @selected="$emit('selected')" @delNode="$emit('delNode')" @insertNode="type => $emit('insertNode', type)"
         :placeholder="config.name === '二次会签' ? '指定节点审批人' : '请设置审批人'" :header-bgc="config.name === '二次会签' ? '#505968' : '#ff943e'" header-icon="#icon-shenpi"/>
 </template>
@@ -22,11 +22,48 @@ export default {
     return {
       showError: false,
       errorInfo: '',
+      content: ''
     }
   },
   computed:{
-    content(){
-      return this.config.props.assignedUser.map(item => item.label).join('、') || ''
+    nodeMap() {
+      return this.$store.state.nodeMap
+    },
+    nodes() {
+      const tempNodes = []
+      this.nodeMap.forEach(value => {
+        if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO', 'APPROVAL-CONFIRM'].includes(value?.type)) {
+          tempNodes.push({
+            name: value.name,
+            id: value.id
+          })
+        }
+      })
+      return tempNodes
+    },
+    assignedUser() {
+      return this.$store.state.selectedNode?.props?.assignedUser
+    }
+  },
+  watch: {
+    assignedUser: {
+      handler(val) {
+        if (this.$store.state.selectedNode.id !== this.config.id || this.config.name === '二次会签') {
+          return;
+        }
+        this.content = (val || []).map(item => item.label).join('、') || ''
+      },
+      immediate: true,
+      deep: true
+    },
+    config: {
+      handler() {
+        if (this.config.name === '二次会签') {
+          this.content = this.nodes.find(n => (n.id === this.config.props.nodeId))?.name
+        }
+      },
+      immediate: true,
+      deep: true
     }
   },
   methods: {
@@ -41,8 +78,10 @@ export default {
     },
     // 上一个审批人选中
     validate_SELF_SELECT(err){
-      console.log('this.config.props.assignedUser', this.config.props.assignedUser)
-      if(this.config.props.assignedUser.length > 0){
+      if (this.config.name === '二次会签' && this.config.props.nodeId) {
+        return true;
+      }
+      if(this.config.name !== '二次会签' && this.config.props.assignedUser.length > 0){
         return true;
       }else {
         this.errorInfo = '请指定审批人员'

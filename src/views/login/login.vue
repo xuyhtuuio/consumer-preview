@@ -208,7 +208,7 @@ export default {
     // 获取账号验证码
     async codeFun() {
       const res = await this.$http({
-        url: this.$GLOBAL.uaa + 'captcha'
+        url: '/cpr/captcha'
       });
       if (res.data === undefined) {
         this.$message.error('网络错误，请稍后再试');
@@ -238,7 +238,7 @@ export default {
       this.$http({
         method: 'post',
         contentType: 'application/x-www-form-urlencoded',
-        url: this.$GLOBAL.uaa + 'validCodeSms',
+        url: '/cpr/validCodeSms',
         data: {
           phone: this.login_form.name
         }

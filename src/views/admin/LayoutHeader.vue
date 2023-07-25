@@ -106,8 +106,11 @@ export default {
 @import "@/assets/global";
 
 /deep/ .header {
-  margin: 0 -100px;
-  min-width: 980px;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  margin: -15px -100px 0;
+  // min-width: 980px;
   position: relative;
   height: 60px;
   background: #ffffff;
@@ -151,6 +154,7 @@ export default {
     }
 
     button {
+      padding: 4px 15px;
       border-radius: 15px;
     }
   }

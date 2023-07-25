@@ -28,6 +28,7 @@ export default {
   components: {
     Approval,
     ApprovalTwo,
+    ApprovalConfirm: Approval,
     Condition,
     Trigger,
     Delay,
@@ -61,6 +62,8 @@ export default {
           return '设置审批人';
         case 'APPROVAL-TWO':
           return '二次会签';
+        case 'APPROVAL-CONFIRM':
+          return '确认人';
         default:
           return null;
       }
