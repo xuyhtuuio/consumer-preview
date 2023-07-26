@@ -1,8 +1,10 @@
 <template>
   <div class="upload-file-card">
-    <p class="head" v-if="status!==4">请上传最终上线版本，且已审批通过的材料</p>
+    <p class="head" v-if="status !== 4">
+      请上传最终上线版本，且已审批通过的材料
+    </p>
     <el-upload
-     v-if="status!==4"
+      v-if="status !== 4"
       class="upload-demo"
       drag
       :action="action"
@@ -19,13 +21,8 @@
         <p>支持zip/jpg/png/pdf/doc/xls/mp4/ppt/txt/格式的文件</p>
       </div>
     </el-upload>
-    <div class="upload-list">
-      <div
-        class="item"
-        v-for="(item, index) in fileList"
-        :key="index"
-      
-      >
+    <div :class="{ 'upload-list': true, status4: status == 4 }">
+      <div class="item" v-for="(item, index) in fileList" :key="index">
         <div class="left">{{ `${index + 1}.` }}</div>
         <div class="center">
           <g-icon
@@ -47,7 +44,18 @@
           </div>
           <div class="r-item success" v-if="item.status === 1 && item.isClick">
             <span class="s-item" @click="handleUploadLook(item.url)">预览</span>
-            <span class="s-item" @click="handleUploadDelete(item)">删除</span>
+            <span
+              class="s-item"
+              @click="handleUploadDelete(item)"
+              v-if="status !== 4"
+              >删除</span
+            >
+            <span
+              class="s-item"
+              @click="handleDownload(item)"
+              v-if="status == 4"
+              >下载</span
+            >
           </div>
           <div class="r-item error" v-if="item.status === -2 && item.isClick">
             <span class="s-item success" @click="handleUploadDelete(item)"
@@ -57,6 +65,9 @@
         </div>
       </div>
     </div>
+    <div v-if="status==4">
+       <p class="downloadAll">下载全部</p>
+    </div>
   </div>
 </template>
 <script>
@@ -64,27 +75,27 @@ import { getFormGroups, deleteFormGroups } from "@/api/front.js";
 export default {
   name: "upload-file-card",
   components: {},
-  props:{
-    status:{
-      type:Number,
-      default:0
-    }
+  props: {
+    status: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
       fileList: [
         {
-          type:'zip',
-          name:'压缩包.zip',
-          status:1,
-          isClick:true,
+          type: "zip",
+          name: "压缩包.zip",
+          status: 1,
+          isClick: true,
         },
         {
-          type:'xls',
-          name:'压缩包.xls',
-          status:1,
-          isClick:true,
-        }
+          type: "xls",
+          name: "压缩包.xls",
+          status: 1,
+          isClick: true,
+        },
       ],
       judgment: "zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/",
       action: "http://192.168.210.57:31602/cpr/file/upload",
@@ -114,6 +125,9 @@ export default {
           item.status = 1;
         }
       });
+    },
+    handleDownload() {
+      this.$message.success("下载中");
     },
     handleError(id, file, fileList) {
       this.fileList.forEach((item) => {
@@ -259,6 +273,32 @@ export default {
         }
       }
     }
+  }
+  .status4{
+    .item{
+      .success{
+        visibility: hidden;
+      }
+    }
+    .item:hover{
+      .success{
+        visibility:visible;
+      }
+    }
+
+  }
+  .downloadAll{
+    text-align: right;
+    color:  #306EF5;
+    cursor: pointer;
+text-align: right;
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 22px; /* 157.143% */
+text-decoration-line: underline;
+margin-top: 16px;
+
   }
 }
 </style>

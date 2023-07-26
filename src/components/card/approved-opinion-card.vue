@@ -38,8 +38,8 @@
               <div class="file-list">
                 <div
                   class="file-list-item pointer"
-                  v-for="(file, idx) in child.relevantfile"
-                  :key="idx"
+                  v-for="(file, i) in child.relevantfile"
+                  :key="i"
                 >
                   {{ file }}
                 </div>
@@ -47,28 +47,38 @@
               <i slot="reference">+{{ child.relevantfile.length - 1 }}</i>
             </el-popover>
           </div>
-          <!-- 采纳 -->
-          <div
-            class="accept-box"
-            v-if="$route.fullPath.indexOf('applycenter') !== -1"
-          >
-            <el-radio-group v-model="child.isAccept">
+          <!-- 审批的时候选择采纳与否 -->
+          <div class="accept-box" v-if="status == '3' || status == '5'">
+            <el-radio-group
+              v-model="child.isAccept"
+              @change="changeAccept(child, idx)"
+            >
               <el-radio :label="1">采纳</el-radio>
               <el-radio :label="0">不采纳</el-radio>
             </el-radio-group>
             <el-form
               :model="child"
-              v-if="child.isAccept == 0"
+              :ref="`form_${idx}`"
               :rules="rules"
               class="desc-form"
             >
               <el-form-item prop="desc" label=" " class="flex">
                 <el-input
                   v-model="child.desc"
-                  placeholder="请填写不采纳说明"
+                  :placeholder="
+                    child.isAccept == 1 ? '请填写采纳说明' : '请填写不采纳说明'
+                  "
                 ></el-input>
               </el-form-item>
             </el-form>
+          </div>
+          <!-- 正常显示采纳与否 -->
+          <div class="isAdopt-box" v-if="status == '4'">
+            <span v-if="child.isAccept == 1" class="accept">已采纳</span>
+            <span v-else class="no-accept">不采纳</span>
+            <div v-if="child.isAccept !== 1" class="desc">
+              【反馈】显示确认人在确认时输入的反馈内容
+            </div>
           </div>
         </div>
       </div>
@@ -78,6 +88,10 @@
 </template>
 <script>
 export default {
+  props: {
+    // 3 5显示复选框 4 显示已采纳 不采纳
+    status: { type: Number, default: 0 },
+  },
   data() {
     return {
       rules: {
@@ -101,7 +115,6 @@ export default {
               ],
               isSubstantive: false,
               isAccept: 0,
-  
             },
             {
               opinion:
@@ -113,13 +126,24 @@ export default {
                 "理财公司理财.png",
               ],
               isAccept: 1,
-              desc:'',
+              desc: "",
               isSubstantive: true,
             },
           ],
         },
       ],
     };
+  },
+  methods: {
+    changeAccept(child, idx) {
+      if (child.isAccept == 1) {
+        const form ='form_'+ idx
+        this.$refs[form].clearValidate(['desc']);
+      }
+    },
+    submit(){
+      console.log('vv')
+    },
   },
 };
 </script>
@@ -224,23 +248,23 @@ export default {
           }
           /deep/ .el-form {
             margin-top: 8px;
-            .el-form-item__label{
-                padding-right: 8px;
+            .el-form-item__label {
+              padding-right: 8px;
             }
-            .el-form-item__content{
-                flex: 1;
+            .el-form-item__content {
+              flex: 1;
             }
-            .el-form-item__error::before{
-                font-family: element-icons !important;
-                content:'\e7a3';
-                font-size: 20px;
-                margin-right: 8px;
+            .el-form-item__error::before {
+              font-family: element-icons !important;
+              content: "\e7a3";
+              font-size: 20px;
+              margin-right: 8px;
             }
-            .el-form-item__error{
-                display: flex;
-                align-items: center;
-                margin-top: 6px;
-                color: #EB5757;
+            .el-form-item__error {
+              display: flex;
+              align-items: center;
+              margin-top: 6px;
+              color: #eb5757;
             }
             .el-input {
               .el-input__inner {
@@ -248,15 +272,47 @@ export default {
               }
 
               border-radius: 4px;
-              background:  #fff;
+              background: #fff;
               box-shadow: 1px 1px 5px 0px rgba(45, 92, 246, 0.15);
             }
           }
+        }
+        .isAdopt-box {
+          span {
+            display: inline-block;
+            border-radius: 0px 6px 6px 6px;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 18px;
+            padding: 0px 6px;
+          }
+          .accept {
+            background: #74e4bd;
+          }
+          .no-accept {
+            background: #f98981;
+          }
+        }
+        .desc {
+          margin-top: 10px;
+          padding: 4px 8px;
+          border-radius: 4px;
+          background: #f7f8fa;
+          color: #86909c;
+          font-size: 12px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 20px;
+          box-shadow: 1px 1px 5px 0px rgba(45, 92, 246, 0.15);
         }
       }
     }
     .opinions-item:hover {
       background: #f0f6ff;
+      .opinion-text {
+        color: #2d5cf6;
+      }
     }
   }
 }

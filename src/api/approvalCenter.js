@@ -62,3 +62,10 @@ export function concernApplication(param) {
  }
 
 
+// 提单机构
+export function billOfLadingAgenciesList(){
+  return request({
+      url: '/cpr/censor/billOfLadingAgenciesList',
+      method: 'get',
+    })
+}

@@ -106,7 +106,7 @@
                 :value="item.value"
               ></el-option>
             </el-select>
-            <el-select
+            <!-- <el-select
               v-model="search.billOrganization"
               placeholder="提单机构"
               @change="searchList"
@@ -118,7 +118,17 @@
                 :label="item.label"
                 :value="item.value"
               ></el-option>
-            </el-select>
+            </el-select> -->
+            <el-cascader
+              :options="agenciesList"
+              placeholder="提单机构"
+              ref="agencies"
+              v-model="search.institutionalCode"
+              :show-all-levels="false"
+              @change="changeAgencies"
+              :props="{ checkStrictly: true, label: 'name', value: 'code' }"
+              clearable
+            ></el-cascader>
             <el-select
               v-model="search.updateTime2"
               placeholder="排序"
@@ -204,6 +214,7 @@ import {
   censorList,
   getApprovalType,
   getApprovalStage,
+  billOfLadingAgenciesList,
 } from "@/api/approvalCenter";
 export default {
   components: {
@@ -211,12 +222,13 @@ export default {
   },
   data() {
     return {
-      crtSign: "toModified",
+      crtSign: "toPending",
+      // 待审批：pendingApproval 已审批：approvedCount 关注：applyAll 待修改：toModified 全部任务（本分行）：allTasksThis 总行的任务个数：allTasksOffice 驳回单的个数：overrule
       dataStatistics: [
         {
           name: "待处理",
           count: 0,
-          value: "toModified",
+          value: "toPending",
         },
         {
           name: "已审批",
@@ -226,12 +238,12 @@ export default {
         {
           name: "我的关注",
           count: 0,
-          value: "overrule",
+          value: "applyAll",
         },
         {
           name: "全部任务",
-          count: 10,
-          value: "allTasksThis",
+          count: 0,
+          value: "allBranchCount",
         },
       ],
       search: {
@@ -246,7 +258,9 @@ export default {
         productLaunchDate: "",
         total: 0,
         loading: false,
+        institutionalCode: "",
       },
+      agenciesList: [],
       transactionTypes: [],
       approvalPhases: [],
       isUrgents: [
@@ -305,7 +319,9 @@ export default {
     });
     this.userStatus();
     this.getApprovalType();
+    this.billOfLadingAgenciesList();
     this.searchList();
+
   },
   watch: {},
 
@@ -313,6 +329,10 @@ export default {
     this.getDataStatistic();
   },
   methods: {
+    changeAgencies() {
+      this.$refs["agencies"].dropDownVisible = false;
+      this.searchList();
+    },
     userStatus() {
       getUserStatus()
         .then((res) => {
@@ -365,6 +385,7 @@ export default {
     changeStatis(item) {
       if (item.value == this.crtSign) return;
       this.crtSign = item.value;
+      this.searchList();
     },
     changeSort() {
       const lastKey =
@@ -395,17 +416,40 @@ export default {
     },
     resize() {
       let floor2 = document.querySelectorAll(".approval-center  .floor2")[0];
-      floor2.style.paddingRight = floor2.offsetWidth * (1 / 7) + 16 + "px";
+      floor2
+        ? (floor2.style.paddingRight = floor2.offsetWidth * (1 / 7) + 16 + "px")
+        : "";
     },
     searchList() {
       this.getList(1);
     },
+    billOfLadingAgenciesList() {
+      billOfLadingAgenciesList().then((res) => {
+        this.agenciesList = res.data.data;
+      });
+    },
     getList(pageNow) {
+      let headerFlag = null;
+      switch (this.crtSign) {
+        case "toPending":
+          headerFlag = '1';
+          break;
+        case "approvedCount":
+          headerFlag = '2';
+          break;
+        case "applyAll":
+          headerFlag = '4';
+          break;
+          case "allBranchCount":
+          headerFlag = '0';
+          break;
+          
+      }
       const param = {
         pageNow,
         pageSize: 10,
         ...this.search,
-        headerFlag: this.crtId,
+        headerFlag,
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间
@@ -425,7 +469,7 @@ export default {
         .then((res) => {
           const { data } = res.data;
           this.search.total = data.totalCount;
-          this.list = data.list
+          this.list = data.list;
           this.search.loading = false;
         })
         .catch((err) => {
@@ -449,6 +493,7 @@ export default {
         productLaunchDate: "",
         total: 0,
         loading: false,
+        institutionalCode: "",
       };
       this.approvalPhases = [];
       this.searchList();
@@ -481,7 +526,6 @@ export default {
     background: #fffce8;
     margin-bottom: 8px;
     cursor: default;
-    display: flex;
     align-items: center;
     i {
       margin-right: 8px;
@@ -655,13 +699,16 @@ export default {
         display: flex;
         justify-content: space-between;
 
-        .el-select {
+        .el-select,
+        .el-cascader {
           margin-right: 16px;
           flex: 1;
         }
-
-        .el-select:last-of-type {
+        .el-cascader {
           margin-right: 0;
+        }
+        .el-select:last-of-type {
+          margin-left: 16px;
         }
 
         /deep/ .el-select .el-input .el-icon-arrow-up::before {
@@ -729,9 +776,9 @@ export default {
           margin-right: 16px;
         }
 
-        .el-input:last-of-type {
-          margin-right: 0;
-        }
+        // .el-input:last-of-type {
+        //   margin-right: 0;
+        // }
 
         /deep/.el-date-editor {
           position: relative;

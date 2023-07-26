@@ -4,25 +4,47 @@
     <div class="header">
       <slot name="breadcrumb"> </slot>
       <div class="flex pointer">
-        <div class="back flex" @click="$router.go(-1)">
+        <div class="back flex" @click="goback">
           <i class="iconfont icon-fanhui1"></i>
           <i class="btn">返回</i>
         </div>
-        <div class="back flex">
-          <i class="iconfont icon-zhuanban1"></i>
-          <i class="btn">转办</i>
-        </div>
-        <div class="back flex">
+        <!-- 只有有修改权限的人能看到 -->
+        <div class="back flex white" v-if="status == 5">
           <i class="iconfont icon-xianxingtubiao"></i>
-          <i class="btn">修改申请单</i>
+          <i class="btn">去修改</i>
         </div>
-        <div class="back flex">
+        <div
+          class="back flex"
+          v-if="(status == 3 || status == 5) && $route.query.op == 'check'"
+        >
           <i class="iconfont icon-baocun"></i>
           <i class="btn">保存</i>
         </div>
-        <div class="back flex white">
+        <div
+          class="back flex white"
+          @click="submit"
+          v-if="(status == 3 || status == 5) && $route.query.op == 'check'"
+        >
           <i class="iconfont icon-tijiao"></i>
           <i class="btn">提交</i>
+        </div>
+        <div v-if="status == 2" class="flex">
+          <div class="back flex" @click="transferDialog = true">
+            <i class="iconfont icon-zhuanban1"></i>
+            <i class="btn">转办</i>
+          </div>
+          <div class="back flex">
+            <i class="iconfont icon-xianxingtubiao"></i>
+            <i class="btn">修改申请单</i>
+          </div>
+          <div class="back flex">
+            <i class="iconfont icon-baocun"></i>
+            <i class="btn">保存</i>
+          </div>
+          <div class="back flex white" @click="submit">
+            <i class="iconfont icon-tijiao"></i>
+            <i class="btn">提交</i>
+          </div>
         </div>
       </div>
     </div>
@@ -44,7 +66,7 @@
       </div>
       <div class="right">
         <!-- 消保审查/详情页/审批中预览 -->
-        <div v-if="status == 1">
+        <div v-if="status == 0">
           <nav class="nav active-nav">
             <span class="active-nav" style="text-align: left"
               >审批记录明细</span
@@ -55,10 +77,10 @@
         <div v-if="status == 2">
           <nav class="nav">
             <span
-              :class="crtComp == 'editorialOpinionCard' ? 'active-nav' : ''"
+              :class="crtComp == 'leaderEditOpinion' ? 'active-nav' : ''"
               @click="
                 () => {
-                  crtComp = 'editorialOpinionCard';
+                  crtComp = 'leaderEditOpinion';
                 }
               "
               >编辑意见</span
@@ -138,7 +160,29 @@
             >
           </nav>
         </div>
-        <component :is="crtComp" :status="status">
+        <div v-if="status == 5">
+          <nav class="nav">
+            <span
+              :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''"
+              @click="
+                () => {
+                  crtComp = 'approvedOpinionCard';
+                }
+              "
+              >审查意见书</span
+            >
+            <span
+              :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''"
+              @click="
+                () => {
+                  crtComp = 'approvalRecordCard';
+                }
+              "
+              >审批记录明细</span
+            >
+          </nav>
+        </div>
+        <component :is="crtComp" :status="status" ref="child">
           <template slot="head">
             <div class="approved-opinion-head">
               <h2>消保审查意见书</h2>
@@ -160,11 +204,52 @@
         </component>
       </div>
     </div>
+    <el-dialog
+      :visible.sync="transferDialog"
+      width="800px"
+      center
+      custom-class="transfer-dialog"
+    >
+      <span slot="title">请选择转办对象</span>
+
+      <div>
+        <el-input
+          v-model="staff.keyword"
+          placeholder="搜索人员，支持拼音、姓名"
+        >
+          <i slot="prefix" class="el-input__icon el-icon-search pointer"></i
+        ></el-input>
+        <el-radio-group v-model="staff.people" class="trs-scroll">
+          <el-radio
+            :label="item.code"
+            v-for="(item, index) in peoples"
+            :key="index"
+          >
+            <span class="avatar"
+              ><img src="@/assets/image/apply-center/avatar.png" alt=""
+            /></span>
+            {{ item.name }}</el-radio
+          >
+        </el-radio-group>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="transferDialog = false" type="text" class="cancel"
+          >取消</el-button
+        >
+        <el-button
+          type="text"
+          @click="transferDialog = false"
+          class="submit-btn"
+          >确定</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
 import orderBasicInfo from "@/components/card/order-basic-info.vue";
-import editorialOpinionCard from "@/components/card/editorial-opinion-card.vue";
+import leaderEditOpinion from "@/components/card/leader-edit-opinion.vue";
 import approvalRecordCard from "@/components/card/approval-record-card.vue";
 import approvedOpinionCard from "@/components/card/approved-opinion-card.vue";
 import uploadFileCard from "@/components/card/upload-file-card";
@@ -174,7 +259,7 @@ export default {
   components: {
     orderBasicInfo,
     approvalRecordCard,
-    editorialOpinionCard,
+    leaderEditOpinion,
     approvedOpinionCard,
     uploadFileCard,
   },
@@ -183,19 +268,97 @@ export default {
     return {
       status: 4,
       crtComp: "",
+      transferDialog: false,
+      staff: {
+        keyword: "",
+        people: "",
+      },
+
+      peoples: [
+        { name: "王明明", code: 1 },
+        { name: "王明明", code: 2 },
+        { name: "王明明", code: 3 },
+        { name: "王明明", code: 4 },
+        { name: "王明明", code: 5 },
+        { name: "王明明", code: 6 },
+        { name: "王明明", code: 7 },
+      ],
     };
   },
+  activated() {
+    this.judgeStatus();
+  },
   mounted() {
-    if (this.status == 1) {
-      this.crtComp = "approvalRecordCard";
-    } else if (this.status == 2) {
-      this.crtComp = "editorialOpinionCard";
-    } else if (this.status == 3) {
-      this.crtComp = "approvedOpinionCard";
-    }
-    else if (this.status == 4) {
-      this.crtComp = "approvedOpinionCard";
-    }
+    this.judgeStatus();
+  },
+  created() {},
+  methods: {
+    judgeStatus() {
+      // 一般进入详情页：展示返回按钮 及 审批记录详细
+      // 已经结束的工单 展示: 返回按钮、审批记录详细、审查意见书、最终上线材
+      // <!-- 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
+      let item = JSON.parse(window.localStorage.getItem("order-detail"));
+      // item.taskStatus = "2";
+      // 已经结束的工单
+      if (item.taskStatus == 0) {
+        this.status = 0;
+        this.crtComp = "approvedOpinionCard";
+      }
+      if (item.taskStatus == 4) {
+        this.status = 4;
+        this.crtComp = "approvedOpinionCard";
+      }
+      // 状态待修改  有实质性、已确认 返回按钮、去修改，审查意见书、审批记录详细；采纳实质意见的确认人、二次会签的指定人右上角会看到去修改按钮      有修改权限的人（全部采纳实质意见的确认人、二次会签指定的人）看到的页面，在右上角增加【去修改】按钮，点击【去修改】进入修改申请单页面；
+      if (item.taskStatus == 2) {
+        this.status = 5;
+        this.crtComp = "approvedOpinionCard";
+      }
+      // 从申请那里过来 == 点击了确认按钮
+      if (this.$route.query.op == "check") {
+        // 有实质性意见
+        if (item.hasOpinions == 1) {
+          this.status = 5;
+        } else {
+          //无实质性意见
+          this.status = 3;
+        }
+        this.crtComp = "approvedOpinionCard";
+      }
+      // 从申请那里过来 == 点击了确认按钮
+      if (this.$route.query.op == "approve") {
+        this.status = 2;
+        this.crtComp = "leaderEditOpinion";
+      }
+    },
+    goback() {
+      // 如果是从审批页进来；二次弹窗
+      // 申请页 正常返回
+      if (this.$route.query.pageFrom == "approval") {
+        this.$confirm("是否保存本审查项目的审查意见？", "", {
+          customClass: "confirmBox",
+          confirmButtonText: "保存",
+          cancelButtonText: "不保存",
+          type: "warning",
+        })
+          .then(() => {
+            this.$router.go(-1);
+          })
+          .catch(() => {
+            this.$router.go(-1);
+          });
+        // this.$router.go(-1);
+      } else {
+        this.$router.go(-1);
+      }
+    },
+    submit() {
+      if (this.crtComp == "approvedOpinionCard") {
+        this.$refs["child"].submit();
+      }
+      if (this.crtComp == "leaderEditOpinion") {
+        this.$refs["child"].opinionSubmit();
+      }
+    },
   },
 };
 </script>
@@ -340,6 +503,92 @@ export default {
       line-height: 22px;
       font-size: 14px;
       color: #306ef5;
+    }
+  }
+  /deep/ .transfer-dialog {
+    border-radius: 10px;
+    background: #fff;
+    padding: 40px 60px;
+    /* 阴影/大 */
+    box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.1);
+    .el-dialog__header {
+      padding: 0;
+      color: var(--gray-gray-9, #1d2128);
+      text-align: center;
+
+      /* 二级标题/加粗 */
+      font-family: Microsoft YaHei;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 24px; /* 150% */
+      .el-dialog__headerbtn {
+        right: 60px;
+        top: 40px;
+        font-size: 20px;
+        color: #505968;
+      }
+    }
+    .el-dialog__body {
+      margin: 16px 0;
+      padding: 0;
+      width: 100%;
+      padding: 16px;
+      border-radius: 4px;
+      border: 1px solid var(--gray-gray-4, #e5e6eb);
+      .el-input {
+        width: 100%;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        .el-input__inner {
+          border: 1px solid var(--gray-gray-4, #e5e6eb);
+          background: var(--gray-gray-1, #fff);
+        }
+      }
+      .el-radio-group {
+        display: flex;
+        flex-direction: column;
+        height: 284px;
+        overflow-y: auto;
+        .el-radio {
+          padding: 6px 12px;
+          margin-bottom: 4px;
+          font-weight: 400;
+          .avatar {
+            width: 32px;
+            height: 32px;
+            display: inline-block;
+            background: #e8faf7;
+            border-radius: 50%;
+            margin: 0 8px;
+            img {
+              width: 100%;
+              height: 100%;
+            }
+          }
+        }
+      }
+    }
+    .el-dialog__footer {
+      .el-button {
+        width: 140px;
+        padding: 6px 16px;
+        border-radius: 6px;
+        border: 1px solid #e5e6eb;
+        background: #fff;
+        color: #1d2128;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 24px;
+      }
+      .submit-btn {
+        border-radius: 6px;
+        background: #2d5cf6;
+        font-weight: 700;
+        font-size: 14px;
+        color: #fff;
+      }
     }
   }
 }

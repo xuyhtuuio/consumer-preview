@@ -573,12 +573,13 @@ export default {
     background: #fffce8;
     margin-bottom: 8px;
     cursor: default;
-    display: flex;
+
     align-items: center;
 
     i {
       margin-right: 8px;
       font-size: 16px;
+      line-height: 22px;
     }
   }
 

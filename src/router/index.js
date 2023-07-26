@@ -115,7 +115,7 @@ const router = new Router({
           path: "apply-list",
           name: "apply-list",
           component: () => import("@/views/applycenter/index"),
-          meta: { title: '申请中心',}
+          meta: { title: '申请中心', }
         },
         {
           path: "details",
