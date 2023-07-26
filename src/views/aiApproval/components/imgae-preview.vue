@@ -1,6 +1,6 @@
 <template>
   <div class="preview" ref="contentDom" v-loading="!loaded">
-    <img id="picture" :src="url" @load="handleImageLoaded" ref="imgDom"/>
+    <img id="picture" :src="url" @load="handleImageLoaded" ref="imgDom" />
     <div class="light" ref="light" v-if="lineWordItem?.word" :style="this.BoundingClientRect">
       <div class="light" id="imgLight" :style="this.highLightBoundingClientRect"></div>
     </div>
@@ -57,6 +57,9 @@ export default {
       target.style.top = "0px";
     }
   },
+  mounted() {
+    window.addEventListener('resize', this.handleImageLoaded)
+  },
   methods: {
     linePosition() {
       this.setBoundingClientRect(this.lineWordItem)
@@ -85,7 +88,7 @@ export default {
     // 图片加载完后,初始化
     handleImageLoaded() {
       this.params = JSON.parse(JSON.stringify(paramsInit)),
-      this.loaded = true;
+        this.loaded = true;
       this.naturalWidth = this.$refs.imgDom.naturalWidth;
       this.naturalHeight = this.$refs.imgDom.naturalHeight;
       this.scale = this.$refs.imgDom.clientWidth / this.$refs.imgDom.naturalWidth;
@@ -261,6 +264,9 @@ export default {
         }
       };
     }
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleImageLoaded)
   }
 }
 </script>

@@ -49,7 +49,6 @@ export default {
     this.check()
   },
   mounted() {
-    console.log(document.body.offsetWidth)
     if (document.body.offsetWidth <= 970) {
       this.$msgbox.alert("本设计器未适配中小屏幕，建议您在PC电脑端浏览器进行操作")
     }
@@ -76,14 +75,13 @@ export default {
       })
     },
     to(name) {
-      console.log(name, this.$route.name)
       if (name !== this.$route.name) {
         this.$router.push({ name });
         this.$emit('changeRoute', name)
       }
     },
     handleSelect(key, keyPath) {
-      console.log(key, keyPath);
+      // console.log(key, keyPath);
     },
     listener() {
       window.onunload = this.closeBefore()

@@ -200,7 +200,9 @@ export default {
         disabledDate: time => {
           // 既不能大于当前日期 也不能小于结束日期
           if (value) {
-            return  time.getTime() > new Date(value).getTime() || time.getTime()<new Date() - 8.64e7;
+            return (
+              time.getTime() > new Date(value).getTime() || time.getTime() < new Date() - 8.64e7
+            );
           }
           return time.getTime() < new Date() - 8.64e7;
           // - 8.64e7减去了当天，即可选择当天
@@ -237,7 +239,10 @@ export default {
       }
       if (!flag.length && typeof item.value !== 'number') {
         return item.warnInfo[0].message;
-      } else if ((item.props.numberOfWords && item.value, length > item.props.numberOfWords)) {
+      }
+      console.log(item);
+      if (item.props.numberOfWords && item.value.length > item.props.numberOfWords) {
+        item.isWarning = true;
         return item.warnInfo[1].message;
       } else {
         item.isWarning = false;
@@ -261,8 +266,12 @@ export default {
       return result;
     },
     judgeWarnSave() {
-      if (this.list[0].value.length === 0) {
-        this.$set(this.list[0], 'isWarning', true);
+      this.list.forEach(item => (item.isWarning = false));
+      if (
+        this.list[0].value.length === 0 ||
+        this.list[0].value.length > this.list[0].props.numberOfWords
+      ) {
+        this.list[0].isWarning = true;
         return false;
       } else {
         return true;

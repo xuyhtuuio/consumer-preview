@@ -11,13 +11,17 @@ import LeftMenu from './leftMenu'
 import UserManage from './userManage'
 import FlowManage from './flowManage'
 import FormManage from './formManage'
+import RolePermission from './rolePermission'
+import LabelManage from './labelManage.vue'
 export default {
   name: 'manage',
   components: {
     LeftMenu,
     UserManage,
     FlowManage,
-    FormManage
+    FormManage,
+    RolePermission,
+    LabelManage
   },
   data() {
     return {

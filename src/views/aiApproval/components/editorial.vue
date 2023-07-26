@@ -5,7 +5,7 @@
       <i v-show="showRecommend">|</i>
       <span :class="{ active: active === 2 }" @click="changeType(2)">编辑意见</span>
     </div>
-    <div class="results">
+    <div class="results" ref="results">
       <!-- 推荐意见 -->
       <template v-if="active === 1">
         <div class="recommend" v-for="(recommend, a) in recommends" :key="recommend.word" :word="recommend.word"
@@ -81,10 +81,17 @@
 
 <script>
 import addFileSource from '../dialogs/add-file-source'
+import {
+  RecommendedListLoadMore
+} from "@/api/aiApproval";
 export default {
   name: 'editorial',
   components: { addFileSource },
   props: {
+    formId: {
+      type: String,
+      default: ''
+    },
     approval: {
       type: Object,
       default: () => ({})
@@ -187,25 +194,32 @@ export default {
       this.$refs.addFileSource.init(item?.files || this.newFiles);
       this.editItem = item || {};
     },
-    changeSelect(a, i) {
+    changeSelect(a, i, isedit) {
       const id = this.recommends[a].list[i].id;
-      if (this.recommends[a].selected === id) {
+      if (this.recommends[a].selected === id && !isedit) {
         this.recommends[a].selected = null;
       } else {
         this.recommends[a].selected = id;
       }
     },
-    getMoreList(a) {
+    async getMoreList(a) {
       this.$set(this.recommends[a], 'hideMore', false);
       if (this.recommends[a].pageNow < this.recommends[a].totalPage) {
-        this.recommends[a].pageNow++;
-        this.recommends[a].list.push({
-          str: 4
-        }, {
-          str: 4
-        }, {
-          str: 4
+        const pageNow = this.recommends[a].pageNow + 1;
+        await RecommendedListLoadMore({
+          formId: this.formId,
+          keywordId: this.recommends[a].id,
+          pageNow,
         })
+          .then(res => {
+            const { data, status, message } = res.data;
+            if (status === 200) {
+              this.recommends[a].pageNow = pageNow;
+              this.recommends[a].list.push(...data.list)
+            } else {
+              this.$message.error({ offset: 40, title: "提醒", message });
+            }
+          });
       }
       this.$nextTick(() => {
         this.$emit('drawLine')
@@ -227,7 +241,7 @@ export default {
     hideEdit(a, i, update) {
       this.$set(this.recommends[a].list[i], 'showEdit', false);
       this.input && this.$set(this.recommends[a].list[i], 'str', this.input);
-      update && this.changeSelect(a, i)
+      update && this.changeSelect(a, i, true)
     },
     showEdit_collection(i) {
       this.$set(this.collection[i], 'showEdit', true);
@@ -495,10 +509,12 @@ export default {
   font-weight: 400;
   line-height: 28px;
   color: #86909C;
-  img{
+
+  img {
     margin-bottom: 32px;
   }
-  .underline{
+
+  .underline {
     color: #1D2128;
     text-decoration: underline;
   }

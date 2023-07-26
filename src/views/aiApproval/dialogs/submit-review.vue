@@ -9,7 +9,7 @@
                 </span>
                 <div>
                     <el-button @click="submitReviewDialog = false">取消</el-button>
-                    <el-button type="primary" @click="submitReviewDialog = false"> 提交</el-button>
+                    <el-button type="primary" @click="submit"> 提交</el-button>
                 </div>
             </div>
         </div>
@@ -61,13 +61,11 @@
                         </div>
                         <div class="submission-op">
                             <!-- <i>无实质意见</i> -->
-                            <span v-if="item.opinion" class="opinion has-opinion"
-                                @click="item.opinion = !item.opinion">
+                            <span v-if="item.opinion" class="opinion has-opinion" @click="item.opinion = !item.opinion">
                                 <i class="iconfont icon icon-guanzhu"></i>
                                 有实质意见
                             </span>
-                            <span v-if="!item.opinion" class="opinion no-opinion"
-                                @click="item.opinion = !item.opinion">
+                            <span v-if="!item.opinion" class="opinion no-opinion" @click="item.opinion = !item.opinion">
                                 <i class="iconfont icon icon-guanzhu2"></i>
                                 无实质意见
                             </span>
@@ -77,7 +75,7 @@
                                     v-if="index !== submission.length - 1 && mousePoint == index"
                                     @click='moveDown(index)'></i></span>
                             <span style="width:20px;">
-                                <i class="iconfont icon  icon-xianxingtubiao-1 del"  @click="del(item,index)"></i></span>
+                                <i class="iconfont icon  icon-xianxingtubiao-1 del" @click="del(item, index)"></i></span>
                         </div>
                     </div>
                 </div>
@@ -128,6 +126,7 @@ export default {
                 ],
             },
             submission: [],
+            increasedIds: {}, //须在最后提交时移除的
             mousePoint: -1,
             params: {
                 isPasses: '2',
@@ -139,12 +138,19 @@ export default {
         }
     },
     methods: {
+        // 提交结果
+        submit() {
+            // console.log(this.submission, this.increasedIds)
+            this.submission.forEach(comment => {
+                comment.id = this.increasedIds.strIds.includes(comment.id) ? null : comment.id;
+                comment.words = comment.words.filter(id => !this.increasedIds.words.includes(id))
+            })
+        },
         handleClose() {
             this.submitReviewDialog = false
         },
         mouseenter(item, index) {
             this.mousePoint = index
-
         },
         mouseleave() {
             this.mousePoint = -1
@@ -161,14 +167,14 @@ export default {
             this.$set(this.submission, index, copyNextValue)
             this.$set(this.submission, index + 1, copyCrtValue)
         },
-        del(item,index){
+        del(item, index) {
             this.$confirm('确定删除该条意见吗？', '', {
                 customClass: 'confirmBox',
                 confirmButtonText: '删除',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-              this.submission.splice(index,1)
+                this.submission.splice(index, 1)
             }).catch(() => {
                 this.$message({
                     type: 'info',
@@ -419,4 +425,5 @@ export default {
 
     }
 
-}</style>
+}
+</style>

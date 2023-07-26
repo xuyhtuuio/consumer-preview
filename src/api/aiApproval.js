@@ -15,9 +15,43 @@ export function getOCRAnalysisResults(param) {
     params: param
   })
 }
+// 获取ocr结果命中的关键词及推荐意见
 export function getOcrExamineShow(param) {
   return request({
     url: '/cpr/OcrExamine/getOcrExamineShow',
+    method: 'get',
+    params: param
+  })
+}
+// 保存ocr审批草稿
+export function approvalStorageDraft(param) {
+  return request({
+    url: '/cpr/OcrExamine/approvalStorageDraft',
+    method: 'post',
+    data: param
+  })
+}
+// 获取审批草稿
+export function getApprovalDraft(param) {
+  return request({
+    url: '/cpr/OcrExamine/getApprovalDraft',
+    method: 'get',
+    params: param
+  })
+}
+// 文件下载
+export function download(param) {
+  return request({
+    url: '/cpr/file/download',
+    method: 'post',
+    contentType : 'application/x-www-form-urlencoded;charset=utf-8',
+    data: param
+  })
+}
+// 推荐列表加载更多
+export function RecommendedListLoadMore(param) {
+  return request({
+    url: '/cpr/OcrExamine/RecommendedListLoadMore',
     method: 'get',
     params: param
   })

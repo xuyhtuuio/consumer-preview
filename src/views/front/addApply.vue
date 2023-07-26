@@ -84,8 +84,14 @@ export default {
     submit() {
       if (!this.$refs['basicInformationRef'].judgeWarn()) {
         return this.$nextTick(() => {
-          const offsetTop =
-            this.$refs['basicInformationRef'].$refs['refWarn'][0].$el.offsetParent.offsetTop;
+          console.log(this.$refs['basicInformationRef'].$refs['refWarn']);
+          const refs = this.$refs['basicInformationRef'].$refs['refWarn'];
+          let offsetTop = refs[0].$el.offsetParent.offsetTop;
+          refs.forEach(item => {
+            if (item.$el.offsetParent.offsetTop < offsetTop) {
+              offsetTop = item.$el.offsetParent.offsetTop;
+            }
+          });
           this.rollTo(offsetTop);
         });
       }

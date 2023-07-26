@@ -51,6 +51,12 @@ const router = new Router({
           meta: { title: '用户管理' }
         },
         {
+          path: "rolePermission",
+          name: "RolePermission",
+          component: () => import("@/views/admin/manage/rolePermission.vue"),
+          meta: { title: '角色/权限' }
+        },
+        {
           path: "flowManage",
           name: "FlowManage",
           component: () => import("@/views/admin/manage/flowManage.vue"),
@@ -61,6 +67,12 @@ const router = new Router({
           name: "FormManage",
           component: () => import("@/views/admin/manage/formManage.vue"),
           meta: { title: '表单管理' }
+        },
+        {
+          path: "labelManage",
+          name: "LabelManage",
+          component: () => import("@/views/admin/manage/labelManage.vue"),
+          meta: { title: '标签管理' }
         }
       ]
     },

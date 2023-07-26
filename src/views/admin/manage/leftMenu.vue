@@ -1,17 +1,37 @@
 <template>
   <el-menu router :default-active="$route.path">
-    <el-menu-item index="/admin/manage/userManage" :class="{'is-active': $route.name === 'UserManage'}" >用户管理</el-menu-item>
-    <el-menu-item index="/admin/manage/flowManage" :class="{'is-active': $route.name === 'FlowManage'}" >流程管理</el-menu-item>
-    <el-menu-item index="/admin/manage/formManage" :class="{'is-active': $route.name === 'FormManage'}" >表单管理</el-menu-item>
+    <el-menu-item
+      index="/admin/manage/userManage"
+      :class="{ 'is-active': $route.name === 'UserManage' }"
+      >用户管理</el-menu-item
+    >
+    <el-menu-item
+      index="/admin/manage/rolePermission"
+      :class="{ 'is-active': $route.name === 'RolePermission' }"
+      >角色/权限</el-menu-item
+    >
+    <el-menu-item
+      index="/admin/manage/FlowManage"
+      :class="{ 'is-active': $route.name === 'FlowManage' }"
+      >流程管理</el-menu-item
+    >
+    <el-menu-item
+      index="/admin/manage/formManage"
+      :class="{ 'is-active': $route.name === 'FormManage' }"
+      >表单管理</el-menu-item
+    >
+    <el-menu-item
+      index="/admin/manage/labelManage"
+      :class="{ 'is-active': $route.name === 'LabelManage' }"
+      >标签管理</el-menu-item
+    >
   </el-menu>
-
 </template>
 
 <script>
 export default {
   data() {
-    return {
-    };
+    return {};
   }
 };
 </script>
@@ -26,8 +46,8 @@ export default {
     text-align: center;
   }
   .el-menu-item.is-active {
-    color: #306EF5;
-    background: #DFE8FF;
+    color: #306ef5;
+    background: #dfe8ff;
     font-weight: 700;
     &::before {
       content: '|';
