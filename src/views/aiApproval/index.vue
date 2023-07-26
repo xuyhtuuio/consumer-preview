@@ -32,7 +32,7 @@
           v-if="['jpeg', 'jpg', 'png', 'pdf'].includes(approval?.fileName?.split('.')[1]) && showOcr" @showLine="showLine"
           :lineWordItem="lineWordItem">
         </orcTxt>
-        <editorial ref="editorial" :approval="approval" :files="files" @linePosition="linePosition"
+        <editorial ref="editorial" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
           :lineWordItem="lineWordItem" @upDateComments="upDateComments" @drawLine="drawLine"
           @changeEditorialType="changeEditorialType">
         </editorial>
@@ -113,7 +113,7 @@ export default {
         strIds: []
       },
       showOcr: true,
-      formId: 86,
+      formId: '82',
       inDraft: false, //判断当前单子是否有 已存的审批意见
       userId: 1,
       formCategoryId: 1
@@ -126,18 +126,18 @@ export default {
   methods: {
     // 获取工单基本信息
     init() {
-      getApplyForm({
-        formCategoryId: this.formCategoryId,
-        formId: this.formId,
-        userId: this.userId
-      }).then(res => {
-        const { data, status, message } = res.data;
-        if (status === 200) {
-          data
-        } else {
-          this.$message.error({ offset: 40, title: "提醒", message });
-        }
-      });
+      // getApplyForm({
+      //   formCategoryId: this.formCategoryId,
+      //   formId: this.formId,
+      //   userId: this.userId
+      // }).then(res => {
+      //   const { data, status, message } = res.data;
+      //   if (status === 200) {
+      //     data
+      //   } else {
+      //     this.$message.error({ offset: 40, title: "提醒", message });
+      //   }
+      // });
       // 先获取工单基本信息，，然后判断获取草稿或初始化  文件信息
       this.getFileList()
     },

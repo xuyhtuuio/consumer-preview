@@ -48,3 +48,11 @@ export function download(param) {
     data: param
   })
 }
+// 推荐列表加载更多
+export function RecommendedListLoadMore(param) {
+  return request({
+    url: '/cpr/OcrExamine/RecommendedListLoadMore',
+    method: 'get',
+    params: param
+  })
+}
