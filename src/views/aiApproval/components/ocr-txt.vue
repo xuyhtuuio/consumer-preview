@@ -1,7 +1,6 @@
 <template>
   <div class="ocr-txt">
     <div class="header">
-      {{ approval?.recommends?.length }}
       <span :class="{ active: activeWordType === 1 }" @click="changeWorkType(1)">禁用词</span>
       <span :class="{ active: activeWordType === 2 }" @click="changeWorkType(2)">敏感词</span>
       <el-input v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search" size="medium">
@@ -66,6 +65,7 @@ export default {
   },
   mounted() {
     document.addEventListener('click', this.hideAdd)
+    this.getInitContent(this.approval)
   },
   methods: {
     addWord() {
@@ -105,10 +105,10 @@ export default {
     // 标记命中关键词(敏感词,禁用词)
     getInitContent(approval) {
       const html = []
-      approval.ocr.forEach((ocr) => {
+      approval?.ocr?.forEach((ocr) => {
         const { text, location } = ocr;
         let newOcr = [text];
-        approval.recommends.forEach((recommend, i) => {
+        approval?.recommends?.forEach((recommend, i) => {
           const { word, wordType } = recommend
           if (newOcr.join().includes(word)) {
             const temp = [];

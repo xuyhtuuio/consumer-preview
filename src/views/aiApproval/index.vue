@@ -16,15 +16,20 @@
         <span class="content-title">
           <i class="iconfont icon-shenpiyemiantubiao"></i>审查项目名称显审查项目名称显示审查项目名称显示</span>
         <span class="content-btns">
-          <el-button>返回</el-button>
-          <el-button type="primary" @click="showSubmit">提交</el-button>
+          <el-button><i class="iconfont icon-fanhui1"></i>返回</el-button>
+          <el-button type="tuihui"><i class="iconfont icon-tuihui1"></i>退回/驳回</el-button>
+          <el-button><i class="iconfont icon-baocun"></i>保存</el-button>
+          <el-button type="primary" @click="changeOcrView"><i class="iconfont icon-ocr"></i>{{ showOcr ? '关闭' :
+            '打开' }}智能审批</el-button>
+          <!-- <el-button type="primary"><i class="iconfont icon-heduiyaodian"></i>要点核对</el-button> -->
+          <el-button type="primary" @click="showSubmit"><i class="iconfont icon-tijiao"></i>提交</el-button>
         </span>
       </div>
-      <div class="content-cont">
+      <div class="content-cont" v-loading="fileloading">
         <file-preview ref="filePreview" :files="files" :activeIndex="activeIndex" @changeFile="changeFile"
-          :lineWordItem="lineWordItem" @linePosition="linePosition"></file-preview>
+          :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"></file-preview>
         <orcTxt ref="ocrTxt" :approval="approval" @addWord="addWord"
-          v-show="['jpeg', 'jpg', 'png', 'pdf'].includes(approval?.fileName?.split('.')[1])" @showLine="showLine"
+          v-if="['jpeg', 'jpg', 'png', 'pdf'].includes(approval?.fileName?.split('.')[1]) && showOcr" @showLine="showLine"
           :lineWordItem="lineWordItem">
         </orcTxt>
         <editorial ref="editorial" :approval="approval" :files="files" @linePosition="linePosition"
@@ -43,7 +48,6 @@ import LeaderLine from '@/utils/leader-line';
 import filePreview from './components/file-preview'
 import orcTxt from './components/ocr-txt'
 import editorial from './components/editorial'
-import { files, pngOcr, recommends } from "./files";
 import addReview from './dialogs/add-review.vue'
 import submitReview from './dialogs/submit-review.vue'
 import applyForm from './sidebar/apply-form.vue'
@@ -51,6 +55,11 @@ import approvalRecordDetail from './sidebar/approval-record-detail'
 import similarCase from './sidebar/similar-case.vue'
 import approvedOpinion from './sidebar/approved-opinion'
 import aiKnowledgeBase from './sidebar/ai-knowledge-base'
+import {
+  getUploadedFilesList,
+  getOCRAnalysisResults,
+  getOcrExamineShow
+} from "@/api/aiApproval";
 
 export default {
   name: 'aiApproval',
@@ -58,6 +67,7 @@ export default {
   data() {
     return {
       loading: false,
+      fileloading: false,
       files: [], // 文件相关信息
       comments: [], // 编辑意见
       crtTools: '',//当前侧边工具栏激活项
@@ -97,20 +107,46 @@ export default {
         words: [],
         strIds: []
       },
+      showOcr: true,
+      formId: 82
     }
   },
   mounted() {
     this.loading = true;
-    setTimeout(() => {
-      this.files = files;
-      this.loading = false;
-      this.$nextTick(() => {
-        this.$refs.filePreview.init();
-        this.changeFile(0)
-      })
-    }, 1000);
+    this.init()
   },
   methods: {
+    init() {
+      getUploadedFilesList({ formId: this.formId })
+        .then((res) => {
+          const { data, status } = res.data;
+          if (status === 200) {
+            this.getFiles(data)
+            this.$nextTick(() => {
+              this.$refs.filePreview.init();
+              this.changeFile(0)
+            })
+          }
+        })
+        .catch(() => {
+          this.list = [];
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    getFiles(data, zipName) {
+      data.forEach(file => {
+        if (file.child) {
+          const suffer = file.fileName.split('.')[file.fileName.split('.').length - 1]
+          this.getFiles(file.child, suffer === 'zip' ? file.fileName : zipName);
+        } else {
+          file.id = file.key;
+          file.zip = zipName;
+          this.files.push(file)
+        }
+      })
+    },
     showSubmit() {
       this.$refs.submitReview.submitReviewDialog = true;
       this.getComments();
@@ -138,25 +174,64 @@ export default {
       this.$refs['addFileSource'].init()
     },
     // 切换审批文件
-    changeFile(i) {
+    async changeFile(i) {
       if (this.activeIndex === i) {
         return;
       }
+      this.fileloading = true;
+      this.showOcr = true;
       this.lineWordItem = {}
       this.lineRemove()
-      if (!this.files[i].ocr && !this.files[i].recommends) {
-        this.files[i].ocr = JSON.parse(JSON.stringify(pngOcr));
-        this.files[i].recommends = JSON.parse(JSON.stringify(recommends));
-      }
       if (this.files?.[this.activeIndex]?.ocr) {
         this.files[this.activeIndex] = {
           ...this.approval,
           recommends: this.$refs.editorial.recommends
         };
-        // this.getComments(this.files[this.activeIndex])
       }
       this.activeIndex = i;
-      this.approval = this.files[i];
+      // 更新对应文件的ocr和推荐意见
+      const temp = this.files[i];
+      const suffer = ['jpeg', 'jpg', 'png', 'pdf'].includes(temp?.fileName?.split('.')[1])
+      if (!temp.ocr && !temp.recommends && suffer) {
+        await getOCRAnalysisResults({
+          // fileId: 'cpr_1690254720157_Snipaste_test.png'
+          fileId: temp.id
+        })
+          .then((res) => {
+            const { data, status } = res.data;
+            if (status === 200) {
+              let ocr = [];
+              for (let key in data.results) {
+                ocr.push(...data.results[key])
+              }
+              temp.ocr = ocr;
+            }
+          })
+          .catch(() => {
+            temp.ocr = []
+          })
+        await getOcrExamineShow({
+          formId: this.formId,
+          // fileId: 'cpr_1690254720157_Snipaste_test.png',
+          fileId: temp.id
+        })
+          .then((res) => {
+            const { data, status } = res.data;
+            if (status === 200) {
+              temp.recommends = data.recommends
+            }
+          })
+          .catch(() => {
+            temp.recommends = []
+          })
+      }
+      this.approval = temp;
+      this.fileloading = false;
+    },
+    changeOcrView() {
+      this.lineRemove()
+      this.lineWordItem = {}
+      this.showOcr = !this.showOcr;
     },
     // 展示连线
     showLine(wordItem) {
@@ -173,7 +248,9 @@ export default {
     drawLine() {
       this.lineRemove();
       const start = document.querySelector('#' + this.lineWordItem.ocrWordId)
-      const ends = [...document.querySelectorAll(`[word="${this.lineWordItem.word}"] .list-item`), document.querySelector('#imgLight')]
+      const ends = [...document.querySelectorAll(`[word="${this.lineWordItem.word}"] .list-item`)]
+      const imgLight = document.querySelector('#imgLight');
+      imgLight && ends.push(imgLight)
       if (start) {
         ends.forEach((item, index) => {
           // 动画参数
@@ -283,13 +360,24 @@ export default {
             file?.comments && file?.comments.map((comment, i) => {
               if (item.str === comment.str) {
                 if (type === 'remove') {
-                  delete file.comments[i]
+                  file.comments.splice(i, 1)
                 } else if (type === 'editStr') {
                   file.comments[i] = newVal
                 }
               }
             });
-            file.comments = file?.comments?.filter(comment => comment?.str)
+          });
+          // 意见存在于文件其他的  comments里,不在filterFiles
+          this.files.forEach(file => {
+            file?.comments?.forEach((comment, i) => {
+              if (comment.str === item.str) {
+                if (type === 'remove') {
+                  file.comments.splice(i, 1)
+                } else if (type === 'editStr') {
+                  file.comments[i].str = newVal;
+                }
+              }
+            })
           })
           break;
         // 修改类型为修改关联文件: 查找 意见对应关联文件与 更新的关联文件的新增或移除的 文件id,进入文件修改 对应的selectd,  comment内的内容,可不用处理
@@ -313,10 +401,21 @@ export default {
                     ...item,
                     files: newVal
                   })
-                  delete removeFile.comments[i]
+                  removeFile.comments.splice(i, 1)
                 }
               });
             }
+            // 更新已存在的意见里的 ids
+            const existIds = item.files.filter(id => newVal.includes(id))
+            existIds.map(id => {
+              const addFile = this.files.filter(file => file.id === id)?.[0];
+              const matchComments = addFile?.comments?.filter(comment => comment.str === item.str);
+              if (matchComments) {
+                matchComments.forEach(comment => {
+                  comment.files = newVal
+                })
+              }
+            })
           })
           // 新增关联的文件
           const addIds = newVal.filter(id => !item.files.includes(id))
@@ -343,6 +442,7 @@ export default {
     },
     // 新增的关键词和新增的话术
     addRecommend(recommend, wordId, strId) {
+      debugger
       this.increasedIds.words.push(wordId)
       this.increasedIds.strIds.push(strId)
       this.approval.recommends.push(recommend);
@@ -439,6 +539,22 @@ export default {
 .content-btns {
   margin-left: 20px;
   white-space: pre;
+
+  .iconfont {
+    font-size: 20px;
+    margin-right: 4px;
+  }
+
+  /deep/ .el-button {
+    >span {
+      display: flex;
+    }
+  }
+
+  .el-button--tuihui {
+    background: #ffffff;
+    color: #EB5757;
+  }
 }
 
 .content-cont {
@@ -452,7 +568,6 @@ export default {
     border-radius: 10px;
     box-shadow: 0px 0px 10px 0px #4343430D;
     width: 380px;
-    flex: 1;
 
     &:first-child {
       overflow: hidden;
@@ -475,8 +590,7 @@ export default {
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.15);
   left: 64px !important;
 }
-</style>
-<style lang="less">
+
 svg.leader-line {
   z-index: 2;
 }

@@ -46,7 +46,7 @@ export default {
             this.addReviewDialog = false;
         },
         addRecommend() {
-            const newId = Date.parse(new Date());
+            const newId = Date.parse(new Date()).toString();
             this.$emit('addRecommend', {
                 word: this.params.keywords,
                 wordType: this.params.type,

@@ -1,5 +1,5 @@
 <template>
-  <div class="review-material" ref="globalRef" v-if="list.length">
+  <div class="review-material" ref="globalRef" >
     <g-table-card :title="title">
       <template v-slot:cardInfo>
         <div class="cardInfo">

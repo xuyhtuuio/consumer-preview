@@ -1,7 +1,8 @@
 <template>
   <div class="preview" ref="contentDom" v-loading="!loaded">
-    <img id="picture" src="../img.png" @load="handleImageLoaded" ref="imgDom" />
-    <div class="light" id="imgLight" ref="light" v-if="lineWordItem?.word" :style="this.BoundingClientRect">
+    <img id="picture" :src="url" @load="handleImageLoaded" ref="imgDom"/>
+    <div class="light" ref="light" v-if="lineWordItem?.word" :style="this.BoundingClientRect">
+      <div class="light" id="imgLight" :style="this.highLightBoundingClientRect"></div>
     </div>
   </div>
 </template>
@@ -26,24 +27,34 @@ export default {
       type: Object,
       default: () => ({})
     },
+    url: {
+      type: String,
+      default: ''
+    }
   },
   data() {
     return {
       loaded: false,
-      params: JSON.parse(JSON.stringify(paramsInit)),
+      params: {},
       naturalHeight: 0,
       naturalWidth: 0,
       scale: 1,
-      BoundingClientRect: {}
+      BoundingClientRect: {},
+      highLightBoundingClientRect: {}
     }
   },
-  mounted() { },
   watch: {
     lineWordItem: {
       handler(val) {
         this.setBoundingClientRect(val)
       },
       // deep: true
+    },
+    url() {
+      this.loaded = false;
+      const target = this.$refs.imgDom
+      target.style.left = "0px";
+      target.style.top = "0px";
     }
   },
   methods: {
@@ -56,33 +67,36 @@ export default {
     // 获取局部高亮样式(当前缩放时定位不准)
     setBoundingClientRect(val) {
       if (val?.word) {
-        // const positionZoom = this.params.zoomVal - this.$refs.imgDom.clientWidth / this.$refs.imgDom.naturalWidth
         this.BoundingClientRect = {
+          width: this.$refs.imgDom.clientWidth + 'px',
+          height: this.$refs.imgDom.clientHeight + 'px',
+          left: parseInt(this.params.left, 10) + 'px',
+          top: parseInt(this.params.top, 10) + 'px',
+          transform: `scale(${this.params.zoomVal})`
+        }
+        this.highLightBoundingClientRect = {
           width: val?.location.w * this.scale + 'px',
           height: val?.location.h * this.scale + 'px',
-          left: (val?.location.x * this.scale * this.params.zoomVal + parseInt(this.params.left, 10)) + 'px',
-          top: (val?.location.y * this.scale * this.params.zoomVal  + parseInt(this.params.top, 10)) + 'px',
-          // left: parseInt(this.params.left, 10) * positionZoom + 'px',
-          // top: parseInt(this.params.top, 10) * positionZoom + 'px',
-          transform: `scale(${this.params.zoomVal})`
+          left: val?.location.x * this.scale + 'px',
+          top: val?.location.y * this.scale + 'px',
         }
       }
     },
     // 图片加载完后,初始化
     handleImageLoaded() {
-      setTimeout(() => {
-        this.loaded = true;
-        this.naturalWidth = this.$refs.imgDom.naturalWidth;
-        this.naturalHeight = this.$refs.imgDom.naturalHeight;
-        this.scale = this.$refs.imgDom.clientWidth / this.$refs.imgDom.naturalWidth;
-        this.getMaxPosition()
-        this.initCenter()
-        // 绑定缩放事件
-        const content = this.$refs.contentDom
-        content.addEventListener('wheel', this.handleWheel)
-        // 绑定拖拽
-        this.startDrag()
-      }, 1000);
+      this.params = JSON.parse(JSON.stringify(paramsInit)),
+      this.loaded = true;
+      this.naturalWidth = this.$refs.imgDom.naturalWidth;
+      this.naturalHeight = this.$refs.imgDom.naturalHeight;
+      this.scale = this.$refs.imgDom.clientWidth / this.$refs.imgDom.naturalWidth;
+      this.getMaxPosition()
+      this.initCenter()
+      // 绑定缩放事件
+      const content = this.$refs.contentDom
+      content.removeEventListener('wheel', this.handleWheel)
+      content.addEventListener('wheel', this.handleWheel)
+      // 绑定拖拽
+      this.startDrag()
     },
     // 计算出允许拖拽的最大偏移量
     getMaxPosition() {
