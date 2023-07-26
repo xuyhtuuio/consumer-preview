@@ -5,7 +5,7 @@
         <span class="header-count">共 {{ activeIndex + 1 }}/<label style="font-size: 12px;">{{ files.length }}</label>
         </span>
         <span class="header-btns">
-          <i class="iconfont">&#xe62e;</i>
+          <i class="iconfont" @click="saveFile">&#xe62e;</i>
           <i class="iconfont" @click="fullScreen">&#xe62f;</i>
         </span>
       </p>
@@ -54,6 +54,9 @@ import Swiper from 'swiper'
 import imgaePreview from './imgae-preview'
 import fileType from './file-type'
 import filePreview from '@/components/filePreview'
+import {
+  download
+} from "@/api/aiApproval";
 export default {
   components: { imgaePreview, fileType, filePreview },
   name: 'file-preview',
@@ -97,6 +100,21 @@ export default {
   },
   mounted() { },
   methods: {
+    saveFile() {
+      download({ key: this.approval.id })
+        .then((res) => {
+          const { data, status } = res.data;
+          if (status === 200) {
+            window.open(data)
+          }
+        })
+        .catch(() => {
+          this.list = [];
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
     // 初始化
     init() {
       this.swiper = new Swiper('.swiper-container', {

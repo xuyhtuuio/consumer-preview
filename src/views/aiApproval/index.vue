@@ -18,7 +18,7 @@
         <span class="content-btns">
           <el-button><i class="iconfont icon-fanhui1"></i>返回</el-button>
           <el-button type="tuihui"><i class="iconfont icon-tuihui1"></i>退回/驳回</el-button>
-          <el-button><i class="iconfont icon-baocun"></i>保存</el-button>
+          <el-button @click="save"><i class="iconfont icon-baocun"></i>保存</el-button>
           <el-button type="primary" @click="changeOcrView"><i class="iconfont icon-ocr"></i>{{ showOcr ? '关闭' :
             '打开' }}智能审批</el-button>
           <!-- <el-button type="primary"><i class="iconfont icon-heduiyaodian"></i>要点核对</el-button> -->
@@ -58,8 +58,13 @@ import aiKnowledgeBase from './sidebar/ai-knowledge-base'
 import {
   getUploadedFilesList,
   getOCRAnalysisResults,
-  getOcrExamineShow
+  getOcrExamineShow,
+  approvalStorageDraft,
+  getApprovalDraft
 } from "@/api/aiApproval";
+import {
+  getApplyForm
+} from "@/api/front";
 
 export default {
   name: 'aiApproval',
@@ -108,7 +113,10 @@ export default {
         strIds: []
       },
       showOcr: true,
-      formId: 82
+      formId: 86,
+      inDraft: false, //判断当前单子是否有 已存的审批意见
+      userId: 1,
+      formCategoryId: 1
     }
   },
   mounted() {
@@ -116,24 +124,53 @@ export default {
     this.init()
   },
   methods: {
+    // 获取工单基本信息
     init() {
-      getUploadedFilesList({ formId: this.formId })
-        .then((res) => {
-          const { data, status } = res.data;
-          if (status === 200) {
-            this.getFiles(data)
-            this.$nextTick(() => {
-              this.$refs.filePreview.init();
+      getApplyForm({
+        formCategoryId: this.formCategoryId,
+        formId: this.formId,
+        userId: this.userId
+      }).then(res => {
+        const { data, status, message } = res.data;
+        if (status === 200) {
+          data
+        } else {
+          this.$message.error({ offset: 40, title: "提醒", message });
+        }
+      });
+      // 先获取工单基本信息，，然后判断获取草稿或初始化  文件信息
+      this.getFileList()
+    },
+    async getFileList() {
+      this.list = [];
+      if (this.inDraft) {
+        await getApprovalDraft({ formId: this.formId })
+          .then((res) => {
+            const { data, status, message } = res.data;
+            if (status === 200) {
+              this.files = data.files;
+              this.increasedIds = data.increasedIds;
               this.changeFile(0)
-            })
-          }
-        })
-        .catch(() => {
-          this.list = [];
-        })
-        .finally(() => {
-          this.loading = false;
-        });
+            } else {
+              this.$message.error({ offset: 40, title: "提醒", message });
+            }
+          })
+      } else {
+        await getUploadedFilesList({ formId: this.formId })
+          .then((res) => {
+            const { data, status, message } = res.data;
+            if (status === 200) {
+              this.getFiles(data)
+              this.$nextTick(() => {
+                this.$refs.filePreview.init();
+                this.changeFile(0)
+              })
+            } else {
+              this.$message.error({ offset: 40, title: "提醒", message });
+            }
+          })
+      }
+      this.loading = false;
     },
     getFiles(data, zipName) {
       data.forEach(file => {
@@ -150,12 +187,18 @@ export default {
     showSubmit() {
       this.$refs.submitReview.submitReviewDialog = true;
       this.getComments();
+      this.$refs.submitReview.increasedIds = this.increasedIds;
       this.$refs.submitReview.submission = JSON.parse(JSON.stringify(
         this.comments.map(comment => {
           comment.opinion = false
           return comment;
         })
       ))
+      console.log({
+        files: this.files,
+        increasedIds: this.increasedIds,
+        comments: this.comments
+      })
     },
     // 添加关键词
     addWord(word) {
@@ -180,7 +223,6 @@ export default {
       }
       this.fileloading = true;
       this.showOcr = true;
-      this.lineWordItem = {}
       this.lineRemove()
       if (this.files?.[this.activeIndex]?.ocr) {
         this.files[this.activeIndex] = {
@@ -193,26 +235,9 @@ export default {
       const temp = this.files[i];
       const suffer = ['jpeg', 'jpg', 'png', 'pdf'].includes(temp?.fileName?.split('.')[1])
       if (!temp.ocr && !temp.recommends && suffer) {
-        await getOCRAnalysisResults({
-          // fileId: 'cpr_1690254720157_Snipaste_test.png'
-          fileId: temp.id
-        })
-          .then((res) => {
-            const { data, status } = res.data;
-            if (status === 200) {
-              let ocr = [];
-              for (let key in data.results) {
-                ocr.push(...data.results[key])
-              }
-              temp.ocr = ocr;
-            }
-          })
-          .catch(() => {
-            temp.ocr = []
-          })
+        await this.getOcr(temp)
         await getOcrExamineShow({
           formId: this.formId,
-          // fileId: 'cpr_1690254720157_Snipaste_test.png',
           fileId: temp.id
         })
           .then((res) => {
@@ -228,16 +253,33 @@ export default {
       this.approval = temp;
       this.fileloading = false;
     },
+    getOcr(temp) {
+      getOCRAnalysisResults({
+        fileId: temp.id
+      })
+        .then((res) => {
+          const { data, status } = res.data;
+          if (status === 200) {
+            let ocr = [];
+            for (let key in data.results) {
+              ocr.push(...data.results[key])
+            }
+            temp.ocr = ocr;
+          }
+        })
+        .catch(() => {
+          temp.ocr = []
+        })
+    },
     changeOcrView() {
       this.lineRemove()
-      this.lineWordItem = {}
       this.showOcr = !this.showOcr;
     },
     // 展示连线
     showLine(wordItem) {
-      if (wordItem.ocrWordId === this.lineWordItem.ocrWordId) {
-        this.lineRemove();
-        this.lineWordItem = {}
+      const onlyHide = wordItem.ocrWordId === this.lineWordItem.ocrWordId;
+      this.lineRemove();
+      if (onlyHide) {
         return;
       }
       this.lineWordItem = wordItem;
@@ -246,7 +288,6 @@ export default {
       })
     },
     drawLine() {
-      this.lineRemove();
       const start = document.querySelector('#' + this.lineWordItem.ocrWordId)
       const ends = [...document.querySelectorAll(`[word="${this.lineWordItem.word}"] .list-item`)]
       const imgLight = document.querySelector('#imgLight');
@@ -284,6 +325,7 @@ export default {
       (this.word_lines || []).forEach((item) => {
         item.remove();
       });
+      this.lineWordItem = {}
       this.word_lines = [];
     },
     // 切换意见编辑
@@ -302,7 +344,7 @@ export default {
         // 存在推荐意见
         file?.recommends?.map(recommend => {
           // 存在选择意见
-          if (recommend.selected !== null) {
+          if (recommend.selected) {
             const selected = recommend.list.filter(a => a.id === recommend.selected);
             arr.push({
               id: selected?.[0].id,
@@ -330,7 +372,7 @@ export default {
         }
       })
       this.comments = setArr;
-      console.log('comments', this.comments)
+      // console.log('comments', this.comments)
     },
     // 编辑意见后,同步更新  文件的推荐意见状态
     upDateComments(type, item, newVal) {
@@ -438,17 +480,42 @@ export default {
         default:
           break;
       }
-      console.log('files', this.files)
+      // console.log('files', this.files)
     },
     // 新增的关键词和新增的话术
     addRecommend(recommend, wordId, strId) {
-      debugger
       this.increasedIds.words.push(wordId)
       this.increasedIds.strIds.push(strId)
-      this.approval.recommends.push(recommend);
+      this.approval.recommends.unshift(recommend);
       this.$refs.ocrTxt.getInitContent(this.approval)
       this.$refs.editorial.init(this.approval)
-    }
+      this.$nextTick(() => {
+        this.$refs.editorial.$refs.results.scrollTop = 0;
+      })
+    },
+    // 保存当前审批结果
+    save() {
+      this.getComments()
+      approvalStorageDraft({
+        formId: this.formId,
+        ocrExamineShowDto: {
+          files: this.files,
+          increasedIds: this.increasedIds,
+          comments: {}
+        }
+      })
+        .then((res) => {
+          const { data, status, message } = res.data;
+          if (status === 200) {
+            // 返回审批列表
+            this.$router.push({
+              name: 'approvalcenter'
+            })
+          } else {
+            this.$message.error({ offset: 40, title: "提醒", message });
+          }
+        })
+    },
   },
   beforeDestroy() {
     this.lineRemove()
