@@ -7,7 +7,7 @@
       </div>
       <el-button type="primary" @click="addFlow">新增</el-button>
     </div>
-    <!-- <TrsTable theme="TRS-table-gray" :data="data" :colConfig="colConfig">
+    <TrsTable theme="TRS-table-gray" :data="data" :colConfig="colConfig">
       <template #status="scope">
         <TrsTag v-if="scope.row.status==='1'" :tag="tagItem" />
         <TrsTag v-else :tag="tagItem1" />
@@ -22,7 +22,7 @@
     </TrsTable>
     <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
       v-if="page.total">
-    </TrsPagination> -->
+    </TrsPagination>
   </div>
 </template>
 <script>
