@@ -51,6 +51,12 @@ const router = new Router({
           meta: { title: '用户管理' }
         },
         {
+          path: "rolePermission",
+          name: "RolePermission",
+          component: () => import("@/views/admin/manage/rolePermission.vue"),
+          meta: { title: '角色/权限' }
+        },
+        {
           path: "flowManage",
           name: "FlowManage",
           component: () => import("@/views/admin/manage/flowManage.vue"),
