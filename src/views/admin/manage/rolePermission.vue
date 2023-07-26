@@ -87,7 +87,7 @@
       </template>
       <div class="dialog-item">
         <i class="el-alert__icon el-icon-warning icon"></i>
-        <div class="info">停用该用户将不能登录，确定停用吗？</div>
+        <div class="info">停用与此角色相关的用户权限将受到影响，确定停用吗？</div>
       </div>
       <div slot="footer" class="dialog-footer">
         <g-button @click="limitVisible = false">取 消</g-button>

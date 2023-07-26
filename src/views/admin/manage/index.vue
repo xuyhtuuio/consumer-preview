@@ -12,6 +12,7 @@ import UserManage from './userManage'
 import FlowManage from './flowManage'
 import FormManage from './formManage'
 import RolePermission from './rolePermission'
+import LabelManage from './labelManage.vue'
 export default {
   name: 'manage',
   components: {
@@ -19,7 +20,8 @@ export default {
     UserManage,
     FlowManage,
     FormManage,
-    RolePermission
+    RolePermission,
+    LabelManage
   },
   data() {
     return {

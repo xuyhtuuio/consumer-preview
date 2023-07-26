@@ -67,6 +67,12 @@ const router = new Router({
           name: "FormManage",
           component: () => import("@/views/admin/manage/formManage.vue"),
           meta: { title: '表单管理' }
+        },
+        {
+          path: "labelManage",
+          name: "LabelManage",
+          component: () => import("@/views/admin/manage/labelManage.vue"),
+          meta: { title: '标签管理' }
         }
       ]
     },
