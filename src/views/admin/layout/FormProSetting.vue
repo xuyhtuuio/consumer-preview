@@ -12,7 +12,7 @@
                    v-model="setup.undo"></el-switch>
         <div class="sign-tip">该节点第一个审批人未提交审批结果前，申请人可以撤销申请（配置前已发起的申请不生效）</div>
         <span style="display: inline-block;font-size:14px;margin: 24px 10px 0 0;">指定节点 </span>
-        <el-select v-model="setup.nodeId" @visible-change="visibleChange" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
+        <el-select v-model="setup.target" @visible-change="visibleChange" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
           <el-option v-for="(op, index) in nodes" :key="index" :label="op.name" :value="op.id"></el-option>
         </el-select>
       </el-form-item>

@@ -7,7 +7,7 @@
       <el-button @click="validate">校验流程</el-button>
     </div> -->
     <div class="design" :style="'transform: scale('+ scale / 100 +');'">
-      <process-tree ref="process-tree" @selectedNode="nodeSelected"/>
+      <process-tree v-bind="$attrs" ref="process-tree" @selectedNode="nodeSelected"/>
     </div>
     <el-drawer :title="selectedNode.name" :visible.sync="showConfig"
                :size="selectedNode.type === 'CONDITION' ? '600px':'550px'"
