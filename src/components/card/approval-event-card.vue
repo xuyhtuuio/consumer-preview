@@ -3,41 +3,24 @@
     <div class="event-info">
       <div class="event-name-status">
         <!-- 加急 -->
-        <svg
-          class="icon urgent-icon"
-          aria-hidden="true"
-          v-if="item.urgent == 1"
-        >
+        <svg class="icon urgent-icon" aria-hidden="true" v-if="item.urgent == 1">
           <use xlink:href="#icon-shenpiyemiantubiao"></use>
         </svg>
-        <svg
-          class="icon urgent-icon"
-          aria-hidden="true"
-          v-if="item.dismissalMark == 1"
-        >
+        <svg class="icon urgent-icon" aria-hidden="true" v-if="item.dismissalMark == 1">
           <use xlink:href="#icon-tongyongtubiao2"></use>
         </svg>
         <span class="event-name" @click="toDetail(item)">{{ item.name }}</span>
         <span class="event-status">
           <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
 
-          <i v-if="item.taskStatus === '1'" class="tag in-approval"
-            >审批中>{{ item.approvalStage }}</i
-          >
-          <i v-if="item.taskStatus === '2'" class="tag in-modify"
-            >待修改>{{ item.approvalStage }}</i
-          >
-          <i v-if="item.taskStatus === '3'" class="tag check"
-            >待确认>{{ item.approvalStage }}</i
-          >
+          <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中>{{ item.approvalStage }}</i>
+          <i v-if="item.taskStatus === '2'" class="tag in-modify">待修改>{{ item.approvalStage }}</i>
+          <i v-if="item.taskStatus === '3'" class="tag check">待确认>{{ item.approvalStage }}</i>
           <i v-if="item.taskStatus === '4'" class="end">
             <i class="tag end-sign"> 已结束 </i>
           </i>
           <!-- 有无意见 -->
-          <i
-            v-if="item.taskStatus === '3' || item.taskStatus === '4'"
-            class="flex"
-          >
+          <i v-if="item.taskStatus === '3' || item.taskStatus === '4'" class="flex">
             <i class="tag has-opinion" v-if="item.hasOpinions == 1">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-guanzhu2"></use>
@@ -68,23 +51,20 @@
         <span class="sDate date">上线时间：{{ item.launchDate || "--" }}</span>
 
         <!-- <span class="handler date">当前处理人：王明明</span> -->
-        <el-popover
-          placement="bottom"
-          trigger="hover"
-          popper-class="popper-persons"
-        >
-          <div>{{ item.dep }} | {{ item.dep }}</div>
-          <span slot="reference" class="handler date"
-            >发起人：{{ item.currentAssignee }}</span
-          >
+        <el-popover placement="bottom" trigger="hover" popper-class="popper-persons">
+          <div>
+            {{ item.currentAssignee && item.currentAssignee[0].Institution }}
+          </div>
+          <span slot="reference" class="handler date">发起人：{{
+            item.currentAssignee && item.currentAssignee[0].name
+          }}</span>
         </el-popover>
         <span class="handler">
           <i class="iconfont icon-dept"></i>
-          {{ item.dep }}</span
-        >
+          {{ item.dep }}</span>
       </div>
     </div>
-    <!-- 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
+    <!-- 任务状态（0:草稿 1：审查中 2：待修改 3：待确认 4：已完成 -->
 
     <div class="right-operation">
       <!-- 待审核状态显示审查 -->
@@ -103,26 +83,19 @@
       </span>
 
       <!-- 待确认状态的工单 需要该审批人确认的工单-->
-      <span class="attention check icon-op" v-if="item.taskStatus == 3">
+      <span class="attention check icon-op" v-if="item.taskStatus == 3" @click="check(item)">
         <span class="iconfont icon icon-tubiao urgent-icon"></span>
-        确认</span
-      >
+        确认</span>
       <!-- 关注 -->
-      <span
-        class="attention no-attention icon-op"
-        v-if="item.concernId == 0"
-        @click="concern(item)"
-      >
+      <span class="attention no-attention icon-op" v-if="item.concernId == 0" @click="concern(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-tubiao-1"></use>
         </svg>
-        关注</span
-      >
+        关注</span>
       <span class="attention has-attention icon-op" v-else>
         <svg class="icon urgent-icon" aria-hidden="true">
-          <use xlink:href="#icon-guanzhu-1"></use></svg
-        >已关注</span
-      >
+          <use xlink:href="#icon-guanzhu-1"></use>
+        </svg>已关注</span>
     </div>
   </div>
 </template>
@@ -133,7 +106,7 @@ export default {
   props: {
     item: {
       type: Object,
-      default: () => {},
+      default: () => { },
     },
   },
   data() {
@@ -143,26 +116,35 @@ export default {
   },
   methods: {
     toApproval(item) {
-      window.localStorage.setItem("order-detail", JSON.stringify(item));
+      window.sessionStorage.setItem("order-detail", JSON.stringify({
+        item: item,
+        pageFrom: "approve",
+        op: "approve",
+      }));
       this.$router.push({
-        name: "approval-details",
-        query: {
-          search: encodeURI({
-            item: item,
-            pageFrom: "approve",
-            op: "approve",
-          }),
-        },
+        name: "approval-details"
       });
     },
     toDetail(item) {
-      window.localStorage.setItem("order-detail", JSON.stringify(item));
+      window.sessionStorage.setItem("order-detail", JSON.stringify({
+        item,
+        pageFrom: "approve",
+      }));
       this.$router.push({
         name: "details",
-        query: {
-          item,
-          pageFrom: "approve",
-        },
+      });
+    },
+    check(item) {
+      window.sessionStorage.setItem(
+        "order-detail",
+        JSON.stringify({
+          item: item,
+          pageFrom: "apply",
+          op: "check",
+        })
+      );
+      this.$router.push({
+        name: "approval-details",
       });
     },
     concern(item) {
@@ -261,9 +243,9 @@ export default {
         color: #fff;
         border-radius: 0px 6px 6px 6px;
         background: linear-gradient(90deg, #e85167 0%, #ff8193 100%);
-        i{
-          font-size: 16px;
 
+        i {
+          font-size: 16px;
         }
       }
 
@@ -271,9 +253,9 @@ export default {
         border-radius: 0px 6px 6px 6px;
         color: #fff;
         background: linear-gradient(90deg, #7b61ff 0%, #61a0ff 100%);
-        i{
-          font-size: 16px;
 
+        i {
+          font-size: 16px;
         }
       }
 
@@ -290,8 +272,8 @@ export default {
       .adoption {
         border-radius: 8px;
         border: 1px solid #f2f3f5;
-        background: #E7F0FF;
-        color: #2D5CF6;
+        background: #e7f0ff;
+        color: #2d5cf6;
       }
 
       .check {
@@ -388,9 +370,11 @@ export default {
 
       /* 157.143% */
     }
+
     .check {
       border-radius: 4px;
       color: #14c9c9;
+
       .icon {
         font-size: 20px;
       }
@@ -401,10 +385,12 @@ export default {
       background: #e7f0ff;
       padding: 4px 8px 4px 4px;
     }
+
     .check:hover {
       border-radius: 2px;
       background: #e6fffb;
     }
+
     .no-attention {
       color: #2d5cf6;
     }

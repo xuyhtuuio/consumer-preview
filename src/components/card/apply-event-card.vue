@@ -3,18 +3,10 @@
     <div class="event-info">
       <div class="event-name-status">
         <!-- 加急 -->
-        <svg
-          class="icon urgent-icon"
-          aria-hidden="true"
-          v-if="item.urgent == 1"
-        >
+        <svg class="icon urgent-icon" aria-hidden="true" v-if="item.urgent == 1">
           <use xlink:href="#icon-shenpiyemiantubiao"></use>
         </svg>
-        <svg
-          class="icon urgent-icon"
-          aria-hidden="true"
-          v-if="item.dismissalMark == 1"
-        >
+        <svg class="icon urgent-icon" aria-hidden="true" v-if="item.dismissalMark == 1">
           <use xlink:href="#icon-tongyongtubiao2"></use>
         </svg>
         <span class="event-name" @click="toDetail(item)">{{
@@ -23,24 +15,14 @@
         <!-- 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
         <span class="event-status">
           <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
-
-          <i v-if="item.taskStatus === '1'" class="tag in-approval"
-            >审批中>{{ item.approvalStage }}</i
-          >
-          <i v-if="item.taskStatus === '2'" class="tag in-modify"
-            >待修改>{{ item.approvalStage }}</i
-          >
-          <i v-if="item.taskStatus === '3'" class="tag check"
-            >待确认>{{ item.approvalStage }}</i
-          >
+          <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中>{{ item.approvalStage }}</i>
+          <i v-if="item.taskStatus === '2'" class="tag in-modify">待修改>{{ item.approvalStage }}</i>
+          <i v-if="item.taskStatus === '3'" class="tag check">待确认>{{ item.approvalStage }}</i>
           <i v-if="item.taskStatus === '4'" class="end">
             <i class="tag end-sign"> 已结束 </i>
           </i>
           <!-- 有无意见 -->
-          <i
-            v-if="item.taskStatus === '3' || item.taskStatus === '4'"
-            class="flex"
-          >
+          <i v-if="item.taskStatus === '3' || item.taskStatus === '4'" class="flex">
             <i class="tag has-opinion" v-if="item.hasOpinions == 1">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-guanzhu2"></use>
@@ -69,36 +51,23 @@
         <span class="sDate date">发起时间：{{ item.create_time || "--" }}</span>
         <span class="sDate date">更新时间：{{ item.update_time || "--" }}</span>
         <span class="sDate date">上线时间：{{ item.launchDate || "--" }}</span>
-        <el-popover
-          placement="bottom"
-          trigger="click"
-          popper-class="popper-persons"
-          v-if="item.currentAssignee && item.currentAssignee.length"
-        >
+        <el-popover placement="bottom" trigger="click" popper-class="popper-persons"
+          v-if="item.currentAssignee && item.currentAssignee.length">
           <div style="max-height: 270x; overflow-y: auto">
-            <div
-              v-for="(child, index) in item.currentAssignee"
-              :key="index"
-              class="person-item"
-            >
-              <span
-                >{{ child.name }}/{{ child.WorkId }}/{{ child.Institution }}/{{
-                  child.Dep
-                }}</span
-              >
+            <div v-for="(child, index) in item.currentAssignee" :key="index" class="person-item">
+              <span>{{ child.name }}/{{ child.WorkId }}/{{ child.Institution }}/{{
+                child.Dep
+              }}</span>
               <span class="reminder" @click="reminderItem(child)">{{
                 child.hasReminder ? "已催单" : "催一下"
               }}</span>
             </div>
           </div>
-          <span slot="reference" class="handler"
-            >当前处理人：{{
-              (item.currentAssignee && item.currentAssignee[0].name) || "--"
-            }}
-            <i v-if="item.currentAssignee && item.currentAssignee.length > 1"
-              >+{{ item.currentAssignee && item.currentAssignee.length - 1 }}</i
-            ></span
-          >
+          <span slot="reference" class="handler">当前处理人：{{
+            (item.currentAssignee && item.currentAssignee[0].name) || "--"
+          }}
+            <i v-if="item.currentAssignee && item.currentAssignee.length > 1">+{{ item.currentAssignee &&
+              item.currentAssignee.length - 1 }}</i></span>
         </el-popover>
         <span class="handler" v-else>当前处理人：--</span>
       </div>
@@ -119,11 +88,7 @@
           撤销
         </span>
         <span class="attention icon-op" @click="showReminderDialog(item)">
-          <svg
-            class="icon urgent-icon"
-            aria-hidden="true"
-            @click="urgentOrder(item)"
-          >
+          <svg class="icon urgent-icon" aria-hidden="true" @click="urgentOrder(item)">
             <use xlink:href="#icon-guanzhu1"></use>
           </svg>
           催单
@@ -149,53 +114,36 @@
       <div class="flex" v-if="item.taskStatus == 0">
         <span class="modify icon-op">
           <svg class="icon urgent-icon" aria-hidden="true">
-            <use xlink:href="#icon-xianxingtubiao"></use></svg
-          >修改
+            <use xlink:href="#icon-xianxingtubiao"></use>
+          </svg>修改
         </span>
         <span class="del icon-op" @click="del(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
-            <use xlink:href="#icon-xianxingtubiao-1"></use></svg
-          >删除
+            <use xlink:href="#icon-xianxingtubiao-1"></use>
+          </svg>删除
         </span>
       </div>
       <!--  是否显示关注：草稿；文件解析失败；不显示-->
       <div v-if="item.taskStatus != 0">
-        <span
-          class="attention no-attention icon-op"
-          v-if="item.concernId == 0"
-          @click="concern(item)"
-        >
+        <span class="attention no-attention icon-op" v-if="item.concernId == 0" @click="concern(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-tubiao-1"></use>
           </svg>
-          关注</span
-        >
-        <span
-          class="attention has-attention icon-op"
-          v-else
-          @click="concern(item)"
-        >
+          关注</span>
+        <span class="attention has-attention icon-op" v-else @click="concern(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
-            <use xlink:href="#icon-guanzhu-1"></use></svg
-          >已关注</span
-        >
+            <use xlink:href="#icon-guanzhu-1"></use>
+          </svg>已关注</span>
       </div>
     </div>
     <!-- 审批浮窗 -->
-    <el-dialog
-      :visible.sync="reminderDialog"
-      align="center"
-      custom-class="reminderDialog"
-      :before-close="closeReminder"
-    >
+    <el-dialog :visible.sync="reminderDialog" align="center" custom-class="reminderDialog" :before-close="closeReminder">
       <p slot="title">请选择催单对象</p>
       <div>
         <div v-for="(child, index) in persons" :key="index" class="person-item">
-          <span
-            >{{ child.name }}/{{ child.WorkId }}/{{ child.Institution }}/{{
-              child.Dep
-            }}</span
-          >
+          <span>{{ child.name }}/{{ child.WorkId }}/{{ child.Institution }}/{{
+            child.Dep
+          }}</span>
           <span class="reminder" @click="reminderItem(child)">{{
             child.hasReminder ? "已催单" : "催一下"
           }}</span>
@@ -211,7 +159,7 @@ export default {
   props: {
     item: {
       type: Object,
-      default: () => {},
+      default: () => { },
     },
   },
   data() {
@@ -223,24 +171,28 @@ export default {
   },
   methods: {
     toDetail(item) {
-      window.localStorage.setItem("order-detail", JSON.stringify(item));
-      this.$router.push({
-        name: "details",
-        query: {
+      window.sessionStorage.setItem(
+        "order-detail",
+        JSON.stringify({
           item,
           pageFrom: "apply",
-        },
+        })
+      );
+      this.$router.push({
+        path: "details",
       });
     },
     check(item) {
-      window.localStorage.setItem("order-detail", JSON.stringify(item));
-      this.$router.push({
-        name: "details",
-        query: {
+      window.sessionStorage.setItem(
+        "order-detail",
+        JSON.stringify({
           item: item,
           pageFrom: "apply",
           op: "check",
-        },
+        })
+      );
+      this.$router.push({
+        name: "details",
       });
     },
     showReminderDialog(item) {

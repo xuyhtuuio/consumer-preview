@@ -15,7 +15,8 @@
         </div>
         <div
           class="back flex"
-          v-if="(status == 3 || status == 5) && $route.query.op == 'check'"
+          @click="keep"
+          v-if="(status == 3 || status == 5) && info.op == 'check'"
         >
           <i class="iconfont icon-baocun"></i>
           <i class="btn">保存</i>
@@ -23,7 +24,7 @@
         <div
           class="back flex white"
           @click="submit"
-          v-if="(status == 3 || status == 5) && $route.query.op == 'check'"
+          v-if="(status == 3 || status == 5) && info.op == 'check'"
         >
           <i class="iconfont icon-tijiao"></i>
           <i class="btn">提交</i>
@@ -297,8 +298,9 @@ export default {
       // 一般进入详情页：展示返回按钮 及 审批记录详细
       // 已经结束的工单 展示: 返回按钮、审批记录详细、审查意见书、最终上线材
       // <!-- 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
-      let item = JSON.parse(window.localStorage.getItem("order-detail"));
-      // item.taskStatus = "2";
+      let { item }= JSON.parse(window.sessionStorage.getItem("order-detail"));
+      const info = JSON.parse(window.sessionStorage.getItem("order-detail"));
+      // item.taskStatus = 4;
       // 已经结束的工单
       if (item.taskStatus == 0) {
         this.status = 0;
@@ -314,7 +316,7 @@ export default {
         this.crtComp = "approvedOpinionCard";
       }
       // 从申请那里过来 == 点击了确认按钮
-      if (this.$route.query.op == "check") {
+      if (info.op == "check") {
         // 有实质性意见
         if (item.hasOpinions == 1) {
           this.status = 5;
@@ -325,15 +327,20 @@ export default {
         this.crtComp = "approvedOpinionCard";
       }
       // 从申请那里过来 == 点击了确认按钮
-      if (this.$route.query.op == "approve") {
+      if (info.op == "approve") {
         this.status = 2;
         this.crtComp = "leaderEditOpinion";
+      }
+    },
+    keep(){
+      if(this.crtComp == 'approvedOpinionCard'){
+        this.$refs["child"].keep();
       }
     },
     goback() {
       // 如果是从审批页进来；二次弹窗
       // 申请页 正常返回
-      if (this.$route.query.pageFrom == "approval") {
+      if (info.pageFrom == "approval") {
         this.$confirm("是否保存本审查项目的审查意见？", "", {
           customClass: "confirmBox",
           confirmButtonText: "保存",

@@ -51,20 +51,23 @@
           <div class="accept-box" v-if="status == '3' || status == '5'">
             <el-radio-group
               v-model="child.isAccept"
-              @change="changeAccept(child, idx)"
+              @change="changeAccept(child, index, idx)"
             >
               <el-radio :label="1">采纳</el-radio>
               <el-radio :label="0">不采纳</el-radio>
             </el-radio-group>
             <el-form
               :model="child"
-              :ref="`form_${idx}`"
-              :rules="rules"
+              :ref="`form_${index}_${idx}`"
+              :class="`form_${index}_${idx}`"
+              :rules="child.isAccept == 0 ? rules : {}"
               class="desc-form"
             >
               <el-form-item prop="desc" label=" " class="flex">
                 <el-input
                   v-model="child.desc"
+                  class="input-desc"
+                  :ref="`input_${index}_${idx}`"
                   :placeholder="
                     child.isAccept == 1 ? '请填写采纳说明' : '请填写不采纳说明'
                   "
@@ -95,7 +98,13 @@ export default {
   data() {
     return {
       rules: {
-        desc: [{ required: true, message: "请填写说明", trigger: ["blur"] }],
+        desc: [
+          {
+            required: true,
+            message: "请填写说明",
+            trigger: ["blur", "change"],
+          },
+        ],
       },
       opinions: [
         {
@@ -115,6 +124,41 @@ export default {
               ],
               isSubstantive: false,
               isAccept: 0,
+              desc: "",
+            },
+            {
+              opinion:
+                "1.活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权",
+              relevantfile: [
+                "理财公司理财.png",
+                "理财公司理财.png",
+                "理财公司理财.png",
+                "理财公司理财.png",
+              ],
+              isAccept: 1,
+              desc: "",
+              isSubstantive: true,
+            },
+          ],
+        },
+        {
+          stuff: "谭新宇",
+          post: "产品研发与推广岗",
+          total: 2,
+          time: "2023-07-14",
+          substantiveopinion: [
+            {
+              opinion:
+                "1.活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权",
+              relevantfile: [
+                "理财公司理财.png",
+                "理财公司理财.png",
+                "理财公司理财.png",
+                "理财公司理财.png",
+              ],
+              isSubstantive: false,
+              isAccept: 0,
+              desc: "",
             },
             {
               opinion:
@@ -135,14 +179,32 @@ export default {
     };
   },
   methods: {
-    changeAccept(child, idx) {
+    changeAccept(child, index, idx) {
       if (child.isAccept == 1) {
-        const form ='form_'+ idx
-        this.$refs[form].clearValidate(['desc']);
+        const form = `form_${index}_${idx}`;
+        this.$nextTick(() => {
+          this.$refs[form][0].clearValidate();
+        });
       }
     },
-    submit(){
-      console.log('vv')
+    keep() {
+      const inputArr = [];
+      for (let i = 0; i < this.opinions.length; i++) {
+        for (let j = 0; j < this.opinions[i].substantiveopinion.length; j++) {
+          const form = `form_${i}_${j}`;
+          this.$refs[form][0].validate((valid) => {
+            if (valid) {
+            } else {
+              const ref = `input_${i}_${j}`;
+              inputArr.push(ref);
+            }
+          });
+        }
+      }
+      this.$refs[inputArr[0]][0].focus();
+    },
+    submit() {
+      console.log("vv");
     },
   },
 };
