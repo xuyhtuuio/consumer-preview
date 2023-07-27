@@ -39,7 +39,7 @@
       </div>
     </div>
     <add-review ref="addReview" @addRecommend="addRecommend"></add-review>
-    <submit-review ref="submitReview"></submit-review>
+    <submit-review ref="submitReview" :formId="formId"></submit-review>
   </div>
 </template>
 

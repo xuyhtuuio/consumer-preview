@@ -14,7 +14,7 @@
             </div>
         </div>
         <div>
-            <el-form :model="params" ref="paramsForm" label-width="86px" label-position="left" :rules="rules">
+            <el-form v-if="false" :model="params" ref="paramsForm" label-width="86px" label-position="left" :rules="rules">
                 <el-form-item label="请选择">
                     <el-radio-group v-model="params.isPasses">
                         <el-radio :label="item.id" v-for="item in passlist" :key="item.id">
@@ -91,7 +91,16 @@
     </el-dialog>
 </template>
 <script>
+import {
+    ocrApprovalSubmission
+} from "@/api/aiApproval";
 export default {
+    props: {
+        formId: {
+            type: String,
+            default: ''
+        },
+    },
     data() {
         return {
             showClose: false,
@@ -99,7 +108,6 @@ export default {
             passlist: [
                 { name: '通过', id: '1' },
                 { name: '不通过', id: '2' },
-
             ],
             productEssentialList: [
                 { label: '产品基本信息：起购金额、起购时间、销售渠道、年化利率(含历史)、起息方式、投资方式(存款)', value: 1 },
@@ -144,6 +152,17 @@ export default {
             this.submission.forEach(comment => {
                 comment.id = this.increasedIds.strIds.includes(comment.id) ? null : comment.id;
                 comment.words = comment.words.filter(id => !this.increasedIds.words.includes(id))
+            })
+            ocrApprovalSubmission({
+                editedCommentsDtoList: this.submission,
+                formId: this.formId
+            }).then((res) => {
+                const { status, message } = res.data;
+                if (status === 200) {
+                    this.$message.success({ offset: 40, message });
+                } else {
+                    this.$message.error({ offset: 40, message });
+                }
             })
         },
         handleClose() {
