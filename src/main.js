@@ -12,6 +12,7 @@ import Ellipsis from '@/components/common/Ellipsis'
 import WDialog from '@/components/common/WDialog'
 import $GLOBAL from '@/utils/const';
 import http from '@/api/request.js'; /* eslint-disable */
+import bus from '@/utils/bus';
 
 import 'trs-web-components/lib/common.less';
 import 'trs-web-components/lib/element.less';
@@ -30,6 +31,7 @@ Vue.component('Empty',Empty)
 Vue.use(Ellipsis);
 Vue.use(WDialog);
 Vue.use(onceClick);
+Vue.use(bus);
 Vue.prototype.$GLOBAL = $GLOBAL; // 全局常量
 Vue.prototype.$http = http; // 请求库
 

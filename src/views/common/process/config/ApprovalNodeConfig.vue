@@ -40,7 +40,7 @@
         </div>
         <div v-else-if="nodeProps.assignedType === 'SELECT_NODE'">
           选择节点
-          <el-select v-model="nodeProps.nodeId" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
+          <el-select v-model="nodeProps.target" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
             <el-option v-for="(op, index) in nodes" :key="index" :label="op.name" :value="op.id"></el-option>
           </el-select>
           <p style="color:#86909C;font-size: 12px;line-height:24px;">可以选择前序节点名称，如名称重复建议先修改节点名称<br/>如果是多人，最后一个提交审批的人</p>
@@ -135,9 +135,9 @@
       <el-divider>高级设置</el-divider>
       <el-form-item label="目标页面配置" prop="target" v-if="nodeProps.assignedType === 'DEPT_USER_ROLE'">
         <el-radio-group class="radio-group" v-model="nodeProps.target">
-          <el-radio label="PASS">领导审批</el-radio>
-          <el-radio label="REFUSE">消保审批</el-radio>
-          <el-radio label="NOTIFY">确认意见</el-radio>
+          <el-radio label="LEADER">领导审批</el-radio>
+          <el-radio label="XIAOBAO">消保审批</el-radio>
+          <el-radio label="CONFIRM">确认意见</el-radio>
         </el-radio-group>
       </el-form-item>
       <div class="zhuanban" v-if="!['SELECT_NODE'].includes(nodeProps.assignedType)">
@@ -229,7 +229,7 @@ export default {
       showOrgSelect: false,
       showOrgSelect1: false,
       // select: [],
-      select1: [],
+      // select1: [],
       approvalTypes: [
         // {name: '指定人员', type: 'ASSIGN_USER'},
         {name: '上一审批人选择', type: 'SELF_SELECT'},
@@ -258,6 +258,14 @@ export default {
     select: {
       get() {
         return this.config.assignedUser || []
+      },
+      set() {
+
+      }
+    },
+    select1: {
+      get() {
+        return this.config.zhuanbanUser || []
       },
       set() {
 
@@ -344,6 +352,7 @@ export default {
           ...this.tagConfig
         }))
       }
+      this.$store.state.selectedNode.props.zhuanbanUser = this.select1
     },
     removeOrgItem(index) {
       this.select.splice(index, 1)

@@ -1,16 +1,23 @@
 <template>
   <div class="base-setup">
-    <el-form ref="baseSetting" :model="setup" label-position="top" label-width="80px">
-      <el-form-item>
+    <el-form ref="baseSetting" :model="setup" :rules="rules" label-position="top" :hide-required-aterisk="false" label-width="80px">
+      <el-form-item prop="formName">
         <template slot="label">
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#icon-form-name"></use>
           </svg>
           流程名称<span style="color: red">*</span>
         </template>
-        <el-input v-model="setup.formName" placeholder="请输入流程名称" class="is-dark input" size="medium"></el-input>
+        <el-input v-model.trim="setup.formName" placeholder="请输入流程名称" class="is-dark input" size="medium"></el-input>
+        <template slot="error">
+          <span class="custom-error">
+            <i class="iconfont icon-a-tubiao1"></i>
+            <span class="error1" v-if="!setup.formName">请输入流程名称</span>
+            <span class="error1" v-else>长度在 2 到 10 个字符</span>
+          </span>
+        </template>
       </el-form-item>
-      <el-form-item class="group">
+      <el-form-item class="group" prop="formId">
         <template slot="label">
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#icon-form-desc"></use>
@@ -21,8 +28,14 @@
           <el-option v-for="(op, index) in fromGroup" :key="index"
                      :label="op.name" :value="op.id"></el-option>
         </el-select>
+        <template slot="error">
+          <span class="custom-error">
+            <i class="iconfont icon-a-tubiao1"></i>
+            <span class="error1">请选择关联表单</span>
+          </span>
+        </template>
       </el-form-item>
-      <el-form-item>
+      <el-form-item prop="remark">
         <template slot="label">
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#icon-form-desc"></use>
@@ -56,6 +69,15 @@ export default {
         name: '表单2',
         id: 'form-2222'
       }],
+      rules: {
+        formName: [
+          { required: true, message: '请输入流程名称', trigger: 'blur' },
+          { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
+        ],
+        formId: [
+          { type: 'array', required: true, message: '请选择关联表单', trigger: 'change' }
+        ],
+      }
     }
   },
   computed: {
@@ -131,38 +153,34 @@ export default {
   margin-top: 10px;
   padding: 15px 20px;
 
-  i:first-child {
-    position: relative;
-    cursor: pointer;
-    font-size: xx-large;
-    color: #ffffff;
-    border-radius: 10px;
-    padding: 10px;
-  }
-
-  .change-icon {
-    margin-left: 20px;
-
-    span {
-      font-size: small;
-      color: #7a7a7a;
-      margin-right: 15px;
-    }
-
-    i {
-      cursor: pointer;
-      color: #7a7a7a;
-      font-size: x-large;
-    }
-  }
-
   /deep/ .el-form-item__label {
     padding: 0;
     font-weight: normal;
   }
 
   /deep/ .el-form-item {
-    margin-bottom: 5px;
+    margin-bottom: 15px;
+    .custom-error {
+      position: absolute;
+      bottom: -28px;
+      i {
+        font-size: 18px;
+      }
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      color: #F56C6C;
+      .right-icon {
+        height: 20px;
+      }
+      .error1 {
+        // position: relative;
+        // bottom: 2px;
+      }
+    }
+  }
+  /deep/ .el-form-item.is-required:not(.is-no-asterisk)>.el-form-item__label:before {
+    content: '';
   }
 }
 

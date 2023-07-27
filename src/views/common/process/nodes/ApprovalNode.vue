@@ -59,7 +59,7 @@ export default {
     config: {
       handler() {
         if (this.config.name === '二次会签') {
-          this.content = this.nodes.find(n => (n.id === this.config.props.nodeId))?.name
+          this.content = this.nodes.find(n => (n.id === this.config.props.target))?.name
         }
       },
       immediate: true,
@@ -78,7 +78,7 @@ export default {
     },
     // 上一个审批人选中
     validate_SELF_SELECT(err){
-      if (this.config.name === '二次会签' && this.config.props.nodeId) {
+      if (this.config.name === '二次会签' && this.config.props.target) {
         return true;
       }
       if(this.config.name !== '二次会签' && this.config.props.assignedUser.length > 0){
@@ -94,7 +94,7 @@ export default {
       this.validate_SELF_SELECT(err)
     },
     validate_SELECT_NODE(err) {
-      if(this.config.props.nodeId){
+      if(this.config.props.target){
         return true;
       }else {
         this.errorInfo = '请指定节点审批人'

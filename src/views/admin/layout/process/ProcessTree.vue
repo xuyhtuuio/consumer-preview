@@ -27,6 +27,11 @@ export default {
     Delay,
     Empty
   },
+  props: {
+    from: {
+      type: String
+    }
+  },
   data() {
     return {
       valid: true
@@ -41,8 +46,8 @@ export default {
     }
   },
   render(h, ctx) {
-    console.log("渲染流程树")
     this.nodeMap.clear()
+    console.log("渲染流程树", this.dom)
     let processTrees = this.getDomTree(h, this.dom)
     //插入末端节点
     processTrees.push(h('div', {style:{'text-align': 'center'}}, [
@@ -72,12 +77,18 @@ export default {
           index++;
           return h('div', {'class':{'branch-node-item': true}}, childDoms);
         })
+        let events = {
+          click: () => this.addBranchNode(node)
+        }
+        if (this.from === 'flowManage') {
+          events = {}
+        }
         //插入添加分支/条件的按钮
         branchItems.unshift(h('div',{'class':{'add-branch-btn': true}}, [
           h('el-button', {
            'class':{'add-branch-btn-el': true},
             props: {size: 'small', round: true},
-            on:{click: () => this.addBranchNode(node)},
+            on: events,
             domProps: {innerHTML: `添加${this.isConditionNode(node)?'条件':'分支'}`},
           }, [])
         ]));
@@ -98,19 +109,23 @@ export default {
     //解码渲染的时候插入dom到同级
     decodeAppendDom(h, node, dom, props = {}){
       props.config = node
+      let events = {
+        insertNode: type => this.insertNode(type, node),
+        delNode: () => this.delNode(node),
+        selected: () => this.selectNode(node),
+        copy:() => this.copyBranch(node),
+        leftMove: () => this.branchMove(node, -1),
+        rightMove: () => this.branchMove(node, 1)
+      }
+      if (this.from === 'flowManage') {
+        events = {}
+      }
       dom.unshift(h(node.type.toLowerCase(), {
         props: props,
         ref: node.id,
         key: node.id,
         //定义事件，插入节点，删除节点，选中节点，复制/移动
-        on:{
-          insertNode: type => this.insertNode(type, node),
-          delNode: () => this.delNode(node),
-          selected: () => this.selectNode(node),
-          copy:() => this.copyBranch(node),
-          leftMove: () => this.branchMove(node, -1),
-          rightMove: () => this.branchMove(node, 1)
-        }
+        on: events
       }, []))
     },
     //id映射到map，用来向上遍历

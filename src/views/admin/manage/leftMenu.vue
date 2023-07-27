@@ -11,7 +11,7 @@
       >角色/权限</el-menu-item
     >
     <el-menu-item
-      index="/admin/manage/FlowManage"
+      index="/admin/manage/flowManage"
       :class="{ 'is-active': $route.name === 'FlowManage' }"
       >流程管理</el-menu-item
     >

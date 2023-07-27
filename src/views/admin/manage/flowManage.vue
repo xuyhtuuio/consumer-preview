@@ -23,13 +23,21 @@
     <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
       v-if="page.total">
     </TrsPagination>
+    <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow.formName + '-预览'">
+      <process-design from="flowManage" ref="processDesign" />
+    </w-dialog>
   </div>
 </template>
 <script>
+import ProcessDesign from '@/views/admin/layout/ProcessDesign'
 export default {
   name: 'flowManage',
+  components: {
+    ProcessDesign
+  },
   data() {
     return {
+      flowVisible: false,
       tagItem: {
         label: '已发布',
         background: '#f0fffc',
@@ -109,6 +117,7 @@ export default {
           }
         },
       ],
+      currentRow: {}
     }
   },
   methods: {
@@ -120,7 +129,16 @@ export default {
     handleCurrentChange() {
 
     },
-    previewFlow() {},
+    previewFlow(row) {
+      this.currentRow = row
+      this.$store.state.design = {
+        ...this.$store.state.tempDesign
+      }
+      this.$nextTick(() => {
+        this.flowVisible = true
+      })
+      console.log(this.$store.state.design.process)
+    },
     editFlow() {},
     publishFlow() {
       this.$message.success("审批流程已发布成功！")
