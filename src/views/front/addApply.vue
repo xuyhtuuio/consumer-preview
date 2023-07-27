@@ -16,7 +16,7 @@
         />
         <review-material class="cnt-item" ref="reviewMaterialRef" :list="reviewMaterials" />
       </div>
-      <div class="footer">
+      <div class="footer" v-if="!isLoading">
         <g-button class="btn">流程总览</g-button>
         <g-button class="btn" @click.native="save">保存草稿</g-button>
         <g-button class="btn" type="primary" @click.native="submit">提交</g-button>
@@ -44,10 +44,9 @@ export default {
     ReviewMaterial
   },
   data: () => ({
-    userId: 1,
     title: '审查类型',
     cardInfo: '提醒：产品类内容审查，需于在产品上线/宣传前14天进行提交。',
-    isLoading: false,
+    isLoading: true,
     reviewList: [],
     promotionChannels: [],
     basicInformation: [],
@@ -60,7 +59,7 @@ export default {
 
   methods: {
     initialData() {
-      getFormCategoryArray({ userId: this.userId }).then(res => {
+      getFormCategoryArray().then(res => {
         this.isLoading = true;
         this.reviewList = res.data.data[0];
       });
@@ -69,7 +68,6 @@ export default {
     handleReviewClick(id) {
       getApplyForm({
         formCategoryId: id,
-        userId: this.userId
       }).then(res => {
         const { basicInformation, promotionChannels, keyPointsForVerification, reviewMaterials } =
           res.data.data;
@@ -115,7 +113,6 @@ export default {
         entryName: this.basicInformation[0].value,
         form_managementId: 1,
         uptime: '',
-        userId: this.userId
       };
       const formItemDataList = [];
       const list = ['basicInformation', 'promotionChannels', 'keyPointsForVerification'];
@@ -186,6 +183,7 @@ export default {
     height: 66px;
   }
   .content {
+    min-width: 300px;
     .cnt-head {
       margin-bottom: 8px;
       background: rgba(255, 255, 255, 1);
@@ -214,4 +212,6 @@ export default {
     }
   }
 }
+
+
 </style>
