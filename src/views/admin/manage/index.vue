@@ -2,7 +2,11 @@
   <div class="manage">
     <LeftMenu/>
     <div class="view-content">
-      <components :is="$route.name"></components>
+      <transition name="router-fade" mode="out-in">
+        <keep-alive>
+          <components :is="$route.name"></components>
+        </keep-alive>
+      </transition>
     </div>
   </div>
 </template>
