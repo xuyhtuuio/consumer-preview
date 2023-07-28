@@ -195,6 +195,7 @@
               :item="item"
               @del="del"
               @quash="quash"
+              @concern="concern"
             ></applyEventCard>
           </div>
           <trs-pagination
@@ -483,8 +484,10 @@ export default {
           this.search.loading = false;
         });
     },
+    concern(){
+      this.getDataStatistic()
+    },
     del(id) {
-      console.log('ffff')
       const param = {
         recordId: id,
       };

@@ -13,19 +13,11 @@
           <i class="iconfont icon-xianxingtubiao"></i>
           <i class="btn">去修改</i>
         </div>
-        <div
-          class="back flex"
-          @click="keep"
-          v-if="(status == 3 || status == 5) && info.op == 'check'"
-        >
+        <div class="back flex" @click="keep" v-if="(status == 3 || status == 5) && info && info.op == 'check'">
           <i class="iconfont icon-baocun"></i>
           <i class="btn">保存</i>
         </div>
-        <div
-          class="back flex white"
-          @click="submit"
-          v-if="(status == 3 || status == 5) && info.op == 'check'"
-        >
+        <div class="back flex white" @click="submit" v-if="(status == 3 || status == 5) && info && info.op == 'check'">
           <i class="iconfont icon-tijiao"></i>
           <i class="btn">提交</i>
         </div>
@@ -69,118 +61,66 @@
         <!-- 消保审查/详情页/审批中预览 -->
         <div v-if="status == 0">
           <nav class="nav active-nav">
-            <span class="active-nav" style="text-align: left"
-              >审批记录明细</span
-            >
+            <span class="active-nav" style="text-align: left">审批记录明细</span>
           </nav>
         </div>
         <!-- 消保审查/详情页/审批人审批（非消保 -->
         <div v-if="status == 2">
           <nav class="nav">
-            <span
-              :class="crtComp == 'leaderEditOpinion' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'leaderEditOpinion';
-                }
-              "
-              >编辑意见</span
-            >
-            <span
-              :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvalRecordCard';
-                }
-              "
-              >审批记录明细</span
-            >
+            <span :class="crtComp == 'leaderEditOpinion' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'leaderEditOpinion';
+            }
+              ">编辑意见</span>
+            <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvalRecordCard';
+            }
+              ">审批记录明细</span>
           </nav>
         </div>
         <!-- 消保审查/详情页/审批人审批（非消保 -->
         <div v-if="status == 3">
           <nav class="nav">
-            <span
-              :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvedOpinionCard';
-                }
-              "
-              >审查意见书</span
-            >
-            <span
-              :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'uploadFileCard';
-                }
-              "
-              ><i style="color: #eb5757">*</i> 最终上线材料</span
-            >
-            <span
-              :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvalRecordCard';
-                }
-              "
-              >审批记录明细</span
-            >
+            <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvedOpinionCard';
+            }
+              ">审查意见书</span>
+            <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'uploadFileCard';
+            }
+              "><i style="color: #eb5757">*</i> 最终上线材料</span>
+            <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvalRecordCard';
+            }
+              ">审批记录明细</span>
           </nav>
         </div>
         <!-- 已经结束-->
         <div v-if="status == 4">
           <nav class="nav">
-            <span
-              :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvedOpinionCard';
-                }
-              "
-              >审查意见书</span
-            >
-            <span
-              :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'uploadFileCard';
-                }
-              "
-              ><i style="color: #eb5757">*</i> 最终上线材料</span
-            >
-            <span
-              :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvalRecordCard';
-                }
-              "
-              >审批记录明细</span
-            >
+            <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvedOpinionCard';
+            }
+              ">审查意见书</span>
+            <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'uploadFileCard';
+            }
+              "><i style="color: #eb5757">*</i> 最终上线材料</span>
+            <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvalRecordCard';
+            }
+              ">审批记录明细</span>
           </nav>
         </div>
         <div v-if="status == 5">
           <nav class="nav">
-            <span
-              :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvedOpinionCard';
-                }
-              "
-              >审查意见书</span
-            >
-            <span
-              :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvalRecordCard';
-                }
-              "
-              >审批记录明细</span
-            >
+            <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvedOpinionCard';
+            }
+              ">审查意见书</span>
+            <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvalRecordCard';
+            }
+              ">审批记录明细</span>
           </nav>
         </div>
         <component :is="crtComp" :status="status" ref="child">
@@ -188,8 +128,7 @@
             <div class="approved-opinion-head">
               <h2>消保审查意见书</h2>
               <p>
-                <i>拟同意********活动，并提出以下消保审查意见，</i
-                >请您确认是否采纳以下意见：
+                <i>拟同意********活动，并提出以下消保审查意见，</i>请您确认是否采纳以下意见：
               </p>
             </div>
           </template>
@@ -205,45 +144,22 @@
         </component>
       </div>
     </div>
-    <el-dialog
-      :visible.sync="transferDialog"
-      width="800px"
-      center
-      custom-class="transfer-dialog"
-    >
+    <el-dialog :visible.sync="transferDialog" width="800px" center custom-class="transfer-dialog">
       <span slot="title">请选择转办对象</span>
 
       <div>
-        <el-input
-          v-model="staff.keyword"
-          placeholder="搜索人员，支持拼音、姓名"
-        >
-          <i slot="prefix" class="el-input__icon el-icon-search pointer"></i
-        ></el-input>
+        <el-input v-model="staff.keyword" placeholder="搜索人员，支持拼音、姓名">
+          <i slot="prefix" class="el-input__icon el-icon-search pointer"></i></el-input>
         <el-radio-group v-model="staff.people" class="trs-scroll">
-          <el-radio
-            :label="item.code"
-            v-for="(item, index) in peoples"
-            :key="index"
-          >
-            <span class="avatar"
-              ><img src="@/assets/image/apply-center/avatar.png" alt=""
-            /></span>
-            {{ item.name }}</el-radio
-          >
+          <el-radio :label="item.code" v-for="(item, index) in peoples" :key="index">
+            <span class="avatar"><img src="@/assets/image/apply-center/avatar.png" alt="" /></span>
+            {{ item.name }}</el-radio>
         </el-radio-group>
       </div>
 
       <span slot="footer" class="dialog-footer">
-        <el-button @click="transferDialog = false" type="text" class="cancel"
-          >取消</el-button
-        >
-        <el-button
-          type="text"
-          @click="transferDialog = false"
-          class="submit-btn"
-          >确定</el-button
-        >
+        <el-button @click="transferDialog = false" type="text" class="cancel">取消</el-button>
+        <el-button type="text" @click="transferDialog = false" class="submit-btn">确定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -274,7 +190,7 @@ export default {
         keyword: "",
         people: "",
       },
-
+      info: {},
       peoples: [
         { name: "王明明", code: 1 },
         { name: "王明明", code: 2 },
@@ -292,20 +208,23 @@ export default {
   mounted() {
     this.judgeStatus();
   },
-  created() {},
+  created() { },
   methods: {
     judgeStatus() {
       // 一般进入详情页：展示返回按钮 及 审批记录详细
       // 已经结束的工单 展示: 返回按钮、审批记录详细、审查意见书、最终上线材
       // <!-- 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
-      let { item }= JSON.parse(window.sessionStorage.getItem("order-detail"));
+      let { item } = JSON.parse(window.sessionStorage.getItem("order-detail"));
       const info = JSON.parse(window.sessionStorage.getItem("order-detail"));
-      // item.taskStatus = 4;
-      // 已经结束的工单
-      if (item.taskStatus == 0) {
+      this.info = info
+      console.log('gg', info)
+
+      // 审批中、草稿
+      if (item.taskStatus == 0 || item.taskStatus == 1) {
         this.status = 0;
         this.crtComp = "approvedOpinionCard";
       }
+      // 已经结束的工单
       if (item.taskStatus == 4) {
         this.status = 4;
         this.crtComp = "approvedOpinionCard";
@@ -316,7 +235,7 @@ export default {
         this.crtComp = "approvedOpinionCard";
       }
       // 从申请那里过来 == 点击了确认按钮
-      if (info.op == "check") {
+      if (info && info.op == "check") {
         // 有实质性意见
         if (item.hasOpinions == 1) {
           this.status = 5;
@@ -327,20 +246,20 @@ export default {
         this.crtComp = "approvedOpinionCard";
       }
       // 从申请那里过来 == 点击了确认按钮
-      if (info.op == "approve") {
+      if (info && info.op == "approve") {
         this.status = 2;
         this.crtComp = "leaderEditOpinion";
       }
     },
-    keep(){
-      if(this.crtComp == 'approvedOpinionCard'){
+    keep() {
+      if (this.crtComp == 'approvedOpinionCard') {
         this.$refs["child"].keep();
       }
     },
     goback() {
       // 如果是从审批页进来；二次弹窗
       // 申请页 正常返回
-      if (info.pageFrom == "approval") {
+      if (this.info && this.info.pageFrom == "approval") {
         this.$confirm("是否保存本审查项目的审查意见？", "", {
           customClass: "confirmBox",
           confirmButtonText: "保存",
@@ -367,6 +286,9 @@ export default {
       }
     },
   },
+  beforeDestroy() {
+    console.log('cancel')
+  }
 };
 </script>
 <style lang="less" scoped>
@@ -396,6 +318,7 @@ export default {
         font-size: 14px;
       }
     }
+
     .white {
       color: #fff;
       background: #2d5cf6;
@@ -484,6 +407,7 @@ export default {
       color: #2d5cf6;
     }
   }
+
   .approved-opinion-head {
     h2 {
       color: #1d2128;
@@ -493,17 +417,20 @@ export default {
       line-height: 22px;
       margin-bottom: 12px;
     }
+
     p {
       color: #505968;
       font-size: 14px;
       font-weight: 400;
       line-height: 22px;
       margin-bottom: 12px;
+
       i {
         color: #2d5cf6;
       }
     }
   }
+
   .approved-opinion-foot {
     p {
       font-weight: 400;
@@ -512,12 +439,14 @@ export default {
       color: #306ef5;
     }
   }
+
   /deep/ .transfer-dialog {
     border-radius: 10px;
     background: #fff;
     padding: 40px 60px;
     /* 阴影/大 */
     box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.1);
+
     .el-dialog__header {
       padding: 0;
       color: var(--gray-gray-9, #1d2128);
@@ -528,7 +457,9 @@ export default {
       font-size: 16px;
       font-style: normal;
       font-weight: 700;
-      line-height: 24px; /* 150% */
+      line-height: 24px;
+
+      /* 150% */
       .el-dialog__headerbtn {
         right: 60px;
         top: 40px;
@@ -536,6 +467,7 @@ export default {
         color: #505968;
       }
     }
+
     .el-dialog__body {
       margin: 16px 0;
       padding: 0;
@@ -543,24 +475,29 @@ export default {
       padding: 16px;
       border-radius: 4px;
       border: 1px solid var(--gray-gray-4, #e5e6eb);
+
       .el-input {
         width: 100%;
         border-radius: 4px;
         margin-bottom: 8px;
+
         .el-input__inner {
           border: 1px solid var(--gray-gray-4, #e5e6eb);
           background: var(--gray-gray-1, #fff);
         }
       }
+
       .el-radio-group {
         display: flex;
         flex-direction: column;
         height: 284px;
         overflow-y: auto;
+
         .el-radio {
           padding: 6px 12px;
           margin-bottom: 4px;
           font-weight: 400;
+
           .avatar {
             width: 32px;
             height: 32px;
@@ -568,6 +505,7 @@ export default {
             background: #e8faf7;
             border-radius: 50%;
             margin: 0 8px;
+
             img {
               width: 100%;
               height: 100%;
@@ -576,6 +514,7 @@ export default {
         }
       }
     }
+
     .el-dialog__footer {
       .el-button {
         width: 140px;
@@ -589,6 +528,7 @@ export default {
         font-weight: 400;
         line-height: 24px;
       }
+
       .submit-btn {
         border-radius: 6px;
         background: #2d5cf6;

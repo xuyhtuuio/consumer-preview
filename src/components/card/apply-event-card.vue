@@ -95,7 +95,7 @@
         </span>
       </div>
       <!-- 待确认  展示【确认】、【关注】 流程配置中确认人配置的非工单的发起人 不展示确认按钮-->
-      <div class="flex" v-if="item.taskStatus ==3">
+      <div class="flex" v-if="item.taskStatus == 3">
         <span class="check icon-op" @click="check(item)">
           <span class="iconfont icon icon-tubiao"></span>
           确认
@@ -198,6 +198,7 @@ export default {
     showReminderDialog(item) {
       if (item.currentAssignee && item.currentAssignee.length) {
         this.reminderDialog = true;
+        this.persons = item.currentAssignee
         return;
       } else {
         this.$message({
@@ -206,10 +207,10 @@ export default {
         });
       }
     },
-    modify(item){
+    modify(item) {
       this.$router.push({
-        path:'addApply',
-        params:{
+        path: 'addApply',
+        params: {
           item
         }
       })
@@ -273,6 +274,8 @@ export default {
           this.$message.success(res.data.msg);
           this.allowConcernClick = true;
           item.concernId = item.concernId == 1 ? 0 : 1;
+          this.$emit('concern')
+
         }
         this.allowConcernClick = false;
       });
