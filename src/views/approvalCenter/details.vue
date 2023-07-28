@@ -17,6 +17,13 @@ export default {
   components: {
     orderDetail,
   },
+  watch: {
+    '$route'(val) {
+      if (val.name !== 'approval-details') {
+        window.sessionStorage.removeItem('order-detail')
+      }
+    }
+  },
   data() {
     return {};
   },

@@ -5,7 +5,7 @@
       <template slot="breadcrumb">
         <el-breadcrumb separator="/">
           <el-breadcrumb-item :to="{ path: '/' }">消保审查</el-breadcrumb-item>
-          <el-breadcrumb-item><a href="/">申请中心</a></el-breadcrumb-item>
+          <el-breadcrumb-item><a>申请中心</a></el-breadcrumb-item>
         </el-breadcrumb>
 
       </template>
@@ -18,12 +18,23 @@ export default {
   components: {
     orderDetail,
   },
+  watch: {
+    '$route'(val) {
+      if (val.name !== 'details') {
+        window.sessionStorage.removeItem('order-detail')
+      }
+    }
+  },
+  mounted() {
+
+  },
   data() {
     return {
     };
   },
+
 };
 </script>
 <style lang="less" scoped>
-.apply-order-detail {
-}</style>
+.apply-order-detail {}
+</style>

@@ -170,6 +170,7 @@ import leaderEditOpinion from "@/components/card/leader-edit-opinion.vue";
 import approvalRecordCard from "@/components/card/approval-record-card.vue";
 import approvedOpinionCard from "@/components/card/approved-opinion-card.vue";
 import uploadFileCard from "@/components/card/upload-file-card";
+import { nextTick } from 'vue';
 
 export default {
   name: "order-details",
@@ -286,9 +287,7 @@ export default {
       }
     },
   },
-  beforeDestroy() {
-    console.log('cancel')
-  }
+
 };
 </script>
 <style lang="less" scoped>
