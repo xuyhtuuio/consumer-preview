@@ -265,7 +265,7 @@ export default {
           name: "草稿箱",
           count: 0,
           value: "draftBin",
-          id: 2,
+          id: 3,
         },
       ],
       search: {
@@ -325,6 +325,10 @@ export default {
       list: [],
       // list: []
     };
+  },
+  activated(){
+    this.getDataStatistic()
+    this.searchList()
   },
   async mounted() {
     let dom = document
@@ -488,7 +492,9 @@ export default {
 
         if (res.status === 200) {
           this.$message.success("删除成功");
+          this.getDataStatistic()
           this.getApplicationList(1);
+          
         }
       });
     },

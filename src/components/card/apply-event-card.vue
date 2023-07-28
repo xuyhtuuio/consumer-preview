@@ -10,7 +10,7 @@
           <use xlink:href="#icon-tongyongtubiao2"></use>
         </svg>
         <span class="event-name" @click="toDetail(item)">{{
-          item.name || "点击去详情页"
+          item.taskName
         }}</span>
         <!-- 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
         <span class="event-status">
@@ -95,14 +95,14 @@
         </span>
       </div>
       <!-- 待确认  展示【确认】、【关注】 流程配置中确认人配置的非工单的发起人 不展示确认按钮-->
-      <div class="flex">
+      <div class="flex" v-if="item.taskStatus ==3">
         <span class="check icon-op" @click="check(item)">
           <span class="iconfont icon icon-tubiao"></span>
           确认
         </span>
       </div>
       <!-- 待修改 已采纳意见所有“有实质意见”显示，显示“修改、关注”按钮 流程配置中确认人配置的非工单的发起人 不展示【确认】操作-->
-      <div v-if="item.taskStatus == 2" class="flex">
+      <div v-if="item.taskStatus == 2" class="flex" @click="modify(item)">
         <span class="modify icon-op" v-if="item.hasOpinions == 1">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-xianxingtubiao"></use>
@@ -111,7 +111,7 @@
         </span>
       </div>
       <!-- 草稿 文件解析失败 显示修改和删除 但不显示关注按钮-->
-      <div class="flex" v-if="item.taskStatus == 0">
+      <div class="flex" v-if="item.taskStatus == 0" @click="modify(item)">
         <span class="modify icon-op">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-xianxingtubiao"></use>
@@ -205,6 +205,14 @@ export default {
           message: "此工单当前不存在处理人，无法催单",
         });
       }
+    },
+    modify(item){
+      this.$router.push({
+        path:'addApply',
+        params:{
+          item
+        }
+      })
     },
     cancel(item) {
       this.$confirm("确定撤销该申请吗？", "", {

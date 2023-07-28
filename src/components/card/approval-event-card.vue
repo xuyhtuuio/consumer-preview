@@ -9,7 +9,7 @@
         <svg class="icon urgent-icon" aria-hidden="true" v-if="item.dismissalMark == 1">
           <use xlink:href="#icon-tongyongtubiao2"></use>
         </svg>
-        <span class="event-name" @click="toDetail(item)">{{ item.name }}</span>
+        <span class="event-name" @click="toDetail(item)">{{ item.taskName }}</span>
         <span class="event-status">
           <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
 
@@ -116,13 +116,14 @@ export default {
   },
   methods: {
     toApproval(item) {
-      window.sessionStorage.setItem("order-detail", JSON.stringify({
-        item: item,
-        pageFrom: "approve",
-        op: "approve",
-      }));
+      // window.sessionStorage.setItem("order-detail", JSON.stringify({
+      //   item: item,
+      //   pageFrom: "approve",
+      //   op: "approve",
+      // }));
       this.$router.push({
-        name: "approval-details"
+        path: "aiApproval",
+        params: { item }
       });
     },
     toDetail(item) {

@@ -243,7 +243,7 @@ export default {
         {
           name: "全部任务",
           count: 0,
-          value: "allBranchCount",
+          value: "allTasksOffice",
         },
       ],
       search: {
@@ -440,7 +440,7 @@ export default {
         case "applyAll":
           headerFlag = '4';
           break;
-          case "allBranchCount":
+          case "allTasksOffice":
           headerFlag = '0';
           break;
           
