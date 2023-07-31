@@ -6,7 +6,7 @@
     </div>
     <div class="title" v-else>
       <div>
-        <span @click="goBack" class="breadcrumb">{{ isEdit ? '编辑管理' : '新增管理' }}</span>/{{ currentRow.typesOfReviewItemsName }}
+        <span @click="goBack" class="breadcrumb">{{ isEdit ? '表单管理' : '表单管理' }}</span>/{{ currentRow.typesOfReviewItemsName }}
       </div>
     </div>
     <div>
@@ -41,38 +41,12 @@
         </div>
         <TrsTable theme="TRS-table-gray" :data="data1" :colConfig="colConfig1" @sort-change="changeSort" @submitEdit="submitEdit" :row-class-name="tableRowClassName">
           <template #operate="scope">
-            <el-button type="text" v-if="readonlyField.includes(scope.row.title)">查看</el-button>
-            <template v-else>
-              <el-button type="text" v-if="scope.row.status === '0'">恢复</el-button>
-              <el-button type="text" v-else @click="editFormItem(scope.row)">编辑</el-button>
-              <el-button type="text" class="red" :style="{ visibility: scope.row.status !== '0' ? 'visible' : 'hidden' }">停用</el-button>
-              <el-button type="text" class="red" v-if="!['下线时间'].includes(scope.row.title)">删除</el-button>
-            </template>
+            <el-button type="text" v-if="scope.row.status === '0'">恢复</el-button>
+            <el-button type="text" v-else @click="editFormItem(scope.row)">编辑</el-button>
+            <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)" :style="{ visibility: scope.row.status !== '0' ? 'visible' : 'hidden' }">停用</el-button>
+            <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)">删除</el-button>
           </template>
         </TrsTable>
-        <!-- <el-table :data="data1" @sort-change="changeSort1" :row-class-name="tableRowClassName">
-          <el-table-column label="字段名称" prop="title">
-          </el-table-column>
-          <el-table-column label="字段类型" prop="type">
-          </el-table-column>
-          <el-table-column label="所属模块" prop="belong">
-          </el-table-column>
-          <el-table-column label="是否必填" prop="isRequire">
-          </el-table-column>
-          <el-table-column label="更新时间" prop="utime" sortable="custom"  align="center">
-          </el-table-column>
-          <el-table-column label="操作" align="center">
-            <template slot-scope="scope">
-              <el-button type="text" v-if="readonlyField.includes(scope.row.title)">查看</el-button>
-              <template v-else>
-                <el-button type="text" v-if="scope.row.status === '0'">恢复</el-button>
-                <el-button type="text" v-else @click="editFormItem(scope.row)">编辑</el-button>
-                <el-button type="text" class="red" :style="{ visibility: scope.row.status !== '0' ? 'visible' : 'hidden' }">停用</el-button>
-                <el-button type="text" class="red" v-if="!['下线时间'].includes(scope.row.title)">删除</el-button>
-              </template>
-            </template>
-          </el-table-column>
-        </el-table> -->
       </div>
       <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
           v-if="page.total">
@@ -87,7 +61,7 @@
         {{ drawerTitle }}<i class="el-icon-edit"></i>
       </span>
       <div class="drawer-main">
-        <FormManageCustomField/>
+        <FormManageCustomField :editType="drawerTitle" ref="formManageCustomField"/>
       </div>
     </el-drawer>
     <el-dialog
@@ -192,55 +166,66 @@ export default {
           }
         },
       ],
-      readonlyField: ['项目名称', '上线时间', '审查材料'],
+      defalutField: ['项目名称', '上线时间', '下线时间', '宣传渠道'],
       data1: [
         {
           index: 1,
           title: '项目名称',
-          name: '单行文本框',
+          name: 'TextInput',
           module: '基本信息',
-          require: true,
+          props: {
+            require: true,
+          },
           updateTime: '2023-07-17: 00:00:00',
           status: '1'
         },
         {
           index: 2,
           title: '上线时间',
-          name: '时间选择器',
+          name: 'TimePicker',
           module: '基本信息',
-          require: true,
+          props: {
+            require: true,
+          },
           updateTime: '2023-07-17: 00:00:00',
           status: '1'
         },
         {
           index: 3,
-          title: '审查材料',
-          name: '上传',
-          module: '宣传渠道',
-          require: true,
+          title: '下线时间',
+          name: 'TimePicker',
+          module: '基本信息',
+          props: {
+            require: false,
+          },
           updateTime: '2023-07-17: 00:00:00',
           status: '1'
         },
         {
           index: 4,
-          title: '产品代码',
-          name: '多选框',
-          module: '宣传渠道',
-          require: true,
+          title: '宣传渠道',
+          name: 'MultipleGroupsSelect',
+          module: '基本信息',
+          props: {
+            expanding: true,
+            require: true,
+          },
           updateTime: '2023-07-17: 00:00:00',
-          status: '0'
+          status: '1'
         }
       ],
       colConfig1: [
         {
           label: '序号',
           prop: 'index',
-          edit: true
+          edit: true,
+          bind: {
+            width: 110
+          }
         },
         {
           label: '字段名称',
-          prop: 'title',
-          edit: true
+          prop: 'title'
         },
         {
           label: '字段类型',
@@ -252,12 +237,16 @@ export default {
         },
         {
           label: '是否必填',
-          prop: 'require'
+          prop: 'require',
+          bind: {
+            width: 80
+          }
         },
         {
           label: '更新时间',
           prop: 'updateTime',
           bind: {
+            width: 200,
             align: 'center',
             sortable: "custom"
           }
@@ -389,11 +378,17 @@ export default {
     addFormItem() {
       this.drawerTitle = '新增字段'
       this.drawer = true
+      this.$nextTick(() => {
+        this.$refs['formManageCustomField'].initForm()
+      })
     },
     editFormItem(item) {
       this.drawerTitle = '编辑字段'
       this.currentRowItem = item
       this.drawer = true
+      this.$nextTick(() => {
+        this.$refs['formManageCustomField'].initForm(this.currentRowItem)
+      })
     },
     handleClose(done) {
       done()

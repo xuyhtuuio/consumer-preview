@@ -342,5 +342,28 @@ export default {
     font-size: 12px;
     color: rgba(235, 87, 87, 1);
   }
+
+  /deep/.el-date-editor {
+    display: flex;
+    input {
+      flex: 1;
+    }
+    .el-input__prefix {
+      position: static;
+      margin-right: 5px;
+      .el-input__icon {
+        &::before {
+          content: "\e78e";
+        }
+      }
+    }
+
+    .el-input__suffix {
+      right: 20px;
+    }
+  }
 }
+
+
+
 </style>

@@ -164,7 +164,6 @@ export default {
       return node &&
           (node.type === 'ROOT' || node.type === 'APPROVAL'
            || node.type === 'APPROVAL-TWO'
-           || node.type === 'APPROVAL-CONFIRM'
           || node.type === 'CC' || node.type === 'DELAY'
               || node.type === 'TRIGGER');
     },
@@ -204,7 +203,6 @@ export default {
       switch (type){
         case 'APPROVAL': this.insertApprovalNode(parentNode, afterNode); break;
         case 'APPROVAL-TWO': this.insertApprovalTWONode(parentNode, afterNode); break;
-        case 'APPROVAL-CONFIRM': this.insertApprovalCONFIRMNode(parentNode, afterNode); break; // 确认人
         case 'CC': this.insertCcNode(parentNode); break;
         case 'DELAY': this.insertDelayNode(parentNode); break;
         case 'TRIGGER': this.insertTriggerNode(parentNode); break;
@@ -223,10 +221,6 @@ export default {
     insertApprovalNode(parentNode){
       console.log(parentNode)
       this.$set(parentNode.children, "name", "审批人")
-      this.$set(parentNode.children, "props", this.$deepCopy(DefaultProps.APPROVAL_PROPS))
-    },
-    insertApprovalCONFIRMNode(parentNode) {
-      this.$set(parentNode.children, "name", "确认人")
       this.$set(parentNode.children, "props", this.$deepCopy(DefaultProps.APPROVAL_PROPS))
     },
     insertApprovalTWONode(parentNode) {

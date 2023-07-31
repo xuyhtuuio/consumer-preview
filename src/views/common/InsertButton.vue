@@ -9,10 +9,6 @@
         <i class="el-icon-s-promotion" style="color:#2D5CF6;"></i>
         <span>抄送人</span>
       </div>
-      <div @click="addRtNode" class="has-svg">
-        <i class="el-icon-success" style="color:#2D5CF6;"></i>
-        <span>确认人</span>
-      </div>
       <div @click="addConditionsNode">
         <svg class="icon" aria-hidden="true">
           <use xlink:href="#icon-tiaojian-fenzhi"></use>
@@ -62,9 +58,6 @@ export default {
     },
     addCcNode(){
       this.$emit('insertNode', "CC")
-    },
-    addRtNode() {
-      this.$emit('insertNode', "APPROVAL-CONFIRM") // 确认人
     },
     addDelayNode(){
       this.$emit('insertNode', "DELAY")

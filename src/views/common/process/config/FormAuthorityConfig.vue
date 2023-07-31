@@ -1,5 +1,6 @@
 <template>
   <div>
+    
     <el-table :header-cell-style="{background:'#f5f6f6'}" :data="formPerms" border style="width: 100%">
       <el-table-column prop="title" show-overflow-tooltip label="表单字段">
         <template slot-scope="scope">

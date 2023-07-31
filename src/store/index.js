@@ -75,8 +75,8 @@ export default new Vuex.Store({
       }
      }, {
       "id": "field2570217989262",
-      "title": "MultipleSelect",
-      "name": "MultipleSelect",
+      "title": "MultipleGroupsSelect",
+      "name": "MultipleGroupsSelect",
       "module": "宣传渠道",
       "value": [],
       "valueType": "Array",
@@ -85,11 +85,23 @@ export default new Vuex.Store({
        "placeholder": "2fwewe23",
        "expanding": false,
        "options": [{
-        "id": 0,
-        "value": "111"
+        label: '上传渠道',
+        children: [{
+          "id": 0,
+          "value": "111"
+         }, {
+          "id": 1,
+          "value": "222"
+         }]
        }, {
-        "id": 1,
-        "value": "222"
+        label: '下传渠道',
+        children: [{
+          "id": 3,
+          "value": "333"
+         }, {
+          "id": 4,
+          "value": "444"
+         }]
        }]
       }
      }, {

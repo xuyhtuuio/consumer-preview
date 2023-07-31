@@ -55,7 +55,7 @@ export default {
     getNodes() {
       const tempNodes = []
       this.nodeMap.forEach(value => {
-        if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO', 'APPROVAL-CONFIRM'].includes(value?.type)) {
+        if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO'].includes(value?.type)) {
           tempNodes.push({
             name: value.name,
             id: value.id
