@@ -53,3 +53,11 @@ export function saveDraft(data) {
     data
   })
 }
+//查询工单详情
+export function workOrderTaskInfo(params) {
+  return request({
+    url: '/cpr/applicationForm/workOrderTaskInfo',
+    method: 'get',
+    params
+  })
+}

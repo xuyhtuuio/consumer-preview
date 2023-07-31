@@ -45,17 +45,25 @@
       <!-- 左侧工单信息 -->
       <div class="left-info">
         <div class="order-name">
-          <svg class="icon urgent-icon" aria-hidden="true">
+          <svg class="icon urgent-icon" aria-hidden="true" v-if="orderBaseInfo.urgent == 1">
             <use xlink:href="#icon-shenpiyemiantubiao"></use>
           </svg>
-          <svg class="icon urgent-icon" aria-hidden="true">
+          <svg class="icon urgent-icon" aria-hidden="true" v-if="orderBaseInfo.dismissalMark == 1">
             <use xlink:href="#icon-tongyongtubiao2"></use>
           </svg>
-          睿远平衡18月产品宣传图审核
-          <span class="order-class tag">产品类</span>
-          <span class="end tag">已结束</span>
+          {{ orderBaseInfo.taskName }}
+          <span class="order-class tag">{{ orderBaseInfo.formCategory }}</span>
+          <span class="event-status">
+            <i v-if="orderBaseInfo.taskStatus === '0'" class="tag draft">草稿</i>
+            <i v-if="orderBaseInfo.taskStatus === '1'" class="tag in-approval">审批中</i>
+            <i v-if="orderBaseInfo.taskStatus === '2'" class="tag in-modify">待修改</i>
+            <i v-if="orderBaseInfo.taskStatus === '3'" class="tag check">待确认</i>
+            <i v-if="orderBaseInfo.taskStatus === '4'" class="end">
+              <i class="tag end-sign"> 已结束 </i>
+            </i>
+          </span>
         </div>
-        <order-basic-info></order-basic-info>
+        <order-basic-info @preview='previewFile' @sendbaseInfo="sendbaseInfo"></order-basic-info>
       </div>
       <div class="right">
         <!-- 消保审查/详情页/审批中预览 -->
@@ -162,6 +170,9 @@
         <el-button type="text" @click="transferDialog = false" class="submit-btn">确定</el-button>
       </span>
     </el-dialog>
+    <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
+      <filePreview :url="previewUrl"></filePreview>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -170,8 +181,7 @@ import leaderEditOpinion from "@/components/card/leader-edit-opinion.vue";
 import approvalRecordCard from "@/components/card/approval-record-card.vue";
 import approvedOpinionCard from "@/components/card/approved-opinion-card.vue";
 import uploadFileCard from "@/components/card/upload-file-card";
-import { nextTick } from 'vue';
-
+import filePreview from '@/components/filePreview'
 export default {
   name: "order-details",
   components: {
@@ -180,6 +190,7 @@ export default {
     leaderEditOpinion,
     approvedOpinionCard,
     uploadFileCard,
+    filePreview
   },
 
   data() {
@@ -192,6 +203,9 @@ export default {
         people: "",
       },
       info: {},
+      previewDialog: false,
+      previewUrl: '',
+      orderBaseInfo: {},
       peoples: [
         { name: "王明明", code: 1 },
         { name: "王明明", code: 2 },
@@ -211,6 +225,13 @@ export default {
   },
   created() { },
   methods: {
+    sendbaseInfo(val) {
+      this.orderBaseInfo = val
+    },
+    previewFile(url) {
+      this.previewDialog = true
+      this.previewUrl = url
+    },
     judgeStatus() {
       // 一般进入详情页：展示返回按钮 及 审批记录详细
       // 已经结束的工单 展示: 返回按钮、审批记录详细、审查意见书、最终上线材
@@ -218,7 +239,6 @@ export default {
       let { item } = JSON.parse(window.sessionStorage.getItem("order-detail"));
       const info = JSON.parse(window.sessionStorage.getItem("order-detail"));
       this.info = info
-      console.log('gg', info)
 
       // 审批中、草稿
       if (item.taskStatus == 0 || item.taskStatus == 1) {
@@ -356,6 +376,35 @@ export default {
 
       color: #2d5cf6;
       margin: 0 4px;
+    }
+
+    .event-status {
+      display: inline-block;
+
+
+
+      .draft {
+        background: #f0f6ff;
+        color: #2d5cf6;
+      }
+
+      .in-approval {
+        border-radius: 4px;
+        background: #fff7e6;
+        color: #fa8c16;
+      }
+
+      .check {
+        border-radius: 4px;
+        background: #e6fffb;
+        color: #0da5aa;
+      }
+
+      .in-modify {
+        background: #fff1f0;
+        color: #eb5757;
+      }
+
     }
 
     .end {
@@ -537,5 +586,12 @@ export default {
       }
     }
   }
-}
-</style>
+
+  /deep/ .preview-dialog {
+    height: 80vh;
+
+    .el-dialog__body {
+      height: 96%;
+    }
+  }
+}</style>

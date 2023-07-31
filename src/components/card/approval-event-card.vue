@@ -46,9 +46,9 @@
       </div>
       <div class="event-infos">
         <span class="id">{{ item.taskNumber }}</span>
-        <span class="sDate date">发起时间：{{ item.launchDate || "--" }}</span>
-        <span class="sDate date">更新时间：{{ item.update_time || "--" }}</span>
-        <span class="sDate date">上线时间：{{ item.launchDate || "--" }}</span>
+        <span class="sDate date">发起时间：{{ item.launchDate | timeFormate }}</span>
+        <span class="sDate date">更新时间：{{ item.update_time | timeFormate }}</span>
+        <span class="sDate date">上线时间：{{ item.launchDate | timeFormate }}</span>
 
         <!-- <span class="handler date">当前处理人：王明明</span> -->
         <el-popover placement="bottom" trigger="hover" popper-class="popper-persons">
@@ -75,7 +75,7 @@
         审查
       </span>
       <!-- 待修改状态的工单 需要该审批人修改的工单显示修改-->
-      <span class="modify icon-op" v-if="item.taskStatus == 2">
+      <span class="modify icon-op" v-if="item.taskStatus == 2" @click="modify(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-xianxingtubiao"></use>
         </svg>
@@ -101,6 +101,7 @@
 </template>
 <script>
 import { concernApplication } from "@/api/approvalCenter";
+import moment from 'moment'
 export default {
   name: "applyEventCard",
   props: {
@@ -116,11 +117,6 @@ export default {
   },
   methods: {
     toApproval(item) {
-      // window.sessionStorage.setItem("order-detail", JSON.stringify({
-      //   item: item,
-      //   pageFrom: "approve",
-      //   op: "approve",
-      // }));
       this.$router.push({
         path: "aiApproval",
         params: { item }
@@ -133,6 +129,11 @@ export default {
       }));
       this.$router.push({
         name: "details",
+        params: {
+          formId: item.taskNumber,
+          originatorId: item.taskNumber,
+          taskName:item.taskName
+        },
       });
     },
     check(item) {
@@ -146,24 +147,39 @@ export default {
       );
       this.$router.push({
         name: "approval-details",
+        params: {
+          formId: item.taskNumber,
+          originatorId: item.taskNumber,
+          taskName:item.taskName
+        },
       });
     },
+    modify(item) {
+      this.$router.push({
+        name: 'editApply',
+        params: {
+          id:item.taskNumber
+        }
+      })
+    },
     concern(item) {
-      if (!this.allowConcernClick) return;
       const param = {
         recordId: item.id,
       };
-      this.allowConcernClick = true;
       concernApplication(param).then((res) => {
         if (res.status == 200) {
           this.$message.success(res.data.msg);
-          this.allowConcernClick = true;
           item.concernId = item.concernId == 1 ? 0 : 1;
         }
-        this.allowConcernClick = false;
+;
       });
     },
   },
+  filters: {
+    timeFormate(val) {
+      return val ? moment(val).format('YYYY-MM-DD HH:mm:ss'): '--'
+    }
+  }
 };
 </script>
 <style lang="less" scoped>

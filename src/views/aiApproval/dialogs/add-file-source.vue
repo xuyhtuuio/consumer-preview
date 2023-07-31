@@ -17,7 +17,7 @@
   </el-dialog>
 </template>
 <script>
-import FileType from '../components/file-type.vue';
+import FileType from '@/components/common/file-type.vue';
 export default {
   name: "addFileSource",
   components: { FileType },

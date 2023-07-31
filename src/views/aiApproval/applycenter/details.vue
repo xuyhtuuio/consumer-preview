@@ -7,7 +7,6 @@
           <el-breadcrumb-item :to="{ path: '/' }">消保审查</el-breadcrumb-item>
           <el-breadcrumb-item><a>申请中心</a></el-breadcrumb-item>
         </el-breadcrumb>
-
       </template>
     </order-detail>
   </div>
@@ -18,6 +17,11 @@ export default {
   components: {
     orderDetail,
   },
+  data(){
+    return{
+      ids:{}
+    }
+  },
   watch: {
     '$route'(val) {
       if (val.name !== 'details') {
@@ -26,7 +30,6 @@ export default {
     }
   },
   mounted() {
-
   },
   data() {
     return {

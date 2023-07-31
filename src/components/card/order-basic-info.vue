@@ -1,11 +1,10 @@
 <template>
-    <div class="order-basic-info">
+    <div class="order-basic-info" v-loading="loading">
         <div class="user">
             <div class="user-info">
-                <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" v-if="Math.random() > 0.5" />
-                <div class="avatar" v-else>谭</div>
-                <span class="nickname"> 谭新宇 / 300592 </span>
-                <span>总行 | 财富平台部 | 财富平台部</span>
+                <img src="@/assets/image/ai-approval/ocr-avatar.png" alt=""  />
+                <span class="nickname"> {{ orderBaseInfo.approverInfo&&orderBaseInfo.approverInfo.name }} / {{orderBaseInfo.approverInfo&&orderBaseInfo.approverInfo.workId  }} </span>
+                <span>{{  orderBaseInfo.approverInfo&&orderBaseInfo.approverInfo.institution}} <i v-if="orderBaseInfo.approverInfo&&orderBaseInfo.approverInfo.dep ">| {{orderBaseInfo.approverInfo.dep  }}</i></span>
             </div>
             <slot name="apply-modify"></slot>
         </div>
@@ -16,42 +15,27 @@
                 基本信息</span>
         </p>
         <!-- 项目基本信息-->
-        <div v-if="orderInfo.newBaseInfo && orderInfo.newBaseInfo.length" >
+        <div v-if="orderInfo.newBaseInfo && orderInfo.newBaseInfo.length">
             <div v-for="item, index in orderInfo.newBaseInfo" :key="index" class="proj-info">
-                <div v-for="child, idx in item" :key="idx"
-                    class="proj-info-item">
+                <div v-for="child, idx in item" :key="idx" class="proj-info-item">
                     <div class="item">
-                        <span class="label">{{ child.label }}</span>
-                        <span class="value">{{ child.value }}</span>
+                        <span class="label">{{ child.title }}</span>
+                        <span class="value">{{ child | valueFormat }}</span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="proj-info">
-            <div class="item">
-                <span class="label">申请说明</span>
-                <span class="value">2睿远平衡18月产品宣传图审核睿远平衡18月产品宣传图审核睿远平衡18月产品宣传图审核睿远平衡
-                    18月产品宣传图审核睿远平衡18月产品宣审核睿远平衡18月产品宣传图审核睿远平衡18月产品宣传
-                    图审核睿远平衡18月产品宣传图审核18月产品宣传图审核睿远平衡18月产品宣传</span>
+        <div class="proj-info pro-info-textarea">
+            <div class="item" v-for="(item, index) in orderInfo.textAreaBaseInfo" :key="index">
+                <span class="label">{{ item.title }}</span>
+                <span class="value">{{ item | valueFormat }}</span>
             </div>
         </div>
         <div class="line"></div>
         <div class="channel-info">
-            <div class="item">
-                <span class="label">线上渠道</span>
-                <span class="value">手机银行、短信、手机银行直播、手机银行、短信、手机银行直播</span>
-            </div>
-            <div class="item">
-                <span class="label">外部渠道</span>
-                <span class="value">线上媒体</span>
-            </div>
-            <div class="item">
-                <span class="label">线下渠道</span>
-                <span class="value">- -</span>
-            </div>
-            <div class="item">
-                <span class="label">个人渠道</span>
-                <span class="value">- -</span>
+            <div class="item" v-for="(item, index) in orderInfo.promotionChannels" :key="index">
+                <span class="label">{{ item.title }}</span>
+                <span class="value">{{ item | valueFormat }}</span>
             </div>
             <slot name="personal-channel"></slot>
         </div>
@@ -70,8 +54,8 @@
                 : 'review-pointer1',
         ]">
             <div class="item" v-for="(item, index) in orderInfo.reviewPointer" :key="index">
-                <span class="label">{{ item.label }}</span>
-                <span class="value"> {{ item.value }}</span>
+                <span class="label">{{ item.title }}</span>
+                <span class="value"> {{ item | valueFormat }}</span>
             </div>
         </div>
         <div class="line"></div>
@@ -79,152 +63,76 @@
             <span>
                 <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Rectangle143"></use>
-                </svg>审查材料 <i class="total">共 6 个</i></span>
-            <span class="download pointer">下载全部</span>
+                </svg>审查材料 <i class="total">共 {{ orderInfo.fileList && orderInfo.fileList.length }} 个</i></span>
+            <span class="download pointer" v-if="orderInfo.fileList.length">下载全部</span>
         </p>
         <div class="file-list">
-            <div class="file-item pointer" v-for="(item, index) in fileList" :key="index">
+            <div class="file-item pointer" v-for="(item, index) in orderInfo.fileList" :key="index">
                 <span class="left ellipsis ellipsis_1">
                     <i class="indexes">{{ index + 1 }}.</i>
-                    <svg class="icon" aria-hidden="true" v-if="item.fileType == 'pdf'">
-                        <use xlink:href="#icon-mianxingtubiao"></use>
-                    </svg>
-                    <svg class="icon" aria-hidden="true" v-if="item.fileType == 'xls'">
-                        <use xlink:href="#icon-mianxingtubiao-1"></use>
-                    </svg>
-                    <svg class="icon" aria-hidden="true" v-if="item.fileType == 'doc'">
-                        <use xlink:href="#icon-mianxingtubiao-2"></use>
-                    </svg>
-                    <i class="filename">{{ item.filename }}</i>
+                    <file-type :fileName="item.fileName"></File-type>
+                    <i class="filename">{{ item.fileName }}</i>
                 </span>
-                <span class="preview">预览</span>
+                <span class="preview" @click="preview(item.url)">预览</span>
             </div>
         </div>
     </div>
 </template>
 
 <script >
+import { getApplyForm, workOrderTaskInfo } from "@/api/front";
+import moment from 'moment'
+import FileType from '@/components/common/file-type.vue';
+
 export default {
+    components: { FileType },
+
     data() {
         return {
-            fileList: [
-                {
-                    filename: "附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件1.png",
-                    fileType: "doc",
-                },
-                {
-                    filename: "附件附件附件1.png",
-                    fileType: "xls",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-                {
-                    filename: "附件附件附件附件附件附件附件附件附件附件附件附件1.png",
-                    fileType: "pdf",
-                },
-            ],
+            loading: false,
+            orderBaseInfo: {},
             orderInfo: {
-                baseInfo: [
-                    { label: '项目名称', value: '国家石财富系列之睿远平衡18期' },
-                    { label: '审批类型', value: '产品营销类' },
-                    { label: '产品名称', value: '理财石财富系列之睿远平衡' },
-                    { label: '产品类型', value: '理财类' },
-                    { label: '上线时间', value: '2023-08-26' },
-                    { label: '下线时间', value: '2023-08-26' },
-                ],
+                baseInfo: [],
                 newBaseInfo: [],
-                reviewPointer: [
-                    {
-                        label: "产品要点",
-                        value:
-                            "产品基本信息：起购金额、起购时间、销售起息方式、投资方式(存款)、免责条款",
-                    },
-                    {
-                        label: "审查要点",
-                        value:
-                            "承担义务不得低于宣传所承诺的标准 不得虚假欺诈隐瞒或者误导宣传、资料真实准确、不得隐瞒限制条件",
-                    },
-                    {
-                        label: "审查要点",
-                        value:
-                            "承担义务不得低于宣传所承诺的标准 不得虚假欺诈隐瞒或者误导宣传、资料真实准确、不得隐瞒限制条件",
-                    },
-                    {
-                        label: "审查要点",
-                        value:
-                            "承担义务不得低于宣传所承诺的标准 不得虚假欺诈隐瞒或者误导宣传、资料真实准确、不得隐瞒限制条件",
-                    },
-                ],
+                textAreaBaseInfo: [],
+                reviewPointer: [],
+                fileList: []
             },
         };
     },
     mounted() {
-        this.orderInfo.newBaseInfo = this.getMapping(this.orderInfo.baseInfo)
-        console.log('ff', this.orderInfo.newBaseInfo)
+        if (!this.$route.params.formId) {
+            const {path} = this.$route 
+            const url =path.match(/\/(\S*)\//)[1]
+             this.$router.replace({
+                name:url
+             })
+        }
+    },
+    activated() {
+        if (!this.$route.params) {
+             this.$router.go(-1)
+        }
+        this.getWorkOrderTaskInfo()
+        this.getOrderDetail()
     },
     methods: {
+        getWorkOrderTaskInfo() {
+            const param = {
+                formId:  '175',
+                originatorId:  '798',
+            }
+            workOrderTaskInfo(param).then(res => {
+                const { data, status, message } = res.data;
+                if (status == 200) {
+                    this.orderBaseInfo = {
+                        ...data,
+                        taskName: this.$route.params.taskName
+                    }
+                    this.$emit('sendbaseInfo',  this.orderBaseInfo)
+                }
+            })
+        },
         getMapping(list) {
             let len = list.length
             let newList = []
@@ -236,6 +144,66 @@ export default {
             }
             return newList
         },
+
+        getOrderDetail() {
+            this.loading = true
+            getApplyForm({
+                formCategoryId: '1',
+                formId: this.$route.params.formId,
+            }).then(res => {
+                const { data, status, message } = res.data;
+                if (status === 200) {
+                    const { basicInformation, keyPointsForVerification, promotionChannels, reviewMaterials } = data
+                    //大段文本过滤
+                    const noTextAreaBeseInfo = basicInformation.filter(v => { return v.name !== 'TextareaInput' })
+                    const textAreaBaseInfo = basicInformation.filter(v => { return v.name == 'TextareaInput' })
+                    this.orderInfo = {
+                        baseInfo: noTextAreaBeseInfo,
+                        textAreaBaseInfo: textAreaBaseInfo,
+                        newBaseInfo: this.getMapping(noTextAreaBeseInfo),
+                        reviewPointer: keyPointsForVerification,
+                        promotionChannels,
+                        fileList: reviewMaterials && reviewMaterials[0].value
+
+                    }
+                } else {
+                    this.$message.error({ offset: 40, title: "提醒", message });
+                }
+            }).finally(() => {
+                this.loading = false
+            });
+        },
+        preview(url) {
+            this.$emit('preview', url)
+        }
+    },
+    filters: {
+        valueFormat(val) {
+
+            if (val.name == 'TextInput' || val.name == 'TextareaInput') {
+                return val.value
+            }
+            if (val.name == 'SelectInput') {
+                const { options } = val.props
+                let strings = options.filter(v => v.id == val.value)
+                strings = strings.map(m => { return m.value }).join('、')
+                return strings
+            }
+            if (val.name == 'TimePicker') {
+                return moment(val.value).format('YYYY-MM-DD HH:mm:ss')
+
+            }
+            if (val.name == 'MultipleSelect') {
+                const { options } = val.props
+                let array = []
+                val.value.forEach(id => {
+                    let strings = options.filter(v => v.id == id)[0]
+                    array.push(strings)
+                })
+                const label = array.map(m => { return m.value }).join('、')
+                return label
+            }
+        }
     }
 };
 </script>
@@ -353,13 +321,19 @@ export default {
         margin-bottom: 12px;
         flex-wrap: wrap;
 
-        .proj-info-item{
+        .proj-info-item {
             flex: 1;
             margin-right: 13px;
         }
-        .proj-info-item:last-of-type{
+
+        .proj-info-item:last-of-type {
             margin-right: 0;
         }
+    }
+
+    .pro-info-textarea {
+        display: flex;
+        flex-direction: column;
     }
 
     .channel-info {

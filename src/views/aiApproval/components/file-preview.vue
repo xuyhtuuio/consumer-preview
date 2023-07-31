@@ -52,7 +52,7 @@
 import 'swiper/css/swiper.css'
 import Swiper from 'swiper'
 import imgaePreview from './imgae-preview'
-import fileType from './file-type'
+import fileType from '@/components/common/file-type.vue';
 import filePreview from '@/components/filePreview'
 import {
   download

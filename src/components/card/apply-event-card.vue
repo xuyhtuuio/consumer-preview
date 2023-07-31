@@ -53,7 +53,7 @@
         <span class="sDate date">上线时间：{{ item.launchDate || "--" }}</span>
         <el-popover placement="bottom" trigger="click" popper-class="popper-persons"
           v-if="item.currentAssignee && item.currentAssignee.length">
-          <div style="max-height: 270x; overflow-y: auto">
+          <div style="max-height: 270px; overflow-y: auto" class="trs-scroll assignee-content">
             <div v-for="(child, index) in item.currentAssignee" :key="index" class="person-item">
               <span>{{ child.name }}/{{ child.WorkId }}/{{ child.Institution }}/{{
                 child.Dep
@@ -111,8 +111,8 @@
         </span>
       </div>
       <!-- 草稿 文件解析失败 显示修改和删除 但不显示关注按钮-->
-      <div class="flex" v-if="item.taskStatus == 0" @click="modify(item)">
-        <span class="modify icon-op">
+      <div class="flex" v-if="item.taskStatus == 0">
+        <span class="modify icon-op" @click="modify(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-xianxingtubiao"></use>
           </svg>修改
@@ -179,7 +179,12 @@ export default {
         })
       );
       this.$router.push({
-        path: "details",
+        name: "details",
+        params: {
+          formId: item.taskNumber,
+          originatorId: item.taskNumber,
+          taskName:item.taskName
+        },
       });
     },
     check(item) {
@@ -193,6 +198,11 @@ export default {
       );
       this.$router.push({
         name: "details",
+        params: {
+          formId: item.taskNumber,
+          originatorId: item.taskNumber,
+          taskName:item.taskName
+        },
       });
     },
     showReminderDialog(item) {
@@ -209,9 +219,9 @@ export default {
     },
     modify(item) {
       this.$router.push({
-        path: 'addApply',
+        name: 'editApply',
         params: {
-          item
+          id: item.taskNumber
         }
       })
     },
@@ -264,20 +274,15 @@ export default {
       this.persons = [];
     },
     concern(item) {
-      if (!this.allowConcernClick) return;
       const param = {
         recordId: item.taskNumber,
       };
-      this.allowConcernClick = false;
       concernApplication(param).then((res) => {
         if (res.status == 200) {
           this.$message.success(res.data.msg);
-          this.allowConcernClick = true;
           item.concernId = item.concernId == 1 ? 0 : 1;
           this.$emit('concern')
-
         }
-        this.allowConcernClick = false;
       });
     },
   },
@@ -573,6 +578,11 @@ export default {
 .reminderDialog,
 .popper-persons {
   padding: 16px;
+
+  .assignee-content {
+    width: 520px;
+    padding-right: 10px;
+  }
 
   .person-item {
     border-radius: 4px;

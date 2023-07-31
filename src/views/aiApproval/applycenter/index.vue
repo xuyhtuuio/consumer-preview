@@ -203,7 +203,7 @@
             @getList="getApplicationList"
           ></trs-pagination>
         </div>
-        <div v-else v-loading="search.loading">
+        <div v-else>
           <Empty></Empty>
         </div>
       </div>
