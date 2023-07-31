@@ -672,7 +672,7 @@ export default {
         .default-icon {
           position: absolute;
           top: 12px;
-          left: 7px;
+          left: 8px;
         }
       }
     }
