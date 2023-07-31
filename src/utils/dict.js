@@ -21,6 +21,11 @@ export const feildTypes = [
     valueType: 'Array'
   },
   {
+    label: '多选框组',
+    value: 'MultipleGroupsSelect',
+    valueType: 'Array'
+  },
+  {
     label: '级联选择框',
     value: 'Cascader',
     valueType: 'Tree',
@@ -41,10 +46,10 @@ export const belongModules = [
     label: '基本信息',
     value: '基本信息'
   },
-  {
-    label: '宣传渠道',
-    value: '宣传渠道'
-  },
+  // {
+  //   label: '宣传渠道',
+  //   value: '宣传渠道'
+  // },
   {
     label: '核对要点',
     value: '核对要点'
