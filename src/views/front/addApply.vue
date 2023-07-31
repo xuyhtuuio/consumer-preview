@@ -5,7 +5,12 @@
       <add-tag @submit="submit" @save="save" />
     </div>
     <div class="content" v-loading="isLoading">
-      <review-matters class="cnt-head" :list="reviewList" @handleTo="handleReviewClick" />
+      <review-matters
+        ref="refReviewMatters"
+        class="cnt-head"
+        :list="reviewList"
+        @handleTo="handleReviewClick"
+      />
       <div class="cnt-main">
         <basic-information class="cnt-item" ref="basicInformationRef" :list="basicInformation" />
         <publicity-channels class="cnt-item" ref="publicityChannelsRef" :list="promotionChannels" />
@@ -51,12 +56,33 @@ export default {
     promotionChannels: [],
     basicInformation: [],
     keyPointsForVerification: [],
-    reviewMaterials: []
+    reviewMaterials: [],
+    formId: undefined
   }),
   created() {
     this.initialData();
   },
-
+  beforeRouteEnter({ name, params: { id } }, from, next) {
+    console.log(name);
+    if (name === 'addApply') return next();
+    next(vm => {
+      console.log('123', id);
+      if (id || window.localStorage.getItem('editId')) {
+        console.log(id, window.localStorage.getItem('editId'));
+        vm.formId = id || window.localStorage.getItem('editId');
+        window.localStorage.setItem('editId', id || window.localStorage.getItem('editId'));
+      } else {
+        vm.formId = undefined;
+      }
+    });
+  },
+  beforeRouteLeave(to, from, next) {
+    window.localStorage.removeItem('editId');
+    next();
+  },
+  activated() {
+    this.initialData();
+  },
   methods: {
     initialData() {
       getFormCategoryArray().then(res => {
@@ -67,7 +93,8 @@ export default {
     // 审查事项类型
     handleReviewClick(id) {
       getApplyForm({
-        formCategoryId: id,
+        formId: this.formId,
+        formCategoryId: id
       }).then(res => {
         const { basicInformation, promotionChannels, keyPointsForVerification, reviewMaterials } =
           res.data.data;
@@ -113,13 +140,14 @@ export default {
         entryName: this.basicInformation[0].value,
         form_managementId: 1,
         uptime: '',
+        formId: this.formId
       };
       const formItemDataList = [];
       const list = ['basicInformation', 'promotionChannels', 'keyPointsForVerification'];
       list.forEach(item => {
         this[item].forEach(iten => {
           if (iten.props.order == 0) {
-            result.uptime = timestampToDateTime(iten.value);
+            result.uptime = iten.value ? timestampToDateTime(iten.value) : '';
           }
           formItemDataList.push({
             formItemId: iten.id,
@@ -167,7 +195,10 @@ export default {
           this.rollTo(offsetTop);
         });
       }
-      this.submitTrue(false);
+      const [result2, offsetTop2] = this.$refs['reviewMaterialRef'].judgeWarn(false);
+      if (result2) {
+        this.submitTrue(false);
+      }
     }
   },
   computed: {}
@@ -212,6 +243,4 @@ export default {
     }
   }
 }
-
-
 </style>

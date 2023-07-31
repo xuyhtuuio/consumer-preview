@@ -142,6 +142,13 @@ const router = new Router({
           parent: "/home",
           meta: { title: '新的申请' ,viewport: viewport ,pTitle: "申请中心"}
         },
+        {
+          path:"editApply",
+          name: "editApply",
+          component: () => import("@/views/front/addApply.vue"),
+          parent: "/home",
+          meta: { title: '编辑申请' ,viewport: viewport ,pTitle: "申请中心"}
+        }
       ]
     },
 

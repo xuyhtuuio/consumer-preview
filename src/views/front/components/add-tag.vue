@@ -1,8 +1,8 @@
 <template>
   <div class="add-tag">
     <div class="left">
-      <img class="img" src="" alt="">
-      <span class="text">谭新宇</span>
+      <img class="img" src="@/assets/image/ai-approval/ocr-avatar.png" alt="">
+      <span class="text">{{fullname}}</span>
     </div>
     <div class="center">
       <span class="item"> 总行</span>
@@ -20,7 +20,22 @@
 
 <script>
   export default {
+    data() {
+      return {
+        fullname: ""
+      }
+    },
+    created() {
+      this.initData()
+    },
     methods: {
+     async initData() {
+        const {data:{data}} = await this.$http({
+        method: 'get',
+        url: '/cpr/applicationForm/getUserDepartmentInfo',
+      });
+      this.fullname = data.fullname
+      },
       submit() {
         this.$emit("submit")
       },
@@ -73,4 +88,13 @@
 
   }
 }
+
+
+
+
+
+
+
+
+
 </style>

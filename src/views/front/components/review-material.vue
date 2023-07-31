@@ -39,7 +39,7 @@
               <div class="left">{{ `${index + 1}.` }}</div>
               <div class="center">
                 <g-icon class="left-icon" stylePx="16" :href="fileSuffix[item.type]" />{{
-                  item.name
+                  item.name || item.fileName
                 }}
               </div>
               <div class="right">
@@ -114,7 +114,13 @@ export default {
   },
   watch: {
     list(newVal) {
-      this.fileList = newVal[0].value
+      this.fileList = newVal[0].value;
+      this.fileList.forEach(item => {
+        item.status = 1;
+        item.name = item.fileName;
+        item.type = item.fileName.replace(/.+\./, '');
+        this.$set(item, 'isClick', false);
+      });
     },
     'fileList.length'() {
       if (this.judgeWarnFlag) this.judgeWarnFlag = false;
@@ -146,12 +152,12 @@ export default {
       const judgeRes = judgeArr.includes(type);
       // const judgeName = file.name.replace(`.${type}`,"")
       // const pattern = new RegExp(`${this.uploadTip1}`);
-        // if(pattern.test(judgeName)){
-        //   this.$message({
-        //     type: 'error',
-        //     message: '只支持zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/格式的文件！'
-        //   });
-        // }
+      // if(pattern.test(judgeName)){
+      //   this.$message({
+      //     type: 'error',
+      //     message: '只支持zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/格式的文件！'
+      //   });
+      // }
       this.fileList.push({
         name: file.name,
         id: file.uid,
@@ -200,21 +206,25 @@ export default {
       item.isClick = false;
     },
 
-    judgeWarn() {
+    judgeWarn(flag = true) {
       const offsetTop = this.$refs['globalRef'].offsetTop;
       if (this.fileList.some(item => item.status === -2)) {
         this.$message({ type: 'error', message: this.info.err });
-        this.judgeWarnFlag = true;
+        flag && (this.judgeWarnFlag = true);
         return [false, offsetTop];
       }
       if (this.fileList.some(item => item.status === -1)) {
         this.$message({ type: 'error', message: this.info.errT });
-        this.judgeWarnFlag = true;
+        flag && (this.judgeWarnFlag = true);
         return [false, offsetTop];
       }
       if (!this.fileList.length) {
-        this.judgeWarnFlag = true;
-        return [false, offsetTop];
+        if (flag) {
+          this.judgeWarnFlag = true;
+          return [false, offsetTop];
+        } else {
+          return [true];
+        }
       }
       return [true];
     }
