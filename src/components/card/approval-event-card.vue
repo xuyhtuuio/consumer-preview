@@ -116,7 +116,7 @@ export default {
   methods: {
     toApproval(item) {
       this.$router.push({
-        name: "aiApproval",
+        name: "approval-aiApproval",
         params: { item }
       });
     },
