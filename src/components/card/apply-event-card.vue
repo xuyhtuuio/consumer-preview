@@ -33,11 +33,11 @@
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
-            <i class="tag check" v-if="item.adoptionStatus == 0">
+            <i class="tag check" v-if="item.adoptionStatus == 0&&item.taskStatus!='3'">
               <i class="iconfont icon-guanzhu2"></i>
               不采纳
             </i>
-            <i class="tag adoption" v-else>
+            <i class="tag adoption" v-if="item.adoptionStatus == 1&&item.taskStatus!='3'">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tubiao"></use>
               </svg>
@@ -139,7 +139,7 @@
     <!-- 审批浮窗 -->
     <el-dialog :visible.sync="reminderDialog" align="center" custom-class="reminderDialog" :before-close="closeReminder">
       <p slot="title">请选择催单对象</p>
-      <div>
+      <div style="max-height: 270px; overflow-y: auto" class="trs-scroll assignee-content">
         <div v-for="(child, index) in persons" :key="index" class="person-item">
           <span>{{ child.name }}/{{ child.WorkId }}/{{ child.Institution }}/{{
             child.Dep
@@ -540,7 +540,7 @@ export default {
       background: #fff7e6;
       padding: 4px 8px 4px 4px;
     }
-
+    
     .del:hover {
       border-radius: 2px;
       background: #fff1f0;
@@ -562,6 +562,9 @@ export default {
       background: #e6fffb;
       border-radius: 2px;
     }
+    .del{
+      color: #EB5D78;
+    }
 
     .no-attention,
     .del {
@@ -572,6 +575,9 @@ export default {
 
 .apply-event-card:hover {
   background: #f7f8fa;
+  .event-name{
+    color: #2D5CF6;
+  }
 }
 </style>
 <style lang="less">

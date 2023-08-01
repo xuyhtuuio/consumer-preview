@@ -31,11 +31,11 @@
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
-            <i class="tag check" v-if="item.adoptionStatus == 0">
+            <i class="tag check" v-if="item.adoptionStatus == 0&&item.taskStatus!='3'">
               <i class="iconfont icon-guanzhu2"></i>
               不采纳
             </i>
-            <i class="tag adoption" v-else>
+            <i class="tag adoption" v-if="item.adoptionStatus == 1&&item.taskStatus!='3'">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tubiao"></use>
               </svg>
@@ -436,5 +436,8 @@ export default {
 
 .approval-event-card:hover {
   background: #f7f8fa;
+  .event-name{
+    color: #2d5cf6;
+  }
 }
 </style>

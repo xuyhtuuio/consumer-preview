@@ -41,7 +41,7 @@
         </div>
       </div>
     </div>
-    <div class="flex" style="align-items: flex-start">
+    <div class="flex" style="align-items: flex-start;   height: calc(100% - 50px);">
       <!-- 左侧工单信息 -->
       <div class="left-info">
         <div class="order-name">
@@ -57,10 +57,10 @@
             <i v-if="orderBaseInfo.taskStatus === '0'" class="tag draft">草稿</i>
             <i v-if="orderBaseInfo.taskStatus === '1'" class="tag in-approval">审批中<i
                 v-if="orderBaseInfo.approvalStage">>{{ orderBaseInfo.approvalStage }}</i></i>
-            <i v-if="orderBaseInfo.taskStatus === '2'" class="tag in-modify">待修改<i
-                v-if="orderBaseInfo.approvalStage">>{{ orderBaseInfo.approvalStage }}</i></i>
-            <i v-if="orderBaseInfo.taskStatus === '3'" class="tag check">待确认<i
-                v-if="orderBaseInfo.approvalStage">>{{ orderBaseInfo.approvalStage }}</i></i>
+            <i v-if="orderBaseInfo.taskStatus === '2'" class="tag in-modify">待修改<i v-if="orderBaseInfo.approvalStage">>{{
+              orderBaseInfo.approvalStage }}</i></i>
+            <i v-if="orderBaseInfo.taskStatus === '3'" class="tag check">待确认<i v-if="orderBaseInfo.approvalStage">>{{
+              orderBaseInfo.approvalStage }}</i></i>
             <i v-if="orderBaseInfo.taskStatus === '4'" class="end">
               <i class="tag end-sign"> 已结束 </i>
             </i>
@@ -70,14 +70,13 @@
       </div>
       <div class="right">
         <!-- 消保审查/详情页/审批中预览 -->
-        <div v-if="status == 0">
-          <nav class="nav active-nav">
+        <div class="right-nav">
+          <nav class="nav active-nav" v-if="status == 0">
             <span class="active-nav" style="text-align: left">审批记录明细</span>
           </nav>
-        </div>
-        <!-- 消保审查/详情页/审批人审批（非消保 -->
-        <div v-if="status == 2">
-          <nav class="nav">
+
+          <!-- 消保审查/详情页/审批人审批（非消保 -->
+          <nav class="nav" v-if="status == 2">
             <span :class="crtComp == 'leaderEditOpinion' ? 'active-nav' : ''" @click="() => {
               crtComp = 'leaderEditOpinion';
             }
@@ -87,10 +86,9 @@
             }
               ">审批记录明细</span>
           </nav>
-        </div>
-        <!-- 消保审查/详情页/审批人审批（非消保 -->
-        <div v-if="status == 3">
-          <nav class="nav">
+
+          <!-- 消保审查/详情页/审批人审批（非消保 -->
+          <nav class="nav" v-if="status == 3">
             <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
               crtComp = 'approvedOpinionCard';
             }
@@ -104,10 +102,8 @@
             }
               ">审批记录明细</span>
           </nav>
-        </div>
-        <!-- 已经结束-->
-        <div v-if="status == 4">
-          <nav class="nav">
+          <!-- 已经结束-->
+          <nav class="nav" v-if="status == 4">
             <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
               crtComp = 'approvedOpinionCard';
             }
@@ -121,9 +117,7 @@
             }
               ">审批记录明细</span>
           </nav>
-        </div>
-        <div v-if="status == 5">
-          <nav class="nav">
+          <nav class="nav" v-if="status == 5">
             <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
               crtComp = 'approvedOpinionCard';
             }
@@ -134,25 +128,27 @@
               ">审批记录明细</span>
           </nav>
         </div>
-        <component :is="crtComp" :status="status" ref="child">
-          <template slot="head">
-            <div class="approved-opinion-head">
-              <h2>消保审查意见书</h2>
-              <p>
-                <i>拟同意********活动，并提出以下消保审查意见，</i>请您确认是否采纳以下意见：
-              </p>
-            </div>
-          </template>
-          <template slot="foot">
-            <div class="approved-opinion-foot">
-              <p>以上为消保审查办公室建议，请酌情考虑。</p>
-              <p style="text-align: right; color: #1d2128; padding: 16px 0">
-                消保审查中心<br />
-                2021-09-08 12：20：30
-              </p>
-            </div>
-          </template>
-        </component>
+        <div class="right-content">
+          <component :is="crtComp" :status="status" ref="child">
+            <template slot="head">
+              <div class="approved-opinion-head">
+                <h2>消保审查意见书</h2>
+                <p>
+                  <i>拟同意********活动，并提出以下消保审查意见，</i>请您确认是否采纳以下意见：
+                </p>
+              </div>
+            </template>
+            <template slot="foot">
+              <div class="approved-opinion-foot">
+                <p>以上为消保审查办公室建议，请酌情考虑。</p>
+                <p style="text-align: right; color: #1d2128; padding: 16px 0">
+                  消保审查中心<br />
+                  2021-09-08 12：20：30
+                </p>
+              </div>
+            </template>
+          </component>
+        </div>
       </div>
     </div>
     <el-dialog :visible.sync="transferDialog" width="800px" center custom-class="transfer-dialog">
@@ -173,7 +169,7 @@
         <el-button type="text" @click="transferDialog = false" class="submit-btn">确定</el-button>
       </span>
     </el-dialog>
-     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
+    <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <filePreview :url="previewUrl"></filePreview>
     </el-dialog>
   </div>
@@ -198,7 +194,7 @@ export default {
 
   data() {
     return {
-      status: 4,
+      status: 0,
       crtComp: "",
       transferDialog: false,
       staff: {
@@ -249,10 +245,13 @@ export default {
       let { item } = JSON.parse(window.sessionStorage.getItem("order-detail"));
       const info = JSON.parse(window.sessionStorage.getItem("order-detail"));
       this.info = info
-
       // 审批中、草稿
       if (item.taskStatus == 0 || item.taskStatus == 1) {
         this.status = 0;
+        this.crtComp = "approvedOpinionCard";
+      }
+      if (item.taskStatus == 3) {
+        this.status = 3;
         this.crtComp = "approvedOpinionCard";
       }
       // 已经结束的工单
@@ -281,6 +280,7 @@ export default {
         this.status = 2;
         this.crtComp = "leaderEditOpinion";
       }
+      
     },
     keep() {
       if (this.crtComp == 'approvedOpinionCard') {
@@ -322,7 +322,13 @@ export default {
 </script>
 <style lang="less" scoped>
 .order-detail {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+
   .header {
+    height: 34px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -359,6 +365,8 @@ export default {
     padding: 20px 24px;
     border-radius: 10px;
     background: #fff;
+    height: 100%;
+    overflow: auto;
 
     .order-name {
       color: #1d2128;
@@ -434,13 +442,25 @@ export default {
   }
 
   .right {
+
     width: 420px;
     margin-left: 16px;
     padding: 22px 20px 20px 20px;
     display: inline-block;
     border-radius: 10px;
     background: #fff;
-    height: auto;
+    height: 100%;
+    overflow: hidden;
+
+    .right-nav {
+      height: 53px;
+    }
+
+    .right-content {
+      height: calc(100% - 53px);
+      overflow: auto;
+    }
+
 
     .nav {
       padding: 2px 0px;
@@ -604,4 +624,5 @@ export default {
       height: 96%;
     }
   }
-}</style>
+}
+</style>
