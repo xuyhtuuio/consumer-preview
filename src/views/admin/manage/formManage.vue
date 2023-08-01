@@ -35,7 +35,6 @@
           </el-select>
           <el-select class="is-dark input" v-model="search.belong" size="small" placeholder="所属模块">
             <el-option v-for="item in belongModules" :label="item.label" :value="item.value" :key="item.value"></el-option>
-            <el-option lable="上传" value="Upload" key="Upload"></el-option>
           </el-select>
           <el-button type="primary" @click="addFormItem" size="small" style="margin-left: 16px;">新增字段</el-button>
         </div>
@@ -45,6 +44,9 @@
             <el-button type="text" v-else @click="editFormItem(scope.row)">编辑</el-button>
             <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)" :style="{ visibility: scope.row.status !== '0' ? 'visible' : 'hidden' }">停用</el-button>
             <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)">删除</el-button>
+          </template>
+          <template #require="scope">
+            {{ scope.row.props.require ? '是' : '否' }}
           </template>
         </TrsTable>
       </div>
@@ -336,6 +338,7 @@ export default {
     },
     editSelfForm(item) {
       this.currentRow = item
+      this.imageUrl = item.icon
       this.limitTimeVisible = true
     },
     // 停用
