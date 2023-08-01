@@ -174,6 +174,11 @@ const router = new Router({
           name: "approval-details",
           component: () => import("@/views/approvalCenter/details"),
           meta: { title: '申请单详情', }
+        },{
+          path: "approval-aiApproval",
+          name: "approval-aiApproval",
+          component: () => import("@/views/aiApproval/index.vue"),
+          meta: { title: '智能审批', viewport: viewport }
         },
       ]
     },

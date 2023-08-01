@@ -31,11 +31,11 @@
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
-            <i class="tag check" v-if="item.adoptionStatus == 0">
+            <i class="tag check" v-if="item.adoptionStatus == 0&&item.taskStatus!='3'">
               <i class="iconfont icon-guanzhu2"></i>
               不采纳
             </i>
-            <i class="tag adoption" v-else>
+            <i class="tag adoption" v-if="item.adoptionStatus == 1&&item.taskStatus!='3'">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tubiao"></use>
               </svg>
@@ -51,7 +51,7 @@
         <span class="sDate date">上线时间：{{ item.launchDate | timeFormate }}</span>
         <!-- <span class="handler date">当前处理人：王明明</span> -->
         <el-popover placement="bottom" trigger="hover" popper-class="popper-persons">
-          <div>
+          <div style="text-align: center;">
             {{ item.sponsorMap && item.sponsorMap.institution }} | {{ item.sponsorMap && item.sponsorMap.dep }}
           </div>
           <span slot="reference" class="handler date">发起人：{{
@@ -116,7 +116,7 @@ export default {
   methods: {
     toApproval(item) {
       this.$router.push({
-        name: "aiApproval",
+        name: "approval-aiApproval",
         params: { item }
       });
     },
@@ -436,5 +436,8 @@ export default {
 
 .approval-event-card:hover {
   background: #f7f8fa;
+  .event-name{
+    color: #2d5cf6;
+  }
 }
 </style>

@@ -500,6 +500,10 @@ export default {
         }
       }
     }
+    &-item:hover {
+      background: #fff;
+      border-radius: 6px;
+    }
 
     .active-item {
       .icon {

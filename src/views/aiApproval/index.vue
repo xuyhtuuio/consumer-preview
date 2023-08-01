@@ -1,8 +1,8 @@
 <template>
   <div class="container" v-loading="loading">
     <div class="tools">
-      <el-popover placement="right" trigger="click" popper-class="sidebar-popper" @after-leave="hiddenPopover"
-        v-for="(item, index) in tools" :key="index">
+      <el-popover placement="right" trigger="click" popper-class="sidebar-popper"
+        @after-leave="hiddenPopover" v-for="(item, index) in tools" :key="index"  :arrow-offset="-30">
         <component :is="crtToolComponent" :sidebarParam="sidebarParam" @previewFile="previewFile"></component>
         <span slot="reference"
           :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
@@ -126,7 +126,7 @@ export default {
     }
   },
   mounted() {
-    if(!this.$route.params.item){
+    if (!this.$route.params.item) {
       this.$router.go(-1)
       return
     }
@@ -566,6 +566,7 @@ export default {
 
     .iconfont {
       font-size: 22px;
+      color: #506197;
 
     }
 
@@ -680,10 +681,11 @@ export default {
   border-radius: 10px;
   background: #FFF;
   padding: 24px;
-  height: 96%;
+  height: calc(100% - 52px);
   /* 投影/10% */
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.15);
   left: 64px !important;
+  top: 50px !important;
 }
 
 svg.leader-line {
