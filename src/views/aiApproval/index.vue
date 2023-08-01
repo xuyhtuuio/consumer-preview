@@ -237,9 +237,6 @@ export default {
       }
       this.sidebarParam = params
     },
-    popoverHidden() {
-
-    },
     hiddenPopover() {
       this.crtTools = ''
     },
