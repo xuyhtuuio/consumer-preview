@@ -73,6 +73,12 @@ const router = new Router({
           name: "LabelManage",
           component: () => import("@/views/admin/manage/labelManage.vue"),
           meta: { title: '标签管理' }
+        },
+        {
+          path: "opinionManage",
+          name: "OpinionManage",
+          component: () => import("@/views/admin/manage/opinionManage.vue"),
+          meta: { title: '意见管理' }
         }
       ]
     },

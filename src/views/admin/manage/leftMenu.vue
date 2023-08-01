@@ -25,6 +25,11 @@
       :class="{ 'is-active': $route.name === 'LabelManage' }"
       >标签管理</el-menu-item
     >
+    <el-menu-item
+      index="/admin/manage/opinionManage"
+      :class="{ 'is-active': $route.name === 'OpinionManage' }"
+      >意见管理</el-menu-item
+    >
   </el-menu>
 </template>
 
@@ -57,4 +62,6 @@ export default {
     }
   }
 }
+
+
 </style>
