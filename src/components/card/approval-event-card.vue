@@ -51,7 +51,7 @@
         <span class="sDate date">上线时间：{{ item.launchDate | timeFormate }}</span>
         <!-- <span class="handler date">当前处理人：王明明</span> -->
         <el-popover placement="bottom" trigger="hover" popper-class="popper-persons">
-          <div>
+          <div style="text-align: center;">
             {{ item.sponsorMap && item.sponsorMap.institution }} | {{ item.sponsorMap && item.sponsorMap.dep }}
           </div>
           <span slot="reference" class="handler date">发起人：{{
