@@ -17,6 +17,7 @@ import FlowManage from './flowManage'
 import FormManage from './formManage'
 import RolePermission from './rolePermission'
 import LabelManage from './labelManage.vue'
+import OpinionManage from "./opinionManage.vue"
 export default {
   name: 'manage',
   components: {
@@ -25,7 +26,8 @@ export default {
     FlowManage,
     FormManage,
     RolePermission,
-    LabelManage
+    LabelManage,
+    OpinionManage
   },
   data() {
     return {
@@ -44,4 +46,5 @@ export default {
     border-radius: 4px;
   }
 }
+
 </style>

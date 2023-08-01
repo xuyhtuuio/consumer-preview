@@ -1,5 +1,5 @@
 <template>
-  <div class="addApply">
+  <div class="addApply" v-loading.body="isGLoading">
     <g-breadcrunm />
     <div class="tag">
       <add-tag @submit="submit" @save="save" />
@@ -52,6 +52,7 @@ export default {
     title: '审查类型',
     cardInfo: '提醒：产品类内容审查，需于在产品上线/宣传前14天进行提交。',
     isLoading: true,
+    isGLoading: false,
     reviewList: [],
     promotionChannels: [],
     basicInformation: [],
@@ -63,7 +64,6 @@ export default {
     this.initialData();
   },
   beforeRouteEnter({ name, params: { id } }, from, next) {
-    console.log(name);
     if (name === 'addApply') return next();
     next(vm => {
       console.log('123', id);
@@ -103,6 +103,7 @@ export default {
         this.keyPointsForVerification = keyPointsForVerification;
         this.reviewMaterials = reviewMaterials;
         this.isLoading = false;
+        this.isGLoading = false
       });
     },
     // 提交
@@ -135,6 +136,9 @@ export default {
       this.submitTrue();
     },
     submitTrue(flag = true) {
+      if(this.isGLoading) return
+       this.isGLoading = true
+     
       const result = {
         approvalType: this.basicInformation[1].value,
         entryName: this.basicInformation[0].value,
@@ -174,11 +178,13 @@ export default {
         submit(result).then(res => {
           this.initialData();
           this.$message({ type: 'success', message: res.data.data });
+          this.rollTo(0)
         });
       !flag &&
         saveDraft(result).then(res => {
           this.initialData();
           this.$message({ type: 'success', message: res.data.data });
+          this.rollTo(0)
         });
     },
     rollTo(offsetTop) {
@@ -243,4 +249,19 @@ export default {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </style>

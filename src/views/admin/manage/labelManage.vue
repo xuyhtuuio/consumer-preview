@@ -348,6 +348,7 @@ export default {
       align-items: center;
       .class-com {
         background-color: #f7f8fa;
+        color: #86909c;
       }
       .class-common {
         margin-left: 12px;
@@ -486,4 +487,5 @@ export default {
     color: #1d2128;
   }
 }
+
 </style>
