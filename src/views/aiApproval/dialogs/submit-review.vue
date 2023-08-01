@@ -208,7 +208,7 @@ export default {
 <style lang="less" scoped>
 /deep/ .submit-review {
     width: 1200px;
-    height: 682px;
+    max-height: 682px;
     padding: 40px 60px;
     border-radius: 15px;
     background: #FFF;

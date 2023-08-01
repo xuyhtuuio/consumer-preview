@@ -173,7 +173,7 @@
         <el-button type="text" @click="transferDialog = false" class="submit-btn">确定</el-button>
       </span>
     </el-dialog>
-    <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
+     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <filePreview :url="previewUrl"></filePreview>
     </el-dialog>
   </div>

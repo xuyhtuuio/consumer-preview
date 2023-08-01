@@ -29,13 +29,6 @@ const router = new Router({
       name: 'login',
       component: () => import('@/views/login'),
     },
-    // ocr审批页
-    {
-      path: "/aiApproval",
-      name: "aiApproval",
-      component: () => import("@/views/aiApproval/index.vue"),
-      meta: { title: '智能审批', viewport: viewport }
-    },
     // 后台管理
     {
       path: '/admin/manage',

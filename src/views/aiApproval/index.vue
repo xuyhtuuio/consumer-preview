@@ -3,7 +3,7 @@
     <div class="tools">
       <el-popover placement="right" trigger="click" popper-class="sidebar-popper" @after-leave="hiddenPopover"
         v-for="(item, index) in tools" :key="index">
-        <component :is="crtToolComponent" :sidebarParam="sidebarParam"></component>
+        <component :is="crtToolComponent" :sidebarParam="sidebarParam" @previewFile="previewFile"></component>
         <span slot="reference"
           :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
           @click="changeTools(item)">
@@ -16,7 +16,7 @@
         <span class="content-title">
           <i class="iconfont icon-shenpiyemiantubiao"></i>审查项目名称显审查项目名称显示审查项目名称显示</span>
         <span class="content-btns">
-          <el-button @click="$route.go(-1)"><i class="iconfont icon-fanhui1"></i>返回</el-button>
+          <el-button @click="$router.go(-1)"><i class="iconfont icon-fanhui1"></i>返回</el-button>
           <el-button type="tuihui"><i class="iconfont icon-tuihui1"></i>退回/驳回</el-button>
           <el-button @click="save"><i class="iconfont icon-baocun"></i>保存</el-button>
           <el-button type="primary" @click="changeOcrView"><i class="iconfont icon-ocr"></i>{{ showOcr ? '关闭' :
@@ -40,6 +40,9 @@
     </div>
     <add-review ref="addReview" @addRecommend="addRecommend"></add-review>
     <submit-review ref="submitReview" :formId="formId"></submit-review>
+    <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
+      <filePreview :url="previewfileUrl"></filePreview>
+    </el-dialog>
   </div>
 </template>
 
@@ -71,6 +74,8 @@ export default {
   components: { filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase },
   data() {
     return {
+      previewDialog: false,
+      previewfileUrl: '',
       loading: false,
       fileloading: false,
       files: [], // 文件相关信息
@@ -121,6 +126,12 @@ export default {
     }
   },
   mounted() {
+    if(!this.$route.params.item){
+      this.$router.go(-1)
+      return
+    }
+    const { item } = this.$route.params
+    this.formId = item.taskNumber
     this.loading = true;
     this.init()
   },
@@ -141,6 +152,11 @@ export default {
       // });
       // 先获取工单基本信息，，然后判断获取草稿或初始化  文件信息
       this.getFileList()
+    },
+    previewFile(url) {
+      this.previewDialog = true
+      console.log(url)
+      this.previewfileUrl = url
     },
     async getFileList() {
       this.list = [];
@@ -212,14 +228,13 @@ export default {
       let params = {}
       switch (item.component) {
         case 'applyForm':
-        const {item} =this.$route.params
+          const { item } = this.$route.params
           params = {
             formId: item.taskNumber,
             originatorId: item.sponsorMap.sponsorId,
           }
           break;
       }
-      console.log('fff',params)
       this.sidebarParam = params
     },
     hiddenPopover() {

@@ -49,7 +49,6 @@
         <span class="sDate date">发起时间：{{ item.create_time | timeFormate }}</span>
         <span class="sDate date">更新时间：{{ item.update_time | timeFormate }}</span>
         <span class="sDate date">上线时间：{{ item.launchDate | timeFormate }}</span>
-
         <!-- <span class="handler date">当前处理人：王明明</span> -->
         <el-popover placement="bottom" trigger="hover" popper-class="popper-persons">
           <div>
@@ -61,11 +60,10 @@
         </el-popover>
         <span class="handler">
           <i class="iconfont icon-dept"></i>
-          {{ item.dep }}</span>
+          {{ item.institution }}</span>
       </div>
     </div>
     <!-- 任务状态（0:草稿 1：审查中 2：待修改 3：待确认 4：已完成 -->
-
     <div class="right-operation">
       <!-- 待审核状态显示审查 -->
       <span class="attention icon-op" v-if="item.taskStatus == '1'" @click="toApproval(item)">
