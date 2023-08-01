@@ -29,13 +29,6 @@ const router = new Router({
       name: 'login',
       component: () => import('@/views/login'),
     },
-    // ocr审批页
-    {
-      path: "/aiApproval",
-      name: "aiApproval",
-      component: () => import("@/views/aiApproval/index.vue"),
-      meta: { title: '智能审批', viewport: viewport }
-    },
     // 后台管理
     {
       path: '/admin/manage',
@@ -154,7 +147,12 @@ const router = new Router({
           component: () => import("@/views/front/addApply.vue"),
           parent: "/home",
           meta: { title: '编辑申请' ,viewport: viewport ,pTitle: "申请中心"}
-        }
+        },    {
+          path: "aiApproval",
+          name: "aiApproval",
+          component: () => import("@/views/aiApproval/index.vue"),
+          meta: { title: '智能审批', viewport: viewport }
+        },
       ]
     },
 

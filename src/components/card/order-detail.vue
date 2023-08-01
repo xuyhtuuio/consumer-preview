@@ -55,9 +55,12 @@
           <span class="order-class tag">{{ orderBaseInfo.formCategory }}</span>
           <span class="event-status">
             <i v-if="orderBaseInfo.taskStatus === '0'" class="tag draft">草稿</i>
-            <i v-if="orderBaseInfo.taskStatus === '1'" class="tag in-approval">审批中</i>
-            <i v-if="orderBaseInfo.taskStatus === '2'" class="tag in-modify">待修改</i>
-            <i v-if="orderBaseInfo.taskStatus === '3'" class="tag check">待确认</i>
+            <i v-if="orderBaseInfo.taskStatus === '1'" class="tag in-approval">审批中<i
+                v-if="orderBaseInfo.approvalStage">>{{ orderBaseInfo.approvalStage }}</i></i>
+            <i v-if="orderBaseInfo.taskStatus === '2'" class="tag in-modify">待修改<i
+                v-if="orderBaseInfo.approvalStage">>{{ orderBaseInfo.approvalStage }}</i></i>
+            <i v-if="orderBaseInfo.taskStatus === '3'" class="tag check">待确认<i
+                v-if="orderBaseInfo.approvalStage">>{{ orderBaseInfo.approvalStage }}</i></i>
             <i v-if="orderBaseInfo.taskStatus === '4'" class="end">
               <i class="tag end-sign"> 已结束 </i>
             </i>
@@ -170,7 +173,7 @@
         <el-button type="text" @click="transferDialog = false" class="submit-btn">确定</el-button>
       </span>
     </el-dialog>
-    <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
+     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <filePreview :url="previewUrl"></filePreview>
     </el-dialog>
   </div>
@@ -221,6 +224,13 @@ export default {
     this.judgeStatus();
   },
   mounted() {
+    if (!this.$route.params.formId) {
+      const { path } = this.$route
+      const url = path.match(/\/(\S*)\//)[1]
+      this.$router.replace({
+        name: url
+      })
+    }
     this.judgeStatus();
   },
   created() { },

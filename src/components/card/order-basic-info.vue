@@ -2,9 +2,12 @@
     <div class="order-basic-info" v-loading="loading">
         <div class="user">
             <div class="user-info">
-                <img src="@/assets/image/ai-approval/ocr-avatar.png" alt=""  />
-                <span class="nickname"> {{ orderBaseInfo.approverInfo&&orderBaseInfo.approverInfo.name }} / {{orderBaseInfo.approverInfo&&orderBaseInfo.approverInfo.workId  }} </span>
-                <span>{{  orderBaseInfo.approverInfo&&orderBaseInfo.approverInfo.institution}} <i v-if="orderBaseInfo.approverInfo&&orderBaseInfo.approverInfo.dep ">| {{orderBaseInfo.approverInfo.dep  }}</i></span>
+                <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
+                <span class="nickname"> {{ orderBaseInfo.approverInfo && orderBaseInfo.approverInfo.name }} /
+                    {{ orderBaseInfo.approverInfo && orderBaseInfo.approverInfo.workId }} </span>
+                <span>{{ orderBaseInfo.approverInfo && orderBaseInfo.approverInfo.institution }} <i
+                        v-if="orderBaseInfo.approverInfo && orderBaseInfo.approverInfo.dep">|
+                        {{ orderBaseInfo.approverInfo.dep }}</i></span>
             </div>
             <slot name="apply-modify"></slot>
         </div>
@@ -86,7 +89,12 @@ import FileType from '@/components/common/file-type.vue';
 
 export default {
     components: { FileType },
-
+    props: {
+        sidebarParam: {
+            type: Object,
+            default: () => { }
+        }
+    },
     data() {
         return {
             loading: false,
@@ -101,17 +109,12 @@ export default {
         };
     },
     mounted() {
-        if (!this.$route.params.formId) {
-            const {path} = this.$route 
-            const url =path.match(/\/(\S*)\//)[1]
-             this.$router.replace({
-                name:url
-             })
-        }
+        this.getWorkOrderTaskInfo()
+        this.getOrderDetail()
     },
     activated() {
         if (!this.$route.params) {
-             this.$router.go(-1)
+            this.$router.go(-1)
         }
         this.getWorkOrderTaskInfo()
         this.getOrderDetail()
@@ -119,17 +122,16 @@ export default {
     methods: {
         getWorkOrderTaskInfo() {
             const param = {
-                formId:  '175',
-                originatorId:  '798',
+                formId: this.$route.params.formId || this.sidebarParam.formId,
+                originatorId: this.$route.params.originatorId || this.sidebarParam.originatorId,
             }
             workOrderTaskInfo(param).then(res => {
                 const { data, status, message } = res.data;
                 if (status == 200) {
                     this.orderBaseInfo = {
                         ...data,
-                        taskName: this.$route.params.taskName
                     }
-                    this.$emit('sendbaseInfo',  this.orderBaseInfo)
+                    this.$emit('sendbaseInfo', this.orderBaseInfo)
                 }
             })
         },
@@ -149,11 +151,12 @@ export default {
             this.loading = true
             getApplyForm({
                 formCategoryId: '1',
-                formId: this.$route.params.formId,
+                formId: this.$route.params.formId || this.sidebarParam.formId,
             }).then(res => {
                 const { data, status, message } = res.data;
                 if (status === 200) {
-                    const { basicInformation, keyPointsForVerification, promotionChannels, reviewMaterials } = data
+                    let { basicInformation, keyPointsForVerification, promotionChannels, reviewMaterials } = data
+
                     //大段文本过滤
                     const noTextAreaBeseInfo = basicInformation.filter(v => { return v.name !== 'TextareaInput' })
                     const textAreaBaseInfo = basicInformation.filter(v => { return v.name == 'TextareaInput' })
@@ -179,19 +182,17 @@ export default {
     },
     filters: {
         valueFormat(val) {
-
             if (val.name == 'TextInput' || val.name == 'TextareaInput') {
-                return val.value
+                return val.value || '--'
             }
             if (val.name == 'SelectInput') {
                 const { options } = val.props
                 let strings = options.filter(v => v.id == val.value)
                 strings = strings.map(m => { return m.value }).join('、')
-                return strings
+                return strings || '--'
             }
             if (val.name == 'TimePicker') {
-                return moment(val.value).format('YYYY-MM-DD HH:mm:ss')
-
+                return val.value ? moment(val.value).format('YYYY-MM-DD HH:mm:ss') : '--'
             }
             if (val.name == 'MultipleSelect') {
                 const { options } = val.props
@@ -201,7 +202,7 @@ export default {
                     array.push(strings)
                 })
                 const label = array.map(m => { return m.value }).join('、')
-                return label
+                return label || '--'
             }
         }
     }

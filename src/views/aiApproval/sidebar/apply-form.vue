@@ -1,6 +1,6 @@
 <template>
     <div class="ocr-apply-form">
-        <order-basic-info>
+        <order-basic-info :sidebarParam="sidebarParam" @preview=preview>
             <template slot="apply-modify">
                 <el-button type="text" class="apply-modify">
                     <i class="icon el-icon-edit-outline"></i>修改申请单
@@ -13,11 +13,22 @@
 <script >
 import orderBasicInfo from '@/components/card/order-basic-info'
 export default {
+    props: {
+        sidebarParam: {
+            type: Object,
+            default: () => { }
+        }
+    },
     components: {
         orderBasicInfo
     },
     data() {
         return {
+        }
+    },
+    methods:{
+        preview(url){
+            this.$emit('previewFile', url)
         }
     }
 }
@@ -50,4 +61,5 @@ export default {
     }
 
 
-}</style>
+}
+</style>
