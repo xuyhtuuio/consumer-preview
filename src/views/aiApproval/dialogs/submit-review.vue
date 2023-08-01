@@ -417,13 +417,13 @@ export default {
 
                     }
 
-                    .has-opinion {
+                    .no-opinion {
                         border-radius: 0px 6px 6px 6px;
                         background: linear-gradient(90deg, #7B61FF 0%, #61A0FF 100%);
 
                     }
 
-                    .no-opinion {
+                    .has-opinion {
                         border-radius: 0px 6px 6px 6px;
                         background: linear-gradient(90deg, #E85167 0%, #FF8193 100%);
 

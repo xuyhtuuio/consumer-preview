@@ -232,7 +232,7 @@ export default {
     userStatus() {
       getUserStatus()
         .then((res) => {
-          this.tipsMsg = res.data.msg;
+          this.tipsMsg = res.data.data;
         })
         .catch((err) => {
           this.tipsMsg = false;

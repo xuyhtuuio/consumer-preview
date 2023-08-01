@@ -89,7 +89,12 @@ import FileType from '@/components/common/file-type.vue';
 
 export default {
     components: { FileType },
-
+    props: {
+        sidebarParam: {
+            type: Object,
+            default: () => { }
+        }
+    },
     data() {
         return {
             loading: false,
@@ -104,13 +109,8 @@ export default {
         };
     },
     mounted() {
-        if (!this.$route.params.formId) {
-            const { path } = this.$route
-            const url = path.match(/\/(\S*)\//)[1]
-            this.$router.replace({
-                name: url
-            })
-        }
+        this.getWorkOrderTaskInfo()
+        this.getOrderDetail()
     },
     activated() {
         if (!this.$route.params) {
@@ -122,8 +122,8 @@ export default {
     methods: {
         getWorkOrderTaskInfo() {
             const param = {
-                formId: this.$route.params.formId,
-                originatorId: this.$route.params.originatorId,
+                formId: this.$route.params.formId || this.sidebarParam.formId,
+                originatorId: this.$route.params.originatorId || this.sidebarParam.originatorId,
             }
             workOrderTaskInfo(param).then(res => {
                 const { data, status, message } = res.data;
@@ -151,12 +151,12 @@ export default {
             this.loading = true
             getApplyForm({
                 formCategoryId: '1',
-                formId: this.$route.params.formId,
+                formId: this.$route.params.formId || this.sidebarParam.formId,
             }).then(res => {
                 const { data, status, message } = res.data;
                 if (status === 200) {
                     let { basicInformation, keyPointsForVerification, promotionChannels, reviewMaterials } = data
-                    
+
                     //大段文本过滤
                     const noTextAreaBeseInfo = basicInformation.filter(v => { return v.name !== 'TextareaInput' })
                     const textAreaBaseInfo = basicInformation.filter(v => { return v.name == 'TextareaInput' })
@@ -182,19 +182,17 @@ export default {
     },
     filters: {
         valueFormat(val) {
-
             if (val.name == 'TextInput' || val.name == 'TextareaInput') {
-                return val.value||'--'
+                return val.value || '--'
             }
             if (val.name == 'SelectInput') {
                 const { options } = val.props
                 let strings = options.filter(v => v.id == val.value)
                 strings = strings.map(m => { return m.value }).join('、')
-                return strings||'--'
+                return strings || '--'
             }
             if (val.name == 'TimePicker') {
-                return val.value?moment(val.value).format('YYYY-MM-DD HH:mm:ss'):'--'
-
+                return val.value ? moment(val.value).format('YYYY-MM-DD HH:mm:ss') : '--'
             }
             if (val.name == 'MultipleSelect') {
                 const { options } = val.props
@@ -204,7 +202,7 @@ export default {
                     array.push(strings)
                 })
                 const label = array.map(m => { return m.value }).join('、')
-                return label ||'--'
+                return label || '--'
             }
         }
     }
@@ -428,4 +426,5 @@ export default {
             }
         }
     }
-}</style>
+}
+</style>

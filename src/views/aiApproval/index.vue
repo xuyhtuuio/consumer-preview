@@ -3,7 +3,7 @@
     <div class="tools">
       <el-popover placement="right" trigger="click" popper-class="sidebar-popper" @after-leave="hiddenPopover"
         v-for="(item, index) in tools" :key="index">
-        <component :is="crtToolComponent"></component>
+        <component :is="crtToolComponent" :sidebarParam="sidebarParam"></component>
         <span slot="reference"
           :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
           @click="changeTools(item)">
@@ -16,7 +16,7 @@
         <span class="content-title">
           <i class="iconfont icon-shenpiyemiantubiao"></i>审查项目名称显审查项目名称显示审查项目名称显示</span>
         <span class="content-btns">
-          <el-button><i class="iconfont icon-fanhui1"></i>返回</el-button>
+          <el-button @click="$route.go(-1)"><i class="iconfont icon-fanhui1"></i>返回</el-button>
           <el-button type="tuihui"><i class="iconfont icon-tuihui1"></i>退回/驳回</el-button>
           <el-button @click="save"><i class="iconfont icon-baocun"></i>保存</el-button>
           <el-button type="primary" @click="changeOcrView"><i class="iconfont icon-ocr"></i>{{ showOcr ? '关闭' :
@@ -76,6 +76,7 @@ export default {
       files: [], // 文件相关信息
       comments: [], // 编辑意见
       crtTools: '',//当前侧边工具栏激活项
+      sidebarParam: {}, //侧边工具栏激活项 props
       tools: [
         {
           component: 'applyForm',
@@ -206,8 +207,20 @@ export default {
       window.getSelection().removeAllRanges();
     },
     changeTools(item) {
-      this.crtTools = item.toolSign,
-        this.crtToolComponent = item.component
+      this.crtTools = item.toolSign
+      this.crtToolComponent = item.component
+      let params = {}
+      switch (item.component) {
+        case 'applyForm':
+        const {item} =this.$route.params
+          params = {
+            formId: item.taskNumber,
+            originatorId: item.sponsorMap.sponsorId,
+          }
+          break;
+      }
+      console.log('fff',params)
+      this.sidebarParam = params
     },
     hiddenPopover() {
       this.crtTools = ''
