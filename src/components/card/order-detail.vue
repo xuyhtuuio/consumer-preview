@@ -55,9 +55,9 @@
           <span class="order-class tag">{{ orderBaseInfo.formCategory }}</span>
           <span class="event-status">
             <i v-if="orderBaseInfo.taskStatus === '0'" class="tag draft">草稿</i>
-            <i v-if="orderBaseInfo.taskStatus === '1'" class="tag in-approval">审批中</i>
-            <i v-if="orderBaseInfo.taskStatus === '2'" class="tag in-modify">待修改</i>
-            <i v-if="orderBaseInfo.taskStatus === '3'" class="tag check">待确认</i>
+            <i v-if="orderBaseInfo.taskStatus === '1'" class="tag in-approval">审批中<i v-if="orderBaseInfo.approvalStage">>{{orderBaseInfo.approvalStage }}</i></i>
+            <i v-if="orderBaseInfo.taskStatus === '2'" class="tag in-modify">待修改<i v-if="orderBaseInfo.approvalStage">>{{orderBaseInfo.approvalStage }}</i></i>
+            <i v-if="orderBaseInfo.taskStatus === '3'" class="tag check">待确认<i v-if="orderBaseInfo.approvalStage">>{{orderBaseInfo.approvalStage }}</i></i>
             <i v-if="orderBaseInfo.taskStatus === '4'" class="end">
               <i class="tag end-sign"> 已结束 </i>
             </i>

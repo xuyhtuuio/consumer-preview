@@ -46,17 +46,17 @@
       </div>
       <div class="event-infos">
         <span class="id">{{ item.taskNumber }}</span>
-        <span class="sDate date">发起时间：{{ item.launchDate | timeFormate }}</span>
+        <span class="sDate date">发起时间：{{ item.create_time | timeFormate }}</span>
         <span class="sDate date">更新时间：{{ item.update_time | timeFormate }}</span>
         <span class="sDate date">上线时间：{{ item.launchDate | timeFormate }}</span>
 
         <!-- <span class="handler date">当前处理人：王明明</span> -->
         <el-popover placement="bottom" trigger="hover" popper-class="popper-persons">
           <div>
-            {{ item.currentAssignee && item.currentAssignee[0].Institution }}
+            {{ item.sponsorMap && item.sponsorMap.institution }} | {{ item.sponsorMap && item.sponsorMap.dep }}
           </div>
           <span slot="reference" class="handler date">发起人：{{
-            item.currentAssignee && item.currentAssignee[0].name
+            item.sponsorMap && item.sponsorMap.name
           }}</span>
         </el-popover>
         <span class="handler">
@@ -118,7 +118,7 @@ export default {
   methods: {
     toApproval(item) {
       this.$router.push({
-        path: "aiApproval",
+        path: "/aiApproval",
         params: { item }
       });
     },
@@ -128,10 +128,10 @@ export default {
         pageFrom: "approve",
       }));
       this.$router.push({
-        name: "details",
+        name: "approval-details",
         params: {
           formId: item.taskNumber,
-          originatorId: item.taskNumber,
+          originatorId: item.sponsorMap.sponsorId,
           taskName:item.taskName
         },
       });
@@ -149,7 +149,7 @@ export default {
         name: "approval-details",
         params: {
           formId: item.taskNumber,
-          originatorId: item.taskNumber,
+          originatorId: item.sponsorMap.sponsorId,
           taskName:item.taskName
         },
       });
@@ -171,7 +171,6 @@ export default {
           this.$message.success(res.data.msg);
           item.concernId = item.concernId == 1 ? 0 : 1;
         }
-;
       });
     },
   },

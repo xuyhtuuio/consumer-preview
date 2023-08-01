@@ -370,7 +370,7 @@ export default {
       }
     },
     changeArrrovalType() {
-      if (this.search.approvalType) {
+      if (this.search.approvalType||this.search.approvalType==0) {
         this.getApprovalStage();
       } else {
         this.search.approvalStage = "";
@@ -389,14 +389,15 @@ export default {
       });
     },
     getApprovalStage() {
+      const name = this.transactionTypes.filter(v =>  {return v.value == this.search.approvalType})[0].label
       let params = {
-        approvalPhases: this.search.approvalType,
+        approvalPhases: name,
       };
       getApprovalStage(params).then((res) => {
-        this.approvalPhases = res.data.data.map((v) => {
+        this.approvalPhases = res.data.data.map((v,index) => {
           return {
             label: v,
-            value: v,
+            value: index,
           };
         });
       });
@@ -517,7 +518,7 @@ export default {
     userStatus() {
       getUserStatus()
         .then((res) => {
-          this.tipsMsg = res.data;
+          this.tipsMsg = res.data.msg;
         })
         .catch((err) => {
           this.tipsMsg = false;
