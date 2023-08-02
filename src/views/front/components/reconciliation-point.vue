@@ -4,6 +4,7 @@
     <g-table-card :title="title">
       <template v-slot:cardInfo>
           <div class="cardInfo">
+            <span style="color:#EB5757">*</span>
             {{cardInfo}}
           </div>
           <div class="warn" v-if="judgeWarnFlag">
@@ -116,4 +117,5 @@ import WarnInfo  from "./warn-info"
       padding: 16px 72px 0;
     }
 }
+
 </style>

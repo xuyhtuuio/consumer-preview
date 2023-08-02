@@ -11,11 +11,15 @@
             :type="currentId === item.recordId ? 'primary-active' : 'normal'"
             @click.native="handleClick(item.recordId)"
           >
+          <g-icon v-show="currentId !== item.recordId" class="icon button-icon" :stylePx="18" href="#icon-Vector" />
             <g-icon
-              class="icon"
-              :stylePx="currentId === item.recordId ?30: 18"
-              :href="currentId === item.recordId ? '#icon-chanpin1' : '#icon-Vector'"
+            v-show="currentId === item.recordId"
+              class="icon button-icon"
+              style="position: relative;top: 4px;left:-3px"
+              :stylePx="30"
+              href="#icon-chanpin1"
             />
+            
             {{ item.examineTypesName }}
           </g-button>
         </div>
@@ -70,7 +74,7 @@ export default {
         padding: 10px 24px;
         font-size: 14px;
       }
-      .icon {
+      .button-icon {
         display: flex;
         align-items: center;
         font-size: 24px;
@@ -88,6 +92,7 @@ export default {
     }
     /deep/.btn-primary-active {
       font-weight: 700;
+      border: 1px solid #A8C5FF;
     }
     .icon {
       position: relative;
@@ -97,6 +102,11 @@ export default {
     }
   }
 }
+
+
+
+
+
 
 
 
