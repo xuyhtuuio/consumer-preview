@@ -175,7 +175,7 @@ export default {
         "order-detail",
         JSON.stringify({
           item,
-          pageFrom: "apply",
+          clickPoint:'taskName',
         })
       );
       this.$router.push({
