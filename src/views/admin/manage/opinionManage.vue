@@ -12,11 +12,23 @@
           </el-form-item>
 
           <el-form-item class="form-item">
-            <el-input
-              suffix-icon="el-icon-search"
+            <el-autocomplete
+              popper-class="my-autocomplete"
               v-model="search.baseline"
+              :fetch-suggestions="querySearch"
               placeholder="基准"
-            ></el-input>
+              @select="handleSelect"
+            >
+              <i class="el-icon-search el-input__icon" slot="suffix"> </i>
+              <template slot-scope="{ item }">
+                <div class="option-info">
+                  <span class="left" v-html="item.showItem"></span>
+                  <span :class="['right', item.typeId === 0 ? 'right-zero' : 'right-one']">{{
+                    item.type
+                  }}</span>
+                </div>
+              </template>
+            </el-autocomplete>
           </el-form-item>
 
           <el-form-item class="form-item">
@@ -59,7 +71,7 @@
           <div class="btns">
             <span v-if="item.isTop" class="btn btn-yellow"><i>取消置顶</i></span>
             <span v-else class="btn"><i>置顶</i></span>
-            <span class="btn"><i>编辑</i></span>
+            <span class="btn"><i @click="handleClick(item)">编辑</i></span>
             <span class="btn btn-red"><i>停用</i></span>
             <span class="btn"><i>删除</i></span>
           </div>
@@ -92,10 +104,11 @@
         <el-form-item class="form-item" label="标签名称">
           <el-select
             class="label-right"
-            v-model="dialogItem.input"
+            v-model="dialogItem.title"
             filterable
             :filter-method="dataFilter"
             @visible-change="visibleHideSelectInput"
+            @change="handleSelectChange"
             placeholder="请输入标签名称"
           >
             <el-option
@@ -117,8 +130,7 @@
           <el-input
             type="textarea"
             placeholder="请输入审查话术内容"
-            v-model="dialogItem.textarea"
-            maxlength="30"
+            v-model="dialogItem.content"
             resize="none"
             size="medium"
             :autosize="{ minRows: 10, maxRows: 10 }"
@@ -218,15 +230,49 @@ export default {
       },
       titleDialog: '新建标签',
       dialogTitle: '标签名称',
-      dialogItem: [],
+      dialogItem: {
+      },
       deviceIdList: [],
-      deviceIdListFilter: []
+      deviceIdListFilter: [],
+      searchList: [],
+      searchListFilter: []
     };
   },
   created() {
     this.initData();
   },
   methods: {
+    initData() {
+      const data = {
+        code: '0',
+        content: [
+          { value: 'M107NEC2E98BE9C95', id: 0, typeId: 0, type: '禁用词' },
+          { value: '456王子沛123', id: 1, typeId: 0, type: '禁用词' },
+          { value: 'M107W01decce91b7b810c', id: 2, typeId: 0, type: '禁用词' },
+          { value: 'M107N000822B49FFB', id: 3, typeId: 1, type: '敏感词' },
+          { value: 'M107W512780e6ef2a40d7', id: 4, typeId: 0, type: '禁用词' },
+          { value: 'M107N0008229CA2FB', id: 5, typeId: 0, type: '禁用词' },
+          { value: 'M107NEC2E98BEAE31', id: 6, typeId: 0, type: '禁用词' },
+          { value: 'M107Ne1acff34c9b13a88', id: 7, typeId: 0, type: '禁用词' },
+          { value: '比较基准', id: 8, typeId: 0, type: '禁用词' },
+          { value: 'M107NC0847D2C5A72', id: 9, typeId: 0, type: '禁用词' }
+        ],
+        message: '获取成功'
+      };
+      data.content.forEach(({ value, id: label, typeId, type }) => {
+        let obj = {
+          label,
+          value,
+          typeId,
+          type,
+          showItem: value
+        };
+        this.deviceIdList.push(obj);
+        this.deviceIdListFilter.push(obj);
+        this.searchList.push(obj);
+        this.searchListFilter.push(obj);
+      });
+    },
     sortChange({ column, prop, order }) {
       console.log(column, prop, order);
     },
@@ -255,35 +301,7 @@ export default {
     handleSelectIpt(val) {
       console.log(val);
     },
-    initData() {
-      const data = {
-        code: '0',
-        content: [
-          { value: 'M107NEC2E98BE9C95', id: 0, typeId: 0, type: '禁用词' },
-          { value: 'M107W957309e677f9fb44', id: 1, typeId: 0, type: '禁用词' },
-          { value: 'M107W01decce91b7b810c', id: 2, typeId: 0, type: '禁用词' },
-          { value: 'M107N000822B49FFB', id: 3, typeId: 1, type: '敏感词' },
-          { value: 'M107W512780e6ef2a40d7', id: 4, typeId: 0, type: '禁用词' },
-          { value: 'M107N0008229CA2FB', id: 5, typeId: 0, type: '禁用词' },
-          { value: 'M107NEC2E98BEAE31', id: 6, typeId: 0, type: '禁用词' },
-          { value: 'M107Ne1acff34c9b13a88', id: 7, typeId: 0, type: '禁用词' },
-          { value: 'M107N0008225CA5FB', id: 8, typeId: 0, type: '禁用词' },
-          { value: 'M107NC0847D2C5A72', id: 9, typeId: 0, type: '禁用词' }
-        ],
-        message: '获取成功'
-      };
-      data.content.forEach(({ value, id: label, typeId, type }) => {
-        let obj = {
-          label,
-          value,
-          typeId,
-          type,
-          showItem: value
-        };
-        this.deviceIdList.push(obj);
-        this.deviceIdListFilter.push(obj);
-      });
-    },
+
     // 自定义筛选方法
     dataFilter(val) {
       if (val) {
@@ -305,9 +323,9 @@ export default {
         this.deviceIdList = [];
         arr.filter(item => {
           let reg = new RegExp(keyword, 'gi');
-          const res = reg.exec(item.value )
+          const res = reg.exec(item.value);
           if (res) {
-             let replaceString = `<span style="color:#2D5CF6;">${res[0]}</span>`;
+            let replaceString = `<span style="color:#2D5CF6;">${res[0]}</span>`;
             item.showItem = item.value.replace(res, replaceString);
             this.deviceIdList.push(item);
           }
@@ -316,13 +334,28 @@ export default {
         this.deviceIdList = [];
       }
     },
-
+    handleSelectChange(item) {
+      console.log(item.title);
+      this.dataFilter(item.title)
+    },
     // 当下拉框出现时触发
     visibleHideSelectInput(val) {
       if (val) {
         this.deviceIdList = JSON.parse(JSON.stringify(this.deviceIdListFilter));
       }
-    }
+    },
+    querySearch(val, cb) {
+      let searchList = JSON.parse(JSON.stringify(this.searchList));
+      let results = val
+        ? searchList.filter(
+            item => item.value.includes(val) || item.value.toUpperCase().includes(val.toUpperCase())
+          )
+        : searchList;
+      this.setHighlight(results, val);
+      // 调用 callback 返回建议列表的数据
+      cb(results);
+    },
+    handleSelect() {}
   }
 };
 </script>

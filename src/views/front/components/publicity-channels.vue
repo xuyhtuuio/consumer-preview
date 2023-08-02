@@ -65,7 +65,8 @@ export default {
 
 .publicity-channels {
     .cardInfo {
-      padding: 0 8px;
+      color: #EB5757;
+      // padding: 0 8px;
     }
      .warn {
       display: flex;
@@ -85,4 +86,6 @@ export default {
       }
     }
 }
+
+
 </style>

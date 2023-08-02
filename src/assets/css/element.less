@@ -136,66 +136,6 @@
   line-height: 100%;
 }
 
-// table
-
-// 表格文本溢出处理，表格文本内容过多鼠标滑过显示全部,添加属性：:show-overflow-tooltip="true" 
-// 斑马线纹表格样式：waring-row 添加属性 :row-class-name=""  在method返回对应class样式 return waring-row  勿与stripe共存
-.TRS-table {
-  .el-table__body td > .cell:empty::before{
-    content: '-';
-    display: inline-block;
-  }
-  .el-table {
-    border: 1px solid #E8F1FF;
-    border-bottom: none;
-    border-radius: 6px;
-    .el-table__body, .el-table__footer, .el-table__header {
-      border-collapse: collapse!important;
-    }
-    .el-table__body td > .cell:empty::before{
-        content: '-';
-        display: inline-block;
-       }
-    .waring-row {
-      background: #F9FBFF;
-    }
-    .el-table__cell {
-      border-right: 1px solid #E8F1FF;
-      border-bottom: 1px solid #E8F1FF;
-    }
-
-    .el-table__body tr:hover>td {
-      background-color: #E8F1FF;
-      }
-      th {
-        background: #F9FBFF;
-      }
-      thead {
-        color: #505968;
-        font-weight: 600;
-        font-size: 14px;
-        line-height: 22px;
-        .el-table__cell {
-          height: 40px;
-          padding: 0;
-        }
-      }
-      tbody {
-        .el-table__cell {
-          font-size: 14px;
-          color: #1D2128;
-          font-weight: 400;
-          line-height: 22px;
-          height: 40px;
-          padding: 4px 0;
-        }
-      }
-    }
-  }
-.table {
-  overflow-x: auto;
-}
-
 /* ************自定义组件的通用样式***************************** */
 // trs-descriptions
 .descriptions {
@@ -257,6 +197,10 @@
     line-height: 38px;
     background: rgba(247, 248, 250, 1);
     border: 0;
+  }
+
+  .el-autocomplete {
+    width: 100%;
   }
   
   .el-textarea__inner,.el-form-item__content  {

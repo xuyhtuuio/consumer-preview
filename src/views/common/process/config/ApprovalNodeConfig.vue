@@ -317,6 +317,9 @@ export default {
       this.showOrgSelect = false
       this.select = []
       this.$store.state.selectedNode.props.assignedUser = []
+      if (this.nodeProps.assignedType === 'SELECT_NODE') {
+        this.$store.state.selectedNode.props.mode = 'OR'
+      }
     },
     closeSelect() {
       this.showOrgSelect = false
