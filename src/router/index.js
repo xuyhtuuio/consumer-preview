@@ -29,6 +29,11 @@ const router = new Router({
       name: 'login',
       component: () => import('@/views/login'),
     },
+    {
+      path: "/show-review",
+      name: "showReview",
+      component: () => import('@/views/front/show-review.vue'),
+    },
     // 后台管理
     {
       path: '/admin/manage',

@@ -38,9 +38,8 @@
             >
               <div class="left">{{ `${index + 1}.` }}</div>
               <div class="center">
-                <g-icon class="left-icon" stylePx="16" :href="fileSuffix[item.type]" />{{
-                  item.name || item.fileName
-                }}
+                <file-type class="left-icon" :fileName="item.name || item.fileName"></file-type>
+                {{item.name || item.fileName}}
               </div>
               <div class="right">
                 <div class="r-item progress" v-if="item.status === -1">上传中...</div>
@@ -67,10 +66,12 @@
 <script>
 import WarnInfo from './warn-info.vue';
 import { getFormGroups, deleteFormGroups } from '@/api/front.js';
+import FileType from "@/components/common/file-type"
 // 核对要点
 export default {
   components: {
-    WarnInfo
+    WarnInfo,
+    FileType,
   },
   props: {
     list: {
@@ -189,7 +190,13 @@ export default {
         });
     },
     handleUploadLook(url) {
-      window.open(url);
+      let routeUrl = this.$router.resolve({
+        name: 'showReview',
+        query: {
+          url
+        }
+      })
+      window.open(routeUrl.href, '_blank')
     },
     //删除图片
     handleUploadDelete(item) {
@@ -319,4 +326,30 @@ export default {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </style>
