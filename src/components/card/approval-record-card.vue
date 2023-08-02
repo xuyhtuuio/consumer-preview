@@ -389,7 +389,7 @@ export default {
       }
 
       .top-line {
-        height: 30px;
+        height: 16px;
         width: 1px;
         background-repeat: no-repeat;
         background-repeat-y: inherit;
