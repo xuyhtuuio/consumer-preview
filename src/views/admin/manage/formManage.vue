@@ -9,18 +9,21 @@
         <span @click="goBack" class="breadcrumb">{{ isEdit ? '表单管理' : '表单管理' }}</span>/{{ currentRow.typesOfReviewItemsName }}
       </div>
     </div>
-    <div>
+    <div v-loading="loadingList">
       <!-- 表单管理一级表格 -->
       <TrsTable theme="TRS-table-gray" :data="data" :colConfig="colConfig" @sort-change="changeSort" v-if="level === 1" @submitEdit="submitEdit">
         <template #icon="scope">
-          <img v-if="scope.row.icon" :src="scope.row.icon"/>
+          <img v-if="scope.row.icon" :src="scope.row.icon" style="max-height: 30px;max-width: 120px;"/>
           <span v-else>--</span>
+        </template>
+        <template #ladingBillTimeLimit="scope">
+          <span>{{ scope.row.ladingBillTimeLimit ? scope.row.ladingBillTimeLimit + '天' : '--' }}</span>
         </template>
         <template #operate="scope">
           <el-button type="text" @click="copyForm(scope.row)">复制</el-button>
           <el-button type="text" @click="editForm(scope.row)">编辑</el-button>
           <el-button type="text" @click="editSelfForm(scope.row)">修改时限</el-button>
-          <el-button type="text" v-if="scope.row.deactivateOrNot" class="red" @click="stopApllay(scope.row)">停用</el-button>
+          <el-button type="text" v-if="scope.row.run === '1'" class="red" @click="stopApllay(scope.row)">停用</el-button>
           <el-button type="text" v-else @click="stopApllay(scope.row)">恢复</el-button>
         </template>
       </TrsTable>
@@ -86,8 +89,8 @@
         <i class="icon-chanpin1"></i>
         <el-upload
           class="avatar-uploader"
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :on-success="handleAvatarSuccess"
+          action="/cpr/file/upload"
+          :http-request="uploadBpmn"
           :show-file-list="false">
           <img v-if="imageUrl" :src="imageUrl" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -106,7 +109,15 @@
 </template>
 <script>
 import { feildTypes, belongModules } from '@/utils/dict'
-import { obtainExamineTypeList } from '@/api/manage'
+import { getFormGroups } from "@/api/front";
+import {
+  obtainExamineTypeList,
+  copyFormCategory,
+  addFormCategory,
+  modifyNameFormCategory,
+  modifyTimeLimitFormCategory,
+  switchFormCategoryState
+} from '@/api/manage'
 import FormManageCustomField from './formManageCustomField'
 export default {
   name: 'FormManage',
@@ -118,26 +129,12 @@ export default {
       feildTypes,
       belongModules,
       level: 1,
-      data: [
-        {
-          typesOfReviewItemsName: '产品类',
-          billOfLadingTimeLimit: '上线前12小时',
-          deactivateOrNot: 0,
-          icon: '#',
-          updateTime: '2023-07-12 09:00:01'
-        },
-        {
-          typesOfReviewItemsName: '产品类1',
-          billOfLadingTimeLimit: '上线前121小时',
-          deactivateOrNot: 1,
-          icon: '',
-          updateTime: '2023-07-13 09:00:01'
-        }
-      ],
+      loadingList: false,
+      data: [],
       colConfig: [
         {
           label: '审查事项类型',
-          prop: 'typesOfReviewItemsName',
+          prop: 'examineTypesName',
           edit: true
         },
         {
@@ -149,7 +146,7 @@ export default {
         },
         {
           label: '提单时限（加急单）',
-          prop: 'billOfLadingTimeLimit'
+          prop: 'ladingBillTimeLimit'
         },
         {
           label: '更新时间',
@@ -285,60 +282,100 @@ export default {
     this.getObtainExamineTypeList()
   },
   methods: {
+    uploadBpmn(param) {
+      const formData = new FormData();
+      console.log(param);
+      formData.append("mf", param.file); // 传入bpmn文件
+      getFormGroups(formData)
+        .then((res) => {
+          console.log(res.data.data)
+          this.handleAvatarSuccess(res.data.data, param.file.uid);
+        })
+        .catch((err) => {
+          param.onError(param.file.uid);
+        });
+    },
     async getObtainExamineTypeList(params) {
+      this.loadingList = true
       const res = await obtainExamineTypeList({
-        pageNow: 10,
-        pageSize: 1,
+        pageNow: 1,
+        pageSize: 10,
+        orderColumn: 'updateTime',
+        orderType: 'desc',
         ...params
       })
-      if (res.data) {
-        this.data = res.data.list;
-        this.page.total = res.data.totalCount
-        this.page.pageNow = res.data.pageNow
+      const resData = res.data.data
+      if (resData) {
+        this.data = resData.data.list;
+        this.page.total = resData.data.totalCount
+        this.page.pageNow = resData.data.pageNow
       }
+      this.loadingList = false
     },
-    changeSort() {
-
+    changeSort(sort) {
+      if (sort.order.startsWith('desc')) {
+        this.getObtainExamineTypeList({
+          orderColumn: sort.prop,
+          orderType: 'desc'
+        })
+      } else {
+        this.getObtainExamineTypeList({
+          orderColumn: sort.prop,
+          orderType: 'asc'
+        })
+      }
     },
     changeSort1() {
 
     },
-    handleCurrentChange() {
-
+    handleCurrentChange(val) {
+      if (this.level === 1) {
+        this.getObtainExamineTypeList({
+          pageNow: val
+        })
+      }
     },
-    handleAvatarSuccess(res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw);
+    handleAvatarSuccess(data) {
+      this.imageUrl = data.url;
     },
     reUpload() {
       console.log(document.querySelector('#icon-uploader'))
       document.querySelector('#icon-uploader').click()
     },
-    addForm() {
-      // 掉接口复制一个
-      this.isEdit = false
-      this.currentRow.title = '表单' + (this.page.total + 1)
-      this.level = 2
+    // 新增表单
+    async addForm() {
+      const res = await addFormCategory()
+      if (res.data) {
+        this.getObtainExamineTypeList()
+        this.$message.success('新增成功')
+      }
     },
     editForm(item) {
       this.isEdit = true
       this.level = 2
       this.currentRow = item
     },
-    copyForm() {
-      this.data.unshift({
-        title: '表单' + (this.page.total + 1),
-        limitTime: '上线前12小时',
-        utime: '2023-07-12 09:00:01'
+    async copyForm(row) {
+      await copyFormCategory(row.recordId)
+      this.getObtainExamineTypeList({
+        orderColumn: 'updateTime',
+        orderType: 'desc'
       })
-      this.page.total++
     },
     // 编辑单元格
-    submitEdit() {
-
+    async submitEdit(row) {
+      const res = await modifyNameFormCategory({
+        name: row.examineTypesName,
+        formCategoryId: row.recordId
+      })
+      if (res.data) {
+        this.$message.success('修改成功')
+      }
     },
     editSelfForm(item) {
       this.currentRow = item
       this.imageUrl = item.icon
+      this.limitTime = item.ladingBillTimeLimit
       this.limitTimeVisible = true
     },
     // 停用
@@ -348,11 +385,18 @@ export default {
         cancelButtonText: '取消',
         dangerouslyUseHTMLString: true,
         // showClose: false,
-      }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '停用成功!'
-        });
+      }).then(async () => {
+        const res = await switchFormCategoryState({
+          formCategoryId: row.recordId
+        })
+        if (res.data.data) {
+          this.$message({
+            type: 'success',
+            message: row.run === '1' ? '停用成功!' : '恢复成功!'
+          });
+          row.run = row.run === '0' ? '1' : '0'
+          return;
+        }
         this.stopApllayNo()
       }).catch(() => {
          
@@ -370,10 +414,16 @@ export default {
          
       });
     },
-    handleSubmitLimitTime() {
+    async handleSubmitLimitTime() {
       if (this.limitTime) {
+        await modifyTimeLimitFormCategory({
+          formCategoryId: this.currentRow.recordId,
+          timeLimit: this.limitTime,
+          fileUrl: this.imageUrl
+        })
+        this.getObtainExamineTypeList()
         this.limitTimeVisible = false
-        this.$message.success('修改时限成功')
+        this.$message.success('修改成功')
       } else {
         this.$message.warning('请输入大于0的数字')
       }

@@ -1,6 +1,13 @@
 <template>
   <div>
-    
+    <div style="margin-bottom: 20px">
+      <el-radio-group v-model="formId" @input="changeFormId" size="small">
+        <el-radio-button label="111">表单1</el-radio-button>
+        <el-radio-button label="222">表单2</el-radio-button>
+        <el-radio-button label="333">表单3</el-radio-button>
+        <el-radio-button label="444">表单4</el-radio-button>
+      </el-radio-group>
+    </div>
     <el-table :header-cell-style="{background:'#f5f6f6'}" :data="formPerms" border style="width: 100%">
       <el-table-column prop="title" show-overflow-tooltip label="表单字段">
         <template slot-scope="scope">
@@ -49,7 +56,8 @@ export default {
         readOnly: true,
         editable: false,
         hide: false
-      }
+      },
+      formId: '111'
     }
   },
   created() {
@@ -90,6 +98,9 @@ export default {
     },
     handleCheckAllChange(){
 
+    },
+    changeFormId() {
+      
     }
   },
   watch:{
@@ -117,6 +128,20 @@ export default {
   }
   .el-radio__label{
     display: none;
+  }
+}
+/deep/ .el-radio-group {
+  .el-radio-button.is-active {
+    .el-radio-button__inner {
+      background-color: #2D5CF6;
+      border-color: #2D5CF6;
+    }
+  }
+  .el-radio-button:not(.is-active) .el-radio-button__inner:hover {
+      color: #2D5CF6;
+    }
+  .el-radio-button__orig-radio:checked+.el-radio-button__inner {
+    box-shadow: -1px 0 0 0 #2D5CF6;
   }
 }
 </style>

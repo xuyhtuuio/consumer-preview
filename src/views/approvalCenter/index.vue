@@ -500,6 +500,10 @@ export default {
         }
       }
     }
+    &-item:hover {
+      background: #fff;
+      border-radius: 6px;
+    }
 
     .active-item {
       .icon {
@@ -611,6 +615,10 @@ export default {
           margin-left: 16px;
         }
 
+        /deep/ .el-cascader .el-input .el-icon-arrow-down::before{
+          font-family: element-icons !important;
+          content: "\e790";
+        }
         /deep/ .el-select .el-input .el-icon-arrow-up::before {
           font-family: element-icons !important;
           content: "\e78f";

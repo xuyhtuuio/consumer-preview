@@ -109,15 +109,17 @@ export default {
         };
     },
     mounted() {
-        this.getWorkOrderTaskInfo()
-        this.getOrderDetail()
+        if ((this.$route.params && this.$route.params.formId) || (this.sidebarParam && this.sidebarParam.formId)) {
+            this.getWorkOrderTaskInfo()
+            this.getOrderDetail()
+        }
     },
     activated() {
-        if (!this.$route.params) {
-            this.$router.go(-1)
+        const keys = Object.keys(this.$route.params) || Object.keys(this.$route.sidebarParam)
+        if (keys.length) {
+            this.getWorkOrderTaskInfo()
+            this.getOrderDetail()
         }
-        this.getWorkOrderTaskInfo()
-        this.getOrderDetail()
     },
     methods: {
         getWorkOrderTaskInfo() {

@@ -20,6 +20,7 @@ export default {
   },
   computed: {
     iframeUrl() {
+      console.log('this.url',this.url)
       const encondeUrl =  encodeURIComponent(Base64.encode(this.url))
       // console.log(encondeUrl)
       return 'http://192.168.210.52:31400/onlinePreview?url=' + encondeUrl
