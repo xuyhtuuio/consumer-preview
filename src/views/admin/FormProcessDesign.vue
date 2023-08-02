@@ -187,7 +187,7 @@ export default {
     },
     saveProcess() {
       let template = {
-        formId: this.setup.formId,
+        formId: this.setup.formId.join(','),
         formName: this.setup.formName,
         // logo: JSON.stringify(this.setup.logo),
         settings: JSON.stringify(this.setup.settings),
@@ -212,7 +212,7 @@ export default {
         console.log('formItems', this.setup.formItems)
         console.log('process', this.setup.process)
         let template = {
-          formId: this.setup.formId,
+          formId: this.setup.formId.join(','),
           formName: this.setup.formName,
           // logo: JSON.stringify(this.setup.logo),
           settings: JSON.stringify(this.setup.settings),
@@ -226,8 +226,8 @@ export default {
           createForm(template).then(rsp => {
             this.$message.success("创建表单成功")
             // this.$router.push("/formsPanel")
-          }).catch(err => {
-            this.$message.error(err)
+          }).catch(() => {
+            this.$message.error("创建表单失败")
           })
         }else {
           updateFormDetail(template).then(rsp => {

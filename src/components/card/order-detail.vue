@@ -617,12 +617,6 @@ export default {
     }
   }
 
-  /deep/ .preview-dialog {
-    height: 80vh;
 
-    .el-dialog__body {
-      height: 96%;
-    }
-  }
 }
 </style>

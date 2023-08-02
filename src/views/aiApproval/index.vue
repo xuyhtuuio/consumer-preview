@@ -3,7 +3,7 @@
     <div class="tools">
       <el-popover placement="right" trigger="click" popper-class="sidebar-popper"
         @after-leave="hiddenPopover" v-for="(item, index) in tools" :key="index"  :arrow-offset="-30">
-        <component :is="crtToolComponent" :sidebarParam="sidebarParam" @previewFile="previewFile"></component>
+        <component :is="crtToolComponent" :sidebarParam="item.sidebarParam" @previewFile="previewFile"></component>
         <span slot="reference"
           :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
           @click="changeTools(item)">
@@ -14,7 +14,7 @@
     <div class="content">
       <div class="content-header">
         <span class="content-title">
-          <i class="iconfont icon-shenpiyemiantubiao"></i>审查项目名称显审查项目名称显示审查项目名称显示</span>
+          <i class="iconfont icon-shenpiyemiantubiao" v-if="tools?.[0]?.sidebarParam?.urgent === 1"></i>{{projectName}}</span>
         <span class="content-btns">
           <el-button @click="$router.go(-1)"><i class="iconfont icon-fanhui1"></i>返回</el-button>
           <el-button type="tuihui"><i class="iconfont icon-tuihui1"></i>退回/驳回</el-button>
@@ -41,7 +41,7 @@
     <add-review ref="addReview" @addRecommend="addRecommend"></add-review>
     <submit-review ref="submitReview" :formId="formId"></submit-review>
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
-      <filePreview :url="previewfileUrl"></filePreview>
+      <applyFormFilePreview :url="previewfileUrl"></applyFormFilePreview>
     </el-dialog>
   </div>
 </template>
@@ -51,19 +51,21 @@ import LeaderLine from '@/utils/leader-line';
 import filePreview from './components/file-preview'
 import orcTxt from './components/ocr-txt'
 import editorial from './components/editorial'
-import addReview from './dialogs/add-review.vue'
-import submitReview from './dialogs/submit-review.vue'
-import applyForm from './sidebar/apply-form.vue'
+import addReview from './dialogs/add-review'
+import submitReview from './dialogs/submit-review'
+import applyForm from './sidebar/apply-form'
 import approvalRecordDetail from './sidebar/approval-record-detail'
-import similarCase from './sidebar/similar-case.vue'
+import similarCase from './sidebar/similar-case'
 import approvedOpinion from './sidebar/approved-opinion'
 import aiKnowledgeBase from './sidebar/ai-knowledge-base'
+import applyFormFilePreview from '@/components/filePreview'
 import {
   getUploadedFilesList,
   getOCRAnalysisResults,
   getOcrExamineShow,
   approvalStorageDraft,
-  getApprovalDraft
+  getApprovalDraft,
+  
 } from "@/api/aiApproval";
 import {
   getApplyForm
@@ -71,9 +73,10 @@ import {
 
 export default {
   name: 'aiApproval',
-  components: { filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase },
+  components: {applyFormFilePreview, filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase },
   data() {
     return {
+      projectName: '',
       previewDialog: false,
       previewfileUrl: '',
       loading: false,
@@ -81,32 +84,36 @@ export default {
       files: [], // 文件相关信息
       comments: [], // 编辑意见
       crtTools: '',//当前侧边工具栏激活项
-      sidebarParam: {}, //侧边工具栏激活项 props
       tools: [
         {
           component: 'applyForm',
           toolSign: 'apply-form',
-          icon: 'icon-shenqingdan'
+          icon: 'icon-shenqingdan',
+          sidebarParam: {}, //侧边工具栏激活项 props
         },
         {
           component: 'approvalRecordDetail',
           toolSign: 'approval-record',
-          icon: 'icon-jilumingxi'
+          icon: 'icon-jilumingxi',
+          sidebarParam: {}, //侧边工具栏激活项 props
         },
         {
           component: 'similarCase',
           toolSign: 'similar-case',
-          icon: 'icon-xiangsianli'
+          icon: 'icon-xiangsianli',
+          sidebarParam: {}, //侧边工具栏激活项 props
         },
         {
           component: 'approvedOpinion',
           toolSign: 'approved-opinion',
-          icon: 'icon-yijianshu'
+          icon: 'icon-yijianshu',
+          sidebarParam: {}, //侧边工具栏激活项 props
         },
         {
           component: 'aiKnowledgeBase',
           toolSign: 'ai',
-          icon: 'icon-ciku'
+          icon: 'icon-ciku',
+          sidebarParam: {}, //侧边工具栏激活项 props
         }
       ],
       crtToolComponent: '',
@@ -119,9 +126,8 @@ export default {
         strIds: []
       },
       showOcr: true,
-      formId: '82',
+      formId: '',
       inDraft: false, //判断当前单子是否有 已存的审批意见
-      userId: 1,
       formCategoryId: 1
     }
   },
@@ -131,25 +137,27 @@ export default {
       return
     }
     const { item } = this.$route.params
-    this.formId = item.taskNumber
+    this.formId = item.taskNumber;
+    this.inDraft = item.draftFlag === 1;
+    // this.formCategoryId = item.formCategoryId
     this.loading = true;
     this.init()
   },
   methods: {
     // 获取工单基本信息
     init() {
-      // getApplyForm({
-      //   formCategoryId: this.formCategoryId,
-      //   formId: this.formId,
-      //   userId: this.userId
-      // }).then(res => {
-      //   const { data, status, message } = res.data;
-      //   if (status === 200) {
-      //     data
-      //   } else {
-      //     this.$message.error({ offset: 40, title: "提醒", message });
-      //   }
-      // });
+      getApplyForm({
+        formCategoryId: this.formCategoryId,
+        formId: this.formId,
+      }).then(res => {
+        const { data, status, message } = res.data;
+        if (status === 200) {
+          this.tools[0].sidebarParam = data;
+          this.projectName = data.basicInformation.filter(item => item.title === '项目名称')?.[0]?.value
+        } else {
+          this.$message.error({ offset: 40, title: "提醒", message });
+        }
+      });
       // 先获取工单基本信息，，然后判断获取草稿或初始化  文件信息
       this.getFileList()
     },
@@ -664,6 +672,7 @@ export default {
     border-radius: 10px;
     box-shadow: 0px 0px 10px 0px #4343430D;
     width: 380px;
+    overflow: auto;
 
     &:first-child {
       overflow: hidden;
@@ -675,6 +684,13 @@ export default {
     }
   }
 }
+/deep/ .preview-dialog {
+    height: 80vh;
+
+    .el-dialog__body {
+      height: 96%;
+    }
+  }
 </style>
 <style lang="less">
 .sidebar-popper {

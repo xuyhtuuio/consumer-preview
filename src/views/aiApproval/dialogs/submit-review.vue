@@ -48,7 +48,7 @@
             </el-form>
             <div class="line"></div>
             <p class="title">消保审查意见书</p>
-            <div class="submission-content">
+            <div class="submission-content" v-if="submission.length">
                 <p class="submission-name">
                     拟同意{{ params.submissionName }}活动，并提出以下消保审查意见：
 
@@ -86,6 +86,10 @@
                     <span>消保审查中心</span><br />
                     <span>2021-09-08 12：20：30</span>
                 </p>
+            </div>
+            <div v-else class="nodata">
+                <img src="@/assets/image/ai-approval/nodata.svg" alt="" class="暂无推荐的意见">
+                <p>未提出相关意见内容</p>
             </div>
         </div>
     </el-dialog>
@@ -420,7 +424,7 @@ export default {
                     .no-opinion {
                         border-radius: 0px 6px 6px 6px;
                         background: linear-gradient(90deg, #E85167 0%, #FF8193 100%);
-                       
+
 
                     }
 
@@ -445,5 +449,18 @@ export default {
 
     }
 
+}
+
+.nodata {
+    text-align: center;
+    color: #86909C;
+    padding: 12px;
+
+    p {
+        margin-top: 12px;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 28px;
+    }
 }
 </style>
