@@ -3,6 +3,7 @@
     <g-table-card :title="title">
       <template v-slot:cardInfo>
         <div class="cardInfo">
+            <span style="color:#EB5757">*</span>
           {{ cardInfo }}
         </div>
         <div class="warn" v-if="judgeWarnFlag">
@@ -15,7 +16,7 @@
             class="upload"
             drag
             :action="action"
-            :multiple="false"
+            :multiple="true"
             :http-request="uploadBpmn"
             :file-list="fileList"
             :on-success="handleSuccess"
@@ -38,9 +39,8 @@
             >
               <div class="left">{{ `${index + 1}.` }}</div>
               <div class="center">
-                <g-icon class="left-icon" stylePx="16" :href="fileSuffix[item.type]" />{{
-                  item.name || item.fileName
-                }}
+                <file-type class="left-icon" :fileName="item.name || item.fileName"></file-type>
+                {{ item.name || item.fileName }}
               </div>
               <div class="right">
                 <div class="r-item progress" v-if="item.status === -1">上传中...</div>
@@ -67,10 +67,12 @@
 <script>
 import WarnInfo from './warn-info.vue';
 import { getFormGroups, deleteFormGroups } from '@/api/front.js';
+import FileType from '@/components/common/file-type';
 // 核对要点
 export default {
   components: {
-    WarnInfo
+    WarnInfo,
+    FileType
   },
   props: {
     list: {
@@ -114,13 +116,16 @@ export default {
   },
   watch: {
     list(newVal) {
-      this.fileList = newVal[0].value;
-      this.fileList.forEach(item => {
-        item.status = 1;
-        item.name = item.fileName;
-        item.type = item.fileName.replace(/.+\./, '');
-        this.$set(item, 'isClick', false);
-      });
+      if (newVal.length) {
+        this.fileList = newVal[0].value;
+        this.fileList.length &&
+          this.fileList.forEach(item => {
+            item.status = 1;
+            item.name = item.fileName;
+            item.type = item.fileName.replace(/.+\./, '');
+            this.$set(item, 'isClick', false);
+          });
+      }
     },
     'fileList.length'() {
       if (this.judgeWarnFlag) this.judgeWarnFlag = false;
@@ -189,7 +194,13 @@ export default {
         });
     },
     handleUploadLook(url) {
-      window.open(url);
+      let routeUrl = this.$router.resolve({
+        name: 'showReview',
+        query: {
+          url
+        }
+      });
+      window.open(routeUrl.href, '_blank');
     },
     //删除图片
     handleUploadDelete(item) {
@@ -319,4 +330,10 @@ export default {
     }
   }
 }
+
+
+
+
+
+
 </style>
