@@ -77,6 +77,7 @@
   </div>
 </template>
 <script>
+import {getApprovalRecordByFromid} from '@/api/applyCenter'
 export default {
   data() {
     return {
@@ -205,6 +206,18 @@ export default {
       ],
     };
   },
+  mounted(){
+    this.init()
+  },
+  methods:{
+    init(){
+      getApprovalRecordByFromid({
+        formId:'1002'
+      }).then(res=>{
+        
+      })
+    }
+  }
 };
 </script>
 <style lang="less" scoped>

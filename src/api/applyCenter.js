@@ -71,5 +71,13 @@ export function concernApplication(param) {
   })
 }
 
+export function getApprovalRecordByFromid(param) {
+  return request({
+    url: '/cpr/approvalrecord/getApprovalRecordByFromid',
+    method: 'post',
+    contentType:'application/x-www-form-urlencoded',
+    data: param
+  })
+}
 
 
