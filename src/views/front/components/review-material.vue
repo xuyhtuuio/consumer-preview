@@ -3,7 +3,7 @@
     <g-table-card :title="title">
       <template v-slot:cardInfo>
         <div class="cardInfo">
-            <span style="color:#EB5757">*</span>
+          <span style="color: #eb5757">*</span>
           {{ cardInfo }}
         </div>
         <div class="warn" v-if="judgeWarnFlag">
@@ -220,12 +220,12 @@ export default {
     judgeWarn(flag = true) {
       const offsetTop = this.$refs['globalRef'].offsetTop;
       if (this.fileList.some(item => item.status === -2)) {
-        this.$message({ type: 'error', message: this.info.err });
+        this.warnInfoMessage(this.info.err);
         flag && (this.judgeWarnFlag = true);
         return [false, offsetTop];
       }
       if (this.fileList.some(item => item.status === -1)) {
-        this.$message({ type: 'error', message: this.info.errT });
+        this.warnInfoMessage(this.info.errT);
         flag && (this.judgeWarnFlag = true);
         return [false, offsetTop];
       }
@@ -238,6 +238,13 @@ export default {
         }
       }
       return [true];
+    },
+    warnInfoMessage( message, type = 'warning', customClass = 'el-icon-warning-one') {
+      this.$message({
+        type,
+        customClass,
+        message
+      });
     }
   }
 };
@@ -330,6 +337,14 @@ export default {
     }
   }
 }
+// /deep/.el-message--warning {
+//   .el-icon-warning {
+//     &::before {
+//       content: "";
+//       color: red;
+//     }
+//   }
+// }
 
 
 

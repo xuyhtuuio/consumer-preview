@@ -24,7 +24,8 @@
 export default {
   data() {
     return {
-      fullname: ''
+      fullname: '',
+      approverInfo: ''
     };
   },
   created() {
@@ -91,5 +92,6 @@ export default {
     }
   }
 }
+
 
 </style>
