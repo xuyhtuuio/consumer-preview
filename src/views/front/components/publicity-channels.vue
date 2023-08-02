@@ -18,7 +18,7 @@
         >
           <el-form-item v-for="(item, index) in list" :key="index" prop="name">
             <label slot="label"
-              >{{ item.title }}<span :style="{ color: 'red', opacity: 0 }"> * </span></label
+              >{{ item.title }}<span :style="{ color: 'red',opacity: !item.props.required && 0 }"> * </span></label
             >
             <el-checkbox-group v-model="item.value">
               <el-checkbox
@@ -95,5 +95,6 @@ export default {
     }
   }
 }
+
 
 </style>
