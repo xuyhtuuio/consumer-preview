@@ -147,12 +147,7 @@ const router = new Router({
           component: () => import("@/views/front/addApply.vue"),
           parent: "/home",
           meta: { title: '编辑申请' ,viewport: viewport ,pTitle: "申请中心"}
-        },    {
-          path: "aiApproval",
-          name: "aiApproval",
-          component: () => import("@/views/aiApproval/index.vue"),
-          meta: { title: '智能审批', viewport: viewport }
-        },
+        }
       ]
     },
 
@@ -174,9 +169,9 @@ const router = new Router({
           name: "approval-details",
           component: () => import("@/views/approvalCenter/details"),
           meta: { title: '申请单详情', }
-        },{
-          path: "approval-aiApproval",
-          name: "approval-aiApproval",
+        }, {
+          path: "aiApproval",
+          name: "aiApproval",
           component: () => import("@/views/aiApproval/index.vue"),
           meta: { title: '智能审批', viewport: viewport }
         },
