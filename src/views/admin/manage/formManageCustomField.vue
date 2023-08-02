@@ -120,7 +120,7 @@
         }],
         selectGroupOptions: [{
           id: 0,
-          name: '组1',
+          value: '组1',
           showInput: false,
           children: [{
             id: '11',
@@ -203,7 +203,7 @@
       addSelectGroupOptions() {
         this.selectGroupOptions.push({
           id: ++id,
-          name: '组' + (this.selectGroupOptions.length + 1),
+          value: '组' + (this.selectGroupOptions.length + 1),
           children: [{
             id: ++id,
             value: ''
@@ -308,7 +308,7 @@
               required,
               placeholder,
               expanding,
-              options: this.selectOptions
+              options: this.selectGroupOptions
             }
           },
           Cascader: {

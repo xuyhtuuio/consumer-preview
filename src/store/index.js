@@ -18,14 +18,14 @@ export default new Vuex.Store({
       // },
       settings:{
         undo: false,
-        target: []
+        target: [],
         // commiter: [],
         // admin:[],
         // sign: false,
-        // notify:{
-        //   types: ["APP"],
-        //   title: "消息通知标题"
-        // }
+        notify:{
+          types: ["APP"],
+          title: "消息通知标题"
+        }
       },
       // groupId: undefined,
       // TODO 暂时处理
