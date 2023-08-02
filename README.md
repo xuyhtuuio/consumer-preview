@@ -259,15 +259,17 @@
     "mode": "AND", //多人审批时的审批模式，AND 会签、OR 或签、NEXT 顺序依次审批
     "sign": false, //审批同意时是否需要签字
     //审批人为空时的规则
-    "nobady": {
+    "nobody": {
        "handler": "PASS", //PASS 直接通过、 TO_ADMIN 转交主管理员、TO_USER 转交指定人员
         "assignedUser":[] //TO_USER 时的指定人员
     },
     // 驳回处理
-    "refuse": {
-        "type": "TO_NODE",
-        "target": ""
-    },
+    "refuseWay": "TO_NODE",
+    "refuseNode": "",
+    // "refuse": {
+    //     "type": "TO_NODE",
+    //     "target": ""
+    // },
     //审批超时限制设置
     "timeLimit":{
         //超时时间限制

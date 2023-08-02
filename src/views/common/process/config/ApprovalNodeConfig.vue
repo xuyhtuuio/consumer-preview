@@ -133,8 +133,8 @@
       </div>
 
       <el-divider>高级设置</el-divider>
-      <el-form-item label="目标页面配置" prop="target" v-if="nodeProps.assignedType === 'DEPT_USER_ROLE'">
-        <el-radio-group class="radio-group" v-model="nodeProps.target">
+      <el-form-item label="目标页面配置" prop="targetPage" v-if="nodeProps.assignedType === 'DEPT_USER_ROLE'">
+        <el-radio-group class="radio-group" v-model="nodeProps.targetPage">
           <el-radio label="LEADER">领导审批</el-radio>
           <el-radio label="XIAOBAO">消保审批</el-radio>
           <el-radio label="CONFIRM">确认意见</el-radio>
@@ -147,7 +147,7 @@
         是否启用转办，启用后审批人有权选择转办给指定人员再次审批。
       </div>
       <el-form-item label="" prop="text1" v-if="!['SELECT_NODE'].includes(nodeProps.assignedType)">
-        <el-switch active-text="启用转办" v-model="nodeProps.zhuanban"></el-switch>
+        <el-switch active-text="启用转办" v-model="nodeProps.isChangeHandle"></el-switch>
         <div class="select-user" style="margin-top: 10px;">
           <p>请选择【被转办人】可选用户范围</p>
           <el-button size="mini" @click="selectUser1" icon="el-icon-plus" type="primary">选择部门/人员/角色</el-button>
@@ -166,12 +166,12 @@
           </svg>
           如果申请被驳回
         </template>
-        <el-radio-group class="radio-group" v-model="nodeProps.refuse.type">
+        <el-radio-group class="radio-group" v-model="nodeProps.refuseWay">
           <el-radio label="TO_NODE">驳回到指定节点</el-radio>
           <el-radio label="TO_BEFORE">审批人自选（前序节点）</el-radio>
         </el-radio-group>
-        <div style="margin-top: 10px" v-if="nodeProps.refuse.type === 'TO_NODE'">
-          <el-select v-model="nodeProps.refuse.target" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
+        <div style="margin-top: 10px" v-if="nodeProps.refuseWay === 'TO_NODE'">
+          <el-select v-model="nodeProps.refuseNode" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
             <el-option v-for="(op, index) in nodes" :key="index" :label="op.name" :value="op.id"></el-option>
           </el-select>
         </div>
@@ -265,7 +265,7 @@ export default {
     },
     select1: {
       get() {
-        return this.config.zhuanbanUser || []
+        return this.config.changeHandleUser || []
       },
       set() {
 
@@ -352,7 +352,7 @@ export default {
           ...this.tagConfig
         }))
       }
-      this.$store.state.selectedNode.props.zhuanbanUser = this.select1
+      this.$store.state.selectedNode.props.changeHandleUser = this.select1
     },
     removeOrgItem(index) {
       this.select.splice(index, 1)
