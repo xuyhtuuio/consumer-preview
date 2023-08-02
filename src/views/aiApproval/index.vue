@@ -41,7 +41,7 @@
     <add-review ref="addReview" @addRecommend="addRecommend"></add-review>
     <submit-review ref="submitReview" :formId="formId"></submit-review>
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
-      <filePreview :url="previewfileUrl"></filePreview>
+      <applyFormFilePreview :url="previewfileUrl"></applyFormFilePreview>
     </el-dialog>
   </div>
 </template>
@@ -58,12 +58,14 @@ import approvalRecordDetail from './sidebar/approval-record-detail'
 import similarCase from './sidebar/similar-case.vue'
 import approvedOpinion from './sidebar/approved-opinion'
 import aiKnowledgeBase from './sidebar/ai-knowledge-base'
+import applyFormFilePreview from '@/components/filePreview'
 import {
   getUploadedFilesList,
   getOCRAnalysisResults,
   getOcrExamineShow,
   approvalStorageDraft,
-  getApprovalDraft
+  getApprovalDraft,
+  
 } from "@/api/aiApproval";
 import {
   getApplyForm
@@ -71,7 +73,7 @@ import {
 
 export default {
   name: 'aiApproval',
-  components: { filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase },
+  components: {applyFormFilePreview, filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase },
   data() {
     return {
       previewDialog: false,
@@ -675,6 +677,13 @@ export default {
     }
   }
 }
+/deep/ .preview-dialog {
+    height: 80vh;
+
+    .el-dialog__body {
+      height: 96%;
+    }
+  }
 </style>
 <style lang="less">
 .sidebar-popper {
