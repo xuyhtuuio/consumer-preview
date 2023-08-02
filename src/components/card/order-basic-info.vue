@@ -67,7 +67,8 @@
                 <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Rectangle143"></use>
                 </svg>审查材料 <i class="total">共 {{ orderInfo.fileList && orderInfo.fileList.length }} 个</i></span>
-            <span class="download pointer" v-if="orderInfo.fileList.length">下载全部</span>
+            <span class="download pointer" v-if="orderInfo.fileList.length"
+                @click="download(orderInfo.fileList)">下载全部</span>
         </p>
         <div class="file-list">
             <div class="file-item pointer" v-for="(item, index) in orderInfo.fileList" :key="index">
@@ -84,6 +85,8 @@
 
 <script >
 import { getApplyForm, workOrderTaskInfo } from "@/api/front";
+import { downloadAllFiles } from "@/api/applyCenter";
+
 import moment from 'moment'
 import FileType from '@/components/common/file-type.vue';
 
@@ -180,6 +183,31 @@ export default {
         },
         preview(url) {
             this.$emit('preview', url)
+        },
+        download(fileList) {
+            const list = fileList.map(v => {
+                // return {
+                //     fileName: v.fileName,
+                //     key: v.key
+                // }
+                return v.key
+            })
+            const params = {
+                loadList: list
+            }
+            downloadAllFiles(params).then(res => {
+                const { data } = res.data
+                for (let i in data) {
+                    const link = document.createElement('a');
+                    link.href = data[i];
+                    // link.setAttribute('download', 'xxxx.docx')
+                    // link.download = 'file';
+                    document.body.appendChild(link); // 生成下载链接
+                    link.click(); // 触发下载事件
+                    document.body.removeChild(link)
+                }
+            })
+
         }
     },
     filters: {

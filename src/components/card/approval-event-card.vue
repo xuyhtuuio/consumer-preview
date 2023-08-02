@@ -147,7 +147,7 @@ export default {
         name: "approval-details",
         params: {
           formId: item.taskNumber,
-          originatorId: item.sponsorMap.sponsorId,
+          originatorId: item.sponsor,
           taskName:item.taskName
         },
       });
