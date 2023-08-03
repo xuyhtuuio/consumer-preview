@@ -220,13 +220,13 @@ export default {
     this.judgeStatus();
   },
   mounted() {
-    if (!this.$route.params.formId) {
-      const { path } = this.$route
-      const url = path.match(/\/(\S*)\//)[1]
-      this.$router.replace({
-        name: url
-      })
-    }
+    // if (!this.$route.params.formId) {
+    //   const { path } = this.$route
+    //   const url = path.match(/\/(\S*)\//)[1]
+    //   this.$router.replace({
+    //     name: url
+    //   })
+    // }
     this.judgeStatus();
   },
   created() { },
@@ -242,11 +242,11 @@ export default {
       // 一般进入详情页：展示返回按钮 及 审批记录详细
       // 已经结束的工单 展示: 返回按钮、审批记录详细、审查意见书、最终上线材
       // <!-- 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
-      let { item } = JSON.parse(window.sessionStorage.getItem("order-detail"));
+      // let { item } = JSON.parse(window.sessionStorage.getItem("order-detail"));
       const info = JSON.parse(window.sessionStorage.getItem("order-detail"));
-      // let item ={
-      //   taskStatus:0
-      // }
+      let item ={
+        taskStatus:0
+      }
       this.info = info
       // 审批中、草稿
       if (item.taskStatus == 0 || item.taskStatus == 1) {

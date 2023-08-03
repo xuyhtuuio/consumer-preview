@@ -1,25 +1,17 @@
 <template>
   <div class="record-detail">
-    <div
-      v-for="(activity, index) in recordList"
-      :key="index"
-      class="task-item pointer"
-    >
+    <div v-for="(activity, index) in recordList" :key="index" class="task-item pointer">
       <div class="left">
         <div class="top-line"></div>
-        <img
-          src="@/assets/image/ai-approval/timeline-ellipse.svg"
-          alt=""
-          class="dot"
-        />
+        <img src="@/assets/image/ai-approval/timeline-ellipse.svg" alt="" class="dot" />
         <div class="bottom-line"></div>
       </div>
       <div class="right">
         <p class="taskname-staff">
-          <span class="taskname">{{ activity.taskName }}</span>
+          <span class="taskname">{{ activity.nodeId }}</span>
           <span class="staff">
-            <i>{{ activity.initiator }}</i>
-            <i class="post">（{{ activity.post }}）</i>
+            <i>{{ activity.approverName }}</i>
+            <i class="post" v-if="activity.approverOrgName">（{{ activity.approverOrgName }}）</i>
             <img src="@/assets/image/ai-approval/record-avatar.svg" alt="" />
           </span>
         </p>
@@ -28,46 +20,49 @@
             任务发起：{{ activity.startingtime }}
           </div>
           <div class="time-note" v-else>
-            <span>任务到达：07-08 09:12</span>
-            <span class="handle-time">处理：<i>12 小时</i></span>
-            <span>任务结束：07-08 09:12</span>
+            <span>任务到达：{{ activity.createTime | timeFormat }}</span>
+            <span class="handle-time">处理：<i>{{ activity | handleTimeFormat }} 小时</i></span>
+            <span>任务结束：{{ activity.updateTime | timeFormat }}</span>
           </div>
         </div>
         <div class="opinions" v-if="activity.taskName !== '发起申请'">
-          <div
-            v-for="(item, idx) in activity.substantiveopinion"
-            :key="idx"
-            class="opinions-item"
-          >
-            <div class="opinion-tag" v-if="activity.targetPage === 'ocr'">
-              <span v-if="item.isSubstantive" class="guanzhu">
+          <!-- ocr审批有个关联的审查要点 -->
+          <div class="point opinions-item">
+            <div class="opinion-tag">
+              <span class="approval-point-icon guanzhu" style="background: #505968;color: #fff">
+                <i class="iconfont icon icon-tubiao4"></i>审查要点
+              </span>
+            </div>
+            <div>
+              <span>缺少以下要点</span><br />
+              <span><i style="color: #86909C;">产品要点：</i>重要提示(理财有风险、投资需谨慎等）</span><br />
+              <span>不符合以下要点</span><br />
+              <span><i style="color: #86909C;">审查要点：</i>承担义务不得低于宣传所承诺的标准</span>
+            </div>
+          </div>
+          <div v-for="(item, idx) in activity.editedCommentsList" :key="idx" class="opinions-item">
+            <div class="opinion-tag">
+              <span v-if="item.substantiveOpinions == 1" class="guanzhu">
+                <!-- v-if="activity.targetPage === 'ocr'" -->
                 <i class="iconfont icon icon-guanzhu"></i>
                 有实质意见
               </span>
-              <span v-if="!item.isSubstantive" class="guanzhu2">
+              <span v-if="item.substantiveOpinions == 0" class="guanzhu2">
                 <i class="iconfont icon icon-guanzhu2"></i>
                 无实质意见
               </span>
             </div>
-            <p class="opinion-text">{{ idx + 1 }} {{ item.opinion }}</p>
+            <p class="opinion-text">{{ idx + 1 }} {{ item.content }}</p>
             <div class="relevant-file">
-              关联文件：<i class="file-name">{{ item.relevantfile }} </i>
-              <el-popover
-                placement="bottom"
-                popper-class="file-overview-popper"
-                trigger="click"
-                v-if="item.file && item.file.length"
-              >
+              关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.fileList && item.fileList[0] }} </i>
+              <el-popover placement="bottom" popper-class="file-overview-popper" trigger="click"
+                v-if="item.fileList && item.fileList.length > 1">
                 <div class="file-list">
-                  <div
-                    class="file-list-item pointer"
-                    v-for="(file, idx) in item.file"
-                    :key="idx"
-                  >
+                  <div class="file-list-item pointer" v-for="(file, idx) in item.fileList" :key="idx">
                     {{ file }}
                   </div>
                 </div>
-                <i slot="reference">+{{ item.file.length }}</i>
+                <i slot="reference">+{{ item.fileList.length - 1 }}</i>
               </el-popover>
             </div>
           </div>
@@ -77,145 +72,51 @@
   </div>
 </template>
 <script>
-import {getApprovalRecordByFromid} from '@/api/applyCenter'
+import moment from 'moment';
+import { getApprovalRecordByFromid } from '@/api/applyCenter'
 export default {
   data() {
     return {
       recordList: [
-        {
-          startingtime: "07-08 09:12",
-          initiator: "谭新宇",
-          post: "产品研发与推广岗",
-          taskName: "发起申请",
-          arrivaltime: "07-08 09:12",
-          finishtime: "07-08 09:12",
-          handletime: "12",
-          substantiveopinion: [
-            {
-              opinion:
-                "1.活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权",
-              relevantfile: "理财公司理财.png",
-              isSubstantive: false,
-            },
-          ],
-          targetPage: "领导审批",
-        },
-        {
-          startingtime: "07-08 09:12",
-          initiator: "谭新宇",
-          post: "产品研发与推广岗",
-          taskName: "发起申请1",
-          arrivaltime: "07-08 09:12",
-          finishtime: "07-08 09:12",
-          handletime: "12",
-          substantiveopinion: [
-            {
-              opinion:
-                "1.活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权",
-              relevantfile: "理财公司理财.png",
-              isSubstantive: false,
-            },
-          ],
-
-          targetPage: "领导审批",
-        },
-        {
-          startingtime: "07-08 09:12",
-          initiator: "谭新宇",
-          post: "产品研发与推广岗",
-          taskName: "发起申请1",
-          arrivaltime: "07-08 09:12",
-          finishtime: "07-08 09:12",
-          handletime: "12",
-          substantiveopinion: [
-            {
-              opinion:
-                "活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权",
-              relevantfile: "理财公司理财.png",
-              isSubstantive: false,
-            },
-          ],
-          targetPage: "领导审批",
-        },
-        {
-          startingtime: "07-08 09:12",
-          initiator: "谭新宇",
-          post: "产品研发与推广岗",
-          taskName: "发起申请1",
-          arrivaltime: "07-08 09:12",
-          finishtime: "07-08 09:12",
-          handletime: "12",
-          substantiveopinion: [
-            {
-              opinion:
-                "活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权",
-              relevantfile: "理财公司理财.png",
-              isSubstantive: false,
-            },
-          ],
-          targetPage: "领导审批",
-        },
-        {
-          startingtime: "07-08 09:12",
-          initiator: "谭新宇",
-          post: "产品研发与推广岗",
-          taskName: "发起申请1",
-          arrivaltime: "07-08 09:12",
-          finishtime: "07-08 09:12",
-          handletime: "12",
-          substantiveopinion: [
-            {
-              opinion:
-                "活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权",
-              relevantfile: "理财公司理财.png",
-              isSubstantive: false,
-            },
-          ],
-          targetPage: "ocr",
-        },
-        {
-          startingtime: "07-08 09:12",
-          initiator: "谭新宇",
-          post: "产品研发与推广岗",
-          taskName: "发起申请1",
-          arrivaltime: "07-08 09:12",
-          finishtime: "07-08 09:12",
-          handletime: "12",
-          substantiveopinion: [
-            {
-              opinion:
-                "活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权",
-              relevantfile: "理财公司理财.png",
-              file: [
-                "理财公司理财.png",
-                "理财公司理财.png",
-                "理财公司理财.png",
-                "理财公司理财.png",
-              ],
-              isSubstantive: true,
-            },
-            {
-              opinion:
-                "ww活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权",
-              relevantfile: "理财公司理财.png",
-              isSubstantive: false,
-            },
-          ],
-          targetPage: "ocr",
-        },
       ],
     };
   },
-  mounted(){
+  mounted() {
     this.init()
   },
-  methods:{
-    init(){
+  methods: {
+    init() {
+      this.loading = true
       getApprovalRecordByFromid({
-        formId:'1002'
-      }).then(res=>{
-        
+        formId: this.$route.params.formId
+      }).then(res => {
+        const { data } = res.data
+        this.recordList = data.length ? data.map(v => {
+          return {
+            ...v,
+            editedCommentsList: v.editedCommentsList.length ? v.editedCommentsList.map(m => {
+              return {
+                ...m,
+                fileList: m.associatedAttachmentsIds.split(',')
+              }
+            }) : []
+          }
+        }) : []
+
+      }).finally(() => {
+        this.loading = false
       })
+    }
+  },
+  filters: {
+    timeFormat(val) {
+      return moment(val).format('MM-DD HH:mm')
+    },
+    handleTimeFormat(val) {
+      let timediff = moment(val.updateTime).diff(moment(val.createTime), 'seconds');
+      timediff = timediff>0?(timediff / 3600).toFixed(1):0
+      return timediff
+
     }
   }
 };
@@ -366,11 +267,13 @@ export default {
           color: #86909c;
           display: flex;
           align-items: center;
+          word-break: keep-all;
 
           .file-name {
             margin: 0 8px 0 0;
             background: #fff;
             padding: 2px 12px;
+            word-break: break-all;
           }
 
           i {
@@ -402,7 +305,7 @@ export default {
       }
 
       .top-line {
-        height: 30px;
+        height: 17px;
         width: 1px;
         background-repeat: no-repeat;
         background-repeat-y: inherit;
@@ -410,7 +313,7 @@ export default {
       }
 
       .bottom-line {
-        height: 84%;
+        height: calc(100% - 30px);
         width: 1px;
         background-repeat: no-repeat;
         background-repeat-y: inherit;
@@ -433,11 +336,11 @@ export default {
   box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.1);
 
   .file-list {
-    display: flex;
-    flex-wrap: wrap;
+    // display: flex;
+    // flex-wrap: wrap;
 
     .file-list-item {
-      width: 31%;
+      display: inline-block;
       border-radius: 4px;
       background: #f7f8fa;
       padding: 2px 12px;
@@ -445,12 +348,13 @@ export default {
       font-size: 12px;
       font-weight: 400;
       line-height: 20px;
-      margin-right: 12px;
       margin-bottom: 8px;
     }
-    .file-list-item:nth-of-type(3n) {
-      margin-right: 0;
+
+    .file-list-item:nth-of-type(n+2) {
+      margin-left: 12px;
     }
+
   }
 }
 </style>
