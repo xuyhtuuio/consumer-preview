@@ -187,7 +187,7 @@ export default {
     },
     saveProcess() {
       let template = {
-        formId: this.setup.formId.join(','),
+        formId: this.setup.formId,
         formName: this.setup.formName,
         // logo: JSON.stringify(this.setup.logo),
         settings: JSON.stringify(this.setup.settings),
@@ -212,7 +212,7 @@ export default {
         console.log('formItems', this.setup.formItems)
         console.log('process', this.setup.process)
         let template = {
-          formId: this.setup.formId.join(','),
+          formId: this.setup.formId,
           formName: this.setup.formName,
           // logo: JSON.stringify(this.setup.logo),
           settings: JSON.stringify(this.setup.settings),

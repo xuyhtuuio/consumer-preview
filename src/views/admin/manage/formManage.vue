@@ -30,26 +30,26 @@
       <!-- 表单管理二级表格 -->
       <div v-else>
         <div style="margin-bottom: 24px;">
-          <el-input class="is-dark input" v-model="search.title" size="small" placeholder="请输入字段名称搜索" style="width: 254px;">
-            <i slot="suffix" class="el-input__icon el-icon-search"></i>
+          <el-input class="is-dark input" v-model="search.title" @keypress.native.enter="changeSearch" size="small" placeholder="请输入字段名称搜索" style="width: 254px;">
+            <i slot="suffix" class="el-input__icon el-icon-search" @click="changeSearch"></i>
           </el-input>
-          <el-select class="is-dark input" v-model="search.type" size="small" placeholder="字段类型" style="margin: 0 16px;">
+          <el-select class="is-dark input" v-model="search.type" @change="changeSearch" size="small" placeholder="字段类型" style="margin: 0 16px;">
             <el-option v-for="item in feildTypes" :label="item.label" :value="item.value" :key="item.value"></el-option>
           </el-select>
-          <el-select class="is-dark input" v-model="search.belong" size="small" placeholder="所属模块">
+          <el-select class="is-dark input" v-model="search.belong" @change="changeSearch" size="small" placeholder="所属模块">
             <el-option v-for="item in belongModules" :label="item.label" :value="item.value" :key="item.value"></el-option>
           </el-select>
           <el-button type="primary" @click="addFormItem" size="small" style="margin-left: 16px;">新增字段</el-button>
         </div>
-        <TrsTable theme="TRS-table-gray" :data="data1" :colConfig="colConfig1" @sort-change="changeSort" @submitEdit="submitEdit" :row-class-name="tableRowClassName">
+        <TrsTable theme="TRS-table-gray" :data="data1" :colConfig="colConfig1" @sort-change="changeSort1" @submitEdit="submitEdit" :row-class-name="tableRowClassName">
           <template #operate="scope">
-            <el-button type="text" v-if="scope.row.status === '0'">恢复</el-button>
+            <el-button type="text" v-if="+scope.row.run === 0">恢复</el-button>
             <el-button type="text" v-else @click="editFormItem(scope.row)">编辑</el-button>
-            <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)" :style="{ visibility: scope.row.status !== '0' ? 'visible' : 'hidden' }">停用</el-button>
+            <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)" :style="{ visibility: +scope.row.run === 1 ? 'visible' : 'hidden' }">停用</el-button>
             <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)">删除</el-button>
           </template>
-          <template #require="scope">
-            {{ scope.row.props.require ? '是' : '否' }}
+          <template #required="scope">
+            {{ scope.row.required ? '是' : '否' }}
           </template>
         </TrsTable>
       </div>
@@ -66,7 +66,7 @@
         {{ drawerTitle }}<i class="el-icon-edit"></i>
       </span>
       <div class="drawer-main">
-        <FormManageCustomField :editType="drawerTitle" ref="formManageCustomField"/>
+        <FormManageCustomField @close="drawer = false" ref="formManageCustomField"/>
       </div>
     </el-drawer>
     <el-dialog
@@ -116,7 +116,8 @@ import {
   addFormCategory,
   modifyNameFormCategory,
   modifyTimeLimitFormCategory,
-  switchFormCategoryState
+  switchFormCategoryState,
+  itemPagingList
 } from '@/api/manage'
 import FormManageCustomField from './formManageCustomField'
 export default {
@@ -166,57 +167,11 @@ export default {
         },
       ],
       defalutField: ['项目名称', '上线时间', '下线时间', '宣传渠道'],
-      data1: [
-        {
-          index: 1,
-          title: '项目名称',
-          name: 'TextInput',
-          module: '基本信息',
-          props: {
-            require: true,
-          },
-          updateTime: '2023-07-17: 00:00:00',
-          status: '1'
-        },
-        {
-          index: 2,
-          title: '上线时间',
-          name: 'TimePicker',
-          module: '基本信息',
-          props: {
-            require: true,
-          },
-          updateTime: '2023-07-17: 00:00:00',
-          status: '1'
-        },
-        {
-          index: 3,
-          title: '下线时间',
-          name: 'TimePicker',
-          module: '基本信息',
-          props: {
-            require: false,
-          },
-          updateTime: '2023-07-17: 00:00:00',
-          status: '1'
-        },
-        {
-          index: 4,
-          title: '宣传渠道',
-          name: 'MultipleGroupsSelect',
-          module: '基本信息',
-          props: {
-            expanding: true,
-            require: true,
-          },
-          updateTime: '2023-07-17: 00:00:00',
-          status: '1'
-        }
-      ],
+      data1: [],
       colConfig1: [
         {
           label: '序号',
-          prop: 'index',
+          prop: 'sort',
           edit: true,
           bind: {
             width: 110
@@ -236,7 +191,7 @@ export default {
         },
         {
           label: '是否必填',
-          prop: 'require',
+          prop: 'required',
           bind: {
             width: 80
           }
@@ -325,8 +280,28 @@ export default {
         })
       }
     },
-    changeSort1() {
-
+    changeSort1(sort) {
+      let data = {
+        orderColumn: sort.prop,
+        orderType: 'asc'
+      }
+      if (sort.order.startsWith('desc')) {
+        data = {
+          orderColumn: sort.prop,
+          orderType: 'desc'
+        }
+      }
+      this.editForm({
+        recordId: this.currentRow.recordId,
+        params: {
+          itemName: this.search.title,
+          itemType: this.search.type,
+          currentModule: this.search.belong,
+          orderColumn: 'updateTime',
+          orderType: 'desc',
+          ...data
+        }
+      })
     },
     handleCurrentChange(val) {
       if (this.level === 1) {
@@ -334,6 +309,19 @@ export default {
           pageNow: val
         })
       }
+    },
+    // 表单项 搜索
+    changeSearch() {
+      this.editForm({
+        recordId: this.currentRow.recordId,
+        params: {
+          itemName: this.search.title,
+          itemType: this.search.type,
+          currentModule: this.search.belong,
+          orderColumn: 'updateTime',
+          orderType: 'desc'
+        }
+      })
     },
     handleAvatarSuccess(data) {
       this.imageUrl = data.url;
@@ -350,10 +338,20 @@ export default {
         this.$message.success('新增成功')
       }
     },
-    editForm(item) {
-      this.isEdit = true
-      this.level = 2
-      this.currentRow = item
+    async editForm(item) {
+      const res = await itemPagingList({
+        formCategoryId: item.recordId,
+        ...item.params
+      })
+      const resData = res.data.data
+      if (resData) {
+        this.data1 = resData.list;
+        this.page.total = resData.totalCount
+        this.page.pageNow = resData.pageNow
+        this.isEdit = true
+        this.level = 2
+        this.currentRow = item
+      }
     },
     async copyForm(row) {
       await copyFormCategory(row.recordId)
