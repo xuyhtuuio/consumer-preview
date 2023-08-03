@@ -53,6 +53,7 @@
 <script>
 import orgPicker from '@/components/common/organizationPicker'
 import {getFormGroups, updateGroup} from '@/api/design'
+import { itemPagingList } from '@/api/manage'
 import {
   obtainExamineTypeList,
 } from '@/api/manage'
@@ -85,6 +86,18 @@ export default {
     this.getObtainExamineTypeList()
   },
   methods: {
+    async getFormItems() {
+      const res = await itemPagingList({
+        formCategoryId: this.setup.formId,
+        pageNow: 1,
+        pageSize: 1000
+      })
+      const resData = res.data.data
+      if (resData) {
+        const formItems = resData.list.map(item => item.special);
+        this.$store.state.design.formItems = formItems
+      }
+    },
     async getObtainExamineTypeList() {
       const res = await obtainExamineTypeList({
         pageNow: 1,
@@ -106,6 +119,7 @@ export default {
       const value = [val]
       const group = this.fromGroup.filter(item => value.includes(item.id))
       window.sessionStorage.setItem('formGroup', JSON.stringify(group))
+      this.getFormItems()
     },
     closeSelect() {
       this.showUserSelect = false

@@ -29,6 +29,7 @@
   </div>
 </template>
 <script>
+import { getProcessList } from '@/api/manage'
 import ProcessDesign from '@/views/admin/layout/ProcessDesign'
 export default {
   name: 'flowManage',
@@ -54,22 +55,6 @@ export default {
         size: 'small'
       },
       data: [
-        {
-          formName: '消保审批流程',
-          formId: '关联表单1',
-          remark: '表单说明111',
-          status: '1',
-          createUser: '章三',
-          updateTime: '2023-07-12 09:00:01'
-        },
-        {
-          formName: '消保审批流程1',
-          formId: '关联表单2',
-          remark: '表单说明2',
-          status: '0',
-          createUser: '章思',
-          updateTime: '2023-07-13 09:00:11'
-        }
       ],
       page: {
         pageNow: 1,
@@ -78,7 +63,7 @@ export default {
       colConfig: [
         {
           label: '流程名称',
-          prop: 'formName'
+          prop: 'templateName'
         },
         {
           label: '关联表单',
@@ -97,11 +82,11 @@ export default {
         },
         {
           label: '创建人',
-          prop: 'createUser'
+          prop: 'createUserName'
         },
         {
           label: '更新时间',
-          prop: 'updateTime',
+          prop: 'updated',
           bind: {
             width: 180,
             // align: 'center',
@@ -120,14 +105,32 @@ export default {
       currentRow: {}
     }
   },
+  created() {
+    this.getProcessList()
+  },
   methods: {
+    async getProcessList(params) {
+      const res = await getProcessList({
+        pageNow: 1,
+        pageSize: 10,
+        ...params
+      })
+      const resData = res.data.data
+      if (resData) {
+        this.data = resData.list
+        this.page.pageNow = resData.pageNow
+        this.page.total = resData.totalCount
+      }
+    },
     addFlow() {
       this.$router.push({
         name: 'design'
       })
     },
-    handleCurrentChange() {
-
+    handleCurrentChange(val) {
+      this.getProcessList({
+        pageNow: val
+      })
     },
     previewFlow(row) {
       this.currentRow = row

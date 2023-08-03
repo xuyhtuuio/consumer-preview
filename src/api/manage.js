@@ -71,3 +71,15 @@ export function itemPagingList(param) {
 
 
 /* 表单管理end */
+
+
+/* 流程管理start */
+// 流程列表
+export function getProcessList(param) {
+  return request({
+    url: '/cpr/admin/form/list',
+    method: 'get',
+    params: param
+  })
+}
+/* 流程管理end */

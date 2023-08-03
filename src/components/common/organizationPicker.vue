@@ -46,7 +46,7 @@
 						<!-- <span style="margin-left: 20px; cursor: pointer; color:#38adff;" @click="beforeNode">上一级</span> -->
 					</div>
 					<div style="margin-top: 8px; width: 100%;height: 400px;">
-						<div style="margin-top: 8px; overflow-y: auto; height: calc(100% - 100px);">
+						<div style="margin-top: 8px; overflow-y: auto;" :style="{ height: active === 'user' ? 'calc(100% - 100px)' : 'calc(100% - 160px)' }">
               <el-tree
                 v-show="active === 'user'"
                 :data="data"
@@ -104,10 +104,8 @@
           <p class="check-desc">
             <span>已选 {{ checkedTotal }} 项</span>
             <span @click="clearAll" class="clear" :class="{ 'can-clear': !checkedTotal }">
-              <svg class="icon" aria-hidden="true">
-                <use v-if="checkedTotal" xlink:href="#icon-clear"></use>
-                <use v-else xlink:href="#icon-clear1"></use>
-              </svg>清空
+              <i class="iconfont icon-clear"></i>
+              清空
             </span>
           </p>
 					<div style="overflow-x: hidden; overflow-y: auto; height: calc(100% - 36px);">
@@ -160,7 +158,7 @@
 </template>
 
 <script>
-  import {getOrgTree, getUserByName} from '@/api/org'
+  import {getOrgTree, queryUserList} from '@/api/org'
 
   export default {
     name: "organizationPicker",
@@ -275,31 +273,6 @@
           }]
         }],
         roleData: [
-          {
-            id: '审批管理员',
-            label: '审批管理员',
-            type: 'role'
-          },
-          {
-            id: '内审审批人员',
-            label: '内审审批人员',
-            type: 'role'
-          },
-          {
-            id: '内审审批复核人员',
-            label: '内审审批复核人员',
-            type: 'role'
-          },
-          {
-            id: '消保审批人员',
-            label: '消保审批人员',
-            type: 'role'
-          },
-          {
-            id: '消保审批复核人员',
-            label: '消保审批复核人员',
-            type: 'role'
-          }
         ],
         defaultProps: {
           children: 'children',
@@ -321,7 +294,7 @@
       show() {
         if (this.show) {
           this.init()
-          this.getOrgList()
+          this.queryUserList()
         }
       },
       search(val) {
@@ -331,6 +304,19 @@
     mounted() {
     },
     methods: {
+      async queryUserList() {
+        const res = await queryUserList()
+        if (res.data.data) {
+          console.log(res.data.data.data.role)
+          this.roleData = res.data.data.data.role.map(item => {
+            return {
+              id: item.id,
+              label: item.name,
+              type: item.flag
+            }
+          })
+        }
+      },
       filterNode(value, data) {
         if (!value) return true;
         return data.label.indexOf(value) !== -1;
@@ -598,7 +584,7 @@
       .can-clear {
         color: #86909C;
       }
-      svg {
+      svg, i {
         width: 18px;
         height: 18px;
       }

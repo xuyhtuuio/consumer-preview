@@ -186,6 +186,7 @@ export default {
       }
     },
     saveProcess() {
+      const user = window.localStorage.getItem('user_name')
       let template = {
         formId: this.setup.formId,
         formName: this.setup.formName,
@@ -194,7 +195,12 @@ export default {
         // groupId: this.setup.groupId,
         formItems: JSON.stringify(this.setup.formItems),
         process: JSON.stringify(this.setup.process),
-        remark: this.setup.remark
+        remark: this.setup.remark,
+        status: '',
+        isRevoke: this.setup.settings.undo,
+        node: this.setup.settings.target,
+        createUserName: user.fullname,
+        createUserId: user.id
       }
       // 调取暂存接口
     },
@@ -219,7 +225,7 @@ export default {
           // groupId: this.setup.groupId,
           formItems: JSON.stringify(this.setup.formItems),
           process: JSON.stringify(this.setup.process),
-          remark: this.setup.remark
+          remark: this.setup.remark,
         }
         console.log(template)
         if (this.isNew || this.$isEmpty(this.setup.formId)){

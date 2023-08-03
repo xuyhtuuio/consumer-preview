@@ -694,6 +694,7 @@ export default {
         },
         msg: false
       });
+      window.localStorage.setItem('user_name', res.data.user_name)
       const role = JSON.parse(res.data.user_name).roles.filter(item => {
         return item.clientId === 'teisdata';
       });
