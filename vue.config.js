@@ -57,7 +57,7 @@ module.exports = {
         }
       },
       '/cpr': {
-        target: 'http://192.168.210.57:31604',
+        target: 'http://192.168.210.57:31602',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
