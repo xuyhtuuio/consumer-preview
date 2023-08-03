@@ -1,8 +1,8 @@
 <template>
   <div class="container" v-loading="loading">
     <div class="tools">
-      <el-popover placement="right" trigger="click" popper-class="sidebar-popper"
-        @after-leave="hiddenPopover" v-for="(item, index) in tools" :key="index"  :arrow-offset="-30">
+      <el-popover placement="right" trigger="click" popper-class="sidebar-popper" @after-leave="hiddenPopover"
+        v-for="(item, index) in tools" :key="index" :arrow-offset="-30">
         <component :is="crtToolComponent" :sidebarParam="item.sidebarParam" @previewFile="previewFile"></component>
         <span slot="reference"
           :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
@@ -14,12 +14,13 @@
     <div class="content">
       <div class="content-header">
         <span class="content-title">
-          <i class="iconfont icon-shenpiyemiantubiao" v-if="tools?.[0]?.sidebarParam?.urgent === 1"></i>{{projectName}}</span>
+          <i class="iconfont icon-shenpiyemiantubiao"
+            v-if="tools?.[0]?.sidebarParam?.urgent === 1"></i>{{ projectName }}</span>
         <span class="content-btns">
-          <el-button @click="$router.go(-1)"><i class="iconfont icon-fanhui1"></i>返回</el-button>
+          <el-button @click="goBack"><i class="iconfont icon-fanhui1"></i>返回</el-button>
           <el-button type="tuihui"><i class="iconfont icon-tuihui1"></i>退回/驳回</el-button>
           <el-button @click="save"><i class="iconfont icon-baocun"></i>保存</el-button>
-          <el-button type="primary" @click="changeOcrView"><i class="iconfont icon-ocr"></i>{{ showOcr ? '关闭' :
+          <el-button type="primary" @click="changeOcrView" v-if="specialFileType.includes(approval?.fileName?.split('.')[1])"><i class="iconfont icon-ocr"></i>{{ showOcr ? '关闭' :
             '打开' }}智能审批</el-button>
           <!-- <el-button type="primary"><i class="iconfont icon-heduiyaodian"></i>要点核对</el-button> -->
           <el-button type="primary" @click="showSubmit"><i class="iconfont icon-tijiao"></i>提交</el-button>
@@ -29,7 +30,7 @@
         <file-preview ref="filePreview" :files="files" :activeIndex="activeIndex" @changeFile="changeFile"
           :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"></file-preview>
         <orcTxt ref="ocrTxt" :approval="approval" @addWord="addWord"
-          v-if="['jpeg', 'jpg', 'png', 'pdf'].includes(approval?.fileName?.split('.')[1]) && showOcr" @showLine="showLine"
+          v-if="specialFileType.includes(approval?.fileName?.split('.')[1]) && showOcr" @showLine="showLine"
           :lineWordItem="lineWordItem">
         </orcTxt>
         <editorial ref="editorial" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
@@ -43,6 +44,7 @@
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <applyFormFilePreview :url="previewfileUrl"></applyFormFilePreview>
     </el-dialog>
+    <secondary-confirmation :option="saveOption" ref="confirmation" @handleClose="goBack" @handleConfirm="save"></secondary-confirmation>
   </div>
 </template>
 
@@ -59,13 +61,14 @@ import similarCase from './sidebar/similar-case'
 import approvedOpinion from './sidebar/approved-opinion'
 import aiKnowledgeBase from './sidebar/ai-knowledge-base'
 import applyFormFilePreview from '@/components/filePreview'
+import secondaryConfirmation from "@/components/common/secondaryConfirmation"
 import {
   getUploadedFilesList,
   getOCRAnalysisResults,
   getOcrExamineShow,
   approvalStorageDraft,
   getApprovalDraft,
-  
+
 } from "@/api/aiApproval";
 import {
   getApplyForm
@@ -73,7 +76,7 @@ import {
 
 export default {
   name: 'aiApproval',
-  components: {applyFormFilePreview, filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase },
+  components: { applyFormFilePreview, filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase,secondaryConfirmation },
   data() {
     return {
       projectName: '',
@@ -81,6 +84,7 @@ export default {
       previewfileUrl: '',
       loading: false,
       fileloading: false,
+      specialFileType: ['jpeg', 'jpg', 'png', 'pdf'],
       files: [], // 文件相关信息
       comments: [], // 编辑意见
       crtTools: '',//当前侧边工具栏激活项
@@ -128,7 +132,12 @@ export default {
       showOcr: true,
       formId: '',
       inDraft: false, //判断当前单子是否有 已存的审批意见
-      formCategoryId: 1
+      formCategoryId: '',
+      saveOption: {
+        message: '是否保存本审查项目的审查意见？',
+        cancelBtn: '不保存',
+        confirmBtn: '保存',
+      }
     }
   },
   mounted() {
@@ -137,22 +146,23 @@ export default {
       return
     }
     const { item } = this.$route.params
+    console.log('item',item)
     this.formId = item.taskNumber;
     this.inDraft = item.draftFlag === 1;
-    // this.formCategoryId = item.formCategoryId
+    this.formCategoryId = item.formCategoryId
     this.loading = true;
-    this.init()
+    this.init(item)
   },
   methods: {
     // 获取工单基本信息
-    init() {
+    init(item) {
       getApplyForm({
         formCategoryId: this.formCategoryId,
         formId: this.formId,
       }).then(res => {
         const { data, status, message } = res.data;
         if (status === 200) {
-          this.tools[0].sidebarParam = data;
+          this.tools[0].sidebarParam = { data, formId: item.taskNumber, originatorId: item.sponsor };
           this.projectName = data.basicInformation.filter(item => item.title === '项目名称')?.[0]?.value
         } else {
           this.$message.error({ offset: 40, title: "提醒", message });
@@ -552,6 +562,15 @@ export default {
           }
         })
     },
+    // 返回
+    goBack(backNow) {
+      this.getComments()
+      if (this.comments.length && backNow !== true) {
+        this.$refs.confirmation.dialogVisible = true;
+      } else {
+        this.$router.go(-1);
+      }
+    },
   },
   beforeDestroy() {
     this.lineRemove()
@@ -684,13 +703,14 @@ export default {
     }
   }
 }
-/deep/ .preview-dialog {
-    height: 80vh;
 
-    .el-dialog__body {
-      height: 96%;
-    }
+/deep/ .preview-dialog {
+  height: 80vh;
+
+  .el-dialog__body {
+    height: 96%;
   }
+}
 </style>
 <style lang="less">
 .sidebar-popper {

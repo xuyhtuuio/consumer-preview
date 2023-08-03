@@ -1,5 +1,13 @@
 import request from '@/api/request.js'
 
+// 查询人员，角色，部门列表
+export function queryUserList(param) {
+  return request({
+    url: '/cpr/admin/queryUserList',
+    method: 'get',
+    params: param
+  })
+}
 
 // 查询组织架构树
 export function getOrgTree(param) {
@@ -17,8 +25,4 @@ export function getUserByName(param) {
     method: 'get',
     params: param
   })
-}
-
-export default {
-  getOrgTree, getUserByName
 }

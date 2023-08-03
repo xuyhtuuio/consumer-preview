@@ -123,7 +123,7 @@ export default {
     toDetail(item) {
       window.sessionStorage.setItem("order-detail", JSON.stringify({
         item,
-        pageFrom: "approve",
+        clickPoint: "taskName",
       }));
       this.$router.push({
         name: "approval-details",
@@ -147,7 +147,7 @@ export default {
         name: "approval-details",
         params: {
           formId: item.taskNumber,
-          originatorId: item.sponsorMap.sponsorId,
+          originatorId: item.sponsor,
           taskName:item.taskName
         },
       });

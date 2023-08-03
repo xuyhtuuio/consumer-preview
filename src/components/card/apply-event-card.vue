@@ -175,14 +175,14 @@ export default {
         "order-detail",
         JSON.stringify({
           item,
-          pageFrom: "apply",
+          clickPoint:'taskName',
         })
       );
       this.$router.push({
         name: "details",
         params: {
           formId: item.taskNumber,
-          originatorId: item.taskNumber,
+          originatorId: item.userId,
           taskName:item.taskName
         },
       });
@@ -200,7 +200,7 @@ export default {
         name: "details",
         params: {
           formId: item.taskNumber,
-          originatorId: item.taskNumber,
+          originatorId: item.userId,
           taskName:item.taskName
         },
       });

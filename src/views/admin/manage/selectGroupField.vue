@@ -1,7 +1,7 @@
 <template>
   <div class="groups">
     <div class="groups-item" v-for="(item, index) in data" :key="item.id">
-      <el-input v-model="item.name" size="medium" v-show="item.showInput"
+      <el-input v-model="item.value" size="medium" v-show="item.showInput"
                 style="width: 300px" @blur="showInput = false">
         <i
           class="el-icon-success el-input__icon"
@@ -12,7 +12,7 @@
       </el-input>
       <div @mouseover="item.isHover = true" @mouseout="item.isHover=false" style="display: inline-block;">
         <div class="header-title" v-show="!item.showInput" @click="item.showInput = true" style="font-size: medium">
-          {{item.name}}
+          {{item.value}}
           <i class="iconfont icon-bi"></i>
         </div>
       </div>

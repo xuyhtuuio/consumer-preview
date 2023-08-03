@@ -60,4 +60,26 @@ export function addFormField(param) {
     data: param
   })
 }
+// 表单管理-根据表单类别id找到字段详情
+export function itemPagingList(param) {
+  return request({
+    url: '/cpr/FormManagement/itemPagingList',
+    method: 'get',
+    params: param
+  })
+}
+
+
 /* 表单管理end */
+
+
+/* 流程管理start */
+// 流程列表
+export function getProcessList(param) {
+  return request({
+    url: '/cpr/admin/form/list',
+    method: 'get',
+    params: param
+  })
+}
+/* 流程管理end */

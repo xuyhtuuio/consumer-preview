@@ -42,7 +42,7 @@ export default {
         type = 'png'
       } else if (['xls', 'xlsx'].includes(suffix)) {
         type = 'xls'
-      } else if (['doc'].includes(suffix)) {
+      } else if (['doc','docx'].includes(suffix)) {
         type = 'doc'
       } else if (['mp4'].includes(suffix)) {
         type = 'mp4'

@@ -179,6 +179,7 @@ export default {
     };
   },
   methods: {
+    // 先获取详情
     changeAccept(child, index, idx) {
       if (child.isAccept == 1) {
         const form = `form_${index}_${idx}`;
@@ -206,6 +207,7 @@ export default {
     submit() {
       console.log("vv");
     },
+    
   },
 };
 </script>
@@ -387,11 +389,12 @@ export default {
   box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.1);
 
   .file-list {
-    display: flex;
-    flex-wrap: wrap;
+    // display: flex;
+    // flex-wrap: wrap;
 
     .file-list-item {
-      width: 31%;
+      display: inline-block;
+      // width: 31%;
       border-radius: 4px;
       background: #f7f8fa;
       padding: 2px 12px;
@@ -399,11 +402,10 @@ export default {
       font-size: 12px;
       font-weight: 400;
       line-height: 20px;
-      margin-right: 12px;
       margin-bottom: 8px;
     }
-    .file-list-item:nth-of-type(3n) {
-      margin-right: 0;
+    .file-list-item:nth-of-type(n+2) {
+      margin-left: 12px;
     }
   }
 }

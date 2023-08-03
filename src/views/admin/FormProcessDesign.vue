@@ -186,15 +186,21 @@ export default {
       }
     },
     saveProcess() {
+      const user = window.localStorage.getItem('user_name')
       let template = {
-        formId: this.setup.formId.join(','),
+        formId: this.setup.formId,
         formName: this.setup.formName,
         // logo: JSON.stringify(this.setup.logo),
         settings: JSON.stringify(this.setup.settings),
         // groupId: this.setup.groupId,
         formItems: JSON.stringify(this.setup.formItems),
         process: JSON.stringify(this.setup.process),
-        remark: this.setup.remark
+        remark: this.setup.remark,
+        status: '',
+        isRevoke: this.setup.settings.undo,
+        node: this.setup.settings.target,
+        createUserName: user.fullname,
+        createUserId: user.id
       }
       // 调取暂存接口
     },
@@ -212,14 +218,14 @@ export default {
         console.log('formItems', this.setup.formItems)
         console.log('process', this.setup.process)
         let template = {
-          formId: this.setup.formId.join(','),
+          formId: this.setup.formId,
           formName: this.setup.formName,
           // logo: JSON.stringify(this.setup.logo),
           settings: JSON.stringify(this.setup.settings),
           // groupId: this.setup.groupId,
           formItems: JSON.stringify(this.setup.formItems),
           process: JSON.stringify(this.setup.process),
-          remark: this.setup.remark
+          remark: this.setup.remark,
         }
         console.log(template)
         if (this.isNew || this.$isEmpty(this.setup.formId)){

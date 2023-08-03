@@ -1,6 +1,15 @@
 import request from '@/api/request.js'
 
 
+// 根据id 查询表单详情
+export function getFormTemplateById(formId) {
+  return request({
+    url: `/cpr/admin/form/detail/${formId}`,
+    method: 'get',
+    params: {}
+  })
+}
+
 // 查询表单组
 export function getFormGroups(param) {
   return request({

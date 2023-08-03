@@ -120,7 +120,7 @@
         }],
         selectGroupOptions: [{
           id: 0,
-          name: '组1',
+          value: '组1',
           showInput: false,
           children: [{
             id: '11',
@@ -142,7 +142,7 @@
         return this.ruleForm.name === 'MultipleGroupsSelect'
       },
       moudleDisable() {
-        return this.isMultipleGroupsSelect || this.editType === '编辑字段'
+        return this.isMultipleGroupsSelect || this.titleDisable
       },
       expandingDisable() {
         return this.isMultipleGroupsSelect || this.ruleForm.module === '核对要点'
@@ -161,8 +161,9 @@
           this.$set(this.ruleForm, 'title', row.title)
           this.$set(this.ruleForm, 'module', row.module)
           this.$set(this.ruleForm, 'name', row.name)
-          this.$set(this.ruleForm, 'required', row.props.require)
-          this.$set(this.ruleForm, 'expanding', row.props.expanding)
+          this.$set(this.ruleForm, 'required', Boolean(row.required))
+          this.$set(this.ruleForm, 'expanding', Boolean(row.expanding))
+          console.log(this.ruleForm)
         } else {
           this.currentRow = {}
           this.ruleForm = this.$options.data().ruleForm
@@ -203,7 +204,7 @@
       addSelectGroupOptions() {
         this.selectGroupOptions.push({
           id: ++id,
-          name: '组' + (this.selectGroupOptions.length + 1),
+          value: '组' + (this.selectGroupOptions.length + 1),
           children: [{
             id: ++id,
             value: ''
@@ -226,6 +227,7 @@
       resetForm(formName) {
         this.$refs[formName].resetFields();
         this.initForm(this.currentRow)
+        this.$emit('close')
       },
       handleForm() {
         const {
@@ -308,7 +310,7 @@
               required,
               placeholder,
               expanding,
-              options: this.selectOptions
+              options: this.selectGroupOptions
             }
           },
           Cascader: {

@@ -56,14 +56,6 @@ module.exports = {
           '^/uaa/': '/uaa/',
         }
       },
-      '/test/': {
-        target:"http://192.168.161.39:8324/",
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          '^/test/': '',
-        }
-      },
       '/cpr': {
         target: 'http://192.168.210.57:31602',
         changeOrigin: true,

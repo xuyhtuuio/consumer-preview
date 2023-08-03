@@ -71,5 +71,22 @@ export function concernApplication(param) {
   })
 }
 
+export function getApprovalRecordByFromid(param) {
+  return request({
+    url: '/cpr/approvalrecord/getApprovalRecordByFromid',
+    method: 'post',
+    contentType:'application/x-www-form-urlencoded',
+    data: param
+  })
+}
+//下载
 
+export function downloadAllFiles(param) {
+  return request({
+    url: '/cpr/applicationForm/downloadAllFiles',
+    method: 'post',
+
+    data: param
+  })
+}
 

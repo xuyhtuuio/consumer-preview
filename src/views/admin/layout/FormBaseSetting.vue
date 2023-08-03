@@ -24,7 +24,7 @@
           </svg>
           关联表单<span style="color: red">*</span>
         </template>
-        <el-select v-model="setup.formId" multiple placeholder="请选择关联表单(多选)" size="medium" class="is-dark input" style="width: 100%">
+        <el-select v-model="setup.formId" @change="changeSelectFormId" placeholder="请选择关联表单(多选)" size="medium" class="is-dark input" style="width: 100%">
           <el-option v-for="(op, index) in fromGroup" :key="index"
                      :label="op.name" :value="op.id"></el-option>
         </el-select>
@@ -53,7 +53,10 @@
 <script>
 import orgPicker from '@/components/common/organizationPicker'
 import {getFormGroups, updateGroup} from '@/api/design'
-
+import { itemPagingList } from '@/api/manage'
+import {
+  obtainExamineTypeList,
+} from '@/api/manage'
 export default {
   name: "FormBaseSetting",
   components: {orgPicker},
@@ -62,20 +65,14 @@ export default {
       nowUserSelect: null,
       showUserSelect: false,
       select: [],
-      fromGroup: [{
-        name: '表单1',
-        id: 'form-1111'
-      }, {
-        name: '表单2',
-        id: 'form-2222'
-      }],
+      fromGroup: [],
       rules: {
         formName: [
           { required: true, message: '请输入流程名称', trigger: 'blur' },
           { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
         ],
         formId: [
-          { type: 'array', required: true, message: '请选择关联表单', trigger: 'change' }
+          { required: true, message: '请选择关联表单', trigger: 'change' }
         ],
       }
     }
@@ -86,8 +83,44 @@ export default {
     }
   },
   mounted(){
+    this.getObtainExamineTypeList()
   },
   methods: {
+    async getFormItems() {
+      const res = await itemPagingList({
+        formCategoryId: this.setup.formId,
+        pageNow: 1,
+        pageSize: 1000
+      })
+      const resData = res.data.data
+      if (resData) {
+        const formItems = resData.list.map(item => item.special);
+        this.$store.state.design.formItems = formItems
+      }
+    },
+    async getObtainExamineTypeList() {
+      const res = await obtainExamineTypeList({
+        pageNow: 1,
+        pageSize: 5000,
+        orderColumn: 'updateTime',
+        orderType: 'desc'
+      })
+      const resData = res.data.data
+      if (resData) {
+        this.fromGroup = resData.data.list.map(item => {
+          return {
+            name: item.examineTypesName,
+            id: item.recordId
+          }
+        });
+      }
+    },
+    changeSelectFormId(val) {
+      const value = [val]
+      const group = this.fromGroup.filter(item => value.includes(item.id))
+      window.sessionStorage.setItem('formGroup', JSON.stringify(group))
+      this.getFormItems()
+    },
     closeSelect() {
       this.showUserSelect = false
       //this.nowUserSelect = null
@@ -109,7 +142,7 @@ export default {
       if (!this.$isNotEmpty(this.setup.formName)){
         err.push('流程名称未设置')
       }
-      if (!this.$isNotEmpty(this.setup.formId) || this.setup.formId.length === 0){
+      if (!this.$isNotEmpty(this.setup.formId) || !this.setup.formId){
         err.push('关联表单未设置')
       }
       console.log(this.setup)

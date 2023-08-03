@@ -2,10 +2,7 @@
   <div>
     <div style="margin-bottom: 20px">
       <el-radio-group v-model="formId" @input="changeFormId" size="small">
-        <el-radio-button label="111">表单1</el-radio-button>
-        <el-radio-button label="222">表单2</el-radio-button>
-        <el-radio-button label="333">表单3</el-radio-button>
-        <el-radio-button label="444">表单4</el-radio-button>
+        <el-radio-button :label="item.id" v-for="item in formGroup" :key="item.id">{{ item.name }}</el-radio-button>
       </el-radio-group>
     </div>
     <el-table :header-cell-style="{background:'#f5f6f6'}" :data="formPerms" border style="width: 100%">
@@ -44,6 +41,7 @@
 </template>
 
 <script>
+import { getFormTemplateById } from '@/api/design'
 export default {
   name: "FormAuthorityConfig",
   components: {},
@@ -57,11 +55,15 @@ export default {
         editable: false,
         hide: false
       },
-      formId: '111'
+      formGroup: [],
+      formId: ''
     }
   },
   created() {
     this.formPermsLoad()
+    this.formGroup = JSON.parse(window.sessionStorage.getItem('formGroup')) || []
+    this.formId = this.formGroup[0]?.id
+    // this.formId && this.getFormItemeById(this.formId)
   },
   computed:{
     formData(){
@@ -72,6 +74,14 @@ export default {
     }
   },
   methods: {
+    async getFormItemeById(formId) {
+      const res = await getFormTemplateById(formId)
+      const formDetail = res.data
+      console.log(formDetail)
+      if (formDetail) {
+        
+      }
+    },
     allSelect(type){
       this.permSelect = type
       this.formPerms.forEach(f => f.perm = type)
@@ -95,12 +105,12 @@ export default {
           })
         }
       })
+      console.log(this.formData)
     },
     handleCheckAllChange(){
 
     },
     changeFormId() {
-      
     }
   },
   watch:{

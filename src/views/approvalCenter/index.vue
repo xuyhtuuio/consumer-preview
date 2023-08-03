@@ -119,6 +119,7 @@ export default {
   data() {
     return {
       crtSign: "toPending",
+      pageNow: 1,
       // 待审批：pendingApproval 已审批：approvedCount 关注：applyAll 待修改：toModified 全部任务（本分行）：allTasksThis 总行的任务个数：allTasksOffice 驳回单的个数：overrule
       dataStatistics: [
         {
@@ -148,8 +149,8 @@ export default {
         urgent: "",
         hasOpinions: "",
         adoptionStatus: "",
-        updateTime: [1, "asc"],
-        updateTime2: [1, "asc"],
+        updateTime: [2, "asc"],
+        updateTime2: [2, "asc"],
         keywords: "",
         productLaunchDate: "",
         total: 0,
@@ -219,8 +220,14 @@ export default {
     this.searchList();
 
   },
-  watch: {},
-
+  watch: {
+    $route(to, from) {
+      // 从审批页来, 刷新当前页码的数据且  跳转到审批页面
+      if (from.name === 'aiApproval' && to.name === 'approval-list') {
+        this.getList(this.pageNow);
+      }
+    }
+  },
   created() {
     this.getDataStatistic();
   },
@@ -342,6 +349,7 @@ export default {
           break;
 
       }
+      this.pageNow = pageNow;
       const param = {
         pageNow,
         pageSize: 10,
