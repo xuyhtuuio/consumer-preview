@@ -257,7 +257,7 @@ export default {
       // 草稿
       if (item.taskStatus == 0) {
         this.status = 0;
-        this.crtComp = "approvedOpinionCard";
+        this.crtComp = "approvalRecordCard";
         //后期扩展,审批也分好几种类型
       }
       // 审批中 主要区分是否OCR审批、部门审批  所有的的节点
@@ -270,7 +270,7 @@ export default {
           this.isOCR = Math.random()
         } else {
           this.status = 0;
-          this.crtComp = "approvedOpinionCard";
+          this.crtComp = "approvalRecordCard";
         }
       }
       // 状态待修改 
