@@ -79,5 +79,14 @@ export function getApprovalRecordByFromid(param) {
     data: param
   })
 }
+//下载
 
+export function downloadAllFiles(param) {
+  return request({
+    url: '/cpr/applicationForm/downloadAllFiles',
+    method: 'post',
+
+    data: param
+  })
+}
 

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <NavMenu v-if="$route.name !== 'login'"></NavMenu>
+    <NavMenu v-if="$route.name !== 'login'&& $route.name !== 'showReview'"></NavMenu>
     <transition name="router-fade" mode="out-in" >
       <router-view v-if="!$route.meta.keepAlive" class="view-box" :style="{
         padding: noPaddingRoute.indexOf($route.name) !== -1 ? '0':'16px 80px',
@@ -82,4 +82,10 @@ ul {
 .item-desc {
   font-size: small;
   color: #5e5e5e;
+
+
+
+
+
+
 }</style>

@@ -118,7 +118,4 @@ import WarnInfo  from "./warn-info"
     }
 }
 
-
-
-
 </style>

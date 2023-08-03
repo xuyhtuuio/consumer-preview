@@ -17,7 +17,7 @@
             <div class="list" v-loading="search.loading" v-if="search.total > 0">
                 <div v-for="(item, index) in search.list" :key="index" class="item pointer">
                     <div class="base-left">
-                        <i class="iconfont icon-fuzhi"></i>
+                        <i class="iconfont icon-fuzhi" @click="copy(item)"></i>
                         <p>
                             <span>
                                 <i class="name">{{ item.name }}</i>
@@ -92,6 +92,14 @@ export default {
                 pageSize: 5
             }
         },
+        copy(item) {
+            const input = document.createElement('input');
+            input.value = item.content;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('Copy');
+            this.$message.success('复制成功！')
+        }
     }
 }
 
@@ -134,9 +142,10 @@ export default {
     .list {
         .item:hover {
             background: #F9FBFF;
-             .base-left .iconfont{
-                display:block ;
-             }
+
+            .base-left .iconfont {
+                display: block;
+            }
         }
 
 
@@ -146,13 +155,15 @@ export default {
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px dashed #E5E6EB;
+
             .base-left {
                 color: #1D2128;
                 font-size: 14px;
                 font-weight: 700;
                 line-height: 22px;
                 position: relative;
-                .iconfont{
+
+                .iconfont {
                     display: none;
                     position: absolute;
                     right: 0;
@@ -160,9 +171,11 @@ export default {
                     font-size: 14px;
                     color: rgba(45, 92, 246, 1);
                 }
+
                 p {
                     margin-bottom: 8px;
                 }
+
                 .content {
 
                     font-size: 12px;
@@ -221,5 +234,4 @@ export default {
     }
 
 
-}
-</style>
+}</style>

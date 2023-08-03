@@ -1,49 +1,55 @@
 <template>
   <div class="add-tag">
     <div class="left">
-      <img class="img" src="@/assets/image/ai-approval/ocr-avatar.png" alt="">
-      <span class="text">{{fullname}}</span>
+      <img class="img" src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
+      <span class="text">{{ fullname }}</span>
     </div>
     <div class="center">
-      <span class="item"> 总行</span>
-      <span class="line">|</span>
-      <span class="item"> 财富平台部</span>
-      <span class="line">|</span>
-      <span class="item">财富客群团队</span>
+      <div v-show="approverInfo">
+        <span class="item"> 总行</span>
+        <span class="line">|</span>
+        <span class="item"> 财富平台部</span>
+        <span class="line">|</span>
+        <span class="item">财富客群团队</span>
+      </div>
     </div>
     <div class="right">
       <g-button class="btn" @click="save">保存草稿</g-button>
-      <g-button class="btn"  type="primary" @click="submit">提交</g-button>
+      <g-button class="btn" type="primary" @click="submit">提交</g-button>
     </div>
   </div>
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        fullname: ""
-      }
-    },
-    created() {
-      this.initData()
-    },
-    methods: {
-     async initData() {
-        const {data:{data}} = await this.$http({
+export default {
+  data() {
+    return {
+      fullname: '',
+      approverInfo: ''
+    };
+  },
+  created() {
+    this.initData();
+  },
+  methods: {
+    async initData() {
+      const {
+        data: { data }
+      } = await this.$http({
         method: 'get',
-        url: '/cpr/applicationForm/getUserDepartmentInfo',
+        url: '/cpr/applicationForm/getUserDepartmentInfo'
       });
-      this.fullname = data.fullname
-      },
-      submit() {
-        this.$emit("submit")
-      },
-      save() {
-        this.$emit("save")
-      }
+      this.fullname = data.fullname;
+      this.approverInfo = data.approverInfo;
+    },
+    submit() {
+      this.$emit('submit');
+    },
+    save() {
+      this.$emit('save');
     }
   }
+};
 </script>
 
 <style lang="less" scoped>
@@ -52,7 +58,7 @@
   align-items: center;
   width: 100%;
   .left {
-     display: flex;
+    display: flex;
     align-items: center;
     margin: 0 16px;
     .img {
@@ -66,7 +72,6 @@
     .text {
       font-weight: 700;
       color: rgba(29, 33, 40, 1);
-
     }
   }
   .center {
@@ -79,22 +84,14 @@
   }
   .right {
     display: flex;
-    
+
     .btn {
       &:not(:last-child) {
         margin-right: 8px;
       }
     }
-
   }
 }
-
-
-
-
-
-
-
 
 
 </style>

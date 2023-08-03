@@ -66,7 +66,6 @@ export default {
   beforeRouteEnter({ name, params: { id } }, from, next) {
     if (name === 'addApply') return next();
     next(vm => {
-      console.log('123', id);
       if (id || window.localStorage.getItem('editId')) {
         console.log(id, window.localStorage.getItem('editId'));
         vm.formId = id || window.localStorage.getItem('editId');
@@ -78,6 +77,8 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     window.localStorage.removeItem('editId');
+    this.formId = undefined
+    this.initialData();
     next();
   },
   activated() {
@@ -176,15 +177,15 @@ export default {
       result.formItemDataList = formItemDataList;
       flag &&
         submit(result).then(res => {
-          this.initialData();
           this.$message({ type: 'success', message: res.data.data });
-          this.rollTo(0)
+          this.$router.push({name:"apply-list"})
+          // this.rollTo(0)
         });
       !flag &&
         saveDraft(result).then(res => {
-          this.initialData();
           this.$message({ type: 'success', message: res.data.data });
-          this.rollTo(0)
+          this.$router.push({name:"apply-list"})
+          // this.rollTo(0)
         });
     },
     rollTo(offsetTop) {
@@ -249,6 +250,13 @@ export default {
     }
   }
 }
+
+
+
+
+
+
+
 
 
 

@@ -9,7 +9,7 @@
           <i class="btn">返回</i>
         </div>
         <!-- 只有有修改权限的人能看到 -->
-        <div class="back flex white" v-if="status == 5">
+        <div class="back flex white" v-if="status == 5" @click="toModify">
           <i class="iconfont icon-xianxingtubiao"></i>
           <i class="btn">去修改</i>
         </div>
@@ -26,17 +26,17 @@
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
           </div>
-          <div class="back flex">
-            <i class="iconfont icon-xianxingtubiao"></i>
-            <i class="btn">修改申请单</i>
-          </div>
-          <div class="back flex">
+          <div class="back flex" v-if="!isOCR">
             <i class="iconfont icon-baocun"></i>
             <i class="btn">保存</i>
           </div>
-          <div class="back flex white" @click="submit">
+          <div class="back flex white" @click="submit" v-if="!isOCR">
             <i class="iconfont icon-tijiao"></i>
             <i class="btn">提交</i>
+          </div>
+          <div class="back flex white" @click="toApproval" v-if="isOCR">
+            <i class="iconfont icon-yijianshu"></i>
+            <i class="btn">审查</i>
           </div>
         </div>
       </div>
@@ -74,7 +74,6 @@
           <nav class="nav active-nav" v-if="status == 0">
             <span class="active-nav" style="text-align: left">审批记录明细</span>
           </nav>
-
           <!-- 消保审查/详情页/审批人审批（非消保 -->
           <nav class="nav" v-if="status == 2">
             <span :class="crtComp == 'leaderEditOpinion' ? 'active-nav' : ''" @click="() => {
@@ -205,6 +204,8 @@ export default {
       previewDialog: false,
       previewUrl: '',
       orderBaseInfo: {},
+      item: {},
+      isOCR: false,
       peoples: [
         { name: "王明明", code: 1 },
         { name: "王明明", code: 2 },
@@ -238,37 +239,47 @@ export default {
       this.previewDialog = true
       this.previewUrl = url
     },
+    toApproval() {
+      this.$router.push({
+        name: "aiApproval",
+        params: { item: this.item }
+      });
+    },
     judgeStatus() {
       // 一般进入详情页：展示返回按钮 及 审批记录详细
       // 已经结束的工单 展示: 返回按钮、审批记录详细、审查意见书、最终上线材
       // <!-- 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
-      // let { item } = JSON.parse(window.sessionStorage.getItem("order-detail"));
+      let { item } = JSON.parse(window.sessionStorage.getItem("order-detail"));
       const info = JSON.parse(window.sessionStorage.getItem("order-detail"));
-      let item ={
-        taskStatus:0
-      }
+      console.log('ggg', item)
       this.info = info
-      // 审批中、草稿
-      if (item.taskStatus == 0 || item.taskStatus == 1) {
+      this.item = item
+      // 草稿
+      if (item.taskStatus == 0) {
         this.status = 0;
-        this.crtComp = "approvalRecordCard";
-      }
-      if (item.taskStatus == 3) {
-        this.status = 3;
         this.crtComp = "approvedOpinionCard";
+        //后期扩展,审批也分好几种类型
       }
-      // 已经结束的工单
-      if (item.taskStatus == 4) {
-        this.status = 4;
-        this.crtComp = "approvedOpinionCard";
+      // 审批中 主要区分是否OCR审批、部门审批  所有的的节点
+      if (item.taskStatus == 1) {
+        // 点击审查 点击了审查按钮
+        if (info && info.op == "approve") {
+          this.status = 2;
+          this.crtComp = "leaderEditOpinion";
+          //区分是否有OCR审批
+          this.isOCR = Math.random()
+        } else {
+          this.status = 0;
+          this.crtComp = "approvedOpinionCard";
+        }
       }
-      // 状态待修改  有实质性、已确认 返回按钮、去修改，审查意见书、审批记录详细；采纳实质意见的确认人、二次会签的指定人右上角会看到去修改按钮      有修改权限的人（全部采纳实质意见的确认人、二次会签指定的人）看到的页面，在右上角增加【去修改】按钮，点击【去修改】进入修改申请单页面；
+      // 状态待修改 
       if (item.taskStatus == 2) {
         this.status = 5;
         this.crtComp = "approvedOpinionCard";
       }
-      // 从申请那里过来 == 点击了确认按钮
-      if (info && info.op == "check") {
+      //  待确认
+      if (item.taskStatus == 3) {
         // 有实质性意见
         if (item.hasOpinions == 1) {
           this.status = 5;
@@ -278,17 +289,26 @@ export default {
         }
         this.crtComp = "approvedOpinionCard";
       }
-      // 从申请那里过来 == 点击了确认按钮
-      if (info && info.op == "approve") {
-        this.status = 2;
-        this.crtComp = "leaderEditOpinion";
+      // 已结束
+      if (item.taskStatus == 4) {
+        this.status = 4;
+        this.crtComp = "approvedOpinionCard";
       }
-      
+
+
     },
     keep() {
       if (this.crtComp == 'approvedOpinionCard') {
         this.$refs["child"].keep();
       }
+    },
+    toModify() {
+      this.$router.push({
+        name: 'editApply',
+        params: {
+          id: this.item.taskNumber
+        }
+      })
     },
     goback() {
       // 如果是从审批页进来；二次弹窗
