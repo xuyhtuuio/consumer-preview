@@ -163,13 +163,6 @@ export default {
       //     message: '只支持zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/格式的文件！'
       //   });
       // }
-      this.fileList.push({
-        name: file.name,
-        id: file.uid,
-        status: -1,
-        isClick: false,
-        type: type
-      });
       if (!judgeRes) {
         this.$message({
           type: 'error',
@@ -177,6 +170,14 @@ export default {
         });
         return false;
       }
+      this.fileList.push({
+        name: file.name,
+        id: file.uid,
+        status: -1,
+        isClick: false,
+        type: type
+      });
+      
     },
     // 上传文件
     uploadBpmn(param) {
