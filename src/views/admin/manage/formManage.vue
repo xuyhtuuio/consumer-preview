@@ -308,6 +308,19 @@ export default {
         this.getObtainExamineTypeList({
           pageNow: val
         })
+      } else {
+        this.editForm({
+          recordId: this.currentRow.recordId,
+          params: {
+            itemName: this.search.title,
+            itemType: this.search.type,
+            currentModule: this.search.belong,
+            orderColumn: 'updateTime',
+            orderType: 'desc',
+            pageSize: 10,
+            pageNow: val
+          }
+        })
       }
     },
     // 表单项 搜索
@@ -319,7 +332,9 @@ export default {
           itemType: this.search.type,
           currentModule: this.search.belong,
           orderColumn: 'updateTime',
-          orderType: 'desc'
+          orderType: 'desc',
+          pageSize: 10,
+          pageNow: 1
         }
       })
     },
