@@ -11,11 +11,7 @@
         <i class="line"></i>
       </p>
       <div class="opinions">
-        <div
-          v-for="(child, idx) in item.substantiveopinion"
-          :key="idx"
-          class="opinions-item pointer"
-        >
+        <div v-for="(child, idx) in item.substantiveopinion" :key="idx" class="opinions-item pointer">
           <div class="opinion-tag">
             <span v-if="child.isSubstantive" class="guanzhu">
               <i class="iconfont icon icon-guanzhu"></i>
@@ -29,18 +25,10 @@
           <p class="opinion-text">{{ idx + 1 }} {{ child.opinion }}</p>
           <div class="relevant-file">
             关联文件：<i class="file-name">{{ child.relevantfile[0] }} </i>
-            <el-popover
-              placement="bottom"
-              popper-class="file-overview-popper"
-              trigger="click"
-              v-if="child.relevantfile && child.relevantfile.length - 1"
-            >
+            <el-popover placement="bottom" popper-class="file-overview-popper" trigger="click"
+              v-if="child.relevantfile && child.relevantfile.length - 1">
               <div class="file-list">
-                <div
-                  class="file-list-item pointer"
-                  v-for="(file, i) in child.relevantfile"
-                  :key="i"
-                >
+                <div class="file-list-item pointer" v-for="(file, i) in child.relevantfile" :key="i">
                   {{ file }}
                 </div>
               </div>
@@ -49,29 +37,15 @@
           </div>
           <!-- 审批的时候选择采纳与否 -->
           <div class="accept-box" v-if="status == '3' || status == '5'">
-            <el-radio-group
-              v-model="child.isAccept"
-              @change="changeAccept(child, index, idx)"
-            >
+            <el-radio-group v-model="child.isAccept" @change="changeAccept(child, index, idx)">
               <el-radio :label="1">采纳</el-radio>
               <el-radio :label="0">不采纳</el-radio>
             </el-radio-group>
-            <el-form
-              :model="child"
-              :ref="`form_${index}_${idx}`"
-              :class="`form_${index}_${idx}`"
-              :rules="child.isAccept == 0 ? rules : {}"
-              class="desc-form"
-            >
+            <el-form :model="child" :ref="`form_${index}_${idx}`" :class="`form_${index}_${idx}`"
+              :rules="child.isAccept == 0 ? rules : {}" class="desc-form">
               <el-form-item prop="desc" label=" " class="flex">
-                <el-input
-                  v-model="child.desc"
-                  class="input-desc"
-                  :ref="`input_${index}_${idx}`"
-                  :placeholder="
-                    child.isAccept == 1 ? '请填写采纳说明' : '请填写不采纳说明'
-                  "
-                ></el-input>
+                <el-input v-model="child.desc" class="input-desc" :ref="`input_${index}_${idx}`" :placeholder="child.isAccept == 1 ? '请填写采纳说明' : '请填写不采纳说明'
+                  "></el-input>
               </el-form-item>
             </el-form>
           </div>
@@ -90,6 +64,7 @@
   </div>
 </template>
 <script>
+import { getEditedCommentsByFormId, insertApprovalRecordAndEditedComments, updateAdoptEditedComments } from '@/api/applyCenter'
 export default {
   props: {
     // 3 5显示复选框 4 显示已采纳 不采纳
@@ -178,6 +153,12 @@ export default {
       ],
     };
   },
+  activated() {
+    this.getEditedCommentsByFormId()
+  },
+  mounted() {
+    this.getEditedCommentsByFormId()
+  },
   methods: {
     // 先获取详情
     changeAccept(child, index, idx) {
@@ -188,26 +169,45 @@ export default {
         });
       }
     },
+    getEditedCommentsByFormId() {
+      this.loading = true
+      getEditedCommentsByFormId({ formId: '158'}).then(res => {
+        console.log('res')
+      }).finally(() => {
+        this.loading = false
+      })
+    },
     keep() {
+      console.log('keep')
       const inputArr = [];
       for (let i = 0; i < this.opinions.length; i++) {
         for (let j = 0; j < this.opinions[i].substantiveopinion.length; j++) {
           const form = `form_${i}_${j}`;
           this.$refs[form][0].validate((valid) => {
-            if (valid) {
-            } else {
+            if (!valid) {
               const ref = `input_${i}_${j}`;
               inputArr.push(ref);
             }
           });
         }
       }
-      this.$refs[inputArr[0]][0].focus();
+      inputArr.length ? this.$refs[inputArr[0]][0].focus() : ''
+      if (inputArr.length < 1) {
+        const params = {
+
+        }
+        this.$parent.startLoading(true)
+        // this.$emit('startLoading',true)
+        insertApprovalRecordAndEditedComments(params).then(res => {
+          console.log('ffffffffff')
+        })
+        // this.$emit('startLoading',false)
+      }
     },
     submit() {
       console.log("vv");
     },
-    
+
   },
 };
 </script>
@@ -290,46 +290,56 @@ export default {
           color: #86909c;
           display: flex;
           align-items: center;
+          word-break: keep-all;
 
           .file-name {
             margin: 0 8px 0 0;
             background: #fff;
             padding: 2px 12px;
+            word-break: keep-all;
           }
 
           i {
             color: #306ef5;
           }
         }
+
         .accept-box {
           margin-top: 8px;
-          /deep/ .el-radio .el-radio__input.is-checked + .el-radio__label,
+
+          /deep/ .el-radio .el-radio__input.is-checked+.el-radio__label,
           /deep/ .el-radio .el-radio__label {
             color: #1d2128;
             font-weight: 400;
             line-height: 20px;
             font-size: 12px;
           }
+
           /deep/ .el-form {
             margin-top: 8px;
+
             .el-form-item__label {
               padding-right: 8px;
             }
+
             .el-form-item__content {
               flex: 1;
             }
+
             .el-form-item__error::before {
               font-family: element-icons !important;
               content: "\e7a3";
               font-size: 20px;
               margin-right: 8px;
             }
+
             .el-form-item__error {
               display: flex;
               align-items: center;
               margin-top: 6px;
               color: #eb5757;
             }
+
             .el-input {
               .el-input__inner {
                 border: none;
@@ -341,6 +351,7 @@ export default {
             }
           }
         }
+
         .isAdopt-box {
           span {
             display: inline-block;
@@ -351,13 +362,16 @@ export default {
             line-height: 18px;
             padding: 0px 6px;
           }
+
           .accept {
             background: #74e4bd;
           }
+
           .no-accept {
             background: #f98981;
           }
         }
+
         .desc {
           margin-top: 10px;
           padding: 4px 8px;
@@ -372,8 +386,10 @@ export default {
         }
       }
     }
+
     .opinions-item:hover {
       background: #f0f6ff;
+
       .opinion-text {
         color: #2d5cf6;
       }
@@ -404,6 +420,7 @@ export default {
       line-height: 20px;
       margin-bottom: 8px;
     }
+
     .file-list-item:nth-of-type(n+2) {
       margin-left: 12px;
     }

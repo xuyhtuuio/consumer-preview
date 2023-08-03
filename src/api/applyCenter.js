@@ -73,7 +73,7 @@ export function concernApplication(param) {
 
 export function getApprovalRecordByFromid(param) {
   return request({
-    url: '/cpr/approvalrecord/getApprovalRecordByFromid',
+    url: '/cpr/approvalrecord/getApprovalRecordByFromId',
     method: 'post',
     contentType:'application/x-www-form-urlencoded',
     data: param
@@ -89,4 +89,32 @@ export function downloadAllFiles(param) {
     data: param
   })
 }
+
+// 用id获取意见详情
+export function getEditedCommentsByFormId(param){
+  return request({
+    url: '/cpr/approvalrecord/getEditedCommentsByFormId',
+    contentType:'application/x-www-form-urlencoded',
+    method: 'post',
+    data: param
+  })
+}
+//审查意见书 保存
+export function insertApprovalRecordAndEditedComments(param){
+  return request({
+    url: '/cpr/approvalrecord/insertApprovalRecordAndEditedComments',
+    method: 'post',
+    data: param
+  })
+} 
+
+//审查意见书 提交
+export function updateAdoptEditedComments(param){
+  return request({
+    url: '/cpr/approvalrecord/updateAdoptEditedComments',
+    method: 'post',
+    data: param
+  })
+} 
+
 
