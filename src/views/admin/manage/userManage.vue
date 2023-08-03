@@ -378,7 +378,7 @@ export default {
       .icon {
         margin-bottom: 16px;
         color: #fdb123;
-        font-size: 54px;
+        font-size: 40px;
       }
       .info {
         color: #1d2128;
@@ -390,6 +390,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        font-size: 14px;
         .g-button {
           margin-right: 24px;
           .btn-primary {

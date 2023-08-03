@@ -63,7 +63,7 @@ export default {
     this.formPermsLoad()
     this.formGroup = JSON.parse(window.sessionStorage.getItem('formGroup')) || []
     this.formId = this.formGroup[0]?.id
-    this.formId && this.getFormItemeById(this.formId)
+    // this.formId && this.getFormItemeById(this.formId)
   },
   computed:{
     formData(){

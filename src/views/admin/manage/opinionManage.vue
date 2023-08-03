@@ -33,7 +33,9 @@
 
           <el-form-item class="form-item">
             <g-button class="g-btn" type="primary" @click="handleClick">
-              <i class="iconfont icon-a-tubiaotianjiabiaoqian"></i>
+              <!-- <i class="iconfont icon-a-tubiaotianjiabiaoqian"></i> 
+              -->
+              <i class="add-icon">+</i>
               添加意见</g-button
             >
           </el-form-item>
@@ -48,36 +50,68 @@
           条
         </div>
         <div class="right">
-          <span class="r-item">按引用次数排序</span>
-          <span class="r-item">按更新时间排序</span>
+          <span
+            :class="['r-item', currentSort ? 'r-item-active' : '']"
+            @click="handleSort('refer')"
+          >
+            按引用次数排序
+            <span
+              style="font-size: 12px"
+              class="iconfont icon-jiantou left-icon"
+              :class="{ 'left-icon-reverse': referSort }"
+            ></span>
+          </span>
+          <span
+            :class="['r-item', !currentSort ? 'r-item-active' : '']"
+            @click="handleSort('update')"
+            >按更新时间排序
+            <span
+              style="font-size: 12px"
+              class="iconfont icon-jiantou left-icon"
+              :class="{ 'left-icon-reverse': updateSort }"
+            ></span>
+          </span>
         </div>
       </div>
       <div class="body">
         <div class="b-item" v-for="item in data" :key="item.id">
           <div class="left">
-            <div class="title">{{ item.title }}</div>
+            <div class="title">
+              <span>{{ item.title }}</span>
+              <g-icon
+                class="left-icon"
+                stylePx="20"
+                href="#icon-fuzhi1"
+                @click.native="handleCopy(item.content)"
+              />
+            </div>
             <div class="content">{{ item.content }}</div>
             <div class="info">
               <span :class="['info-item', item.typeId === 0 ? 'class-zero' : 'class-one']">{{
                 item.type
               }}</span>
               <span class="info-item"
-                >已引用<i class="high">{{ item.useFrequency }}</i
+                ><g-icon class="left-icon" stylePx="20" href="#icon-yinyong" />已引用<i
+                  class="high"
+                  >{{ item.useFrequency }}</i
                 >次</span
               >
               <span class="info-item">更新时间：{{ item.updateTime }}</span>
             </div>
           </div>
           <div class="btns">
-            <span v-if="item.isTop" class="btn btn-yellow"><i>取消置顶</i></span>
+            <span v-if="item.isTop" class="btn btn-yellow">
+              <i> <g-icon class="left-icon" stylePx="20" href="#icon-zhiding" />取消置顶</i>
+            </span>
             <span v-else class="btn"><i>置顶</i></span>
             <span class="btn"><i @click="handleClick(item)">编辑</i></span>
-            <span class="btn btn-red"><i>停用</i></span>
+            <span class="btn btn-red"><i @click="stopApllay(item)">停用</i></span>
             <span class="btn"><i>删除</i></span>
           </div>
         </div>
       </div>
       <TrsPagination
+      class="trs-pagination"
         :pageSize="10"
         :pageNow="page.pageNow"
         :total="page.total"
@@ -104,11 +138,10 @@
         <el-form-item class="form-item" label="标签名称">
           <el-select
             class="label-right"
-            v-model="dialogItem.title"
+            v-model="dialogItem.titleId"
             filterable
             :filter-method="dataFilter"
             @visible-change="visibleHideSelectInput"
-            @change="handleSelectChange"
             placeholder="请输入标签名称"
           >
             <el-option
@@ -141,7 +174,7 @@
       <div class=""></div>
       <div slot="footer" class="dialog-footer">
         <g-button @click="limitTimeVisible = false">取 消</g-button>
-        <g-button type="primary" @click="handleSubmitLimitTime">确 定</g-button>
+        <g-button class="stop" type="primary" @click="handleSubmitLimitTime">确 定</g-button>
       </div>
     </el-dialog>
 
@@ -157,7 +190,7 @@
       </template>
       <div class="dialog-item">
         <i class="el-alert__icon el-icon-warning icon"></i>
-        <div class="info">停用后提交的工单将不会对该关键词进行风险提示， 确定停用此标签吗？</div>
+        <div class="info">停用后将无法推荐此意见，确定停用吗？</div>
       </div>
       <div slot="footer" class="dialog-footer">
         <g-button @click="limitVisible = false">取 消</g-button>
@@ -167,6 +200,7 @@
   </div>
 </template>
 <script>
+import { copyText } from '@/utils/Clipboard.js';
 export default {
   name: 'OpinionManage',
   data() {
@@ -182,10 +216,11 @@ export default {
         {
           id: 0,
           title: '比较基准',
+          titleId: 1,
           type: '禁用词',
           typeId: 0,
           content:
-            '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因、测算依据或计算方法的业绩比较基准。',
+            '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因、测算依据或计算方法的业绩比较基准1。',
           isTop: true,
           updateTime: '2021-08-11',
           useFrequency: 110
@@ -193,10 +228,11 @@ export default {
         {
           id: 1,
           title: '比较基准',
+          titleId: 2,
           type: '敏感词',
           typeId: 1,
           content:
-            '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因、测算依据或计算方法的业绩比较基准。',
+            '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因、测算依据或计算方法的业绩比较基准2。',
           isTop: true,
           updateTime: '2021-08-11',
           useFrequency: 110
@@ -204,10 +240,11 @@ export default {
         {
           id: 2,
           title: '比较基准',
+          titleId: 3,
           type: '禁用词',
           typeId: 0,
           content:
-            '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因、测算依据或计算方法的业绩比较基准。',
+            '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因、测算依据或计算方法的业绩比较基准3。',
           isTop: false,
           updateTime: '2021-08-11',
           useFrequency: 110
@@ -215,10 +252,11 @@ export default {
         {
           id: 3,
           title: '比较基准',
+          titleId: 4,
           type: '敏感词',
           typeId: 1,
           content:
-            '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因、测算依据或计算方法的业绩比较基准。',
+            '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因、测算依据或计算方法的业绩比较基准4。',
           isTop: false,
           updateTime: '2021-08-11',
           useFrequency: 110
@@ -230,12 +268,14 @@ export default {
       },
       titleDialog: '新建标签',
       dialogTitle: '标签名称',
-      dialogItem: {
-      },
+      dialogItem: {},
       deviceIdList: [],
       deviceIdListFilter: [],
       searchList: [],
-      searchListFilter: []
+      searchListFilter: [],
+      currentSort: true,
+      referSort: true,
+      updateSort: true
     };
   },
   created() {
@@ -273,6 +313,18 @@ export default {
         this.searchListFilter.push(obj);
       });
     },
+    handleSort(type) {
+      if (type === 'refer') {
+        if (this.currentSort) {
+          this.referSort = !this.referSort;
+        } else {
+          this.currentSort = true;
+        }
+      } else {
+        !this.currentSort && (this.updateSort = !this.updateSort);
+        this.currentSort && (this.currentSort = false);
+      }
+    },
     sortChange({ column, prop, order }) {
       console.log(column, prop, order);
     },
@@ -284,6 +336,7 @@ export default {
       this.limitTimeVisible = true;
       this.dialogItem = row ? { ...row } : { typeId: 0 };
       console.log(row);
+      row && this.dataFilter(row.title);
     },
     submitEdit(row) {
       console.log(row);
@@ -304,6 +357,7 @@ export default {
 
     // 自定义筛选方法
     dataFilter(val) {
+      console.log(val);
       if (val) {
         let filterResult = [];
         let originalData = JSON.parse(JSON.stringify(this.deviceIdListFilter));
@@ -334,10 +388,6 @@ export default {
         this.deviceIdList = [];
       }
     },
-    handleSelectChange(item) {
-      console.log(item.title);
-      this.dataFilter(item.title)
-    },
     // 当下拉框出现时触发
     visibleHideSelectInput(val) {
       if (val) {
@@ -353,9 +403,24 @@ export default {
         : searchList;
       this.setHighlight(results, val);
       // 调用 callback 返回建议列表的数据
-      cb(results);
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        cb(results);
+      }, 3000 * Math.random());
     },
-    handleSelect() {}
+    handleSelect() {},
+    // 复制
+    handleCopy(val) {
+      copyText(
+        val,
+        msg => {
+          this.$message.success(msg);
+        },
+        err => {
+          console.log(err);
+        }
+      );
+    }
   }
 };
 </script>
@@ -371,6 +436,11 @@ export default {
 @color9: #f7f8fa;
 .opinion {
   height: 100%;
+  .left-icon {
+    display: inline-block;
+    position: relative;
+    margin-right: 4px;
+  }
   .top {
     font-size: 14px;
     margin: 0 -24px;
@@ -421,6 +491,13 @@ export default {
             display: flex;
             .g-btn {
               margin-left: 10px;
+              .add-icon {
+                position: relative;
+                top: -1px;
+                margin-right: 8px;
+                font-size: 26px;
+                font-weight: 100;
+              }
               .btn {
                 min-width: auto;
                 padding: 0 16px;
@@ -472,7 +549,15 @@ export default {
       .right {
         .r-item {
           font-size: 12px;
-
+          &.r-item-active {
+            color: #2d5cf6;
+          }
+          cursor: pointer;
+          .left-icon {
+            &-reverse {
+              transform: rotate(180deg);
+            }
+          }
           &:first-child {
             margin-right: 10px;
           }
@@ -490,12 +575,25 @@ export default {
         border-radius: 10px;
         &:hover {
           background: @color9;
+          .left {
+            .title {
+              .left-icon {
+                display: block;
+              }
+            }
+          }
         }
         .left {
           flex: 1;
           line-height: 24px;
           .title {
+            display: flex;
+            justify-content: space-between;
             font-weight: 700;
+            .left-icon {
+              display: none;
+              cursor: pointer;
+            }
           }
           .content {
             margin: 10px 0;
@@ -503,6 +601,9 @@ export default {
           .info {
             &-item {
               margin-right: 24px;
+              .left-icon {
+                top: 4px;
+              }
               .high {
                 color: @color2;
                 font-weight: 700;
@@ -518,9 +619,13 @@ export default {
         }
         .btns {
           margin-left: 24px;
+          line-height: 22px;
           .btn {
             color: @color3;
-            font-size: 14x;
+            font-size: 14px;
+            .left-icon {
+              top: 2px;
+            }
             &-red {
               color: @color5;
             }
@@ -761,4 +866,11 @@ export default {
     }
   }
 }
+
+.trs-pagination {
+  /deep/.pagination {
+    text-align: center;
+  }
+}
+
 </style>
