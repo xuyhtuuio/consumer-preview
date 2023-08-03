@@ -17,13 +17,15 @@
               'swiper-slide-split': showSplit(i)
             }">
               <div class="slide" @click="changeFile(i)" :class="{ active: i === activeIndex }">
-                <el-image v-if="['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))" :src="file.url"></el-image>
-                <file-type v-else :fileName="file.fileName"></file-type>
-                <!-- 是否为压缩包 -->
-                <svg class="icon icon-zip" aria-hidden="true" v-if="file.zip">
-                  <use xlink:href="#icon-zip"></use>
-                </svg>
-                <!-- <i class="iconfont icon-zip" v-if="file.zip"></i> -->
+                <el-tooltip placement="bottom-start">
+                  <div slot="content">{{ file.fileName }}</div>
+                  <el-image v-if="['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))" :src="file.url"></el-image>
+                  <file-type v-else :fileName="file.fileName"></file-type>
+                  <!-- 是否为压缩包 -->
+                  <svg class="icon icon-zip" aria-hidden="true" v-if="file.zip">
+                    <use xlink:href="#icon-zip"></use>
+                  </svg>
+                </el-tooltip>
               </div>
               <!-- 是否显示分割线 -->
               <label class="swiper-split" v-if="showSplit(i)"></label>
@@ -364,4 +366,5 @@ export default {
     z-index: 1;
     cursor: pointer;
   }
-}</style>
+}
+</style>
