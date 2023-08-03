@@ -119,6 +119,7 @@ export default {
   data() {
     return {
       crtSign: "toPending",
+      pageNow: 1,
       // 待审批：pendingApproval 已审批：approvedCount 关注：applyAll 待修改：toModified 全部任务（本分行）：allTasksThis 总行的任务个数：allTasksOffice 驳回单的个数：overrule
       dataStatistics: [
         {
@@ -348,6 +349,7 @@ export default {
           break;
 
       }
+      this.pageNow = pageNow;
       const param = {
         pageNow,
         pageSize: 10,
