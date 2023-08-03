@@ -26,6 +26,7 @@
 
 <style lang="less" scoped>
 .g-button {
+  font-size: 14px;
     .btn {
       display: flex;
       align-items: center;
@@ -55,4 +56,5 @@
       }
     }
 }
+
 </style>

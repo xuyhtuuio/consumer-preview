@@ -94,7 +94,7 @@
       <div class="dialog-item">
         <g-table-card :title="dialogTitle">
           <template #content>
-            <el-input v-model="dialogItem.useFrequency"></el-input>
+            <el-input v-model="dialogItem.label"></el-input>
           </template>
         </g-table-card>
       </div>
@@ -487,5 +487,6 @@ export default {
     color: #1d2128;
   }
 }
+
 
 </style>

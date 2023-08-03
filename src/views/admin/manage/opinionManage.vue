@@ -5,10 +5,12 @@
         <el-form class="my-form form" :inline="true" :model="search">
           <el-form-item class="form-item">
             <el-input
-              suffix-icon="el-icon-search"
               v-model="search.review"
               placeholder="请输入审查意见搜索"
-            ></el-input>
+              @keyup.enter.native="onSearch"
+            >
+             <i slot="suffix" class="el-icon-search" @click="onSearch"></i>
+            </el-input>
           </el-form-item>
 
           <el-form-item class="form-item">
@@ -18,8 +20,9 @@
               :fetch-suggestions="querySearch"
               placeholder="基准"
               @select="handleSelect"
+              @keyup.enter.native="onSearch"
             >
-              <i class="el-icon-search el-input__icon" slot="suffix"> </i>
+              <i  slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
               <template slot-scope="{ item }">
                 <div class="option-info">
                   <span class="left" v-html="item.showItem"></span>
@@ -33,8 +36,6 @@
 
           <el-form-item class="form-item">
             <g-button class="g-btn" type="primary" @click="handleClick">
-              <!-- <i class="iconfont icon-a-tubiaotianjiabiaoqian"></i> 
-              -->
               <i class="add-icon">+</i>
               添加意见</g-button
             >
@@ -313,6 +314,15 @@ export default {
         this.searchListFilter.push(obj);
       });
     },
+    onSearch() {
+      console.log(this.search);
+       this.changeStyle("none", ".el-autocomplete-suggestion");
+    },
+     //根据传进来的状态改变建议输入框的状态（展开|隐藏）
+    changeStyle(status, className) {
+      let dom = document.querySelectorAll(className);
+      dom[0].style.display = status;
+    },
     handleSort(type) {
       if (type === 'refer') {
         if (this.currentSort) {
@@ -350,9 +360,6 @@ export default {
     handleSubmitLimitTime() {
       const { typeId, useFrequency } = this.dialogItem;
       console.log(typeId, useFrequency);
-    },
-    handleSelectIpt(val) {
-      console.log(val);
     },
 
     // 自定义筛选方法
@@ -408,7 +415,10 @@ export default {
         cb(results);
       }, 3000 * Math.random());
     },
-    handleSelect() {},
+    handleSelect(val) {
+      // console.log(val);
+      // this.search.baseline = `${val.value}#`
+    },
     // 复制
     handleCopy(val) {
       copyText(
@@ -436,6 +446,9 @@ export default {
 @color9: #f7f8fa;
 .opinion {
   height: 100%;
+  .el-icon-search {
+    cursor: pointer;
+  }
   .left-icon {
     display: inline-block;
     position: relative;
@@ -872,5 +885,26 @@ export default {
     text-align: center;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 </style>

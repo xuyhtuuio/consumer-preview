@@ -11,18 +11,24 @@
             <el-cascader
               v-model="search.value"
               :options="cascaderOptions"
+              @change="onSearch"
             ></el-cascader>
           </el-form-item>
 
           <el-form-item class="form-item" label="角色">
-            <el-select v-model="search.region" placeholder="全部">
+            <el-select v-model="search.region" placeholder="全部" @change="onSearch">
               <el-option label="区域一" value="shanghai"></el-option>
               <el-option label="区域二" value="beijing"></el-option>
             </el-select>
           </el-form-item>
 
           <el-form-item class="form-item">
-            <el-input v-model="search.user1" placeholder="请输入姓名或一事通ID"></el-input>
+            <el-input
+              v-model="search.user1"
+              placeholder="请输入姓名或一事通ID"
+              @keyup.enter.native="onSearch"
+              @blur="onSearch"
+            ></el-input>
           </el-form-item>
         </el-form>
       </div>
@@ -252,6 +258,9 @@ export default {
     sortChange({ column, prop, order }) {
       console.log(column, prop, order);
     },
+    onSearch() {
+      console.log(this.search);
+    },
     handleClick(row) {
       this.limitTimeVisible = true;
       console.log(row);
@@ -450,4 +459,5 @@ export default {
     }
   }
 }
+
 </style>
