@@ -8,7 +8,7 @@
                     <i class="title">提交审查意见</i>
                 </span>
                 <div>
-                    <el-button @click="submitReviewDialog = false">取消</el-button>
+                    <el-button @click="handleClose">取消</el-button>
                     <el-button type="primary" @click="submit"> 提交</el-button>
                 </div>
             </div>
@@ -92,13 +92,17 @@
                 <p>未提出相关意见内容</p>
             </div>
         </div>
+        <secondary-confirmation :option="saveOption" ref="confirmation"
+            @handleConfirm="() => { submitReviewDialog = false }"></secondary-confirmation>
     </el-dialog>
 </template>
 <script>
 import {
     ocrApprovalSubmission
 } from "@/api/aiApproval";
+import secondaryConfirmation from "@/components/common/secondaryConfirmation"
 export default {
+    components: { secondaryConfirmation },
     props: {
         formId: {
             type: String,
@@ -107,6 +111,11 @@ export default {
     },
     data() {
         return {
+            saveOption: {
+                message: '关闭提交弹窗将不保存已修改内容，确定关闭？',
+                cancelBtn: '取消',
+                confirmBtn: '关闭',
+            },
             showClose: false,
             submitReviewDialog: false,
             passlist: [
@@ -170,7 +179,8 @@ export default {
             })
         },
         handleClose() {
-            this.submitReviewDialog = false
+            this.$refs.confirmation.dialogVisible = true;
+            // this.submitReviewDialog = false
         },
         mouseenter(item, index) {
             this.mousePoint = index
