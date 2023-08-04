@@ -228,8 +228,9 @@ export default {
           this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
         });
       !flag &&
-        saveDraft(result).then(res => {
-          this.$message({ type: 'success', message: res.data.data });
+        saveDraft(result).then(({data:{data,msg}}) => {
+          this.formId = data
+          this.$message({ type: 'success', message: msg});
           this.rollTo(0);
           this.isGLoading = false;
           this.handleClear()
