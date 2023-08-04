@@ -27,6 +27,7 @@
         <g-button class="btn" type="primary" @click.native="submit">提交</g-button>
       </div>
     </div>
+    <secondary-confirmation ref="RefSecondaryCon" :option="confirmOption" ></secondary-confirmation >
   </div>
 </template>
 
@@ -36,6 +37,7 @@ import ReviewMatters from './components/review-matters.vue';
 import BasicInformation from './components/basic-information.vue';
 import PublicityChannels from './components/publicity-channels.vue';
 import ReconciliationPoint from './components/reconciliation-point.vue';
+import SecondaryConfirmation from '@/components/common/secondaryConfirmation';
 import ReviewMaterial from './components/review-material.vue';
 import { timestampToDateTime } from '@/utils/utils.js';
 import { getFormCategoryArray, getApplyForm, submit, saveDraft } from '@/api/front.js';
@@ -46,7 +48,8 @@ export default {
     BasicInformation,
     PublicityChannels,
     ReconciliationPoint,
-    ReviewMaterial
+    ReviewMaterial,
+    SecondaryConfirmation
   },
   data: () => ({
     title: '审查类型',
@@ -58,7 +61,12 @@ export default {
     basicInformation: [],
     keyPointsForVerification: [],
     reviewMaterials: [],
-    formId: undefined
+    formId: undefined,
+    confirmOption: {
+      message: '是否保存当前编辑内容？',
+      cancelBtn: '不保存',
+      confirmBtn: '保存'
+    }
   }),
   created() {
     this.initialData();
@@ -67,7 +75,6 @@ export default {
     if (name === 'addApply') return next();
     next(vm => {
       if (id || window.localStorage.getItem('editId')) {
-        console.log(id, window.localStorage.getItem('editId'));
         vm.formId = id || window.localStorage.getItem('editId');
         window.localStorage.setItem('editId', id || window.localStorage.getItem('editId'));
       } else {
@@ -76,10 +83,22 @@ export default {
     });
   },
   beforeRouteLeave(to, from, next) {
-    window.localStorage.removeItem('editId');
-    this.formId = undefined
-    this.initialData();
-    next();
+    const _this = this.$refs['RefSecondaryCon'];
+    _this.dialogVisible = true;
+    _this.handleConfirm = () => {
+      _this.dialogVisible = false;
+      this.save(() => {
+        window.localStorage.removeItem('editId');
+        this.formId = undefined;
+        this.initialData();
+        next();
+      });
+    };
+      _this.handleClose = () => {
+        console.log(123);
+        _this.dialogVisible = false;
+        next();
+      };
   },
   activated() {
     this.initialData();
@@ -91,6 +110,10 @@ export default {
         this.reviewList = res.data.data[0];
       });
     },
+    // handleConfirm() {
+    //   this.initialData()
+    // },
+
     // 审查事项类型
     handleReviewClick(id) {
       getApplyForm({
@@ -104,42 +127,44 @@ export default {
         this.keyPointsForVerification = keyPointsForVerification;
         this.reviewMaterials = reviewMaterials;
         this.isLoading = false;
-        this.isGLoading = false
+        this.isGLoading = false;
       });
     },
     // 提交
     submit() {
+      let result0 = true;
       if (!this.$refs['basicInformationRef'].judgeWarn()) {
-        return this.$nextTick(() => {
-          console.log(this.$refs['basicInformationRef'].$refs['refWarn']);
+        this.$nextTick(() => {
           const refs = this.$refs['basicInformationRef'].$refs['refWarn'];
-          let offsetTop = refs[0].$el.offsetParent.offsetTop;
-          refs.forEach(item => {
-            if (item.$el.offsetParent.offsetTop < offsetTop) {
-              offsetTop = item.$el.offsetParent.offsetTop;
-            }
-          });
-          this.rollTo(offsetTop);
+          console.log(refs);
+          result0 = refs?.length ? false : true;
+          if (refs?.length) {
+            let offsetTop = refs[0].$el.offsetParent.offsetTop;
+            refs.forEach(item => {
+              if (item.$el?.offsetParent?.offsetTop < offsetTop) {
+                offsetTop = item.$el?.offsetParent?.offsetTop;
+              }
+            });
+            this.rollTo(offsetTop);
+          }
+          
         });
       }
       const [result, offsetTop] = this.$refs['publicityChannelsRef'].judgeWarn();
-      if (!result) {
-        return this.rollTo(offsetTop);
-      }
+
       const [result1, offsetTop1] = this.$refs['reconPointRef'].judgeWarn();
-      if (!result1) {
-        return this.rollTo(offsetTop1);
-      }
+
       const [result2, offsetTop2] = this.$refs['reviewMaterialRef'].judgeWarn();
-      if (!result2) {
-        return this.rollTo(offsetTop2);
+      console.log(result0, result, result1, result2);
+      if (!result0 || !result || !result1 || !result2) {
+        return this.rollTo(offsetTop ? offsetTop : offsetTop1 ? offsetTop1 : offsetTop2);
       }
       this.submitTrue();
     },
-    submitTrue(flag = true) {
-      if(this.isGLoading) return
-       this.isGLoading = true
-     
+    submitTrue(flag = true, success) {
+      if (this.isGLoading) return;
+      this.isGLoading = true;
+
       const result = {
         approvalType: this.basicInformation[1].value,
         entryName: this.basicInformation[0].value,
@@ -178,14 +203,14 @@ export default {
       flag &&
         submit(result).then(res => {
           this.$message({ type: 'success', message: res.data.data });
-          this.$router.push({name:"apply-list"})
-          // this.rollTo(0)
+          this.$router.push({ name: 'apply-list' });
         });
       !flag &&
         saveDraft(result).then(res => {
           this.$message({ type: 'success', message: res.data.data });
-          this.$router.push({name:"apply-list"})
-          // this.rollTo(0)
+          this.rollTo(0);
+          this.isGLoading = false;
+          typeof success === 'function' && success();
         });
     },
     rollTo(offsetTop) {
@@ -194,17 +219,18 @@ export default {
         .scrollTo({ top: Number(offsetTop - 100), behavior: 'smooth' });
     },
     // 保存草稿
-    save() {
+    save(success) {
       if (!this.$refs['basicInformationRef'].judgeWarnSave()) {
-        return this.$nextTick(() => {
+        this.$nextTick(() => {
           const offsetTop =
             this.$refs['basicInformationRef'].$refs['refWarn'][0].$el.offsetParent.offsetTop;
           this.rollTo(offsetTop);
         });
+        return false;
       }
       const [result2, offsetTop2] = this.$refs['reviewMaterialRef'].judgeWarn(false);
       if (result2) {
-        this.submitTrue(false);
+        return this.submitTrue(false, success);
       }
     }
   },
@@ -250,14 +276,6 @@ export default {
     }
   }
 }
-
-
-
-
-
-
-
-
 
 
 

@@ -1,5 +1,7 @@
 <template>
-  <div class="record-detail">
+  <div class="record-detail" v-loading="loading">
+    <empty v-if="!hasData"></empty>
+    <div v-else> 
     <div v-for="(activity, index) in recordList" :key="index" class="task-item pointer">
       <div class="left">
         <div class="top-line"></div>
@@ -70,15 +72,19 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 <script>
 import moment from 'moment';
 import { getApprovalRecordByFromid } from '@/api/applyCenter'
+import empty from '@/components/common/empty'
 export default {
+  components: { empty },
   data() {
     return {
-      recordList: [
-      ],
+      hasData: false,
+      loading:false,
+      recordList: [],
     };
   },
   mounted() {
@@ -88,9 +94,12 @@ export default {
     init() {
       this.loading = true
       getApprovalRecordByFromid({
-        formId: this.$route.params.formId
+        formId: '158'
       }).then(res => {
         const { data } = res.data
+        if (!data) {
+          return this.hasData = false
+        }
         this.recordList = data.length ? data.map(v => {
           return {
             ...v,
@@ -102,6 +111,7 @@ export default {
             }) : []
           }
         }) : []
+        return this.hasData = false
 
       }).finally(() => {
         this.loading = false
@@ -114,7 +124,7 @@ export default {
     },
     handleTimeFormat(val) {
       let timediff = moment(val.updateTime).diff(moment(val.createTime), 'seconds');
-      timediff = timediff>0?(timediff / 3600).toFixed(1):0
+      timediff = timediff > 0 ? (timediff / 3600).toFixed(1) : 0
       return timediff
 
     }

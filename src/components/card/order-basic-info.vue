@@ -112,7 +112,7 @@ export default {
         };
     },
     mounted() {
-        console.log('gg',this.$route.params)
+        console.log('gg', this.$route.params)
         if ((this.$route.params && this.$route.params.formId) || (this.sidebarParam && this.sidebarParam.formId)) {
             this.getWorkOrderTaskInfo()
             this.getOrderDetail()
@@ -120,13 +120,16 @@ export default {
     },
     activated() {
         const keys = Object.keys(this.$route.params) || Object.keys(this.$route.sidebarParam)
-        console.log('gg',this.$route.params)
+        console.log('gg', this.$route.params)
         if (keys.length) {
             this.getWorkOrderTaskInfo()
             this.getOrderDetail()
         }
     },
     methods: {
+        startLoading(val) {
+            this.$parent.startLoading(true)
+        },
         getWorkOrderTaskInfo() {
             const param = {
                 formId: this.$route.params.formId || this.sidebarParam.formId,
@@ -202,8 +205,8 @@ export default {
                 for (let i in data) {
                     const link = document.createElement('a');
                     link.href = data[i];
-                    // link.setAttribute('download', 'xxxx.docx')
-                    // link.download = 'file';
+                    // link.setAttribute('download', fileList[i].key)
+                    // link.download = fileList[i].key;
                     document.body.appendChild(link); // 生成下载链接
                     link.click(); // 触发下载事件
                     document.body.removeChild(link)

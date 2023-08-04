@@ -13,11 +13,11 @@
           <i class="iconfont icon-xianxingtubiao"></i>
           <i class="btn">去修改</i>
         </div>
-        <div class="back flex" @click="keep" v-if="(status == 3 || status == 5) && info && info.op == 'check'">
+        <div class="back flex" @click="keep" v-if="status == 3 || status == 5">
           <i class="iconfont icon-baocun"></i>
           <i class="btn">保存</i>
         </div>
-        <div class="back flex white" @click="submit" v-if="(status == 3 || status == 5) && info && info.op == 'check'">
+        <div class="back flex white" @click="submit" v-if="status == 3 || status == 5">
           <i class="iconfont icon-tijiao"></i>
           <i class="btn">提交</i>
         </div>
@@ -133,7 +133,7 @@
               <div class="approved-opinion-head">
                 <h2>消保审查意见书</h2>
                 <p>
-                  <i>拟同意********活动，并提出以下消保审查意见，</i>请您确认是否采纳以下意见：
+                  <i>拟同意{{item.taskName}}活动，并提出以下消保审查意见，</i>请您确认是否采纳以下意见：
                 </p>
               </div>
             </template>
@@ -152,7 +152,6 @@
     </div>
     <el-dialog :visible.sync="transferDialog" width="800px" center custom-class="transfer-dialog">
       <span slot="title">请选择转办对象</span>
-
       <div>
         <el-input v-model="staff.keyword" placeholder="搜索人员，支持拼音、姓名">
           <i slot="prefix" class="el-input__icon el-icon-search pointer"></i></el-input>
@@ -193,6 +192,7 @@ export default {
 
   data() {
     return {
+      loading:false,
       status: 0,
       crtComp: "",
       transferDialog: false,
@@ -232,6 +232,7 @@ export default {
   },
   created() { },
   methods: {
+    startLoading(){this.loading=true},
     sendbaseInfo(val) {
       this.orderBaseInfo = val
     },
@@ -254,6 +255,7 @@ export default {
       console.log('ggg', item)
       this.info = info
       this.item = item
+      item.taskStatus =3
       // 草稿
       if (item.taskStatus == 0) {
         this.status = 0;
@@ -349,6 +351,7 @@ export default {
   height: 100%;
   flex-direction: column;
   overflow: hidden;
+  width: 100%;
 
   .header {
     height: 34px;
