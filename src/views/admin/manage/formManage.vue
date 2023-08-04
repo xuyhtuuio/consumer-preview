@@ -1,23 +1,24 @@
 <template>
   <div>
     <div class="title" v-if="level === 1">
-      <span>表单管理</span>
+      <span class="title-nav">表单管理</span>
       <el-button type="primary" @click="addForm">新增</el-button>
     </div>
     <div class="title" v-else>
-      <div>
-        <span @click="goBack" class="breadcrumb">{{ isEdit ? '表单管理' : '表单管理' }}</span>/{{ currentRow.typesOfReviewItemsName }}
+      <div class="title-nav">
+        <span @click="goBack" class="breadcrumb">{{ isEdit ? '表单管理' : '表单管理' }}</span>/{{ currentRow.examineTypesName }}
       </div>
     </div>
     <div v-loading="loadingList">
       <!-- 表单管理一级表格 -->
-      <TrsTable theme="TRS-table-gray" :data="data" :colConfig="colConfig" @sort-change="changeSort" v-if="level === 1" @submitEdit="submitEdit">
+      <TrsTable theme="TRS-table-gray" :data="data" :colConfig="colConfig" @sort-change="changeSort" v-if="level === 1"
+        @submitEdit="submitEdit">
         <template #icon="scope">
-          <img v-if="scope.row.icon" :src="scope.row.icon" style="max-height: 30px;max-width: 120px;"/>
+          <img v-if="scope.row.icon" :src="scope.row.icon" style="max-height: 30px;max-width: 120px;" />
           <span v-else>--</span>
         </template>
         <template #ladingBillTimeLimit="scope">
-          <span>{{ scope.row.ladingBillTimeLimit ? scope.row.ladingBillTimeLimit + '天' : '--' }}</span>
+          <span>{{ scope.row.ladingBillTimeLimit ? `上线前${scope.row.ladingBillTimeLimit}天` : '--' }}</span>
         </template>
         <template #operate="scope">
           <el-button type="text" @click="copyForm(scope.row)">复制</el-button>
@@ -30,50 +31,47 @@
       <!-- 表单管理二级表格 -->
       <div v-else>
         <div style="margin-bottom: 24px;">
-          <el-input class="is-dark input" v-model="search.title" @keypress.native.enter="changeSearch" size="small" placeholder="请输入字段名称搜索" style="width: 254px;">
+          <el-input class="is-dark input" v-model="search.title" @keypress.native.enter="changeSearch" size="small"
+            placeholder="请输入字段名称搜索" style="width: 254px;">
             <i slot="suffix" class="el-input__icon el-icon-search" @click="changeSearch"></i>
           </el-input>
-          <el-select class="is-dark input" v-model="search.type" @change="changeSearch" size="small" placeholder="字段类型" style="margin: 0 16px;">
+          <el-select class="is-dark input" v-model="search.type" @change="changeSearch" size="small" placeholder="字段类型"
+            style="margin: 0 16px;">
             <el-option v-for="item in feildTypes" :label="item.label" :value="item.value" :key="item.value"></el-option>
           </el-select>
           <el-select class="is-dark input" v-model="search.belong" @change="changeSearch" size="small" placeholder="所属模块">
-            <el-option v-for="item in belongModules" :label="item.label" :value="item.value" :key="item.value"></el-option>
+            <el-option v-for="item in belongModules" :label="item.label" :value="item.value"
+              :key="item.value"></el-option>
           </el-select>
           <el-button type="primary" @click="addFormItem" size="small" style="margin-left: 16px;">新增字段</el-button>
         </div>
-        <TrsTable theme="TRS-table-gray" :data="data1" :colConfig="colConfig1" @sort-change="changeSort1" @submitEdit="submitEdit" :row-class-name="tableRowClassName">
+        <TrsTable theme="TRS-table-gray" :data="data1" :colConfig="colConfig1" @sort-change="changeSort1"
+          @submitEdit="submitEdit" :row-class-name="tableRowClassName">
           <template #operate="scope">
-            <el-button type="text" v-if="+scope.row.run === 0">恢复</el-button>
+            <el-button type="text" v-if="+scope.row.run === 0" @click="changeFormItemState(scope.row)">恢复</el-button>
             <el-button type="text" v-else @click="editFormItem(scope.row)">编辑</el-button>
-            <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)" :style="{ visibility: +scope.row.run === 1 ? 'visible' : 'hidden' }">停用</el-button>
-            <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)">删除</el-button>
+            <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)"
+              :style="{ visibility: +scope.row.run === 1 ? 'visible' : 'hidden' }"  @click="changeFormItemState(scope.row)">停用</el-button>
+            <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)" @click="deleteFormItem(scope.row)">删除</el-button>
           </template>
           <template #required="scope">
             {{ scope.row.required ? '是' : '否' }}
           </template>
         </TrsTable>
       </div>
-      <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
-          v-if="page.total">
-        </TrsPagination>
+      <TrsPagination v-if="page.total" :pageSize="10" :pageNow="page.pageNow" :total="page.total"
+        @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom">
+      </TrsPagination>
     </div>
-    <el-drawer
-      :size="600"
-      :visible.sync="drawer"
-      direction="rtl"
-      :before-close="handleClose">
+    <el-drawer :size="600" :visible.sync="drawer" direction="rtl" :before-close="handleClose">
       <span slot="title" style="font-size: 16px;">
         {{ drawerTitle }}<i class="el-icon-edit"></i>
       </span>
       <div class="drawer-main">
-        <FormManageCustomField @close="drawer = false" ref="formManageCustomField"/>
+        <FormManageCustomField @close="drawer = false" ref="formManageCustomField" @refreshItemList="refreshItemList" />
       </div>
     </el-drawer>
-    <el-dialog
-      title="修改"
-      :visible.sync="limitTimeVisible"
-      width="40%"
-      center>
+    <el-dialog title="修改" :visible.sync="limitTimeVisible" width="40%" center>
       <!-- <div class="dialog-item">
         <p><b>审查事项类型</b></p>
         <el-input v-model.trim="checkType" size="small" class="is-dark input" oninput="value=value.slice(0, 8)" placeholder="请输入审查事项类型" style="width: 150px; display: inline-block;"></el-input><span class="gray">{{ checkType.length }}/8</span>
@@ -81,17 +79,14 @@
       <div class="dialog-item">
         <p><b>提单时限（加急单）</b></p>
         上线前
-        <el-input v-model="limitTime" size="small" class="is-dark input" oninput="value=value.replace(/^0|[^0-9]/g, '')" placeholder="请输入数字" style="width: 150px; display: inline-block;"></el-input>
+        <el-input v-model="limitTime" size="small" class="is-dark input" oninput="value=value.replace(/^0|[^0-9]/g, '')"
+          placeholder="请输入数字" style="width: 150px; display: inline-block;"></el-input>
         天 视为加急
       </div>
       <div class="dialog-item">
         <p><b>图标</b></p>
-        <i class="icon-chanpin1"></i>
-        <el-upload
-          class="avatar-uploader"
-          action="/cpr/file/upload"
-          :http-request="uploadBpmn"
-          :show-file-list="false">
+        <!-- <i class="icon-chanpin1"></i> -->
+        <el-upload class="avatar-uploader" action="/cpr/file/upload" :http-request="uploadBpmn" :show-file-list="false">
           <img v-if="imageUrl" :src="imageUrl" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           <el-button size="small" style="display: none;" id="icon-uploader" type="text">上传</el-button>
@@ -117,7 +112,10 @@ import {
   modifyNameFormCategory,
   modifyTimeLimitFormCategory,
   switchFormCategoryState,
-  itemPagingList
+  itemPagingList,
+  modifyOrder,
+  deletedFormItem,
+  switchFormItemState
 } from '@/api/manage'
 import FormManageCustomField from './formManageCustomField'
 export default {
@@ -224,6 +222,14 @@ export default {
         pageNow: 1,
         total: 1
       },
+      page1: {
+        pageNow: 1,
+        total: 1
+      },
+      page2: {
+        pageNow: 1,
+        total: 1
+      },
       drawer: false,
       drawerTitle: '',
       currentRowItem: {},
@@ -262,8 +268,9 @@ export default {
       const resData = res.data.data
       if (resData) {
         this.data = resData.data.list;
-        this.page.total = resData.data.totalCount
-        this.page.pageNow = resData.data.pageNow
+        this.page1.total = resData.data.totalCount
+        this.page1.pageNow = resData.data.pageNow
+        this.page = this.page1
       }
       this.loadingList = false
     },
@@ -354,20 +361,26 @@ export default {
       }
     },
     async editForm(item) {
+      if (this.level === 1) {
+        this.currentRow = item;
+        this.isEdit = true;
+        this.level = 2;
+      }
+      this.loadingList = true
       const res = await itemPagingList({
         formCategoryId: item.recordId,
         ...item.params
       })
+      this.loadingList = false
       const resData = res.data.data
       if (resData) {
         this.data1 = resData.list;
-        this.page.total = resData.totalCount
-        this.page.pageNow = resData.pageNow
-        this.isEdit = true
-        this.level = 2
-        this.currentRow = item
+        this.page2.total = resData.totalCount
+        this.page2.pageNow = resData.pageNow
+        this.page = this.page2
       }
     },
+    // 复制表单
     async copyForm(row) {
       await copyFormCategory(row.recordId)
       this.getObtainExamineTypeList({
@@ -377,12 +390,25 @@ export default {
     },
     // 编辑单元格
     async submitEdit(row) {
-      const res = await modifyNameFormCategory({
-        name: row.examineTypesName,
-        formCategoryId: row.recordId
-      })
-      if (res.data) {
-        this.$message.success('修改成功')
+      let res;
+      if (this.level === 1) {
+        res = await modifyNameFormCategory({
+          name: row.examineTypesName,
+          formCategoryId: row.recordId
+        })
+
+      } else {
+        // 修改字段序号
+        res = await modifyOrder({
+          newSort: Number(row.sort),
+          formItemId: row.id
+        })
+        this.editForm(this.currentRow)
+      }
+      if (res?.data?.success) {
+        this.$message.success('修改成功!')
+      } else{
+        this.$message.error(res?.msg)
       }
     },
     editSelfForm(item) {
@@ -412,7 +438,7 @@ export default {
         }
         this.stopApllayNo()
       }).catch(() => {
-         
+
       });
     },
     // 无法停用
@@ -424,7 +450,7 @@ export default {
         // showClose: false,
       }).then(() => {
       }).catch(() => {
-         
+
       });
     },
     async handleSubmitLimitTime() {
@@ -436,7 +462,7 @@ export default {
         })
         this.getObtainExamineTypeList()
         this.limitTimeVisible = false
-        this.$message.success('修改成功')
+        this.$message.success('修改成功!')
       } else {
         this.$message.warning('请输入大于0的数字')
       }
@@ -445,25 +471,54 @@ export default {
       this.drawerTitle = '新增字段'
       this.drawer = true
       this.$nextTick(() => {
-        this.$refs['formManageCustomField'].initForm()
+        this.$refs['formManageCustomField'].initForm(this.currentRow)
       })
     },
     editFormItem(item) {
+      this.drawer = true
       this.drawerTitle = '编辑字段'
       this.currentRowItem = item
-      this.drawer = true
       this.$nextTick(() => {
-        this.$refs['formManageCustomField'].initForm(this.currentRowItem)
+        this.$refs['formManageCustomField'].initForm(this.currentRow, this.currentRowItem,)
       })
+    },
+    // 删除表单项
+    async deleteFormItem(item) {
+      const res = await deletedFormItem({
+        formItemId: item.id
+      })
+      if (res?.data.success) {
+        this.$message.success('删除成功!')
+        this.handleCurrentChange(this.data1.length === 1 ? this.page2.pageNow -1: this.page2.pageNow)
+      } else {
+        this.$message.error(res?.data?.msg)
+      }
+    },
+    // 停用表单项
+    async changeFormItemState(item) {
+      const res = await switchFormItemState({
+        formItemId: item.id
+      })
+      if (res?.data.success) {
+        this.$message.success('操作成功!')
+        item.run = item.run === 0 ? 1 : 0;
+      } else {
+        this.$message.error(res?.data?.msg)
+      }
+    },
+    // 刷新表单项list
+    refreshItemList() {
+      this.drawer = false;
+      this.handleCurrentChange(this.page2.pageNow)
     },
     handleClose(done) {
       done()
     },
     goBack() {
-      this.page.pageNow = 1
       this.level = 1
+      this.page = this.page1
     },
-    tableRowClassName({row, rowIndex}) {
+    tableRowClassName({ row, rowIndex }) {
       if (row.status === '0') {
         return 'disable-row';
       }
@@ -481,6 +536,11 @@ export default {
   padding-bottom: 20px;
   margin-bottom: 20px;
   border-bottom: 1px solid #E5E6EB;
+
+  &-nav {
+    line-height: 34px;
+  }
+
   .el-button {
     display: flex;
     align-items: center;
@@ -488,17 +548,21 @@ export default {
     width: 80px;
     height: 34px;
   }
+
   .breadcrumb:hover {
     font-weight: 600;
     cursor: pointer;
   }
 }
+
 .el-button--text {
   padding: 5px;
 }
+
 /deep/.disable-row .cell {
   color: #86909C;
 }
+
 .drawer-main {
   padding: 0 24px 0 14px;
 }
@@ -509,24 +573,30 @@ export default {
     height: 34px;
     line-height: 34px;
     border-radius: 6px;
+
     span {
       position: relative;
       bottom: 5px;
     }
   }
+
   .el-button--primary {
     border: none;
   }
 }
+
 .dialog-item {
   margin-bottom: 12px;
+
   p {
     margin-bottom: 6px;
   }
+
   .gray {
     color: #86909C;
   }
 }
+
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
   border-radius: 6px;
@@ -534,9 +604,11 @@ export default {
   position: relative;
   overflow: hidden;
 }
+
 .avatar-uploader .el-upload:hover {
   border-color: #409EFF;
 }
+
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
@@ -545,6 +617,7 @@ export default {
   line-height: 60px;
   text-align: center;
 }
+
 .avatar {
   width: 60px;
   height: 60px;
