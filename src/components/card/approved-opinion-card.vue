@@ -5,25 +5,25 @@
       <p class="stuff">
         <i class="line"></i>
         <span>
-          {{ item.stuff }} / {{ item.post }} <i>共{{ item.total }}条</i>
-          {{ item.time }}
+          {{ item.approveName }} / {{ item.approverOrgName }} <i>共{{ item.substantiveopinion.length }}条</i>
+          {{ item.approveTime }}
         </span>
         <i class="line"></i>
       </p>
       <div class="opinions">
         <div v-for="(child, idx) in item.substantiveopinion" :key="idx" class="opinions-item pointer">
           <div class="opinion-tag">
-            <span v-if="child.isSubstantive" class="guanzhu">
+            <span v-if="child.substantiveOpinions == 1" class="guanzhu">
               <i class="iconfont icon icon-guanzhu"></i>
               有实质意见
             </span>
-            <span v-if="!child.isSubstantive" class="guanzhu2">
+            <span v-if="child.substantiveOpinions == 0" class="guanzhu2">
               <i class="iconfont icon icon-guanzhu2"></i>
               无实质意见
             </span>
           </div>
-          <p class="opinion-text">{{ idx + 1 }} {{ child.opinion }}</p>
-          <div class="relevant-file">
+          <p class="opinion-text">{{ idx + 1 }} {{ child.content }}</p>
+          <div class="relevant-file" v-if="child.relevantfile && child.relevantfile.length">
             关联文件：<i class="file-name">{{ child.relevantfile[0] }} </i>
             <el-popover placement="bottom" popper-class="file-overview-popper" trigger="click"
               v-if="child.relevantfile && child.relevantfile.length - 1">
@@ -37,15 +37,16 @@
           </div>
           <!-- 审批的时候选择采纳与否 -->
           <div class="accept-box" v-if="status == '3' || status == '5'">
-            <el-radio-group v-model="child.isAccept" @change="changeAccept(child, index, idx)">
+            <el-radio-group v-model="child.adoptOpinions" @change="changeAccept(child, index, idx)">
               <el-radio :label="1">采纳</el-radio>
               <el-radio :label="0">不采纳</el-radio>
             </el-radio-group>
             <el-form :model="child" :ref="`form_${index}_${idx}`" :class="`form_${index}_${idx}`"
-              :rules="child.isAccept == 0 ? rules : {}" class="desc-form">
-              <el-form-item prop="desc" label=" " class="flex">
-                <el-input v-model="child.desc" class="input-desc" :ref="`input_${index}_${idx}`" :placeholder="child.isAccept == 1 ? '请填写采纳说明' : '请填写不采纳说明'
-                  "></el-input>
+              :rules="child.adoptOpinions!=1  ? rules : {}" class="desc-form">
+              <el-form-item prop="notAdoptingReasons" label=" " class="flex">
+                <el-input v-model="child.notAdoptingReasons" class="input-desc" :ref="`input_${index}_${idx}`"
+                  :placeholder="child.isAccept == 1 ? '请填写采纳说明' : '请填写不采纳说明'
+                    "></el-input>
               </el-form-item>
             </el-form>
           </div>
@@ -64,6 +65,7 @@
   </div>
 </template>
 <script>
+import moment from 'moment'
 import { getEditedCommentsByFormId, insertApprovalRecordAndEditedComments, updateAdoptEditedComments } from '@/api/applyCenter'
 export default {
   props: {
@@ -73,7 +75,7 @@ export default {
   data() {
     return {
       rules: {
-        desc: [
+        notAdoptingReasons: [
           {
             required: true,
             message: "请填写说明",
@@ -82,74 +84,6 @@ export default {
         ],
       },
       opinions: [
-        {
-          stuff: "谭新宇",
-          post: "产品研发与推广岗",
-          total: 2,
-          time: "2023-07-14",
-          substantiveopinion: [
-            {
-              opinion:
-                "1.活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权",
-              relevantfile: [
-                "理财公司理财.png",
-                "理财公司理财.png",
-                "理财公司理财.png",
-                "理财公司理财.png",
-              ],
-              isSubstantive: false,
-              isAccept: 0,
-              desc: "",
-            },
-            {
-              opinion:
-                "1.活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权",
-              relevantfile: [
-                "理财公司理财.png",
-                "理财公司理财.png",
-                "理财公司理财.png",
-                "理财公司理财.png",
-              ],
-              isAccept: 1,
-              desc: "",
-              isSubstantive: true,
-            },
-          ],
-        },
-        {
-          stuff: "谭新宇",
-          post: "产品研发与推广岗",
-          total: 2,
-          time: "2023-07-14",
-          substantiveopinion: [
-            {
-              opinion:
-                "1.活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权",
-              relevantfile: [
-                "理财公司理财.png",
-                "理财公司理财.png",
-                "理财公司理财.png",
-                "理财公司理财.png",
-              ],
-              isSubstantive: false,
-              isAccept: 0,
-              desc: "",
-            },
-            {
-              opinion:
-                "1.活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权",
-              relevantfile: [
-                "理财公司理财.png",
-                "理财公司理财.png",
-                "理财公司理财.png",
-                "理财公司理财.png",
-              ],
-              isAccept: 1,
-              desc: "",
-              isSubstantive: true,
-            },
-          ],
-        },
       ],
     };
   },
@@ -171,14 +105,32 @@ export default {
     },
     getEditedCommentsByFormId() {
       this.loading = true
-      getEditedCommentsByFormId({ formId: '158'}).then(res => {
-        console.log('res')
+      getEditedCommentsByFormId({ formId: '158' }).then(res => {
+        const { data } = res.data
+        const keys = Object.keys(data)
+        let opinions = []
+        for (let i in keys) {
+          const obj = {}
+          obj.approveName = keys[i]
+          let _info = data[keys[i]]
+          obj.approverOrgName = _info[0].approverOrgName
+          obj.approveTime = _info[0].updateTime ? moment(_info[0].updateTime).format('YYYY-MM-DD') : ''
+          const _newInfo = _info.map(v => {
+            return {
+              ...v,
+              adoptOpinions: v.adoptOpinions!='null' ? 1 : v.adoptOpinions,
+              relevantfile: v.associatedAttachmentsIds ? v.associatedAttachmentsIds.split(';') : []
+            }
+          })
+          obj.substantiveopinion = _newInfo
+          opinions.push(obj)
+        }
+        this.opinions = opinions
       }).finally(() => {
         this.loading = false
       })
     },
-    keep() {
-      console.log('keep')
+    checkParam() {
       const inputArr = [];
       for (let i = 0; i < this.opinions.length; i++) {
         for (let j = 0; j < this.opinions[i].substantiveopinion.length; j++) {
@@ -192,20 +144,44 @@ export default {
         }
       }
       inputArr.length ? this.$refs[inputArr[0]][0].focus() : ''
-      if (inputArr.length < 1) {
-        const params = {
-
-        }
+      return inputArr.length < 1
+    },
+    keep() {
+      const flag = this.checkParam()
+      if (flag) {
+        let opinions = Object.values(this.opinions)
+        opinions = opinions.map(v => {
+          return v.substantiveopinion
+        }).flat()
+        console.log('ff1', opinions)
         this.$parent.startLoading(true)
         // this.$emit('startLoading',true)
+        return
         insertApprovalRecordAndEditedComments(params).then(res => {
-          console.log('ffffffffff')
         })
         // this.$emit('startLoading',false)
       }
     },
     submit() {
-      console.log("vv");
+      const flag = this.checkParam()
+      if (flag) {
+        let opinions = Object.values(this.opinions)
+        opinions = opinions.map(v => {
+          return v.substantiveopinion
+        }).flat()
+
+        const params = opinions.map(v => {
+          return {
+            adoptOpinions:v.adoptOpinions,
+            notAdoptingReasons:v.notAdoptingReasons,
+            recordId:v.recordId
+          }
+        })
+        this.$parent.startLoading(true)
+        // updateAdoptEditedComments(params).then(res => {
+        // })
+        // this.$emit('startLoading',false)
+      }
     },
 
   },
