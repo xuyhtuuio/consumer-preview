@@ -15,11 +15,14 @@
 
           <el-form-item class="form-item">
             <el-autocomplete
+              ref="autocomplete"
               popper-class="my-autocomplete"
               v-model="search.baseline"
+              v-scrollLoad="load"
               :fetch-suggestions="querySearch"
-              placeholder="基准"
+              placeholder="关键词"
               @select="handleSelect"
+              @blur="handleSearchBlur"
             >
               <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
               <template slot-scope="{ item }">
@@ -283,22 +286,46 @@ export default {
       searchListFilter: [],
       currentSort: true,
       referSort: true,
-      updateSort: true
+      updateSort: true,
+      searchDialogIndex: 1
     };
   },
   created() {
     this.initData();
+  },
+  directives: {
+    scrollLoad: {
+      bind(el, binding, vnode) {
+        var that = this;
+        let wrapDom = el.querySelector('.el-autocomplete-suggestion__wrap');
+        let listDom = el.querySelector(
+          '.el-autocomplete-suggestion__wrap  .el-autocomplete-suggestion__list'
+        );
+        wrapDom.addEventListener(
+          'scroll',
+          e => {
+            let condition = wrapDom.offsetHeight + wrapDom.scrollTop - listDom.offsetHeight - 20;
+            // console.log(condition,vnode);
+            if (condition == 0) {
+              //滚动到底部则执行滚动方法load，binding.value就是v-scrollLoad绑定的值，加()表示执行绑定的方法
+              binding.value();
+            }
+          },
+          false
+        );
+      }
+    }
   },
   methods: {
     initData() {
       this.isLoading = true;
       const pageData = {
         keywordContent: this.search.baseline,
-        opinionContent:this.search.review,
+        opinionContent: this.search.review,
         orderType: this.currentSort ? (this.referSort ? 1 : 2) : this.updateSort ? 3 : 4,
         pageNow: this.page.pageNow,
         pageSize: this.page.pageSize
-      }
+      };
       console.log(pageData);
       getPageList(pageData).then(({ totalCount, list }) => {
         this.page.total = totalCount;
@@ -337,8 +364,28 @@ export default {
     },
     onSearch() {
       console.log(this.search);
-      this.initData()
+      this.initData();
       this.changeStyle('none', '.el-autocomplete-suggestion');
+    },
+    load(e) {
+      this.searchDialogIndex += 1;
+      this.$refs.autocomplete.activated = true;
+      this.$refs.autocomplete.getData(this.search.baseline);
+      // if (this.suppilerListTotal < this.suppilerListQuery.pageSize) {
+      //   return false;
+      // }
+      // this.loading = true;
+      // this.suppilerListQuery.pageSize += 10;
+      //XXX -滚动到底部后请求的列表
+      // XXX(this.suppilerListQuery, this.state2).then(res => {
+      //   this.suppilerListTotal = res.data.total;
+      //   this.$refs['autocomplete'].$data.suggestions = res.data.records;
+      //   this.loading = false;
+      // });
+      console.log(e);
+    },
+    handleSearchBlur(flag) {
+      console.log(flag);
     },
     //根据传进来的状态改变建议输入框的状态（展开|隐藏）
     changeStyle(status, className) {
@@ -380,7 +427,7 @@ export default {
       this.limitVisible = true;
     },
     handleCurrentChange(val) {
-      this.page.pageNow = val
+      this.page.pageNow = val;
       this.initData();
     },
     handleSubmitLimitTime() {
@@ -428,21 +475,23 @@ export default {
       }
     },
     querySearch(val, cb) {
-      let searchList = JSON.parse(JSON.stringify(this.searchList));
-      let results = val
-        ? searchList.filter(
-            item => item.value.includes(val) || item.value.toUpperCase().includes(val.toUpperCase())
-          )
-        : searchList;
+      console.log(val,this.searchDialogIndex);
+      // let searchList = JSON.parse(JSON.stringify(this.searchList));
+      let searchList = this.searchList
+      this.searchList.push(this.searchList[0])
+      // let results = val
+      //   ? searchList.filter(
+      //       item => item.value.includes(val) || item.value.toUpperCase().includes(val.toUpperCase())
+      //     )
+      //   : searchList;
+      let results =[...searchList,searchList[0]]
+      console.log(results);
       this.setHighlight(results, val);
       // 调用 callback 返回建议列表的数据
-      clearTimeout(this.timeout);
-      this.timeout = setTimeout(() => {
         cb(results);
-      }, 3000 * Math.random());
     },
     handleSelect(val) {
-      this.initData()
+      this.initData();
     },
     // 复制
     handleCopy(val) {
