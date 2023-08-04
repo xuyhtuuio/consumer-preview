@@ -140,6 +140,7 @@ export default {
       }
     }
   },
+
   mounted() {
     if (!this.$route.params.item) {
       this.$router.go(-1)
