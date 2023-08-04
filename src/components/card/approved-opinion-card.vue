@@ -30,7 +30,8 @@
               <el-popover placement="bottom" popper-class="file-overview-popper" trigger="click"
                 v-if="child.relevantfile && child.relevantfile.length - 1">
                 <div class="file-list">
-                  <div class="file-list-item pointer" v-for="(file, i) in child.relevantfile" :key="i">
+                  <div class="file-list-item pointer ellipsis ellipsis_1 " v-for="(file, i) in child.relevantfile"
+                    :key="i">
                     {{ file }}
                   </div>
                 </div>
@@ -38,7 +39,7 @@
               </el-popover>
             </div>
             <!-- 审批的时候选择采纳与否 -->
-            <div class="accept-box" v-if="status == '3' || status == '5'">
+            <div class="accept-box" v-if="(status == '3' || status == '5') && taskStatus != 2">
               <el-radio-group v-model="child.adoptOpinions" @change="changeAccept(child, index, idx)">
                 <el-radio :label="1">采纳</el-radio>
                 <el-radio :label="0">不采纳</el-radio>
@@ -53,7 +54,7 @@
               </el-form>
             </div>
             <!-- 正常显示采纳与否 -->
-            <div class="isAdopt-box" v-if="status == '4'">
+            <div class="isAdopt-box" v-if="status == '4' || taskStatus == 2">
               <span v-if="child.adoptOpinions == 1" class="accept">已采纳</span>
               <span v-if="child.adoptOpinions == 0" class="no-accept">不采纳</span>
               <div v-if="child.adoptOpinions == 0" class="desc">
@@ -70,13 +71,14 @@
 <script>
 import empty from '@/components/common/empty'
 import moment from 'moment'
-import { getEditedCommentsByFormId, insertApprovalRecordAndEditedComments,  } from '@/api/applyCenter'
+import { getEditedCommentsByFormId, insertApprovalRecordAndEditedComments, } from '@/api/applyCenter'
 export default {
   name: 'approved-opinion-card',
   components: { empty },
   props: {
     // 3 5显示复选框 4 显示已采纳 不采纳
     status: { type: Number, default: 0 },
+    taskStatus: { type: Number, default: 0 },
   },
   data() {
     return {
@@ -103,19 +105,11 @@ export default {
     updateState() {
       const flag = this.checkParam()
       this.$store.commit('setApprovedOpinionRequired', flag)
-      console.log('this.$store', this.$store.state.checkApprovedForm.approvedOpinionRequired)
       let opinions = Object.values(this.opinions)
-        opinions = opinions.map(v => {
-          return v.substantiveopinion
-        }).flat()
-        const params = opinions.map(v => {
-          return {
-            adoptOpinions: v.adoptOpinions,
-            notAdoptingReasons: v.notAdoptingReasons,
-            recordId: v.recordId
-          }
-        })
-      this.$store.commit('setApprovedOpinionForm', params)
+      opinions = opinions.map(v => {
+        return v.substantiveopinion
+      }).flat()
+      this.$store.commit('setApprovedOpinionForm', opinions)
 
     },
     // 先获取详情
@@ -126,7 +120,7 @@ export default {
           this.$refs[form][0].clearValidate();
         });
       }
-     this.updateState()
+      this.updateState()
     },
     getEditedCommentsByFormId() {
       this.loading = true
@@ -156,6 +150,18 @@ export default {
           opinions.push(obj)
         }
         this.opinions = opinions
+        const newOpinions = opinions.map(v => {
+          return v.substantiveopinion
+        }).flat()
+        // const params = newOpinions.map(v => {
+        //   return {
+        //     adoptOpinions: v.adoptOpinions,
+        //     notAdoptingReasons: v.notAdoptingReasons,
+        //     recordId: v.recordId,
+        //     substantiveOpinions:v.substantiveOpinions
+        //   }
+        // })
+        this.$store.commit('setApprovedOpinionForm', newOpinions)
       }).finally(() => {
         this.loading = false
       })
@@ -390,12 +396,13 @@ export default {
   box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.1);
 
   .file-list {
-    // display: flex;
-    // flex-wrap: wrap;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 
     .file-list-item {
+      width: fit-content;
       display: inline-block;
-      // width: 31%;
       border-radius: 4px;
       background: #f7f8fa;
       padding: 2px 12px;
@@ -404,10 +411,6 @@ export default {
       font-weight: 400;
       line-height: 20px;
       margin-bottom: 8px;
-    }
-
-    .file-list-item:nth-of-type(n+2) {
-      margin-left: 12px;
     }
   }
 }

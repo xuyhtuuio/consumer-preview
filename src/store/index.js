@@ -168,8 +168,9 @@ export default new Vuex.Store({
     },
     checkApprovedForm:{
       approvedOpinionRequired:true,
-      uploadFileRequired:true,
+      uploadFileRequired:false,
       approvedOpinionForm:[],
+      fileUploadForm:[],
       opinionStorage:false
     },
   },
@@ -194,6 +195,12 @@ export default new Vuex.Store({
     },
     setOpinionStorage(state,val){
       state.checkApprovedForm.opinionStorage= val
+    },
+    setUploadFileForm(state,val){
+      state.checkApprovedForm.fileUploadForm = val
+    },
+    setUploadFileRequired(state,val){
+      state.checkApprovedForm.uploadFileRequired = val
     }
 
   },
