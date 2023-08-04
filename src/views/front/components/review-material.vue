@@ -191,7 +191,7 @@ export default {
           this.handleSuccess(res.data.data, param.file.uid);
         })
         .catch(err => {
-          param.onError(param.file.uid);
+          this.handleError(param.file.uid)
         });
     },
     handleUploadLook(url) {
