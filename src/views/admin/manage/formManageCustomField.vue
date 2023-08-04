@@ -6,12 +6,12 @@
       </el-form-item>
       <el-form-item label="所属模块" prop="module">
         <el-select v-model="ruleForm.module" :disabled="moudleDisable" @change="changeModule" placeholder="请选择所属模块" class="is-dark input" style="width: 100%">
-          <el-option v-for="item in belongModules" :label="item.label" :value="item.value" :key="item.value"></el-option>
+          <el-option v-for="item in belongModules" :label="item.label" :value="item.value" :key="item.value" :disabled="item.disable"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="字段类型" prop="name">
         <el-select v-model="ruleForm.name" @change="changeFiledType" :disabled="nameDisable" placeholder="请选择字段类型" class="is-dark input" style="width: 100%">
-          <el-option v-for="item in feildTypes" :label="item.label" :value="item.value" :key="item.value"></el-option>
+          <el-option v-for="item in feildTypes" :label="item.label" :value="item.value" :key="item.value" :disabled="item.disable"></el-option>
         </el-select>
       </el-form-item>
       <!-- <el-form-item v-if="ruleForm.name === 'TimePicker'" label="时间格式" prop="dateFormat" class="is-dark input">
@@ -61,7 +61,7 @@
 </template>
 <script>
   import { feildTypes, belongModules } from '@/utils/dict'
-  import { addFormField } from '@/api/manage'
+  import { addFormField, editItem } from '@/api/manage'
   import CascaderField from './cascaderField'
   import SelectField from './selectField'
   import SelectGroupField from './selectGroupField'
@@ -127,7 +127,8 @@
             value: ''
           }]
         }],
-        currentRow: {}
+        currentRow: {},
+        parentForm: {}
       };
     },
     computed: {
@@ -151,24 +152,27 @@
         return this.ruleForm.name === 'SelectInput' || this.ruleForm.name === 'MultipleSelect' || this.ruleForm.name === 'MultipleGroupsSelect'
       },
       isRequired() {
-        return this.titleDisable || this.expandingDisable || this.ruleForm.title === '下线时间'
+        return (this.titleDisable || this.expandingDisable) && this.ruleForm.title !== '下线时间'
       }
     },
     methods: {
-      initForm(row) {
+      initForm(form, row ) {
+        this.parentForm = form;
         if (row) {
           this.currentRow = row
           this.$set(this.ruleForm, 'title', row.title)
           this.$set(this.ruleForm, 'module', row.module)
-          this.$set(this.ruleForm, 'name', row.name)
+          this.$set(this.ruleForm, 'name', row.special.name)
           this.$set(this.ruleForm, 'required', Boolean(row.required))
           this.$set(this.ruleForm, 'expanding', Boolean(row.expanding))
           console.log(this.ruleForm)
         } else {
           this.currentRow = {}
           this.ruleForm = this.$options.data().ruleForm
-          this.$refs['ruleForm'].clearValidate()
         }
+        this.$nextTick(() => {
+          this.$refs['ruleForm'].clearValidate()
+        })
       },
       changeModule(val) {
         if (val === '核对要点') {
@@ -186,8 +190,8 @@
           this.$set(this.ruleForm, 'module', '基本信息')
           this.$set(this.ruleForm, 'expanding', true)
         } else {
-          this.$set(this.ruleForm, 'title', '')
-          this.$set(this.ruleForm, 'module', '')
+          // this.$set(this.ruleForm, 'title', '')
+          // this.$set(this.ruleForm, 'module', '')
           this.$set(this.ruleForm, 'expanding', false)
         }
         this.$refs['ruleForm'].clearValidate() 
@@ -197,9 +201,6 @@
           id: ++id,
           value: ''
         })
-      },
-      async addFormField() {
-
       },
       addSelectGroupOptions() {
         this.selectGroupOptions.push({
@@ -211,14 +212,33 @@
           }]
         })
       },
-      submitForm(formName) {
+      async submitForm(formName) {
         this.$refs[formName].validate(async (valid) => {
           if (valid) {
-            const form = this.handleForm()
-            console.log(JSON.stringify(form))
-            addFormField(form)
+            const data = this.handleForm()
+            const form = {
+              type: data.name,
+              formCategoryId: this.parentForm.recordId,
+              formItemId: this.currentRow?.id,
+              data
+            }
+            console.log(form)
+            // 没有id是新增
+            let res;
+            if (!this.currentRow?.id) {
+              // 新增字段
+              res = await addFormField(form)
+            } else {
+              // 编辑字段
+              res = await editItem(form)
+            }
+            if (res?.data?.success) {
+              this.$emit('refreshItemList')
+            } else {
+              this.$message.error(res.msg)
+            }
           } else {
-            console.log('error submit!!');
+            // console.log('error submit!!');
             return false;
           }
         });
@@ -226,7 +246,6 @@
 
       resetForm(formName) {
         this.$refs[formName].resetFields();
-        this.initForm(this.currentRow)
         this.$emit('close')
       },
       handleForm() {
@@ -344,8 +363,8 @@
         return form[this.ruleForm.name]
       },
       getId() {
-      return 'field' + (Math.floor(Math.random() * (99999 - 10000)) + 10000).toString()
-            + new Date().getTime().toString().substring(5);
+        // return this.currentRow?.id;
+      return this.currentRow?.id || 'field' + (Math.floor(Math.random() * (99999 - 10000)) + 10000).toString() + new Date().getTime().toString().substring(5);
       },
     }
   }
