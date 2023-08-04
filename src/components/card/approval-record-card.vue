@@ -94,7 +94,7 @@ export default {
     init() {
       this.loading = true
       getApprovalRecordByFromid({
-        formId: this.$route.params.formId
+        formId: '158'
       }).then(res => {
         const { data } = res.data
         if (!data) {

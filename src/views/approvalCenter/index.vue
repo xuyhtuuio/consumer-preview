@@ -269,12 +269,13 @@ export default {
         approvalPhases: name,
       };
       getApprovalStage(params).then((res) => {
-        this.approvalPhases = res.data.data.map((v) => {
+        const { data } = res.data
+        this.approvalPhases = data?data.map((v) => {
           return {
             label: v,
             value: v,
           };
-        });
+        }):[]
       });
     },
     changeArrrovalType() {

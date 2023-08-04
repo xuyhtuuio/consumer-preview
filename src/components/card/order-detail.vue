@@ -152,7 +152,6 @@
     </div>
     <el-dialog :visible.sync="transferDialog" width="800px" center custom-class="transfer-dialog">
       <span slot="title">请选择转办对象</span>
-
       <div>
         <el-input v-model="staff.keyword" placeholder="搜索人员，支持拼音、姓名">
           <i slot="prefix" class="el-input__icon el-icon-search pointer"></i></el-input>

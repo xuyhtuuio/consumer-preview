@@ -83,6 +83,7 @@
                 :format="item.props.format"
                 v-model="item.value"
                 :picker-options="pickerTime(item.props.gl, item.props.order)"
+                @change="handlePickerChange(item)"
                 style="width: 100%"
               ></el-date-picker>
 
@@ -90,7 +91,6 @@
                 v-else-if="item.name === 'TextareaInput'"
                 type="textarea"
                 v-model="item.value"
-                :maxlength="item.props.numberOfWords"
                 :placeholder="item.props.placeholder"
               ></el-input>
 
@@ -117,6 +117,15 @@ import WarnInfo from './warn-info';
 function rulesFn(data) {
   switch (data.name) {
     case 'TextInput':
+      return [
+        { required: true, message: `请输入${data.title}` },
+        {
+          min: 3,
+          max: data.props.numberOfWords,
+          message: `长度在 1 到 ${data.props.numberOfWords} 个字符`
+        }
+      ];
+    case 'TextareaInput':
       return [
         { required: true, message: `请输入${data.title}` },
         {
@@ -156,17 +165,6 @@ export default {
     };
   },
   computed: {
-    rulesCpt() {
-      const result = {};
-      this.list.forEach(item => {
-        if (item.props.required) {
-          result[item.id] = rulesFn(item);
-        }
-      });
-      const result2 = {};
-      result2[this.list[0].id] = rulesFn(this.list[0]);
-      return result;
-    },
     formItemCpt() {
       return item => {
         if (item.name === 'SelectInput' && !item.props.expanding) {
@@ -215,6 +213,7 @@ export default {
         disabledDate: time => {
           // 既不能大于当前日期 也不能大于开始日期
           if (value) {
+            // console.log(value);
             return time.getTime() < new Date(value).getTime();
           }
           return time.getTime() < new Date() - 8.64e7;
@@ -222,6 +221,16 @@ export default {
           // return time.getTime() < new Date(this.params.actStartTime).getTime() - 86400000;
         }
       };
+    },
+    handlePickerChange(item) {
+      const otherItem = this.list.find(iten => iten.id == item.props.gl);
+      const otherVal = new Date(otherItem.value).getTime();
+      const itemVal = new Date(item.value).getTime();
+      if (item.props.order == 0 && otherVal && itemVal > otherVal) {
+        item.value = '';
+      } else if (item.props.order == 1 && otherVal && itemVal < otherVal) {
+        item.value = '';
+      }
     },
     handleInput(val, item, id) {
       // this.checkBox[item.id]= val
@@ -233,32 +242,42 @@ export default {
     judgementWarn(item) {
       let flag;
       if (item.valueType == 'Date') {
-        flag = String(item.value);
+        flag = item.value == null ? '' : String(item.value);
       } else {
         flag = item.value;
       }
-      if (!flag.length && typeof item.value !== 'number') {
-        return item.warnInfo[0].message;
-      }
-      console.log(item);
-      if (item.props.numberOfWords && item.value.length > item.props.numberOfWords) {
-        item.isWarning = true;
-        return item.warnInfo[1].message;
-      } else {
+      if (item.props.required) {
+        if (!flag.length && typeof item.value !== 'number') {
+          return item.warnInfo[0].message;
+        } else if (item.props.numberOfWords && item.value.length > item.props.numberOfWords) {
+          item.isWarning = true;
+          return item.warnInfo[1].message;
+        } else {
+          return (item.isWarning = false);
+        }
+      } else if (item.props.numberOfWords && item.value.length) {
+        if (item.value.length > item.props.numberOfWords) return item.warnInfo[0].message;
         item.isWarning = false;
+      } else {
+        return (item.isWarning = false);
       }
     },
     judgeWarn() {
       const result = this.list.every((item, index) => {
         if (item.props.required) {
-          return item.value.length !== 0;
+          if (item.value == null) return false;
+          else if (item.props.numberOfWords && item.value.length !== 0)
+            return item.value.length < item.props.numberOfWords;
+          else return item.value.length !== 0;
+        } else if (item.props.numberOfWords && item.value.length !== 0) {
+          return false;
         } else {
           return true;
         }
       });
       if (!result) {
         this.list.forEach(item => {
-          if (item.props.required) {
+          if (item.props.required || item.props.numberOfWords) {
             item.isWarning = true;
           }
         });
@@ -282,6 +301,9 @@ export default {
         if (item.props.required == true) {
           this.$set(item, 'isWarning', false);
           this.$set(item, 'warnInfo', rulesFn(item));
+        } else if (item.props.numberOfWords) {
+          this.$set(item, 'isWarning', false);
+          this.$set(item, 'warnInfo', [rulesFn(item)[1]]);
         }
       });
     },
@@ -353,7 +375,7 @@ export default {
       margin-right: 5px;
       .el-input__icon {
         &::before {
-          content: "\e78e";
+          content: '\e78e';
         }
       }
     }
@@ -363,7 +385,4 @@ export default {
     }
   }
 }
-
-
-
 </style>
