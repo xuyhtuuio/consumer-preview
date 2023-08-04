@@ -1,18 +1,18 @@
 <template>
   <div class="base-setup">
     <el-form ref="baseSetting" :model="setup" :rules="rules" label-position="top" :hide-required-aterisk="false" label-width="80px">
-      <el-form-item prop="formName">
+      <el-form-item prop="templateName">
         <template slot="label">
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#icon-form-name"></use>
           </svg>
           流程名称<span style="color: red">*</span>
         </template>
-        <el-input v-model.trim="setup.formName" placeholder="请输入流程名称" class="is-dark input" size="medium"></el-input>
+        <el-input v-model.trim="setup.templateName" placeholder="请输入流程名称" class="is-dark input" size="medium"></el-input>
         <template slot="error">
           <span class="custom-error">
             <i class="iconfont icon-a-tubiao1"></i>
-            <span class="error1" v-if="!setup.formName">请输入流程名称</span>
+            <span class="error1" v-if="!setup.templateName">请输入流程名称</span>
             <span class="error1" v-else>长度在 2 到 10 个字符</span>
           </span>
         </template>
@@ -67,7 +67,7 @@ export default {
       select: [],
       fromGroup: [],
       rules: {
-        formName: [
+        templateName: [
           { required: true, message: '请输入流程名称', trigger: 'blur' },
           { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
         ],
@@ -118,6 +118,7 @@ export default {
     changeSelectFormId(val) {
       const value = [val]
       const group = this.fromGroup.filter(item => value.includes(item.id))
+      this.setup.formName = group[0].name
       window.sessionStorage.setItem('formGroup', JSON.stringify(group))
       this.getFormItems()
     },
@@ -126,7 +127,6 @@ export default {
       //this.nowUserSelect = null
     },
     selected(select) {
-      console.log(select)
       this.showUserSelect = false
       // this.$set(this.setup.settings, this.nowUserSelect, select)
       //this.setup[this.nowUserSelect] = select
@@ -139,7 +139,7 @@ export default {
     validate(){
       this.$refs.baseSetting.validate()
       let err = []
-      if (!this.$isNotEmpty(this.setup.formName)){
+      if (!this.$isNotEmpty(this.setup.templateName)){
         err.push('流程名称未设置')
       }
       if (!this.$isNotEmpty(this.setup.formId) || !this.setup.formId){

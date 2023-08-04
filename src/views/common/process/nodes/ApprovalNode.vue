@@ -48,18 +48,21 @@ export default {
   watch: {
     assignedUser: {
       handler(val) {
-        if (this.$store.state.selectedNode.id !== this.config.id || this.config.name === '二次会签') {
-          return;
-        }
-        this.content = (val || []).map(item => item.label).join('、') || ''
+        // console.log('55', this.config.props.assignedUser)
+        // if (this.$store.state.selectedNode.id !== this.config.id || this.config.name === '二次会签') {
+        //   return;
+        // }
+        this.content = (this.config.props.assignedUser || val || []).map(item => item.label).join('、') || ''
+        
       },
       immediate: true,
       deep: true
     },
     config: {
       handler() {
-        if (this.config.name === '二次会签') {
+        if (this.config.name === '二次会签' || this.config.props.assignedType === 'SELECT_NODE') {
           this.content = this.nodes.find(n => (n.id === this.config.props.target))?.name
+          console.log('二次会签', this.content)
         }
       },
       immediate: true,
