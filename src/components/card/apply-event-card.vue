@@ -63,7 +63,7 @@
               }}</span>
             </div>
           </div>
-          <span slot="reference" class="handler">当前处理人：{{
+          <span slot="reference" class="handler pointer">当前处理人：{{
             (item.currentAssignee && item.currentAssignee[0].name) || "--"
           }}
             <i v-if="item.currentAssignee && item.currentAssignee.length > 1">+{{ item.currentAssignee &&
@@ -140,7 +140,7 @@
     <el-dialog :visible.sync="reminderDialog" align="center" custom-class="reminderDialog" :before-close="closeReminder">
       <p slot="title">请选择催单对象</p>
       <div style="max-height: 270px; overflow-y: auto" class="trs-scroll assignee-content">
-        <div v-for="(child, index) in persons" :key="index" class="person-item">
+        <div v-for="(child, index) in persons" :key="index" class="person-item" style="width: auto;">
           <span>{{ child.name }}/{{ child.WorkId }}/{{ child.Institution }}/{{
             child.Dep
           }}</span>
@@ -290,12 +290,12 @@ export default {
 </script>
 <style lang="less" scoped>
 .apply-event-card {
+  cursor: default;
   margin: 16px 0;
   padding: 12px 24px 12px 12px;
   border-radius: 8px;
   border: 1px solid #f2f3f5;
   background: #fff;
-  cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -504,6 +504,7 @@ export default {
       justify-content: center;
       padding: 4px 8px 4px 4px;
       margin-right: 16px;
+      cursor: pointer;
     }
 
     .attention {
@@ -577,6 +578,7 @@ export default {
   background: #f7f8fa;
   .event-name{
     color: #2D5CF6;
+    cursor: pointer;
   }
 }
 </style>

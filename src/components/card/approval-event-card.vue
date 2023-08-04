@@ -9,7 +9,7 @@
         <svg class="icon urgent-icon" aria-hidden="true" v-if="item.dismissalMark == 1">
           <use xlink:href="#icon-tongyongtubiao2"></use>
         </svg>
-        <span class="event-name" @click="toDetail(item)">{{ item.taskName }}</span>
+        <span class="event-name pointer" @click="toDetail(item)">{{ item.taskName }}</span>
         <span class="event-status">
           <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
 
@@ -50,14 +50,15 @@
         <span class="sDate date">更新时间：{{ item.update_time | timeFormate }}</span>
         <span class="sDate date">上线时间：{{ item.launchDate | timeFormate }}</span>
         <!-- <span class="handler date">当前处理人：王明明</span> -->
-        <el-popover placement="bottom" trigger="hover" popper-class="popper-persons">
+        <el-popover placement="bottom" trigger="hover" popper-class="popper-persons" v-if="item.sponsorMap && item.sponsorMap.name">
           <div style="text-align: center;">
             {{ item.sponsorMap && item.sponsorMap.institution }} | {{ item.sponsorMap && item.sponsorMap.dep }}
           </div>
-          <span slot="reference" class="handler date">发起人：{{
+          <span slot="reference" class="handler date pointer" >发起人：{{
             item.sponsorMap && item.sponsorMap.name
           }}</span>
         </el-popover>
+        <span  class="handler date" v-else>发起人：--</span>
         <span class="handler">
           <i class="iconfont icon-dept"></i>
           {{ item.institution }}</span>
@@ -186,10 +187,10 @@ export default {
   border-radius: 8px;
   border: 1px solid #f2f3f5;
   background: #fff;
-  cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: default;
 
   .event-info {
     flex: 1;
@@ -371,6 +372,7 @@ export default {
       justify-content: center;
       padding: 4px 8px 4px 4px;
       margin-right: 16px;
+      cursor: pointer;
     }
 
     .icon-op:last-of-type {
