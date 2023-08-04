@@ -163,8 +163,15 @@ export default new Vuex.Store({
         },
         children: {}
       },
-      remark: ""
-    }
+      remark: "",
+
+    },
+    checkApprovedForm:{
+      approvedOpinionRequired:true,
+      uploadFileRequired:true,
+      approvedOpinionForm:[],
+      opinionStorage:false
+    },
   },
   mutations: {
     selectedNode(state, val) {
@@ -178,7 +185,17 @@ export default new Vuex.Store({
     },
     setBreadcrumbList(state,val) {
       state.breadcrumbList= val
+    },
+    setApprovedOpinionRequired(state,val){
+      state.checkApprovedForm.approvedOpinionRequired= val
+    },
+    setApprovedOpinionForm(state,val){
+      state.checkApprovedForm.approvedOpinionForm= val
+    },
+    setOpinionStorage(state,val){
+      state.checkApprovedForm.opinionStorage= val
     }
+
   },
   getters: {
   },

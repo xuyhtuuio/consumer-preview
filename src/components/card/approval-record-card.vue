@@ -80,6 +80,7 @@ import { getApprovalRecordByFromid } from '@/api/applyCenter'
 import empty from '@/components/common/empty'
 export default {
   components: { empty },
+  name:'approved-record-card',
   data() {
     return {
       hasData: false,
@@ -100,7 +101,7 @@ export default {
         if (!data) {
           return this.hasData = false
         }
-        this.recordList = data.length ? data.map(v => {
+        this.recordList = data instanceof Array&&data.length ? data.map(v => {
           return {
             ...v,
             editedCommentsList: v.editedCommentsList.length ? v.editedCommentsList.map(m => {
