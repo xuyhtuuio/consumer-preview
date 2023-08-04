@@ -12,6 +12,9 @@
         <TrsTag v-if="scope.row.status==='已发布'" :tag="tagItem" />
         <TrsTag v-else :tag="tagItem1" />
       </template>
+      <template #createUserName="scope">
+        <span>{{ scope.row.createUserName + '/' +  scope.row.createUserId }}</span>
+      </template>
       <template #operate="scope">
         <el-button type="text" @click="previewFlow(scope.row)">预览</el-button>
         <el-button type="text" v-if="scope.row.status === '已发布'" class="red" @click="stopFlow(scope.row)">停用</el-button>
@@ -23,7 +26,7 @@
     <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
       v-if="page.total">
     </TrsPagination>
-    <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow.formName + '-预览'">
+    <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow.templateName + '-预览'">
       <process-design from="flowManage" ref="processDesign" style="background: #f5f6f6;" />
     </w-dialog>
   </div>
@@ -173,7 +176,7 @@ export default {
         this.$message.error("流程id不存在！")
         return;
       }
-      const res = await stopProcess(processDetailRes.data.data.processDefinitionId)
+      const res = await stopProcess(processDetailRes.data.data.processDefinitionId, row.templateId)
       // const msg = '此流程中存在未结束的申请单，暂时无法停用'
       // const msg1 = '停用后将无法使用此流程，确定停用吗？'
       const msg = res.data?.msg

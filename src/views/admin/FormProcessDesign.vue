@@ -245,22 +245,25 @@ export default {
           createUserName: user.fullname,
           createUserId: user.id
         }
-        console.log(template)
-        if (this.isNew || this.$isEmpty(this.setup.formId)){
-          publishProcess(template).then(rsp => {
-            this.$message.success("发布成功！可在流程管理列表页查看")
-            // this.$router.push("/formsPanel")
-          }).catch(() => {
-            this.$message.error("发布失败")
+        // if (this.isNew || this.$isEmpty(this.setup.formId)){
+        publishProcess(template).then(rsp => {
+          this.$message.success("发布成功！可在流程管理列表页查看")
+          // this.setup.processDefinitionI
+          this.validVisible = false
+          this.$router.push({
+            name: 'FlowManage'
           })
-        }else {
-          updateFormDetail(template).then(rsp => {
-            this.$message.success("更新表单成功")
-            // this.$router.push("/formsPanel")
-          }).catch(err => {
-            this.$message.error(err)
-          })
-        }
+        }).catch(() => {
+          this.$message.error("发布失败")
+        })
+        // }else {
+        //   updateFormDetail(template).then(rsp => {
+        //     this.$message.success("更新表单成功")
+        //     // this.$router.push("/formsPanel")
+        //   }).catch(err => {
+        //     this.$message.error(err)
+        //   })
+        // }
       })
     }
   }

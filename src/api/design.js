@@ -47,13 +47,14 @@ export function getProcessDetailByTemplateId(templateId) {
   })
 }
 // 通过流程定义id停用流程
-export function stopProcess(processDefinitionId) {
+export function stopProcess(processDefinitionId, templateId) {
   return request({
     url: '/cpr/workspace/process/stop',
     method: 'post',
     contentType: 'application/x-www-form-urlencoded',
     data: {
-      processDefinitionId
+      processDefinitionId,
+      templateId
     }
   })
 }
