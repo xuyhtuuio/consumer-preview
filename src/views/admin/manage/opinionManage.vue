@@ -9,7 +9,7 @@
               placeholder="请输入审查意见搜索"
               @keyup.enter.native="onSearch"
             >
-             <i slot="suffix" class="el-icon-search" @click="onSearch"></i>
+              <i slot="suffix" class="el-icon-search" @click="onSearch"></i>
             </el-input>
           </el-form-item>
 
@@ -20,9 +20,8 @@
               :fetch-suggestions="querySearch"
               placeholder="基准"
               @select="handleSelect"
-              @keyup.enter.native="onSearch"
             >
-              <i  slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
+              <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
               <template slot-scope="{ item }">
                 <div class="option-info">
                   <span class="left" v-html="item.showItem"></span>
@@ -43,11 +42,11 @@
         </el-form>
       </div>
     </div>
-    <div class="main">
+    <div class="main" v-loading.body="isLoading">
       <div class="info">
         <div class="left">
           共
-          <span class="high">3216</span>
+          <span class="high">{{ this.page.total }}</span>
           条
         </div>
         <div class="right">
@@ -78,30 +77,30 @@
         <div class="b-item" v-for="item in data" :key="item.id">
           <div class="left">
             <div class="title">
-              <span>{{ item.title }}</span>
+              <span>{{ item.keywordName }}</span>
               <g-icon
                 class="left-icon"
                 stylePx="20"
                 href="#icon-fuzhi1"
-                @click.native="handleCopy(item.content)"
+                @click.native="handleCopy(item.recommendedOpinions)"
               />
             </div>
-            <div class="content">{{ item.content }}</div>
+            <div class="content">{{ item.recommendedOpinions }}</div>
             <div class="info">
-              <span :class="['info-item', item.typeId === 0 ? 'class-zero' : 'class-one']">{{
-                item.type
-              }}</span>
+              <span :class="['info-item', item.keywordType === 1 ? 'class-zero' : 'class-one']">
+                {{ item.keywordType === 1 ? '禁用词' : '敏感词' }}
+              </span>
               <span class="info-item"
                 ><g-icon class="left-icon" stylePx="20" href="#icon-yinyong" />已引用<i
                   class="high"
-                  >{{ item.useFrequency }}</i
+                  >{{ item.citationsCount }}</i
                 >次</span
               >
-              <span class="info-item">更新时间：{{ item.updateTime }}</span>
+              <span class="info-item">更新时间：{{ timestampToDateTime(item.updateTime) }}</span>
             </div>
           </div>
           <div class="btns">
-            <span v-if="item.isTop" class="btn btn-yellow">
+            <span v-if="item.isTop !== 0" class="btn btn-yellow">
               <i> <g-icon class="left-icon" stylePx="20" href="#icon-zhiding" />取消置顶</i>
             </span>
             <span v-else class="btn"><i>置顶</i></span>
@@ -112,7 +111,7 @@
         </div>
       </div>
       <TrsPagination
-      class="trs-pagination"
+        class="trs-pagination"
         :pageSize="10"
         :pageNow="page.pageNow"
         :total="page.total"
@@ -201,18 +200,25 @@
   </div>
 </template>
 <script>
+import { getPageList } from '@/api/admin-opinion.js';
 import { copyText } from '@/utils/Clipboard.js';
+import { timestampToDateTime } from '@/utils/utils.js';
 export default {
   name: 'OpinionManage',
   data() {
     return {
-      search: {},
+      search: {
+        review: '',
+        baseline: ''
+      },
       types: [
         { id: 0, value: '禁用词' },
         { id: 1, value: '敏感词' }
       ],
       limitTimeVisible: false,
       limitVisible: false,
+      isLoading: false,
+      timestampToDateTime,
       data: [
         {
           id: 0,
@@ -265,7 +271,8 @@ export default {
       ],
       page: {
         pageNow: 1,
-        total: 3
+        total: 0,
+        pageSize: 10
       },
       titleDialog: '新建标签',
       dialogTitle: '标签名称',
@@ -284,6 +291,20 @@ export default {
   },
   methods: {
     initData() {
+      this.isLoading = true;
+      const pageData = {
+        keywordContent: this.search.baseline,
+        opinionContent:this.search.review,
+        orderType: this.currentSort ? (this.referSort ? 1 : 2) : this.updateSort ? 3 : 4,
+        pageNow: this.page.pageNow,
+        pageSize: this.page.pageSize
+      }
+      console.log(pageData);
+      getPageList(pageData).then(({ totalCount, list }) => {
+        this.page.total = totalCount;
+        this.isLoading = false;
+        this.data = list;
+      });
       const data = {
         code: '0',
         content: [
@@ -316,9 +337,10 @@ export default {
     },
     onSearch() {
       console.log(this.search);
-       this.changeStyle("none", ".el-autocomplete-suggestion");
+      this.initData()
+      this.changeStyle('none', '.el-autocomplete-suggestion');
     },
-     //根据传进来的状态改变建议输入框的状态（展开|隐藏）
+    //根据传进来的状态改变建议输入框的状态（展开|隐藏）
     changeStyle(status, className) {
       let dom = document.querySelectorAll(className);
       dom[0].style.display = status;
@@ -334,6 +356,7 @@ export default {
         !this.currentSort && (this.updateSort = !this.updateSort);
         this.currentSort && (this.currentSort = false);
       }
+      this.initData();
     },
     sortChange({ column, prop, order }) {
       console.log(column, prop, order);
@@ -356,7 +379,10 @@ export default {
       console.log(item);
       this.limitVisible = true;
     },
-    handleCurrentChange() {},
+    handleCurrentChange(val) {
+      this.page.pageNow = val
+      this.initData();
+    },
     handleSubmitLimitTime() {
       const { typeId, useFrequency } = this.dialogItem;
       console.log(typeId, useFrequency);
@@ -416,8 +442,7 @@ export default {
       }, 3000 * Math.random());
     },
     handleSelect(val) {
-      // console.log(val);
-      // this.search.baseline = `${val.value}#`
+      this.initData()
     },
     // 复制
     handleCopy(val) {
@@ -602,6 +627,7 @@ export default {
           .title {
             display: flex;
             justify-content: space-between;
+            line-height: 25px;
             font-weight: 700;
             .left-icon {
               display: none;
@@ -885,26 +911,4 @@ export default {
     text-align: center;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </style>
