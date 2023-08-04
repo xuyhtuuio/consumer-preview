@@ -37,7 +37,7 @@
 
 <script>
 import LayoutHeader from './LayoutHeader'
-import {getFormDetail, createForm, updateFormDetail} from '@/api/design'
+import {createForm, updateFormDetail, saveProcess, publishProcess, getProcessDetail} from '@/api/design'
 import FormBaseSetting from '@/views/admin/layout/FormBaseSetting'
 import ProcessDesign from '@/views/admin/layout/ProcessDesign'
 import FormProSetting from '@/views/admin/layout/FormProSetting'
@@ -86,10 +86,12 @@ export default {
     this.showValiding()
     let formId = this.$route.query.code
     //判断传参，决定是新建还是加载原始数据
-    this.loadInitFrom()
+    
     if (!this.$isEmpty(formId)){
       this.isNew = false
       this.loadFormInfo(formId)
+    } else {
+      this.loadInitFrom()
     }
     // let group = this.$route.query.group
     // this.setup.groupId = this.$isEmpty(group) ? null : parseInt(group)
@@ -98,18 +100,15 @@ export default {
     this.stopTimer()
   },
   methods:{
-    loadFormInfo(formId){
-      getFormDetail(formId).then(rsp => {
-        console.log(rsp.data)
-        let form = rsp.data;
-        // form.logo = JSON.parse(form.logo)
-        form.settings = JSON.parse(form.settings)
-        form.formItems = JSON.parse(form.formItems)
-        form.process = JSON.parse(form.process)
-        this.$store.commit('loadForm', form)
-      }).catch(err => {
-        this.$message.error(err)
-      })
+    async loadFormInfo(formId){
+      const res = await getProcessDetail(formId)
+      const design = res.data.data
+      console.log(design)
+      design.formId = +design.formId
+      design.settings = JSON.parse(design.settings)
+      design.formItems = JSON.parse(design.formItems)
+      design.process = JSON.parse(design.process)
+      this.$store.commit('loadForm', design)
     },
     loadInitFrom(){
       this.$store.commit('loadForm', {
@@ -185,11 +184,14 @@ export default {
         clearInterval(this.timer)
       }
     },
-    saveProcess() {
-      const user = window.localStorage.getItem('user_name')
+    async saveProcess() {
+      const user = JSON.parse(window.localStorage.getItem('user_name'))
+      console.log(user)
       let template = {
         formId: this.setup.formId,
         formName: this.setup.formName,
+        templateName: this.setup.templateName,
+        templateId: this.setup.templateId,
         // logo: JSON.stringify(this.setup.logo),
         settings: JSON.stringify(this.setup.settings),
         // groupId: this.setup.groupId,
@@ -203,6 +205,14 @@ export default {
         createUserId: user.id
       }
       // 调取暂存接口
+      const res = await saveProcess(template)
+      console.log(res)
+      if (res.data.data) {
+        this.$message.success('已保存当前内容至草稿箱')
+        // this.$router.push({
+        //   name: 'FlowManage'
+        // })
+      }
     },
     publishProcess() {
       this.validateDesign()
@@ -217,23 +227,31 @@ export default {
         console.log('settings', this.setup.settings)
         console.log('formItems', this.setup.formItems)
         console.log('process', this.setup.process)
+        const user = JSON.parse(window.localStorage.getItem('user_name'))
         let template = {
           formId: this.setup.formId,
           formName: this.setup.formName,
+          templateName: this.setup.templateName,
+          templateId: this.setup.templateId,
           // logo: JSON.stringify(this.setup.logo),
           settings: JSON.stringify(this.setup.settings),
           // groupId: this.setup.groupId,
           formItems: JSON.stringify(this.setup.formItems),
           process: JSON.stringify(this.setup.process),
           remark: this.setup.remark,
+          status: '',
+          isRevoke: this.setup.settings.undo,
+          node: this.setup.settings.target,
+          createUserName: user.fullname,
+          createUserId: user.id
         }
         console.log(template)
         if (this.isNew || this.$isEmpty(this.setup.formId)){
-          createForm(template).then(rsp => {
-            this.$message.success("创建表单成功")
+          publishProcess(template).then(rsp => {
+            this.$message.success("发布成功！可在流程管理列表页查看")
             // this.$router.push("/formsPanel")
           }).catch(() => {
-            this.$message.error("创建表单失败")
+            this.$message.error("发布失败")
           })
         }else {
           updateFormDetail(template).then(rsp => {

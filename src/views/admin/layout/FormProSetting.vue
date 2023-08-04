@@ -31,7 +31,7 @@ export default {
   },
   computed: {
     setup() {
-      return this.$store.state.design.settings;
+      return this.$store.state.design.settings || {};
     },
     nodeMap() {
       return this.$store.state.nodeMap

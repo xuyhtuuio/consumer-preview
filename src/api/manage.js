@@ -55,7 +55,15 @@ export function copyFormCategory(formCategoryId) {
 // 表单管理-新增字段
 export function addFormField(param) {
   return request({
-    url: '/workflow/formManagement/addFormField',
+    url: '/cpr/FormManagement/addItem',
+    method: 'post',
+    data: param
+  })
+}
+// 表单管理-编辑表单项
+export function editItem(param) {
+  return request({
+    url: '/cpr/FormManagement/editItem',
     method: 'post',
     data: param
   })
@@ -68,8 +76,31 @@ export function itemPagingList(param) {
     params: param
   })
 }
-
-
+// 表单管理-修改表单字段序号
+export function modifyOrder(param) {
+  return request({
+    url: '/cpr/FormManagement/modifyOrder',
+    method: 'post',
+    contentType : 'application/x-www-form-urlencoded;charset=utf-8',
+    data: param
+  })
+}
+// 表单管理-删除表单项
+export function deletedFormItem(param) {
+  return request({
+    url: '/cpr/FormManagement/deletedFormItem',
+    method: 'get',
+    params: param
+  })
+}
+// 表单管理-停用或重新启用表单项
+export function switchFormItemState(param) {
+  return request({
+    url: '/cpr/FormManagement/switchFormItemState',
+    method: 'get',
+    params: param
+  })
+}
 /* 表单管理end */
 
 

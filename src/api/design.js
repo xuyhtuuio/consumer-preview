@@ -10,6 +10,63 @@ export function getFormTemplateById(formId) {
   })
 }
 
+// 发布
+export function publishProcess(data) {
+  return request({
+    url: '/cpr/admin/form',
+    method: 'post',
+    data
+  })
+}
+// 保存
+export function saveProcess(data) {
+  return request({
+    url: '/cpr/admin/insert',
+    method: 'post',
+    data
+  })
+}
+// 删除
+export function deleteProcess(templateId) {
+  return request({
+    url: '/cpr/admin/delete',
+    method: 'get',
+    params: {
+      templateId
+    }
+  })
+}
+// 通过模板id查看流程信息 会附带流程定义id
+export function getProcessDetailByTemplateId(templateId) {
+  return request({
+    url: '/cpr/workspace/process/detail',
+    method: 'get',
+    params: {
+      templateId
+    }
+  })
+}
+// 通过流程定义id停用流程
+export function stopProcess(processDefinitionId) {
+  return request({
+    url: '/cpr/workspace/process/stop',
+    method: 'post',
+    contentType: 'application/x-www-form-urlencoded',
+    data: {
+      processDefinitionId
+    }
+  })
+}
+// 查询模版详情
+export function getProcessDetail(templateId) {
+  return request({
+    url: '/cpr/admin/form/detail',
+    method: 'get',
+    params: {
+      templateId
+    }
+  })
+}
 // 查询表单组
 export function getFormGroups(param) {
   return request({

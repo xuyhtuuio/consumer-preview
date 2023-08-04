@@ -1,12 +1,17 @@
 <template>
-  <el-main>
+  <el-main :style="{ 'max-height': $route.name !== 'processDesign' ? 'calc(100vh - 300px)' : 'calc(100vh - 100px)' }">
     <!-- <div class="scale">
       <el-button icon="el-icon-plus" size="small" @click="scale += 10" :disabled="scale >= 150" circle></el-button>
       <span>{{ scale }}%</span>
       <el-button icon="el-icon-minus" size="small" @click="scale -= 10" :disabled="scale <= 40" circle></el-button>
       <el-button @click="validate">校验流程</el-button>
     </div> -->
-    <div class="design" :style="'transform: scale('+ scale / 100 +');'">
+    <div class="op-btns" v-show="from !== 'flowManage'">
+      <span class="zoomIn" @click="handleZoom"><i class="el-icon-refresh" />恢复</span>
+      <span class="zoomOut" @click="handleZoom(10)"><i class="el-icon-zoom-in" />放大</span>
+      <span class="zoomIn" @click="handleZoom(-10)"><i class="el-icon-zoom-out" />缩小</span>
+    </div>
+    <div class="design" id="design-box" :style="'transform: scale('+ scale / 100 +');'">
       <process-tree v-bind="$attrs" ref="process-tree" @selectedNode="nodeSelected"/>
     </div>
     <el-drawer :title="selectedNode.name" :visible.sync="showConfig"
@@ -51,6 +56,9 @@ import NodeConfig from '../../common/process/config/NodeConfig'
 export default {
   name: "ProcessDesign",
   components: {ProcessTree, NodeConfig},
+  props: {
+    from: String
+  },
   data() {
     return {
       scale: 100,
@@ -75,6 +83,15 @@ export default {
     nodeSelected(node){
       console.log('配置节点', node)
       this.showConfig = true
+    },
+    handleZoom(scale) {
+      console.log(scale)
+      if (typeof scale === 'number') {
+        this.scale += scale
+      } else {
+        this.scale = 100
+      }
+      // document.querySelector('#design-box').style.transform
     }
   },
   watch:{
@@ -98,6 +115,38 @@ export default {
   margin-top: 100px;
   display: flex;
   transform-origin: 50% 0px 0px;
+}
+
+.op-btns {
+  position: absolute;
+  // top: 130px;
+  right: 95px;
+  z-index: 99;
+  display: inline-block;
+  padding: 6px 4px;
+  border: 1px solid #E5E6EB;
+  border-radius: 4px;
+  font-size: 12px;
+  height: 30px;
+  background: #FFFFFF;
+  z-index: 999;
+  span {
+    padding: 2px 6px;
+    border-right: 1px solid #E5E6EB;
+    cursor: pointer;
+    user-select: none;
+    &:hover {
+      color: #2D5CF6;
+      background: #F9FBFF;
+    }
+    i {
+      color: #2D5CF6;
+      margin-right: 2px;
+    }
+  }
+  span:last-child {
+    border-right: none;
+  }
 }
 
 .scale {

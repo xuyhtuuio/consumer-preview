@@ -13,7 +13,7 @@
       </el-menu>
       <div class="publish">
         <el-button size="mini" @click="save"><i class="el-icon-folder-opened"></i>保存</el-button>
-        <el-button size="mini" type="primary" @click="publish"><i class="el-icon-s-promotion"></i>发布</el-button>
+        <el-button size="mini" type="primary" :disabled="setup.processDefinitionId" @click="publish"><i class="el-icon-s-promotion"></i>{{ setup.processDefinitionId ? '已发布' : '发布' }}</el-button>
       </div>
       <div class="back">
         <el-button @click="exit" size="small" icon="el-icon-arrow-left" circle style="line-height: 12px;padding: 7px;background: #F7F8FA;border:none;margin-right: 12px;"></el-button>
@@ -76,7 +76,7 @@ export default {
     },
     to(name) {
       if (name !== this.$route.name) {
-        this.$router.push({ name });
+        this.$router.push({ name, query: { ...this.$route.query } });
         this.$emit('changeRoute', name)
       }
     },

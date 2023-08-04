@@ -21,9 +21,10 @@ export const feildTypes = [
     valueType: 'Array'
   },
   {
-    label: '多选框组',
+    label: '选项组',
     value: 'MultipleGroupsSelect',
-    valueType: 'Array'
+    valueType: 'Array',
+    disable: true
   },
   {
     label: '级联选择框',
@@ -52,6 +53,7 @@ export const belongModules = [
   // },
   {
     label: '核对要点',
-    value: '核对要点'
+    value: '核对要点',
+    disable: true
   }
 ]

@@ -336,6 +336,7 @@ export default {
     selected(select) {
       this.showOrgSelect = false
       this.select = []
+      console.log(select)
       for (let key in select) {
         select[key].forEach(val => this.select.push({
           ...val,

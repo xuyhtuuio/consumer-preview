@@ -75,7 +75,7 @@
                     <svg class="icon" aria-hidden="true" style="position: relative;top:1px;width:18px;height:18px;">
                       <use xlink:href="#icon-multiple-user"></use>
                     </svg>
-                    {{ data.label }}
+                    {{ data.name }}
                   </span>
                 </span>
               </el-tree>
@@ -223,60 +223,12 @@
           'rgb(255, 120, 0)',
           'hsl(181, 100%, 37%)',
         ],
-        data: [{
-          id: 1,
-          label: '部门1',
-          children: [{
-            id: 4,
-            label: '二级部门1',
-            children: [{
-              id: 91,
-              label: '张三',
-            }, {
-              id: 101,
-              label: '李思',
-            }]
-          }]
-        }, {
-          id: 2,
-          label: '部门2',
-          children: [{
-            id: 5,
-            label: '二级部门2',
-            children: [{
-              id: 91223,
-              label: '周杰伦'
-            }, {
-              id: 102233,
-              label: '迪丽热巴'
-            }]
-          }, {
-            id: 6,
-            label: '二级部门3',
-            children: [{
-              id: 9223,
-              label: '王维'
-            }, {
-              id: 1034556,
-              label: '李白'
-            }]
-          },{
-            id: 16,
-            label: '二级部门4',
-            children: [{
-              id: 19111,
-              label: '杜甫'
-            }, {
-              id: 1102222,
-              label: '高适'
-            }]
-          }]
-        }],
+        data: [],
         roleData: [
         ],
         defaultProps: {
           children: 'children',
-          label: 'label'
+          label: 'name'
         },
         rightCheckedList: {
           user: [],
@@ -306,20 +258,24 @@
     methods: {
       async queryUserList() {
         const res = await queryUserList()
-        if (res.data.data) {
-          console.log(res.data.data.data.role)
-          this.roleData = res.data.data.data.role.map(item => {
+          console.log(res.data.data)
+        const resData = res.data.data.data
+        if (resData) {
+          this.roleData = resData.map.role.map(item => {
             return {
               id: item.id,
-              label: item.name,
-              type: item.flag
+              name: item.name,
+              type: item.flag,
+              children: []
             }
           })
+          console.log(this.roleData)
+          this.data = resData.root.children
         }
       },
       filterNode(value, data) {
         if (!value) return true;
-        return data.label.indexOf(value) !== -1;
+        return data.name.indexOf(value) !== -1;
       },
       clearAll() {
         this.rightCheckedList = this.$options.data().rightCheckedList
@@ -328,24 +284,36 @@
       },
       // 树选择的回调
       checkChange(node, data) {
-        const dept = data.checkedNodes.filter(e => e.children).map(item => {
-          item.type = 'dept'
-          return item;
+        const dept = data.checkedNodes.filter(e => e.type === 'dept').map(item => {
+          return {
+            id: item.id,
+            label: item.name
+          }
         })
-        const user = data.checkedNodes.filter(e => !e.children).map(item => {
-          item.type = 'user'
-          return item;
+        const user = data.checkedNodes.filter(e => e.type === 'user').map(item => {
+          return {
+            id: item.id,
+            label: item.name
+          }
         })
         this.rightCheckedList = {
           ...this.rightCheckedList,
           dept,
           user
         }
+        console.log(this.rightCheckedList)
       },
       checkRoleChange(node, data) {
+        const role = data.checkedNodes.map(item => {
+          return {
+            id: item.id,
+            label: item.name,
+            roleRange: this.roleRange
+          }
+        })
         this.rightCheckedList = {
           ...this.rightCheckedList,
-          role: data.checkedNodes
+          role
         }
       },
       changeTabType(type) {
@@ -577,7 +545,7 @@
       margin-bottom: 8px;
       .clear {
         display: flex;
-        align-items: center;
+        // align-items: center;
         color: #2D5CF6;
         cursor: pointer;
       }

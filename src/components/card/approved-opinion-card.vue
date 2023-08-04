@@ -1,73 +1,79 @@
 <template>
   <div class="approved-opinion-card">
-    <slot name="head"></slot>
-    <div v-for="(item, index) in opinions" :key="index" class="opinion-box">
-      <p class="stuff">
-        <i class="line"></i>
-        <span>
-          {{ item.approveName }} / {{ item.approverOrgName }} <i>共{{ item.substantiveopinion.length }}条</i>
-          {{ item.approveTime }}
-        </span>
-        <i class="line"></i>
-      </p>
-      <div class="opinions">
-        <div v-for="(child, idx) in item.substantiveopinion" :key="idx" class="opinions-item pointer">
-          <div class="opinion-tag">
-            <span v-if="child.substantiveOpinions == 1" class="guanzhu">
-              <i class="iconfont icon icon-guanzhu"></i>
-              有实质意见
-            </span>
-            <span v-if="child.substantiveOpinions == 0" class="guanzhu2">
-              <i class="iconfont icon icon-guanzhu2"></i>
-              无实质意见
-            </span>
-          </div>
-          <p class="opinion-text">{{ idx + 1 }} {{ child.content }}</p>
-          <div class="relevant-file" v-if="child.relevantfile && child.relevantfile.length">
-            关联文件：<i class="file-name">{{ child.relevantfile[0] }} </i>
-            <el-popover placement="bottom" popper-class="file-overview-popper" trigger="click"
-              v-if="child.relevantfile && child.relevantfile.length - 1">
-              <div class="file-list">
-                <div class="file-list-item pointer" v-for="(file, i) in child.relevantfile" :key="i">
-                  {{ file }}
+    <empty v-if="!hasData"></empty>
+    <div v-if="hasData">
+      <slot name="head"></slot>
+      <div v-for="(item, index) in opinions" :key="index" class="opinion-box">
+        <p class="stuff">
+          <i class="line"></i>
+          <span>
+            {{ item.approveName }} / {{ item.approverOrgName }} <i>共{{ item.substantiveopinion.length }}条</i>
+            {{ item.approveTime }}
+          </span>
+          <i class="line"></i>
+        </p>
+        <div class="opinions">
+          <div v-for="(child, idx) in item.substantiveopinion" :key="idx" class="opinions-item pointer">
+            <div class="opinion-tag">
+              <span v-if="child.substantiveOpinions == 1" class="guanzhu">
+                <i class="iconfont icon icon-guanzhu"></i>
+                有实质意见
+              </span>
+              <span v-if="child.substantiveOpinions == 0" class="guanzhu2">
+                <i class="iconfont icon icon-guanzhu2"></i>
+                无实质意见
+              </span>
+            </div>
+            <p class="opinion-text">{{ idx + 1 }} {{ child.content }}</p>
+            <div class="relevant-file" v-if="child.relevantfile && child.relevantfile.length">
+              关联文件：<i class="file-name">{{ child.relevantfile[0] }} </i>
+              <el-popover placement="bottom" popper-class="file-overview-popper" trigger="click"
+                v-if="child.relevantfile && child.relevantfile.length - 1">
+                <div class="file-list">
+                  <div class="file-list-item pointer" v-for="(file, i) in child.relevantfile" :key="i">
+                    {{ file }}
+                  </div>
                 </div>
+                <i slot="reference">+{{ child.relevantfile.length - 1 }}</i>
+              </el-popover>
+            </div>
+            <!-- 审批的时候选择采纳与否 -->
+            <div class="accept-box" v-if="status == '3' || status == '5'">
+              <el-radio-group v-model="child.adoptOpinions" @change="changeAccept(child, index, idx)">
+                <el-radio :label="1">采纳</el-radio>
+                <el-radio :label="0">不采纳</el-radio>
+              </el-radio-group>
+              <el-form :model="child" :ref="`form_${index}_${idx}`" :class="`form_${index}_${idx}`"
+                :rules="child.adoptOpinions != 1 ? rules : {}" class="desc-form">
+                <el-form-item prop="notAdoptingReasons" label=" " class="flex">
+                  <el-input v-model="child.notAdoptingReasons" class="input-desc" :ref="`input_${index}_${idx}`"
+                    :placeholder="child.isAccept == 1 ? '请填写采纳说明' : '请填写不采纳说明'
+                      " @input="updateState"></el-input>
+                </el-form-item>
+              </el-form>
+            </div>
+            <!-- 正常显示采纳与否 -->
+            <div class="isAdopt-box" v-if="status == '4'">
+              <span v-if="child.adoptOpinions == 1" class="accept">已采纳</span>
+              <span v-if="child.adoptOpinions == 0" class="no-accept">不采纳</span>
+              <div v-if="child.adoptOpinions == 0" class="desc">
+                {{ child.notAdoptingReasons }}
               </div>
-              <i slot="reference">+{{ child.relevantfile.length - 1 }}</i>
-            </el-popover>
-          </div>
-          <!-- 审批的时候选择采纳与否 -->
-          <div class="accept-box" v-if="status == '3' || status == '5'">
-            <el-radio-group v-model="child.adoptOpinions" @change="changeAccept(child, index, idx)">
-              <el-radio :label="1">采纳</el-radio>
-              <el-radio :label="0">不采纳</el-radio>
-            </el-radio-group>
-            <el-form :model="child" :ref="`form_${index}_${idx}`" :class="`form_${index}_${idx}`"
-              :rules="child.adoptOpinions!=1  ? rules : {}" class="desc-form">
-              <el-form-item prop="notAdoptingReasons" label=" " class="flex">
-                <el-input v-model="child.notAdoptingReasons" class="input-desc" :ref="`input_${index}_${idx}`"
-                  :placeholder="child.isAccept == 1 ? '请填写采纳说明' : '请填写不采纳说明'
-                    "></el-input>
-              </el-form-item>
-            </el-form>
-          </div>
-          <!-- 正常显示采纳与否 -->
-          <div class="isAdopt-box" v-if="status == '4'">
-            <span v-if="child.isAccept == 1" class="accept">已采纳</span>
-            <span v-else class="no-accept">不采纳</span>
-            <div v-if="child.isAccept !== 1" class="desc">
-              【反馈】显示确认人在确认时输入的反馈内容
             </div>
           </div>
         </div>
       </div>
+      <slot name="foot"></slot>
     </div>
-    <slot name="foot"></slot>
   </div>
 </template>
 <script>
+import empty from '@/components/common/empty'
 import moment from 'moment'
-import { getEditedCommentsByFormId, insertApprovalRecordAndEditedComments, updateAdoptEditedComments } from '@/api/applyCenter'
+import { getEditedCommentsByFormId, insertApprovalRecordAndEditedComments,  } from '@/api/applyCenter'
 export default {
+  name: 'approved-opinion-card',
+  components: { empty },
   props: {
     // 3 5显示复选框 4 显示已采纳 不采纳
     status: { type: Number, default: 0 },
@@ -83,31 +89,54 @@ export default {
           },
         ],
       },
-      opinions: [
-      ],
+      opinions: [],
+      hasData: false,
+      loading: false,
     };
   },
-  activated() {
-    this.getEditedCommentsByFormId()
-  },
+
   mounted() {
     this.getEditedCommentsByFormId()
   },
   methods: {
+    // 判断是否更新数据并向state更新
+    updateState() {
+      const flag = this.checkParam()
+      this.$store.commit('setApprovedOpinionRequired', flag)
+      console.log('this.$store', this.$store.state.checkApprovedForm.approvedOpinionRequired)
+      let opinions = Object.values(this.opinions)
+        opinions = opinions.map(v => {
+          return v.substantiveopinion
+        }).flat()
+        const params = opinions.map(v => {
+          return {
+            adoptOpinions: v.adoptOpinions,
+            notAdoptingReasons: v.notAdoptingReasons,
+            recordId: v.recordId
+          }
+        })
+      this.$store.commit('setApprovedOpinionForm', params)
+
+    },
     // 先获取详情
     changeAccept(child, index, idx) {
-      if (child.isAccept == 1) {
+      if (child.adoptOpinions == 1) {
         const form = `form_${index}_${idx}`;
         this.$nextTick(() => {
           this.$refs[form][0].clearValidate();
         });
       }
+     this.updateState()
     },
     getEditedCommentsByFormId() {
       this.loading = true
       getEditedCommentsByFormId({ formId: '158' }).then(res => {
         const { data } = res.data
         const keys = Object.keys(data)
+        if (keys.length < 1) {
+          return this.hasData = false
+        }
+        this.hasData = true
         let opinions = []
         for (let i in keys) {
           const obj = {}
@@ -118,7 +147,8 @@ export default {
           const _newInfo = _info.map(v => {
             return {
               ...v,
-              adoptOpinions: v.adoptOpinions!='null' ? 1 : v.adoptOpinions,
+              adoptOpinions: 1,
+              notAdoptingReasons: '',
               relevantfile: v.associatedAttachmentsIds ? v.associatedAttachmentsIds.split(';') : []
             }
           })
@@ -153,7 +183,6 @@ export default {
         opinions = opinions.map(v => {
           return v.substantiveopinion
         }).flat()
-        console.log('ff1', opinions)
         this.$parent.startLoading(true)
         // this.$emit('startLoading',true)
         return
@@ -162,27 +191,7 @@ export default {
         // this.$emit('startLoading',false)
       }
     },
-    submit() {
-      const flag = this.checkParam()
-      if (flag) {
-        let opinions = Object.values(this.opinions)
-        opinions = opinions.map(v => {
-          return v.substantiveopinion
-        }).flat()
 
-        const params = opinions.map(v => {
-          return {
-            adoptOpinions:v.adoptOpinions,
-            notAdoptingReasons:v.notAdoptingReasons,
-            recordId:v.recordId
-          }
-        })
-        this.$parent.startLoading(true)
-        // updateAdoptEditedComments(params).then(res => {
-        // })
-        // this.$emit('startLoading',false)
-      }
-    },
 
   },
 };

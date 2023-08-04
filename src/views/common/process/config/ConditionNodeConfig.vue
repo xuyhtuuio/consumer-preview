@@ -13,6 +13,11 @@
           <el-button icon="el-icon-sort" size="small" slot="reference">第{{ nowNodeLeave + 1 }}级</el-button>
         </el-popover>
       </el-form-item>
+      <div class="iknow" v-show="iknow">
+        <i class="iconfont icon-guanzhu1"></i>
+        <span>当审批单满足以下条件时进入此流程</span>
+        <span @click="iknow=false">我知道了</span>
+      </div>
       <el-form-item label="条件组关系">
         <el-switch v-model="config.groupsType" active-color="#409EFF"
                    inactive-color="#c1c1c1" active-value="AND" inactive-value="OR"
@@ -71,6 +76,7 @@ export default {
   },
   data() {
     return {
+      iknow: true,
       sortOption: {
         animation: 300,
         chosenClass: 'choose',
@@ -167,5 +173,20 @@ export default {
   font-size: 12px;
   line-height: 20px;
   opacity: 0.8;
+}
+.iknow {
+  width: 340px;
+  padding: 4px 12px;
+  border-radius: 15px;
+  color: #2D5CF6;
+  background: #F0F6FF;
+  span:last-child {
+    margin-left: 60px;
+    cursor: pointer;
+  }
+  i {
+    position: relative;
+    top: 1px;
+  }
 }
 </style>
