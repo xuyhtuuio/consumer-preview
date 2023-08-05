@@ -2,7 +2,7 @@
   <div class="addApply" v-loading.body="isGLoading">
     <g-breadcrunm />
     <div class="tag">
-      <add-tag @submit="submit" @save="save" />
+      <add-tag ref="refAddTag" @submit="submit" @save="save" />
     </div>
     <div class="content" v-loading="isLoading">
       <review-matters
@@ -40,7 +40,14 @@ import ReconciliationPoint from './components/reconciliation-point.vue';
 import SecondaryConfirmation from '@/components/common/secondaryConfirmation';
 import ReviewMaterial from './components/review-material.vue';
 import { timestampToDateTime } from '@/utils/utils.js';
-import { getFormCategoryArray, getApplyForm, submit, saveDraft } from '@/api/front.js';
+import {
+  getFormCategoryArray,
+  getApplyForm,
+  submit,
+  saveDraft,
+  externalLogicController,
+  processStart
+} from '@/api/front.js';
 export default {
   components: {
     AddTag,
@@ -66,7 +73,9 @@ export default {
       message: '是否保存当前编辑内容？',
       cancelBtn: '不保存',
       confirmBtn: '保存'
-    }
+    },
+    templateId: '',
+    processDefinitionId: ''
   }),
   created() {
     this.initialData();
@@ -87,7 +96,7 @@ export default {
     console.log(isNoDialog);
 
     !isNoDialog && (_this.dialogVisible = true);
-   isNoDialog && next();
+    isNoDialog && next();
     _this.handleConfirm = () => {
       _this.dialogVisible = false;
       this.save(() => {
@@ -149,6 +158,9 @@ export default {
         this.reviewMaterials = reviewMaterials;
         this.isLoading = false;
         this.isGLoading = false;
+      });
+      externalLogicController({ formId: id }).then(({ data: { data: res } }) => {
+        (this.templateId = res.templateId), (this.processDefinitionId = res.processDefinitionId);
       });
     },
     // 提交
@@ -222,18 +234,38 @@ export default {
       });
       formItemDataList.push(reviewMaterialsData);
       result.formItemDataList = formItemDataList;
-      flag &&
-        submit(result).then(res => {
-          this.$message({ type: 'success', message: res.data.data });
+
+      if (flag) {
+        // submit(result).then(res => {
+        //   this.$message({ type: 'success', message: res.data.data });
+        //   this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
+        // });
+        const { id, name, dep: label } = this.$refs['refAddTag'].approverInfo;
+        processStart({
+          templateId: this.templateId,
+          processDefinitionId: this.processDefinitionId,
+          startUserInfo: {
+            id,
+            name,
+            label
+          },
+          submitDto: result
+        }).then(res => {
+          console.log('processStart', res);
+          this.$message({ type: 'success', message: res.data.msg });
+          // res.data.data
           this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
-        });
+        }).catch(err => {
+          console.log(err);
+        })
+      }
       !flag &&
-        saveDraft(result).then(({data:{data,msg}}) => {
-          this.formId = data
-          this.$message({ type: 'success', message: msg});
+        saveDraft(result).then(({ data: { data, msg } }) => {
+          this.formId = data;
+          this.$message({ type: 'success', message: msg });
           this.rollTo(0);
           this.isGLoading = false;
-          this.handleClear()
+          this.handleClear();
           typeof success === 'function' && success();
         });
     },
