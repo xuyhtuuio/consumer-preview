@@ -107,7 +107,6 @@ export default {
           })
         }
       })
-      console.log(this.formData)
     },
     handleCheckAllChange(){
 
@@ -120,7 +119,7 @@ export default {
       deep: true,
       handler(){
         const set = new Set(this.formPerms.map(f => f.perm))
-        this.permSelect = set.size === 1 ? set.values()[0] : ''
+        this.permSelect = set.size === 1 ? this.formPerms[0].perm : ''
       }
     }
   }
