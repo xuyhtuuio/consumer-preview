@@ -163,7 +163,7 @@ export default {
     },
     concern(item) {
       const param = {
-        recordId: item.id,
+        recordId: item.taskNumber,
       };
       concernApplication(param).then((res) => {
         if (res.status == 200) {
