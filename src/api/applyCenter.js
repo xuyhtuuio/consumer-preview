@@ -116,5 +116,14 @@ export function updateAdoptEditedComments(param){
     data: param
   })
 } 
+// 保存审查意见书
+export function insertEditedComments(param){
+  return request({
+    url: '/cpr/approvalrecord/insertEditedComments',
+    method: 'post',
+    contentType:'application/json',
+    data: param
+  })
+} 
 
 

@@ -60,7 +60,7 @@
               <el-popover placement="bottom" popper-class="file-overview-popper" trigger="click"
                 v-if="item.fileList && item.fileList.length > 1">
                 <div class="file-list">
-                  <div class="file-list-item pointer" v-for="(file, idx) in item.fileList" :key="idx">
+                  <div class="file-list-item pointer ellipsis ellipsis_1 " v-for="(file, idx) in item.fileList" :key="idx">
                     {{ file }}
                   </div>
                 </div>
@@ -347,10 +347,12 @@ export default {
   box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.1);
 
   .file-list {
-    // display: flex;
-    // flex-wrap: wrap;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 
     .file-list-item {
+      width: fit-content;
       display: inline-block;
       border-radius: 4px;
       background: #f7f8fa;
@@ -360,10 +362,6 @@ export default {
       font-weight: 400;
       line-height: 20px;
       margin-bottom: 8px;
-    }
-
-    .file-list-item:nth-of-type(n+2) {
-      margin-left: 12px;
     }
 
   }

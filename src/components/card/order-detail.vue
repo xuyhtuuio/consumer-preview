@@ -9,15 +9,16 @@
           <i class="btn">返回</i>
         </div>
         <!-- 只有有修改权限的人能看到 -->
-        <div class="back flex white" v-if="status == 5" @click="toModify">
+        <div class="back flex white" v-if="status == 5 && item.taskStatus == 2" @click="toModify">
           <i class="iconfont icon-xianxingtubiao"></i>
           <i class="btn">去修改</i>
         </div>
-        <div class="back flex" @click="submit('storage')" v-if="status == 3 || status == 5">
+        <div class="back flex" @click="submit('storage')" v-if="(status == 3 || status == 5) && item.taskStatus != 2">
           <i class="iconfont icon-baocun"></i>
           <i class="btn">保存</i>
         </div>
-        <div class="back flex white" @click="submit('update')" v-if="status == 3 || status == 5">
+        <div class="back flex white" @click="submit('update')"
+          v-if="(status == 3 || status == 5) && item.taskStatus != 2">
           <i class="iconfont icon-tijiao"></i>
           <i class="btn">提交</i>
         </div>
@@ -127,7 +128,7 @@
         </div>
         <div class="right-content">
           <keep-alive>
-            <component :is="crtComp" :status="status" ref="child">
+            <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus">
               <template slot="head">
                 <div class="approved-opinion-head">
                   <h2>消保审查意见书</h2>
@@ -161,7 +162,6 @@
             {{ item.name }}</el-radio>
         </el-radio-group>
       </div>
-
       <span slot="footer" class="dialog-footer">
         <el-button @click="transferDialog = false" type="text" class="cancel">取消</el-button>
         <el-button type="text" @click="transferDialog = false" class="submit-btn">确定</el-button>
@@ -179,9 +179,7 @@ import approvalRecordCard from "@/components/card/approval-record-card.vue";
 import approvedOpinionCard from "@/components/card/approved-opinion-card.vue";
 import uploadFileCard from "@/components/card/upload-file-card";
 import filePreview from '@/components/filePreview'
-import { updateAdoptEditedComments } from '@/api/applyCenter'
-
-
+import { updateAdoptEditedComments, insertEditedComments } from '@/api/applyCenter'
 export default {
   name: "order-details",
   components: {
@@ -225,11 +223,11 @@ export default {
   },
   mounted() {
     // if (!this.$route.params.formId) {
-    //   const { path } = this.$route
-    //   const url = path.match(/\/(\S*)\//)[1]
-    //   this.$router.replace({
-    //     name: url
-    //   })
+    const { path } = this.$route
+    const url = path.match(/\/(\S*)\//)[1]
+    // this.$router.replace({
+    //   name: url
+    // })
     // }
     this.judgeStatus();
   },
@@ -250,15 +248,17 @@ export default {
       });
     },
     judgeStatus() {
+      const { path } = this.$route
+      const originRouter = path.match(/\/(\S*)\//)[1]
       // 一般进入详情页：展示返回按钮 及 审批记录详细
       // 已经结束的工单 展示: 返回按钮、审批记录详细、审查意见书、最终上线材
       // <!-- 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
       let { item } = JSON.parse(window.sessionStorage.getItem("order-detail"));
       const info = JSON.parse(window.sessionStorage.getItem("order-detail"));
-      console.log('ggg', item)
       this.info = info
       this.item = item
       item.taskStatus = 3
+
       // 草稿
       if (item.taskStatus == 0) {
         this.status = 0;
@@ -267,15 +267,16 @@ export default {
       }
       // 审批中 主要区分是否OCR审批、部门审批  所有的的节点
       if (item.taskStatus == 1) {
-        // 点击审查 点击了审查按钮
-        if (info && info.op == "approve") {
-          this.status = 2;
-          this.crtComp = "leaderEditOpinion";
-          //区分是否有OCR审批
-          this.isOCR = Math.random()
-        } else {
+        if (originRouter == 'applycenter') {
           this.status = 0;
           this.crtComp = "approvalRecordCard";
+        } else if (originRouter == 'approvalcenter') {
+          //区分是否OCR审批还是领导审批
+          this.isOCR = Math.random() > 0.5
+          !this.isOCR ? (this.status = 2, this.crtComp = "leaderEditOpinion") : (
+            this.status = 0,
+            this.crtComp = "approvalRecordCard"
+          )
         }
       }
       // 状态待修改 
@@ -299,13 +300,6 @@ export default {
         this.status = 4;
         this.crtComp = "approvedOpinionCard";
       }
-
-
-    },
-    keep() {
-      if (this.crtComp == 'approvedOpinionCard') {
-        this.$refs["child"].keep();
-      }
     },
     toModify() {
       this.$router.push({
@@ -319,39 +313,64 @@ export default {
       // 如果是从审批页进来；二次弹窗
       // 申请页 正常返回
       if (this.info) {
-        const that=this
+        const that = this
         // 当前状态属于待确认的 要保存意见书
         if (this.status == 3 || this.status == 5) {
-          const { opinionStorage } = this.$store.state.checkApprovedForm
-          if (!opinionStorage) {
-            this.$confirm("是否保存已编辑的意见确认信息？", "", {
-              customClass: "confirmBox",
-              confirmButtonText: "保存",
-              cancelButtonText: "不保存",
-              type: "warning",
+          // const { opinionStorage } = this.$store.state.checkApprovedForm
+          // if (!opinionStorage) {
+          this.$confirm("是否保存已编辑的意见确认信息？", "", {
+            customClass: "confirmBox",
+            confirmButtonText: "保存",
+            cancelButtonText: "不保存",
+            type: "warning",
+          })
+            .then(() => {
+              that.saveOpinion()
             })
-              .then(() => {
-                // that.submit('storage')
-                console.log('gbb')
-              })
-              .catch(() => {
-                console.log('ffee11111')
-              });
-          }
+            .catch(() => {
+              this.$router.go(-1);
+            });
+          // }
+        } else {
+          this.$router.go(-1);
         }
-      } else {
-        this.$router.go(-1);
       }
     },
+    //保存意见书功能
+    saveOpinion() {
+      const { approvedOpinionForm } = this.$store.state.checkApprovedForm
+      insertEditedComments(approvedOpinionForm).then(res => {
+        const { status } = res.data
+        if (status == 200) {
+          this.$store.commit('setOpinionStorage', true)
+          this.$message.success('已保存当前意见确认内容')
+        }
+      })
+    },
+
     submit(way) {
+      const that = this
       //  待确认的 分有实质性意见和无实质性意见 status:3无/5有
       const { approvedOpinionRequired, uploadFileRequired } = this.$store.state.checkApprovedForm
-      if (this.status == 3) {
-        if (way == 'storage') {
-          this.$state.commit('setOpinionStorage', true)
-          this.$message.error('已保存当前意见确认内容')
-          return false
-        }
+      //保存功能
+      if (way == 'storage' && [3, 5].includes(this.status)) {
+        this.$confirm("是否保存已编辑的意见确认信息？", "", {
+          customClass: "confirmBox",
+          confirmButtonText: "保存",
+          cancelButtonText: "不保存",
+          type: "warning",
+
+        })
+          .then(() => {
+            that.saveOpinion()
+          }).catch((e) => {
+
+
+          })
+        return false
+      }
+      // 无实质性意见
+      if (this.status == 3 && way == 'update') {
         // 有意见书和上线材料
         if (!approvedOpinionRequired) {
           // 审批页定位第一个未输入项
@@ -359,7 +378,7 @@ export default {
           this.$nextTick(() => {
             this.$refs['child'].checkParam()
           })
-          return
+          return false
         }
         // 定位上线材料
         if (!uploadFileRequired) {
@@ -369,21 +388,47 @@ export default {
             message: '当前未上传最终上线材料，请上传材料后提交'
           })
           this.crtComp = 'uploadFileCard'
+          return false
         }
-        // 在这里做提交
+        // 意见提交
         if (approvedOpinionRequired && uploadFileRequired) {
           if (way == 'update') {
-            // 意见提交
-            const { approvedOpinionForm } = this.$store.state.checkApprovedForm
-            updateAdoptEditedComments(approvedOpinionForm).then(res => {
-            })
+            // 细分已采纳，存在未采纳
+            const { approvedOpinionForm } = this.$store.state.checkApprovedFor
+            const isAllAccept = approvedOpinionForm.every(v => v.adoptOpinions == 1)
+            if (isAllAccept) {
+              this.$confirm("当前已采纳所有意见，是否继续提交？", "", {
+                customClass: "confirmBox",
+                confirmButtonText: "提交",
+                cancelButtonText: "取消",
+                type: "warning",
+              })
+                .then(() => {
+                  that.submitOpinion()
+                })
+                .catch(() => {
+                });
+            } else {
+              this.$confirm("当前存在不采纳意见，是否继续提交？", "", {
+                customClass: "confirmBox",
+                confirmButtonText: "提交",
+                cancelButtonText: "取消",
+                closeOnClickModal: false,
+                type: "warning",
+              })
+                .then(() => {
+                  that.submitOpinion()
+                })
+                .catch(() => {
+                });
+            }
             //上线材料提交
             //保存 给个状态吧
           }
         }
-        console.log('vbb')
       }
-      if (this.status == 5) {
+      //有实质性意见
+      if (this.status == 5 && way == 'update') {
         // 有意见书
         if (!approvedOpinionRequired) {
           this.crtComp == 'approvedOpinionCard'
@@ -394,15 +439,86 @@ export default {
         }
         // 在这里做提交
         if (approvedOpinionRequired) {
-          if (way == 'update') {
-            // 意见提交
-            const { approvedOpinionForm } = this.$store.state.checkApprovedForm
-            updateAdoptEditedComments(approvedOpinionForm).then(res => {
+          const { approvedOpinionForm } = this.$store.state.checkApprovedForm
+          const isAllAccept = approvedOpinionForm.every(v => v.adoptOpinions == 1)
+          if (isAllAccept) {
+            this.$confirm("当前已采纳所有“实质意见”，是否继续提交？", "", {
+              customClass: "confirmBox",
+              confirmButtonText: "提交",
+              cancelButtonText: "取消",
+              closeOnClickModal: false,
+              type: "warning",
             })
+              .then(() => {
+                that.submitOpinion(true, 1)
+              })
+              .catch(() => {
+              });
+          } else {
+            this.$confirm("当前存在未采纳的“实质意见”，提交后将会进一步审核，是否继续提交？", "", {
+              customClass: "confirmBox",
+              confirmButtonText: "提交",
+              cancelButtonText: "取消",
+              closeOnClickModal: false,
+              type: "warning",
+            })
+              .then(() => {
+                that.submitOpinion(true, 0)
+              })
+              .catch(() => {
+              });
           }
+
         }
       }
     },
+
+    submitOpinion(opinions, type) {
+      const that = this
+      const { approvedOpinionForm, fileUploadForm } = this.$store.state.checkApprovedForm
+      const params = approvedOpinionForm.map(v => {
+        return {
+          adoptOpinions: v.adoptOpinions,
+          notAdoptingReasons: v.notAdoptingReasons,
+          recordId: v.recordId,
+          substantiveOpinions: v.substantiveOpinions
+        }
+      })
+      if (!opinions) {
+        //上传文件的逻辑
+      }
+      updateAdoptEditedComments(params).then(res => {
+        //有实质意见且采纳所以的有实质意见
+        if (type && type == 1) {
+          this.$confirm("审查意见已确认，请根据审查意见修改提单内容。", "", {
+            customClass: "confirmBox",
+            confirmButtonText: "去修改",
+            cancelButtonText: "知道了",
+            closeOnClickModal: false,
+            distinguishCancelAndClose: true,
+            type: "warning",
+          }).then(() => {
+            that.toModify()
+          }).catch((e) => {
+            switch (e) {
+              case 'close':
+                that.toModify()
+                break;
+              case 'cancel':
+                break;
+            }
+          })
+        } else {
+          this.$confirm("审查意见已确认，可在申请中心查看。", "", {
+            customClass: "confirmBox",
+            cancelButtonText: "知道了",
+            showConfirmButton: false,
+            closeOnClickModal: false,
+            type: "warning",
+          })
+        }
+      })
+    }
   },
 
 };
