@@ -83,8 +83,10 @@ export default {
       }
     },
     allSelect(type){
-      this.permSelect = type
       this.formPerms.forEach(f => f.perm = type)
+      this.$nextTick(() => {
+        this.permSelect = type
+      })
     },
     formPermsLoad(){
       let perms = this.$store.state.selectedNode.props.formPerms

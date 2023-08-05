@@ -2,7 +2,7 @@
   <div>
     <div class="title" v-if="level === 1">
       <span class="title-nav">表单管理</span>
-      <el-button type="primary" @click="addForm">新增</el-button>
+      <el-button type="primary" @click="addForm" :loading="addLoading">新增</el-button>
     </div>
     <div class="title" v-else>
       <div class="title-nav">
@@ -125,6 +125,7 @@ export default {
   },
   data() {
     return {
+      addLoading: false,
       feildTypes,
       belongModules,
       level: 1,
@@ -354,7 +355,9 @@ export default {
     },
     // 新增表单
     async addForm() {
+      this.addLoading = true;
       const res = await addFormCategory()
+      this.addLoading = false;
       if (res.data) {
         this.getObtainExamineTypeList()
         this.$message.success('新增成功')

@@ -222,6 +222,9 @@ export default {
       default: () => {
         return {}
       }
+    },
+    nodeName: {
+      type: String
     }
   },
   data() {
@@ -277,7 +280,7 @@ export default {
     nodes() {
       const tempNodes = []
       this.nodeMap.forEach(value => {
-        if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO'].includes(value?.type)) {
+        if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO'].includes(value?.type) && value.name !== this.nodeName) {
           tempNodes.push({
             name: value.name,
             id: value.id

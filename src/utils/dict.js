@@ -54,6 +54,6 @@ export const belongModules = [
   {
     label: '核对要点',
     value: '核对要点',
-    disable: true
+    // disable: true
   }
 ]
