@@ -96,7 +96,7 @@
           <org-picker :show="showOrgSelect" @close="closeSelect" :selected="select" @selectOver="selected"></org-picker>
           <div class="tag-action" >
             <div class="tag-box" v-for="(item, index) in select" :key="index">
-              <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
+              <TrsTag :tag="{ ...item, ...tagConfig }" @handleClose="removeOrgItem(index)" />
             </div>
           </div>
         </div>
@@ -154,7 +154,7 @@
           <org-picker :show="showOrgSelect1" @close="closeSelect1" :selected="select1" @selectOver="selected1"></org-picker>
           <div class="tag-action" >
             <div class="tag-box" v-for="(item, index) in select1" :key="index">
-              <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
+              <TrsTag :tag="{ ...item, ...tagConfig }" @handleClose="removeOrgItem(index)" />
             </div>
           </div>
         </div>
@@ -344,7 +344,6 @@ export default {
         select[key].forEach(val => this.select.push({
           ...val,
           label: val.label,
-          ...this.tagConfig
         }))
       }
       this.$store.state.selectedNode.props.assignedUser = this.select
@@ -356,7 +355,6 @@ export default {
         select[key].forEach(val => this.select1.push({
           ...val,
           label: val.label,
-          ...this.tagConfig
         }))
       }
       this.$store.state.selectedNode.props.changeHandleUser = this.select1
