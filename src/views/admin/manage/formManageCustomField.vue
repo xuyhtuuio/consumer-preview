@@ -222,7 +222,10 @@
               formItemId: this.currentRow?.id,
               data
             }
-            console.log(form)
+            if (this.checkOptionValue(data.name)) {
+              this.$message.error('请完善选项设置')
+              return false;
+            }
             // 没有id是新增
             let res;
             if (!this.currentRow?.id) {
@@ -243,7 +246,26 @@
           }
         });
       },
-
+      checkOptionValue(type) {
+        let isNullValue = false;
+        switch (type) {
+          case 'SelectInput':
+          case 'MultipleSelect':
+          chenck(this.selectOptions)
+            break;
+          case 'Cascader':
+          chenck(this.selectGroupOptions)
+            break;
+        }
+        return isNullValue;
+        function chenck(arr) {
+          const nullValue = arr.filter(option => option.value.trim() === '');
+          if (nullValue.length) {
+            isNullValue = true;
+          }
+          arr?.children?.length && chenck(arr?.children?.length)
+        }
+      },
       resetForm(formName) {
         this.$refs[formName].resetFields();
         this.$emit('close')
