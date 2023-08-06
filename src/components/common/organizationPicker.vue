@@ -287,6 +287,7 @@
           return {
             id: item.id,
             label: item.name,
+            name: item.name,
             type: 'dept'
           }
         })
@@ -294,6 +295,7 @@
           return {
             id: item.id,
             label: item.name,
+            name: item.name,
             type: 'user'
           }
         })
@@ -309,6 +311,7 @@
           return {
             id: item.id,
             label: item.name,
+            name: item.name,
             type: 'role',
             roleRange: this.roleRange
           }
