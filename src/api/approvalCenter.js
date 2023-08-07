@@ -80,3 +80,11 @@ export function toDoList(param) {
 
   })
 }
+export function getApplicationToDoListByUser(param) {
+  return request({
+    url: '/cpr/censor/getApplicationToDoListByUser',
+    method: 'post',
+    data: param,
+
+  })
+}

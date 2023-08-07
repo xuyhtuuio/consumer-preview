@@ -97,6 +97,7 @@ import {
   getApprovalType,
   getApprovalStage,
   billOfLadingAgenciesList,
+  getApplicationToDoListByUser
 } from "@/api/approvalCenter";
 export default {
   components: {
@@ -367,6 +368,7 @@ export default {
       Reflect.deleteProperty(param, "total");
       Reflect.deleteProperty(param, "loading");
       this.search.loading = true;
+
       censorList(param)
         .then((res) => {
           const { data } = res.data;
@@ -380,6 +382,8 @@ export default {
         .finally(() => {
           this.search.loading = false;
         });
+
+
     },
     reset() {
       this.search = {
