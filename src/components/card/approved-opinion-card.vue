@@ -80,6 +80,10 @@ export default {
     // 3 5显示复选框 4 显示已采纳 不采纳
     status: { type: Number, default: 0 },
     taskStatus: { type: Number, default: 0 },
+    sidebarParam: {
+      type: Object,
+      default: () => { }
+    }
   },
   data() {
     return {
@@ -127,7 +131,7 @@ export default {
       this.loading = true
       getEditedCommentsByFormId({ formId: '158' }).then(res => {
         const { data } = res.data
-        
+
         const keys = Object.keys(data)
 
         if (data?.constructor !== Object) {
