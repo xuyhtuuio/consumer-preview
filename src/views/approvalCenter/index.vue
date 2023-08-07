@@ -94,7 +94,7 @@
           </div>
           <trs-pagination :total="search.total" @getList='getList' :pageNow="pageNow"></trs-pagination>
         </div>
-        <div v-loading="search.loading" v-else> 
+        <div v-loading="search.loading" v-else>
           <Empty></Empty>
         </div>
       </div>
@@ -254,7 +254,7 @@ export default {
         });
       });
     },
-    concern(){
+    concern() {
       this.getDataStatistic()
     },
     getApprovalType() {
@@ -274,12 +274,12 @@ export default {
       };
       getApprovalStage(params).then((res) => {
         const { data } = res.data
-        this.approvalPhases = data?data.map((v) => {
+        this.approvalPhases = data ? data.map((v) => {
           return {
             label: v,
             value: v,
           };
-        }):[]
+        }) : []
       });
     },
     changeArrrovalType() {
@@ -375,21 +375,20 @@ export default {
       // Reflect.deleteProperty(param, "total");
       // Reflect.deleteProperty(param, "loading");
       this.search.loading = true;
-      const userInfo =JSON.parse(window.localStorage.getItem('user_name'))
-      const param ={
-        pageNo:pageNow,
-        pageSize:10,
-        currentUserInfo:{
-          id:userInfo.id,
-          name:userInfo.fullname
+      const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
+      const param = {
+        pageNo: pageNow,
+        pageSize: 10,
+        currentUserInfo: {
+          id: userInfo.id,
+          name: userInfo.fullname
         }
-
       }
-      toDoList(param).then(res=>{
-                 const { data } = res.data;
-          this.search.total = data.total;
-          this.list = data.records;
-          this.search.loading = false;
+      toDoList(param).then(res => {
+        const { data,records } = res.data;
+        this.search.total = data.total;
+        this.list = data;
+        this.search.loading = false;
 
       })
       // censorList(param)
@@ -530,6 +529,7 @@ export default {
         }
       }
     }
+
     &-item:hover {
       background: #fff;
       border-radius: 6px;
@@ -645,10 +645,11 @@ export default {
           margin-left: 16px;
         }
 
-        /deep/ .el-cascader .el-input .el-icon-arrow-down::before{
+        /deep/ .el-cascader .el-input .el-icon-arrow-down::before {
           font-family: element-icons !important;
           content: "\e790";
         }
+
         /deep/ .el-select .el-input .el-icon-arrow-up::before {
           font-family: element-icons !important;
           content: "\e78f";
