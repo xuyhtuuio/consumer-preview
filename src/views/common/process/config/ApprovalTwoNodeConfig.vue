@@ -83,7 +83,8 @@ export default {
     },
     selected(select) {
       this.showOrgSelect = false
-      this.select = []
+      // this.select = []
+      this.config.assignedUser = []
       for (let key in select) {
         select[key].forEach(val => this.select.push({
           ...val,

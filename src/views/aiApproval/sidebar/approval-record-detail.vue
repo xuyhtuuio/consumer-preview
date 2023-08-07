@@ -7,13 +7,19 @@
             审批记录明细
         </p>
         <div class="workflow">
-            <approvalRecordCard></approvalRecordCard>
+            <approvalRecordCard :sidebarParam="sidebarParam"> </approvalRecordCard>
         </div>
     </div>
 </template>
 <script>
-  import approvalRecordCard from '@/components/card/approval-record-card.vue'
+import approvalRecordCard from '@/components/card/approval-record-card.vue'
 export default {
+    props: {
+        sidebarParam: {
+            type: Object,
+            default: () => { }
+        }
+    },
     components: {
         approvalRecordCard
     },

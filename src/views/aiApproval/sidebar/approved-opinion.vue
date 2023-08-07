@@ -7,7 +7,7 @@
             已审查意见
         </p>
         <div class="opinion-content">
-          <approvedOpinionCard></approvedOpinionCard>
+          <approvedOpinionCard :sidebarParam="sidebarParam" :status="0"></approvedOpinionCard>
         </div>
     </div>
 </template>
@@ -15,6 +15,12 @@
 import approvedOpinionCard from '@/components/card/approved-opinion-card'
 export default {
     name: 'ocr-approved-opinion',
+    props: {
+        sidebarParam: {
+            type: Object,
+            default: () => { }
+        }
+    },
     components:{approvedOpinionCard},
     data() {
         return {

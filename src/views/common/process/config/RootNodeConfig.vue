@@ -95,7 +95,8 @@ export default {
     },
     selected(select) {
       this.showOrgSelect = false
-      this.select = []
+      this.config.assignedUser = []
+      // this.select = []
       for (let key in select) {
         select[key].forEach(val => this.select.push({
           ...val,
@@ -104,6 +105,7 @@ export default {
       }
       const mapId = {}
       const assignedUser = []
+      this.config.assignedUser = this.select
       this.config.assignedUser.forEach(item => {
         if (!mapId[item.id + item.type]) {
           mapId[item.id + item.type] = true
@@ -111,12 +113,10 @@ export default {
         }
       })
       this.config.assignedUser = assignedUser
-      console.log(this.select, this.config.assignedUser)
     },
     removeOrgItem(index){
       console.log(index)
       this.select.splice(index, 1)
-      console.log(this.select)
     }
   }
 }

@@ -15,7 +15,17 @@
           </el-form-item>
 
           <el-form-item class="form-item">
-            <el-autocomplete suffix-icon="el-icon-search" v-model="search.keyword" placeholder="请输入标签名称进行搜索" :fetch-suggestions="querySearch" :trigger-on-focus="false" @select="handleSelect" @keyup.enter.native="getList(1)" clearable @clear="getList(1)"></el-autocomplete>
+            <el-autocomplete v-model="search.keyword" placeholder="请输入标签名称进行搜索" :fetch-suggestions="querySearch" :trigger-on-focus="false" @select="handleSelect" @keyup.enter.native="getList(1)" clearable @clear="getList(1)">
+              <i slot="suffix" class="el-icon-search el-input__icon" @click="getList(1)"> </i>
+              <template slot-scope="{ item }">
+                <div class="option-info">
+                  <span class="left" v-html="item.keywordContent"></span>
+                  <span :class="['right', item.type === 1 ? 'right-zero' : 'right-one']">{{
+                    item.type === 1 ? '禁用词' : '敏感词'
+                  }}</span>
+                </div>
+              </template>
+            </el-autocomplete>
           </el-form-item>
 
           <el-form-item class="form-item">
@@ -135,12 +145,16 @@ export default {
         },
         {
           label: '标签类型',
-          prop: 'type'
+          prop: 'type',
+          bind: {
+            width: 250,
+          }
         },
         {
           label: '使用频率',
           prop: 'count',
           bind: {
+            width: 250,
             align: 'center',
             sortable: 'custom'
           }
@@ -179,11 +193,7 @@ export default {
         content: queryString
       })
       const { data } = res.data
-      cb(data?.list?.map(item => {
-        return {
-          value: item.keywordContent
-        }
-      }) || []);
+      cb(data?.list  || []);
     },
     async getList(pageNow) {
       this.loading = true;
@@ -539,5 +549,40 @@ export default {
   }
 }
 
-
+.option-info {
+  display: flex;
+  justify-content: space-between;
+  .left {
+    flex: 1;
+    overflow: hidden;
+  }
+  .right {
+    position: relative;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    -webkit-transform: scale(0.5);
+    &::before {
+      display: inline-block;
+      content: '';
+      margin-right: 16px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    &-zero {
+      color: #eb5757;
+      &::before {
+        background: #eb5757;
+      }
+    }
+    &-one {
+      color: #fa8c16;
+      &::before {
+        background: #fa8c16;
+      }
+    }
+  }
+}
 </style>
