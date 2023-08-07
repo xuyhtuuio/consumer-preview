@@ -167,11 +167,15 @@ export default new Vuex.Store({
 
     },
     checkApprovedForm:{
-      approvedOpinionRequired:true,
+      approvedOpinionRequired:true,  //默认给了采纳所以为true
       uploadFileRequired:false,
       approvedOpinionForm:[],
       fileUploadForm:[],
-      opinionStorage:false
+      opinionStorage:false,
+
+      editOpinionStorage:false,
+      editOpinionForm:{},
+      editOpinionRequired:false
     },
   },
   mutations: {
@@ -201,6 +205,15 @@ export default new Vuex.Store({
     },
     setUploadFileRequired(state,val){
       state.checkApprovedForm.uploadFileRequired = val
+    },
+    setEditOpinionStorage(state,val){
+      state.checkApprovedForm.editOpinionStorage= val
+    },
+    setEditOpinionForm(state,val){
+      state.checkApprovedForm.editOpinionForm = val
+    },
+    setEditOpinionRequired(state,val){
+      state.checkApprovedForm.editOpinionRequired = val
     }
 
   },

@@ -27,11 +27,11 @@
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
           </div>
-          <div class="back flex" v-if="!isOCR">
+          <div class="back flex" v-if="!isOCR" @click="submit('storage')">
             <i class="iconfont icon-baocun"></i>
             <i class="btn">保存</i>
           </div>
-          <div class="back flex white" @click="submit" v-if="!isOCR">
+          <div class="back flex white" @click="submit('update')" v-if="!isOCR">
             <i class="iconfont icon-tijiao"></i>
             <i class="btn">提交</i>
           </div>
@@ -179,7 +179,8 @@ import approvalRecordCard from "@/components/card/approval-record-card.vue";
 import approvedOpinionCard from "@/components/card/approved-opinion-card.vue";
 import uploadFileCard from "@/components/card/upload-file-card";
 import filePreview from '@/components/filePreview'
-import { updateAdoptEditedComments, insertEditedComments } from '@/api/applyCenter'
+import { workSpaceAgree } from '@/api/approvalCenter'
+import { updateAdoptEditedComments, updateEditedComments } from '@/api/applyCenter'
 export default {
   name: "order-details",
   components: {
@@ -272,7 +273,7 @@ export default {
           this.crtComp = "approvalRecordCard";
         } else if (originRouter == 'approvalcenter') {
           //区分是否OCR审批还是领导审批
-          this.isOCR = Math.random() > 0.5
+          this.isOCR = false
           !this.isOCR ? (this.status = 2, this.crtComp = "leaderEditOpinion") : (
             this.status = 0,
             this.crtComp = "approvalRecordCard"
@@ -315,22 +316,22 @@ export default {
       if (this.info) {
         const that = this
         // 当前状态属于待确认的 要保存意见书
-        if (this.status == 3 || this.status == 5) {
-          // const { opinionStorage } = this.$store.state.checkApprovedForm
-          // if (!opinionStorage) {
-          this.$confirm("是否保存已编辑的意见确认信息？", "", {
-            customClass: "confirmBox",
-            confirmButtonText: "保存",
-            cancelButtonText: "不保存",
-            type: "warning",
-          })
-            .then(() => {
-              that.saveOpinion()
+        if ([2, 3, 5].includes(this.status)) {
+          const { opinionStorage } = this.$store.state.checkApprovedForm
+          if (!opinionStorage || !editOpinionStorage) {
+            this.$confirm("是否保存已编辑的意见确认信息？", "", {
+              customClass: "confirmBox",
+              confirmButtonText: "保存",
+              cancelButtonText: "不保存",
+              type: "warning",
             })
-            .catch(() => {
-              this.$router.go(-1);
-            });
-          // }
+              .then(() => {
+                that.status == 2 ? that.saveEditOpinion() : that.saveOpinion()
+              })
+              .catch(() => {
+                this.$router.go(-1);
+              });
+          }
         } else {
           this.$router.go(-1);
         }
@@ -339,7 +340,10 @@ export default {
     //保存意见书功能
     saveOpinion() {
       const { approvedOpinionForm } = this.$store.state.checkApprovedForm
-      insertEditedComments(approvedOpinionForm).then(res => {
+      const params = approvedOpinionForm.map(v => {
+        return { ...v, cacheFlag: 1 }
+      })
+      updateEditedComments(params).then(res => {
         const { status } = res.data
         if (status == 200) {
           this.$store.commit('setOpinionStorage', true)
@@ -347,11 +351,16 @@ export default {
         }
       })
     },
+    //保存编辑意见功能
+    saveEditOpinion() {
+      this.$store.commit('setEditOpinionStorage', true)
+      this.$message.success('已保存当前意见确认内容')
+    },
 
     submit(way) {
       const that = this
       //  待确认的 分有实质性意见和无实质性意见 status:3无/5有
-      const { approvedOpinionRequired, uploadFileRequired } = this.$store.state.checkApprovedForm
+      const { approvedOpinionRequired, uploadFileRequired, editOpinionRequired, editOpinionForm } = this.$store.state.checkApprovedForm
       //保存功能
       if (way == 'storage' && [3, 5].includes(this.status)) {
         this.$confirm("是否保存已编辑的意见确认信息？", "", {
@@ -359,15 +368,26 @@ export default {
           confirmButtonText: "保存",
           cancelButtonText: "不保存",
           type: "warning",
-
         })
           .then(() => {
             that.saveOpinion()
           }).catch((e) => {
-
-
           })
         return false
+      }
+      if (this.status == 2 && way == 'storage') {
+        this.$confirm("是否保存已编辑的意见确认信息？", "", {
+          customClass: "confirmBox",
+          confirmButtonText: "保存",
+          cancelButtonText: "不保存",
+          type: "warning",
+        })
+          .then(() => {
+            that.saveEditOpinion()
+          }).catch((e) => {
+          })
+        return false
+
       }
       // 无实质性意见
       if (this.status == 3 && way == 'update') {
@@ -394,7 +414,7 @@ export default {
         if (approvedOpinionRequired && uploadFileRequired) {
           if (way == 'update') {
             // 细分已采纳，存在未采纳
-            const { approvedOpinionForm } = this.$store.state.checkApprovedFor
+            const { approvedOpinionForm } = this.$store.state.checkApprovedForm
             const isAllAccept = approvedOpinionForm.every(v => v.adoptOpinions == 1)
             if (isAllAccept) {
               this.$confirm("当前已采纳所有意见，是否继续提交？", "", {
@@ -471,8 +491,27 @@ export default {
 
         }
       }
+      if (this.status == 2 && way == 'update') {
+        // !editOpinionRequired ? (this.crtComp = 'leaderEditOpinion', this.$message.error('请在编辑意见后提交')) : ''
+        // !editOpinionRequired ?return false : ''
+        if (!editOpinionRequired) {
+          this.crtComp = 'leaderEditOpinion'
+          this.$message.error('请在编辑意见后提交')
+          return false
+        }
+        let params = {}
+        if (editOpinionForm.isAccept == '1') {
+          params = {
+          }
+        } else {
+          params = {
+          }
+        }
+        workSpaceAgree(params).then(res => {
+          this.$message.success('审查意见已提交')
+        })
+      }
     },
-
     submitOpinion(opinions, type) {
       const that = this
       const { approvedOpinionForm, fileUploadForm } = this.$store.state.checkApprovedForm
@@ -481,7 +520,8 @@ export default {
           adoptOpinions: v.adoptOpinions,
           notAdoptingReasons: v.notAdoptingReasons,
           recordId: v.recordId,
-          substantiveOpinions: v.substantiveOpinions
+          substantiveOpinions: v.substantiveOpinions,
+          cacheFlag:0
         }
       })
       if (!opinions) {
