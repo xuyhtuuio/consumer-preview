@@ -8,13 +8,13 @@
     }
   }
 }
-// 按钮宽度 
+// 按钮宽度
 .view-config.el-button {
   color: #1d2128;
   height: 36px;
-  background: #FFFFFF;
-  border: 1px solid #E5E6EB;
-  color: #1D2128;
+  background: #ffffff;
+  border: 1px solid #e5e6eb;
+  color: #1d2128;
   font-weight: 400;
 }
 .el-button.submit,
@@ -32,9 +32,9 @@
   border: 1px solid #e5e6eb;
 }
 .el-button.test {
-  background: #FFFFFF;
-  border-color: #2D5CF6;
-  color: #2D5CF6;
+  background: #ffffff;
+  border-color: #2d5cf6;
+  color: #2d5cf6;
   font-weight: 400;
 }
 // dialog
@@ -49,7 +49,7 @@
 .el-form.is-dark {
   .el-form-item__content {
     .el-input__inner {
-      background: #F3F3F5;
+      background: #f3f3f5;
       border-radius: 4px;
       border: none;
     }
@@ -57,7 +57,7 @@
 }
 .input.is-dark {
   .el-input__inner {
-    background: #F3F3F5;
+    background: #f3f3f5;
     border-radius: 4px;
     border: none;
   }
@@ -72,7 +72,7 @@
     background: #ffffff;
     .el-button {
       padding: 6px 12px;
-      color: #88909B !important;
+      color: #88909b !important;
       border: none !important;
     }
   }
@@ -132,7 +132,8 @@
 }
 
 // 下拉框
-.el-input__icon,.el-input--small .el-input__icon {
+.el-input__icon,
+.el-input--small .el-input__icon {
   line-height: 100%;
 }
 
@@ -178,7 +179,7 @@
 .el-breadcrumb {
   font-size: 14px;
 }
-.el-breadcrumb .el-breadcrumb__inner  {
+.el-breadcrumb .el-breadcrumb__inner {
   font-size: 14px;
 }
 
@@ -191,33 +192,55 @@
     height: 38px;
     line-height: 38px;
   }
-  .el-input__inner{
+  .el-input__suffix {
+    right: 5px;
+  }
+  .my-search-input {
+    .el-input__inner {
+      &:hover {
+        padding-right: 48px;
+        & + .el-input__suffix {
+          .el-input__suffix-inner {
+            .el-icon-search {
+              background-color: #f7f8fa;
+            }
+          }
+        }
+      }
+      &:focus {
+        padding-right: 48px;
+      }
+    }
+  }
+  .el-input__inner {
     padding: 0;
+    padding-right: 30px;
     height: 38px;
     line-height: 38px;
     background: rgba(247, 248, 250, 1);
     border: 0;
   }
+  .el-input__inner-1 {
+    padding-right: 60px;
+  }
 
   .el-autocomplete {
     width: 100%;
   }
-  
-  .el-textarea__inner,.el-form-item__content  {
+
+  .el-textarea__inner,
+  .el-form-item__content {
     padding-left: 0;
     background: rgba(247, 248, 250, 1);
     border: 0;
 
     .warn {
-      background:transparent
+      background: transparent;
     }
   }
   .el-textarea {
     .el-textarea__inner {
-     
     }
-    
-   
   }
   .el-form-item {
     margin-bottom: 16px;
@@ -229,16 +252,16 @@
       width: 100%;
     }
     .el-select .el-input .el-select__caret.el-input__icon::before {
-      content: "\e790";
+      content: '\e790';
       position: absolute;
       width: 100%;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) rotateZ(180deg);
-    }    
+    }
     .el-icon-arrow-down {
       &::before {
-        content: "\e790";
+        content: '\e790';
       }
     }
   }
@@ -253,7 +276,7 @@
       margin-right: 5px;
       .el-input__icon {
         &::before {
-          content: "\e78e";
+          content: '\e78e';
         }
       }
     }
@@ -267,7 +290,7 @@
     margin-right: 32px;
   }
 
-  .el-radio__input.is-checked+.el-radio__label {
+  .el-radio__input.is-checked + .el-radio__label {
     color: black;
   }
 
@@ -284,12 +307,12 @@
     flex-wrap: wrap;
     line-height: 38px;
   }
-  .el-checkbox__input.is-checked+.el-checkbox__label {
+  .el-checkbox__input.is-checked + .el-checkbox__label {
     color: black;
   }
 
   // 多选框文字过多自动换行
-  .el-checkbox__label{
+  .el-checkbox__label {
     display: inline-grid;
     white-space: pre-line;
     word-wrap: break-word;
@@ -297,7 +320,8 @@
     line-height: 20px;
   }
 
-  .el-form-item__label,.el-form-item__content {
+  .el-form-item__label,
+  .el-form-item__content {
     line-height: 38px;
   }
 
@@ -305,39 +329,41 @@
     display: block;
   }
 }
-.el-breadcrumb{
-  .el-breadcrumb__separator{
+.el-breadcrumb {
+  .el-breadcrumb__separator {
     margin: 0 2px;
   }
-  .el-breadcrumb__item .el-breadcrumb__inner .item{
+  .el-breadcrumb__item .el-breadcrumb__inner .item {
     font-weight: 500;
-    color: #86909C !important;
+    color: #86909c !important;
   }
-  .el-breadcrumb__inner a, .el-breadcrumb__inner.is-link {
+  .el-breadcrumb__inner a,
+  .el-breadcrumb__inner.is-link {
     font-weight: 500;
-    color: #86909C;
+    color: #86909c;
     font-size: 14px;
   }
-   .el-breadcrumb__item:last-of-type{ .el-breadcrumb__inner .item{
-    font-weight: 400;
-    color: #000 !important;
-    font-size: 14px;
-  }}
-
+  .el-breadcrumb__item:last-of-type {
+    .el-breadcrumb__inner .item {
+      font-weight: 400;
+      color: #000 !important;
+      font-size: 14px;
+    }
+  }
 }
 // 红色警告
 .el-icon-warning-one {
   .el-icon-warning {
     &::before {
-      color: #F76560;
+      color: #f76560;
     }
   }
 }
 /**
  * @description:  popper-class="my-cascader"
  */
- 
- .my-cascader {
+
+.my-cascader {
   .el-cascader-menu {
     .el-cascader-menu__wrap {
       .el-scrollbar__view {

@@ -290,6 +290,9 @@ export default {
 <style lang="less" scoped>
 @color1: #1d2128;
 .label {
+  .el-icon-search {
+    cursor: pointer;
+  }
   .top {
     font-size: 14px;
     margin: 0 -24px;
@@ -585,4 +588,5 @@ export default {
     }
   }
 }
+
 </style>

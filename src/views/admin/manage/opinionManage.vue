@@ -5,6 +5,7 @@
         <el-form class="my-form form" :inline="true" :model="search">
           <el-form-item class="form-item">
             <el-input
+              class="my-search-input"
               v-model="search.review"
               placeholder="请输入审查意见搜索"
               @keyup.enter.native="onSearch"
@@ -24,7 +25,11 @@
               :fetch-suggestions="querySearch"
               placeholder="关键词"
               @select="handleSelect"
-              @keyup.enter="onSearch"
+              @keyup.enter.native="onSearch"
+              @focus="handleSearchFocusOrBlur"
+              @blur="handleSearchFocusOrBlur(false)"
+              @mouseout.native="handleSearchOutOrOver(false)"
+              @mouseover.native="handleSearchOutOrOver"
               clearable
             >
               <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
@@ -32,7 +37,7 @@
                 <div class="option-info">
                   <span class="left" v-html="item.showItem"></span>
                   <span :class="['right', item.keywordType === 1 ? 'right-zero' : 'right-one']">{{
-                    item.type
+                    item.type === 1 ? '禁用词' : '敏感词'
                   }}</span>
                 </div>
               </template>
@@ -112,7 +117,7 @@
             <span v-else class="btn" @click="changeIsTop(item)"><i>置顶</i></span>
             <span class="btn"><i @click="handleClick(item)">编辑</i></span>
             <span class="btn btn-red"><i @click="stopApllay(item)">停用</i></span>
-            <span class="btn"><i  @click="stopApllay(item)">删除</i></span>
+            <span class="btn"><i @click="stopApllay(item)">删除</i></span>
           </div>
         </div>
       </div>
@@ -128,7 +133,6 @@
       >
       </TrsPagination>
     </div>
-
     <el-dialog
       :visible.sync="limitTimeVisible"
       width="800px"
@@ -142,26 +146,31 @@
       </template>
       <el-form class="my-form" :model="dialogItem" label-width="100px">
         <el-form-item class="form-item" label="标签名称">
-            <el-autocomplete
-              ref="autocomplete"
-              popper-class="my-autocomplete"
-              v-model="dialogItem.keywordName"
-              v-scrollLoad="load"
-              :fetch-suggestions="querySearch"
-              placeholder="关键词"
-              @select="handleSelect"
-              @keyup.enter.native="onSearch"
-            >
-              <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
-              <template slot-scope="{ item }">
-                <div class="option-info">
-                  <span class="left" v-html="item.showItem"></span>
-                  <span :class="['right', item.type === 1 ? 'right-zero' : 'right-one']">{{
-                    item.type === 1 ? '禁用词' : '敏感词'
-                  }}</span>
-                </div>
-              </template>
-            </el-autocomplete>
+          <el-autocomplete
+            ref="autocomplete"
+            popper-class="my-autocomplete"
+            v-model="dialogItem.keywordName"
+            v-scrollLoad="load"
+            :fetch-suggestions="(val, cb) => querySearch(val, cb, true)"
+            placeholder="关键词"
+            @select="handleSelect"
+            @keyup.enter.native="onSearch"
+            @focus="handleSearchFocusOrBlur"
+            @blur="handleSearchFocusOrBlur(false)"
+            @mouseout.native="handleSearchOutOrOver(false)"
+            @mouseover.native="handleSearchOutOrOver"
+            clearable
+          >
+            <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
+            <template slot-scope="{ item }">
+              <div class="option-info">
+                <span class="left" v-html="item.showItem"></span>
+                <span :class="['right', item.type === 1 ? 'right-zero' : 'right-one']">{{
+                  item.type === 1 ? '禁用词' : '敏感词'
+                }}</span>
+              </div>
+            </template>
+          </el-autocomplete>
         </el-form-item>
         <el-form-item class="item-form" label="审查话术">
           <el-input
@@ -178,7 +187,7 @@
       <div class=""></div>
       <div slot="footer" class="dialog-footer">
         <g-button @click="limitTimeVisible = false">取 消</g-button>
-        <g-button class="stop" type="primary" @click="editItem">确 定</g-button>
+        <g-button class="stop" type="primary" @click="editItem(dialogItem)">确 定</g-button>
       </div>
     </el-dialog>
 
@@ -231,20 +240,37 @@ export default {
       deviceIdList: [],
       deviceIdListFilter: [],
       searchList: [],
-      searchListFilter: [],
       currentSort: true,
       referSort: true,
       updateSort: true,
-      searchDialogIndex: 1
+      searchDialogIndex: 1,
+      iptPaddingFlag: true,
+      isSearchFocus: false
     };
   },
   created() {
     this.initData();
     this.initSearchData();
   },
+  watch: {
+    'search.baseline'(val) {
+      if (val) {
+        if (this.iptPaddingFlag) {
+          this.iptPaddingFlag = false;
+          val && this.handleIptPadding('autocomplete');
+        }
+      } else {
+        this.iptPaddingFlag = true;
+      }
+    },
+    limitTimeVisible(val) {
+      !val && (this.searchList.length = 0);
+    }
+  },
   directives: {
     scrollLoad: {
       bind(el, binding, vnode) {
+        console.log('bind');
         var that = this;
         let wrapDom = el.querySelector('.el-autocomplete-suggestion__wrap');
         let listDom = el.querySelector(
@@ -281,18 +307,20 @@ export default {
         this.isLoading = false;
         this.data = list;
       });
+      this.searchList.length = 0;
     },
-    initSearchData() {
+    initSearchData(flag = false) {
+      console.log(flag);
       const data = {
-        content: this.search.baseline,
+        content: flag ? this.dialogItem.keywordName : this.search.baseline,
         pageNum: this.searchDialogIndex,
         pageSize: 10
       };
       getSearchList(data).then(res => {
         const arr = res.list;
         this.formatting(arr);
-        const keyword = this.search.baseline;
-        if (arr && arr.length > 0 && keyword.length > 0) {
+        const keyword = flag ? this.dialogItem.keywordName : this.search.baseline;
+        if (arr && arr.length > 0 && keyword?.length > 0) {
           arr.filter(item => {
             let reg = new RegExp(keyword, 'gi');
             const regRes = reg.exec(item.value);
@@ -308,19 +336,23 @@ export default {
         this.searchList.push(...arr);
       });
     },
-
+    handleIptPadding(ref, flag = true) {
+      flag && this.$refs[ref].$el.children[0].children[0].classList.add('el-input__inner-1');
+      !flag && this.$refs[ref].$el.children[0].children[0].classList.remove('el-input__inner-1');
+    },
     formatting(data) {
       data.forEach(({ keywordContent: value, recordId: label, type: keywordType }, index) => {
         data[index] = {
           label,
           value,
           keywordType,
-          showItem: value,
+          showItem: value
         };
       });
     },
 
     onSearch() {
+      console.log('onSearch');
       this.initData();
       this.changeStyle('none', '.el-autocomplete-suggestion');
     },
@@ -329,8 +361,15 @@ export default {
       this.$refs.autocomplete.activated = true;
       this.initSearchData();
     },
-    handleSearchBlur(flag) {
+    handleSearchFocusOrBlur(flag = true) {
       this.searchDialogIndex = 1;
+      flag && ((this.isSearchFocus = true), this.handleIptPadding('autocomplete'));
+      !flag && ((this.isSearchFocus = false), this.handleIptPadding('autocomplete', false));
+    },
+    handleSearchOutOrOver(flag) {
+      if (this.isSearchFocus) return;
+      flag && this.handleIptPadding('autocomplete');
+      !flag && this.handleIptPadding('autocomplete', false);
     },
     //根据传进来的状态改变建议输入框的状态（展开|隐藏）
     changeStyle(status, className) {
@@ -351,26 +390,31 @@ export default {
       this.initData();
     },
     async changeIsTop(item, i) {
-      const isTop = item.isTop === 0 ? 1 : 0
+      this.isLoading = true;
+      const isTop = item.isTop === 0 ? 1 : 0;
+      console.log(item);
+      
       const res = await edit({
         ...item,
-        isTop
-      })
+        isTop,
+      });
       if (res.success) {
-        this.$message.success('操作成功!')
-        item.isTop = isTop;
+        this.$message.success('操作成功!');
+        this.initData();
       } else {
-        this.$message.error(res.msg)
+        this.$message.error(res.msg);
       }
     },
     handleLabelType(id) {
       this.dialogItem.keywordType = id;
     },
     handleClick(row) {
+      console.log(row);
       this.titleDialog = row ? '编辑意见' : '新建意见';
-      this.dialogItem = row ? { ...row } : { keywordType: 1 };
+      this.dialogItem = row ? { ...row, keywordId: row.keywordType } : {};
       this.limitTimeVisible = true;
-      row && this.dataFilter(row.keywordName);
+      !row && this.initSearchData(false);
+      row && this.initSearchData(true);
     },
     submitEdit(row) {
       console.log(row);
@@ -387,73 +431,53 @@ export default {
     // 删除 意见
     async editStatus() {
       const res = await remove({
-        ...this.dialogItem,
-      })
+        ...this.dialogItem
+      });
       if (res.success) {
-        this.$message.success('操作成功!')
-        this.handleCurrentChange(this.data.length === 1 ? this.page.pageNow -1 : this.page.pageNow)
+        this.$message.success('操作成功!');
+        this.handleCurrentChange(
+          this.data.length === 1 ? this.page.pageNow - 1 : this.page.pageNow
+        );
       } else {
-        this.$message.error(res.msg)
+        this.$message.error(res.msg);
       }
       this.limitVisible = false;
     },
     // 编辑意见 或新增
-    async editItem() {
+    async editItem({keywordName,recommendedOpinions}) {
+      if(!keywordName || !recommendedOpinions) return this.$message.error('请填写相关信息');
+      console.log(keywordName,recommendedOpinions,this.searchList)
+      if (!this.searchList.find(listItem => listItem.value === keywordName))
+        return this.$message.error('请选择正确的关键词');
       let res;
       if (this.dialogItem?.recordId) {
         res = await edit({
           ...this.dialogItem,
-        })
+          content: this.dialogItem.recommendedOpinions
+        });
       } else {
         res = await add({
           ...this.dialogItem,
           content: this.dialogItem.recommendedOpinions
-        })
+        });
       }
       if (res.success) {
-        this.$message.success('操作成功!')
-        this.handleCurrentChange(this.page.pageNow)
+        this.$message.success('操作成功!');
+        this.handleCurrentChange(this.page.pageNow);
+        this.limitTimeVisible = false;
       } else {
-        this.$message.error(res.msg)
-      }
-      this.limitTimeVisible = false;
-    },
-    // 自定义筛选方法
-    dataFilter(val) {
-        this.initSearchData()
-    },
-    // 设置文字高亮
-    setHighlight(arr, keyword) {
-      if (arr && arr.length > 0 && keyword) {
-        this.deviceIdList = [];
-        arr.filter(item => {
-          let reg = new RegExp(keyword, 'gi');
-          const res = reg.exec(item.value);
-          if (res) {
-            let replaceString = `<span style="color:#2D5CF6;">${res[0]}</span>`;
-            item.showItem = item.value.replace(res, replaceString);
-            this.deviceIdList.push(item);
-          }
-        });
-      } else {
-        this.deviceIdList = [];
+        this.$message.error(res.msg);
       }
     },
-    // 当下拉框出现时触发
-    visibleHideSelectInput(val) {
-      if (val) {
-        this.deviceIdList = JSON.parse(JSON.stringify(this.deviceIdListFilter));
-      }
-    },
-    querySearch(val, cb) {
-      console.log(val, this.searchList);
+    querySearch(val, cb,flag = false) {
       this.searchDialogIndex = 1;
       cb(this.searchList);
-      this.initSearchData();
+      this.initSearchData(flag);
     },
     handleSelect(val) {
+      console.log('val', val);
       if (this.limitTimeVisible) {
-        this.dialogItem.keywordId = val.label
+        this.dialogItem.keywordId = val.label;
       } else {
         this.initData();
       }
@@ -929,4 +953,23 @@ export default {
     text-align: center;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </style>
