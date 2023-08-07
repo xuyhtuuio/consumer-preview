@@ -92,7 +92,7 @@
           <div v-for="(item, index) in list" :key="index">
             <approvalEventCard :item="item"></approvalEventCard>
           </div>
-          <trs-pagination :total="list.length" @getList="getList"></trs-pagination>
+          <trs-pagination :total="search.total" @getList='getList'></trs-pagination>
         </div>
         <div v-loading="search.loading" v-else> 
           <Empty></Empty>

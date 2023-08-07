@@ -245,7 +245,6 @@
     watch: {
       show() {
         if (this.show) {
-          this.init()
           this.queryUserList()
         }
       },
@@ -258,7 +257,6 @@
     methods: {
       async queryUserList() {
         const res = await queryUserList()
-          console.log(res.data.data)
         const resData = res.data.data.data
         if (resData) {
           this.roleData = resData.map.role.map(item => {
@@ -271,6 +269,7 @@
           })
           console.log(this.roleData)
           this.data = resData.root.children
+          this.init()
         }
       },
       filterNode(value, data) {
@@ -287,13 +286,17 @@
         const dept = data.checkedNodes.filter(e => e.type === 'dept').map(item => {
           return {
             id: item.id,
-            label: item.name
+            label: item.name,
+            name: item.name,
+            type: 'dept'
           }
         })
         const user = data.checkedNodes.filter(e => e.type === 'user').map(item => {
           return {
             id: item.id,
-            label: item.name
+            label: item.name,
+            name: item.name,
+            type: 'user'
           }
         })
         this.rightCheckedList = {
@@ -308,6 +311,8 @@
           return {
             id: item.id,
             label: item.name,
+            name: item.name,
+            type: 'role',
             roleRange: this.roleRange
           }
         })

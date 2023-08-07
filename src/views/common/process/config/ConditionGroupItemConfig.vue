@@ -228,8 +228,7 @@ export default {
       for (let key in select) {
         select[key].forEach(val => this.users.push({
           ...val,
-          label: val.label,
-          ...this.tagConfig
+          label: val.label
         }))
       }
       // select.forEach(val => this.users.push(val))

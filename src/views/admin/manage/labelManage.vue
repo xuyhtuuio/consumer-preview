@@ -4,7 +4,7 @@
       <div class="search">
         <el-form class="my-form form" :inline="true" :model="search">
           <el-form-item class="form-item" label="标签类型">
-            <el-select v-model="search.type" placeholder="请选择标签类型">
+            <el-select v-model="search.type" placeholder="请选择标签类型" @change="getList" clearable>
               <el-option
                 v-for="item in types"
                 :key="item.id"
@@ -15,11 +15,7 @@
           </el-form-item>
 
           <el-form-item class="form-item">
-            <el-input
-              suffix-icon="el-icon-search"
-              v-model="search.user1"
-              placeholder="请输入标签名称进行搜索"
-            ></el-input>
+            <el-autocomplete suffix-icon="el-icon-search" v-model="search.keyword" placeholder="请输入标签名称进行搜索" :fetch-suggestions="querySearch" :trigger-on-focus="false" @select="handleSelect" @keyup.enter.native="getList(1)" clearable @clear="getList(1)"></el-autocomplete>
           </el-form-item>
 
           <el-form-item class="form-item">
@@ -35,7 +31,7 @@
         </el-form>
       </div>
     </div>
-    <div class="main">
+    <div class="main" v-loading="loading">
       <TrsTable
         theme="TRS-table-gray"
         :data="data"
@@ -46,26 +42,26 @@
         :cell-style="{ 'text-align': 'center' }"
       >
         <template #type="{ row }">
-          <span :class="[row.typeId === 0 ? 'class-zero' : 'class-one']">{{ row.type }}</span>
+          <span :class="[row.type === 1 ? 'class-zero' : 'class-one']">{{ row.type === 1 ? '禁用词' : '敏感词' }}</span>
         </template>
         <template #operate="scope">
           <el-button type="text" size="small" @click="handleClick(scope.row)"> 编辑</el-button>
-          <el-button type="text" size="small">恢复</el-button>
-          <el-button type="text" class="red" @click="stopApllay(scope.row)">停用</el-button>
+          <el-button type="text" size="small" v-if="scope.row.status === 0" @click="handleSubmitLimitTime(scope.row)">恢复</el-button>
+          <el-button type="text" class="red" @click="stopApllay(scope.row)" v-else>停用</el-button>
         </template>
       </TrsTable>
       <TrsPagination
         :pageSize="10"
         :pageNow="page.pageNow"
         :total="page.total"
-        @getList="handleCurrentChange"
+        @getList="(val) => getList(val)"
         scrollType="scrollCom"
         scrollName="scrollCom"
         v-if="page.total"
       >
       </TrsPagination>
     </div>
-
+    <!-- 编辑或新增 标签 -->
     <el-dialog
       :visible.sync="limitTimeVisible"
       width="600px"
@@ -84,8 +80,8 @@
           :key="item.id"
           :class="[
             'class-common',
-            item.id !== dialogItem.typeId ? 'class-com' : '',
-            item.id === 0 ? ' class-zero' : ' class-one'
+            item.id !== dialogItem.type ? 'class-com' : '',
+            item.id === 1 ? ' class-zero' : ' class-one'
           ]"
           @click="handleLabelType(item.id)"
           >{{ item.value }}</span
@@ -94,69 +90,48 @@
       <div class="dialog-item">
         <g-table-card :title="dialogTitle">
           <template #content>
-            <el-input v-model="dialogItem.label"></el-input>
+            <el-input v-model="dialogItem.keywordContent"></el-input>
           </template>
         </g-table-card>
       </div>
       <div slot="footer" class="dialog-footer">
         <g-button @click="limitTimeVisible = false">取 消</g-button>
-        <g-button type="primary" @click="handleSubmitLimitTime">确 定</g-button>
+        <g-button type="primary" @click="editKeyWord">确 定</g-button>
       </div>
     </el-dialog>
-
-    <el-dialog
-      :visible.sync="limitVisible"
-      width="500px"
-      custom-class="stop-dialog"
-      :show-close="false"
-      center
-    >
-      <template slot="title">
-        <span class="close" @click="limitVisible = false"><i class="el-icon-close"></i></span>
-      </template>
-      <div class="dialog-item">
-        <i class="el-alert__icon el-icon-warning icon"></i>
-        <div class="info">停用后提交的工单将不会对该关键词进行风险提示， 确定停用此标签吗？</div>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <g-button @click="limitVisible = false">取 消</g-button>
-        <g-button class="stop" type="primary" @click="handleSubmitLimitTime">停用</g-button>
-      </div>
-    </el-dialog>
+    <!-- 停用二次确认 -->
+    <secondary-confirmation :option="confirmOption" ref="confirmation" @handleConfirm="handleSubmitLimitTime(dialogItem)"></secondary-confirmation>
   </div>
 </template>
 <script>
+import { getList, edit, add } from '@/api/admin-label.js';
+import secondaryConfirmation from "@/components/common/secondaryConfirmation"
 export default {
-  name: 'UserManage',
+  name: 'labelManage',
+  components: { secondaryConfirmation },
   data() {
     return {
       search: {
-        type: ''
+        type: '',
+        keyword: ''
+      },
+      confirmOption: {
+        message: '停用后提交的工单将不会对该关键词进行风险提示， 确定停用此标签吗？',
+        cancelBtn: '取消',
+        confirmBtn: '停用',
       },
       types: [
-        { id: 0, value: '禁用词' },
-        { id: 1, value: '敏感词' }
+        { id: 1, value: '禁用词' },
+        { id: 2, value: '敏感词' }
       ],
       limitTimeVisible: false,
       limitVisible: false,
-      data: [
-        {
-          label: '比较基准',
-          type: '禁用词',
-          typeId: 0,
-          useFrequency: '110'
-        },
-        {
-          label: '比较基准',
-          type: '敏感词',
-          typeId: 1,
-          useFrequency: '财富运营团队'
-        }
-      ],
+      loading: false,
+      data: [],
       colConfig: [
         {
           label: '标签',
-          prop: 'label'
+          prop: 'keywordContent'
         },
         {
           label: '标签类型',
@@ -164,7 +139,7 @@ export default {
         },
         {
           label: '使用频率',
-          prop: 'useFrequency',
+          prop: 'count',
           bind: {
             align: 'center',
             sortable: 'custom'
@@ -181,47 +156,123 @@ export default {
       ],
       page: {
         pageNow: 1,
-        total: 3
+        total: 1
       },
       titleDialog: '新建标签',
       dialogTitle: '标签名称',
-      dialogRadio: '',
-      dialogRadioItem: [
-        { label: 0, value: '超级管理员' },
-        { label: 1, value: '超级管理员' },
-        { label: 2, value: '总行' },
-        { label: 3, value: '超级管理员' },
-        { label: 4, value: '总行' }
-      ],
       dialogItem: []
     };
   },
-  created() {},
+  created() {
+    this.getList()
+  },
   methods: {
+    handleSelect() {
+      this.getList()
+    },
+    async querySearch(queryString, cb) {
+      const res = await getList({
+        pageNum: 1,
+        pageSize: 10,
+        isAll: 1,
+        type: this.search.type,
+        content: queryString
+      })
+      const { data } = res.data
+      cb(data?.list?.map(item => {
+        return {
+          value: item.keywordContent
+        }
+      }) || []);
+    },
+    async getList(pageNow) {
+      this.loading = true;
+      const pageNum = pageNow || 1
+      const res = await getList({
+        pageNum,
+        pageSize: 10,
+        isAll: 1,
+        type: this.search.type,
+        content: this.search.keyword
+      })
+      const { data, success } = res.data
+      if (success) {
+        this.data = data.list
+        this.page.pageNow = pageNum;
+        this.page.total = data.totalCount;
+      }
+      this.loading = false;
+    },
     sortChange({ column, prop, order }) {
       console.log(column, prop, order);
     },
     handleLabelType(id) {
-      this.dialogItem.typeId = id;
+      this.dialogItem.type = id;
     },
-    handleClick(row) {
+    handleClick(row, index) {
       this.titleDialog = row ? '编辑标签' : '新建标签';
       this.limitTimeVisible = true;
-      this.dialogItem = row ? { ...row } : { typeId: 0 };
-      console.log(row);
+      this.dialogItem = row ? { ...row } : { type: 1 };
+      this.dialogItem.index = index;
     },
     submitEdit(row) {
       console.log(row);
     },
     // 停用
     stopApllay(item) {
-      console.log(item);
-      this.limitVisible = true;
+      // this.limitVisible = true;
+      this.$refs.confirmation.dialogVisible = true;
+      this.dialogItem = item;
     },
-    handleCurrentChange() {},
-    handleSubmitLimitTime() {
-      const { typeId, useFrequency } = this.dialogItem;
-      console.log(typeId, useFrequency);
+    // 编辑标签
+    async editKeyWord() {
+      const recordId = this.dialogItem.recordId;
+      // const index = this.dialogItem.index;
+      const { keywordContent, type } = this.dialogItem;
+      let res;
+      if (recordId) {
+        res = await edit({
+          keywordContent,
+          recordId,
+          type,
+        })
+      } else {
+        res = await add({
+          keywordContent,
+          type,
+        })
+      }
+      const { success, msg } = res.data
+      if (success) {
+        this.$message.success('操作成功!');
+        // if (recordId) {
+        //   this.$set(this.data, index, {
+        //     ...this.data[index],
+        //     ...this.dialogItem
+        //   })
+        // } else {
+        //   this.getList(this.page.pageNow)
+        // }
+        this.getList(this.page.pageNow)
+        this.limitTimeVisible = false;
+      } else {
+        this.$message.error(msg)
+      }
+    },
+    async handleSubmitLimitTime(item) {
+      const { recordId, status } = item;
+      const res = await edit({
+        status: status === 0 ? 1 : 0,
+        recordId,
+      })
+      const { success, msg } = res.data
+      if (success) {
+        this.$message.success('操作成功!');
+        this.getList(this.page.pageNow)
+      } else {
+        this.$message.error(msg)
+      }
+      
     }
   }
 };

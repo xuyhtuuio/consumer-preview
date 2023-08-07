@@ -56,7 +56,7 @@ export default {
     nodes() {
       const tempNodes = []
       this.nodeMap.forEach(value => {
-        if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO'].includes(value?.type)) {
+        if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO'].includes(value?.type) && value.name !== this.nodeName) {
           tempNodes.push({
             name: value.name,
             id: value.id
@@ -88,15 +88,9 @@ export default {
         select[key].forEach(val => this.select.push({
           ...val,
           label: val.label,
-          ...this.tagConfig
+          name: val.label,
         }))
       }
-      // select.forEach(val => this.select.push({
-      //   ...val,
-      //   label: val.name,
-      //   ...this.tagConfig
-      // }))
-      // console.log(this.select)
     },
     removeOrgItem(index){
       console.log(index)

@@ -139,7 +139,7 @@
       </template>
       <el-form class="my-form" :model="dialogItem" label-width="100px">
         <el-form-item class="form-item" label="标签名称">
-          <el-select
+          <!-- <el-select
             class="label-right"
             v-model="dialogItem.titleId"
             filterable
@@ -148,7 +148,7 @@
             placeholder="请输入标签名称"
           >
             <el-option
-              v-for="item in deviceIdList"
+              v-for="item in searchList"
               :key="item.value"
               :label="item.value"
               :value="item.label"
@@ -160,7 +160,27 @@
                 }}</span>
               </div></el-option
             >
-          </el-select>
+          </el-select> -->
+            <el-autocomplete
+              ref="autocomplete"
+              popper-class="my-autocomplete"
+              v-model="dialogItem.titleId"
+              v-scrollLoad="load"
+              :fetch-suggestions="querySearch"
+              placeholder="关键词"
+              @select="handleSelect"
+              @blur="handleSearchBlur"
+            >
+              <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
+              <template slot-scope="{ item }">
+                <div class="option-info">
+                  <span class="left" v-html="item.showItem"></span>
+                  <span :class="['right', item.typeId === 0 ? 'right-zero' : 'right-one']">{{
+                    item.type
+                  }}</span>
+                </div>
+              </template>
+            </el-autocomplete>
         </el-form-item>
         <el-form-item class="item-form" label="审查话术">
           <el-input
@@ -203,7 +223,7 @@
   </div>
 </template>
 <script>
-import { getPageList } from '@/api/admin-opinion.js';
+import { getPageList, getSearchList } from '@/api/admin-opinion.js';
 import { copyText } from '@/utils/Clipboard.js';
 import { timestampToDateTime } from '@/utils/utils.js';
 export default {
@@ -292,6 +312,7 @@ export default {
   },
   created() {
     this.initData();
+    this.initSearchData();
   },
   directives: {
     scrollLoad: {
@@ -305,9 +326,10 @@ export default {
           'scroll',
           e => {
             let condition = wrapDom.offsetHeight + wrapDom.scrollTop - listDom.offsetHeight - 20;
-            // console.log(condition,vnode);
-            if (condition == 0) {
+            // console.log(wrapDom.offsetHeight , wrapDom.scrollTop,listDom.offsetHeight ,condition);
+            if (condition == 0 && wrapDom.scrollTop !== 0) {
               //滚动到底部则执行滚动方法load，binding.value就是v-scrollLoad绑定的值，加()表示执行绑定的方法
+              console.log('滚动到底部');
               binding.value();
             }
           },
@@ -358,10 +380,51 @@ export default {
         };
         this.deviceIdList.push(obj);
         this.deviceIdListFilter.push(obj);
-        this.searchList.push(obj);
-        this.searchListFilter.push(obj);
       });
     },
+    initSearchData() {
+      const data = {
+        content: this.search.baseline,
+        pageNum: this.searchDialogIndex,
+        pageSize: 10
+      };
+      console.log('initSearchData', data);
+      getSearchList(data).then(res => {
+        console.log(res);
+        const arr = res.list;
+        this.formatting(arr);
+        console.log(arr);
+        const keyword = this.search.baseline;
+        if (arr && arr.length > 0 && keyword.length > 0) {
+          arr.filter(item => {
+            let reg = new RegExp(keyword, 'gi');
+            const regRes = reg.exec(item.value);
+            if (regRes) {
+              let replaceString = `<span style="color:#2D5CF6;">${regRes[0]}</span>`;
+              item.showItem = item.value.replace(regRes, replaceString);
+            }
+          });
+        }
+        if (this.searchDialogIndex === 1) {
+          this.searchList.length = 0;
+        }
+        this.searchList.push(...arr);
+      });
+    },
+
+    formatting(data) {
+      console.log('formatting', data);
+      data.forEach(({ keywordContent: value, recordId: label, type: typeId }, index) => {
+        data[index] = {
+          label,
+          value,
+          typeId,
+          type: typeId == 1 ? '禁用词' : '敏感词',
+          showItem: value
+        };
+      });
+    },
+
     onSearch() {
       console.log(this.search);
       this.initData();
@@ -370,7 +433,8 @@ export default {
     load(e) {
       this.searchDialogIndex += 1;
       this.$refs.autocomplete.activated = true;
-      this.$refs.autocomplete.getData(this.search.baseline);
+      // this.$refs.autocomplete.getData(this.search.baseline);
+      this.initSearchData();
       // if (this.suppilerListTotal < this.suppilerListQuery.pageSize) {
       //   return false;
       // }
@@ -382,10 +446,10 @@ export default {
       //   this.$refs['autocomplete'].$data.suggestions = res.data.records;
       //   this.loading = false;
       // });
-      console.log(e);
     },
     handleSearchBlur(flag) {
       console.log(flag);
+      this.searchDialogIndex = 1;
     },
     //根据传进来的状态改变建议输入框的状态（展开|隐藏）
     changeStyle(status, className) {
@@ -437,19 +501,8 @@ export default {
 
     // 自定义筛选方法
     dataFilter(val) {
-      console.log(val);
-      if (val) {
-        let filterResult = [];
-        let originalData = JSON.parse(JSON.stringify(this.deviceIdListFilter));
-        originalData.filter(item => {
-          if (item.value.includes(val) || item.value.toUpperCase().includes(val.toUpperCase())) {
-            filterResult.push(item);
-          }
-        });
-        this.setHighlight(filterResult, val); // 匹配文字高亮显示
-      } else {
-        this.deviceIdList = this.deviceIdListFilter;
-      }
+       // this.setHighlight(this.searchList, val); // 匹配文字高亮显示
+        this.initSearchData()
     },
     // 设置文字高亮
     setHighlight(arr, keyword) {
@@ -475,20 +528,20 @@ export default {
       }
     },
     querySearch(val, cb) {
-      console.log(val,this.searchDialogIndex);
+      console.log(val, this.searchList);
+      this.searchDialogIndex = 1;
+      cb(this.searchList);
+      this.initSearchData();
       // let searchList = JSON.parse(JSON.stringify(this.searchList));
-      let searchList = this.searchList
-      this.searchList.push(this.searchList[0])
       // let results = val
       //   ? searchList.filter(
       //       item => item.value.includes(val) || item.value.toUpperCase().includes(val.toUpperCase())
       //     )
       //   : searchList;
-      let results =[...searchList,searchList[0]]
-      console.log(results);
-      this.setHighlight(results, val);
+      // let results = [...searchList, searchList[0]];
+      // console.log(results);
+      // this.setHighlight(searchList, val);
       // 调用 callback 返回建议列表的数据
-        cb(results);
     },
     handleSelect(val) {
       this.initData();
@@ -925,6 +978,10 @@ export default {
 .option-info {
   display: flex;
   justify-content: space-between;
+  .left {
+    flex: 1;
+    overflow: hidden;
+  }
   .right {
     position: relative;
     left: 10px;

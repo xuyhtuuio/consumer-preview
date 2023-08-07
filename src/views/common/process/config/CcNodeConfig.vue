@@ -12,7 +12,7 @@
     <div style="margin-top: 16px">
       <div class="tag-action" >
         <div class="tag-box" v-for="(item, index) in select" :key="index">
-          <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
+          <TrsTag :tag="{...item, ...tagConfig}" @handleClose="removeOrgItem(index)" />
         </div>
       </div>
     </div>
@@ -74,8 +74,7 @@ export default {
       for (let key in select) {
         select[key].forEach(val => this.select.push({
           ...val,
-          label: val.label,
-          ...this.tagConfig
+          label: val.label
         }))
       }
       // select.forEach(val => this.select.push({

@@ -187,6 +187,7 @@ export default {
     async saveProcess() {
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       console.log(user)
+      console.log('this.setup.process', this.setup.process)
       let template = {
         formId: this.setup.formId,
         formName: this.setup.formName,

@@ -1,5 +1,5 @@
 <template>
-  <el-main :style="{ 'max-height': $route.name !== 'processDesign' ? 'calc(100vh - 300px)' : 'calc(100vh - 100px)' }">
+  <el-main :style="{ 'height': $route.name !== 'processDesign' ? 'calc(100vh - 300px)' : 'calc(100vh - 100px)' }">
     <!-- <div class="scale">
       <el-button icon="el-icon-plus" size="small" @click="scale += 10" :disabled="scale >= 150" circle></el-button>
       <span>{{ scale }}%</span>

@@ -61,3 +61,19 @@ export function workOrderTaskInfo(params) {
     params
   })
 }
+//查询工单详情
+export function externalLogicController(params) {
+  return request({
+    url: '/cpr/externalLogicController',
+    method: 'post',
+    params
+  })
+}
+
+export function processStart(data) {
+  return request({
+    url: '/cpr/workspace/process/start',
+    method: 'post',
+    data
+  })
+}

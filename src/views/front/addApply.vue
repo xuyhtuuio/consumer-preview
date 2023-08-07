@@ -2,7 +2,7 @@
   <div class="addApply" v-loading.body="isGLoading">
     <g-breadcrunm />
     <div class="tag">
-      <add-tag @submit="submit" @save="save" />
+      <add-tag ref="refAddTag" @submit="submit" @save="save" />
     </div>
     <div class="content" v-loading="isLoading">
       <review-matters
@@ -27,7 +27,7 @@
         <g-button class="btn" type="primary" @click.native="submit">提交</g-button>
       </div>
     </div>
-    <secondary-confirmation ref="RefSecondaryCon" :option="confirmOption" ></secondary-confirmation >
+    <secondary-confirmation ref="RefSecondaryCon" :option="confirmOption"></secondary-confirmation>
   </div>
 </template>
 
@@ -40,7 +40,14 @@ import ReconciliationPoint from './components/reconciliation-point.vue';
 import SecondaryConfirmation from '@/components/common/secondaryConfirmation';
 import ReviewMaterial from './components/review-material.vue';
 import { timestampToDateTime } from '@/utils/utils.js';
-import { getFormCategoryArray, getApplyForm, submit, saveDraft } from '@/api/front.js';
+import {
+  getFormCategoryArray,
+  getApplyForm,
+  submit,
+  saveDraft,
+  externalLogicController,
+  processStart
+} from '@/api/front.js';
 export default {
   components: {
     AddTag,
@@ -66,7 +73,9 @@ export default {
       message: '是否保存当前编辑内容？',
       cancelBtn: '不保存',
       confirmBtn: '保存'
-    }
+    },
+    templateId: '',
+    processDefinitionId: ''
   }),
   created() {
     this.initialData();
@@ -82,26 +91,36 @@ export default {
       }
     });
   },
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave({ params: { isNoDialog } }, from, next) {
     const _this = this.$refs['RefSecondaryCon'];
-    _this.dialogVisible = true;
+    console.log(isNoDialog);
+
+    !isNoDialog && (_this.dialogVisible = true);
+    isNoDialog && next();
     _this.handleConfirm = () => {
       _this.dialogVisible = false;
       this.save(() => {
+        console.log('save');
         window.localStorage.removeItem('editId');
-        this.formId = undefined;
-        this.initialData();
+        // this.formId = undefined;
+        // this.initialData();
         next();
       });
     };
-      _this.handleClose = () => {
-        console.log(123);
-        _this.dialogVisible = false;
-        next();
-      };
+    _this.handleClose = () => {
+      _this.dialogVisible = false;
+      next();
+    };
   },
   activated() {
+    console.log('activated');
     this.initialData();
+  },
+  deactivated() {
+    console.log('deactivated');
+    this.formId = undefined;
+    this.initialData();
+    this.handleClear();
   },
   methods: {
     initialData() {
@@ -113,7 +132,18 @@ export default {
     // handleConfirm() {
     //   this.initialData()
     // },
-
+    handleClear() {
+      const list = [
+        'basicInformationRef',
+        'publicityChannelsRef',
+        'reconPointRef',
+        'reviewMaterialRef'
+      ];
+      list.forEach(el => {
+        console.log(el, this.$refs[el]);
+        this.$refs[el].judgeWarnFlag = false;
+      });
+    },
     // 审查事项类型
     handleReviewClick(id) {
       getApplyForm({
@@ -129,15 +159,18 @@ export default {
         this.isLoading = false;
         this.isGLoading = false;
       });
+      externalLogicController({ formId: id }).then(({ data: { data: res } }) => {
+        (this.templateId = res.templateId), (this.processDefinitionId = res.processDefinitionId);
+      });
     },
     // 提交
-    submit() {
+    async submit() {
       let result0 = true;
       if (!this.$refs['basicInformationRef'].judgeWarn()) {
-        this.$nextTick(() => {
+        await this.$nextTick(() => {
           const refs = this.$refs['basicInformationRef'].$refs['refWarn'];
-          console.log(refs);
           result0 = refs?.length ? false : true;
+          console.log('result0', result0);
           if (refs?.length) {
             let offsetTop = refs[0].$el.offsetParent.offsetTop;
             refs.forEach(item => {
@@ -145,9 +178,9 @@ export default {
                 offsetTop = item.$el?.offsetParent?.offsetTop;
               }
             });
+            console.log('offsetTop', offsetTop);
             this.rollTo(offsetTop);
           }
-          
         });
       }
       const [result, offsetTop] = this.$refs['publicityChannelsRef'].judgeWarn();
@@ -157,6 +190,7 @@ export default {
       const [result2, offsetTop2] = this.$refs['reviewMaterialRef'].judgeWarn();
       console.log(result0, result, result1, result2);
       if (!result0 || !result || !result1 || !result2) {
+        if (!result0) return;
         return this.rollTo(offsetTop ? offsetTop : offsetTop1 ? offsetTop1 : offsetTop2);
       }
       this.submitTrue();
@@ -200,16 +234,38 @@ export default {
       });
       formItemDataList.push(reviewMaterialsData);
       result.formItemDataList = formItemDataList;
-      flag &&
-        submit(result).then(res => {
-          this.$message({ type: 'success', message: res.data.data });
-          this.$router.push({ name: 'apply-list' });
-        });
+
+      if (flag) {
+        // submit(result).then(res => {
+        //   this.$message({ type: 'success', message: res.data.data });
+        //   this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
+        // });
+        const { id, name, dep: label } = this.$refs['refAddTag'].approverInfo;
+        processStart({
+          templateId: this.templateId,
+          processDefinitionId: this.processDefinitionId,
+          startUserInfo: {
+            id,
+            name,
+            label
+          },
+          submitDto: result
+        }).then(res => {
+          console.log('processStart', res);
+          this.$message({ type: 'success', message: res.data.msg });
+          // res.data.data
+          this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
+        }).catch(err => {
+          console.log(err);
+        })
+      }
       !flag &&
-        saveDraft(result).then(res => {
-          this.$message({ type: 'success', message: res.data.data });
+        saveDraft(result).then(({ data: { data, msg } }) => {
+          this.formId = data;
+          this.$message({ type: 'success', message: msg });
           this.rollTo(0);
           this.isGLoading = false;
+          this.handleClear();
           typeof success === 'function' && success();
         });
     },
@@ -276,18 +332,4 @@ export default {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </style>

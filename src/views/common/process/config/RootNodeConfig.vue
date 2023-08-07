@@ -20,7 +20,7 @@
       <div style="margin-top: 20px">
         <div class="tag-action" >
           <div class="tag-box" v-for="(item, index) in select" :key="index">
-            <TrsTag :tag="item" @handleClose="removeOrgItem(index)" />
+            <TrsTag :tag="{...item, ...tagConfig}" @handleClose="removeOrgItem(index)" />
           </div>
         </div>
         <!-- <el-tag class="org-item" :type="org.type === 'dept'?'':'info'"
@@ -99,10 +99,19 @@ export default {
       for (let key in select) {
         select[key].forEach(val => this.select.push({
           ...val,
-          label: val.label,
-          ...this.tagConfig
+          label: val.label
         }))
       }
+      const mapId = {}
+      const assignedUser = []
+      this.config.assignedUser.forEach(item => {
+        if (!mapId[item.id + item.type]) {
+          mapId[item.id + item.type] = true
+          assignedUser.push(item)
+        }
+      })
+      this.config.assignedUser = assignedUser
+      console.log(this.select, this.config.assignedUser)
     },
     removeOrgItem(index){
       console.log(index)
