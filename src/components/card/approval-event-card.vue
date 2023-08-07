@@ -192,9 +192,11 @@ export default {
   justify-content: space-between;
   align-items: center;
   cursor: default;
+  width: 100%;
 
   .event-info {
-    flex: 1;
+    // flex: 1;
+    width: calc(100% - 250px);
 
     .event-name-status {
       margin-bottom: 17px;

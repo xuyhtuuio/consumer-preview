@@ -87,9 +87,9 @@
       <div class="list" v-loading="search.loading">
         <div v-if="list.length">
           <div v-for="(item, index) in list" :key="index">
-            <applyEventCard :item="item" @del="del" @quash="quash" @concern="concern"></applyEventCard>
+            <applyEventCard :item="item" @del="del" @quash="quash" @concern="concern" ></applyEventCard>
           </div>
-          <trs-pagination :total="search.total" @getList="getApplicationList"></trs-pagination>
+          <trs-pagination :total="search.total" @getList="getApplicationList" :pageNow="pageNow"></trs-pagination>
         </div>
         <div v-else>
           <Empty></Empty>
@@ -328,6 +328,7 @@ export default {
       });
     },
     getApplicationList(pageNow) {
+      this.pageNow=pageNow
       // 关于排序
       const param = {
         pageNow,
