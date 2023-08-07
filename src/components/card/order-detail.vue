@@ -347,14 +347,14 @@ export default {
         const { status } = res.data
         if (status == 200) {
           this.$store.commit('setOpinionStorage', true)
-          this.$message.success('已保存当前意见确认内容')
+          this.$message.success({ showClose: true, message: '已保存当前意见确认内容' })
         }
       })
     },
     //保存编辑意见功能
     saveEditOpinion() {
       this.$store.commit('setEditOpinionStorage', true)
-      this.$message.success('已保存当前意见确认内容')
+      this.$message.success({ showClose: true, message:'已保存当前意见确认内容'})
     },
 
     submit(way) {
@@ -492,8 +492,6 @@ export default {
         }
       }
       if (this.status == 2 && way == 'update') {
-        // !editOpinionRequired ? (this.crtComp = 'leaderEditOpinion', this.$message.error('请在编辑意见后提交')) : ''
-        // !editOpinionRequired ?return false : ''
         if (!editOpinionRequired) {
           this.crtComp = 'leaderEditOpinion'
           this.$message.error('请在编辑意见后提交')
@@ -521,7 +519,7 @@ export default {
           notAdoptingReasons: v.notAdoptingReasons,
           recordId: v.recordId,
           substantiveOpinions: v.substantiveOpinions,
-          cacheFlag:0
+          cacheFlag: 0
         }
       })
       if (!opinions) {
