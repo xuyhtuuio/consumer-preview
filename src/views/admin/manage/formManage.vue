@@ -530,7 +530,7 @@ export default {
         formItemId: item.id
       })
       if (res?.data.success) {
-        this.$message.success('操作成功!')
+        this.$message.success(item.run ? '停用成功' : '恢复成功')
         item.run = item.run === 0 ? 1 : 0;
       } else {
         this.$message.error(res?.data?.msg)
