@@ -250,14 +250,15 @@ export default {
             label
           },
           submitDto: result
-        }).then(res => {
-          console.log('processStart', res);
-          this.$message({ type: 'success', message: res.data.msg });
-          // res.data.data
-          this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
-        }).catch(err => {
-          console.log(err);
         })
+          .then(res => {
+            this.$message({ type: 'success', message: res.data.msg === 'success' && '提交成功' });
+            this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
+          })
+          .catch(err => {
+            console.log(err);
+            this,$message({ type: 'error', message: '提交失败'})
+          });
       }
       !flag &&
         saveDraft(result).then(({ data: { data, msg } }) => {
