@@ -89,7 +89,6 @@ export function downloadAllFiles(param) {
     data: param
   })
 }
-
 // 用id获取意见详情
 export function getEditedCommentsByFormId(param){
   return request({
@@ -117,9 +116,9 @@ export function updateAdoptEditedComments(param){
   })
 } 
 // 保存审查意见书
-export function insertEditedComments(param){
+export function updateEditedComments(param){
   return request({
-    url: '/cpr/approvalrecord/insertEditedComments',
+    url: '/cpr/approvalrecord/updateEditedComments',
     method: 'post',
     contentType:'application/json',
     data: param

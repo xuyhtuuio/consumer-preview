@@ -112,7 +112,6 @@ export default {
         };
     },
     mounted() {
-        console.log('gg', this.$route.params)
         if ((this.$route.params && this.$route.params.formId) || (this.sidebarParam && this.sidebarParam.formId)) {
             this.getWorkOrderTaskInfo()
             this.getOrderDetail()
@@ -120,7 +119,6 @@ export default {
     },
     activated() {
         const keys = Object.keys(this.$route.params) || Object.keys(this.$route.sidebarParam)
-        console.log('gg', this.$route.params)
         if (keys.length) {
             this.getWorkOrderTaskInfo()
             this.getOrderDetail()

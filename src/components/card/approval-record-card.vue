@@ -81,6 +81,12 @@ import empty from '@/components/common/empty'
 export default {
   components: { empty },
   name:'approved-record-card',
+  props: {
+        sidebarParam: {
+            type: Object,
+            default: () => { }
+        }
+    },
   data() {
     return {
       hasData: false,
@@ -95,7 +101,7 @@ export default {
     init() {
       this.loading = true
       getApprovalRecordByFromid({
-        formId: '158'
+        formId: this.$route.params.formId ||this.sidebarParam.formId
       }).then(res => {
         const { data } = res.data
         if (!data) {

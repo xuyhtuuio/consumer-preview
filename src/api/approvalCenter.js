@@ -46,26 +46,35 @@ export function concernApplication(param) {
   return request({
     url: '/cpr/censor/concern',
     method: 'post',
-    contentType:'application/x-www-form-urlencoded',
+    contentType: 'application/x-www-form-urlencoded',
     data: param
   })
 }
 
 // 驳回
- export function overrule(param){
-    return request({
-        url: '/cpr/censor/overrule',
-        method: 'post',
-        contentType:'application/x-www-form-urlencoded',
-        data: param
-      })
- }
+export function overrule(param) {
+  return request({
+    url: '/cpr/censor/overrule',
+    method: 'post',
+    contentType: 'application/x-www-form-urlencoded',
+    data: param
+  })
+}
 
 
 // 提单机构
-export function billOfLadingAgenciesList(){
+export function billOfLadingAgenciesList() {
   return request({
-      url: '/cpr/censor/billOfLadingAgenciesList',
-      method: 'get',
-    })
+    url: '/cpr/censor/billOfLadingAgenciesList',
+    method: 'get',
+  })
+}
+// 详情页领导审批通过驳回
+export function workSpaceAgree(param) {
+  return request({
+    url: '/cpr/workspace/agree',
+    method: 'post',
+    contentType: 'multipart/form-data',
+    data: param
+  })
 }

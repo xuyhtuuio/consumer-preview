@@ -1,5 +1,5 @@
 <template>
-  <div class="approved-opinion-card">
+  <div class="approved-opinion-card" v-loading="loading">
     <empty v-if="!hasData"></empty>
     <div v-if="hasData">
       <slot name="head"></slot>
@@ -71,7 +71,8 @@
 <script>
 import empty from '@/components/common/empty'
 import moment from 'moment'
-import { getEditedCommentsByFormId, insertApprovalRecordAndEditedComments, } from '@/api/applyCenter'
+
+import { getEditedCommentsByFormId, } from '@/api/applyCenter'
 export default {
   name: 'approved-opinion-card',
   components: { empty },
@@ -79,6 +80,10 @@ export default {
     // 3 5显示复选框 4 显示已采纳 不采纳
     status: { type: Number, default: 0 },
     taskStatus: { type: Number, default: 0 },
+    sidebarParam: {
+      type: Object,
+      default: () => { }
+    }
   },
   data() {
     return {
@@ -126,8 +131,10 @@ export default {
       this.loading = true
       getEditedCommentsByFormId({ formId: '158' }).then(res => {
         const { data } = res.data
+
         const keys = Object.keys(data)
-        if (keys.length < 1) {
+
+        if (data?.constructor !== Object) {
           return this.hasData = false
         }
         this.hasData = true
@@ -138,14 +145,28 @@ export default {
           let _info = data[keys[i]]
           obj.approverOrgName = _info[0].approverOrgName
           obj.approveTime = _info[0].updateTime ? moment(_info[0].updateTime).format('YYYY-MM-DD') : ''
-          const _newInfo = _info.map(v => {
-            return {
-              ...v,
-              adoptOpinions: 1,
-              notAdoptingReasons: '',
-              relevantfile: v.associatedAttachmentsIds ? v.associatedAttachmentsIds.split(';') : []
-            }
-          })
+          //根据不同的status展示不同的信息
+          // status:4已经结束   其他的的值表示是可以编辑的表单
+          let _newInfo = []
+          if (this.taskStatus != 4) {
+            _newInfo = _info.map(v => {
+              return {
+                ...v,
+                adoptOpinions: v.cacheFlag === '1' ? v.adoptOpinions : 1,
+                notAdoptingReasons: v.cacheFlag === '1' ? v.notAdoptingReasons : '',
+                relevantfile: v.associatedAttachmentsIds ? v.associatedAttachmentsIds.split(';') : []
+              }
+            })
+          } else {
+            _newInfo = _info.map(v => {
+              return {
+                ...v,
+                adoptOpinions: v.adoptOpinions,
+                notAdoptingReasons: v.notAdoptingReasons,
+                relevantfile: v.associatedAttachmentsIds ? v.associatedAttachmentsIds.split(';') : []
+              }
+            })
+          }
           obj.substantiveopinion = _newInfo
           opinions.push(obj)
         }
@@ -153,14 +174,6 @@ export default {
         const newOpinions = opinions.map(v => {
           return v.substantiveopinion
         }).flat()
-        // const params = newOpinions.map(v => {
-        //   return {
-        //     adoptOpinions: v.adoptOpinions,
-        //     notAdoptingReasons: v.notAdoptingReasons,
-        //     recordId: v.recordId,
-        //     substantiveOpinions:v.substantiveOpinions
-        //   }
-        // })
         this.$store.commit('setApprovedOpinionForm', newOpinions)
       }).finally(() => {
         this.loading = false
@@ -182,23 +195,6 @@ export default {
       inputArr.length ? this.$refs[inputArr[0]][0].focus() : ''
       return inputArr.length < 1
     },
-    keep() {
-      const flag = this.checkParam()
-      if (flag) {
-        let opinions = Object.values(this.opinions)
-        opinions = opinions.map(v => {
-          return v.substantiveopinion
-        }).flat()
-        this.$parent.startLoading(true)
-        // this.$emit('startLoading',true)
-        return
-        insertApprovalRecordAndEditedComments(params).then(res => {
-        })
-        // this.$emit('startLoading',false)
-      }
-    },
-
-
   },
 };
 </script>

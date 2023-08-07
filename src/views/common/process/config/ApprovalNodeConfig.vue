@@ -338,8 +338,8 @@ export default {
     },
     selected(select) {
       this.showOrgSelect = false
-      this.select = []
-      console.log(select)
+      // this.select = []
+      this.config.assignedUser = []
       for (let key in select) {
         select[key].forEach(val => this.select.push({
           ...val,
@@ -350,13 +350,17 @@ export default {
     },
     selected1(select) {
       this.showOrgSelect1 = false
-      this.select1 = []
+      this.config.changeHandleUser = []
+      // this.$store.state.selectedNode.props.changeHandleUser = []
+      // debugger
       for (let key in select) {
         select[key].forEach(val => this.select1.push({
           ...val,
           label: val.label,
         }))
       }
+      // console.log(this.select1)
+      // debugger
       this.$store.state.selectedNode.props.changeHandleUser = this.select1
     },
     removeOrgItem(index) {
