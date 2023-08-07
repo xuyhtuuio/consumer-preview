@@ -23,12 +23,12 @@ export default {
         { title: "首页", name: "home",sign:'home' },
         { title: "申请中心", name: "apply-list",sign:'applycenter' },
         { title: "审批中心", name: 'approval-list' ,sign:'approvalcenter'},
-        { title: "人员中心" },
-        { title: "产业图谱" },
+        // { title: "人员中心" },
+        // { title: "产品图谱" },
       ],
       activeMenu: 'home',
       iconList: [
-        { href: "icon-tongyongtubiao3" },
+        // { href: "icon-tongyongtubiao3" },
         { href: "icon-tongyongtubiao5", name: 'manage' },
         { href: "icon-gerenyonghutouxiang2" },
       ]
