@@ -27,6 +27,7 @@ export const APPROVAL_PROPS = {
     }
   },
   assignedUser:[],
+  changeHandleUser: [],
   formPerms:[],
   selfSelect: {
     multiple: false
