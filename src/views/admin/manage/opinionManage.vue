@@ -8,6 +8,8 @@
               v-model="search.review"
               placeholder="请输入审查意见搜索"
               @keyup.enter.native="onSearch"
+              @clear="onSearch"
+              clearable
             >
               <i slot="suffix" class="el-icon-search" @click="onSearch"></i>
             </el-input>
@@ -22,13 +24,14 @@
               :fetch-suggestions="querySearch"
               placeholder="关键词"
               @select="handleSelect"
-              @blur="handleSearchBlur"
+              @keyup.enter="onSearch"
+              clearable
             >
               <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
               <template slot-scope="{ item }">
                 <div class="option-info">
                   <span class="left" v-html="item.showItem"></span>
-                  <span :class="['right', item.typeId === 0 ? 'right-zero' : 'right-one']">{{
+                  <span :class="['right', item.keywordType === 1 ? 'right-zero' : 'right-one']">{{
                     item.type
                   }}</span>
                 </div>
@@ -103,13 +106,13 @@
             </div>
           </div>
           <div class="btns">
-            <span v-if="item.isTop !== 0" class="btn btn-yellow">
+            <span v-if="item.isTop !== 0" class="btn btn-yellow" @click="changeIsTop(item)">
               <i> <g-icon class="left-icon" stylePx="20" href="#icon-zhiding" />取消置顶</i>
             </span>
-            <span v-else class="btn"><i>置顶</i></span>
+            <span v-else class="btn" @click="changeIsTop(item)"><i>置顶</i></span>
             <span class="btn"><i @click="handleClick(item)">编辑</i></span>
             <span class="btn btn-red"><i @click="stopApllay(item)">停用</i></span>
-            <span class="btn"><i>删除</i></span>
+            <span class="btn"><i  @click="stopApllay(item)">删除</i></span>
           </div>
         </div>
       </div>
@@ -139,44 +142,22 @@
       </template>
       <el-form class="my-form" :model="dialogItem" label-width="100px">
         <el-form-item class="form-item" label="标签名称">
-          <!-- <el-select
-            class="label-right"
-            v-model="dialogItem.titleId"
-            filterable
-            :filter-method="dataFilter"
-            @visible-change="visibleHideSelectInput"
-            placeholder="请输入标签名称"
-          >
-            <el-option
-              v-for="item in searchList"
-              :key="item.value"
-              :label="item.value"
-              :value="item.label"
-            >
-              <div class="option-info">
-                <span class="left" v-html="item.showItem"></span>
-                <span :class="['right', item.typeId === 0 ? 'right-zero' : 'right-one']">{{
-                  item.type
-                }}</span>
-              </div></el-option
-            >
-          </el-select> -->
             <el-autocomplete
               ref="autocomplete"
               popper-class="my-autocomplete"
-              v-model="dialogItem.titleId"
+              v-model="dialogItem.keywordName"
               v-scrollLoad="load"
               :fetch-suggestions="querySearch"
               placeholder="关键词"
               @select="handleSelect"
-              @blur="handleSearchBlur"
+              @keyup.enter.native="onSearch"
             >
               <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
               <template slot-scope="{ item }">
                 <div class="option-info">
                   <span class="left" v-html="item.showItem"></span>
-                  <span :class="['right', item.typeId === 0 ? 'right-zero' : 'right-one']">{{
-                    item.type
+                  <span :class="['right', item.type === 1 ? 'right-zero' : 'right-one']">{{
+                    item.type === 1 ? '禁用词' : '敏感词'
                   }}</span>
                 </div>
               </template>
@@ -186,7 +167,7 @@
           <el-input
             type="textarea"
             placeholder="请输入审查话术内容"
-            v-model="dialogItem.content"
+            v-model="dialogItem.recommendedOpinions"
             resize="none"
             size="medium"
             :autosize="{ minRows: 10, maxRows: 10 }"
@@ -197,7 +178,7 @@
       <div class=""></div>
       <div slot="footer" class="dialog-footer">
         <g-button @click="limitTimeVisible = false">取 消</g-button>
-        <g-button class="stop" type="primary" @click="handleSubmitLimitTime">确 定</g-button>
+        <g-button class="stop" type="primary" @click="editItem">确 定</g-button>
       </div>
     </el-dialog>
 
@@ -217,13 +198,13 @@
       </div>
       <div slot="footer" class="dialog-footer">
         <g-button @click="limitVisible = false">取 消</g-button>
-        <g-button class="stop" type="primary" @click="handleSubmitLimitTime">停用</g-button>
+        <g-button class="stop" type="primary" @click="editStatus">停用</g-button>
       </div>
     </el-dialog>
   </div>
 </template>
 <script>
-import { getPageList, getSearchList } from '@/api/admin-opinion.js';
+import { getPageList, getSearchList, edit, add, remove } from '@/api/admin-opinion.js';
 import { copyText } from '@/utils/Clipboard.js';
 import { timestampToDateTime } from '@/utils/utils.js';
 export default {
@@ -234,64 +215,11 @@ export default {
         review: '',
         baseline: ''
       },
-      types: [
-        { id: 0, value: '禁用词' },
-        { id: 1, value: '敏感词' }
-      ],
       limitTimeVisible: false,
       limitVisible: false,
       isLoading: false,
       timestampToDateTime,
-      data: [
-        {
-          id: 0,
-          title: '比较基准',
-          titleId: 1,
-          type: '禁用词',
-          typeId: 0,
-          content:
-            '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因、测算依据或计算方法的业绩比较基准1。',
-          isTop: true,
-          updateTime: '2021-08-11',
-          useFrequency: 110
-        },
-        {
-          id: 1,
-          title: '比较基准',
-          titleId: 2,
-          type: '敏感词',
-          typeId: 1,
-          content:
-            '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因、测算依据或计算方法的业绩比较基准2。',
-          isTop: true,
-          updateTime: '2021-08-11',
-          useFrequency: 110
-        },
-        {
-          id: 2,
-          title: '比较基准',
-          titleId: 3,
-          type: '禁用词',
-          typeId: 0,
-          content:
-            '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因、测算依据或计算方法的业绩比较基准3。',
-          isTop: false,
-          updateTime: '2021-08-11',
-          useFrequency: 110
-        },
-        {
-          id: 3,
-          title: '比较基准',
-          titleId: 4,
-          type: '敏感词',
-          typeId: 1,
-          content:
-            '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因、测算依据或计算方法的业绩比较基准4。',
-          isTop: false,
-          updateTime: '2021-08-11',
-          useFrequency: 110
-        }
-      ],
+      data: [],
       page: {
         pageNow: 1,
         total: 0,
@@ -348,38 +276,10 @@ export default {
         pageNow: this.page.pageNow,
         pageSize: this.page.pageSize
       };
-      console.log(pageData);
       getPageList(pageData).then(({ totalCount, list }) => {
         this.page.total = totalCount;
         this.isLoading = false;
         this.data = list;
-      });
-      const data = {
-        code: '0',
-        content: [
-          { value: 'M107NEC2E98BE9C95', id: 0, typeId: 0, type: '禁用词' },
-          { value: '456王子沛123', id: 1, typeId: 0, type: '禁用词' },
-          { value: 'M107W01decce91b7b810c', id: 2, typeId: 0, type: '禁用词' },
-          { value: 'M107N000822B49FFB', id: 3, typeId: 1, type: '敏感词' },
-          { value: 'M107W512780e6ef2a40d7', id: 4, typeId: 0, type: '禁用词' },
-          { value: 'M107N0008229CA2FB', id: 5, typeId: 0, type: '禁用词' },
-          { value: 'M107NEC2E98BEAE31', id: 6, typeId: 0, type: '禁用词' },
-          { value: 'M107Ne1acff34c9b13a88', id: 7, typeId: 0, type: '禁用词' },
-          { value: '比较基准', id: 8, typeId: 0, type: '禁用词' },
-          { value: 'M107NC0847D2C5A72', id: 9, typeId: 0, type: '禁用词' }
-        ],
-        message: '获取成功'
-      };
-      data.content.forEach(({ value, id: label, typeId, type }) => {
-        let obj = {
-          label,
-          value,
-          typeId,
-          type,
-          showItem: value
-        };
-        this.deviceIdList.push(obj);
-        this.deviceIdListFilter.push(obj);
       });
     },
     initSearchData() {
@@ -388,12 +288,9 @@ export default {
         pageNum: this.searchDialogIndex,
         pageSize: 10
       };
-      console.log('initSearchData', data);
       getSearchList(data).then(res => {
-        console.log(res);
         const arr = res.list;
         this.formatting(arr);
-        console.log(arr);
         const keyword = this.search.baseline;
         if (arr && arr.length > 0 && keyword.length > 0) {
           arr.filter(item => {
@@ -413,42 +310,26 @@ export default {
     },
 
     formatting(data) {
-      console.log('formatting', data);
-      data.forEach(({ keywordContent: value, recordId: label, type: typeId }, index) => {
+      data.forEach(({ keywordContent: value, recordId: label, type: keywordType }, index) => {
         data[index] = {
           label,
           value,
-          typeId,
-          type: typeId == 1 ? '禁用词' : '敏感词',
-          showItem: value
+          keywordType,
+          showItem: value,
         };
       });
     },
 
     onSearch() {
-      console.log(this.search);
       this.initData();
       this.changeStyle('none', '.el-autocomplete-suggestion');
     },
     load(e) {
       this.searchDialogIndex += 1;
       this.$refs.autocomplete.activated = true;
-      // this.$refs.autocomplete.getData(this.search.baseline);
       this.initSearchData();
-      // if (this.suppilerListTotal < this.suppilerListQuery.pageSize) {
-      //   return false;
-      // }
-      // this.loading = true;
-      // this.suppilerListQuery.pageSize += 10;
-      //XXX -滚动到底部后请求的列表
-      // XXX(this.suppilerListQuery, this.state2).then(res => {
-      //   this.suppilerListTotal = res.data.total;
-      //   this.$refs['autocomplete'].$data.suggestions = res.data.records;
-      //   this.loading = false;
-      // });
     },
     handleSearchBlur(flag) {
-      console.log(flag);
       this.searchDialogIndex = 1;
     },
     //根据传进来的状态改变建议输入框的状态（展开|隐藏）
@@ -469,39 +350,76 @@ export default {
       }
       this.initData();
     },
-    sortChange({ column, prop, order }) {
-      console.log(column, prop, order);
+    async changeIsTop(item, i) {
+      const isTop = item.isTop === 0 ? 1 : 0
+      const res = await edit({
+        ...item,
+        isTop
+      })
+      if (res.success) {
+        this.$message.success('操作成功!')
+        item.isTop = isTop;
+      } else {
+        this.$message.error(res.msg)
+      }
     },
     handleLabelType(id) {
-      this.dialogItem.typeId = id;
+      this.dialogItem.keywordType = id;
     },
     handleClick(row) {
       this.titleDialog = row ? '编辑意见' : '新建意见';
+      this.dialogItem = row ? { ...row } : { keywordType: 1 };
       this.limitTimeVisible = true;
-      this.dialogItem = row ? { ...row } : { typeId: 0 };
-      console.log(row);
-      row && this.dataFilter(row.title);
+      row && this.dataFilter(row.keywordName);
     },
     submitEdit(row) {
       console.log(row);
     },
     // 停用
     stopApllay(item) {
-      console.log(item);
       this.limitVisible = true;
+      this.dialogItem = item;
     },
     handleCurrentChange(val) {
       this.page.pageNow = val;
       this.initData();
     },
-    handleSubmitLimitTime() {
-      const { typeId, useFrequency } = this.dialogItem;
-      console.log(typeId, useFrequency);
+    // 删除 意见
+    async editStatus() {
+      const res = await remove({
+        ...this.dialogItem,
+      })
+      if (res.success) {
+        this.$message.success('操作成功!')
+        this.handleCurrentChange(this.data.length === 1 ? this.page.pageNow -1 : this.page.pageNow)
+      } else {
+        this.$message.error(res.msg)
+      }
+      this.limitVisible = false;
     },
-
+    // 编辑意见 或新增
+    async editItem() {
+      let res;
+      if (this.dialogItem?.recordId) {
+        res = await edit({
+          ...this.dialogItem,
+        })
+      } else {
+        res = await add({
+          ...this.dialogItem,
+          content: this.dialogItem.recommendedOpinions
+        })
+      }
+      if (res.success) {
+        this.$message.success('操作成功!')
+        this.handleCurrentChange(this.page.pageNow)
+      } else {
+        this.$message.error(res.msg)
+      }
+      this.limitTimeVisible = false;
+    },
     // 自定义筛选方法
     dataFilter(val) {
-       // this.setHighlight(this.searchList, val); // 匹配文字高亮显示
         this.initSearchData()
     },
     // 设置文字高亮
@@ -532,19 +450,13 @@ export default {
       this.searchDialogIndex = 1;
       cb(this.searchList);
       this.initSearchData();
-      // let searchList = JSON.parse(JSON.stringify(this.searchList));
-      // let results = val
-      //   ? searchList.filter(
-      //       item => item.value.includes(val) || item.value.toUpperCase().includes(val.toUpperCase())
-      //     )
-      //   : searchList;
-      // let results = [...searchList, searchList[0]];
-      // console.log(results);
-      // this.setHighlight(searchList, val);
-      // 调用 callback 返回建议列表的数据
     },
     handleSelect(val) {
-      this.initData();
+      if (this.limitTimeVisible) {
+        this.dialogItem.keywordId = val.label
+      } else {
+        this.initData();
+      }
     },
     // 复制
     handleCopy(val) {
