@@ -111,6 +111,7 @@ import {
   getApprovalType,
   getApprovalStage,
   billOfLadingAgenciesList,
+  toDoList
 } from "@/api/approvalCenter";
 export default {
   components: {
@@ -338,55 +339,72 @@ export default {
     },
     getList(pageNow) {
       let headerFlag = null;
-      switch (this.crtSign) {
-        case "toPending":
-          headerFlag = '1';
-          break;
-        case "approvedCount":
-          headerFlag = '2';
-          break;
-        case "applyAll":
-          headerFlag = '4';
-          break;
-        case "allTasksOffice":
-          headerFlag = '0';
-          break;
+      // switch (this.crtSign) {
+      //   case "toPending":
+      //     headerFlag = '1';
+      //     break;
+      //   case "approvedCount":
+      //     headerFlag = '2';
+      //     break;
+      //   case "applyAll":
+      //     headerFlag = '4';
+      //     break;
+      //   case "allTasksOffice":
+      //     headerFlag = '0';
+      //     break;
+
+      // }
+      // this.pageNow = pageNow;
+      // const param = {
+      //   pageNow,
+      //   pageSize: 10,
+      //   ...this.search,
+      //   headerFlag,
+      // };
+      // let sortType = "";
+      // // desc:降序 asc 升序 1 发起时间 2 更新时间
+      // // 1：创建时间：升序 2：创建时间：降序 3：更新时间：升序 4：更新时间：降序
+      // if (this.search.updateTime2[0] == 1) {
+      //   sortType = this.search.updateTime2[1] == "desc" ? 2 : 1;
+      // } else if (this.search.updateTime2[0] == 2) {
+      //   sortType = this.search.updateTime2[1] == "desc" ? 4 : 3;
+      // }
+      // param.sortType = sortType;
+      // Reflect.deleteProperty(param, "updateTime");
+      // Reflect.deleteProperty(param, "updateTime2");
+      // Reflect.deleteProperty(param, "total");
+      // Reflect.deleteProperty(param, "loading");
+      this.search.loading = true;
+      const userInfo =JSON.parse(window.localStorage.getItem('user_name'))
+      const param ={
+        pageNo:pageNow,
+        pageSize:10,
+        currentUserInfo:{
+          id:userInfo.id,
+          name:userInfo.fullname
+        }
 
       }
-      this.pageNow = pageNow;
-      const param = {
-        pageNow,
-        pageSize: 10,
-        ...this.search,
-        headerFlag,
-      };
-      let sortType = "";
-      // desc:降序 asc 升序 1 发起时间 2 更新时间
-      // 1：创建时间：升序 2：创建时间：降序 3：更新时间：升序 4：更新时间：降序
-      if (this.search.updateTime2[0] == 1) {
-        sortType = this.search.updateTime2[1] == "desc" ? 2 : 1;
-      } else if (this.search.updateTime2[0] == 2) {
-        sortType = this.search.updateTime2[1] == "desc" ? 4 : 3;
-      }
-      param.sortType = sortType;
-      Reflect.deleteProperty(param, "updateTime");
-      Reflect.deleteProperty(param, "updateTime2");
-      Reflect.deleteProperty(param, "total");
-      Reflect.deleteProperty(param, "loading");
-      this.search.loading = true;
-      censorList(param)
-        .then((res) => {
-          const { data } = res.data;
-          this.search.total = data.totalCount;
-          this.list = data.list;
+      toDoList(param).then(res=>{
+                 const { data } = res.data;
+          this.search.total = data.total;
+          this.list = data.records;
           this.search.loading = false;
-        })
-        .catch((err) => {
-          this.list = [];
-        })
-        .finally(() => {
-          this.search.loading = false;
-        });
+
+      })
+      // censorList(param)
+      //   .then((res) => {
+      //     const { data } = res.data;
+      //     this.search.total = data.totalCount;
+      //     this.list = data.list;
+      //     this.search.loading = false;
+      //   })
+      //   .catch((err) => {
+      //     this.list = [];
+      //   })
+      //   .finally(() => {
+      //     this.search.loading = false;
+      //   });
     },
     reset() {
       this.search = {
