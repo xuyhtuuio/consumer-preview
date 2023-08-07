@@ -91,7 +91,7 @@
           <use xlink:href="#icon-tubiao-1"></use>
         </svg>
         关注</span>
-      <span class="attention has-attention icon-op" v-else>
+      <span class="attention has-attention icon-op" v-else @click="concern(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-guanzhu-1"></use>
         </svg>已关注</span>
@@ -169,6 +169,7 @@ export default {
         if (res.status == 200) {
           this.$message.success(res.data.msg);
           item.concernId = item.concernId == 1 ? 0 : 1;
+  
         }
       });
     },
