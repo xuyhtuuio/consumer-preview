@@ -11,7 +11,7 @@
       </el-form-item>
       <el-form-item label="字段类型" prop="name">
         <el-select v-model="ruleForm.name" @change="changeFiledType" :disabled="nameDisable" placeholder="请选择字段类型" class="is-dark input" style="width: 100%">
-          <el-option v-for="item in feildTypes" :label="item.label" :value="item.value" :key="item.value" :disabled="item.disable"></el-option>
+          <el-option v-for="item in feildTypes" :label="item.chineseCharacter" :value="item.name" :key="item.name" :disabled="item.disable"></el-option>
         </el-select>
       </el-form-item>
       <!-- <el-form-item v-if="ruleForm.name === 'TimePicker'" label="时间格式" prop="dateFormat" class="is-dark input">
@@ -52,7 +52,7 @@
       <el-form-item label="是否必填" prop="required" class="is-dark input">
         <el-switch v-model="ruleForm.required" :disabled="isRequired"></el-switch>
       </el-form-item>
-      <el-form-item>
+      <el-form-item style="margin-left: 100px;">
         <el-button type="primary" @click="submitForm('ruleForm')">确认</el-button>
         <el-button @click="resetForm('ruleForm')">取消</el-button>
       </el-form-item>
@@ -60,7 +60,7 @@
   </div>
 </template>
 <script>
-  import { feildTypes, belongModules } from '@/utils/dict'
+  import { belongModules } from '@/utils/dict'
   import { addFormField, editItem } from '@/api/manage'
   import CascaderField from './cascaderField'
   import SelectField from './selectField'
@@ -73,7 +73,8 @@
       SelectGroupField
     },
     props: {
-      drawerTitle: String
+      drawerTitle: String,
+      feildTypes: Array
     },
     data() {
       return {
@@ -105,7 +106,6 @@
             { required: true, message: '请选择时间格式', trigger: 'change' }
           ]
         },
-        feildTypes,
         belongModules,
         cascaderOptions: [
           {
@@ -156,6 +156,11 @@
       }
     },
     methods: {
+      resetOptions() {
+        this.selectOptions = this.$options.data().selectOptions
+        this.selectGroupOptions = this.$options.data().selectGroupOptions
+        this.cascaderOptions = this.$options.data().cascaderOptions
+      },
       initForm(form, row ) {
         this.parentForm = form;
         if (row) {
@@ -391,3 +396,8 @@
     }
   }
 </script>
+<style lang="less" scoped>
+/deep/.el-input__inner {
+  height: 36px;
+}
+</style>
