@@ -1,3 +1,4 @@
+
 <template>
   <div class="user">
     <div class="top">
@@ -10,6 +11,7 @@
           <el-form-item class="form-item" label="所属机构">
             <el-cascader
               v-model="search.value"
+              popper-class="my-cascader"
               :options="cascaderOptions"
               @change="onSearch"
             ></el-cascader>
@@ -459,5 +461,7 @@ export default {
     }
   }
 }
+
+
 
 </style>
