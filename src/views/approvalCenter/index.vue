@@ -253,6 +253,9 @@ export default {
         });
       });
     },
+    concern(){
+      this.getDataStatistic()
+    },
     getApprovalType() {
       getApprovalType().then((res) => {
         this.transactionTypes = res.data.data.map((v, index) => {
