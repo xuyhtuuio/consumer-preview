@@ -10,8 +10,7 @@
         : 'data-statistics-item active-item'
         ">
         <div class="icon">
-          <img src="@/assets/image/apply-center/attention.png" alt="" v-if="index == 0" class="active-icon" />
-          <img src="@/assets/image/apply-center/no-attention.png" v-else alt="" class="default-icon" />
+          <img :src="item.icon" alt="" :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
         </div>
         <div class="name-count">
           <span class="name">{{ item.name }}</span>
@@ -42,19 +41,6 @@
               <el-option v-for="(item, index) in adoptionSituations" :key="index" :label="item.label"
                 :value="item.value"></el-option>
             </el-select>
-            <!-- <el-select
-              v-model="search.billOrganization"
-              placeholder="提单机构"
-              @change="searchList"
-              clearable
-            >
-              <el-option
-                v-for="(item, index) in adoptionSituations"
-                :key="index"
-                :label="item.label"
-                :value="item.value"
-              ></el-option>
-            </el-select> -->
             <el-cascader :options="agenciesList" placeholder="提单机构" ref="agencies" v-model="search.institutionalCode"
               :show-all-levels="false" @change="changeAgencies"
               :props="{ checkStrictly: true, label: 'name', value: 'code' }" clearable></el-cascader>
@@ -94,7 +80,7 @@
           </div>
           <trs-pagination :total="search.total" @getList='getList' :pageNow="pageNow"></trs-pagination>
         </div>
-        <div v-loading="search.loading" v-else> 
+        <div v-loading="search.loading" v-else>
           <Empty></Empty>
         </div>
       </div>
@@ -126,21 +112,27 @@ export default {
           name: "待处理",
           count: 0,
           value: "toPending",
+          icon: require('@/assets/image/apply-center/wait-review.svg')
         },
         {
           name: "已审批",
           count: 0,
           value: "approvedCount",
+          icon: require('@/assets/image/apply-center/approved.svg')
         },
         {
           name: "我的关注",
           count: 0,
           value: "applyAll",
+          icon: require('@/assets/image/apply-center/my-attention.svg')
         },
         {
           name: "全部任务",
           count: 0,
           value: "allTasksOffice",
+          icon: require('@/assets/image/apply-center/all-attention.svg')
+
+
         },
       ],
       search: {
@@ -253,8 +245,9 @@ export default {
         });
       });
     },
-    concern(){
+    concern() {
       this.getDataStatistic()
+      this.searchList();
     },
     getApprovalType() {
       getApprovalType().then((res) => {
@@ -273,12 +266,12 @@ export default {
       };
       getApprovalStage(params).then((res) => {
         const { data } = res.data
-        this.approvalPhases = data?data.map((v) => {
+        this.approvalPhases = data ? data.map((v) => {
           return {
             label: v,
             value: v,
           };
-        }):[]
+        }) : []
       });
     },
     changeArrrovalType() {
@@ -467,15 +460,15 @@ export default {
         position: relative;
 
         img {
-          width: 32px;
-          height: 32px;
+          width: 35px;
+          height: 35px;
         }
 
         .active-icon,
         .default-icon {
           position: absolute;
           top: 12px;
-          left: 9px;
+          left: 6px;
         }
       }
 
@@ -512,6 +505,7 @@ export default {
         }
       }
     }
+
     &-item:hover {
       background: #fff;
       border-radius: 6px;
@@ -524,7 +518,7 @@ export default {
         .default-icon {
           position: absolute;
           top: 12px;
-          left: 8px;
+          left: 6px;
         }
       }
     }
@@ -627,10 +621,11 @@ export default {
           margin-left: 16px;
         }
 
-        /deep/ .el-cascader .el-input .el-icon-arrow-down::before{
+        /deep/ .el-cascader .el-input .el-icon-arrow-down::before {
           font-family: element-icons !important;
           content: "\e790";
         }
+
         /deep/ .el-select .el-input .el-icon-arrow-up::before {
           font-family: element-icons !important;
           content: "\e78f";

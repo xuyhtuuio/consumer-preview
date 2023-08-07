@@ -11,8 +11,7 @@
           : 'data-statistics-item active-item'
         ">
         <div class="icon">
-          <img src="@/assets/image/apply-center/attention.png" alt="" v-if="item.value == crtSign" class="active-icon" />
-          <img src="@/assets/image/apply-center/no-attention.png" v-else alt="" class="default-icon" />
+          <img :src="item.icon" alt="" :class="item.value == crtSign?'active-icon':'default-icon'">
         </div>
         <div class="name-count">
           <span class="name">{{ item.name }}</span>
@@ -125,36 +124,42 @@ export default {
           count: 0,
           value: "applyAll",
           id: 0,
+          icon:require('@/assets/image/apply-center/all-attention.svg')
         },
         {
           name: "我的关注",
           count: 0,
           value: "myConcern",
           id: 1,
+          icon:require('@/assets/image/apply-center/my-attention.svg')
         },
         {
           name: "待修改",
           count: 0,
           value: "toModified",
           id: 4,
+          icon:require('@/assets/image/apply-center/wait-modify.svg')
         },
         {
           name: "待确认",
           count: 0,
           value: "toConfirmed",
           id: 5,
+          icon:require('@/assets/image/apply-center/wait-check.svg')
         },
         {
           name: "审批中",
           count: 0,
           value: "Approval",
           id: 6,
+          icon:require('@/assets/image/apply-center/in-approval.svg')
         },
         {
           name: "草稿箱",
           count: 0,
           value: "draftBin",
           id: 3,
+          icon:require('@/assets/image/apply-center/draft-box.svg')
         },
       ],
       search: {
@@ -377,6 +382,7 @@ export default {
     },
     concern() {
       this.getDataStatistic()
+      this.getApplicationList(1)
     },
     del(id) {
       const param = {
@@ -510,15 +516,15 @@ export default {
         position: relative;
 
         img {
-          width: 32px;
-          height: 32px;
+          width: 36px;
+          height: 36px;
         }
 
         .active-icon,
         .default-icon {
           position: absolute;
           top: 12px;
-          left: 9px;
+          left: 6px;
         }
       }
 
@@ -565,7 +571,7 @@ export default {
         .default-icon {
           position: absolute;
           top: 12px;
-          left: 8px;
+          left: 6px;
         }
       }
     }
