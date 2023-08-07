@@ -76,5 +76,14 @@ export function workSpaceAgree(param) {
     method: 'post',
     contentType: 'multipart/form-data',
     data: param
+//新的查询列表条件 
+  })
+}
+export function toDoList(param) {
+  return request({
+    url: '/cpr/workspace/process/toDoList',
+    method: 'post',
+    data: param,
+
   })
 }
