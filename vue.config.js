@@ -57,8 +57,8 @@ module.exports = {
         }
       },
       '/cpr': {
-        // target: 'http://192.168.210.57:31602',
-        target: 'http://10.8.0.86:8324',
+        target: 'http://192.168.210.57:31602',
+        // target: 'http://10.8.0.86:8324', // 徐维昌后台
         changeOrigin: true,
         ws: true,
         pathRewrite: {
