@@ -78,7 +78,7 @@ export default {
     processDefinitionId: ''
   }),
   created() {
-    this.initialData();
+    // this.initialData();
   },
   beforeRouteEnter({ name, params: { id } }, from, next) {
     if (name === 'addApply') return next();
@@ -144,8 +144,16 @@ export default {
         this.$refs[el].judgeWarnFlag = false;
       });
     },
+    clearForm() {
+      this.promotionChannels = [];
+      this.basicInformation = [];
+      this.keyPointsForVerification = [];
+      this.reviewMaterials = [];
+      // this.isLoading = true
+    },
     // 审查事项类型
     handleReviewClick(id) {
+      this.clearForm()
       getApplyForm({
         formId: this.formId,
         formCategoryId: id
@@ -257,7 +265,7 @@ export default {
           })
           .catch(err => {
             console.log(err);
-            this,$message({ type: 'error', message: '提交失败'})
+            this, $message({ type: 'error', message: '提交失败' });
           });
       }
       !flag &&
@@ -333,4 +341,9 @@ export default {
     }
   }
 }
+
+
+
+
+
 </style>

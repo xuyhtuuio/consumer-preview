@@ -32,6 +32,7 @@
       align-items: center;
       justify-content: center;
       border-radius: 6px;
+      width: max-content;
       cursor: pointer;
       &.size-normal {
         min-width: 88px;
@@ -56,5 +57,6 @@
       }
     }
 }
+
 
 </style>
