@@ -51,7 +51,14 @@ export function copyFormCategory(formCategoryId) {
     }
   })
 }
-
+// 表单管理-表单字段类型
+export function getItemType() {
+  return request({
+    url: '/cpr/FormManagement/getItemType',
+    method: 'get',
+    params: {}
+  })
+}
 // 表单管理-新增字段
 export function addFormField(param) {
   return request({

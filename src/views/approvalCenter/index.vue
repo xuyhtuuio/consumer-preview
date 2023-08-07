@@ -10,8 +10,7 @@
         : 'data-statistics-item active-item'
         ">
         <div class="icon">
-          <img src="@/assets/image/apply-center/attention.png" alt="" v-if="index == 0" class="active-icon" />
-          <img src="@/assets/image/apply-center/no-attention.png" v-else alt="" class="default-icon" />
+          <img :src="item.icon" alt="" :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
         </div>
         <div class="name-count">
           <span class="name">{{ item.name }}</span>
@@ -42,19 +41,6 @@
               <el-option v-for="(item, index) in adoptionSituations" :key="index" :label="item.label"
                 :value="item.value"></el-option>
             </el-select>
-            <!-- <el-select
-              v-model="search.billOrganization"
-              placeholder="提单机构"
-              @change="searchList"
-              clearable
-            >
-              <el-option
-                v-for="(item, index) in adoptionSituations"
-                :key="index"
-                :label="item.label"
-                :value="item.value"
-              ></el-option>
-            </el-select> -->
             <el-cascader :options="agenciesList" placeholder="提单机构" ref="agencies" v-model="search.institutionalCode"
               :show-all-levels="false" @change="changeAgencies"
               :props="{ checkStrictly: true, label: 'name', value: 'code' }" clearable></el-cascader>
@@ -90,11 +76,11 @@
       <div class="list" v-loading="search.loading">
         <div v-if="list.length">
           <div v-for="(item, index) in list" :key="index">
-            <approvalEventCard :item="item"></approvalEventCard>
+            <approvalEventCard :item="item" @concern="concern"></approvalEventCard>
           </div>
-          <trs-pagination :total="search.total" @getList='getList'></trs-pagination>
+          <trs-pagination :total="search.total" @getList='getList' :pageNow="pageNow"></trs-pagination>
         </div>
-        <div v-loading="search.loading" v-else> 
+        <div v-loading="search.loading" v-else>
           <Empty></Empty>
         </div>
       </div>
@@ -111,6 +97,7 @@ import {
   getApprovalType,
   getApprovalStage,
   billOfLadingAgenciesList,
+  toDoList
 } from "@/api/approvalCenter";
 export default {
   components: {
@@ -126,21 +113,27 @@ export default {
           name: "待处理",
           count: 0,
           value: "toPending",
+          icon: require('@/assets/image/apply-center/wait-review.svg')
         },
         {
           name: "已审批",
           count: 0,
           value: "approvedCount",
+          icon: require('@/assets/image/apply-center/approved.svg')
         },
         {
           name: "我的关注",
           count: 0,
           value: "applyAll",
+          icon: require('@/assets/image/apply-center/my-attention.svg')
         },
         {
           name: "全部任务",
           count: 0,
           value: "allTasksOffice",
+          icon: require('@/assets/image/apply-center/all-attention.svg')
+
+
         },
       ],
       search: {
@@ -253,6 +246,10 @@ export default {
         });
       });
     },
+    concern() {
+      this.getDataStatistic()
+      this.searchList();
+    },
     getApprovalType() {
       getApprovalType().then((res) => {
         this.transactionTypes = res.data.data.map((v, index) => {
@@ -270,12 +267,12 @@ export default {
       };
       getApprovalStage(params).then((res) => {
         const { data } = res.data
-        this.approvalPhases = data?data.map((v) => {
+        this.approvalPhases = data ? data.map((v) => {
           return {
             label: v,
             value: v,
           };
-        }):[]
+        }) : []
       });
     },
     changeArrrovalType() {
@@ -335,55 +332,71 @@ export default {
     },
     getList(pageNow) {
       let headerFlag = null;
-      switch (this.crtSign) {
-        case "toPending":
-          headerFlag = '1';
-          break;
-        case "approvedCount":
-          headerFlag = '2';
-          break;
-        case "applyAll":
-          headerFlag = '4';
-          break;
-        case "allTasksOffice":
-          headerFlag = '0';
-          break;
+      // switch (this.crtSign) {
+      //   case "toPending":
+      //     headerFlag = '1';
+      //     break;
+      //   case "approvedCount":
+      //     headerFlag = '2';
+      //     break;
+      //   case "applyAll":
+      //     headerFlag = '4';
+      //     break;
+      //   case "allTasksOffice":
+      //     headerFlag = '0';
+      //     break;
 
-      }
-      this.pageNow = pageNow;
-      const param = {
-        pageNow,
-        pageSize: 10,
-        ...this.search,
-        headerFlag,
-      };
-      let sortType = "";
-      // desc:降序 asc 升序 1 发起时间 2 更新时间
-      // 1：创建时间：升序 2：创建时间：降序 3：更新时间：升序 4：更新时间：降序
-      if (this.search.updateTime2[0] == 1) {
-        sortType = this.search.updateTime2[1] == "desc" ? 2 : 1;
-      } else if (this.search.updateTime2[0] == 2) {
-        sortType = this.search.updateTime2[1] == "desc" ? 4 : 3;
-      }
-      param.sortType = sortType;
-      Reflect.deleteProperty(param, "updateTime");
-      Reflect.deleteProperty(param, "updateTime2");
-      Reflect.deleteProperty(param, "total");
-      Reflect.deleteProperty(param, "loading");
+      // }
+      // this.pageNow = pageNow;
+      // const param = {
+      //   pageNow,
+      //   pageSize: 10,
+      //   ...this.search,
+      //   headerFlag,
+      // };
+      // let sortType = "";
+      // // desc:降序 asc 升序 1 发起时间 2 更新时间
+      // // 1：创建时间：升序 2：创建时间：降序 3：更新时间：升序 4：更新时间：降序
+      // if (this.search.updateTime2[0] == 1) {
+      //   sortType = this.search.updateTime2[1] == "desc" ? 2 : 1;
+      // } else if (this.search.updateTime2[0] == 2) {
+      //   sortType = this.search.updateTime2[1] == "desc" ? 4 : 3;
+      // }
+      // param.sortType = sortType;
+      // Reflect.deleteProperty(param, "updateTime");
+      // Reflect.deleteProperty(param, "updateTime2");
+      // Reflect.deleteProperty(param, "total");
+      // Reflect.deleteProperty(param, "loading");
       this.search.loading = true;
-      censorList(param)
-        .then((res) => {
-          const { data } = res.data;
-          this.search.total = data.totalCount;
-          this.list = data.list;
-          this.search.loading = false;
-        })
-        .catch((err) => {
-          this.list = [];
-        })
-        .finally(() => {
-          this.search.loading = false;
-        });
+      const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
+      const param = {
+        pageNo: pageNow,
+        pageSize: 10,
+        currentUserInfo: {
+          id: userInfo.id,
+          name: userInfo.fullname
+        }
+      }
+      toDoList(param).then(res => {
+        const { data,records } = res.data;
+        this.search.total = data.total;
+        this.list = data;
+        this.search.loading = false;
+
+      })
+      // censorList(param)
+      //   .then((res) => {
+      //     const { data } = res.data;
+      //     this.search.total = data.totalCount;
+      //     this.list = data.list;
+      //     this.search.loading = false;
+      //   })
+      //   .catch((err) => {
+      //     this.list = [];
+      //   })
+      //   .finally(() => {
+      //     this.search.loading = false;
+      //   });
     },
     reset() {
       this.search = {
@@ -464,15 +477,15 @@ export default {
         position: relative;
 
         img {
-          width: 32px;
-          height: 32px;
+          width: 35px;
+          height: 35px;
         }
 
         .active-icon,
         .default-icon {
           position: absolute;
           top: 12px;
-          left: 9px;
+          left: 6px;
         }
       }
 
@@ -509,6 +522,7 @@ export default {
         }
       }
     }
+
     &-item:hover {
       background: #fff;
       border-radius: 6px;
@@ -521,7 +535,7 @@ export default {
         .default-icon {
           position: absolute;
           top: 12px;
-          left: 8px;
+          left: 6px;
         }
       }
     }
@@ -624,10 +638,11 @@ export default {
           margin-left: 16px;
         }
 
-        /deep/ .el-cascader .el-input .el-icon-arrow-down::before{
+        /deep/ .el-cascader .el-input .el-icon-arrow-down::before {
           font-family: element-icons !important;
           content: "\e790";
         }
+
         /deep/ .el-select .el-input .el-icon-arrow-up::before {
           font-family: element-icons !important;
           content: "\e78f";

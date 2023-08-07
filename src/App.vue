@@ -42,6 +42,7 @@ export default {
 
 .view-box {
   padding: 16px 80px;
+  background: #f7f8fa;
 }
 
 body {

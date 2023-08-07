@@ -301,7 +301,7 @@ export default {
   align-items: center;
 
   .event-info {
-    flex: 1;
+    width: calc(100% - 250px);
 
     .event-name-status {
       margin-bottom: 14px;
