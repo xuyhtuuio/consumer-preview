@@ -393,10 +393,10 @@ export default {
       this.isLoading = true;
       const isTop = item.isTop === 0 ? 1 : 0;
       console.log(item);
-      
+
       const res = await edit({
         ...item,
-        isTop,
+        isTop
       });
       if (res.success) {
         this.$message.success('操作成功!');
@@ -444,9 +444,9 @@ export default {
       this.limitVisible = false;
     },
     // 编辑意见 或新增
-    async editItem({keywordName,recommendedOpinions}) {
-      if(!keywordName || !recommendedOpinions) return this.$message.error('请填写相关信息');
-      console.log(keywordName,recommendedOpinions,this.searchList)
+    async editItem({ keywordName, recommendedOpinions }) {
+      if (!keywordName || !recommendedOpinions) return this.$message.error('请填写相关信息');
+      console.log(keywordName, recommendedOpinions, this.searchList);
       if (!this.searchList.find(listItem => listItem.value === keywordName))
         return this.$message.error('请选择正确的关键词');
       let res;
@@ -469,7 +469,7 @@ export default {
         this.$message.error(res.msg);
       }
     },
-    querySearch(val, cb,flag = false) {
+    querySearch(val, cb, flag = false) {
       this.searchDialogIndex = 1;
       cb(this.searchList);
       this.initSearchData(flag);
@@ -609,7 +609,7 @@ export default {
   .main {
     height: calc(~'100% - 63px');
     overflow-y: auto;
-    padding: 24px 0;
+    padding: 24px 0 0;
     & > .info {
       display: flex;
       justify-content: space-between;
@@ -901,12 +901,6 @@ export default {
 
     color: #eb5757;
   }
-
-  /deep/ .el-input__inner {
-    border: 0;
-    background: #f7f8fa;
-    color: #1d2128;
-  }
 }
 /deep/.el-select-dropdown {
   left: 459px;
@@ -950,26 +944,11 @@ export default {
 
 .trs-pagination {
   /deep/.pagination {
-    text-align: center;
+    // text-align: center;
+    .el-input__inner {
+      height: 28px;
+      line-height: 28px;
+    }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </style>

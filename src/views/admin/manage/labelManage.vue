@@ -4,7 +4,12 @@
       <div class="search">
         <el-form class="my-form form" :inline="true" :model="search">
           <el-form-item class="form-item" label="标签类型">
-            <el-select v-model="search.type" placeholder="请选择标签类型" @change="getList" clearable>
+            <el-select
+              v-model="search.type"
+              placeholder="请选择标签类型"
+              @change="getList"
+              clearable
+            >
               <el-option
                 v-for="item in types"
                 :key="item.id"
@@ -15,7 +20,16 @@
           </el-form-item>
 
           <el-form-item class="form-item">
-            <el-autocomplete v-model="search.keyword" placeholder="请输入标签名称进行搜索" :fetch-suggestions="querySearch" :trigger-on-focus="false" @select="handleSelect" @keyup.enter.native="getList(1)" clearable @clear="getList(1)">
+            <el-autocomplete
+              v-model="search.keyword"
+              placeholder="请输入标签名称进行搜索"
+              :fetch-suggestions="querySearch"
+              :trigger-on-focus="false"
+              @select="handleSelect"
+              @keyup.enter.native="getList(1)"
+              clearable
+              @clear="getList(1)"
+            >
               <i slot="suffix" class="el-icon-search el-input__icon" @click="getList(1)"> </i>
               <template slot-scope="{ item }">
                 <div class="option-info">
@@ -52,11 +66,19 @@
         :cell-style="{ 'text-align': 'center' }"
       >
         <template #type="{ row }">
-          <span :class="[row.type === 1 ? 'class-zero' : 'class-one']">{{ row.type === 1 ? '禁用词' : '敏感词' }}</span>
+          <span :class="[row.type === 1 ? 'class-zero' : 'class-one']">{{
+            row.type === 1 ? '禁用词' : '敏感词'
+          }}</span>
         </template>
         <template #operate="scope">
           <el-button type="text" size="small" @click="handleClick(scope.row)"> 编辑</el-button>
-          <el-button type="text" size="small" v-if="scope.row.status === 0" @click="handleSubmitLimitTime(scope.row)">恢复</el-button>
+          <el-button
+            type="text"
+            size="small"
+            v-if="scope.row.status === 0"
+            @click="handleSubmitLimitTime(scope.row)"
+            >恢复</el-button
+          >
           <el-button type="text" class="red" @click="stopApllay(scope.row)" v-else>停用</el-button>
         </template>
       </TrsTable>
@@ -64,7 +86,7 @@
         :pageSize="10"
         :pageNow="page.pageNow"
         :total="page.total"
-        @getList="(val) => getList(val)"
+        @getList="val => getList(val)"
         scrollType="scrollCom"
         scrollName="scrollCom"
         v-if="page.total"
@@ -73,6 +95,7 @@
     </div>
     <!-- 编辑或新增 标签 -->
     <el-dialog
+      class="trs-pagination"
       :visible.sync="limitTimeVisible"
       width="600px"
       custom-class="user-dialog"
@@ -110,12 +133,16 @@
       </div>
     </el-dialog>
     <!-- 停用二次确认 -->
-    <secondary-confirmation :option="confirmOption" ref="confirmation" @handleConfirm="handleSubmitLimitTime(dialogItem)"></secondary-confirmation>
+    <secondary-confirmation
+      :option="confirmOption"
+      ref="confirmation"
+      @handleConfirm="handleSubmitLimitTime(dialogItem)"
+    ></secondary-confirmation>
   </div>
 </template>
 <script>
 import { getList, edit, add } from '@/api/admin-label.js';
-import secondaryConfirmation from "@/components/common/secondaryConfirmation"
+import secondaryConfirmation from '@/components/common/secondaryConfirmation';
 export default {
   name: 'labelManage',
   components: { secondaryConfirmation },
@@ -128,7 +155,7 @@ export default {
       confirmOption: {
         message: '停用后提交的工单将不会对该关键词进行风险提示， 确定停用此标签吗？',
         cancelBtn: '取消',
-        confirmBtn: '停用',
+        confirmBtn: '停用'
       },
       types: [
         { id: 1, value: '禁用词' },
@@ -147,7 +174,7 @@ export default {
           label: '标签类型',
           prop: 'type',
           bind: {
-            width: 250,
+            width: 250
           }
         },
         {
@@ -178,11 +205,11 @@ export default {
     };
   },
   created() {
-    this.getList()
+    this.getList();
   },
   methods: {
     handleSelect() {
-      this.getList()
+      this.getList();
     },
     async querySearch(queryString, cb) {
       const res = await getList({
@@ -191,23 +218,23 @@ export default {
         isAll: 1,
         type: this.search.type,
         content: queryString
-      })
-      const { data } = res.data
-      cb(data?.list  || []);
+      });
+      const { data } = res.data;
+      cb(data?.list || []);
     },
     async getList(pageNow) {
       this.loading = true;
-      const pageNum = pageNow || 1
+      const pageNum = pageNow || 1;
       const res = await getList({
         pageNum,
         pageSize: 10,
         isAll: 1,
         type: this.search.type,
         content: this.search.keyword
-      })
-      const { data, success } = res.data
+      });
+      const { data, success } = res.data;
       if (success) {
-        this.data = data.list
+        this.data = data.list;
         this.page.pageNow = pageNum;
         this.page.total = data.totalCount;
       }
@@ -244,15 +271,15 @@ export default {
         res = await edit({
           keywordContent,
           recordId,
-          type,
-        })
+          type
+        });
       } else {
         res = await add({
           keywordContent,
-          type,
-        })
+          type
+        });
       }
-      const { success, msg } = res.data
+      const { success, msg } = res.data;
       if (success) {
         this.$message.success('操作成功!');
         // if (recordId) {
@@ -263,26 +290,25 @@ export default {
         // } else {
         //   this.getList(this.page.pageNow)
         // }
-        this.getList(this.page.pageNow)
+        this.getList(this.page.pageNow);
         this.limitTimeVisible = false;
       } else {
-        this.$message.error(msg)
+        this.$message.error(msg);
       }
     },
     async handleSubmitLimitTime(item) {
       const { recordId, status } = item;
       const res = await edit({
         status: status === 0 ? 1 : 0,
-        recordId,
-      })
-      const { success, msg } = res.data
+        recordId
+      });
+      const { success, msg } = res.data;
       if (success) {
         this.$message.success('操作成功!');
-        this.getList(this.page.pageNow)
+        this.getList(this.page.pageNow);
       } else {
-        this.$message.error(msg)
+        this.$message.error(msg);
       }
-      
     }
   }
 };
@@ -290,6 +316,8 @@ export default {
 <style lang="less" scoped>
 @color1: #1d2128;
 .label {
+  height: 100%;
+  overflow-y: auto;
   .el-icon-search {
     cursor: pointer;
   }
@@ -376,7 +404,7 @@ export default {
   }
 
   .main {
-    padding: 24px 0;
+    padding: 24px 0 0;
   }
 
   .el-button--text {
@@ -545,11 +573,11 @@ export default {
     color: #eb5757;
   }
 
-  /deep/ .el-input__inner {
-    border: 0;
-    background: #f7f8fa;
-    color: #1d2128;
-  }
+  // /deep/ .el-input__inner {
+  //   border: 0;
+  //   background: #f7f8fa;
+  //   color: #1d2128;
+  // }
 }
 
 .option-info {
@@ -589,4 +617,11 @@ export default {
   }
 }
 
+/deep/.pagination {
+  // text-align: center;
+  .el-input__inner {
+    height: 28px;
+    line-height: 28px;
+  }
+}
 </style>
