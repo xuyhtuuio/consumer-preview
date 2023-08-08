@@ -218,9 +218,27 @@ export default {
       }
       this.$forceUpdate()
     },
+    checkNewName(n) {
+      const names = []
+      this.nodeMap.forEach(value => {
+        names.push(value.name)
+      })
+      let i = 0
+      let checkUserName = n
+      const checkName = (name) => {
+        const newName = name + (++i)
+        if (names.includes(newName)) {
+         return checkName(checkUserName)
+        }
+        return newName
+      }
+      if (names.length > 1) {
+        checkUserName = checkName(checkUserName)
+      }
+      return checkUserName
+    },
     insertApprovalNode(parentNode){
-      console.log(parentNode)
-      this.$set(parentNode.children, "name", "审批人")
+      this.$set(parentNode.children, "name", this.checkNewName('审批人'))
       this.$set(parentNode.children, "props", this.$deepCopy(DefaultProps.APPROVAL_PROPS))
     },
     insertApprovalTWONode(parentNode) {
@@ -228,7 +246,7 @@ export default {
       this.$set(parentNode.children, "props", this.$deepCopy(DefaultProps.APPROVAL_PROPS))
     },
     insertCcNode(parentNode){
-      this.$set(parentNode.children, "name", "抄送人")
+      this.$set(parentNode.children, "name", this.checkNewName('抄送人'))
       this.$set(parentNode.children, "props", this.$deepCopy(DefaultProps.CC_PROPS))
     },
     insertDelayNode(parentNode){

@@ -139,8 +139,8 @@ export default {
     validate(){
       this.$refs.baseSetting.validate()
       let err = []
-      if (!this.$isNotEmpty(this.setup.templateName)){
-        err.push('流程名称未设置')
+      if (this.setup.templateName < 2 || this.setup.templateName > 10){
+        err.push('流程名称未设置或长度不对')
       }
       if (!this.$isNotEmpty(this.setup.formId) || !this.setup.formId){
         err.push('关联表单未设置')
@@ -176,6 +176,13 @@ export default {
 /deep/ .select-u {
   width: 100%;
 }
+
+.icon {
+  width: 1.3em;
+  height: 1.3em;
+}
+
+
 
 .base-setup {
   overflow: auto;
