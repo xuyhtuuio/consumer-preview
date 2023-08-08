@@ -427,7 +427,7 @@ export default {
         if (resData && this.level === 1) {
           row.examineTypesName = resData.find(item => item.recordId === row.recordId).examineTypesName
         }
-        this.$message.error(res?.data.msg)
+        this.$message.warning(res?.data.msg)
       }
     },
     editSelfForm(item) {
