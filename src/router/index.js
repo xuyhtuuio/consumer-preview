@@ -197,7 +197,12 @@ const router = new Router({
         },
       ]
     },
-    
+    {
+      path: "/productmap",
+      name: "productmap",
+      component: () => import("@/views/product-map/index"),
+      meta: { title: '产品图谱', viewport: viewport },
+    },
   ]
 })
 
