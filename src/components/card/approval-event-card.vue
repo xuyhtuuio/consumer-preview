@@ -9,13 +9,12 @@
         <svg class="icon urgent-icon" aria-hidden="true" v-if="item.dismissalMark == 1">
           <use xlink:href="#icon-tongyongtubiao2"></use>
         </svg>
-        <span class="event-name pointer" @click="toDetail(item)">{{ item.taskName }}</span>
+        <span class="event-name pointer" @click="toDetail(item)">{{ item.entryName }}</span>
         <span class="event-status">
           <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
-
-          <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中>{{ item.approvalStage }}</i>
-          <i v-if="item.taskStatus === '2'" class="tag in-modify">待修改>{{ item.approvalStage }}</i>
-          <i v-if="item.taskStatus === '3'" class="tag check">待确认>{{ item.approvalStage }}</i>
+          <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中>{{ item.nodeName }}</i>
+          <i v-if="item.taskStatus === '2'" class="tag in-modify">待修改>{{ item.nodeName }}</i>
+          <i v-if="item.taskStatus === '3'" class="tag check">待确认>{{ item.nodeName }}</i>
           <i v-if="item.taskStatus === '4'" class="end">
             <i class="tag end-sign"> 已结束 </i>
           </i>
@@ -45,17 +44,17 @@
         </span>
       </div>
       <div class="event-infos">
-        <span class="id">{{ item.taskNumber }}</span>
-        <span class="sDate date">发起时间：{{ item.create_time | timeFormate }}</span>
-        <span class="sDate date">更新时间：{{ item.update_time | timeFormate }}</span>
-        <span class="sDate date">上线时间：{{ item.launchDate | timeFormate }}</span>
+        <span class="id">{{ item.recordId }}</span>
+        <span class="sDate date">发起时间：{{ item.createTime | timeFormate }}</span>
+        <span class="sDate date">更新时间：{{ item.updateTime | timeFormate }}</span>
+        <span class="sDate date">上线时间：{{ item.uptime | timeFormate }}</span>
         <!-- <span class="handler date">当前处理人：王明明</span> -->
-        <el-popover placement="bottom" trigger="hover" popper-class="popper-persons" v-if="item.sponsorMap && item.sponsorMap.name">
+        <el-popover placement="bottom" trigger="hover" popper-class="popper-persons" v-if="item.originator && item.originator.name">
           <div style="text-align: center;">
-            {{ item.sponsorMap && item.sponsorMap.institution }} | {{ item.sponsorMap && item.sponsorMap.dep }}
+            {{ item.originator && item.originator.label }}
           </div>
           <span slot="reference" class="handler date pointer" >发起人：{{
-            item.sponsorMap && item.sponsorMap.name
+            item.originator && item.originator.name
           }}</span>
         </el-popover>
         <span  class="handler date" v-else>发起人：--</span>
@@ -130,7 +129,7 @@ export default {
         name: "approval-details",
         params: {
           formId: item.taskNumber,
-          originatorId: item.sponsorMap.sponsorId,
+          originatorId: item.originator.id,
           taskName:item.taskName
         },
       });
@@ -148,7 +147,7 @@ export default {
         name: "approval-details",
         params: {
           formId: item.taskNumber,
-          originatorId: item.sponsor,
+          originatorId:  item.originator.id,
           taskName:item.taskName
         },
       });

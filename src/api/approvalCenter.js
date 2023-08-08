@@ -87,3 +87,14 @@ export function toDoList(param) {
 
   })
 }
+
+
+export function getApprovalList(param) {
+  return request({
+    url: '/cpr/censor/getApprovalList',
+    method: 'post',
+    data: param,
+    contentType: 'application/json'
+
+  })
+}
