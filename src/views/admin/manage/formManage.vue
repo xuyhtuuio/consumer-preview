@@ -427,7 +427,7 @@ export default {
         if (resData && this.level === 1) {
           row.examineTypesName = resData.find(item => item.recordId === row.recordId).examineTypesName
         }
-        this.$message.error(res?.data.msg)
+        this.$message.warning(res?.data.msg)
       }
     },
     editSelfForm(item) {
@@ -489,6 +489,10 @@ export default {
     },
     async handleSubmitLimitTime() {
       if (this.limitTime) {
+        if (this.limitTime > 1000000) {
+          this.$message.warning('请输入不大于1000000的数字')
+          return;
+        }
         await modifyTimeLimitFormCategory({
           formCategoryId: this.currentRow.recordId,
           timeLimit: this.limitTime,
@@ -614,6 +618,10 @@ export default {
 .drawer-main {
   padding: 0 24px 0 14px;
 }
+/deep/.el-dialog {
+  border-radius: 10px;
+  padding: 20px 40px 10px;
+}
 </style>
 <style lang="less">
 .el-message-box {
@@ -670,9 +678,5 @@ export default {
   width: 40px;
   height: 40px;
   display: block;
-}
-.el-dialog {
-  border-radius: 10px;
-  padding: 20px 40px 10px;
 }
 </style>
