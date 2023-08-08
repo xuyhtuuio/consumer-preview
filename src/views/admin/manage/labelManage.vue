@@ -7,7 +7,7 @@
             <el-select
               v-model="search.type"
               placeholder="请选择标签类型"
-              @change="getList"
+              @change="(val)=>getList()"
               clearable
             >
               <el-option
@@ -28,10 +28,6 @@
               :trigger-on-focus="false"
               @select="handleSelect"
               @keyup.enter.native="getList(1)"
-              @focus="handleSearchFocusOrBlur"
-              @blur="handleSearchFocusOrBlur(false)"
-              @mouseout.native="handleSearchOutOrOver(false)"
-              @mouseover.native="handleSearchOutOrOver"
               clearable
               @clear="getList(1)"
             >
@@ -213,8 +209,9 @@ export default {
     this.getList();
   },
   methods: {
-    handleSelect() {
-      this.getList();
+    handleSelect({keywordContent}) {
+      this.search.keyword = keywordContent
+      this.getList(1);
     },
     async querySearch(queryString, cb) {
       const res = await getList({
@@ -246,7 +243,7 @@ export default {
       this.loading = false;
     },
     sortChange({ column, prop, order }) {
-      console.log(column, prop, order);
+      // console.log(column, prop, order);
     },
     handleLabelType(id) {
       this.dialogItem.type = id;
@@ -258,21 +255,7 @@ export default {
       this.dialogItem.index = index;
     },
     submitEdit(row) {
-      console.log(row);
-    },
-    handleIptPadding(ref, flag = true) {
-      flag && this.$refs[ref].$el.children[0].children[0].classList.add('el-input__inner-1');
-      !flag && this.$refs[ref].$el.children[0].children[0].classList.remove('el-input__inner-1');
-    },
-    handleSearchFocusOrBlur(flag = true) {
-      this.searchDialogIndex = 1;
-      flag && ((this.isSearchFocus = true), this.handleIptPadding('autocomplete'));
-      !flag && ((this.isSearchFocus = false), this.handleIptPadding('autocomplete', false));
-    },
-    handleSearchOutOrOver(flag) {
-      if (this.isSearchFocus) return;
-      flag && this.handleIptPadding('autocomplete');
-      !flag && this.handleIptPadding('autocomplete', false);
+      // console.log(row);
     },
     // 停用
     stopApllay(item) {
@@ -643,4 +626,20 @@ export default {
     line-height: 28px;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </style>
