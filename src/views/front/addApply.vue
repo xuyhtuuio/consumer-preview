@@ -153,7 +153,7 @@ export default {
     },
     // 审查事项类型
     handleReviewClick(id) {
-      this.clearForm()
+      this.clearForm();
       getApplyForm({
         formId: this.formId,
         formCategoryId: id
@@ -259,9 +259,13 @@ export default {
           },
           submitDto: result
         })
-          .then(res => {
-            this.$message({ type: 'success', message: res.data.msg === 'success' && '提交成功' });
-            this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
+          .then(({ data: { success } }) => {
+            if (success) {
+              this.$message({ type: 'success', message: '提交成功' });
+              this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
+            }else {
+              this.$message({ type: 'error', message: '提交失败' });
+            }
           })
           .catch(err => {
             console.log(err);
@@ -341,9 +345,6 @@ export default {
     }
   }
 }
-
-
-
 
 
 </style>

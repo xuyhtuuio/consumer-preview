@@ -29,21 +29,25 @@
     <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow.templateName + '-预览'">
       <process-design from="flowManage" ref="processDesign" style="background: #f5f6f6;" />
     </w-dialog>
+    <secondary-confirmation :option="confirmOption" ref="confirmation" @handleConfirm="handleStop(confirmOption)"></secondary-confirmation>
   </div>
 </template>
 <script>
 import { getProcessList } from '@/api/manage'
 import { deleteProcess, publishProcess, getProcessDetailByTemplateId, stopProcess } from '@/api/design'
 import ProcessDesign from '@/views/admin/layout/ProcessDesign'
+import secondaryConfirmation from "@/components/common/secondaryConfirmation"
 export default {
   name: 'flowManage',
   components: {
-    ProcessDesign
+    ProcessDesign,
+    secondaryConfirmation
   },
   data() {
     return {
       tableLoading: false,
       flowVisible: false,
+      confirmOption: {},
       tagItem: {
         label: '已发布',
         background: '#f0fffc',
@@ -169,30 +173,38 @@ export default {
         this.$message.success("审批流程已发布成功！可在列表页查看")
       }
     },
+    async handleStop() {
+      await stopProcess(this.processDetailRes.data.data.processDefinitionId, this.currentRow.templateId)
+      this.getProcessList()
+      this.$message.success('停用成功')
+    },
     async stopFlow(row) {
-      const processDetailRes = await getProcessDetailByTemplateId(row.templateId)
-      console.log(processDetailRes.data)
-      if (!processDetailRes.data?.data?.processDefinitionId) {
+      this.currentRow = row
+      this.processDetailRes = await getProcessDetailByTemplateId(row.templateId)
+      if (!this.processDetailRes.data?.data?.processDefinitionId) {
         this.$message.error("流程id不存在！")
-        return;
+        return false;
       }
-      const res = await stopProcess(processDetailRes.data.data.processDefinitionId, row.templateId)
-      // const msg = '此流程中存在未结束的申请单，暂时无法停用'
-      // const msg1 = '停用后将无法使用此流程，确定停用吗？'
-      const msg = res.data?.msg
-      if (msg) {
-        this.$confirm(`<div><div><i class="el-alert__icon el-icon-warning" style="color: #e6a23c;font-size: 26px;"></i></div>${msg}</div>`, '', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          dangerouslyUseHTMLString: true,
-          // type: 'warning'
-        }).then(() => {
-          
-        })
+      // check 接口
+      const msg = '此流程中存在未结束的申请单，暂时无法停用'
+      const msg1 = '停用后将无法使用此流程，确定停用吗？'
+      const res = {}
+      if (res.msg) {
+        this.confirmOption = {
+          message: msg,
+          cancelBtn: '取消',
+          confirmBtn: '停用',
+          fetch: true
+        }
       } else {
-        this.getProcessList()
-        this.$message.success('停用成功')
+        this.confirmOption = {
+          message: msg1,
+          cancelBtn: '取消',
+          confirmBtn: '停用',
+          fetch: true
+        }
       }
+      this.$refs.confirmation.dialogVisible = true;
     },
     async deleteFlow(row) {
       const res = await deleteProcess(row.templateId)

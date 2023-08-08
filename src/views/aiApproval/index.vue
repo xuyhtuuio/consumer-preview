@@ -40,7 +40,7 @@
       </div>
     </div>
     <add-review ref="addReview" @addRecommend="addRecommend"></add-review>
-    <submit-review ref="submitReview" :formId="formId"></submit-review>
+    <submit-review ref="submitReview" :formId="formId" :formBase="formBase"></submit-review>
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <applyFormFilePreview :url="previewfileUrl"></applyFormFilePreview>
     </el-dialog>
@@ -79,6 +79,7 @@ export default {
   components: { applyFormFilePreview, filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase,secondaryConfirmation },
   data() {
     return {
+      formBase: {},
       projectName: '',
       previewDialog: false,
       previewfileUrl: '',
@@ -153,6 +154,7 @@ export default {
     this.formCategoryId = item.formCategoryId
     this.loading = true;
     this.init(item)
+    this.formBase = item;
   },
   methods: {
     // 获取工单基本信息
