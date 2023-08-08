@@ -12,6 +12,7 @@
                     <el-button type="primary" @click="submit"> 提交</el-button>
                 </div>
             </div>
+            <div class="line"></div>
         </div>
         <div>
             <el-form v-if="false" :model="params" ref="paramsForm" label-width="86px" label-position="left" :rules="rules">
@@ -46,7 +47,6 @@
                     </el-checkbox-group>
                 </el-form-item>
             </el-form>
-            <div class="line"></div>
             <p class="title">消保审查意见书</p>
             <div class="submission-content" v-if="submission.length">
                 <p class="submission-name">
@@ -56,19 +56,23 @@
                 <div class="submission-list">
                     <div class="submission-item" v-for="(item, index) in submission" :key="index" @mouseleave="mouseleave"
                         @mouseenter="mouseenter(item, index)">
-                        <div class="submission-text">
-                            <span class="sort">{{ index + 1 }}.</span> <span>{{ item.str }}</span>
+                        <div class="submission-text"  @dblclick="showEdit_collection(index)">
+                            <span class="sort">{{ index + 1 }}.</span>
+                            <span v-if="!item.showEdit">{{ item.str }}</span>
+                            <el-input v-else :ref="`input_${index}`" v-model.trim="item.str" placeholder="请输入意见" type="textarea" :rows="3" class="edit-input" resize="none" @blur="item.showEdit = false" @keyup.enter.native="item.showEdit = false"></el-input>
                         </div>
                         <div class="submission-op">
                             <!-- <i>无实质意见</i> -->
-                            <span v-if="item.opinion" class="opinion has-opinion" @click="item.opinion = !item.opinion">
-                                <i class="iconfont icon icon-guanzhu"></i>
-                                有实质意见
-                            </span>
-                            <span v-if="!item.opinion" class="opinion no-opinion" @click="item.opinion = !item.opinion">
-                                <i class="iconfont icon icon-guanzhu2"></i>
-                                无实质意见
-                            </span>
+                            <el-tooltip class="item" content="点击意见标签切换意见类型" placement="bottom">
+                                <span v-if="item.opinion" class="opinion has-opinion" @click="item.opinion = !item.opinion">
+                                    <i class="iconfont icon icon-guanzhu"></i>
+                                    有实质意见
+                                </span>
+                                <span v-if="!item.opinion" class="opinion no-opinion" @click="item.opinion = !item.opinion">
+                                    <i class="iconfont icon icon-guanzhu2"></i>
+                                    无实质意见
+                                </span>
+                            </el-tooltip>
                             <span style="width:20px;"> <i class="el-icon-top move" v-if="index !== 0 && mousePoint == index"
                                     @click="moveTop(index)"></i></span>
                             <span style="width:20px;"><i class="el-icon-bottom move"
@@ -84,7 +88,7 @@
                 </p>
                 <p class="organization">
                     <span>消保审查中心</span><br />
-                    <span>2021-09-08 12：20：30</span>
+                    <span>{{ timeNow }}</span>
                 </p>
             </div>
             <div v-else class="nodata">
@@ -97,6 +101,7 @@
     </el-dialog>
 </template>
 <script>
+import moment from 'moment'
 import {
     ocrApprovalSubmission
 } from "@/api/aiApproval";
@@ -111,6 +116,7 @@ export default {
     },
     data() {
         return {
+            timeNow: '',
             saveOption: {
                 message: '关闭提交弹窗将不保存已修改内容，确定关闭？',
                 cancelBtn: '取消',
@@ -158,7 +164,20 @@ export default {
             }
         }
     },
+    watch: {
+        submitReviewDialog(val) {
+            if (val) {
+                this.timeNow = moment().format('YYYY-MM-DD HH:mm:ss');
+            }
+        }
+    },
     methods: {
+        showEdit_collection(i) {
+            this.$set(this.submission[i], 'showEdit', true);
+            this.$nextTick(() => {
+                this.$refs[`input_${i}`][0].focus()
+            })
+        },
         // 提交结果
         submit() {
             // console.log(this.submission, this.increasedIds)
@@ -170,11 +189,12 @@ export default {
                 editedCommentsDtoList: this.submission,
                 formId: this.formId
             }).then((res) => {
-                const { status, message } = res.data;
+                const { status, msg } = res.data;
                 if (status === 200) {
-                    this.$message.success({ offset: 40, message });
+                    this.$message.success({ offset: 40, message: '审查意见已提交,可在审批中心查看' });
+                    this.$router.go(-1)
                 } else {
-                    this.$message.error({ offset: 40, message });
+                    this.$message.error({ offset: 40, message: msg });
                 }
             })
         },
@@ -226,10 +246,11 @@ export default {
     padding: 40px 60px;
     border-radius: 15px;
     background: #FFF;
+    display: flex;
+    flex-direction: column;
 
     .el-dialog__header {
         padding: 0;
-        margin-bottom: 16px;
 
         .top-op {
             display: flex;
@@ -256,6 +277,13 @@ export default {
             color: #80A6FF;
             margin-right: 8px;
         }
+        .line {
+            width: 100%;
+            height: 1px;
+            background: #E5E6EB;
+            margin: 16px 0;
+        }
+
     }
 
     .el-dialog__body {
@@ -325,13 +353,7 @@ export default {
             height: 18px;
         }
 
-        .line {
-            width: 100%;
-            height: 1px;
-            background: #E5E6EB;
-            margin: 12px 0;
-        }
-
+        
         .title {
             color: #1D2128;
             text-align: center;
