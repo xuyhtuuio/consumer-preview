@@ -59,7 +59,7 @@ export function RecommendedListLoadMore(param) {
 // ocr审批提交
 export function ocrApprovalSubmission(param) {
   return request({
-    url: '/cpr/OcrExamine/ocrApprovalSubmission',
+    url: '/cpr/workspace/agree',
     method: 'post',
     data: param
   })

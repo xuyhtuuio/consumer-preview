@@ -113,6 +113,10 @@ export default {
             type: String,
             default: ''
         },
+        formBase: {
+            type: Object,
+            default: () => ({})
+        }
     },
     data() {
         return {
@@ -185,10 +189,20 @@ export default {
                 comment.id = this.increasedIds.strIds.includes(comment.id) ? null : comment.id;
                 comment.words = comment.words.filter(id => !this.increasedIds.words.includes(id))
             })
-            ocrApprovalSubmission({
-                editedCommentsDtoList: this.submission,
-                formId: this.formId
-            }).then((res) => {
+            const user = JSON.parse(window.localStorage.getItem('user_name'))
+            const data = {
+                approvalSubmissionDto: {
+                    editedCommentsDtoList: this.submission,
+                    formId: this.formId
+                },
+                processInstanceId: this.formBase.processInstanceId,
+                taskId: this.formBase.taskId,
+                currentUserInfo: {
+                    id: user.id,
+                    name: user.fullname
+                }
+            }
+            ocrApprovalSubmission(data).then((res) => {
                 const { status, msg } = res.data;
                 if (status === 200) {
                     this.$message.success({ offset: 40, message: '审查意见已提交,可在审批中心查看' });
