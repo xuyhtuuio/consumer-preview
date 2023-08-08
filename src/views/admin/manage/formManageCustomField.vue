@@ -38,7 +38,7 @@
         <SelectGroupField :data="selectGroupOptions" class="cascader-content"/>
       </el-form-item>
       <el-form-item v-if="ruleForm.name === 'TextInput' || ruleForm.name === 'TextareaInput'" label="文字个数" prop="numberOfWords" class="is-dark input">
-        <el-input v-model="ruleForm.numberOfWords" placeholder="请输入文字个数" oninput="value=value.replace(/^0|[^0-9]/g, '')" class="is-dark input"></el-input>
+        <el-input v-model="ruleForm.numberOfWords" maxlength="7" placeholder="请输入文字个数" oninput="value=value.replace(/^0|[^0-9]/g, '')" class="is-dark input"></el-input>
       </el-form-item>
       <el-form-item v-if="ruleForm.name === 'TextInput'" label="独占一行" prop="exclusiveRowOrNot" class="is-dark input">
         <el-switch v-model="ruleForm.exclusiveRowOrNot"></el-switch>
@@ -46,9 +46,9 @@
       <el-form-item v-if="showExpanding" label="选项展开" prop="expanding" class="is-dark input">
         <el-switch v-model="ruleForm.expanding" :disabled="expandingDisable"></el-switch>
       </el-form-item>
-      <!-- <el-form-item label="是否多选" v-if="ruleForm.name === 'Cascader'" prop="isMultiple" class="is-dark input">
+      <el-form-item label="是否多选" v-if="ruleForm.name === 'Cascader'" prop="isMultiple" class="is-dark input">
         <el-switch v-model="ruleForm.isMultiple"></el-switch>
-      </el-form-item> -->
+      </el-form-item>
       <el-form-item label="是否必填" prop="required" class="is-dark input">
         <el-switch v-model="ruleForm.required" :disabled="isRequired"></el-switch>
       </el-form-item>
@@ -162,6 +162,7 @@
         this.cascaderOptions = this.$options.data().cascaderOptions
       },
       setOptions(name, options) {
+        debugger
         if (name === 'MultipleGroupsSelect') {
           this.selectGroupOptions = options
         } else if (name === 'Cascader') {
@@ -173,16 +174,17 @@
       initForm(form, row ) {
         this.parentForm = form;
         if (row) {
-          this.currentRow = row
-          this.$set(this.ruleForm, 'title', row.title)
-          this.$set(this.ruleForm, 'module', row.module)
-          this.$set(this.ruleForm, 'name', row.special.name)
-          this.$set(this.ruleForm, 'required', Boolean(row.required))
-          this.$set(this.ruleForm, 'expanding', Boolean(row.special.props.expanding))
-          this.$set(this.ruleForm, 'placeholder', row.special.props.placeholder)
-          console.log(this.ruleForm)
-          if (row.special.props.options) {
-            this.setOptions(row.special.props.name, row.special.props.options)
+          this.currentRow = JSON.parse(JSON.stringify(row))
+          this.$set(this.ruleForm, 'title', this.currentRow.title)
+          this.$set(this.ruleForm, 'module', this.currentRow.module)
+          this.$set(this.ruleForm, 'name', this.currentRow.special.name)
+          this.$set(this.ruleForm, 'required', Boolean(this.currentRow.required))
+          this.$set(this.ruleForm, 'expanding', Boolean(this.currentRow.special.props.expanding))
+          this.$set(this.ruleForm, 'placeholder', this.currentRow.special.props.placeholder)
+          this.$set(this.ruleForm, 'numberOfWords', this.currentRow.special.props.numberOfWords)
+          this.$set(this.ruleForm, 'exclusiveRowOrNot', this.currentRow.special.props.exclusiveRowOrNot)
+          if (this.currentRow.special.name && this.currentRow.special.props.options) {
+            this.setOptions(this.currentRow.special.name, this.currentRow.special.props.options)
           }
         } else {
           this.currentRow = {}
