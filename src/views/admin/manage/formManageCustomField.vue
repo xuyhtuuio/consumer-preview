@@ -161,6 +161,15 @@
         this.selectGroupOptions = this.$options.data().selectGroupOptions
         this.cascaderOptions = this.$options.data().cascaderOptions
       },
+      setOptions(name, options) {
+        if (name === 'MultipleGroupsSelect') {
+          this.selectGroupOptions = options
+        } else if (name === 'Cascader') {
+          this.cascaderOptions = options
+        } else {
+          this.selectOptions = options
+        }
+      },
       initForm(form, row ) {
         this.parentForm = form;
         if (row) {
@@ -170,7 +179,11 @@
           this.$set(this.ruleForm, 'name', row.special.name)
           this.$set(this.ruleForm, 'required', Boolean(row.required))
           this.$set(this.ruleForm, 'expanding', Boolean(row.special.props.expanding))
+          this.$set(this.ruleForm, 'placeholder', row.special.props.placeholder)
           console.log(this.ruleForm)
+          if (row.special.props.options) {
+            this.setOptions(row.special.props.name, row.special.props.options)
+          }
         } else {
           this.currentRow = {}
           this.ruleForm = this.$options.data().ruleForm
@@ -243,9 +256,10 @@
               res = await editItem(form)
             }
             if (res?.data?.success) {
+              this.resetOptions()
               this.$emit('refreshItemList')
             } else {
-              this.$message.error(res.msg)
+              this.$message.error(res.data?.msg)
             }
           } else {
             // console.log('error submit!!');
@@ -274,6 +288,7 @@
         }
       },
       resetForm(formName) {
+        this.resetOptions()
         this.$refs[formName].resetFields();
         this.$emit('close')
       },
