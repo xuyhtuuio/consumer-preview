@@ -471,7 +471,7 @@ export default {
     },
     querySearch(val, cb, flag = false) {
       this.searchDialogIndex = 1;
-      cb(this.searchList);
+      cb(this.searchList.length? this.searchList: []);
       this.initSearchData(flag);
     },
     handleSelect(val) {
