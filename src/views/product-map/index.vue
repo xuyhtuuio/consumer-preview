@@ -661,7 +661,7 @@ export default {
             return 16;
           },
           getWidth: function getWidth(cfg) {
-            return G6.Util.getTextSize(cfg.name, 14)[0] + 20;
+            return G6.Util.getTextSize(cfg.name, 14)[0] <= 98 ? 112 : G6.Util.getTextSize(cfg.name, 14)[0] + 14;
           },
           getVGap: function getVGap() {
             return 20;
