@@ -100,25 +100,18 @@
               </div>
               <div class="list-item">
                 <div class="item-title">
-                  <svg
-                    class="icon urgent-icon"
-                    style="width: 14px; height: 16px"
-                    aria-hidden="true"
-                  >
-                    <use xlink:href="#icon-shenpiyemiantubiao"></use>
-                  </svg>
                   <div class="item-title-show">
                     睿远平衡18月产品宣传图审核睿远平衡18月产品宣传图审核
                   </div>
                 </div>
                 <div class="item-time">
-                  <div class="stop-time">
-                    <div class="circle"></div>
-                    <div class="text-style">滞留1小时</div>
-                  </div>
                   <div class="please-time">申请时间：2021-08-23 08:00:00</div>
                 </div>
                 <div class="item-tag">
+                  <div class="tag-item blue">
+                    <span class="iconfont icon-tijiao airplane-class"></span>
+                    我发起的
+                  </div>
                   <div class="tag-item orange">审批中>消保中心审批</div>
                 </div>
               </div>
@@ -137,8 +130,12 @@
             <div class="info-style">联系我们：dataelite@trs.com.cn</div>
             <div class="info-style">客服电话：6484 8899 分机号：6685</div>
             <div class="info-style">工作时间：周一至周五 9:00-19:00</div>
-            <div class="info-style">©️2022拓尔思信息技术股份有限公司 版权所有 京ICP备11022871号-7</div>
-            <div class="info-style">总部地址：北京市海淀区建枫路南延6号院3号楼公司</div>
+            <div class="info-style">
+              ©️2022拓尔思信息技术股份有限公司 版权所有 京ICP备11022871号-7
+            </div>
+            <div class="info-style">
+              总部地址：北京市海淀区建枫路南延6号院3号楼公司
+            </div>
           </div>
         </div>
       </div>
@@ -382,16 +379,28 @@ export default {
                 display: flex;
                 align-items: center;
                 .tag-item {
+                  display: flex;
+                  align-items: center;
                   padding: 2px 12px;
                   border-radius: 4px;
                   font-size: 12px;
                   font-style: normal;
                   font-weight: 400;
                   line-height: 20px;
+                  margin-right: 8px;
+                  .airplane-class {
+                    font-size: 16px;
+                    line-height: 20px;
+                    margin-right: 2px;
+                  }
                 }
                 .orange {
                   background: #fff7e6;
                   color: #fa8c16;
+                }
+                .blue {
+                  background: #f0f6ff;
+                  color: #2d5cf6;
                 }
               }
             }

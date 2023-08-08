@@ -255,7 +255,12 @@ export default {
       formData.append("mf", param.file); // 传入bpmn文件
       getFormGroups(formData)
         .then((res) => {
-          this.handleAvatarSuccess(res.data.data, param.file.uid);
+          if (res.data.data) {
+            this.handleAvatarSuccess(res.data.data, param.file.uid);
+          } else {
+            console.log(res.data.data, 123)
+            this.$message.error(res.data.msg)
+          }
         })
         .catch((err) => {
           param.onError(param.file.uid);
@@ -293,11 +298,19 @@ export default {
           orderColumn: sort.prop,
           orderType: 'desc'
         })
+        this.order = {
+          orderColumn: sort.prop,
+          orderType: 'desc'
+        }
       } else {
         this.getObtainExamineTypeList({
           orderColumn: sort.prop,
           orderType: 'asc'
         })
+        this.order = {
+          orderColumn: sort.prop,
+          orderType: 'asc'
+        }
       }
     },
     changeSort1(sort) {
@@ -326,7 +339,8 @@ export default {
     handleCurrentChange(val) {
       if (this.level === 1) {
         this.getObtainExamineTypeList({
-          pageNow: val
+          pageNow: val,
+          ...this.order,
         })
       } else {
         this.editForm({
@@ -338,7 +352,8 @@ export default {
             orderColumn: 'updateTime',
             orderType: 'desc',
             pageSize: 10,
-            pageNow: val
+            pageNow: val,
+            ...this.order,
           }
         })
       }
@@ -421,11 +436,17 @@ export default {
         })
         this.editForm(this.currentRow)
       }
+      console.log(res?.data)
       if (res?.data?.success) {
         this.$message.success('修改成功!')
       } else {
         if (resData && this.level === 1) {
-          row.examineTypesName = resData.find(item => item.recordId === row.recordId).examineTypesName
+          const findRow = resData.find(item => item.recordId === row.recordId)
+          console.log(findRow, row)
+          if (row.recordId === findRow.recordId && findRow.examineTypesName === row.examineTypesName) {
+            return;
+          }
+          row.examineTypesName = findRow.examineTypesName
         }
         this.$message.warning(res?.data.msg)
       }

@@ -3,7 +3,7 @@
     :title="title" :destroy-on-close="true"
     :close-on-click-modal="false" :modal="false"
     :visible.sync="show" :before-close="close"
-    width="730px" center>
+    width="810px" center>
 		<div class="picker">
 			<div style="float:left;">
 				<div class="box left-box">
@@ -20,12 +20,17 @@
 					<div>
             <div class="right-item-box" v-if="active === 'role'">
               <div style="font-size: 12px;margin-bottom: 11px;line-height: 1em;">请选择该节点对应角色可审批任务的数据权限：
-                <el-tooltip placement="bottom" effect="light">
-                  <div slot="content">若选择【本部门】后，当前节点配置的角色用户可审批自己【所在部门】的任务单；（二级机构）<br/>选择【本行】后，当前节点配置的角色可审批自己【所在分行】的任务单；（一级机构）</div>
-                  <svg class="icon" aria-hidden="true" style="font-size: 16px;">
+                <el-popover
+                  placement="bottom-end"
+                  title=""
+                  width="200"
+                  trigger="hover">
+                  <div ><b style="display: inline-block;margin-bottom: 10px;">选择【本部门】</b><br/>当前节点配置的角色用户可审批自己【所在部门】的任务单；（二级机构）<br/><br/><b style="display: inline-block;margin-bottom: 10px;">选择【本行】</b><br/>当前节点配置的角色可审批自己【所在分行】的任务单；（一级机构）</div>
+                  <svg slot="reference" class="icon" aria-hidden="true" style="font-size: 16px;">
                     <use xlink:href="#icon-wenhao"></use>
                   </svg>
-                </el-tooltip>
+                </el-popover>
+
               </div>
               <el-radio-group v-model="roleRange" style="display: block;">
                 <el-radio label="全行">全行</el-radio>
@@ -488,6 +493,7 @@
 <style lang="less" scoped>
 	/deep/ .el-dialog {
 		z-index: 99999;
+    padding: 20px 40px 10px;
     border-radius: 10px;
 		overflow: hidden;
     box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.10);
@@ -495,6 +501,10 @@
 		.el-dialog__header {
 			background: #ffffff;
 		}
+    .el-dialog__title {
+      font-size: 16px;
+      font-weight: 700;
+    }
 
 		.el-dialog__body {
 			padding-top: 0;

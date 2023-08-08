@@ -5,7 +5,7 @@
         <i class="el-icon-rank" style="margin-right: 6px;color:#bbb;"></i>
         <el-input v-model="data[index].value" size="small" style="width: 160px;"
                   placeholder="请设置选项值">
-          <i slot="suffix" class="el-input__icon el-icon-delete" @click="deleteOptions(data, index)"></i>
+          <i slot="suffix" class="el-input__icon el-icon-delete" @click="deleteOptions(data, index, leval)"></i>
         </el-input>
         <el-popover
           placement="bottom-start"
@@ -52,8 +52,8 @@ export default {
         children: []
       })
     },
-    deleteOptions(data, index) {
-      if (data.length <= 1) {
+    deleteOptions(data, index, level) {
+      if ((data.length <= 1) && (level === 1)) {
         this.$message.warning('至少有一个选项')
         return;
       }
