@@ -11,7 +11,7 @@
       </el-form-item>
       <el-form-item label="字段类型" prop="name">
         <el-select v-model="ruleForm.name" @change="changeFiledType" :disabled="nameDisable" placeholder="请选择字段类型" class="is-dark input" style="width: 100%">
-          <el-option v-for="item in feildTypes" :label="item.label" :value="item.value" :key="item.value" :disabled="item.disable"></el-option>
+          <el-option v-for="item in feildTypes" :label="item.chineseCharacter" :value="item.name" :key="item.name" :disabled="item.disable || item.name === 'MultipleGroupsSelect'"></el-option>
         </el-select>
       </el-form-item>
       <!-- <el-form-item v-if="ruleForm.name === 'TimePicker'" label="时间格式" prop="dateFormat" class="is-dark input">
@@ -52,7 +52,7 @@
       <el-form-item label="是否必填" prop="required" class="is-dark input">
         <el-switch v-model="ruleForm.required" :disabled="isRequired"></el-switch>
       </el-form-item>
-      <el-form-item>
+      <el-form-item style="margin-left: 100px;">
         <el-button type="primary" @click="submitForm('ruleForm')">确认</el-button>
         <el-button @click="resetForm('ruleForm')">取消</el-button>
       </el-form-item>
@@ -60,7 +60,7 @@
   </div>
 </template>
 <script>
-  import { feildTypes, belongModules } from '@/utils/dict'
+  import { belongModules } from '@/utils/dict'
   import { addFormField, editItem } from '@/api/manage'
   import CascaderField from './cascaderField'
   import SelectField from './selectField'
@@ -73,7 +73,8 @@
       SelectGroupField
     },
     props: {
-      drawerTitle: String
+      drawerTitle: String,
+      feildTypes: Array
     },
     data() {
       return {
@@ -105,7 +106,6 @@
             { required: true, message: '请选择时间格式', trigger: 'change' }
           ]
         },
-        feildTypes,
         belongModules,
         cascaderOptions: [
           {
@@ -156,6 +156,20 @@
       }
     },
     methods: {
+      resetOptions() {
+        this.selectOptions = this.$options.data().selectOptions
+        this.selectGroupOptions = this.$options.data().selectGroupOptions
+        this.cascaderOptions = this.$options.data().cascaderOptions
+      },
+      setOptions(name, options) {
+        if (name === 'MultipleGroupsSelect') {
+          this.selectGroupOptions = options
+        } else if (name === 'Cascader') {
+          this.cascaderOptions = options
+        } else {
+          this.selectOptions = options
+        }
+      },
       initForm(form, row ) {
         this.parentForm = form;
         if (row) {
@@ -164,8 +178,12 @@
           this.$set(this.ruleForm, 'module', row.module)
           this.$set(this.ruleForm, 'name', row.special.name)
           this.$set(this.ruleForm, 'required', Boolean(row.required))
-          this.$set(this.ruleForm, 'expanding', Boolean(row.expanding))
+          this.$set(this.ruleForm, 'expanding', Boolean(row.special.props.expanding))
+          this.$set(this.ruleForm, 'placeholder', row.special.props.placeholder)
           console.log(this.ruleForm)
+          if (row.special.props.options) {
+            this.setOptions(row.special.props.name, row.special.props.options)
+          }
         } else {
           this.currentRow = {}
           this.ruleForm = this.$options.data().ruleForm
@@ -206,6 +224,8 @@
         this.selectGroupOptions.push({
           id: ++id,
           value: '组' + (this.selectGroupOptions.length + 1),
+          showInput: false,
+          isHover: false,
           children: [{
             id: ++id,
             value: ''
@@ -236,9 +256,10 @@
               res = await editItem(form)
             }
             if (res?.data?.success) {
+              this.resetOptions()
               this.$emit('refreshItemList')
             } else {
-              this.$message.error(res.msg)
+              this.$message.error(res.data?.msg)
             }
           } else {
             // console.log('error submit!!');
@@ -254,7 +275,7 @@
           chenck(this.selectOptions)
             break;
           case 'Cascader':
-          chenck(this.selectGroupOptions)
+          chenck(this.cascaderOptions)
             break;
         }
         return isNullValue;
@@ -267,6 +288,7 @@
         }
       },
       resetForm(formName) {
+        this.resetOptions()
         this.$refs[formName].resetFields();
         this.$emit('close')
       },
@@ -391,3 +413,8 @@
     }
   }
 </script>
+<style lang="less" scoped>
+/deep/.el-input__inner {
+  height: 36px;
+}
+</style>

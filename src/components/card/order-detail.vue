@@ -22,7 +22,7 @@
           <i class="iconfont icon-tijiao"></i>
           <i class="btn">提交</i>
         </div>
-        <div v-if="status == 2" class="flex">
+        <div v-if="isOCR" class="flex">
           <div class="back flex" @click="transferDialog = true">
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
@@ -223,13 +223,13 @@ export default {
     this.judgeStatus();
   },
   mounted() {
-    // if (!this.$route.params.formId) {
+    if (!this.$route.params.formId) {
     const { path } = this.$route
     const url = path.match(/\/(\S*)\//)[1]
-    // this.$router.replace({
-    //   name: url
-    // })
-    // }
+    this.$router.replace({
+      name: url
+    })
+    }
     this.judgeStatus();
   },
   created() { },
@@ -258,7 +258,6 @@ export default {
       const info = JSON.parse(window.sessionStorage.getItem("order-detail"));
       this.info = info
       this.item = item
-      item.taskStatus = 3
 
       // 草稿
       if (item.taskStatus == 0) {
@@ -272,8 +271,8 @@ export default {
           this.status = 0;
           this.crtComp = "approvalRecordCard";
         } else if (originRouter == 'approvalcenter') {
-          //区分是否OCR审批还是领导审批
-          this.isOCR = false
+          //区分是否OCR审批还是领导审批  先写死OCR
+          this.isOCR = this.item.nodeName.indexOf('消保') == -1
           !this.isOCR ? (this.status = 2, this.crtComp = "leaderEditOpinion") : (
             this.status = 0,
             this.crtComp = "approvalRecordCard"
@@ -347,14 +346,14 @@ export default {
         const { status } = res.data
         if (status == 200) {
           this.$store.commit('setOpinionStorage', true)
-          this.$message.success('已保存当前意见确认内容')
+          this.$message.success({ showClose: true, message: '已保存当前意见确认内容' })
         }
       })
     },
     //保存编辑意见功能
     saveEditOpinion() {
       this.$store.commit('setEditOpinionStorage', true)
-      this.$message.success('已保存当前意见确认内容')
+      this.$message.success({ showClose: true, message: '已保存当前意见确认内容' })
     },
 
     submit(way) {
@@ -492,8 +491,6 @@ export default {
         }
       }
       if (this.status == 2 && way == 'update') {
-        // !editOpinionRequired ? (this.crtComp = 'leaderEditOpinion', this.$message.error('请在编辑意见后提交')) : ''
-        // !editOpinionRequired ?return false : ''
         if (!editOpinionRequired) {
           this.crtComp = 'leaderEditOpinion'
           this.$message.error('请在编辑意见后提交')
@@ -521,7 +518,7 @@ export default {
           notAdoptingReasons: v.notAdoptingReasons,
           recordId: v.recordId,
           substantiveOpinions: v.substantiveOpinions,
-          cacheFlag:0
+          cacheFlag: 0
         }
       })
       if (!opinions) {

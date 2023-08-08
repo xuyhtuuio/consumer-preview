@@ -12,7 +12,7 @@
     <div v-loading="loadingList">
       <!-- 表单管理一级表格 -->
       <TrsTable theme="TRS-table-gray" :data="data" :colConfig="colConfig" @sort-change="changeSort" v-if="level === 1"
-        @submitEdit="submitEdit">
+        @submitEdit="submitEdit" :row-class-name="tableRowClassName">
         <template #icon="scope">
           <img v-if="scope.row.icon" :src="scope.row.icon" style="max-height: 30px;max-width: 120px;" />
           <span v-else>--</span>
@@ -25,7 +25,7 @@
           <el-button type="text" @click="editForm(scope.row)">编辑</el-button>
           <el-button type="text" @click="editSelfForm(scope.row)">修改时限</el-button>
           <el-button type="text" v-if="scope.row.run === '1'" class="red" @click="stopApllay(scope.row)">停用</el-button>
-          <el-button type="text" v-else @click="stopApllay(scope.row)">恢复</el-button>
+          <el-button type="text" v-else @click="enableApllay(scope.row)">恢复</el-button>
         </template>
       </TrsTable>
       <!-- 表单管理二级表格 -->
@@ -35,11 +35,11 @@
             placeholder="请输入字段名称搜索" style="width: 254px;">
             <i slot="suffix" class="el-input__icon el-icon-search" @click="changeSearch"></i>
           </el-input>
-          <el-select class="is-dark input" v-model="search.type" @change="changeSearch" size="small" placeholder="字段类型"
+          <el-select class="is-dark input" v-model="search.type" @change="changeSearch" clearable size="small" placeholder="字段类型"
             style="margin: 0 16px;">
-            <el-option v-for="item in feildTypes" :label="item.label" :value="item.value" :key="item.value"></el-option>
+            <el-option v-for="item in feildTypes" :label="item.chineseCharacter" :value="item.name" :key="item.name"></el-option>
           </el-select>
-          <el-select class="is-dark input" v-model="search.belong" @change="changeSearch" size="small" placeholder="所属模块">
+          <el-select class="is-dark input" v-model="search.belong" @change="changeSearch" clearable size="small" placeholder="所属模块">
             <el-option v-for="item in belongModules" :label="item.label" :value="item.value"
               :key="item.value"></el-option>
           </el-select>
@@ -65,10 +65,11 @@
     </div>
     <el-drawer :size="600" :visible.sync="drawer" direction="rtl" :before-close="handleClose">
       <span slot="title" style="font-size: 16px;">
-        {{ drawerTitle }}<i class="el-icon-edit"></i>
+        {{ drawerTitle }}
+        <!-- <i class="el-icon-edit"></i> -->
       </span>
       <div class="drawer-main">
-        <FormManageCustomField @close="drawer = false" ref="formManageCustomField" @refreshItemList="refreshItemList" />
+        <FormManageCustomField @close="drawer = false" :feildTypes="feildTypes" ref="formManageCustomField" @refreshItemList="refreshItemList" />
       </div>
     </el-drawer>
     <el-dialog title="修改" :visible.sync="limitTimeVisible" width="40%" center>
@@ -91,8 +92,8 @@
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           <el-button size="small" style="display: none;" id="icon-uploader" type="text">上传</el-button>
         </el-upload>
-        <div style="position: relative;left: 80px;bottom:54px;">
-          <el-button size="small" type="text" @click="reUpload">{{ imageUrl ? '重写上传' : '点击上传' }}</el-button>
+        <div style="position: relative;left: 80px;bottom:45px;">
+          <el-button size="small" type="text" @click="reUpload">{{ imageUrl ? '重新上传' : '点击上传' }}</el-button>
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -100,11 +101,13 @@
         <el-button type="primary" @click="handleSubmitLimitTime">确 定</el-button>
       </span>
     </el-dialog>
+    <secondary-confirmation :option="confirmOption" ref="confirmation" @handleConfirm="handleStop(confirmOption)"></secondary-confirmation>
   </div>
 </template>
 <script>
-import { feildTypes, belongModules } from '@/utils/dict'
+import { belongModules } from '@/utils/dict'
 import { getFormGroups } from "@/api/front";
+import secondaryConfirmation from "@/components/common/secondaryConfirmation"
 import {
   obtainExamineTypeList,
   copyFormCategory,
@@ -115,18 +118,21 @@ import {
   itemPagingList,
   modifyOrder,
   deletedFormItem,
-  switchFormItemState
+  switchFormItemState,
+  getItemType
 } from '@/api/manage'
 import FormManageCustomField from './formManageCustomField'
 export default {
   name: 'FormManage',
   components: {
     FormManageCustomField,
+    secondaryConfirmation
   },
   data() {
     return {
+      confirmOption: {},
       addLoading: false,
-      feildTypes,
+      feildTypes: [],
       belongModules,
       level: 1,
       loadingList: false,
@@ -241,21 +247,26 @@ export default {
     }
   },
   created() {
-    this.getObtainExamineTypeList()
+    this.getItemType()
   },
   methods: {
     uploadBpmn(param) {
       const formData = new FormData();
-      console.log(param);
       formData.append("mf", param.file); // 传入bpmn文件
       getFormGroups(formData)
         .then((res) => {
-          console.log(res.data.data)
           this.handleAvatarSuccess(res.data.data, param.file.uid);
         })
         .catch((err) => {
           param.onError(param.file.uid);
         });
+    },
+    async getItemType() {
+      const res = await getItemType()
+      if (res.data.data) {
+        this.feildTypes = res.data.data || []
+      }
+      this.getObtainExamineTypeList()
     },
     async getObtainExamineTypeList(params) {
       this.loadingList = true
@@ -269,6 +280,7 @@ export default {
       const resData = res.data.data
       if (resData) {
         this.data = resData.data.list;
+        this.resData = JSON.parse(JSON.stringify(resData.data.list))
         this.page1.total = resData.data.totalCount
         this.page1.pageNow = resData.data.pageNow
         this.page = this.page1
@@ -350,7 +362,6 @@ export default {
       this.imageUrl = data.url;
     },
     reUpload() {
-      console.log(document.querySelector('#icon-uploader'))
       document.querySelector('#icon-uploader').click()
     },
     // 新增表单
@@ -378,6 +389,7 @@ export default {
       const resData = res.data.data
       if (resData) {
         this.data1 = resData.list;
+        this.resData1 = JSON.parse(JSON.stringify(resData.list))
         this.page2.total = resData.totalCount
         this.page2.pageNow = resData.pageNow
         this.page = this.page2
@@ -394,12 +406,13 @@ export default {
     // 编辑单元格
     async submitEdit(row) {
       let res;
+      let resData;
       if (this.level === 1) {
         res = await modifyNameFormCategory({
           name: row.examineTypesName,
           formCategoryId: row.recordId
         })
-
+        resData = this.resData
       } else {
         // 修改字段序号
         res = await modifyOrder({
@@ -410,8 +423,11 @@ export default {
       }
       if (res?.data?.success) {
         this.$message.success('修改成功!')
-      } else{
-        this.$message.error(res?.msg)
+      } else {
+        if (resData && this.level === 1) {
+          row.examineTypesName = resData.find(item => item.recordId === row.recordId).examineTypesName
+        }
+        this.$message.warning(res?.data.msg)
       }
     },
     editSelfForm(item) {
@@ -422,39 +438,54 @@ export default {
     },
     // 停用
     stopApllay(row) {
-      this.$confirm('<div><div><i class="el-alert__icon el-icon-warning" style="color: #e6a23c;font-size: 26px;"></i></div>停用此表单可能影响部分申请单，确定停用该表单吗？</div>', '', {
-        confirmButtonText: '停用',
-        cancelButtonText: '取消',
-        dangerouslyUseHTMLString: true,
-        // showClose: false,
-      }).then(async () => {
-        const res = await switchFormCategoryState({
-          formCategoryId: row.recordId
-        })
-        if (res.data.data) {
-          this.$message({
-            type: 'success',
-            message: row.run === '1' ? '停用成功!' : '恢复成功!'
-          });
-          row.run = row.run === '0' ? '1' : '0'
-          return;
-        }
-        this.stopApllayNo()
-      }).catch(() => {
-
-      });
+      this.confirmOption = {
+        message: '停用此表单可能影响部分申请单，确定停用该表单吗？',
+        cancelBtn: '取消',
+        confirmBtn: '停用',
+        fetch: true
+      }
+      this.$refs.confirmation.dialogVisible = true;
+      this.currentRow = row
+    },
+    async enableApllay(row) {
+      const res = await switchFormCategoryState({
+        formCategoryId: row.recordId
+      })
+      if (res.data.data) {
+        this.$message({
+          type: 'success',
+          message: row.run === '1' ? '停用成功!' : '该表单已恢复，可在提单时查看'
+        });
+        row.run = row.run === '0' ? '1' : '0'
+        return;
+      }
+    },
+    async handleStop(option) {
+      if (!option.fetch) {
+        return;
+      }
+      const res = await switchFormCategoryState({
+        formCategoryId: this.currentRow.recordId
+      })
+      if (res.data.data) {
+        this.$message({
+          type: 'success',
+          message: this.currentRow.run === '1' ? '停用成功!' : '恢复成功!'
+        });
+        this.currentRow.run = this.currentRow.run === '0' ? '1' : '0'
+        return;
+      }
+      this.stopApllayNo()
     },
     // 无法停用
-    stopApllayNo(row) {
-      this.$confirm('<div><div><i class="el-alert__icon el-icon-warning" style="color: #e6a23c;font-size: 26px;"></i></div>此表单关联的流程中存在未结束的申请单，暂时无法停用</div>', '', {
-        confirmButtonText: '停用',
-        cancelButtonText: '取消',
-        dangerouslyUseHTMLString: true,
-        // showClose: false,
-      }).then(() => {
-      }).catch(() => {
-
-      });
+    stopApllayNo() {
+      this.confirmOption = {
+        message: '此表单关联的流程中存在未结束的申请单，暂时无法停用',
+        cancelBtn: '取消',
+        confirmBtn: '确定',
+        fetch: false
+      }
+      this.$refs.confirmation.dialogVisible = true;
     },
     async handleSubmitLimitTime() {
       if (this.limitTime) {
@@ -503,7 +534,7 @@ export default {
         formItemId: item.id
       })
       if (res?.data.success) {
-        this.$message.success('操作成功!')
+        this.$message.success(item.run ? '停用成功' : '恢复成功')
         item.run = item.run === 0 ? 1 : 0;
       } else {
         this.$message.error(res?.data?.msg)
@@ -515,14 +546,20 @@ export default {
       this.handleCurrentChange(this.page2.pageNow)
     },
     handleClose(done) {
+      this.$refs['formManageCustomField'].resetOptions()
       done()
     },
     goBack() {
+      this.search = {
+        title: '',
+        type: '',
+        belong: ''
+      }
       this.level = 1
       this.page = this.page1
     },
     tableRowClassName({ row, rowIndex }) {
-      if (row.status === '0') {
+      if (row.run === '0') {
         return 'disable-row';
       }
       return '';
@@ -531,6 +568,14 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+.el-select:last-of-type {
+  margin-right: 0;
+}
+
+/deep/ .el-select .el-input .el-icon-arrow-up::before {
+  font-family: element-icons !important;
+  content: "\e78f";
+}
 .title {
   display: flex;
   justify-content: space-between;
@@ -615,15 +660,19 @@ export default {
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
-  width: 60px;
-  height: 60px;
-  line-height: 60px;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
   text-align: center;
 }
 
 .avatar {
-  width: 60px;
-  height: 60px;
+  width: 40px;
+  height: 40px;
   display: block;
+}
+.el-dialog {
+  border-radius: 10px;
+  padding: 20px 40px 10px;
 }
 </style>
