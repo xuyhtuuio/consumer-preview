@@ -366,5 +366,9 @@ export default {
     z-index: 1;
     cursor: pointer;
   }
+  iframe{
+    width: calc(100% - 80px);
+    margin-left: 40px;
+  }
 }
 </style>
