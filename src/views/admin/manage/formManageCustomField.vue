@@ -11,7 +11,7 @@
       </el-form-item>
       <el-form-item label="字段类型" prop="name">
         <el-select v-model="ruleForm.name" @change="changeFiledType" :disabled="nameDisable" placeholder="请选择字段类型" class="is-dark input" style="width: 100%">
-          <el-option v-for="item in feildTypes" :label="item.chineseCharacter" :value="item.name" :key="item.name" :disabled="item.disable"></el-option>
+          <el-option v-for="item in feildTypes" :label="item.chineseCharacter" :value="item.name" :key="item.name" :disabled="item.disable || item.name === 'MultipleGroupsSelect'"></el-option>
         </el-select>
       </el-form-item>
       <!-- <el-form-item v-if="ruleForm.name === 'TimePicker'" label="时间格式" prop="dateFormat" class="is-dark input">
@@ -169,7 +169,7 @@
           this.$set(this.ruleForm, 'module', row.module)
           this.$set(this.ruleForm, 'name', row.special.name)
           this.$set(this.ruleForm, 'required', Boolean(row.required))
-          this.$set(this.ruleForm, 'expanding', Boolean(row.expanding))
+          this.$set(this.ruleForm, 'expanding', Boolean(row.special.props.expanding))
           console.log(this.ruleForm)
         } else {
           this.currentRow = {}
@@ -211,6 +211,8 @@
         this.selectGroupOptions.push({
           id: ++id,
           value: '组' + (this.selectGroupOptions.length + 1),
+          showInput: false,
+          isHover: false,
           children: [{
             id: ++id,
             value: ''
@@ -259,7 +261,7 @@
           chenck(this.selectOptions)
             break;
           case 'Cascader':
-          chenck(this.selectGroupOptions)
+          chenck(this.cascaderOptions)
             break;
         }
         return isNullValue;
