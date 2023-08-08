@@ -252,11 +252,9 @@ export default {
   methods: {
     uploadBpmn(param) {
       const formData = new FormData();
-      console.log(param);
       formData.append("mf", param.file); // 传入bpmn文件
       getFormGroups(formData)
         .then((res) => {
-          console.log(res.data.data)
           this.handleAvatarSuccess(res.data.data, param.file.uid);
         })
         .catch((err) => {
@@ -282,6 +280,7 @@ export default {
       const resData = res.data.data
       if (resData) {
         this.data = resData.data.list;
+        this.resData = JSON.parse(JSON.stringify(resData.data.list))
         this.page1.total = resData.data.totalCount
         this.page1.pageNow = resData.data.pageNow
         this.page = this.page1
@@ -363,7 +362,6 @@ export default {
       this.imageUrl = data.url;
     },
     reUpload() {
-      console.log(document.querySelector('#icon-uploader'))
       document.querySelector('#icon-uploader').click()
     },
     // 新增表单
@@ -391,6 +389,7 @@ export default {
       const resData = res.data.data
       if (resData) {
         this.data1 = resData.list;
+        this.resData1 = JSON.parse(JSON.stringify(resData.list))
         this.page2.total = resData.totalCount
         this.page2.pageNow = resData.pageNow
         this.page = this.page2
@@ -407,11 +406,13 @@ export default {
     // 编辑单元格
     async submitEdit(row) {
       let res;
+      let resData;
       if (this.level === 1) {
         res = await modifyNameFormCategory({
           name: row.examineTypesName,
           formCategoryId: row.recordId
         })
+        resData = this.resData
       } else {
         // 修改字段序号
         res = await modifyOrder({
@@ -422,7 +423,10 @@ export default {
       }
       if (res?.data?.success) {
         this.$message.success('修改成功!')
-      } else{
+      } else {
+        if (resData && this.level === 1) {
+          row.examineTypesName = resData.find(item => item.recordId === row.recordId).examineTypesName
+        }
         this.$message.error(res?.data.msg)
       }
     },
@@ -555,7 +559,6 @@ export default {
       this.page = this.page1
     },
     tableRowClassName({ row, rowIndex }) {
-      console.log(row)
       if (row.run === '0') {
         return 'disable-row';
       }

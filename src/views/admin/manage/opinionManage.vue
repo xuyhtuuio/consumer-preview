@@ -1,37 +1,20 @@
 <template>
-  <div class="opinion">
+  <div class="opinion" :class="pageConfig?.pageType">
     <div class="top">
       <div class="search">
-        <el-form class="my-form form" :inline="true" :model="search">
-          <el-form-item class="form-item">
-            <el-input
-              class="my-search-input"
-              v-model="search.review"
-              placeholder="请输入审查意见搜索"
-              @keyup.enter.native="onSearch"
-              @clear="onSearch"
-              clearable
-            >
+        <el-form class="my-form form" :inline="true" :model="search" @submit.native.prevent>
+          <el-form-item class="form-item" v-if="pageConfig?.pageType !== 'nonManage'">
+            <el-input class="my-search-input" v-model="search.review" placeholder="请输入审查意见搜索"
+              @keyup.enter.native="onSearch" @clear="onSearch" clearable>
               <i slot="suffix" class="el-icon-search" @click="onSearch"></i>
             </el-input>
           </el-form-item>
 
           <el-form-item class="form-item">
-            <el-autocomplete
-              ref="autocomplete"
-              popper-class="my-autocomplete"
-              v-model="search.baseline"
-              v-scrollLoad="load"
-              :fetch-suggestions="querySearch"
-              placeholder="关键词"
-              @select="handleSelect"
-              @keyup.enter.native="onSearch"
-              @focus="handleSearchFocusOrBlur"
-              @blur="handleSearchFocusOrBlur(false)"
-              @mouseout.native="handleSearchOutOrOver(false)"
-              @mouseover.native="handleSearchOutOrOver"
-              clearable
-            >
+            <el-autocomplete ref="autocomplete" popper-class="my-autocomplete" v-model="search.baseline"
+              v-scrollLoad="load" :fetch-suggestions="querySearch" placeholder="请输入关键词进行查询" @select="handleSelect"
+              @keyup.enter.native="onSearch" @focus="handleSearchFocusOrBlur" @blur="handleSearchFocusOrBlur(false)"
+              @mouseout.native="handleSearchOutOrOver(false)" @mouseover.native="handleSearchOutOrOver" clearable @clear="onSearch">
               <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
               <template slot-scope="{ item }">
                 <div class="option-info">
@@ -44,16 +27,15 @@
             </el-autocomplete>
           </el-form-item>
 
-          <el-form-item class="form-item">
+          <el-form-item class="form-item" v-if="pageConfig?.pageType !== 'nonManage'">
             <g-button class="g-btn" type="primary" @click="handleClick">
               <i class="add-icon">+</i>
-              添加意见</g-button
-            >
+              添加意见</g-button>
           </el-form-item>
         </el-form>
       </div>
     </div>
-    <div class="main" v-loading.body="isLoading">
+    <div class="main" v-loading="isLoading">
       <div class="info">
         <div class="left">
           共
@@ -61,26 +43,14 @@
           条
         </div>
         <div class="right">
-          <span
-            :class="['r-item', currentSort ? 'r-item-active' : '']"
-            @click="handleSort('refer')"
-          >
+          <span :class="['r-item', currentSort ? 'r-item-active' : '']" @click="handleSort('refer')">
             按引用次数排序
-            <span
-              style="font-size: 12px"
-              class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': referSort }"
-            ></span>
+            <span style="font-size: 12px" class="iconfont icon-jiantou left-icon"
+              :class="{ 'left-icon-reverse': referSort }"></span>
           </span>
-          <span
-            :class="['r-item', !currentSort ? 'r-item-active' : '']"
-            @click="handleSort('update')"
-            >按更新时间排序
-            <span
-              style="font-size: 12px"
-              class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': updateSort }"
-            ></span>
+          <span :class="['r-item', !currentSort ? 'r-item-active' : '']" @click="handleSort('update')">按更新时间排序
+            <span style="font-size: 12px" class="iconfont icon-jiantou left-icon"
+              :class="{ 'left-icon-reverse': updateSort }"></span>
           </span>
         </div>
       </div>
@@ -89,28 +59,20 @@
           <div class="left">
             <div class="title">
               <span>{{ item.keywordName }}</span>
-              <g-icon
-                class="left-icon"
-                stylePx="20"
-                href="#icon-fuzhi1"
-                @click.native="handleCopy(item.recommendedOpinions)"
-              />
+              <g-icon class="left-icon" stylePx="20" href="#icon-fuzhi1"
+                @click.native="handleCopy(item.recommendedOpinions)" />
             </div>
             <div class="content">{{ item.recommendedOpinions }}</div>
             <div class="info">
               <span :class="['info-item', item.keywordType === 1 ? 'class-zero' : 'class-one']">
                 {{ item.keywordType === 1 ? '禁用词' : '敏感词' }}
               </span>
-              <span class="info-item"
-                ><g-icon class="left-icon" stylePx="20" href="#icon-yinyong" />已引用<i
-                  class="high"
-                  >{{ item.citationsCount }}</i
-                >次</span
-              >
+              <span class="info-item"><g-icon class="left-icon" stylePx="20" href="#icon-yinyong" />已引用<i class="high">{{
+                item.citationsCount }}</i>次</span>
               <span class="info-item">更新时间：{{ timestampToDateTime(item.updateTime) }}</span>
             </div>
           </div>
-          <div class="btns">
+          <div class="btns" v-if="pageConfig?.pageType !== 'nonManage'">
             <span v-if="item.isTop !== 0" class="btn btn-yellow" @click="changeIsTop(item)">
               <i> <g-icon class="left-icon" stylePx="20" href="#icon-zhiding" />取消置顶</i>
             </span>
@@ -121,46 +83,22 @@
           </div>
         </div>
       </div>
-      <TrsPagination
-        class="trs-pagination"
-        :pageSize="10"
-        :pageNow="page.pageNow"
-        :total="page.total"
-        @getList="handleCurrentChange"
-        scrollType="scrollCom"
-        scrollName="scrollCom"
-        v-if="page.total"
-      >
+      <TrsPagination class="trs-pagination" :pageSize="10" :pageNow="page.pageNow" :total="page.total"
+        @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom" v-if="page.total">
       </TrsPagination>
     </div>
-    <el-dialog
-      :visible.sync="limitTimeVisible"
-      width="800px"
-      custom-class="user-dialog"
-      :show-close="false"
-      center
-    >
+    <el-dialog :visible.sync="limitTimeVisible" width="800px" custom-class="user-dialog" :show-close="false" center>
       <template slot="title">
         <span>{{ titleDialog }}</span>
         <span class="close" @click="limitTimeVisible = false"><i class="el-icon-close"></i></span>
       </template>
       <el-form class="my-form" :model="dialogItem" label-width="100px">
         <el-form-item class="form-item" label="标签名称">
-          <el-autocomplete
-            ref="autocomplete"
-            popper-class="my-autocomplete"
-            v-model="dialogItem.keywordName"
-            v-scrollLoad="load"
-            :fetch-suggestions="(val, cb) => querySearch(val, cb, true)"
-            placeholder="关键词"
-            @select="handleSelect"
-            @keyup.enter.native="onSearch"
-            @focus="handleSearchFocusOrBlur"
-            @blur="handleSearchFocusOrBlur(false)"
-            @mouseout.native="handleSearchOutOrOver(false)"
-            @mouseover.native="handleSearchOutOrOver"
-            clearable
-          >
+          <el-autocomplete ref="autocomplete" popper-class="my-autocomplete" v-model="dialogItem.keywordName"
+            v-scrollLoad="load" :fetch-suggestions="(val, cb) => querySearch(val, cb, true)" placeholder="关键词"
+            @select="handleSelect" @keyup.enter.native="onSearch" @focus="handleSearchFocusOrBlur"
+            @blur="handleSearchFocusOrBlur(false)" @mouseout.native="handleSearchOutOrOver(false)"
+            @mouseover.native="handleSearchOutOrOver" clearable>
             <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
             <template slot-scope="{ item }">
               <div class="option-info">
@@ -173,14 +111,8 @@
           </el-autocomplete>
         </el-form-item>
         <el-form-item class="item-form" label="审查话术">
-          <el-input
-            type="textarea"
-            placeholder="请输入审查话术内容"
-            v-model="dialogItem.recommendedOpinions"
-            resize="none"
-            size="medium"
-            :autosize="{ minRows: 10, maxRows: 10 }"
-          >
+          <el-input type="textarea" placeholder="请输入审查话术内容" v-model="dialogItem.recommendedOpinions" resize="none"
+            size="medium" :autosize="{ minRows: 10, maxRows: 10 }">
           </el-input>
         </el-form-item>
       </el-form>
@@ -191,13 +123,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog
-      :visible.sync="limitVisible"
-      width="500px"
-      custom-class="stop-dialog"
-      :show-close="false"
-      center
-    >
+    <el-dialog :visible.sync="limitVisible" width="500px" custom-class="stop-dialog" :show-close="false" center>
       <template slot="title">
         <span class="close" @click="limitVisible = false"><i class="el-icon-close"></i></span>
       </template>
@@ -218,6 +144,12 @@ import { copyText } from '@/utils/Clipboard.js';
 import { timestampToDateTime } from '@/utils/utils.js';
 export default {
   name: 'OpinionManage',
+  props: {
+    pageConfig: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data() {
     return {
       search: {
@@ -471,7 +403,7 @@ export default {
     },
     querySearch(val, cb, flag = false) {
       this.searchDialogIndex = 1;
-      cb(this.searchList);
+      cb(this.searchList.length ? this.searchList : []);
       this.initSearchData(flag);
     },
     handleSelect(val) {
@@ -507,16 +439,20 @@ export default {
 @color7: #86909c;
 @color8: #1d2128;
 @color9: #f7f8fa;
+
 .opinion {
   height: 100%;
+
   .el-icon-search {
     cursor: pointer;
   }
+
   .left-icon {
     display: inline-block;
     position: relative;
     margin-right: 4px;
   }
+
   .top {
     font-size: 14px;
     margin: 0 -24px;
@@ -525,11 +461,13 @@ export default {
 
     .info {
       margin-bottom: 20px;
+
       &-title {
         font-size: 20px;
         font-weight: 700;
         color: rgba(51, 51, 51, 1);
       }
+
       &-desc {
         margin-left: 20px;
         font-size: 14px;
@@ -544,15 +482,18 @@ export default {
     .search {
       .form {
         display: flex;
+
         &-item {
           // flex: 1;
           display: flex;
           width: 320px;
           margin-right: 0;
           margin-bottom: 0;
+
           &:first-child {
             margin-right: 10px;
           }
+
           &:last-child {
             flex: 1;
 
@@ -561,12 +502,15 @@ export default {
               background-color: transparent;
             }
           }
+
           /deep/.el-form-item__content {
             border-radius: 4px;
             flex: 1;
             display: flex;
+
             .g-btn {
               margin-left: 10px;
+
               .add-icon {
                 position: relative;
                 top: -1px;
@@ -574,9 +518,11 @@ export default {
                 font-size: 26px;
                 font-weight: 100;
               }
+
               .btn {
                 min-width: auto;
                 padding: 0 16px;
+
                 .iconfont {
                   margin-right: 4px;
                 }
@@ -596,11 +542,13 @@ export default {
       height: 34px;
       line-height: 26px;
       border-radius: 6px;
+
       span {
         position: relative;
         bottom: 5px;
       }
     }
+
     .el-button--primary {
       border: none;
     }
@@ -610,30 +558,38 @@ export default {
     height: calc(~'100% - 63px');
     overflow-y: auto;
     padding: 24px 0 0;
-    & > .info {
+
+    &>.info {
       display: flex;
       justify-content: space-between;
       margin-left: 16px;
       line-height: 22px;
+
       .left {
         font-size: 14px;
+
         .high {
           color: @color2;
           font-weight: 700;
         }
       }
+
       .right {
         .r-item {
           font-size: 12px;
+
           &.r-item-active {
             color: #2d5cf6;
           }
+
           cursor: pointer;
+
           .left-icon {
             &-reverse {
               transform: rotate(180deg);
             }
           }
+
           &:first-child {
             margin-right: 10px;
           }
@@ -649,8 +605,10 @@ export default {
         padding: 12px 16px;
         font-size: 14px;
         border-radius: 10px;
+
         &:hover {
           background: @color9;
+
           .left {
             .title {
               .left-icon {
@@ -659,56 +617,71 @@ export default {
             }
           }
         }
+
         .left {
           flex: 1;
           line-height: 24px;
+
           .title {
             display: flex;
             justify-content: space-between;
             line-height: 25px;
             font-weight: 700;
+
             .left-icon {
               display: none;
               cursor: pointer;
             }
           }
+
           .content {
             margin: 10px 0;
           }
+
           .info {
             &-item {
               margin-right: 24px;
+
               .left-icon {
                 top: 4px;
               }
+
               .high {
                 color: @color2;
                 font-weight: 700;
               }
+
               &:nth-child(2) {
                 color: @color8;
               }
+
               &:last-child {
                 color: @color7;
               }
             }
           }
         }
+
         .btns {
           margin-left: 24px;
           line-height: 22px;
+
           .btn {
             color: @color3;
             font-size: 14px;
+
             .left-icon {
               top: 2px;
             }
+
             &-red {
               color: @color5;
             }
+
             &-yellow {
               color: @color6;
             }
+
             &:not(:first-child) {
               &::before {
                 content: '|';
@@ -729,6 +702,7 @@ export default {
   .el-button--text {
     padding: 5px;
   }
+
   /deep/.el-dialog {
     .el-dialog__header {
       padding: 0;
@@ -737,6 +711,7 @@ export default {
       color: @color1;
       line-height: 24px;
       height: 24px;
+
       .close {
         float: right;
         font-size: 24px;
@@ -746,22 +721,28 @@ export default {
         }
       }
     }
+
     .el-dialog__body {
       padding: 0;
     }
   }
+
   /deep/.el-dialog.user-dialog {
     border-radius: 10px;
     padding: 40px;
+
     .my-form {
       margin-top: 24px;
+
       .item-form {
         margin-right: 20px;
         margin-top: 2px;
+
         .el-form-item__content {
           padding: 12px 20px;
           border: 1px solid @color4;
           background-color: transparent;
+
           .el-textarea,
           .el-textarea__inner {
             background-color: transparent;
@@ -770,21 +751,25 @@ export default {
         }
       }
     }
+
     .label {
       margin: 24px 20px 0;
       display: flex;
+
       &-left {
         margin-right: 12px;
         min-width: fit-content;
         line-height: 36px;
       }
+
       &-right {
-        .right-option {
-        }
+        .right-option {}
       }
     }
+
     .dialog-footer {
       margin-top: 56px;
+
       .g-button {
         .btn {
           width: 108px;
@@ -797,36 +782,41 @@ export default {
   /deep/.el-dialog.stop-dialog {
     border-radius: 10px;
     padding: 20px 20px 40px;
+
     .dialog-item {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-bottom: 40px;
+
       .icon {
         margin-bottom: 16px;
         color: #fdb123;
         font-size: 54px;
       }
+
       .info {
         padding: 0 60px;
         text-align: center;
         color: #1d2128;
       }
     }
+
     .el-dialog__footer {
       padding: 0;
+
       .dialog-footer {
         display: flex;
         justify-content: center;
         align-items: center;
+
         .g-button {
           margin-right: 24px;
+
           .btn-primary {
-            background-image: linear-gradient(
-              to right,
-              rgba(47, 84, 235, 1),
-              rgba(81, 150, 255, 1)
-            );
+            background-image: linear-gradient(to right,
+                rgba(47, 84, 235, 1),
+                rgba(81, 150, 255, 1));
           }
         }
       }
@@ -835,11 +825,13 @@ export default {
 
   /deep/ .tableCard {
     padding: 0;
+
     .left {
       position: relative;
       left: -8px;
     }
-    & > .content {
+
+    &>.content {
       margin-top: 20px;
       font-weight: 700;
       color: @color1;
@@ -849,6 +841,7 @@ export default {
   /deep/.el-radio-group {
     display: flex;
     flex-wrap: wrap;
+
     .el-radio {
       // display: flex;
       // align-items: center;
@@ -858,22 +851,28 @@ export default {
       margin-right: 10px;
       border-radius: 4px;
       background: #f7f8fa;
+
       &:nth-child(3n) {
         margin-right: 0;
       }
     }
   }
+
   /deep/.el-dialog__footer {
     padding: 0;
+
     .dialog-footer {
       display: flex;
       justify-content: center;
       align-items: center;
+
       .g-button {
         margin-right: 20px;
+
         .btn {
           height: 36px;
         }
+
         .btn-primary {
           background: #306ef5;
         }
@@ -893,6 +892,7 @@ export default {
     font-weight: 700;
     color: #fa8c16;
   }
+
   .class-zero {
     padding: 4px 12px;
     background: #fff1f0;
@@ -902,16 +902,53 @@ export default {
     color: #eb5757;
   }
 }
+
+.nonManage {
+  flex: 1;
+  overflow: hidden;
+
+  .top {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    /deep/.search .my-form .el-form-item__content{
+      padding-left: 0;
+      border-radius: 32px;
+    overflow: hidden;
+    }
+
+    .search .form-item {
+      &:first-child{
+        margin: 0;
+      }
+    }
+    /deep/ .el-input__inner{
+      padding-left: 20px;
+    }
+  }
+
+  .main {
+    padding: 16px 0;
+    height: calc(100% - 25px);
+  }
+  .el-form-item__content {
+    padding: 0;
+  }
+}
+
 /deep/.el-select-dropdown {
   left: 459px;
 }
+
 .option-info {
   display: flex;
   justify-content: space-between;
+
   .left {
     flex: 1;
     overflow: hidden;
   }
+
   .right {
     position: relative;
     left: 10px;
@@ -919,6 +956,7 @@ export default {
     align-items: center;
     font-size: 20px;
     -webkit-transform: scale(0.5);
+
     &::before {
       display: inline-block;
       content: '';
@@ -927,14 +965,18 @@ export default {
       height: 6px;
       border-radius: 50%;
     }
+
     &-zero {
       color: #eb5757;
+
       &::before {
         background: #eb5757;
       }
     }
+
     &-one {
       color: #fa8c16;
+
       &::before {
         background: #fa8c16;
       }
@@ -943,6 +985,7 @@ export default {
 }
 
 .trs-pagination {
+
   /deep/.pagination {
     // text-align: center;
     .el-input__inner {

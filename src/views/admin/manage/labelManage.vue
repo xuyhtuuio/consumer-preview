@@ -21,12 +21,17 @@
 
           <el-form-item class="form-item">
             <el-autocomplete
+              ref="autocomplete"
               v-model="search.keyword"
               placeholder="请输入标签名称进行搜索"
               :fetch-suggestions="querySearch"
               :trigger-on-focus="false"
               @select="handleSelect"
               @keyup.enter.native="getList(1)"
+              @focus="handleSearchFocusOrBlur"
+              @blur="handleSearchFocusOrBlur(false)"
+              @mouseout.native="handleSearchOutOrOver(false)"
+              @mouseover.native="handleSearchOutOrOver"
               clearable
               @clear="getList(1)"
             >
@@ -254,6 +259,20 @@ export default {
     },
     submitEdit(row) {
       console.log(row);
+    },
+    handleIptPadding(ref, flag = true) {
+      flag && this.$refs[ref].$el.children[0].children[0].classList.add('el-input__inner-1');
+      !flag && this.$refs[ref].$el.children[0].children[0].classList.remove('el-input__inner-1');
+    },
+    handleSearchFocusOrBlur(flag = true) {
+      this.searchDialogIndex = 1;
+      flag && ((this.isSearchFocus = true), this.handleIptPadding('autocomplete'));
+      !flag && ((this.isSearchFocus = false), this.handleIptPadding('autocomplete', false));
+    },
+    handleSearchOutOrOver(flag) {
+      if (this.isSearchFocus) return;
+      flag && this.handleIptPadding('autocomplete');
+      !flag && this.handleIptPadding('autocomplete', false);
     },
     // 停用
     stopApllay(item) {
