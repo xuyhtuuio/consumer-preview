@@ -388,12 +388,16 @@ export default {
           this.list = data.list?.map(v=>{
             return {
               ...v,
-              taskNumber:v.recordId,
+              taskNumber:v.recordId+'',
               taskName:v.entryName,
               taskStatus:this.taskStatusSwitch(v.nodeStatus)
             }
           });
           this.search.loading = false;
+        }).catch(err=>{
+          this.search.loading=false
+          this.search.total= 0
+          this.list= []
         })
       } else {
         censorList(param)
