@@ -28,7 +28,7 @@
         <div class="filters-content">
           <div class="floor1">
             <div class="floor1-item">
-              <el-select v-model="search.approvalType" placeholder="事项类型" @change="changeArrrovalType" clearable
+              <el-select v-model="search.form_management_id" placeholder="事项类型" @change="changeArrrovalType" clearable
                 @clear="searchList">
                 <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
                   :value="item.value"></el-option>
@@ -109,6 +109,7 @@ import {
 } from "@/api/applyCenter";
 import applyEventCard from "@/components/card/apply-event-card";
 export default {
+  name:'apply-center-index',
   components: {
     applyEventCard,
   },
@@ -163,7 +164,7 @@ export default {
         },
       ],
       search: {
-        approvalType: "",
+        form_management_id: "",
         approvalStage: "",
         urgent: "",
         hasOpinions: "",
@@ -221,7 +222,6 @@ export default {
     };
   },
   activated() {
-    this.getDataStatistic()
     this.searchList()
   },
   async mounted() {
@@ -238,11 +238,13 @@ export default {
       let floor2 = document.querySelectorAll(".apply-center .floor2")[0];
       floor2 ? (floor2.style.paddingRight = 16 + "px") : "";
     });
+    this.getDataStatistic();
+    this.getApplicationList(1);
     this.userStatus();
     this.getApprovalType();
   },
   watch: {
-    "search.approvalType": {
+    "search.form_management_id": {
       handler(val) {
         if (val == "") {
           this.approvalPhases = [];
@@ -253,8 +255,7 @@ export default {
     },
   },
   created() {
-    this.getDataStatistic();
-    this.getApplicationList(1);
+ 
   },
   methods: {
     to(path) {
@@ -263,7 +264,7 @@ export default {
       }
     },
     changeArrrovalType() {
-      if (this.search.approvalType || this.search.approvalType == 0) {
+      if (this.search.form_management_id || this.search.form_management_id == 0) {
         this.getApprovalStage();
       } else {
         this.search.approvalStage = "";
@@ -273,18 +274,17 @@ export default {
     },
     getApprovalType() {
       getApprovalType().then((res) => {
-        this.transactionTypes = res.data.data.map((v, index) => {
+        this.transactionTypes = res.data.data.map((v) => {
           return {
-            label: v,
-            value: index,
+            label: v.examineTypesName,
+            value: v.recordId,
           };
         });
       });
     },
     getApprovalStage() {
-      const name = this.transactionTypes.filter(v => { return v.value == this.search.approvalType })[0].label
       let params = {
-        approvalPhases: name,
+        approvalPhases: this.search.form_management_id,
       };
       getApprovalStage(params).then((res) => {
         const { data } = res.data
@@ -431,7 +431,7 @@ export default {
     },
     reset() {
       this.search = {
-        approvalType: "",
+        form_management_id: "",
         approvalStage: "",
         urgent: "",
         hasOpinions: "",

@@ -125,7 +125,7 @@
       </div>
       <!--  是否显示关注：草稿；文件解析失败；不显示-->
       <div v-if="item.taskStatus != 0">
-        <span class="attention no-attention icon-op" v-if="item.concernId == 0" @click="concern(item)">
+        <span class="attention no-attention icon-op" v-if="item.concernId != 1" @click="concern(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-tubiao-1"></use>
           </svg>

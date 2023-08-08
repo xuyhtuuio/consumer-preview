@@ -252,18 +252,17 @@ export default {
     },
     getApprovalType() {
       getApprovalType().then((res) => {
-        this.transactionTypes = res.data.data.map((v, index) => {
+        this.transactionTypes = res.data.data.map((v) => {
           return {
-            label: v,
-            value: index,
+            label: v.examineTypesName,
+            value: v.recordId,
           };
         });
       });
     },
     getApprovalStage() {
-      const name = this.transactionTypes.filter(v => { return v.value == this.search.approvalType })[0].label
       let params = {
-        approvalPhases: name,
+        form_management_id: this.search.approvalType,
       };
       getApprovalStage(params).then((res) => {
         const { data } = res.data
@@ -385,19 +384,20 @@ export default {
         getApprovalList(wait_param).then(res => {
           const { data } = res.data;
           this.search.total = data.totalCount;
-          this.list = data.list?.map(v=>{
+          const flag = Array.isArray(data.list)
+          this.list = flag && data.list.length > 0 ? data.list.map(v => {
             return {
               ...v,
-              taskNumber:v.recordId+'',
-              taskName:v.entryName,
-              taskStatus:this.taskStatusSwitch(v.nodeStatus)
+              taskNumber: v.recordId + '',
+              taskName: v.entryName,
+              taskStatus: this.taskStatusSwitch(v.nodeStatus)
             }
-          });
+          }):[];
           this.search.loading = false;
-        }).catch(err=>{
-          this.search.loading=false
-          this.search.total= 0
-          this.list= []
+        }).catch(err => {
+          this.search.loading = false
+          this.search.total = 0
+          this.list = []
         })
       } else {
         censorList(param)
@@ -428,7 +428,7 @@ export default {
           status = '3';
           break;
       }
-      console.log('ff',val,status)
+      console.log('ff', val, status)
       return status
     },
     reset() {
