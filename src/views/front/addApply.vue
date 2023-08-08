@@ -248,23 +248,22 @@ export default {
         //   this.$message({ type: 'success', message: res.data.data });
         //   this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
         // });
-        const { id, name, dep: label } = this.$refs['refAddTag'].approverInfo;
+        const { userId:id, fullname:name } = this.$refs['refAddTag'];
         processStart({
           templateId: this.templateId,
           processDefinitionId: this.processDefinitionId,
           startUserInfo: {
             id,
             name,
-            label
           },
           submitDto: result
         })
-          .then(({ data: { success } }) => {
+          .then(({ data: { success ,msg:message} }) => {
             if (success) {
               this.$message({ type: 'success', message: '提交成功' });
               this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
             }else {
-              this.$message({ type: 'error', message: '提交失败' });
+              this.$message({ type: 'error', message});
             }
           })
           .catch(err => {
@@ -303,7 +302,6 @@ export default {
       }
     }
   },
-  computed: {}
 };
 </script>
 
@@ -345,6 +343,13 @@ export default {
     }
   }
 }
+
+
+
+
+
+
+
 
 
 </style>

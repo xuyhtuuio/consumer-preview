@@ -177,7 +177,6 @@ export default {
         isClick: false,
         type: type
       });
-      
     },
     // 上传文件
     uploadBpmn(param) {
@@ -186,12 +185,16 @@ export default {
       formData.append('mf', param.file); // 传入bpmn文件
       getFormGroups(formData)
         .then(res => {
-          console.log(res.data.data);
-          // param.onSuccess(res.data.data)
-          this.handleSuccess(res.data.data, param.file.uid);
+          if (res.data.success) {
+            console.log(res.data.data);
+            // param.onSuccess(res.data.data)
+            this.handleSuccess(res.data.data, param.file.uid);
+          }else {
+              this.handleError(param.file.uid);
+          }
         })
         .catch(err => {
-          this.handleError(param.file.uid)
+          this.handleError(param.file.uid);
         });
     },
     handleUploadLook(url) {
@@ -240,7 +243,7 @@ export default {
       }
       return [true];
     },
-    warnInfoMessage( message, type = 'warning', customClass = 'el-icon-warning-one') {
+    warnInfoMessage(message, type = 'warning', customClass = 'el-icon-warning-one') {
       this.$message({
         type,
         customClass,
@@ -346,10 +349,5 @@ export default {
 //     }
 //   }
 // }
-
-
-
-
-
 
 </style>

@@ -37,10 +37,11 @@ export default {
         data: { data }
       } = await this.$http({
         method: 'get',
-        url: '/cpr/applicationForm/getUserDepartmentInfo'
+        url: '/cpr/user/getCurrentUser'
       });
+      console.log(data)
+      this.userId = data.id;
       this.fullname = data.fullname;
-      this.approverInfo = data.approverInfo;
     },
     submit() {
       this.$emit('submit');
@@ -92,6 +93,10 @@ export default {
     }
   }
 }
+
+
+
+
 
 
 </style>
