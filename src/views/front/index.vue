@@ -121,13 +121,13 @@
                     {{ item.taskName }}
                   </div>
                 </div>
-                <div class="item-time" v-if="item.create_time">
+                <div class="item-time">
                   <!-- <div class="stop-time">
                     <div class="circle"></div>
                     <div class="text-style">滞留1小时</div>
                   </div> -->
-                  <div class="please-time" v-if="item.create_time">
-                    申请时间：{{ item.create_time }}
+                  <div class="please-time">
+                    申请时间：{{ item.create_time ? item.create_time : '--' }}
                   </div>
                 </div>
                 <div class="item-tag">
@@ -547,8 +547,11 @@ export default {
                 display: flex;
                 align-items: center;
                 margin-bottom: 12px;
+                .urgent-icon {
+                  margin-right: 8px;
+                }
                 .item-title-show {
-                  margin-left: 8px;
+                  // margin-left: 8px;
                   color: #1d2128;
                   font-size: 14px;
                   font-style: normal;
