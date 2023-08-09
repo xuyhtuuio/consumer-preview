@@ -414,9 +414,9 @@ export default {
     // 编辑意见 或新增
     async editItem({ keywordName, recommendedOpinions }) {
       if (!keywordName || !recommendedOpinions) return this.$message.error('请填写相关信息');
-      console.log(keywordName, recommendedOpinions, this.searchList);
-      if (!this.searchList.find(listItem => listItem.value === keywordName))
-        return this.$message.error('请选择正确的关键词');
+      
+      if (this.searchList.length && !this.searchList.find(listItem => listItem.value === keywordName))
+        return this.$message.error('请选择正确的标签名称');
       let res;
       if (this.dialogItem?.recordId) {
         res = await edit({

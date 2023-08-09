@@ -53,7 +53,7 @@
                   <span class="s-item" @click="handleUploadDelete(item)">删除</span>
                 </div>
                 <div class="r-item error" v-if="item.status === -2 && item.isClick">
-                  <span class="s-item success" @click="handleUploadDelete(item)">删除</span>
+                  <span class="s-item success" @click="handleUploadDelete(item, false)">删除</span>
                 </div>
               </div>
             </div>
@@ -189,8 +189,9 @@ export default {
             console.log(res.data.data);
             // param.onSuccess(res.data.data)
             this.handleSuccess(res.data.data, param.file.uid);
-          }else {
-              this.handleError(param.file.uid);
+          } else {
+            this.$message.error(res.data.msg)
+            this.handleError(param.file.uid);
           }
         })
         .catch(err => {
@@ -207,12 +208,18 @@ export default {
       window.open(routeUrl.href, '_blank');
     },
     //删除图片
-    handleUploadDelete(item) {
-      deleteFormGroups({ key: item.key }).then(res => {
+    handleUploadDelete(item, flag = true) {
+      if (flag) {
+        deleteFormGroups({ key: item.key }).then(res => {
+          const idx = this.fileList.findIndex(iten => iten.key === item.key);
+          this.fileList.splice(idx, 1);
+          this.$message({ type: 'success', message: res.data.data });
+        });
+      }else {
         const idx = this.fileList.findIndex(iten => iten.key === item.key);
-        this.fileList.splice(idx, 1);
-        this.$message({ type: 'success', message: res.data.data });
-      });
+          this.fileList.splice(idx, 1);
+          this.$message({ type: 'success', message: '删除成功'});
+      }
     },
     handleMouseEnter(item) {
       item.isClick = true;
@@ -349,5 +356,4 @@ export default {
 //     }
 //   }
 // }
-
 </style>
