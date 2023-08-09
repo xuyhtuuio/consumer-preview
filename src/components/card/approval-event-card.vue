@@ -85,12 +85,12 @@
         <span class="iconfont icon icon-tubiao urgent-icon"></span>
         确认</span>
       <!-- 关注 -->
-      <span class="attention no-attention icon-op" v-if="item.concernId == 0" @click="concern(item)">
+      <span class="attention no-attention icon-op" v-if="item.followed != 1" @click="concern(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-tubiao-1"></use>
         </svg>
         关注</span>
-      <span class="attention has-attention icon-op" v-else @click="concern(item)">
+      <span class="attention has-attention icon-op" v-if="item.followed==1" @click="concern(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-guanzhu-1"></use>
         </svg>已关注</span>
@@ -163,11 +163,13 @@ export default {
     concern(item) {
       const param = {
         recordId: item.taskNumber,
+        type:2
       };
       concernApplication(param).then((res) => {
         if (res.status == 200) {
+          item.followed = item.followed == 1 ? 0 : 1;
           this.$message.success(res.data.msg);
-          item.concernId = item.concernId == 1 ? 0 : 1;
+          this.$emit('concern')
   
         }
       });

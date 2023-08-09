@@ -77,3 +77,10 @@ export function processStart(data) {
     data
   })
 }
+//获取当前登录用户信息
+export function getCurrentUserInfo(){
+  return request({
+    url:'/cpr/user/getCurrentUser',
+    method:'get'
+  })
+}
