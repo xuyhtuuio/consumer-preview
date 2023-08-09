@@ -144,6 +144,7 @@
       <el-form class="my-form" :model="dialogItem" label-width="100px">
         <el-form-item class="form-item" label="标签名称">
           <el-autocomplete
+          class="onlyInput"
             ref="autocomplete"
             popper-class="my-autocomplete"
             v-model="dialogItem.keywordName"
@@ -154,7 +155,7 @@
             @keyup.enter.native="onSearch"
             clearable
           >
-            <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
+            <i slot="suffix" class="el-icon-search el-input__icon"> </i>
             <template slot-scope="{ item }">
               <div class="option-info">
                 <span class="left" v-html="item.showItem"></span>
