@@ -64,3 +64,12 @@ export function ocrApprovalSubmission(param) {
     data: param
   })
 }
+
+// ocr审批驳回
+export function rollback(param) {
+  return request({
+    url: '/cpr/workspace/rollback',
+    method: 'post',
+    data: param
+  })
+}
