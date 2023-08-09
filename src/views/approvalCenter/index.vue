@@ -10,7 +10,7 @@
         : 'data-statistics-item active-item'
         ">
         <div class="icon">
-          <img :src="item.icon" alt="" :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
+          <img :src="item.value == crtSign ?item.activeIcon :item.icon"  :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
         </div>
         <div class="name-count">
           <span class="name">{{ item.name }}</span>
@@ -112,25 +112,31 @@ export default {
           name: "待处理",
           count: 0,
           value: "toPending",
-          icon: require('@/assets/image/apply-center/wait-review.svg')
+          icon: require('@/assets/image/apply-center/wait-review.svg'),
+          activeIcon: require('@/assets/image/apply-center/wait-review-active.svg'),
+
         },
         {
           name: "已审批",
           count: 0,
           value: "approvedCount",
-          icon: require('@/assets/image/apply-center/approved.svg')
+          icon: require('@/assets/image/apply-center/approved.svg'),
+          activeIcon: require('@/assets/image/apply-center/approved-active.svg'),
+
         },
         {
           name: "我的关注",
           count: 0,
           value: "applyAll",
-          icon: require('@/assets/image/apply-center/my-attention.svg')
+          icon: require('@/assets/image/apply-center/my-attention.svg'),
+          activeIcon: require('@/assets/image/apply-center/my-attention-active.svg')
         },
         {
           name: "全部任务",
           count: 0,
           value: "allTask",
-          icon: require('@/assets/image/apply-center/all-attention.svg')
+          icon: require('@/assets/image/apply-center/all-attention.svg'),
+          activeIcon: require('@/assets/image/apply-center/all-attention.svg')
         },
       ],
       search: {

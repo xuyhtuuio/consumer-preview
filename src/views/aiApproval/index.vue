@@ -275,18 +275,19 @@ export default {
       this.crtToolComponent = item.component
       let params = {}
       const { item: param_item } = this.$route.params
-      console.log('dd',param_item )
       switch (item.component) {
         case 'applyForm':
           params = {
             formId: param_item.taskNumber,
             originatorId: param_item.originatorId,
+    
           }
           break;
         case 'approvalRecordDetail':
           params = {
             formId: param_item.taskNumber,
             originatorId: param_item.originatorId,
+            processInstanceId:param_item.processInstanceId
           }
           break;
       }
