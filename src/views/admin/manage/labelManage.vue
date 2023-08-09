@@ -216,8 +216,15 @@ export default {
       this.getList(1);
     },
     async querySearch(queryString, cb) {
-      this.getList();
-      cb(this.data);
+      const res = await getList({
+        pageNum: 1,
+        pageSize: 10,
+        isAll: 1,
+        type: this.search.type,
+        content: queryString
+      });
+      const { data } = res.data;
+        cb(data?.list);
     },
     async getList(pageNow) {
       this.loading = true;
@@ -616,11 +623,6 @@ export default {
     line-height: 28px;
   }
 }
-
-
-
-
-
 
 
 
