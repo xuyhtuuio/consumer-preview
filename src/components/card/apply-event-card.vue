@@ -15,9 +15,9 @@
         <!-- 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
         <span class="event-status">
           <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
-          <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中>{{ item.approvalStage }}</i>
-          <i v-if="item.taskStatus === '2'" class="tag in-modify">待修改>{{ item.approvalStage }}</i>
-          <i v-if="item.taskStatus === '3'" class="tag check">待确认>{{ item.approvalStage }}</i>
+          <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中>{{ item.currentActivityName }}</i>
+          <i v-if="item.taskStatus === '2'" class="tag in-modify">待修改>{{ item.currentActivityName }}</i>
+          <i v-if="item.taskStatus === '3'" class="tag check">待确认>{{ item.currentActivityName }}</i>
           <i v-if="item.taskStatus === '4'" class="end">
             <i class="tag end-sign"> 已结束 </i>
           </i>
@@ -276,6 +276,7 @@ export default {
     concern(item) {
       const param = {
         recordId: item.taskNumber,
+        type:1
       };
       concernApplication(param).then((res) => {
         if (res.status == 200) {

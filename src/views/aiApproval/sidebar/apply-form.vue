@@ -1,6 +1,6 @@
 <template>
     <div class="ocr-apply-form">
-        <order-basic-info :sidebarParam="sidebarParam" @preview=preview>
+        <order-basic-info :sidebarParam="sidebarParam" @preview=preview :personInfo="personInfo">
             <template slot="apply-modify">
                 <el-button type="text" class="apply-modify">
                     <i class="icon el-icon-edit-outline"></i>修改申请单
@@ -16,6 +16,10 @@ export default {
     name:'apply-form',
     props: {
         sidebarParam: {
+            type: Object,
+            default: () => { }
+        },
+        personInfo: {
             type: Object,
             default: () => { }
         }

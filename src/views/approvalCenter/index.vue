@@ -26,9 +26,9 @@
               <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
                 :value="item.value"></el-option>
             </el-select>
-            <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable>
+            <!-- <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable>
               <el-option v-for="(item, index) in approvalPhases" :key="index" :label="item.label"
-                :value="item.value"></el-option></el-select>
+                :value="item.value"></el-option></el-select> -->
             <el-select v-model="search.urgent" placeholder="是否加急" @change="searchList" clearable>
               <el-option v-for="(item, index) in isUrgents" :key="index" :label="item.label"
                 :value="item.value"></el-option>
@@ -92,13 +92,12 @@
 import approvalEventCard from "@/components/card/approval-event-card";
 import {
   getUserStatus,
+  getDataStatistics,
   getApprovalType,
   getApprovalStage,
-  billOfLadingAgenciesList,
   getApprovalListStation,
 } from "@/api/approvalCenter";
-import { queryUserList} from '@/api/org'
-import axiosAll from '@/utils/axios-all'
+import { queryUserList } from '@/api/org'
 export default {
   components: {
     approvalEventCard,
@@ -121,18 +120,18 @@ export default {
           value: "approvedCount",
           icon: require('@/assets/image/apply-center/approved.svg')
         },
-        // {
-        //   name: "我的关注",
-        //   count: 0,
-        //   value: "applyAll",
-        //   icon: require('@/assets/image/apply-center/my-attention.svg')
-        // },
-        // {
-        //   name: "全部任务",
-        //   count: 0,
-        //   value: "allTasksOffice",
-        //   icon: require('@/assets/image/apply-center/all-attention.svg')
-        // },
+        {
+          name: "我的关注",
+          count: 0,
+          value: "applyAll",
+          icon: require('@/assets/image/apply-center/my-attention.svg')
+        },
+        {
+          name: "全部任务",
+          count: 0,
+          value: "allTask",
+          icon: require('@/assets/image/apply-center/all-attention.svg')
+        },
       ],
       search: {
         approvalType: "",
@@ -239,14 +238,6 @@ export default {
     getDataStatistic() {
       const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
       const param = {
-        pageNow: 1,
-        pageSize: 10,
-        approvalType: "",
-        urgent: "",
-        hasOpinions: "",
-        adoptionStatus: "",
-        nodeid: this.search.approvalStage,
-        sort: 1,
         taskDTO: {
           pageNo: 0,
           pageSize: 10,
@@ -256,46 +247,12 @@ export default {
           }
         }
       };
-      const posts = {
-        toPending: {
-          method: 'post',
-          url: this.$GLOBAL.cpr + 'censor/getApprovalListStation',
-          params: {
-            ...param,
-            listType: 1
-          }
-        },
-        approvedCount: {
-          method: 'post',
-          url: this.$GLOBAL.cpr + 'censor/getApprovalListStation',
-          params: {
-            ...param,
-            listType: 2
-          }
-        },
-        applyAll: {
-          method: 'post',
-          url: this.$GLOBAL.cpr + 'censor/getApprovalListStation',
-          params: {
-            ...param,
-            listType: 3
-          }
-        },
-        // allTasksOffice: {
-        //   method: 'post',
-        //   url: this.$GLOBAL.cpr + 'censor/getApprovalListStation',
-        //   params: {
-        //     ...param,
-        //     listType: 4
-        //   }
-        // }
-      }
-      axiosAll(posts).then(res => {
-        for (let key in res) {
-          const { totalCount } = res[key].data
-          this.dataStatistics.forEach(m => {
-            if (m.value == key) {
-              m.count = totalCount
+      getDataStatistics(param).then(res => {
+        const { data } = res.data
+        for (let i in data) {
+          this.dataStatistics.forEach(v => {
+            if (v.value == i) {
+              v.count = data[i]
             }
           })
         }
@@ -330,12 +287,12 @@ export default {
       });
     },
     changeArrrovalType() {
-      if (this.search.approvalType || this.search.approvalType == 0) {
-        this.getApprovalStage();
-      } else {
-        this.search.approvalStage = "";
-        this.approvalPhases = [];
-      }
+      // if (this.search.approvalType || this.search.approvalType == 0) {
+      //   this.getApprovalStage();
+      // } else {
+      //   this.search.approvalStage = "";
+      //   this.approvalPhases = [];
+      // }
       this.searchList();
     },
     changeStatis(item) {
@@ -371,22 +328,22 @@ export default {
       });
     },
     resize() {
-      let floor2 = document.querySelectorAll(".approval-center  .floor2")[0];
-      floor2
-        ? (floor2.style.paddingRight = floor2.offsetWidth * (1 / 7) + 16 + "px")
-        : "";
+      // let floor2 = document.querySelectorAll(".approval-center  .floor2")[0];
+      // floor2
+      //   ? (floor2.style.paddingRight = floor2.offsetWidth * (1 / 7) + 16 + "px")
+      //   : "";
     },
     searchList() {
       this.getList(1);
     },
     queryUserList() {
       queryUserList().then((res) => {
-        const {root} = res.data.data.data
+        const { root } = res.data.data.data
         if (root) {
           this.agenciesList = root.children.map(item => {
             return {
               ...item,
-              children:null,
+              children: null,
               id: item.id,
               name: item.name,
             }
@@ -406,7 +363,7 @@ export default {
         case "applyAll":
           listType = '3';
           break;
-        case "allTasksOffice":
+        case "allTask":
           listType = '4';
           break;
 
@@ -417,8 +374,8 @@ export default {
         pageSize: 10,
         ...this.search,
         listType,
-        institutionalCode:this.search.institutionalCode&&this.search.institutionalCode[0],
-        nodeid:this.search.approvalStage
+        institutionalCode: this.search.institutionalCode && this.search.institutionalCode[0],
+        nodeid: this.search.approvalStage
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间
@@ -456,6 +413,7 @@ export default {
             ...v,
             taskNumber: v.recordId + '',
             taskName: v.entryName,
+            initiator: v.originator,
             taskStatus: this.taskStatusSwitch(v.nodeStatus)
           }
         }) : [];

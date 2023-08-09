@@ -4,8 +4,8 @@ import request from '@/api/request.js'
 export function getDataStatistics(param) {
   return request({
     url: '/cpr/censor/header',
-    method: 'get',
-    params: param
+    method: 'post',
+    data: param
   })
 }
 export function getUserStatus(param) {
@@ -27,8 +27,8 @@ export function getApprovalType(param) {
 export function getApprovalStage(param) {
   return request({
     url: '/cpr/applicationcenter/approvalStage',
-    method: 'get',
-    params: param
+    method: 'post',
+    data: param
   })
 }
 // 获取申请列表

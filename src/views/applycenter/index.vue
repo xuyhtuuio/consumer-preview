@@ -11,7 +11,7 @@
         : 'data-statistics-item active-item'
         ">
         <div class="icon">
-          <img :src="item.icon" alt="" :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
+          <img :src="item.value == crtSign ?item.activeIcon :item.icon" alt="" :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
         </div>
         <div class="name-count">
           <span class="name">{{ item.name }}</span>
@@ -27,18 +27,18 @@
       <div class="filters">
         <div class="filters-content">
           <div class="floor1">
-            <div class="floor1-item">
+            <!-- <div class="floor1-item"> -->
               <el-select popper-class="transaction-select" v-model="search.form_management_id" placeholder="事项类型"
                 @change="changeArrrovalType" clearable @clear="searchList">
                 <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
                   :value="item.value"></el-option>
               </el-select>
-              <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable
+              <!-- <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable
                 @clear="searchList">
                 <el-option v-for="(item, index) in approvalPhases" :key="index" :label="item.label"
-                  :value="item.value"></el-option></el-select>
-            </div>
-            <div class="floor1-item">
+                  :value="item.value"></el-option></el-select> -->
+            <!-- </div> -->
+            <!-- <div class="floor1-item"> -->
               <el-select v-model="search.urgent" placeholder="是否加急" @change="searchList" clearable>
                 <el-option v-for="(item, index) in isUrgents" :key="index" :label="item.label"
                   :value="item.value"></el-option>
@@ -47,8 +47,8 @@
                 <el-option v-for="(item, index) in isOpinions" :key="index" :label="item.label"
                   :value="item.value"></el-option>
               </el-select>
-            </div>
-            <div class="floor1-item">
+            <!-- </div> -->
+            <!-- <div class="floor1-item"> -->
               <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @change="searchList" clearable>
                 <el-option v-for="(item, index) in adoptionSituations" :key="index" :label="item.label"
                   :value="item.value"></el-option>
@@ -63,7 +63,7 @@
                   </el-option>
                 </el-option-group>
               </el-select>
-            </div>
+            <!-- </div> -->
           </div>
           <div class="floor2">
             <el-input v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
@@ -99,7 +99,7 @@
 </template>
 <script>
 import {
-  getUserStatus,
+  getsTheNumberOfHeaders,
   getApprovalType,
   getApprovalStage,
   getApplicationList,
@@ -108,7 +108,8 @@ import {
   concernedList,
   toBeConfirmed,
   revoked,
-  toReviseList
+  toReviseList,
+  Approval
 } from "@/api/applyCenter";
 import axiosAll from '@/utils/axios-all'
 import applyEventCard from "@/components/card/apply-event-card";
@@ -129,42 +130,52 @@ export default {
           count: 0,
           value: "applyAll",
           id: 0,
-          icon: require('@/assets/image/apply-center/all-attention.svg')
+          icon: require('@/assets/image/apply-center/all-attention.svg'),
+          activeIcon: require('@/assets/image/apply-center/all-attention.svg')
+
         },
         {
           name: "我的关注",
           count: 0,
           value: "myConcern",
           id: 1,
-          icon: require('@/assets/image/apply-center/my-attention.svg')
+          icon: require('@/assets/image/apply-center/my-attention.svg'),
+          activeIcon: require('@/assets/image/apply-center/my-attention-active.svg')
+
         },
         {
           name: "待修改",
           count: 0,
           value: "toModified",
           id: 4,
-          icon: require('@/assets/image/apply-center/wait-modify.svg')
+          icon: require('@/assets/image/apply-center/wait-modify.svg'),
+          activeIcon: require('@/assets/image/apply-center/wait-modify-active.svg')
+
         },
         {
           name: "待确认",
           count: 0,
           value: "toConfirmed",
           id: 5,
-          icon: require('@/assets/image/apply-center/wait-check.svg')
+          icon: require('@/assets/image/apply-center/wait-check.svg'),
+          activeIcon:require('@/assets/image/apply-center/wait-check-active.svg'),
         },
         {
           name: "审批中",
           count: 0,
           value: "Approval",
           id: 6,
-          icon: require('@/assets/image/apply-center/in-approval.svg')
+          icon: require('@/assets/image/apply-center/in-approval.svg'),
+          activeIcon: require('@/assets/image/apply-center/in-approval-active.svg')
+
         },
         {
           name: "草稿箱",
           count: 0,
           value: "draftBin",
           id: 3,
-          icon: require('@/assets/image/apply-center/draft-box.svg')
+          icon: require('@/assets/image/apply-center/draft-box.svg'),
+          activeIcon: require('@/assets/image/apply-center/draft-box-active.svg'),
         },
       ],
       search: {
@@ -226,6 +237,7 @@ export default {
     };
   },
   activated() {
+    this.getDataStatistic();
     this.searchList()
   },
   async mounted() {
@@ -242,7 +254,6 @@ export default {
       let floor2 = document.querySelectorAll(".apply-center .floor2")[0];
       floor2 ? (floor2.style.paddingRight = 16 + "px") : "";
     });
-    this.getDataStatistic();
     this.userStatus();
     this.getApprovalType();
   },
@@ -267,12 +278,12 @@ export default {
       }
     },
     changeArrrovalType() {
-      if (this.search.form_management_id || this.search.form_management_id == 0) {
-        this.getApprovalStage();
-      } else {
-        this.search.approvalStage = "";
-        this.approvalPhases = [];
-      }
+      // if (this.search.form_management_id || this.search.form_management_id == 0) {
+      //   this.getApprovalStage();
+      // } else {
+      //   this.search.approvalStage = "";
+      //   this.approvalPhases = [];
+      // }
       this.searchList();
     },
     getApprovalType() {
@@ -314,48 +325,18 @@ export default {
         id: userinfo.id,
         // id: '25',
         name: userinfo.fullname,
-        form_management_id:'1'
       };
-      const posts = {
-        applyAll: {
-          method: 'post',
-          url: this.$GLOBAL.cpr + 'applicationcenter/applicationList',
-          params: {
-            ...param
-          }
-        },
-        // toConfirmed: {
-        //   method: 'post',
-        //   url: this.$GLOBAL.cpr + 'applicationcenter/toBeConfirmed',
-        //   params: {
-        //     ...param
-        //   }
-        // },
-        // toModified: {
-        //   method: 'post',
-        //   url: this.$GLOBAL.cpr + 'applicationcenter/toReviseList',
-        //   params: {
-        //     ...param
-        //   }
-        // },
-        // draftBin: {
-        //   method: 'post',
-        //   url: this.$GLOBAL.cpr + 'applicationcenter/revoked',
-        //   params: {
-        //     ...param
-        //   }
-        // },
-        // myConcern: {
-        //   method: 'post',
-        //   url: this.$GLOBAL.cpr + 'applicationcenter/concernedList',
-        //   params: {
-        //     ...param
-        //   }
-        // }
-
-      }
-      axiosAll(posts)
-
+      getsTheNumberOfHeaders(param).then(res => {
+        const data =res.data.data[0]
+        
+        for (let key in data) {
+          this.dataStatistics.forEach(m => {
+            if (m.value == key) {
+              m.count = data[key]
+            }
+          })
+        }
+      })
     },
     changeSort() {
       const lastKey =
@@ -397,7 +378,7 @@ export default {
         currentActivityName: this.search.approvalStage,
         id: userinfo.id,
         name: userinfo.fullname,
-        form_management_id:'1'
+        form_management_id: '1'
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间
@@ -428,7 +409,7 @@ export default {
           res = await toBeConfirmed(param)
           break;
         case 'Approval':
-          res = await toBeConfirmed(param)
+          res = await Approval(param)
           break;
         case 'draftBin':
           res = await revoked(param)
@@ -439,9 +420,9 @@ export default {
       this.list = data.list && data.list.length ? data.list.map(v => {
         return {
           ...v,
-          formId:v.recordId,
-          taskName:v.entryName,
-          taskNumber:v.recordId,
+          formId: v.taskNumber,
+          taskStatus:'1',
+          initiator:v.sponsorMap,
           currentAssignee: v.currentAssignee && v.currentAssignee.length ? v.currentAssignee.map(m => {
             return {
               ...m,
@@ -744,7 +725,9 @@ export default {
         padding-right: 16px;
         display: flex;
         justify-content: space-between;
-
+        .el-select{
+          margin-right: 16px;
+        }
         .el-select:last-of-type {
           margin-right: 0;
         }
