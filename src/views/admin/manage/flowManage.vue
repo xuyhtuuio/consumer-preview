@@ -25,7 +25,7 @@
     <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
       v-if="page.total">
     </TrsPagination>
-    <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow.templateName + '-预览'">
+    <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow.templateName + '-预览'" width="600px">
       <process-design from="flowManage" ref="processDesign" style="background: #f5f6f6;" />
     </w-dialog>
     <secondary-confirmation :option="confirmOption" ref="confirmation" @handleConfirm="handleConfirmation(confirmOption)"></secondary-confirmation>

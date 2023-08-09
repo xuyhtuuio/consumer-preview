@@ -324,6 +324,7 @@ export default {
           orderType: 'desc'
         }
       }
+      this.order = { ...data }
       this.editForm({
         recordId: this.currentRow.recordId,
         params: {
@@ -398,6 +399,8 @@ export default {
       this.loadingList = true
       const res = await itemPagingList({
         formCategoryId: item.recordId,
+        orderColumn: 'updateTime',
+        orderType: 'desc',
         ...item.params
       })
       this.loadingList = false
@@ -538,7 +541,7 @@ export default {
       this.drawerTitle = '编辑字段'
       this.currentRowItem = item
       this.$nextTick(() => {
-        this.$refs['formManageCustomField'].initForm(this.currentRow, this.currentRowItem,)
+        this.$refs['formManageCustomField'].initForm(this.currentRow, this.currentRowItem)
       })
     },
     // 删除表单项

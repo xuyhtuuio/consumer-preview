@@ -28,19 +28,34 @@ export default {
   computed:{
     assignedUser() {
       return this.$store.state.selectedNode?.props?.assignedUser
-    }
+    },
+    nodeMap() {
+      return this.$store.state.nodeMap
+    },
+    nodes() {
+      const tempNodes = []
+      this.nodeMap.forEach(value => {
+        if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO'].includes(value?.type)) {
+          tempNodes.push({
+            name: value.name,
+            id: value.id
+          })
+        }
+      })
+      return tempNodes
+    },
   },
   watch: {
     assignedUser: {
-      handler(val) {
+      handler() {
+        this.content = (this.config.props.assignedUser || []).map(item => item.label).join('、') || ''
         if (this.$store.state.selectedNode.id !== this.config.id || this.config.name === '二次会签') {
           return;
         }
-        this.content = (val || []).map(item => item.label).join('、') || ''
       },
       immediate: true,
       deep: true
-    },
+    }
   },
   methods: {
     //校验数据配置的合法性

@@ -48,8 +48,8 @@
               </span>
               <span v-if="condition.valueType === ValueType.array">
                 <el-select size="small" placeholder="判断符" style="width: 120px;" v-model="condition.compare">
-                  <el-option label="等于" value="="></el-option>
-                  <el-option label="包含在" value="IN"></el-option>
+                  <el-option label="完全等于" value="="></el-option>
+                  <el-option label="包含任意" value="IN"></el-option>
                 </el-select>
                  <span style="margin-left: 10px">
                    <span v-if="condition.compare === '='">
