@@ -152,7 +152,7 @@ export default {
     // console.log('item',item)
     this.formId = item.taskNumber;
     this.inDraft = item.draftFlag === 1;
-    this.formCategoryId = item.formCategoryId
+    this.formCategoryId = item.formManagementId
     this.loading = true;
     this.init(item)
     this.formBase = item;
