@@ -153,6 +153,8 @@ export default {
     return {
       pageConfig: {
         pageType: "nonManage",
+        isAll: 0,
+        pageSize: 5
       },
     };
   },
