@@ -11,9 +11,19 @@
           </el-form-item>
 
           <el-form-item class="form-item">
-            <el-autocomplete class="onlyInput" popper-class="my-autocomplete" v-model="search.baseline"
-              v-scrollLoad="load" :fetch-suggestions="querySearch" placeholder="请输入关键词进行查询" @select="handleSelect"
-              @keyup.enter.native="onSearch" clearable @clear="onSearch">
+            <el-autocomplete
+              class="onlyInput"
+              ref="autocomplete"
+              popper-class="my-autocomplete"
+              v-model="search.baseline"
+              v-scrollLoad="load"
+              :fetch-suggestions="querySearch"
+              placeholder="请输入关键词进行查询"
+              @select="handleSelect"
+              @keyup.enter.native="onSearch"
+              clearable
+              @clear="onSearch"
+            >
               <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
               <template slot-scope="{ item }">
                 <div class="option-info">
@@ -44,12 +54,21 @@
         <div class="right">
           <span :class="['r-item', currentSort ? 'r-item-active' : '']" @click="handleSort('refer')">
             按引用次数排序
-            <span style="font-size: 12px" class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': referSort }"></span>
+            <span
+              style="font-size: 12px"
+              class="iconfont icon-jiantou left-icon"
+              :class="{ 'left-icon-reverse': !referSort }"
+            ></span>
           </span>
-          <span :class="['r-item', !currentSort ? 'r-item-active' : '']" @click="handleSort('update')">按更新时间排序
-            <span style="font-size: 12px" class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': updateSort }"></span>
+          <span
+            :class="['r-item', !currentSort ? 'r-item-active' : '']"
+            @click="handleSort('update')"
+            >按更新时间排序
+            <span
+              style="font-size: 12px"
+              class="iconfont icon-jiantou left-icon"
+              :class="{ 'left-icon-reverse': !updateSort }"
+            ></span>
           </span>
         </div>
       </div>
@@ -103,8 +122,8 @@
             <template slot-scope="{ item }">
               <div class="option-info">
                 <span class="left" v-html="item.showItem"></span>
-                <span :class="['right', item.type === 1 ? 'right-zero' : 'right-one']">{{
-                  item.type === 1 ? '禁用词' : '敏感词'
+                <span :class="['right', item.keywordType === 1 ? 'right-zero' : 'right-one']">{{
+                  item.keywordType === 1 ? '禁用词' : '敏感词'
                 }}</span>
               </div>
             </template>
@@ -223,6 +242,7 @@ export default {
     }
   },
   methods: {
+    // 初始化数据
     initData() {
       this.isLoading = true;
       const pageData = {
@@ -240,6 +260,7 @@ export default {
       });
       this.searchList.length = 0;
     },
+    // 初始化搜索数据
     initSearchData(flag = false) {
       const data = {
         content: flag ? this.dialogItem.keywordName : this.search.baseline,
@@ -322,12 +343,10 @@ export default {
       this.dialogItem.keywordType = id;
     },
     handleClick(row) {
-      console.log(row);
       this.titleDialog = row ? '编辑意见' : '新建意见';
       this.dialogItem = row ? { ...row, keywordId: row.keywordType } : {};
       this.limitTimeVisible = true;
-      !row && this.initSearchData(false);
-      row && this.initSearchData(true);
+      this.initSearchData(true);
     },
     submitEdit(row) {
       console.log(row);
@@ -750,10 +769,6 @@ export default {
         margin-right: 12px;
         min-width: fit-content;
         line-height: 36px;
-      }
-
-      &-right {
-        .right-option {}
       }
     }
 
