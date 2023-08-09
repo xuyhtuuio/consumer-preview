@@ -216,15 +216,8 @@ export default {
       this.getList(1);
     },
     async querySearch(queryString, cb) {
-      const res = await getList({
-        pageNum: 1,
-        pageSize: 10,
-        isAll: 1,
-        type: this.search.type,
-        content: queryString
-      });
-      const { data } = res.data;
-        cb(data?.list);
+      this.getList();
+      cb(this.data);
     },
     async getList(pageNow) {
       this.loading = true;
@@ -563,15 +556,12 @@ export default {
     padding: 4px 12px;
     background: #fff7e6;
     border-radius: 4px;
-    font-weight: 700;
     color: #fa8c16;
   }
   .class-zero {
     padding: 4px 12px;
     background: #fff1f0;
     border-radius: 4px;
-    font-weight: 700;
-
     color: #eb5757;
   }
 
@@ -626,6 +616,14 @@ export default {
     line-height: 28px;
   }
 }
+
+
+
+
+
+
+
+
 
 
 
