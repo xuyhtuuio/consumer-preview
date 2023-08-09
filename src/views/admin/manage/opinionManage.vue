@@ -163,7 +163,7 @@
             <i slot="suffix" class="el-icon-search el-input__icon"> </i>
             <template slot-scope="{ item }">
               <div class="option-info">
-                <span class="left" v-html="item.showItem"></span>
+                <span class="left ellipsis" v-html="item.showItem"></span>
                 <span :class="['right', item.keywordType === 1 ? 'right-zero' : 'right-one']">{{
                   item.keywordType === 1 ? '禁用词' : '敏感词'
                 }}</span>
@@ -1076,6 +1076,7 @@ export default {
     }
   }
 }
+
 
 
 

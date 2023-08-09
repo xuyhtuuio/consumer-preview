@@ -34,7 +34,7 @@
               <i slot="suffix" class="el-icon-search el-input__icon" @click="getList(1)"> </i>
               <template slot-scope="{ item }">
                 <div class="option-info">
-                  <span class="left" v-html="item.keywordContent"></span>
+                  <span class="left ellipsis" v-html="item.keywordContent"></span>
                   <span :class="['right', item.type === 1 ? 'right-zero' : 'right-one']">{{
                     item.type === 1 ? '禁用词' : '敏感词'
                   }}</span>
@@ -625,5 +625,6 @@ export default {
     line-height: 28px;
   }
 }
+
 
 </style>
