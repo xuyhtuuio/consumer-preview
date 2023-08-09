@@ -66,6 +66,9 @@
         :header-cell-style="{ 'text-align': 'center' }"
         :cell-style="{ 'text-align': 'center' }"
       >
+      <template #keywordContent="{ row }">
+        <div style="text-align:left">{{row.keywordContent}}</div>
+      </template>
         <template #type="{ row }">
           <span :class="[row.type === 1 ? 'class-zero' : 'class-one']">{{
             row.type === 1 ? '禁用词' : '敏感词'
