@@ -2,6 +2,7 @@
   <el-container>
     <el-header>
       <layout-header
+        ref="layoutHeader"
         v-model="activeSelect"
         @changeRoute="(active) => activeSelect = active"
         @save="saveProcess"
@@ -37,7 +38,7 @@
 
 <script>
 import LayoutHeader from './LayoutHeader'
-import {createForm, updateFormDetail, saveProcess, publishProcess, getProcessDetail} from '@/api/design'
+import {saveProcess, publishProcess, getProcessDetail} from '@/api/design'
 import FormBaseSetting from '@/views/admin/layout/FormBaseSetting'
 import ProcessDesign from '@/views/admin/layout/ProcessDesign'
 import FormProSetting from '@/views/admin/layout/FormProSetting'
@@ -187,6 +188,12 @@ export default {
       }
     },
     async saveProcess(callback) {
+      console.log(this.$refs['baseSetting'].setup.templateName)
+      if ((this.$refs['baseSetting'].setup.templateName === null) ||  (this.$refs['baseSetting'].setup.templateName?.length < 2) || (this.$refs['baseSetting'].setup.templateName?.length > 10)) {
+        this.$message.warning('流程名称未设置或长度不对')
+        return false;
+      }
+
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       console.log(user)
       console.log('this.setup.process', this.setup.process)

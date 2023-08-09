@@ -162,7 +162,6 @@
         this.cascaderOptions = this.$options.data().cascaderOptions
       },
       setOptions(name, options) {
-        debugger
         if (name === 'MultipleGroupsSelect') {
           this.selectGroupOptions = options
         } else if (name === 'Cascader') {
@@ -171,7 +170,7 @@
           this.selectOptions = options
         }
       },
-      initForm(form, row ) {
+      initForm(form, row) {
         this.parentForm = form;
         if (row) {
           this.currentRow = JSON.parse(JSON.stringify(row))
@@ -183,8 +182,8 @@
           this.$set(this.ruleForm, 'placeholder', this.currentRow.special.props.placeholder)
           this.$set(this.ruleForm, 'numberOfWords', this.currentRow.special.props.numberOfWords)
           this.$set(this.ruleForm, 'exclusiveRowOrNot', this.currentRow.special.props.exclusiveRowOrNot)
-          if (this.currentRow.special.name && this.currentRow.special.props.options) {
-            this.setOptions(this.currentRow.special.name, this.currentRow.special.props.options)
+          if (this.currentRow.special.name && this.currentRow.special.props.Options) {
+            this.setOptions(this.currentRow.special.name, this.currentRow.special.props.Options)
           }
         } else {
           this.currentRow = {}

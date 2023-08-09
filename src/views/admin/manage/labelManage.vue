@@ -7,7 +7,7 @@
             <el-select
               v-model="search.type"
               placeholder="请选择标签类型"
-              @change="(val)=>getList()"
+              @change="val => getList()"
               clearable
             >
               <el-option
@@ -25,7 +25,7 @@
               v-model="search.keyword"
               placeholder="请输入标签名称进行搜索"
               :fetch-suggestions="querySearch"
-              :trigger-on-focus="false"
+              :trigger-on-focus="true"
               @select="handleSelect"
               @keyup.enter.native="getList(1)"
               clearable
@@ -62,10 +62,12 @@
         :data="data"
         :colConfig="colConfig"
         @sort-change="sortChange"
-        @submitEdit="submitEdit"
         :header-cell-style="{ 'text-align': 'center' }"
         :cell-style="{ 'text-align': 'center' }"
       >
+        <template #keywordContent="{ row }">
+          <div style="text-align: left">{{ row.keywordContent }}</div>
+        </template>
         <template #type="{ row }">
           <span :class="[row.type === 1 ? 'class-zero' : 'class-one']">{{
             row.type === 1 ? '禁用词' : '敏感词'
@@ -209,8 +211,8 @@ export default {
     this.getList();
   },
   methods: {
-    handleSelect({keywordContent}) {
-      this.search.keyword = keywordContent
+    handleSelect({ keywordContent }) {
+      this.search.keyword = keywordContent;
       this.getList(1);
     },
     async querySearch(queryString, cb) {
@@ -222,7 +224,7 @@ export default {
         content: queryString
       });
       const { data } = res.data;
-      cb(data?.list || []);
+      cb(data?.list);
     },
     async getList(pageNow) {
       this.loading = true;
@@ -254,9 +256,7 @@ export default {
       this.dialogItem = row ? { ...row } : { type: 1 };
       this.dialogItem.index = index;
     },
-    submitEdit(row) {
-      // console.log(row);
-    },
+
     // 停用
     stopApllay(item) {
       // this.limitVisible = true;
@@ -406,6 +406,8 @@ export default {
   }
 
   .main {
+    height: calc(~'100% - 63px');
+    overflow-y: auto;
     padding: 24px 0 0;
   }
 
@@ -563,15 +565,12 @@ export default {
     padding: 4px 12px;
     background: #fff7e6;
     border-radius: 4px;
-    font-weight: 700;
     color: #fa8c16;
   }
   .class-zero {
     padding: 4px 12px;
     background: #fff1f0;
     border-radius: 4px;
-    font-weight: 700;
-
     color: #eb5757;
   }
 
@@ -626,20 +625,5 @@ export default {
     line-height: 28px;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height: 100%">
     <div class="title" v-if="level === 1">
       <span class="title-nav">表单管理</span>
       <el-button type="primary" @click="addForm" :loading="addLoading">新增</el-button>
@@ -9,7 +9,7 @@
         <span @click="goBack" class="breadcrumb">{{ isEdit ? '表单管理' : '表单管理' }}</span>/{{ currentRow.examineTypesName }}
       </div>
     </div>
-    <div v-loading="loadingList">
+    <div v-loading="loadingList" style="height: calc(100% - 63px); overflow-y: auto;">
       <!-- 表单管理一级表格 -->
       <TrsTable theme="TRS-table-gray" :data="data" :colConfig="colConfig" @sort-change="changeSort" v-if="level === 1"
         @submitEdit="submitEdit" :row-class-name="tableRowClassName">
@@ -324,6 +324,7 @@ export default {
           orderType: 'desc'
         }
       }
+      this.order = { ...data }
       this.editForm({
         recordId: this.currentRow.recordId,
         params: {
@@ -398,6 +399,8 @@ export default {
       this.loadingList = true
       const res = await itemPagingList({
         formCategoryId: item.recordId,
+        orderColumn: 'updateTime',
+        orderType: 'desc',
         ...item.params
       })
       this.loadingList = false
@@ -538,7 +541,7 @@ export default {
       this.drawerTitle = '编辑字段'
       this.currentRowItem = item
       this.$nextTick(() => {
-        this.$refs['formManageCustomField'].initForm(this.currentRow, this.currentRowItem,)
+        this.$refs['formManageCustomField'].initForm(this.currentRow, this.currentRowItem)
       })
     },
     // 删除表单项

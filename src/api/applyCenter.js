@@ -40,6 +40,41 @@ export function getApplicationList(param) {
     data: param
   })
 }
+// 获取关注列表
+export function concernedList(param) {
+  return request({
+    url: '/cpr/applicationcenter/concernedList',
+    method: 'post',
+    data: param
+  })
+}
+
+//待确认
+export function toBeConfirmed(param) {
+  return request({
+    url: '/cpr/applicationcenter/toBeConfirmed',
+    method: 'post',
+    data: param
+  })
+}
+//待修改
+export function toReviseList(param) {
+  return request({
+    url: '/cpr/applicationcenter/toReviseList',
+    method: 'post',
+    data: param
+  })
+}
+
+// 草稿
+export function revoked(param) {
+  return request({
+    url: '/cpr/applicationcenter/revoked',
+    method: 'post',
+    data: param
+  })
+}
+
 // 删除
 
 export function delApplication(param) {
@@ -64,7 +99,7 @@ export function quashApplication(param) {
 
 export function concernApplication(param) {
   return request({
-    url: '/cpr/applicationcenter/concern',
+    url: '/cpr/censor/follow',
     method: 'post',
     contentType:'application/x-www-form-urlencoded',
     data: param

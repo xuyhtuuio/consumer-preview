@@ -48,6 +48,7 @@ export default {
   .el-menu-item {
     height: 40px;
     line-height: 40px;
+    margin-bottom: 10px;
     text-align: center;
   }
   .el-menu-item.is-active {

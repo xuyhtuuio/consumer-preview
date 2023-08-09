@@ -28,14 +28,17 @@
           <el-form ref="condition-form" label-width="100px">
             <!--构建表达式-->
             <el-form-item :label="condition.title" v-for="(condition, cindex) in group.conditions" :key="condition.id + '_' + cindex" >
-              <span v-if="condition.valueType === ValueType.string">
+              <span v-if="(condition.valueType === ValueType.string)">
                 <el-select size="small" placeholder="判断符" style="width: 120px;" v-model="condition.compare">
                   <el-option label="等于" value="="></el-option>
                   <el-option label="包含在" value="IN"></el-option>
                 </el-select>
                  <span style="margin-left: 10px">
                    <span v-if="condition.compare === '='">
-                     <el-input style="width: 260px;" placeholder="输入比较值" size="small" v-model="condition.value[0]"/>
+                    <el-select v-if="condition.name === 'SelectInput'" style="width: 260px;" filterable allow-create size="small" v-model="condition.value" placeholder="输入可能包含的值">
+                      <el-option v-for="item in selectOptions(condition.id)" :label="item.value" :value="item.value" :key="item.id"></el-option>
+                    </el-select>
+                     <el-input v-else style="width: 260px;" placeholder="输入比较值" size="small" v-model="condition.value[0]"/>
                    </span>
                    <span v-else>
                     <el-select style="width: 260px;" multiple filterable allow-create size="small" v-model="condition.value" placeholder="输入可能包含的值"></el-select>
@@ -45,15 +48,20 @@
               </span>
               <span v-if="condition.valueType === ValueType.array">
                 <el-select size="small" placeholder="判断符" style="width: 120px;" v-model="condition.compare">
-                  <el-option label="等于" value="="></el-option>
-                  <el-option label="包含在" value="IN"></el-option>
+                  <el-option label="完全等于" value="="></el-option>
+                  <el-option label="包含任意" value="IN"></el-option>
                 </el-select>
                  <span style="margin-left: 10px">
                    <span v-if="condition.compare === '='">
-                     <el-input style="width: 260px;" placeholder="输入比较值" size="small" v-model="condition.value[0]"/>
+                    <el-select style="width: 260px;" filterable allow-create size="small" v-model="condition.value[0]" placeholder="输入可能包含的值">
+                      <el-option v-for="item in selectOptions(condition.id)" :label="item.value" :value="item.value" :key="item.id"></el-option>
+                    </el-select>
+                     <!-- <el-input style="width: 260px;" placeholder="输入比较值" size="small" v-model="condition.value[0]"/> -->
                    </span>
                    <span v-else>
-                    <el-select style="width: 260px;" multiple filterable allow-create size="small" v-model="condition.value" placeholder="输入可能包含的值"></el-select>
+                    <el-select style="width: 260px;" multiple collapse-tags filterable allow-create size="small" v-model="condition.value" placeholder="输入可能包含的值">
+                      <el-option v-for="item in selectOptions(condition.id)" :label="item.value" :value="item.value" :key="item.id"></el-option>
+                    </el-select>
                    </span>
                  </span>
                  <i class="el-icon-close" @click="deleteSingleCondition(group.conditions, cindex)" style="position: absolute;right:0; top: 12px;font-size: 20px;"></i>
@@ -165,6 +173,12 @@ export default {
     }
   },
   computed: {
+    selectOptions() {
+      return (id) => {
+        const { formItems } = this.$store.state.design
+        return formItems.find(item => item.id === id).props.options
+      }
+    },
     selectedNode() {
       return this.$store.state.selectedNode
     },

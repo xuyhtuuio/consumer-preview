@@ -116,20 +116,23 @@
 					<div style="overflow-x: hidden; overflow-y: auto; height: calc(100% - 36px);">
             <div class="right-item-box" v-show="rightCheckedList.user.length">
               <span class="title">人员</span>
-              <div v-for="(node, index) in rightCheckedList.user" :key="node.label + index" class="line">
-                <span>{{ node.label }}</span>
+              <div v-for="(node, index) in rightCheckedList.user" :key="node.label + index" @mouseover="handleMouseover('hoverActiveUser', node.label)" @mouseout="handleMouseout('hoverActiveUser')" class="line">
+                <span class="label">{{ node.label }}</span>
+                <i class="el-icon-close" v-if="hoverActiveUser === node.label" @click="deleteNode('user', node.id)"></i>
               </div>
             </div>
             <div class="right-item-box" v-show="rightCheckedList.dept.length">
               <span class="title">部门</span>
-              <div v-for="(node, index) in rightCheckedList.dept" :key="node.label + index" class="line">
-                <span>{{ node.label }}</span>
+              <div v-for="(node, index) in rightCheckedList.dept" :key="node.label + index" @mouseover="handleMouseover('hoverActiveDept', node.label)" @mouseout="handleMouseout('hoverActiveDept')" class="line">
+                <span class="label">{{ node.label }}</span>
+                <i class="el-icon-close" v-if="hoverActiveDept === node.label" @click="deleteNode('dept', node.id)"></i>
               </div>
             </div>
             <div class="right-item-box" v-show="rightCheckedList.role.length">
               <span class="title">系统角色</span>
-              <div v-for="(node, index) in rightCheckedList.role" :key="node.label + index" class="line">
-                <span>{{ node.label }}</span>
+              <div v-for="(node, index) in rightCheckedList.role" :key="node.label + index" @mouseover="handleMouseover('hoverActiveRole', node.label)" @mouseout="handleMouseout('hoverActiveRole')" class="line">
+                <span class="label">{{ node.label }}</span>
+                <i class="el-icon-close" v-if="hoverActiveRole === node.label" @click="deleteNode('role', node.id)"></i>
               </div>
             </div>
             <div v-if="checkedTotal === 0" style="text-align: center;color:#86909C;margin-top:80px;">
@@ -205,6 +208,9 @@
     },
     data() {
       return {
+        hoverActiveUser: '',
+        hoverActiveRole: '',
+        hoverActiveDept: '',
         active: 'user',
         roleRange: '全行',
         checkAll: false,
@@ -239,7 +245,8 @@
           user: [],
           dept: [],
           role: []
-        }
+        },
+        timer: null
       }
     },
     computed:{
@@ -260,6 +267,33 @@
     mounted() {
     },
     methods: {
+      handleMouseover(hover, label) {
+        this[hover] = label
+        clearTimeout(this.timer)
+      },
+      handleMouseout(hover) {
+        this.timer = setTimeout(() => {
+          this[hover] = ''
+        }, 500);
+      },
+      deleteNode(type, id) {
+        if (type === 'role') {
+          const index = this.rightCheckedList.role.findIndex(row => row.id === id)
+          this.rightCheckedList.role.splice(index, 1)
+          const newIds = this.rightCheckedList.role.map(item => item.id)
+          this.$refs.role.setCheckedKeys([...newIds])
+        } else {
+          const index = this.rightCheckedList.user.findIndex(row => row.id === id)
+          if (index !== -1) {
+            this.rightCheckedList.user.splice(index, 1)
+          } else {
+            const index1 = this.rightCheckedList.dept.findIndex(row => row.id === id)
+            this.rightCheckedList.dept.splice(index1, 1)
+          }
+          const newIds = [ ...this.rightCheckedList.user.map(item => item.id), ...this.rightCheckedList.dept.map(item => item.id)]
+          this.$refs.user.setCheckedKeys([...newIds])
+        }
+      },
       async queryUserList() {
         const res = await queryUserList()
         const resData = res.data.data.data
@@ -516,10 +550,18 @@
 	}
 
 	.line {
-    margin-left: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 		width: 290px;
 		height: 35px;
+    padding: 0 10px;
+    margin-left: 6px;
 		line-height: 35px;
+    &:hover {
+      background: #FFFFFF;
+      
+    }
 		.avt {
 			width: 33px;
 			height: 33px;
@@ -529,7 +571,9 @@
 			border-radius: 50%;
 			color: #ffffff;
 		}
-
+    .el-icon-close {
+      cursor: pointer;
+    }
 		i:first-child {
 			font-size: large;
 		}
@@ -605,7 +649,7 @@
         background: #2D5CF6;
       }
       .right-item-box {
-        padding: 4px 8px;
+        padding: 8px;
         border-radius: 4px;
         background: #F7F8FA;
         margin-bottom: 8px;

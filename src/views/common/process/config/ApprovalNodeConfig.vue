@@ -133,7 +133,7 @@
       </div>
 
       <el-divider>高级设置</el-divider>
-      <el-form-item label="目标页面配置" prop="targetPage" v-if="nodeProps.assignedType === 'DEPT_USER_ROLE'">
+      <el-form-item label="目标页面配置" prop="targetPage">
         <el-radio-group class="radio-group" v-model="nodeProps.targetPage">
           <el-radio label="LEADER">领导审批</el-radio>
           <el-radio label="XIAOBAO">消保审批</el-radio>
@@ -148,13 +148,13 @@
       </div>
       <el-form-item label="" prop="text1" v-if="!['SELECT_NODE'].includes(nodeProps.assignedType)">
         <el-switch active-text="启用转办" v-model="nodeProps.isChangeHandle"></el-switch>
-        <div class="select-user" style="margin-top: 10px;">
+        <div class="select-user" style="margin-top: 10px;" v-if="nodeProps.isChangeHandle">
           <p>请选择【被转办人】可选用户范围</p>
           <el-button size="mini" @click="selectUser1" icon="el-icon-plus" type="primary">选择部门/人员/角色</el-button>
           <org-picker :show="showOrgSelect1" @close="closeSelect1" :selected="select1" @selectOver="selected1"></org-picker>
           <div class="tag-action" >
             <div class="tag-box" v-for="(item, index) in select1" :key="index">
-              <TrsTag :tag="{ ...item, ...tagConfig }" @handleClose="removeOrgItem(index)" />
+              <TrsTag :tag="{ ...item, ...tagConfig }" @handleClose="removeOrgItem1(index)" />
             </div>
           </div>
         </div>
@@ -279,7 +279,12 @@ export default {
     },
     nodes() {
       const tempNodes = []
+      let flag = false
       this.nodeMap.forEach(value => {
+        if (value.name === this.nodeName || flag === true) {
+          flag = true
+          return;
+        }
         if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO'].includes(value?.type) && value.name !== this.nodeName) {
           tempNodes.push({
             name: value.name,
@@ -307,7 +312,7 @@ export default {
         case "FORM_USER":
           return true;
         case "DEPT_USER_ROLE":
-          return true;
+          return this.nodeProps.assignedUser.length > 1;
         case "ROLE":
           return true;
         default:

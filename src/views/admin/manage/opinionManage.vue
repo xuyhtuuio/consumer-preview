@@ -19,6 +19,7 @@
           <el-form-item class="form-item">
             <el-autocomplete
               class="onlyInput"
+              ref="autocomplete"
               popper-class="my-autocomplete"
               v-model="search.baseline"
               v-scrollLoad="load"
@@ -32,9 +33,9 @@
               <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
               <template slot-scope="{ item }">
                 <div class="option-info">
-                  <span class="left" v-html="item.showItem"></span>
+                  <span class="left ellipsis" v-html="item.showItem"></span>
                   <span :class="['right', item.keywordType === 1 ? 'right-zero' : 'right-one']">{{
-                    item.type === 1 ? '禁用词' : '敏感词'
+                    item.keywordType === 1 ? '禁用词' : '敏感词'
                   }}</span>
                 </div>
               </template>
@@ -66,7 +67,7 @@
             <span
               style="font-size: 12px"
               class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': referSort }"
+              :class="{ 'left-icon-reverse': !referSort }"
             ></span>
           </span>
           <span
@@ -76,7 +77,7 @@
             <span
               style="font-size: 12px"
               class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': updateSort }"
+              :class="{ 'left-icon-reverse': !updateSort }"
             ></span>
           </span>
         </div>
@@ -85,7 +86,7 @@
         <div class="b-item" v-for="item in data" :key="item.id">
           <div class="left">
             <div class="title">
-              <span>{{ item.keywordName }}</span>
+              <span v-html="item.goalName"></span>
               <g-icon
                 class="left-icon"
                 stylePx="20"
@@ -93,7 +94,7 @@
                 @click.native="handleCopy(item.recommendedOpinions)"
               />
             </div>
-            <div class="content">{{ item.recommendedOpinions }}</div>
+            <div class="content" v-html="item.showItem"></div>
             <div class="info">
               <span :class="['info-item', item.keywordType === 1 ? 'class-zero' : 'class-one']">
                 {{ item.keywordType === 1 ? '禁用词' : '敏感词' }}
@@ -113,14 +114,18 @@
             </span>
             <span v-else class="btn" @click="changeIsTop(item)"><i>置顶</i></span>
             <span class="btn"><i @click="handleClick(item)">编辑</i></span>
-            <span class="btn btn-red"><i @click="stopApllay(item)">停用</i></span>
-            <span class="btn"><i @click="stopApllay(item)">删除</i></span>
+            <span class="btn" :class="{ 'btn-red': item.status === 1 }"
+              ><i @click="stopApllay(item, 'edit' + item.status)">{{
+                item.status === 1 ? '停用' : '恢复'
+              }}</i></span
+            >
+            <span class="btn"><i @click="stopApllay(item, 'remove')">删除</i></span>
           </div>
         </div>
       </div>
       <TrsPagination
         class="trs-pagination"
-        :pageSize="10"
+        :pageSize="page.pageSize"
         :pageNow="page.pageNow"
         :total="page.total"
         @getList="handleCurrentChange"
@@ -144,6 +149,7 @@
       <el-form class="my-form" :model="dialogItem" label-width="100px">
         <el-form-item class="form-item" label="标签名称">
           <el-autocomplete
+            class="onlyInput"
             ref="autocomplete"
             popper-class="my-autocomplete"
             v-model="dialogItem.keywordName"
@@ -154,12 +160,12 @@
             @keyup.enter.native="onSearch"
             clearable
           >
-            <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
+            <i slot="suffix" class="el-icon-search el-input__icon"> </i>
             <template slot-scope="{ item }">
               <div class="option-info">
                 <span class="left" v-html="item.showItem"></span>
-                <span :class="['right', item.type === 1 ? 'right-zero' : 'right-one']">{{
-                  item.type === 1 ? '禁用词' : '敏感词'
+                <span :class="['right', item.keywordType === 1 ? 'right-zero' : 'right-one']">{{
+                  item.keywordType === 1 ? '禁用词' : '敏感词'
                 }}</span>
               </div>
             </template>
@@ -183,29 +189,15 @@
         <g-button class="stop" type="primary" @click="editItem(dialogItem)">确 定</g-button>
       </div>
     </el-dialog>
-
-    <el-dialog
-      :visible.sync="limitVisible"
-      width="500px"
-      custom-class="stop-dialog"
-      :show-close="false"
-      center
-    >
-      <template slot="title">
-        <span class="close" @click="limitVisible = false"><i class="el-icon-close"></i></span>
-      </template>
-      <div class="dialog-item">
-        <i class="el-alert__icon el-icon-warning icon"></i>
-        <div class="info">停用后将无法推荐此意见，确定停用吗？</div>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <g-button @click="limitVisible = false">取 消</g-button>
-        <g-button class="stop" type="primary" @click="editStatus">停用</g-button>
-      </div>
-    </el-dialog>
+    <secondary-confirmation
+      :option="saveOption[action]"
+      ref="confirmation"
+      @handleConfirm="editStatus"
+    ></secondary-confirmation>
   </div>
 </template>
 <script>
+import secondaryConfirmation from '@/components/common/secondaryConfirmation';
 import { getPageList, getSearchList, edit, add, remove } from '@/api/admin-opinion.js';
 import { copyText } from '@/utils/Clipboard.js';
 import { timestampToDateTime } from '@/utils/utils.js';
@@ -217,6 +209,7 @@ export default {
       default: () => ({})
     }
   },
+  components: { secondaryConfirmation },
   data() {
     return {
       search: {
@@ -224,7 +217,6 @@ export default {
         baseline: ''
       },
       limitTimeVisible: false,
-      limitVisible: false,
       isLoading: false,
       timestampToDateTime,
       data: [],
@@ -244,12 +236,33 @@ export default {
       updateSort: true,
       searchDialogIndex: 1,
       iptPaddingFlag: true,
-      isSearchFocus: false
+      isSearchFocus: false,
+      action: '',
+      saveOption: {
+        edit1: {
+          message: '停用后将无法推荐此意见，确定停用吗？',
+          cancelBtn: '取消',
+          confirmBtn: '停用'
+        },
+        edit0: {
+          message: '恢复后将工单可能推荐此意见，确定恢复吗？',
+          cancelBtn: '取消',
+          confirmBtn: '恢复'
+        },
+        remove: {
+          message: '删除后将无法推荐此意见，确定删除吗？',
+          cancelBtn: '取消',
+          confirmBtn: '删除'
+        }
+      }
     };
   },
   created() {
-    this.initData();
     this.initSearchData();
+  },
+  mounted() {
+    this.page.pageSize = this.pageConfig.pageSize || this.page.pageSize;
+    this.initData();
   },
   watch: {
     limitTimeVisible(val) {
@@ -279,6 +292,7 @@ export default {
     }
   },
   methods: {
+    // 初始化数据
     initData() {
       this.isLoading = true;
       const pageData = {
@@ -286,15 +300,23 @@ export default {
         opinionContent: this.search.review,
         orderType: this.currentSort ? (this.referSort ? 1 : 2) : this.updateSort ? 3 : 4,
         pageNum: this.page.pageNow,
-        pageSize: this.page.pageSize
+        pageSize: this.page.pageSize,
+        isAll: this.pageConfig.isAll !== undefined ? this.pageConfig.isAll : 1
       };
       getPageList(pageData).then(({ totalCount, list }) => {
         this.page.total = totalCount;
         this.isLoading = false;
         this.data = list;
+        this.handleTextHigh(this.data, {
+          // keywordName: ['goalName', this.search.baseline],
+          // keywordName: 需要转换的key goalName: 转后以后新增的字段， this.search.baseline:需要高亮显示的关键字
+          keywordName: ['goalName', this.search.baseline],
+          recommendedOpinions: ['showItem', this.search.review]
+        });
       });
       this.searchList.length = 0;
     },
+    // 初始化搜索数据
     initSearchData(flag = false) {
       const data = {
         content: flag ? this.dialogItem.keywordName : this.search.baseline,
@@ -329,6 +351,22 @@ export default {
           keywordType,
           showItem: value
         };
+      });
+    },
+    // 文字关键字高亮显示
+    // keyword 只能是字符串或者数组
+    handleTextHigh(originArr, originObj) {
+      Object.entries(originObj).forEach(([originKey, originValue]) => {
+        originArr.filter(item => {
+          item[originValue[0]] = item[originKey];
+          const keyword = originValue[1];
+            let reg = new RegExp(keyword, 'gi');
+            const regRes = reg.exec(item[originKey]);
+            if (regRes) {
+              let replaceString = `<span style="color:#2D5CF6;">${regRes[0]}</span>`;
+              item[originValue[0]] = item[originKey].replace(regRes, replaceString);
+            }
+        });
       });
     },
 
@@ -377,46 +415,57 @@ export default {
       this.dialogItem.keywordType = id;
     },
     handleClick(row) {
-      console.log(row);
       this.titleDialog = row ? '编辑意见' : '新建意见';
       this.dialogItem = row ? { ...row, keywordId: row.keywordType } : {};
       this.limitTimeVisible = true;
-      !row && this.initSearchData(false);
-      row && this.initSearchData(true);
+      this.initSearchData(true);
     },
     submitEdit(row) {
       console.log(row);
     },
     // 停用
-    stopApllay(item) {
-      this.limitVisible = true;
+    stopApllay(item, action) {
       this.dialogItem = item;
+      this.action = action;
+      this.$refs.confirmation.dialogVisible = true;
     },
     handleCurrentChange(val) {
       this.page.pageNow = val;
       this.initData();
     },
-    // 删除 意见
+    // 停用 或启用 意见， 或删除意见
     async editStatus() {
-      const res = await remove({
-        ...this.dialogItem
-      });
+      let res;
+      if (this.action === 'remove') {
+        res = await remove({
+          ...this.dialogItem
+        });
+      } else if (this.action.indexOf('edit') !== -1) {
+        const status = this.dialogItem.status === 0 ? 1 : 0;
+        res = await edit({
+          ...this.dialogItem,
+          status
+        });
+      }
       if (res.success) {
         this.$message.success('操作成功!');
         this.handleCurrentChange(
-          this.data.length === 1 ? this.page.pageNow - 1 : this.page.pageNow
+          this.action === 'remove' && this.data.length === 1
+            ? this.page.pageNow - 1
+            : this.page.pageNow
         );
       } else {
         this.$message.error(res.msg);
       }
-      this.limitVisible = false;
     },
     // 编辑意见 或新增
     async editItem({ keywordName, recommendedOpinions }) {
       if (!keywordName || !recommendedOpinions) return this.$message.error('请填写相关信息');
-      console.log(keywordName, recommendedOpinions, this.searchList);
-      if (!this.searchList.find(listItem => listItem.value === keywordName))
-        return this.$message.error('请选择正确的关键词');
+      if (
+        this.searchList.length &&
+        !this.searchList.find(listItem => listItem.value === keywordName)
+      )
+        return this.$message.error('请选择正确的标签名称');
       let res;
       if (this.dialogItem?.recordId) {
         res = await edit({
@@ -797,11 +846,6 @@ export default {
         min-width: fit-content;
         line-height: 36px;
       }
-
-      &-right {
-        .right-option {
-        }
-      }
     }
 
     .dialog-footer {
@@ -928,7 +972,6 @@ export default {
     padding: 4px 12px;
     background: #fff7e6;
     border-radius: 4px;
-    font-weight: 700;
     color: #fa8c16;
   }
 
@@ -936,8 +979,6 @@ export default {
     padding: 4px 12px;
     background: #fff1f0;
     border-radius: 4px;
-    font-weight: 700;
-
     color: #eb5757;
   }
 }
@@ -950,6 +991,7 @@ export default {
     border: 0;
     padding: 0;
     margin: 0;
+
     /deep/.search .my-form .el-form-item__content {
       padding-left: 0;
       border-radius: 32px;
@@ -961,6 +1003,7 @@ export default {
         margin: 0;
       }
     }
+
     /deep/ .el-input__inner {
       padding-left: 20px;
     }
@@ -970,6 +1013,7 @@ export default {
     padding: 16px 0;
     height: calc(100% - 25px);
   }
+
   .el-form-item__content {
     padding: 0;
   }
@@ -1032,6 +1076,14 @@ export default {
     }
   }
 }
+
+
+
+
+
+
+
+
 
 
 

@@ -17,7 +17,9 @@ export default {
     data() {
         return {
             pageConfig: {
-                pageType: 'nonManage'
+                pageType: 'nonManage',
+                isAll: 0,
+                pageSize: 5
             }
         }
     }

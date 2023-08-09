@@ -14,6 +14,7 @@
 <script>
 import approvalRecordCard from '@/components/card/approval-record-card.vue'
 export default {
+    name:'approval-record-detail',
     props: {
         sidebarParam: {
             type: Object,
@@ -25,9 +26,11 @@ export default {
     },
     data() {
         return {
-
         }
-    }
+    },
+    mounted(){
+
+    },
 }
 </script>
 <style lang="less" scoped>
