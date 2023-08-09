@@ -4,23 +4,37 @@
       <div class="search">
         <el-form class="my-form form" :inline="true" :model="search" @submit.native.prevent>
           <el-form-item class="form-item" v-if="pageConfig?.pageType !== 'nonManage'">
-            <el-input class="my-search-input" v-model="search.review" placeholder="请输入审查意见搜索"
-              @keyup.enter.native="onSearch" @clear="onSearch" clearable>
+            <el-input
+              class="onlyInput"
+              v-model="search.review"
+              placeholder="请输入审查意见搜索"
+              @keyup.enter.native="onSearch"
+              @clear="onSearch"
+              clearable
+            >
               <i slot="suffix" class="el-icon-search" @click="onSearch"></i>
             </el-input>
           </el-form-item>
 
           <el-form-item class="form-item">
-            <el-autocomplete ref="autocomplete" popper-class="my-autocomplete" v-model="search.baseline"
-              v-scrollLoad="load" :fetch-suggestions="querySearch" placeholder="请输入关键词进行查询" @select="handleSelect"
-              @keyup.enter.native="onSearch" @focus="handleSearchFocusOrBlur" @blur="handleSearchFocusOrBlur(false)"
-              @mouseout.native="handleSearchOutOrOver(false)" @mouseover.native="handleSearchOutOrOver" clearable @clear="onSearch">
+            <el-autocomplete
+              class="onlyInput"
+              popper-class="my-autocomplete"
+              v-model="search.baseline"
+              v-scrollLoad="load"
+              :fetch-suggestions="querySearch"
+              placeholder="请输入关键词进行查询"
+              @select="handleSelect"
+              @keyup.enter.native="onSearch"
+              clearable
+              @clear="onSearch"
+            >
               <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
               <template slot-scope="{ item }">
                 <div class="option-info">
                   <span class="left" v-html="item.showItem"></span>
                   <span :class="['right', item.keywordType === 1 ? 'right-zero' : 'right-one']">{{
-                    item.type === 1 ? '禁用词' : '敏感词'
+                    item.keywordType === 1 ? '禁用词' : '敏感词'
                   }}</span>
                 </div>
               </template>
@@ -30,7 +44,8 @@
           <el-form-item class="form-item" v-if="pageConfig?.pageType !== 'nonManage'">
             <g-button class="g-btn" type="primary" @click="handleClick">
               <i class="add-icon">+</i>
-              添加意见</g-button>
+              添加意见</g-button
+            >
           </el-form-item>
         </el-form>
       </div>
@@ -43,14 +58,26 @@
           条
         </div>
         <div class="right">
-          <span :class="['r-item', currentSort ? 'r-item-active' : '']" @click="handleSort('refer')">
+          <span
+            :class="['r-item', currentSort ? 'r-item-active' : '']"
+            @click="handleSort('refer')"
+          >
             按引用次数排序
-            <span style="font-size: 12px" class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': referSort }"></span>
+            <span
+              style="font-size: 12px"
+              class="iconfont icon-jiantou left-icon"
+              :class="{ 'left-icon-reverse': referSort }"
+            ></span>
           </span>
-          <span :class="['r-item', !currentSort ? 'r-item-active' : '']" @click="handleSort('update')">按更新时间排序
-            <span style="font-size: 12px" class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': updateSort }"></span>
+          <span
+            :class="['r-item', !currentSort ? 'r-item-active' : '']"
+            @click="handleSort('update')"
+            >按更新时间排序
+            <span
+              style="font-size: 12px"
+              class="iconfont icon-jiantou left-icon"
+              :class="{ 'left-icon-reverse': updateSort }"
+            ></span>
           </span>
         </div>
       </div>
@@ -59,16 +86,24 @@
           <div class="left">
             <div class="title">
               <span>{{ item.keywordName }}</span>
-              <g-icon class="left-icon" stylePx="20" href="#icon-fuzhi1"
-                @click.native="handleCopy(item.recommendedOpinions)" />
+              <g-icon
+                class="left-icon"
+                stylePx="20"
+                href="#icon-fuzhi1"
+                @click.native="handleCopy(item.recommendedOpinions)"
+              />
             </div>
             <div class="content">{{ item.recommendedOpinions }}</div>
             <div class="info">
               <span :class="['info-item', item.keywordType === 1 ? 'class-zero' : 'class-one']">
                 {{ item.keywordType === 1 ? '禁用词' : '敏感词' }}
               </span>
-              <span class="info-item"><g-icon class="left-icon" stylePx="20" href="#icon-yinyong" />已引用<i class="high">{{
-                item.citationsCount }}</i>次</span>
+              <span class="info-item"
+                ><g-icon class="left-icon" stylePx="20" href="#icon-yinyong" />已引用<i
+                  class="high"
+                  >{{ item.citationsCount }}</i
+                >次</span
+              >
               <span class="info-item">更新时间：{{ timestampToDateTime(item.updateTime) }}</span>
             </div>
           </div>
@@ -83,23 +118,44 @@
           </div>
         </div>
       </div>
-      <TrsPagination class="trs-pagination" :pageSize="10" :pageNow="page.pageNow" :total="page.total"
-        @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom" v-if="page.total">
+      <TrsPagination
+        class="trs-pagination"
+        :pageSize="10"
+        :pageNow="page.pageNow"
+        :total="page.total"
+        @getList="handleCurrentChange"
+        scrollType="scrollCom"
+        scrollName="scrollCom"
+        v-if="page.total"
+      >
       </TrsPagination>
     </div>
-    <el-dialog :visible.sync="limitTimeVisible" width="800px" custom-class="user-dialog" :show-close="false" center>
+    <el-dialog
+      :visible.sync="limitTimeVisible"
+      width="800px"
+      custom-class="user-dialog"
+      :show-close="false"
+      center
+    >
       <template slot="title">
         <span>{{ titleDialog }}</span>
         <span class="close" @click="limitTimeVisible = false"><i class="el-icon-close"></i></span>
       </template>
       <el-form class="my-form" :model="dialogItem" label-width="100px">
         <el-form-item class="form-item" label="标签名称">
-          <el-autocomplete ref="autocomplete" popper-class="my-autocomplete" v-model="dialogItem.keywordName"
-            v-scrollLoad="load" :fetch-suggestions="(val, cb) => querySearch(val, cb, true)" placeholder="关键词"
-            @select="handleSelect" @keyup.enter.native="onSearch" @focus="handleSearchFocusOrBlur"
-            @blur="handleSearchFocusOrBlur(false)" @mouseout.native="handleSearchOutOrOver(false)"
-            @mouseover.native="handleSearchOutOrOver" clearable>
-            <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
+          <el-autocomplete
+          class="onlyInput"
+            ref="autocomplete"
+            popper-class="my-autocomplete"
+            v-model="dialogItem.keywordName"
+            v-scrollLoad="load"
+            :fetch-suggestions="(val, cb) => querySearch(val, cb, true)"
+            placeholder="关键词"
+            @select="handleSelect"
+            @keyup.enter.native="onSearch"
+            clearable
+          >
+            <i slot="suffix" class="el-icon-search el-input__icon"> </i>
             <template slot-scope="{ item }">
               <div class="option-info">
                 <span class="left" v-html="item.showItem"></span>
@@ -111,8 +167,14 @@
           </el-autocomplete>
         </el-form-item>
         <el-form-item class="item-form" label="审查话术">
-          <el-input type="textarea" placeholder="请输入审查话术内容" v-model="dialogItem.recommendedOpinions" resize="none"
-            size="medium" :autosize="{ minRows: 10, maxRows: 10 }">
+          <el-input
+            type="textarea"
+            placeholder="请输入审查话术内容"
+            v-model="dialogItem.recommendedOpinions"
+            resize="none"
+            size="medium"
+            :autosize="{ minRows: 10, maxRows: 10 }"
+          >
           </el-input>
         </el-form-item>
       </el-form>
@@ -123,7 +185,13 @@
       </div>
     </el-dialog>
 
-    <el-dialog :visible.sync="limitVisible" width="500px" custom-class="stop-dialog" :show-close="false" center>
+    <el-dialog
+      :visible.sync="limitVisible"
+      width="500px"
+      custom-class="stop-dialog"
+      :show-close="false"
+      center
+    >
       <template slot="title">
         <span class="close" @click="limitVisible = false"><i class="el-icon-close"></i></span>
       </template>
@@ -185,16 +253,6 @@ export default {
     this.initSearchData();
   },
   watch: {
-    'search.baseline'(val) {
-      if (val) {
-        if (this.iptPaddingFlag) {
-          this.iptPaddingFlag = false;
-          val && this.handleIptPadding('autocomplete');
-        }
-      } else {
-        this.iptPaddingFlag = true;
-      }
-    },
     limitTimeVisible(val) {
       !val && (this.searchList.length = 0);
     }
@@ -202,7 +260,6 @@ export default {
   directives: {
     scrollLoad: {
       bind(el, binding, vnode) {
-        console.log('bind');
         var that = this;
         let wrapDom = el.querySelector('.el-autocomplete-suggestion__wrap');
         let listDom = el.querySelector(
@@ -212,10 +269,8 @@ export default {
           'scroll',
           e => {
             let condition = wrapDom.offsetHeight + wrapDom.scrollTop - listDom.offsetHeight - 20;
-            // console.log(wrapDom.offsetHeight , wrapDom.scrollTop,listDom.offsetHeight ,condition);
             if (condition == 0 && wrapDom.scrollTop !== 0) {
               //滚动到底部则执行滚动方法load，binding.value就是v-scrollLoad绑定的值，加()表示执行绑定的方法
-              console.log('滚动到底部');
               binding.value();
             }
           },
@@ -231,7 +286,7 @@ export default {
         keywordContent: this.search.baseline,
         opinionContent: this.search.review,
         orderType: this.currentSort ? (this.referSort ? 1 : 2) : this.updateSort ? 3 : 4,
-        pageNow: this.page.pageNow,
+        pageNum: this.page.pageNow,
         pageSize: this.page.pageSize
       };
       getPageList(pageData).then(({ totalCount, list }) => {
@@ -242,7 +297,6 @@ export default {
       this.searchList.length = 0;
     },
     initSearchData(flag = false) {
-      console.log(flag);
       const data = {
         content: flag ? this.dialogItem.keywordName : this.search.baseline,
         pageNum: this.searchDialogIndex,
@@ -268,10 +322,6 @@ export default {
         this.searchList.push(...arr);
       });
     },
-    handleIptPadding(ref, flag = true) {
-      flag && this.$refs[ref].$el.children[0].children[0].classList.add('el-input__inner-1');
-      !flag && this.$refs[ref].$el.children[0].children[0].classList.remove('el-input__inner-1');
-    },
     formatting(data) {
       data.forEach(({ keywordContent: value, recordId: label, type: keywordType }, index) => {
         data[index] = {
@@ -284,7 +334,6 @@ export default {
     },
 
     onSearch() {
-      console.log('onSearch');
       this.initData();
       this.changeStyle('none', '.el-autocomplete-suggestion');
     },
@@ -292,16 +341,6 @@ export default {
       this.searchDialogIndex += 1;
       this.$refs.autocomplete.activated = true;
       this.initSearchData();
-    },
-    handleSearchFocusOrBlur(flag = true) {
-      this.searchDialogIndex = 1;
-      flag && ((this.isSearchFocus = true), this.handleIptPadding('autocomplete'));
-      !flag && ((this.isSearchFocus = false), this.handleIptPadding('autocomplete', false));
-    },
-    handleSearchOutOrOver(flag) {
-      if (this.isSearchFocus) return;
-      flag && this.handleIptPadding('autocomplete');
-      !flag && this.handleIptPadding('autocomplete', false);
     },
     //根据传进来的状态改变建议输入框的状态（展开|隐藏）
     changeStyle(status, className) {
@@ -324,8 +363,6 @@ export default {
     async changeIsTop(item, i) {
       this.isLoading = true;
       const isTop = item.isTop === 0 ? 1 : 0;
-      console.log(item);
-
       const res = await edit({
         ...item,
         isTop
@@ -378,9 +415,9 @@ export default {
     // 编辑意见 或新增
     async editItem({ keywordName, recommendedOpinions }) {
       if (!keywordName || !recommendedOpinions) return this.$message.error('请填写相关信息');
-      console.log(keywordName, recommendedOpinions, this.searchList);
-      if (!this.searchList.find(listItem => listItem.value === keywordName))
-        return this.$message.error('请选择正确的关键词');
+      
+      if (this.searchList.length && !this.searchList.find(listItem => listItem.value === keywordName))
+        return this.$message.error('请选择正确的标签名称');
       let res;
       if (this.dialogItem?.recordId) {
         res = await edit({
@@ -559,7 +596,7 @@ export default {
     overflow-y: auto;
     padding: 24px 0 0;
 
-    &>.info {
+    & > .info {
       display: flex;
       justify-content: space-between;
       margin-left: 16px;
@@ -763,7 +800,8 @@ export default {
       }
 
       &-right {
-        .right-option {}
+        .right-option {
+        }
       }
     }
 
@@ -814,9 +852,11 @@ export default {
           margin-right: 24px;
 
           .btn-primary {
-            background-image: linear-gradient(to right,
-                rgba(47, 84, 235, 1),
-                rgba(81, 150, 255, 1));
+            background-image: linear-gradient(
+              to right,
+              rgba(47, 84, 235, 1),
+              rgba(81, 150, 255, 1)
+            );
           }
         }
       }
@@ -831,7 +871,7 @@ export default {
       left: -8px;
     }
 
-    &>.content {
+    & > .content {
       margin-top: 20px;
       font-weight: 700;
       color: @color1;
@@ -911,18 +951,18 @@ export default {
     border: 0;
     padding: 0;
     margin: 0;
-    /deep/.search .my-form .el-form-item__content{
+    /deep/.search .my-form .el-form-item__content {
       padding-left: 0;
       border-radius: 32px;
-    overflow: hidden;
+      overflow: hidden;
     }
 
     .search .form-item {
-      &:first-child{
+      &:first-child {
         margin: 0;
       }
     }
-    /deep/ .el-input__inner{
+    /deep/ .el-input__inner {
       padding-left: 20px;
     }
   }
@@ -985,7 +1025,6 @@ export default {
 }
 
 .trs-pagination {
-
   /deep/.pagination {
     // text-align: center;
     .el-input__inner {
@@ -994,4 +1033,12 @@ export default {
     }
   }
 }
+
+
+
+
+
+
+
+
 </style>

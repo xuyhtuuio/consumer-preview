@@ -120,7 +120,7 @@ export default {
     min-height: 118px;
     max-height: 158px;
     position: relative;
-    border-radius: 5px;
+    border-radius: 10px;
     background-color: white;
     box-shadow: 0px 0px 5px 0px #d8d8d8;
     &:hover{

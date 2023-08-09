@@ -153,7 +153,7 @@ export default {
     },
     // 审查事项类型
     handleReviewClick(id) {
-      this.clearForm()
+      this.clearForm();
       getApplyForm({
         formId: this.formId,
         formCategoryId: id
@@ -248,20 +248,23 @@ export default {
         //   this.$message({ type: 'success', message: res.data.data });
         //   this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
         // });
-        const { id, name, dep: label } = this.$refs['refAddTag'].approverInfo;
+        const { userId:id, fullname:name } = this.$refs['refAddTag'];
         processStart({
           templateId: this.templateId,
           processDefinitionId: this.processDefinitionId,
           startUserInfo: {
             id,
             name,
-            label
           },
           submitDto: result
         })
-          .then(res => {
-            this.$message({ type: 'success', message: res.data.msg === 'success' && '提交成功' });
-            this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
+          .then(({ data: { success ,msg:message} }) => {
+            if (success) {
+              this.$message({ type: 'success', message: '提交成功' });
+              this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
+            }else {
+              this.$message({ type: 'error', message});
+            }
           })
           .catch(err => {
             console.log(err);
@@ -299,7 +302,6 @@ export default {
       }
     }
   },
-  computed: {}
 };
 </script>
 
@@ -341,6 +343,10 @@ export default {
     }
   }
 }
+
+
+
+
 
 
 

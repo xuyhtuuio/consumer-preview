@@ -20,16 +20,16 @@
       <div slot="title">
         <template v-if="selectedNode.name !== '二次会签'">
           <el-input v-model="selectedNode.name" size="medium" v-show="showInput"
-                    style="width: 300px" @blur="showInput = false">
+                    style="width: 300px">
             <i
               class="el-icon-success el-input__icon"
               style="color: #2D5CF6;"
               slot="suffix"
-              @click="showInput = false">
+              @click="saveSelectedNodeName">
             </i>
           </el-input>
           <div @mouseover="isHover = true" @mouseout="isHover=false">
-            <div class="header-title" v-show="!showInput" @click="showInput = true" style="font-size: medium">
+            <div class="header-title" v-show="!showInput" @click="startEditName" style="font-size: medium">
               {{selectedNode.name}}
               <i class="iconfont icon-bi"></i>
             </div>
@@ -71,10 +71,31 @@ export default {
   computed:{
     selectedNode(){
       return this.$store.state.selectedNode
-    }
+    },
+    nodeMap() {
+      return this.$store.state.nodeMap
+    },
+    nodes() {
+      const tempNodes = []
+      this.nodeMap.forEach(value => {
+        if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO'].includes(value?.type)) {
+          tempNodes.push({
+            name: value.name,
+            id: value.id
+          })
+        }
+      })
+      return tempNodes
+    },
   },
-  mounted() {
-
+  watch:{
+    selectedNode:{
+      deep: true,
+      handler(node){
+        console.log("更新")
+        this.$refs["process-tree"].nodeDomUpdate(node)
+      }
+    }
   },
   methods: {
     validate(){
@@ -92,15 +113,19 @@ export default {
         this.scale = 100
       }
       // document.querySelector('#design-box').style.transform
-    }
-  },
-  watch:{
-    selectedNode:{
-      deep: true,
-      handler(node){
-        console.log("更新")
-        this.$refs["process-tree"].nodeDomUpdate(node)
+    },
+    startEditName() {
+      this.tempNodes = JSON.parse(JSON.stringify(this.nodes))
+      this.nodeName = this.selectedNode.name
+      this.showInput = true
+    },
+    saveSelectedNodeName() {
+      if (this.tempNodes.find(item => item.name === this.selectedNode.name)) {
+        this.$store.state.selectedNode.name = this.nodeName
+        this.$message.warning('节点名称不可重复，请重新编辑')
       }
+      this.showInput = false
+      console.log(this.nodes, this.selectedNode.name)
     }
   }
 }

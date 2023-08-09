@@ -166,6 +166,7 @@ export default new Vuex.Store({
       remark: "",
 
     },
+    designSave: {},
     checkApprovedForm:{
       approvedOpinionRequired:true,  //默认给了采纳所以为true
       uploadFileRequired:false,

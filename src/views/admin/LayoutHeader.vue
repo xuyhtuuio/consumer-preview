@@ -22,13 +22,17 @@
         </span>
       </div>
     </div>
+    <secondary-confirmation :option="confirmOption" ref="confirmation" @handleClose="handleClose" @handleConfirm="handleStop(confirmOption)"></secondary-confirmation>
   </div>
 </template>
 
 <script>
-
+import secondaryConfirmation from "@/components/common/secondaryConfirmation"
 export default {
   name: "LayoutHeader",
+  components: {
+    secondaryConfirmation
+  },
   props:{
     value: {
       type: String,
@@ -38,6 +42,11 @@ export default {
   data() {
     return {
       viewCode: false,
+      confirmOption: {
+        message: '当前流程未保存，是否保存？',
+        cancelBtn: '不保存',
+        confirmBtn: '保存'
+      }
     };
   },
   computed: {
@@ -64,15 +73,20 @@ export default {
     valid() {
       return true;
     },
-    exit() {
-      this.$confirm('未发布的内容将不会被保存，是否直接退出 ?', '提示', {
-        confirmButtonText: '退出',
-        cancelButtonText: '取消',
-        customClass: 'back-confim',
-        type: 'warning'
-      }).then(() => {
+    handleStop() {
+      this.$emit('save', () => {
         this.$router.push({ name: 'FlowManage' })
       })
+    },
+    handleClose() {
+      this.$router.push({ name: 'FlowManage' })
+    },
+    exit() {
+      if (this.$store.state.designSave === JSON.stringify(this.$store.state.design)) {
+        this.$router.push({ name: 'FlowManage' })
+        return;
+      }
+      this.$refs.confirmation.dialogVisible = true;
     },
     to(name) {
       if (name !== this.$route.name) {

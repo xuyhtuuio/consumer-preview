@@ -18,7 +18,7 @@
             v-if="tools?.[0]?.sidebarParam?.urgent === 1"></i>{{ projectName }}</span>
         <span class="content-btns">
           <el-button @click="goBack"><i class="iconfont icon-fanhui1"></i>返回</el-button>
-          <el-button type="tuihui"><i class="iconfont icon-tuihui1"></i>退回/驳回</el-button>
+          <el-button type="tuihui" @click="reject"><i class="iconfont icon-tuihui1"></i>退回/驳回</el-button>
           <el-button @click="save"><i class="iconfont icon-baocun"></i>保存</el-button>
           <el-button type="primary" @click="changeOcrView" v-if="specialFileType.includes(approval?.fileName?.split('.')[1])"><i class="iconfont icon-ocr"></i>{{ showOcr ? '关闭' :
             '打开' }}智能审批</el-button>
@@ -40,7 +40,8 @@
       </div>
     </div>
     <add-review ref="addReview" @addRecommend="addRecommend"></add-review>
-    <submit-review ref="submitReview" :formId="formId"></submit-review>
+    <submit-review ref="submitReview" :formId="formId" :formBase="formBase"></submit-review>
+    <reject-dialog ref="rejectDialog" :formBase="formBase"></reject-dialog>
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <applyFormFilePreview :url="previewfileUrl"></applyFormFilePreview>
     </el-dialog>
@@ -55,6 +56,7 @@ import orcTxt from './components/ocr-txt'
 import editorial from './components/editorial'
 import addReview from './dialogs/add-review'
 import submitReview from './dialogs/submit-review'
+import rejectDialog from './dialogs/reject-dialog';
 import applyForm from './sidebar/apply-form'
 import approvalRecordDetail from './sidebar/approval-record-detail'
 import similarCase from './sidebar/similar-case'
@@ -73,12 +75,12 @@ import {
 import {
   getApplyForm
 } from "@/api/front";
-
 export default {
   name: 'aiApproval',
-  components: { applyFormFilePreview, filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase,secondaryConfirmation },
+  components: { applyFormFilePreview, filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase,secondaryConfirmation, rejectDialog },
   data() {
     return {
+      formBase: {},
       projectName: '',
       previewDialog: false,
       previewfileUrl: '',
@@ -147,14 +149,18 @@ export default {
       return
     }
     const { item } = this.$route.params
-    console.log('item',item)
+    // console.log('item',item)
     this.formId = item.taskNumber;
     this.inDraft = item.draftFlag === 1;
-    this.formCategoryId = item.formCategoryId
+    this.formCategoryId = item.formManagementId
     this.loading = true;
     this.init(item)
+    this.formBase = item;
   },
   methods: {
+    reject() {
+      this.$refs.rejectDialog.init()
+    },
     // 获取工单基本信息
     init(item) {
       getApplyForm({

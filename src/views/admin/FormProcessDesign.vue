@@ -109,11 +109,13 @@ export default {
       design.formItems = JSON.parse(design.formItems)
       design.process = JSON.parse(design.process)
       this.$store.commit('loadForm', design)
+      this.$store.state.designSave = JSON.stringify(design)
     },
     loadInitFrom(){
       this.$store.commit('loadForm', {
         ...this.$store.state.tempDesign
       })
+      this.$store.state.designSave = JSON.stringify(this.$store.state.tempDesign)
     },
     validateDesign() {
       this.validVisible = true
@@ -184,7 +186,13 @@ export default {
         clearInterval(this.timer)
       }
     },
-    async saveProcess() {
+    async saveProcess(callback) {
+      console.log(this.$refs['baseSetting'].setup.templateName)
+      if ((this.$refs['baseSetting'].setup.templateName === null) ||  (this.$refs['baseSetting'].setup.templateName?.length < 2) || (this.$refs['baseSetting'].setup.templateName?.length > 10)) {
+        this.$message.warning('流程名称未设置或长度不对')
+        return false;
+      }
+
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       console.log(user)
       console.log('this.setup.process', this.setup.process)
@@ -210,6 +218,8 @@ export default {
       console.log(res)
       if (res.data.data) {
         this.$message.success('已保存当前内容至草稿箱')
+        this.$store.state.designSave = JSON.stringify(this.$store.state.design)
+        callback && callback();
         // this.$router.push({
         //   name: 'FlowManage'
         // })
