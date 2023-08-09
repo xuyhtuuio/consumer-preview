@@ -1,14 +1,16 @@
 <template>
   <div class="container" v-loading="loading">
     <div class="tools">
-      <el-popover  :append-to-body="false" placement="right" trigger="click" popper-class="sidebar-popper" @after-leave="hiddenPopover(item)"
-        v-for="(item, index) in tools" :key="index" :arrow-offset="-30" :ref="`popover-${item.toolSign}`">
-        <component :is="crtToolComponent" :sidebarParam="item.sidebarParam" @previewFile="previewFile"></component>
-        <span slot="reference"
+      <div v-for="(item, index) in tools" :key="index" :arrow-offset="-30" :ref="`popover-${item.toolSign}`">
+        <span :ref='`sideBar-popover-` + item.toolSign'
           :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
           @click="changeTools(item)">
           <i :class="['iconfont', item.icon]"></i>
         </span>
+      </div>
+      <el-popover v-if="showSideBar" ref="sidebar-popover" :reference='reference' placement="right" trigger="click"
+        popper-class="sidebar-popper" @after-leave="hiddenPopover">
+        <component :is="crtToolComponent" :sidebarParam="sidebarParam" @previewFile="previewFile"></component>
       </el-popover>
     </div>
     <div class="content">
@@ -125,7 +127,10 @@ export default {
           sidebarParam: {}, //侧边工具栏激活项 props
         }
       ],
+      sidebarParam: {},
       crtToolComponent: '',
+      showSideBar: false,
+      reference: {},
       approval: {}, // 当前审批文件的相关内容
       activeIndex: null,
       word_lines: [], // 连线
@@ -172,7 +177,7 @@ export default {
       }).then(res => {
         const { data, status, message } = res.data;
         if (status === 200) {
-          this.tools[0].sidebarParam = { data, formId: item.taskNumber, originatorId: item.originator.id };
+          this.sidebarParam = { data, formId: item.taskNumber, originatorId: item.originator.id };
           this.projectName = data.basicInformation.filter(item => item.title === '项目名称')?.[0]?.value
         } else {
           this.$message.error({ offset: 40, title: "提醒", message });
@@ -251,15 +256,12 @@ export default {
       window.getSelection().removeAllRanges();
     },
     changeTools(item) {
-      // for (const key in this.$refs) {
-      //   if (key.indexOf('popover-') !== -1) {
-      //     this.$refs[key][0]?this.$refs[key][0].doClose():'';
-      //   }
-      // }
+      if (this.crtTools === item.toolSign && this.showSideBar) return
+      this.showSideBar = false
       this.crtTools = item.toolSign
       this.crtToolComponent = item.component
       let params = {}
-      const param_item = this.$route.params
+      const { item: param_item } = this.$route.params
       switch (item.component) {
         case 'applyForm':
           params = {
@@ -274,7 +276,15 @@ export default {
           }
           break;
       }
+      this.reference = this.$refs['sideBar-popover-' + item.toolSign][0].$el
       this.sidebarParam = params
+      this.$nextTick(() => {
+        this.showSideBar = true
+        this.$nextTick(() => {
+          // 此时才能获取refs引用
+          this.$refs['sidebar-popover'].doShow()
+        })
+      })
     },
     hiddenPopover() {
       // for (const key in this.$refs) {
@@ -635,20 +645,16 @@ export default {
     span {
       display: inline-block;
       cursor: pointer;
-
-      .el-popover__reference {
-        padding: 6px !important;
-        margin-bottom: 24px;
-      }
+      margin-bottom: 24px;
+      padding: 6px !important;
     }
 
     span:hover {
-      .el-popover__reference {
-        background: #F2F3F5;
-        border-radius: 4px;
-        padding: 6px;
+      background: #F2F3F5;
+      border-radius: 4px;
+      padding: 6px;
 
-      }
+
 
     }
 
