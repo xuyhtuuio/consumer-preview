@@ -121,12 +121,12 @@ export default {
           value: "approvedCount",
           icon: require('@/assets/image/apply-center/approved.svg')
         },
-        {
-          name: "我的关注",
-          count: 0,
-          value: "applyAll",
-          icon: require('@/assets/image/apply-center/my-attention.svg')
-        },
+        // {
+        //   name: "我的关注",
+        //   count: 0,
+        //   value: "applyAll",
+        //   icon: require('@/assets/image/apply-center/my-attention.svg')
+        // },
         // {
         //   name: "全部任务",
         //   count: 0,
