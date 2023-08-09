@@ -4,32 +4,16 @@
       <div class="search">
         <el-form class="my-form form" :inline="true" :model="search" @submit.native.prevent>
           <el-form-item class="form-item" v-if="pageConfig?.pageType !== 'nonManage'">
-            <el-input
-              class="onlyInput"
-              v-model="search.review"
-              placeholder="请输入审查意见搜索"
-              @keyup.enter.native="onSearch"
-              @clear="onSearch"
-              clearable
-            >
+            <el-input class="onlyInput" v-model="search.review" placeholder="请输入审查意见搜索" @keyup.enter.native="onSearch"
+              @clear="onSearch" clearable>
               <i slot="suffix" class="el-icon-search" @click="onSearch"></i>
             </el-input>
           </el-form-item>
 
           <el-form-item class="form-item">
-            <el-autocomplete
-              class="onlyInput"
-              ref="autocomplete"
-              popper-class="my-autocomplete"
-              v-model="search.baseline"
-              v-scrollLoad="load"
-              :fetch-suggestions="querySearch"
-              placeholder="请输入关键词进行查询"
-              @select="handleSelect"
-              @keyup.enter.native="onSearch"
-              clearable
-              @clear="onSearch"
-            >
+            <el-autocomplete class="onlyInput" ref="autocomplete" popper-class="my-autocomplete" v-model="search.baseline"
+              v-scrollLoad="load" :fetch-suggestions="querySearch" placeholder="请输入关键词进行查询" @select="handleSelect"
+              @keyup.enter.native="onSearch" clearable @clear="onSearch">
               <i slot="suffix" class="el-icon-search el-input__icon" @click="onSearch"> </i>
               <template slot-scope="{ item }">
                 <div class="option-info">
@@ -45,121 +29,79 @@
           <el-form-item class="form-item" v-if="pageConfig?.pageType !== 'nonManage'">
             <g-button class="g-btn" type="primary" @click="handleClick">
               <i class="add-icon">+</i>
-              添加意见</g-button
-            >
+              添加意见</g-button>
           </el-form-item>
         </el-form>
       </div>
     </div>
     <div class="main" v-loading="isLoading">
-      <div class="info">
-        <div class="left">
-          共
-          <span class="high">{{ this.page.total }}</span>
-          条
-        </div>
-        <div class="right">
-          <span
-            :class="['r-item', currentSort ? 'r-item-active' : '']"
-            @click="handleSort('refer')"
-          >
-            按引用次数排序
-            <span
-              style="font-size: 12px"
-              class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': !referSort }"
-            ></span>
-          </span>
-          <span
-            :class="['r-item', !currentSort ? 'r-item-active' : '']"
-            @click="handleSort('update')"
-            >按更新时间排序
-            <span
-              style="font-size: 12px"
-              class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': !updateSort }"
-            ></span>
-          </span>
-        </div>
-      </div>
-      <div class="body">
-        <div class="b-item" v-for="item in data" :key="item.id">
+      <div class="main-body">
+        <div class="info">
           <div class="left">
-            <div class="title">
-              <span v-html="item.goalName"></span>
-              <g-icon
-                class="left-icon"
-                stylePx="20"
-                href="#icon-fuzhi1"
-                @click.native="handleCopy(item.recommendedOpinions)"
-              />
-            </div>
-            <div class="content" v-html="item.showItem"></div>
-            <div class="info">
-              <span :class="['info-item', item.keywordType === 1 ? 'class-zero' : 'class-one']">
-                {{ item.keywordType === 1 ? '禁用词' : '敏感词' }}
-              </span>
-              <span class="info-item"
-                ><g-icon class="left-icon" stylePx="20" href="#icon-yinyong" />已引用<i
-                  class="high"
-                  >{{ item.citationsCount }}</i
-                >次</span
-              >
-              <span class="info-item">更新时间：{{ timestampToDateTime(item.updateTime) }}</span>
-            </div>
+            共
+            <span class="high">{{ this.page.total }}</span>
+            条
           </div>
-          <div class="btns" v-if="pageConfig?.pageType !== 'nonManage'">
-            <span v-if="item.isTop !== 0" class="btn btn-yellow" @click="changeIsTop(item)">
-              <i> <g-icon class="left-icon" stylePx="20" href="#icon-zhiding" />取消置顶</i>
+          <div class="right">
+            <span :class="['r-item', currentSort ? 'r-item-active' : '']" @click="handleSort('refer')">
+              按引用次数排序
+              <span style="font-size: 12px" class="iconfont icon-jiantou left-icon"
+                :class="{ 'left-icon-reverse': !referSort }"></span>
             </span>
-            <span v-else class="btn" @click="changeIsTop(item)"><i>置顶</i></span>
-            <span class="btn"><i @click="handleClick(item)">编辑</i></span>
-            <span class="btn" :class="{ 'btn-red': item.status === 1 }"
-              ><i @click="stopApllay(item, 'edit' + item.status)">{{
-                item.status === 1 ? '停用' : '恢复'
-              }}</i></span
-            >
-            <span class="btn"><i @click="stopApllay(item, 'remove')">删除</i></span>
+            <span :class="['r-item', !currentSort ? 'r-item-active' : '']" @click="handleSort('update')">按更新时间排序
+              <span style="font-size: 12px" class="iconfont icon-jiantou left-icon"
+                :class="{ 'left-icon-reverse': !updateSort }"></span>
+            </span>
           </div>
         </div>
+        <div class="body">
+          <div class="b-item" v-for="item in data" :key="item.id">
+            <div class="left">
+              <div class="title">
+                <span v-html="item.goalName"></span>
+                <g-icon class="left-icon" stylePx="20" href="#icon-fuzhi1"
+                  @click.native="handleCopy(item.recommendedOpinions)" />
+              </div>
+              <div class="content" v-html="item.showItem"></div>
+              <div class="info">
+                <span :class="['info-item', item.keywordType === 1 ? 'class-zero' : 'class-one']">
+                  {{ item.keywordType === 1 ? '禁用词' : '敏感词' }}
+                </span>
+                <span class="info-item"><g-icon class="left-icon" stylePx="20" href="#icon-yinyong" />已引用<i
+                    class="high">{{ item.citationsCount }}</i>次</span>
+                <span class="info-item">更新时间：{{ timestampToDateTime(item.updateTime) }}</span>
+              </div>
+            </div>
+            <div class="btns" v-if="pageConfig?.pageType !== 'nonManage'">
+              <span v-if="item.isTop !== 0" class="btn btn-yellow" @click="changeIsTop(item)">
+                <i> <g-icon class="left-icon" stylePx="20" href="#icon-zhiding" />取消置顶</i>
+              </span>
+              <span v-else class="btn" @click="changeIsTop(item)"><i>置顶</i></span>
+              <span class="btn"><i @click="handleClick(item)">编辑</i></span>
+              <span class="btn" :class="{ 'btn-red': item.status === 1 }"><i
+                  @click="stopApllay(item, 'edit' + item.status)">{{
+                    item.status === 1 ? '停用' : '恢复'
+                  }}</i></span>
+              <span class="btn"><i @click="stopApllay(item, 'remove')">删除</i></span>
+            </div>
+          </div>
+        </div>
+        <TrsPagination class="trs-pagination" :pageSize="page.pageSize" :pageNow="page.pageNow" :total="page.total"
+          @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom" v-if="page.total">
+        </TrsPagination>
       </div>
-      <TrsPagination
-        class="trs-pagination"
-        :pageSize="page.pageSize"
-        :pageNow="page.pageNow"
-        :total="page.total"
-        @getList="handleCurrentChange"
-        scrollType="scrollCom"
-        scrollName="scrollCom"
-        v-if="page.total"
-      >
-      </TrsPagination>
     </div>
-    <el-dialog
-      :visible.sync="limitTimeVisible"
-      width="800px"
-      custom-class="user-dialog"
-      :show-close="false"
-      center
-    >
+    <el-dialog :visible.sync="limitTimeVisible" width="800px" custom-class="user-dialog" :show-close="false" center>
       <template slot="title">
         <span>{{ titleDialog }}</span>
         <span class="close" @click="limitTimeVisible = false"><i class="el-icon-close"></i></span>
       </template>
       <el-form class="my-form" :model="dialogItem" label-width="100px">
         <el-form-item class="form-item" label="标签名称">
-          <el-autocomplete
-            class="onlyInput"
-            ref="autocomplete"
-            popper-class="my-autocomplete"
-            v-model="dialogItem.keywordName"
-            v-scrollLoad="load"
-            :fetch-suggestions="(val, cb) => querySearch(val, cb, true)"
-            placeholder="关键词"
-            @select="handleSelect"
-            @keyup.enter.native="onSearch"
-            clearable
-          >
+          <el-autocomplete class="onlyInput" ref="autocomplete" popper-class="my-autocomplete"
+            v-model="dialogItem.keywordName" v-scrollLoad="load"
+            :fetch-suggestions="(val, cb) => querySearch(val, cb, true)" placeholder="关键词" @select="handleSelect"
+            @keyup.enter.native="onSearch" clearable>
             <i slot="suffix" class="el-icon-search el-input__icon"> </i>
             <template slot-scope="{ item }">
               <div class="option-info">
@@ -172,14 +114,8 @@
           </el-autocomplete>
         </el-form-item>
         <el-form-item class="item-form" label="审查话术">
-          <el-input
-            type="textarea"
-            placeholder="请输入审查话术内容"
-            v-model="dialogItem.recommendedOpinions"
-            resize="none"
-            size="medium"
-            :autosize="{ minRows: 10, maxRows: 10 }"
-          >
+          <el-input type="textarea" placeholder="请输入审查话术内容" v-model="dialogItem.recommendedOpinions" resize="none"
+            size="medium" :autosize="{ minRows: 10, maxRows: 10 }">
           </el-input>
         </el-form-item>
       </el-form>
@@ -189,11 +125,8 @@
         <g-button class="stop" type="primary" @click="editItem(dialogItem)">确 定</g-button>
       </div>
     </el-dialog>
-    <secondary-confirmation
-      :option="saveOption[action]"
-      ref="confirmation"
-      @handleConfirm="editStatus"
-    ></secondary-confirmation>
+    <secondary-confirmation :option="saveOption[action]" ref="confirmation"
+      @handleConfirm="editStatus"></secondary-confirmation>
   </div>
 </template>
 <script>
@@ -360,12 +293,12 @@ export default {
         originArr.filter(item => {
           item[originValue[0]] = item[originKey];
           const keyword = originValue[1];
-            let reg = new RegExp(keyword, 'gi');
-            const regRes = reg.exec(item[originKey]);
-            if (regRes) {
-              let replaceString = `<span style="color:#2D5CF6;">${regRes[0]}</span>`;
-              item[originValue[0]] = item[originKey].replace(regRes, replaceString);
-            }
+          let reg = new RegExp(keyword, 'gi');
+          const regRes = reg.exec(item[originKey]);
+          if (regRes) {
+            let replaceString = `<span style="color:#2D5CF6;">${regRes[0]}</span>`;
+            item[originValue[0]] = item[originKey].replace(regRes, replaceString);
+          }
         });
       });
     },
@@ -643,8 +576,12 @@ export default {
     height: calc(~'100% - 63px');
     overflow-y: auto;
     padding: 24px 0 0;
+    &-body{
+      height: 100%;
+      overflow: auto;
+    }
 
-    & > .info {
+    .info {
       display: flex;
       justify-content: space-between;
       margin-left: 16px;
@@ -895,11 +832,9 @@ export default {
           margin-right: 24px;
 
           .btn-primary {
-            background-image: linear-gradient(
-              to right,
-              rgba(47, 84, 235, 1),
-              rgba(81, 150, 255, 1)
-            );
+            background-image: linear-gradient(to right,
+                rgba(47, 84, 235, 1),
+                rgba(81, 150, 255, 1));
           }
         }
       }
@@ -914,7 +849,7 @@ export default {
       left: -8px;
     }
 
-    & > .content {
+    &>.content {
       margin-top: 20px;
       font-weight: 700;
       color: @color1;
@@ -1068,6 +1003,7 @@ export default {
 }
 
 .trs-pagination {
+
   /deep/.pagination {
     // text-align: center;
     .el-input__inner {
@@ -1076,21 +1012,4 @@ export default {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </style>
