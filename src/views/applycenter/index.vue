@@ -312,7 +312,9 @@ export default {
         currentActivityName: this.search.approvalStage,
         sortType: 1,
         id: userinfo.id,
-        name: userinfo.fullname
+        // id: '25',
+        name: userinfo.fullname,
+        form_management_id:'1'
       };
       const posts = {
         applyAll: {
@@ -394,7 +396,8 @@ export default {
         ...this.search,
         currentActivityName: this.search.approvalStage,
         id: userinfo.id,
-        name: userinfo.fullname
+        name: userinfo.fullname,
+        form_management_id:'1'
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间
