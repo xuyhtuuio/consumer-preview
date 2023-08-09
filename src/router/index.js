@@ -28,6 +28,7 @@ const router = new Router({
       path: '/login',
       name: 'login',
       component: () => import('@/views/login'),
+      meta: { title: '消保管控平台', viewport: viewport }
     },
     {
       path: "/show-review",
