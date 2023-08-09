@@ -4,8 +4,8 @@
     <order-detail>
       <template slot="breadcrumb">
         <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/' }">消保审查</el-breadcrumb-item>
-          <el-breadcrumb-item><a href="/">审批中心</a></el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/approvalcenter' }">消保审查</el-breadcrumb-item>
+          <el-breadcrumb-item><a>审批中心</a></el-breadcrumb-item>
         </el-breadcrumb>
       </template>
     </order-detail>
