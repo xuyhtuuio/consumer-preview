@@ -128,7 +128,7 @@ export default {
       this.$router.push({
         name: "approval-details",
         params: {
-          formId: item.taskNumber,
+          formId: item.recordId,
           originatorId: item.originator.id,
           taskName:item.taskName
         },
@@ -146,7 +146,7 @@ export default {
       this.$router.push({
         name: "approval-details",
         params: {
-          formId: item.taskNumber,
+          formId: item.recordId,
           originatorId:  item.originator.id,
           taskName:item.taskName
         },
