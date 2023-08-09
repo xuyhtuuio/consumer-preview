@@ -192,7 +192,8 @@
     height: 38px;
     line-height: 38px;
   }
-  .el-input__suffix {
+  .el-input__suffix,.el-input__suffix-inner {
+    display: flex;
     right: 5px;
   }
   .el-input__inner {
@@ -231,7 +232,7 @@
     .el-select {
       width: 100%;
     }
-    .el-select .el-input .el-select__caret.el-input__icon::before {
+    .el-select .el-input .el-select__caret.el-icon-arrow-up::before {
       content: '\e790';
       position: absolute;
       width: 100%;
@@ -243,6 +244,11 @@
       &::before {
         content: '\e790';
       }
+    }
+    .el-input__suffix-inner,.el-input__icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   }
 
@@ -260,7 +266,6 @@
         }
       }
     }
-
     .el-input__suffix {
       right: 20px;
     }

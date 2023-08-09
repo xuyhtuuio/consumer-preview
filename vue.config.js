@@ -60,6 +60,8 @@ module.exports = {
         target: 'http://192.168.210.57:31602',
         // target: 'http://10.8.0.75:8324', // 吕强后台
         // target: 'http://10.8.0.46:8324', // 王意杨后台
+        // target: 'http://10.8.0.67:8324', // 吕强后台
+        // target: 'http://10.8.0.75:8324', // 王意杨后台
         changeOrigin: true,
         ws: true,
         pathRewrite: {

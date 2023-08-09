@@ -7,25 +7,27 @@
       </div>
       <el-button type="primary" @click="addFlow">新增</el-button>
     </div>
-    <TrsTable v-loading="tableLoading" theme="TRS-table-gray" :data="data" :colConfig="colConfig">
-      <template #status="scope">
-        <TrsTag v-if="scope.row.status==='已发布'" :tag="tagItem" />
-        <TrsTag v-else :tag="tagItem1" />
-      </template>
-      <template #createUserName="scope">
-        <span>{{ scope.row.createUserName + '/' +  scope.row.createUserId }}</span>
-      </template>
-      <template #operate="scope">
-        <el-button type="text" @click="previewFlow(scope.row)">预览</el-button>
-        <el-button type="text" v-if="scope.row.status === '已发布'" class="red" @click="stopFlow(scope.row)">停用</el-button>
-        <el-button type="text" v-if="scope.row.status !== '已发布'" @click="editFlow(scope.row)">编辑</el-button>
-        <el-button type="text" v-if="scope.row.status !== '已发布'" class="red" @click="deleteFlow(scope.row)">删除</el-button>
-      </template>
-    </TrsTable>
-    <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
-      v-if="page.total">
-    </TrsPagination>
-    <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow.templateName + '-预览'">
+    <div  style="height: calc(100% - 63px); overflow-y: auto;">
+      <TrsTable v-loading="tableLoading" theme="TRS-table-gray" :data="data" :colConfig="colConfig">
+        <template #status="scope">
+          <TrsTag v-if="scope.row.status==='已发布'" :tag="tagItem" />
+          <TrsTag v-else :tag="tagItem1" />
+        </template>
+        <template #createUserName="scope">
+          <span>{{ scope.row.createUserName + '/' +  scope.row.createUserId }}</span>
+        </template>
+        <template #operate="scope">
+          <el-button type="text" @click="previewFlow(scope.row)">预览</el-button>
+          <el-button type="text" v-if="scope.row.status === '已发布'" class="red" @click="stopFlow(scope.row)">停用</el-button>
+          <el-button type="text" v-if="scope.row.status !== '已发布'" @click="editFlow(scope.row)">编辑</el-button>
+          <el-button type="text" v-if="scope.row.status !== '已发布'" class="red" @click="deleteFlow(scope.row)">删除</el-button>
+        </template>
+      </TrsTable>
+      <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
+        v-if="page.total">
+      </TrsPagination>
+    </div>
+    <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow.templateName + '-预览'" width="600px">
       <process-design from="flowManage" ref="processDesign" style="background: #f5f6f6;" />
     </w-dialog>
     <secondary-confirmation :option="confirmOption" ref="confirmation" @handleConfirm="handleConfirmation(confirmOption)"></secondary-confirmation>
@@ -223,6 +225,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .flow {
+  height: 100%;
   .title {
     display: flex;
     justify-content: space-between;

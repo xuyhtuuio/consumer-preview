@@ -133,7 +133,7 @@
       </div>
 
       <el-divider>高级设置</el-divider>
-      <el-form-item label="目标页面配置" prop="targetPage" v-if="nodeProps.assignedType === 'DEPT_USER_ROLE'">
+      <el-form-item label="目标页面配置" prop="targetPage">
         <el-radio-group class="radio-group" v-model="nodeProps.targetPage">
           <el-radio label="LEADER">领导审批</el-radio>
           <el-radio label="XIAOBAO">消保审批</el-radio>

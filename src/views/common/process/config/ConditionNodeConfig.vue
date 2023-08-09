@@ -178,6 +178,7 @@ export default {
   padding: 4px 12px;
   border-radius: 15px;
   color: #2D5CF6;
+  font-size: 12px;
   background: #F0F6FF;
   span:last-child {
     margin-left: 60px;
