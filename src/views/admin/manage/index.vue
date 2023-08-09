@@ -41,11 +41,12 @@ export default {
   display: flex;
   .view-content {
     width: calc(100% - 140px - 16px);
-    height: fit-content;
+    // height: fit-content;
     padding: 24px;
     background: #ffffff;
     border-radius: 4px;
   }
 }
+
 
 </style>
