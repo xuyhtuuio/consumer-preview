@@ -589,6 +589,7 @@ export default {
                 width: bbox.width <= 98 ? 110 : bbox.width + 12,
                 height: 38,
                 radius: 2,
+                cursor: 'pointer',
               },
               name: "rect-shape2",
             });
@@ -603,6 +604,7 @@ export default {
                 textBaseline: "middle",
                 fontSize: 14,
                 lineHeight: 22,
+                cursor: 'pointer',
                 fill: "#1D2128",
               },
               name: "text-shape2",
@@ -618,6 +620,7 @@ export default {
                   stroke: "#2D5CF6",
                   fill: "#2D5CF6",
                   lineWidth: 2,
+                  cursor: 'pointer'
                 },
                 name: "collapse-icon",
               });
