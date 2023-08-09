@@ -44,7 +44,7 @@ export function censorList(param) {
 
 export function concernApplication(param) {
   return request({
-    url: '/cpr/censor/concern',
+    url: '/cpr/censor/follow',
     method: 'post',
     contentType: 'application/x-www-form-urlencoded',
     data: param
@@ -88,20 +88,11 @@ export function toDoList(param) {
   })
 }
 
-
-export function getApprovalList(param) {
+export function getApprovalListStation(param) {
   return request({
-    url: '/cpr/censor/getApprovalList',
+    url: '/cpr/censor/getApprovalListStation',
     method: 'post',
     data: param,
     contentType: 'application/json'
-  })
-}
-export function getApplicationToDoListByUser(param) {
-  return request({
-    url: '/cpr/censor/getApplicationToDoListByUser',
-    method: 'post',
-    data: param,
-
   })
 }

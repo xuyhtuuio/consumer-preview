@@ -86,10 +86,9 @@
 <script >
 import { getApplyForm, workOrderTaskInfo } from "@/api/front";
 import { downloadAllFiles } from "@/api/applyCenter";
-
 import moment from 'moment'
 import FileType from '@/components/common/file-type.vue';
-
+import { getCurrentUserInfo } from '@/api/front.js'
 export default {
     components: { FileType },
     props: {
@@ -112,8 +111,10 @@ export default {
         };
     },
     mounted() {
+        this.getCurrentUserInfo()
         if ((this.$route.params && this.$route.params.formId) || (this.sidebarParam && this.sidebarParam.formId)) {
             this.getWorkOrderTaskInfo()
+            this.getCurrentUserInfo()
             this.getOrderDetail()
         }
     },
@@ -121,6 +122,7 @@ export default {
         const keys = Object.keys(this.$route.params) || Object.keys(this.$route.sidebarParam)
         if (keys.length) {
             this.getWorkOrderTaskInfo()
+            this.getCurrentUserInfo()
             this.getOrderDetail()
         }
     },
@@ -142,6 +144,14 @@ export default {
                     this.$emit('sendbaseInfo', this.orderBaseInfo)
                 }
             })
+        },
+        getCurrentUserInfo() {
+            getCurrentUserInfo().then((res) => {
+                console.log('ddd',res)
+
+            })
+
+
         },
         getMapping(list) {
             let len = list.length

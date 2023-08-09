@@ -226,9 +226,9 @@ export default {
     if (!this.$route.params.formId) {
     const { path } = this.$route
     const url = path.match(/\/(\S*)\//)[1]
-    this.$router.replace({
-      name: url
-    })
+    // this.$router.replace({
+    //   name: url
+    // })
     }
     this.judgeStatus();
   },

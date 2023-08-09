@@ -43,7 +43,7 @@
             </el-select>
             <el-cascader :options="agenciesList" placeholder="提单机构" ref="agencies" v-model="search.institutionalCode"
               :show-all-levels="false" @change="changeAgencies"
-              :props="{ checkStrictly: true, label: 'name', value: 'code' }" clearable></el-cascader>
+              :props="{ checkStrictly: true, label: 'name', value: 'id', children: 'children', }" clearable></el-cascader>
             <el-select v-model="search.updateTime2" placeholder="排序" ref="multiSelect" multiple @change="changeSort"
               :class="search.updateTime2[1] == 'desc'
                 ? 'arrow-select descArrow'
@@ -91,15 +91,14 @@
 <script>
 import approvalEventCard from "@/components/card/approval-event-card";
 import {
-  getDataStatistics,
   getUserStatus,
-  censorList,
   getApprovalType,
   getApprovalStage,
   billOfLadingAgenciesList,
-  getApprovalList,
-  getApplicationToDoListByUser
+  getApprovalListStation,
 } from "@/api/approvalCenter";
+import { queryUserList} from '@/api/org'
+import axiosAll from '@/utils/axios-all'
 export default {
   components: {
     approvalEventCard,
@@ -128,14 +127,12 @@ export default {
           value: "applyAll",
           icon: require('@/assets/image/apply-center/my-attention.svg')
         },
-        {
-          name: "全部任务",
-          count: 0,
-          value: "allTasksOffice",
-          icon: require('@/assets/image/apply-center/all-attention.svg')
-
-
-        },
+        // {
+        //   name: "全部任务",
+        //   count: 0,
+        //   value: "allTasksOffice",
+        //   icon: require('@/assets/image/apply-center/all-attention.svg')
+        // },
       ],
       search: {
         approvalType: "",
@@ -210,7 +207,7 @@ export default {
     });
     this.userStatus();
     this.getApprovalType();
-    this.billOfLadingAgenciesList();
+    this.queryUserList();
     this.searchList();
 
   },
@@ -231,21 +228,78 @@ export default {
       this.searchList();
     },
     userStatus() {
-      getUserStatus()
-        .then((res) => {
-          this.tipsMsg = res.data.data;
-        })
-        .catch((err) => {
-          this.tipsMsg = false;
-        });
+      // getUserStatus()
+      //   .then((res) => {
+      //     this.tipsMsg = res.data.data;
+      //   })
+      //   .catch((err) => {
+      //     this.tipsMsg = false;
+      //   });
     },
     getDataStatistic() {
-      getDataStatistics().then((res) => {
-        const { data } = res.data;
-        this.dataStatistics.forEach((v) => {
-          v.count = data[v.value];
-        });
-      });
+      const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
+      const param = {
+        pageNow: 1,
+        pageSize: 10,
+        approvalType: "",
+        urgent: "",
+        hasOpinions: "",
+        adoptionStatus: "",
+        nodeid: this.search.approvalStage,
+        sortType: 1,
+        taskDTO: {
+          pageNo: 0,
+          pageSize: 10,
+          currentUserInfo: {
+            id: userInfo.id,
+            name: userInfo.fullname
+          }
+        }
+      };
+      const posts = {
+        toPending: {
+          method: 'post',
+          url: this.$GLOBAL.cpr + 'censor/getApprovalListStation',
+          params: {
+            ...param,
+            listType: 1
+          }
+        },
+        approvedCount: {
+          method: 'post',
+          url: this.$GLOBAL.cpr + 'censor/getApprovalListStation',
+          params: {
+            ...param,
+            listType: 2
+          }
+        },
+        applyAll: {
+          method: 'post',
+          url: this.$GLOBAL.cpr + 'censor/getApprovalListStation',
+          params: {
+            ...param,
+            listType: 3
+          }
+        },
+        // allTasksOffice: {
+        //   method: 'post',
+        //   url: this.$GLOBAL.cpr + 'censor/getApprovalListStation',
+        //   params: {
+        //     ...param,
+        //     listType: 4
+        //   }
+        // }
+      }
+      axiosAll(posts).then(res => {
+        for (let key in res) {
+          const { totalCount } = res[key].data
+          this.dataStatistics.forEach(m => {
+            if (m.value == key) {
+              m.count = totalCount
+            }
+          })
+        }
+      })
     },
     concern() {
       this.getDataStatistic()
@@ -325,25 +379,35 @@ export default {
     searchList() {
       this.getList(1);
     },
-    billOfLadingAgenciesList() {
-      billOfLadingAgenciesList().then((res) => {
-        this.agenciesList = res.data.data;
+    queryUserList() {
+      queryUserList().then((res) => {
+        const {root} = res.data.data.data
+        if (root) {
+          this.agenciesList = root.children.map(item => {
+            return {
+              ...item,
+              children:null,
+              id: item.id,
+              name: item.name,
+            }
+          })
+        }
       });
     },
     getList(pageNow) {
-      let headerFlag = null;
+      let listType = null;
       switch (this.crtSign) {
         case "toPending":
-          headerFlag = '1';
+          listType = '1';
           break;
         case "approvedCount":
-          headerFlag = '2';
+          listType = '2';
           break;
         case "applyAll":
-          headerFlag = '4';
+          listType = '3';
           break;
         case "allTasksOffice":
-          headerFlag = '0';
+          listType = '4';
           break;
 
       }
@@ -352,7 +416,9 @@ export default {
         pageNow,
         pageSize: 10,
         ...this.search,
-        headerFlag,
+        listType,
+        institutionalCode:this.search.institutionalCode&&this.search.institutionalCode[0],
+        nodeid:this.search.approvalStage
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间
@@ -368,53 +434,37 @@ export default {
       Reflect.deleteProperty(param, "total");
       Reflect.deleteProperty(param, "loading");
       this.search.loading = true;
-      if (this.crtSign == 'toPending') {
-        const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
-        const taskDTO = {
-          pageNo: 0,
-          pageSize: 10,
-          currentUserInfo: {
-            id: userInfo.id,
-            name: userInfo.fullname
-          }
+      const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
+      const taskDTO = {
+        pageNo: 0,
+        pageSize: 10,
+        currentUserInfo: {
+          id: userInfo.id,
+          name: userInfo.fullname
         }
-        const wait_param = {
-          ...param,
-          taskDTO
-        }
-        getApprovalList(wait_param).then(res => {
-          const { data } = res.data;
-          this.search.total = data.totalCount;
-          const flag = Array.isArray(data.list)
-          this.list = flag && data.list.length > 0 ? data.list.map(v => {
-            return {
-              ...v,
-              taskNumber: v.recordId + '',
-              taskName: v.entryName,
-              taskStatus: this.taskStatusSwitch(v.nodeStatus)
-            }
-          }):[];
-          this.search.loading = false;
-        }).catch(err => {
-          this.search.loading = false
-          this.search.total = 0
-          this.list = []
-        })
-      } else {
-        censorList(param)
-          .then((res) => {
-            const { data } = res.data;
-            this.search.total = data.totalCount;
-            this.list = data.list;
-            this.search.loading = false;
-          })
-          .catch((err) => {
-            this.list = [];
-          })
-          .finally(() => {
-            this.search.loading = false;
-          });
       }
+      const wait_param = {
+        ...param,
+        taskDTO
+      }
+      getApprovalListStation(wait_param).then(res => {
+        const { data } = res.data;
+        this.search.total = data.totalCount;
+        const flag = Array.isArray(data.list)
+        this.list = flag && data.list.length > 0 ? data.list.map(v => {
+          return {
+            ...v,
+            taskNumber: v.recordId + '',
+            taskName: v.entryName,
+            taskStatus: this.taskStatusSwitch(v.nodeStatus)
+          }
+        }) : [];
+        this.search.loading = false;
+      }).catch(err => {
+        this.search.loading = false
+        this.search.total = 0
+        this.list = []
+      })
     },
     taskStatusSwitch(val) {
       let status = ''
@@ -429,7 +479,6 @@ export default {
           status = '3';
           break;
       }
-      console.log('ff', val, status)
       return status
     },
     reset() {
