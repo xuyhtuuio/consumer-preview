@@ -34,7 +34,7 @@
                 <div class="option-info">
                   <span class="left" v-html="item.showItem"></span>
                   <span :class="['right', item.keywordType === 1 ? 'right-zero' : 'right-one']">{{
-                    item.type === 1 ? '禁用词' : '敏感词'
+                    item.keywordType === 1 ? '禁用词' : '敏感词'
                   }}</span>
                 </div>
               </template>
