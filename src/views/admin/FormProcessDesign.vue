@@ -187,6 +187,12 @@ export default {
       }
     },
     async saveProcess(callback) {
+      console.log(this.$refs['baseSetting'].setup.templateName)
+      if ((this.$refs['baseSetting'].setup.templateName === null) ||  (this.$refs['baseSetting'].setup.templateName?.length < 2) || (this.$refs['baseSetting'].setup.templateName?.length > 10)) {
+        this.$message.warning('流程名称未设置或长度不对')
+        return false;
+      }
+
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       console.log(user)
       console.log('this.setup.process', this.setup.process)

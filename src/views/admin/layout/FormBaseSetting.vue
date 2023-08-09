@@ -25,8 +25,13 @@
           关联表单<span style="color: red">*</span>
         </template>
         <el-select v-model="setup.formId" @change="changeSelectFormId" placeholder="请选择关联表单(多选)" size="medium" class="is-dark input" style="width: 100%">
-          <el-option v-for="(op, index) in fromGroup" :key="index"
-                     :label="op.name" :value="op.id"></el-option>
+          <el-option
+            v-for="(op, index) in fromGroup"
+            :key="index"
+            :label="op.name"
+            :value="op.id"
+            style="max-width: 550px;">
+          </el-option>
         </el-select>
         <template slot="error">
           <span class="custom-error">
@@ -139,7 +144,7 @@ export default {
     validate(){
       this.$refs.baseSetting.validate()
       let err = []
-      if (this.setup.templateName < 2 || this.setup.templateName > 10){
+      if ((this.setup.templateName !== null) || (this.setup.templateName.length < 2) || (this.setup.templateName.length > 10)){
         err.push('流程名称未设置或长度不对')
       }
       if (!this.$isNotEmpty(this.setup.formId) || !this.setup.formId){
