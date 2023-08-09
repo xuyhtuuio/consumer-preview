@@ -4,14 +4,8 @@
       <div class="search">
         <el-form class="my-form form" :inline="true" :model="search" @submit.native.prevent>
           <el-form-item class="form-item" v-if="pageConfig?.pageType !== 'nonManage'">
-            <el-input
-              class="onlyInput"
-              v-model="search.review"
-              placeholder="请输入审查意见搜索"
-              @keyup.enter.native="onSearch"
-              @clear="onSearch"
-              clearable
-            >
+            <el-input class="onlyInput" v-model="search.review" placeholder="请输入审查意见搜索" @keyup.enter.native="onSearch"
+              @clear="onSearch" clearable>
               <i slot="suffix" class="el-icon-search" @click="onSearch"></i>
             </el-input>
           </el-form-item>
@@ -19,6 +13,7 @@
           <el-form-item class="form-item">
             <el-autocomplete
               class="onlyInput"
+              ref="autocomplete"
               popper-class="my-autocomplete"
               v-model="search.baseline"
               v-scrollLoad="load"
@@ -44,8 +39,7 @@
           <el-form-item class="form-item" v-if="pageConfig?.pageType !== 'nonManage'">
             <g-button class="g-btn" type="primary" @click="handleClick">
               <i class="add-icon">+</i>
-              添加意见</g-button
-            >
+              添加意见</g-button>
           </el-form-item>
         </el-form>
       </div>
@@ -58,15 +52,12 @@
           条
         </div>
         <div class="right">
-          <span
-            :class="['r-item', currentSort ? 'r-item-active' : '']"
-            @click="handleSort('refer')"
-          >
+          <span :class="['r-item', currentSort ? 'r-item-active' : '']" @click="handleSort('refer')">
             按引用次数排序
             <span
               style="font-size: 12px"
               class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': referSort }"
+              :class="{ 'left-icon-reverse': !referSort }"
             ></span>
           </span>
           <span
@@ -76,7 +67,7 @@
             <span
               style="font-size: 12px"
               class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': updateSort }"
+              :class="{ 'left-icon-reverse': !updateSort }"
             ></span>
           </span>
         </div>
@@ -86,24 +77,16 @@
           <div class="left">
             <div class="title">
               <span>{{ item.keywordName }}</span>
-              <g-icon
-                class="left-icon"
-                stylePx="20"
-                href="#icon-fuzhi1"
-                @click.native="handleCopy(item.recommendedOpinions)"
-              />
+              <g-icon class="left-icon" stylePx="20" href="#icon-fuzhi1"
+                @click.native="handleCopy(item.recommendedOpinions)" />
             </div>
             <div class="content">{{ item.recommendedOpinions }}</div>
             <div class="info">
               <span :class="['info-item', item.keywordType === 1 ? 'class-zero' : 'class-one']">
                 {{ item.keywordType === 1 ? '禁用词' : '敏感词' }}
               </span>
-              <span class="info-item"
-                ><g-icon class="left-icon" stylePx="20" href="#icon-yinyong" />已引用<i
-                  class="high"
-                  >{{ item.citationsCount }}</i
-                >次</span
-              >
+              <span class="info-item"><g-icon class="left-icon" stylePx="20" href="#icon-yinyong" />已引用<i class="high">{{
+                item.citationsCount }}</i>次</span>
               <span class="info-item">更新时间：{{ timestampToDateTime(item.updateTime) }}</span>
             </div>
           </div>
@@ -113,68 +96,42 @@
             </span>
             <span v-else class="btn" @click="changeIsTop(item)"><i>置顶</i></span>
             <span class="btn"><i @click="handleClick(item)">编辑</i></span>
-            <span class="btn btn-red"><i @click="stopApllay(item)">停用</i></span>
-            <span class="btn"><i @click="stopApllay(item)">删除</i></span>
+            <span class="btn" :class="{ 'btn-red': item.status === 1 }"><i @click="stopApllay(item, 'edit' + item.status)">{{
+              item.status
+              === 1 ? '停用' : '恢复' }}</i></span>
+            <span class="btn"><i @click="stopApllay(item, 'remove')">删除</i></span>
           </div>
         </div>
       </div>
-      <TrsPagination
-        class="trs-pagination"
-        :pageSize="10"
-        :pageNow="page.pageNow"
-        :total="page.total"
-        @getList="handleCurrentChange"
-        scrollType="scrollCom"
-        scrollName="scrollCom"
-        v-if="page.total"
-      >
+      <TrsPagination class="trs-pagination" :pageSize="page.pageSize" :pageNow="page.pageNow" :total="page.total"
+        @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom" v-if="page.total">
       </TrsPagination>
     </div>
-    <el-dialog
-      :visible.sync="limitTimeVisible"
-      width="800px"
-      custom-class="user-dialog"
-      :show-close="false"
-      center
-    >
+    <el-dialog :visible.sync="limitTimeVisible" width="800px" custom-class="user-dialog" :show-close="false" center>
       <template slot="title">
         <span>{{ titleDialog }}</span>
         <span class="close" @click="limitTimeVisible = false"><i class="el-icon-close"></i></span>
       </template>
       <el-form class="my-form" :model="dialogItem" label-width="100px">
         <el-form-item class="form-item" label="标签名称">
-          <el-autocomplete
-          class="onlyInput"
-            ref="autocomplete"
-            popper-class="my-autocomplete"
-            v-model="dialogItem.keywordName"
-            v-scrollLoad="load"
-            :fetch-suggestions="(val, cb) => querySearch(val, cb, true)"
-            placeholder="关键词"
-            @select="handleSelect"
-            @keyup.enter.native="onSearch"
-            clearable
-          >
+          <el-autocomplete class="onlyInput" ref="autocomplete" popper-class="my-autocomplete"
+            v-model="dialogItem.keywordName" v-scrollLoad="load"
+            :fetch-suggestions="(val, cb) => querySearch(val, cb, true)" placeholder="关键词" @select="handleSelect"
+            @keyup.enter.native="onSearch" clearable>
             <i slot="suffix" class="el-icon-search el-input__icon"> </i>
             <template slot-scope="{ item }">
               <div class="option-info">
                 <span class="left" v-html="item.showItem"></span>
-                <span :class="['right', item.type === 1 ? 'right-zero' : 'right-one']">{{
-                  item.type === 1 ? '禁用词' : '敏感词'
+                <span :class="['right', item.keywordType === 1 ? 'right-zero' : 'right-one']">{{
+                  item.keywordType === 1 ? '禁用词' : '敏感词'
                 }}</span>
               </div>
             </template>
           </el-autocomplete>
         </el-form-item>
         <el-form-item class="item-form" label="审查话术">
-          <el-input
-            type="textarea"
-            placeholder="请输入审查话术内容"
-            v-model="dialogItem.recommendedOpinions"
-            resize="none"
-            size="medium"
-            :autosize="{ minRows: 10, maxRows: 10 }"
-          >
+          <el-input type="textarea" placeholder="请输入审查话术内容" v-model="dialogItem.recommendedOpinions" resize="none"
+            size="medium" :autosize="{ minRows: 10, maxRows: 10 }">
           </el-input>
         </el-form-item>
       </el-form>
@@ -184,29 +141,12 @@
         <g-button class="stop" type="primary" @click="editItem(dialogItem)">确 定</g-button>
       </div>
     </el-dialog>
-
-    <el-dialog
-      :visible.sync="limitVisible"
-      width="500px"
-      custom-class="stop-dialog"
-      :show-close="false"
-      center
-    >
-      <template slot="title">
-        <span class="close" @click="limitVisible = false"><i class="el-icon-close"></i></span>
-      </template>
-      <div class="dialog-item">
-        <i class="el-alert__icon el-icon-warning icon"></i>
-        <div class="info">停用后将无法推荐此意见，确定停用吗？</div>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <g-button @click="limitVisible = false">取 消</g-button>
-        <g-button class="stop" type="primary" @click="editStatus">停用</g-button>
-      </div>
-    </el-dialog>
+    <secondary-confirmation :option="saveOption[action]" ref="confirmation"
+      @handleConfirm="editStatus"></secondary-confirmation>
   </div>
 </template>
 <script>
+import secondaryConfirmation from "@/components/common/secondaryConfirmation"
 import { getPageList, getSearchList, edit, add, remove } from '@/api/admin-opinion.js';
 import { copyText } from '@/utils/Clipboard.js';
 import { timestampToDateTime } from '@/utils/utils.js';
@@ -215,9 +155,11 @@ export default {
   props: {
     pageConfig: {
       type: Object,
-      default: () => ({})
+      default: () => ({
+      })
     }
   },
+  components: { secondaryConfirmation },
   data() {
     return {
       search: {
@@ -225,7 +167,6 @@ export default {
         baseline: ''
       },
       limitTimeVisible: false,
-      limitVisible: false,
       isLoading: false,
       timestampToDateTime,
       data: [],
@@ -245,12 +186,33 @@ export default {
       updateSort: true,
       searchDialogIndex: 1,
       iptPaddingFlag: true,
-      isSearchFocus: false
+      isSearchFocus: false,
+      action: '',
+      saveOption: {
+        edit1: {
+          message: '停用后将无法推荐此意见，确定停用吗？',
+          cancelBtn: '取消',
+          confirmBtn: '停用',
+        },
+        edit0: {
+          message: '恢复后将工单可能推荐此意见，确定恢复吗？',
+          cancelBtn: '取消',
+          confirmBtn: '恢复',
+        },
+        remove: {
+          message: '删除后将无法推荐此意见，确定删除吗？',
+          cancelBtn: '取消',
+          confirmBtn: '删除',
+        }
+      }
     };
   },
   created() {
-    this.initData();
     this.initSearchData();
+  },
+  mounted() {
+    this.page.pageSize = this.pageConfig.pageSize || this.page.pageSize;
+    this.initData();
   },
   watch: {
     limitTimeVisible(val) {
@@ -280,6 +242,7 @@ export default {
     }
   },
   methods: {
+    // 初始化数据
     initData() {
       this.isLoading = true;
       const pageData = {
@@ -287,7 +250,8 @@ export default {
         opinionContent: this.search.review,
         orderType: this.currentSort ? (this.referSort ? 1 : 2) : this.updateSort ? 3 : 4,
         pageNum: this.page.pageNow,
-        pageSize: this.page.pageSize
+        pageSize: this.page.pageSize,
+        isAll: this.pageConfig.isAll !== undefined ? this.pageConfig.isAll : 1
       };
       getPageList(pageData).then(({ totalCount, list }) => {
         this.page.total = totalCount;
@@ -296,6 +260,7 @@ export default {
       });
       this.searchList.length = 0;
     },
+    // 初始化搜索数据
     initSearchData(flag = false) {
       const data = {
         content: flag ? this.dialogItem.keywordName : this.search.baseline,
@@ -378,44 +343,51 @@ export default {
       this.dialogItem.keywordType = id;
     },
     handleClick(row) {
-      console.log(row);
       this.titleDialog = row ? '编辑意见' : '新建意见';
       this.dialogItem = row ? { ...row, keywordId: row.keywordType } : {};
       this.limitTimeVisible = true;
-      !row && this.initSearchData(false);
-      row && this.initSearchData(true);
+      this.initSearchData(true);
     },
     submitEdit(row) {
       console.log(row);
     },
     // 停用
-    stopApllay(item) {
-      this.limitVisible = true;
+    stopApllay(item, action) {
       this.dialogItem = item;
+      this.action = action;
+      this.$refs.confirmation.dialogVisible = true;
     },
     handleCurrentChange(val) {
       this.page.pageNow = val;
       this.initData();
     },
-    // 删除 意见
+    // 停用 或启用 意见， 或删除意见
     async editStatus() {
-      const res = await remove({
-        ...this.dialogItem
-      });
+      let res;
+      if (this.action === 'remove') {
+        res = await remove({
+          ...this.dialogItem,
+        });
+      } else if (this.action.indexOf('edit') !== -1) {
+        const status = this.dialogItem.status === 0 ? 1 : 0;
+        res = await edit({
+          ...this.dialogItem,
+          status
+        });
+      }
       if (res.success) {
         this.$message.success('操作成功!');
         this.handleCurrentChange(
-          this.data.length === 1 ? this.page.pageNow - 1 : this.page.pageNow
+          this.action === 'remove' && this.data.length === 1 ? this.page.pageNow - 1 : this.page.pageNow
         );
       } else {
         this.$message.error(res.msg);
       }
-      this.limitVisible = false;
     },
     // 编辑意见 或新增
     async editItem({ keywordName, recommendedOpinions }) {
       if (!keywordName || !recommendedOpinions) return this.$message.error('请填写相关信息');
-      
+
       if (this.searchList.length && !this.searchList.find(listItem => listItem.value === keywordName))
         return this.$message.error('请选择正确的标签名称');
       let res;
@@ -596,7 +568,7 @@ export default {
     overflow-y: auto;
     padding: 24px 0 0;
 
-    & > .info {
+    &>.info {
       display: flex;
       justify-content: space-between;
       margin-left: 16px;
@@ -798,11 +770,6 @@ export default {
         min-width: fit-content;
         line-height: 36px;
       }
-
-      &-right {
-        .right-option {
-        }
-      }
     }
 
     .dialog-footer {
@@ -852,11 +819,9 @@ export default {
           margin-right: 24px;
 
           .btn-primary {
-            background-image: linear-gradient(
-              to right,
-              rgba(47, 84, 235, 1),
-              rgba(81, 150, 255, 1)
-            );
+            background-image: linear-gradient(to right,
+                rgba(47, 84, 235, 1),
+                rgba(81, 150, 255, 1));
           }
         }
       }
@@ -871,7 +836,7 @@ export default {
       left: -8px;
     }
 
-    & > .content {
+    &>.content {
       margin-top: 20px;
       font-weight: 700;
       color: @color1;
@@ -951,6 +916,7 @@ export default {
     border: 0;
     padding: 0;
     margin: 0;
+
     /deep/.search .my-form .el-form-item__content {
       padding-left: 0;
       border-radius: 32px;
@@ -962,6 +928,7 @@ export default {
         margin: 0;
       }
     }
+
     /deep/ .el-input__inner {
       padding-left: 20px;
     }
@@ -971,6 +938,7 @@ export default {
     padding: 16px 0;
     height: calc(100% - 25px);
   }
+
   .el-form-item__content {
     padding: 0;
   }
@@ -1025,6 +993,7 @@ export default {
 }
 
 .trs-pagination {
+
   /deep/.pagination {
     // text-align: center;
     .el-input__inner {
@@ -1033,12 +1002,4 @@ export default {
     }
   }
 }
-
-
-
-
-
-
-
-
 </style>
