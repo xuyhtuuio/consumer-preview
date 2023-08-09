@@ -1,19 +1,23 @@
 <template>
   <div class="product-map">
     <div class="map-canvas" id="product-map" v-loading="mapLoading"></div>
-    <el-drawer
-      :title="chooseRisk"
-      :visible.sync="drawer"
-    >
+    <el-drawer :title="chooseRisk" :visible.sync="drawer">
       <div v-loading="riskLoading">
         <div class="total-show">
           <div class="total">
-            相关投诉 <span style="font-weight: 700; color: #eb5757">{{riskList.total}}</span>
+            相关投诉
+            <span style="font-weight: 700; color: #eb5757">{{
+              riskList.total
+            }}</span>
           </div>
-          <div class="to-link">查看详情></div>
+          <div class="to-link" @click="toLink">查看详情></div>
         </div>
         <div class="complaint">
-          <ComplaintCard v-for="(item, index) in riskList.list" :key="index" :item="item"></ComplaintCard>
+          <ComplaintCard
+            v-for="(item, index) in riskList.list"
+            :key="index"
+            :item="item"
+          ></ComplaintCard>
         </div>
         <TrsPagination
           class="trs-pagination"
@@ -473,16 +477,26 @@ export default {
           {
             content:
               "新入职公司需要办理杭州银行工资卡，杭州银行工作人员来公司上门集中开户办卡，在办理杭州银行卡时，拿着我的手机私自一顿操作，我提出疑问开通了什么功能，只是说开通网上银行功能，现在才明白没有任何告知开通了涌薪增利安享49号理财产品，并自动扣款，打电话95527投诉到银行，反馈已购理财产品无法取消，这种没有征得个人同意，开办银行卡时夹带办理理财的行为需要杜绝，并且必须向我公开道歉，否则我就去法院告你们",
-            tag: ["未经客户同意，购买理财类产品","未经客户同意扣费","客户要求银行道歉","司法类风险"],
+            tag: [
+              "未经客户同意，购买理财类产品",
+              "未经客户同意扣费",
+              "客户要求银行道歉",
+              "司法类风险",
+            ],
             source: "95527",
-            time: '2023-08-06'
+            time: "2023-08-06",
           },
           {
             content:
               "购买银行理财产品涌薪增利安享49号人民币理财产品，产品到期后但一直无法到账，订单界面一直显示到期兑付中，多次联系在线客服和95527每次都说已经提交反馈，但实际上毫无反应，拖延将近半个月依旧没有任何进展并给不到确切处理时间，客服表示根本查询不到这比款项也没有收到打款请求，并且服务态度恶劣。要求尽快解决我的问题",
-            tag: ["理财类产品赎回后，资金未到账/到账时间晚","客户对效率不满意","客户要求尽快办理","工作人员服务态度不好"],
+            tag: [
+              "理财类产品赎回后，资金未到账/到账时间晚",
+              "客户对效率不满意",
+              "客户要求尽快办理",
+              "工作人员服务态度不好",
+            ],
             source: "监管转办",
-            time: '2023-08-08'
+            time: "2023-08-08",
           },
         ],
         total: 2,
@@ -492,23 +506,32 @@ export default {
           {
             content:
               "我6.2购买的理财产品聚鑫赢B-180天型2号理财产品我想赎回来，但是网上银行客服一直以系统显示风险为理由不让赎回，麻烦提供什么风险有什么依据，还有什么时候可以解除这个风险，我的理财产品如有亏损谁来承担，麻烦做出回复，不然我就发到抖音、微博上",
-            tag: ["理财类产品无法赎回","客户对理财产品赎回规则不满","客户要求答复/回电","舆情类风险"],
+            tag: [
+              "理财类产品无法赎回",
+              "客户对理财产品赎回规则不满",
+              "客户要求答复/回电",
+              "舆情类风险",
+            ],
             source: "监管转办",
-            time: '2023-08-07'
+            time: "2023-08-07",
           },
           {
             content:
               "本人6月13号下午3点以后购买手机银行上的理财产品聚鑫赢B-180天型2号，因过了交易时间，购买的净值以14号的为准，所以想要撤销，却被告知不能撤回，明明今日交易时间已经过去，也没有申购成功，确不能撤销，并且正规的理财产品都有犹豫期和可撤销期，但是这个确没有，本人怀疑是非合法的理财产品，要求在14号3点交易生效前退回全额",
-            tag: ["客户对理财产品赎回规则不满","客户要求退回账户资金"],
+            tag: ["客户对理财产品赎回规则不满", "客户要求退回账户资金"],
             source: "监管转办",
-            time: '2023-08-07'
+            time: "2023-08-07",
           },
           {
             content:
               "我购买的理财产品聚鑫赢B-180天型2号，该理财产品到期后一直没有回款，联系客服让等消息，结果等到的是让选择退出通道，最终选择了通道二，从那之后，每隔一段时间就又几百到两千不等的回款，但是到今年7月后，软件App登陆一直提示异常，也就无法查看和收到回款了，要求马上解决",
-            tag: ["理财类产品赎回后，资金未到账/到账时间晚","登录失败/无法登陆使用","客户要求尽快办理"],
+            tag: [
+              "理财类产品赎回后，资金未到账/到账时间晚",
+              "登录失败/无法登陆使用",
+              "客户要求尽快办理",
+            ],
             source: "95527",
-            time: '2023-08-08'
+            time: "2023-08-08",
           },
         ],
         total: 3,
@@ -516,7 +539,7 @@ export default {
     },
     riskList: {},
     riskLoading: false,
-    chooseRisk: ''
+    chooseRisk: "",
   }),
   mounted() {
     this.mapLoading = true;
@@ -661,7 +684,9 @@ export default {
             return 16;
           },
           getWidth: function getWidth(cfg) {
-            return G6.Util.getTextSize(cfg.name, 14)[0] <= 98 ? 112 : G6.Util.getTextSize(cfg.name, 14)[0] + 14;
+            return G6.Util.getTextSize(cfg.name, 14)[0] <= 98
+              ? 112
+              : G6.Util.getTextSize(cfg.name, 14)[0] + 14;
           },
           getVGap: function getVGap() {
             return 20;
@@ -783,6 +808,9 @@ export default {
         s4() +
         s4()
       );
+    },
+    toLink() {
+      window.open("http://192.168.210.58:31808/complaint", "_blank");
     },
   },
 };
