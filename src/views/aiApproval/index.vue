@@ -8,7 +8,7 @@
           <i :class="['iconfont', item.icon]"></i>
         </span>
       </div>
-      <el-popover v-if="showSideBar" ref="sidebar-popover" :reference='reference' placement="right" trigger="click"
+      <el-popover v-if="showPopper" ref="sidebar-popover" :reference='reference' placement="right" trigger="click"
         popper-class="sidebar-popper" @after-leave="hiddenPopover">
         <component :is="crtToolComponent" :sidebarParam="sidebarParam" @previewFile="previewFile"></component>
       </el-popover>
@@ -129,7 +129,7 @@ export default {
       ],
       sidebarParam: {},
       crtToolComponent: '',
-      showSideBar: false,
+      showPopper: false,
       reference: {},
       approval: {}, // 当前审批文件的相关内容
       activeIndex: null,
@@ -152,10 +152,13 @@ export default {
   },
 
   mounted() {
-    if (!this.$route.params.item) {
-      this.$router.go(-1)
-      return
-    }
+    document.addEventListener('mousedown', (e)=>{
+      console.log('e',e)
+    });
+    // if (!this.$route.params.item) {
+    //   this.$router.go(-1)
+    //   return
+    // }
     const { item } = this.$route.params
     // console.log('item',item)
     this.formId = item.taskNumber;
@@ -166,6 +169,10 @@ export default {
     this.formBase = item;
   },
   methods: {
+    doToggle() {
+      console.log('dddd')
+      this.showPopper = !this.showPopper;
+    },
     reject() {
       this.$refs.rejectDialog.init()
     },
@@ -256,8 +263,8 @@ export default {
       window.getSelection().removeAllRanges();
     },
     changeTools(item) {
-      if (this.crtTools === item.toolSign && this.showSideBar) return
-      this.showSideBar = false
+      if (this.crtTools === item.toolSign && this.showPopper) return
+      this.showPopper = false
       this.crtTools = item.toolSign
       this.crtToolComponent = item.component
       let params = {}
@@ -279,7 +286,7 @@ export default {
       this.reference = this.$refs['sideBar-popover-' + item.toolSign][0].$el
       this.sidebarParam = params
       this.$nextTick(() => {
-        this.showSideBar = true
+        this.showPopper = true
         this.$nextTick(() => {
           // 此时才能获取refs引用
           this.$refs['sidebar-popover'].doShow()
