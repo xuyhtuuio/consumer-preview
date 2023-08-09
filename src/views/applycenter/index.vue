@@ -312,7 +312,9 @@ export default {
         currentActivityName: this.search.approvalStage,
         sortType: 1,
         id: userinfo.id,
-        name: userinfo.fullname
+        // id: '25',
+        name: userinfo.fullname,
+        form_management_id:'1'
       };
       const posts = {
         applyAll: {
@@ -322,41 +324,37 @@ export default {
             ...param
           }
         },
-        toConfirmed: {
-          method: 'post',
-          url: this.$GLOBAL.cpr + 'applicationcenter/toBeConfirmed',
-          params: {
-            ...param
-          }
-        },
-        toModified: {
-          method: 'post',
-          url: this.$GLOBAL.cpr + 'applicationcenter/toReviseList',
-          params: {
-            ...param
-          }
-        },
-        draftBin: {
-          method: 'post',
-          url: this.$GLOBAL.cpr + 'applicationcenter/revoked',
-          params: {
-            ...param
-          }
-        },
-        myConcern: {
-          method: 'post',
-          url: this.$GLOBAL.cpr + 'applicationcenter/concernedList',
-          params: {
-            ...param
-          }
-        }
+        // toConfirmed: {
+        //   method: 'post',
+        //   url: this.$GLOBAL.cpr + 'applicationcenter/toBeConfirmed',
+        //   params: {
+        //     ...param
+        //   }
+        // },
+        // toModified: {
+        //   method: 'post',
+        //   url: this.$GLOBAL.cpr + 'applicationcenter/toReviseList',
+        //   params: {
+        //     ...param
+        //   }
+        // },
+        // draftBin: {
+        //   method: 'post',
+        //   url: this.$GLOBAL.cpr + 'applicationcenter/revoked',
+        //   params: {
+        //     ...param
+        //   }
+        // },
+        // myConcern: {
+        //   method: 'post',
+        //   url: this.$GLOBAL.cpr + 'applicationcenter/concernedList',
+        //   params: {
+        //     ...param
+        //   }
+        // }
 
       }
       axiosAll(posts)
-
-
-
-
 
     },
     changeSort() {
@@ -398,7 +396,8 @@ export default {
         ...this.search,
         currentActivityName: this.search.approvalStage,
         id: userinfo.id,
-        name: userinfo.fullname
+        name: userinfo.fullname,
+        form_management_id:'1'
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间
@@ -440,6 +439,9 @@ export default {
       this.list = data.list && data.list.length ? data.list.map(v => {
         return {
           ...v,
+          formId:v.recordId,
+          taskName:v.entryName,
+          taskNumber:v.recordId,
           currentAssignee: v.currentAssignee && v.currentAssignee.length ? v.currentAssignee.map(m => {
             return {
               ...m,
@@ -482,13 +484,13 @@ export default {
       });
     },
     userStatus() {
-      getUserStatus()
-        .then((res) => {
-          this.tipsMsg = res.data.data;
-        })
-        .catch((err) => {
-          this.tipsMsg = false;
-        });
+      // getUserStatus()
+      //   .then((res) => {
+      //     this.tipsMsg = res.data.data;
+      //   })
+      //   .catch((err) => {
+      //     this.tipsMsg = false;
+      //   });
     },
     changeStatis(item) {
       if (item.value == this.crtSign) return;

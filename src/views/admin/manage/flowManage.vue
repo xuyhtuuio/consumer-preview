@@ -19,7 +19,6 @@
         <el-button type="text" @click="previewFlow(scope.row)">预览</el-button>
         <el-button type="text" v-if="scope.row.status === '已发布'" class="red" @click="stopFlow(scope.row)">停用</el-button>
         <el-button type="text" v-if="scope.row.status !== '已发布'" @click="editFlow(scope.row)">编辑</el-button>
-        <el-button type="text" v-if="scope.row.status !== '已发布'" @click="publishFlow(scope.row)">发布</el-button>
         <el-button type="text" v-if="scope.row.status !== '已发布'" class="red" @click="deleteFlow(scope.row)">删除</el-button>
       </template>
     </TrsTable>
@@ -29,7 +28,7 @@
     <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow.templateName + '-预览'">
       <process-design from="flowManage" ref="processDesign" style="background: #f5f6f6;" />
     </w-dialog>
-    <secondary-confirmation :option="confirmOption" ref="confirmation" @handleConfirm="handleStop(confirmOption)"></secondary-confirmation>
+    <secondary-confirmation :option="confirmOption" ref="confirmation" @handleConfirm="handleConfirmation(confirmOption)"></secondary-confirmation>
   </div>
 </template>
 <script>
@@ -106,8 +105,8 @@ export default {
           label: '操作',
           prop: 'operate',
           bind: {
-            width: 250,
-            align: 'center'
+            width: 200,
+            align: 'left'
           }
         },
       ],
@@ -166,14 +165,17 @@ export default {
         }
       })
     },
-    async publishFlow(row) {
-      const res = await publishProcess(row)
-      if (res.data) {
-        this.getProcessList()
-        this.$message.success("审批流程已发布成功！可在列表页查看")
+    async handleConfirmation() {
+      if (this.confirmOption.flag === 'delete') {
+        const res = await deleteProcess(this.currentRow.templateId)
+        if (res.data.data === 1) {
+          this.$message.success('删除成功')
+          this.getProcessList({
+            pageNow: 1
+          })
+        }
+        return;
       }
-    },
-    async handleStop() {
       await stopProcess(this.processDetailRes.data.data.processDefinitionId, this.currentRow.templateId)
       this.getProcessList()
       this.$message.success('停用成功')
@@ -207,13 +209,14 @@ export default {
       this.$refs.confirmation.dialogVisible = true;
     },
     async deleteFlow(row) {
-      const res = await deleteProcess(row.templateId)
-      if (res.data.data === 1) {
-        this.$message.success('删除成功')
-        this.getProcessList({
-          pageNow: 1
-        })
+      this.currentRow = row
+      this.confirmOption = {
+        message: '确定删除此流程？',
+        cancelBtn: '取消',
+        confirmBtn: '删除',
+        flag: 'delete'
       }
+      this.$refs.confirmation.dialogVisible = true;
     },
   }
 }

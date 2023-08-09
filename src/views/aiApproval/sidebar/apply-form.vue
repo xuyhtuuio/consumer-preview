@@ -13,6 +13,7 @@
 <script >
 import orderBasicInfo from '@/components/card/order-basic-info'
 export default {
+    name:'apply-form',
     props: {
         sidebarParam: {
             type: Object,

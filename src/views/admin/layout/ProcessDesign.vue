@@ -18,8 +18,8 @@
                :size="selectedNode.type === 'CONDITION' ? '600px':'550px'"
                direction="rtl" :modal="false" destroy-on-close>
       <div slot="title">
-        <template v-if="selectedNode.name !== '二次会签'">
-          <el-input v-model="selectedNode.name" size="medium" v-show="showInput"
+        <template v-if="selectedNode.name !== '二次会签' && selectedNode.id !== 'root'">
+          <el-input v-model.trim="selectedNode.name" size="medium" v-show="showInput"
                     style="width: 300px">
             <i
               class="el-icon-success el-input__icon"
@@ -117,12 +117,16 @@ export default {
     startEditName() {
       this.tempNodes = JSON.parse(JSON.stringify(this.nodes))
       this.nodeName = this.selectedNode.name
+      console.log(this.selectedNode)
       this.showInput = true
     },
     saveSelectedNodeName() {
-      if (this.tempNodes.find(item => item.name === this.selectedNode.name)) {
+      if (this.tempNodes.find(item => item.name === this.selectedNode.name && this.selectedNode.id !== item.id)) {
         this.$store.state.selectedNode.name = this.nodeName
         this.$message.warning('节点名称不可重复，请重新编辑')
+      } else if (!this.selectedNode.name) {
+        this.$store.state.selectedNode.name = this.nodeName
+        this.$message.warning('节点名称不能为空，请重新编辑')
       }
       this.showInput = false
       console.log(this.nodes, this.selectedNode.name)

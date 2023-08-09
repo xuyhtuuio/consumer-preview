@@ -165,6 +165,14 @@ export default {
       .placeholder{
         color: #8c8c8c;
       }
+      span {
+        display: -webkit-box;
+        word-break: break-all;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+      }
     }
     .node-error{
       position: absolute;

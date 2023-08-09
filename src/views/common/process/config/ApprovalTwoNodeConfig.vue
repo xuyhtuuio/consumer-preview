@@ -55,7 +55,12 @@ export default {
     },
     nodes() {
       const tempNodes = []
+      let flag = false
       this.nodeMap.forEach(value => {
+        if (value.name === this.nodeName || flag === true) {
+          flag = true
+          return;
+        }
         if (['ROOT', 'CC', 'APPROVAL', 'APPROVAL-TWO'].includes(value?.type) && value.name !== this.nodeName) {
           tempNodes.push({
             name: value.name,
