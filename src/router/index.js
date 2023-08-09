@@ -40,7 +40,7 @@ const router = new Router({
       name: 'manage',
       component: () => import("@/views/admin/manage/index.vue"),
       meta: { title: '后台管理', viewport: viewport },
-      redirect: '/admin/manage/userManage',
+      redirect: '/admin/manage/flowManage',
       children: [
         {
           path: "userManage",
