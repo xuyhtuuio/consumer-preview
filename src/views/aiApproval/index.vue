@@ -1,8 +1,8 @@
 <template>
   <div class="container" v-loading="loading">
     <div class="tools">
-      <el-popover placement="right" trigger="click" popper-class="sidebar-popper" @after-leave="hiddenPopover"
-        v-for="(item, index) in tools" :key="index" :arrow-offset="-30">
+      <el-popover  :append-to-body="false" placement="right" trigger="click" popper-class="sidebar-popper" @after-leave="hiddenPopover(item)"
+        v-for="(item, index) in tools" :key="index" :arrow-offset="-30" :ref="`popover-${item.toolSign}`">
         <component :is="crtToolComponent" :sidebarParam="item.sidebarParam" @previewFile="previewFile"></component>
         <span slot="reference"
           :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
@@ -14,14 +14,16 @@
     <div class="content">
       <div class="content-header">
         <span class="content-title">
-          <i class="iconfont icon-shenpiyemiantubiao"
-            v-if="tools?.[0]?.sidebarParam?.urgent === 1"></i>{{ projectName }}</span>
+          <i class="iconfont icon-shenpiyemiantubiao" v-if="tools?.[0]?.sidebarParam?.urgent === 1"></i>{{ projectName
+          }}</span>
         <span class="content-btns">
           <el-button @click="goBack"><i class="iconfont icon-fanhui1"></i>返回</el-button>
           <el-button type="tuihui" @click="reject"><i class="iconfont icon-tuihui1"></i>退回/驳回</el-button>
           <el-button @click="save"><i class="iconfont icon-baocun"></i>保存</el-button>
-          <el-button type="primary" @click="changeOcrView" v-if="specialFileType.includes(approval?.fileName?.split('.')[1])"><i class="iconfont icon-ocr"></i>{{ showOcr ? '关闭' :
-            '打开' }}智能审批</el-button>
+          <el-button type="primary" @click="changeOcrView"
+            v-if="specialFileType.includes(approval?.fileName?.split('.')[1])"><i class="iconfont icon-ocr"></i>{{ showOcr
+              ? '关闭' :
+              '打开' }}智能审批</el-button>
           <!-- <el-button type="primary"><i class="iconfont icon-heduiyaodian"></i>要点核对</el-button> -->
           <el-button type="primary" @click="showSubmit"><i class="iconfont icon-tijiao"></i>提交</el-button>
         </span>
@@ -45,7 +47,8 @@
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <applyFormFilePreview :url="previewfileUrl"></applyFormFilePreview>
     </el-dialog>
-    <secondary-confirmation :option="saveOption" ref="confirmation" @handleClose="goBack" @handleConfirm="save"></secondary-confirmation>
+    <secondary-confirmation :option="saveOption" ref="confirmation" @handleClose="goBack"
+      @handleConfirm="save"></secondary-confirmation>
   </div>
 </template>
 
@@ -77,7 +80,7 @@ import {
 } from "@/api/front";
 export default {
   name: 'aiApproval',
-  components: { applyFormFilePreview, filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase,secondaryConfirmation, rejectDialog },
+  components: { applyFormFilePreview, filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase, secondaryConfirmation, rejectDialog },
   data() {
     return {
       formBase: {},
@@ -169,7 +172,7 @@ export default {
       }).then(res => {
         const { data, status, message } = res.data;
         if (status === 200) {
-          this.tools[0].sidebarParam = { data, formId: item.taskNumber, originatorId: item.sponsor };
+          this.tools[0].sidebarParam = { data, formId: item.taskNumber, originatorId: item.originator.id };
           this.projectName = data.basicInformation.filter(item => item.title === '项目名称')?.[0]?.value
         } else {
           this.$message.error({ offset: 40, title: "提醒", message });
@@ -248,22 +251,47 @@ export default {
       window.getSelection().removeAllRanges();
     },
     changeTools(item) {
+      // for (const key in this.$refs) {
+      //   if (key.indexOf('popover-') !== -1) {
+      //     this.$refs[key][0]?this.$refs[key][0].doClose():'';
+      //   }
+      // }
       this.crtTools = item.toolSign
       this.crtToolComponent = item.component
       let params = {}
+      const param_item = this.$route.params
       switch (item.component) {
         case 'applyForm':
-          const { item } = this.$route.params
           params = {
-            formId: item.taskNumber,
-            originatorId: item.sponsorMap.sponsorId,
+            formId: param_item.taskNumber,
+            originatorId: param_item.originatorId,
+          }
+          break;
+        case 'approvalRecordDetail':
+          params = {
+            formId: param_item.taskNumber,
+            originatorId: param_item.originatorId,
           }
           break;
       }
       this.sidebarParam = params
     },
     hiddenPopover() {
+      // for (const key in this.$refs) {
+      //   if (key.indexOf('popover-') !== -1) {
+      //     if (key.indexOf(i.toolSign) === -1) {
+      //       this.$refs[key].doClose();
+      //     }
+      //   }
+      // }
+      // for (const key in this.$refs) {
+      //   if (key.indexOf('popover-') !== -1) {
+      //     this.$refs[key][0].popperElm.remove()
+      //     // this.$refs[key][0]?this.$refs[key][0].doClose():'';
+      //   }
+      // }
       this.crtTools = ''
+      // document.body.click()
     },
     // 初始化文件
     initFile() {

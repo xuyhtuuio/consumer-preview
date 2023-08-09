@@ -170,7 +170,6 @@ export default {
           item.followed = item.followed == 1 ? 0 : 1;
           this.$message.success(res.data.msg);
           this.$emit('concern')
-  
         }
       });
     },

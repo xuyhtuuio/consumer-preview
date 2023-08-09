@@ -439,6 +439,9 @@ export default {
       this.list = data.list && data.list.length ? data.list.map(v => {
         return {
           ...v,
+          formId:v,recordId,
+          taskName:v.entryName,
+          taskNumber:v.recordId,
           currentAssignee: v.currentAssignee && v.currentAssignee.length ? v.currentAssignee.map(m => {
             return {
               ...m,

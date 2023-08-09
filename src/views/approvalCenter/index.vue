@@ -246,7 +246,7 @@ export default {
         hasOpinions: "",
         adoptionStatus: "",
         nodeid: this.search.approvalStage,
-        sortType: 1,
+        sort: 1,
         taskDTO: {
           pageNo: 0,
           pageSize: 10,
@@ -428,7 +428,7 @@ export default {
       } else if (this.search.updateTime2[0] == 2) {
         sortType = this.search.updateTime2[1] == "desc" ? 4 : 3;
       }
-      param.sortType = sortType;
+      param.sort = sortType;
       Reflect.deleteProperty(param, "updateTime");
       Reflect.deleteProperty(param, "updateTime2");
       Reflect.deleteProperty(param, "total");
