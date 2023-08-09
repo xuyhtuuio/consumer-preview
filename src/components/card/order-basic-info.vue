@@ -113,7 +113,7 @@ export default {
     mounted() {
         this.getCurrentUserInfo()
         if ((this.$route.params && this.$route.params.formId) || (this.sidebarParam && this.sidebarParam.formId)) {
-            this.getWorkOrderTaskInfo()
+            // this.getWorkOrderTaskInfo()
             this.getCurrentUserInfo()
             this.getOrderDetail()
         }
@@ -121,7 +121,7 @@ export default {
     activated() {
         const keys = Object.keys(this.$route.params) || Object.keys(this.$route.sidebarParam)
         if (keys.length) {
-            this.getWorkOrderTaskInfo()
+            // this.getWorkOrderTaskInfo()
             this.getCurrentUserInfo()
             this.getOrderDetail()
         }
@@ -147,11 +147,8 @@ export default {
         },
         getCurrentUserInfo() {
             getCurrentUserInfo().then((res) => {
-                console.log('ddd',res)
-
+               
             })
-
-
         },
         getMapping(list) {
             let len = list.length
