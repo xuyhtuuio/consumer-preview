@@ -8,6 +8,15 @@ export function getDataStatistics(param) {
     params: param
   })
 }
+// 数量预览
+export function getsTheNumberOfHeaders(param) {
+  return request({
+    url: '/cpr/applicationcenter/getsTheNumberOfHeaders',
+    method: 'post',
+    data: param
+  })
+}
+
 export function getUserStatus(param) {
   return request({
     url: '/cpr/applicationcenter/user-status',
@@ -70,6 +79,14 @@ export function toReviseList(param) {
 export function revoked(param) {
   return request({
     url: '/cpr/applicationcenter/revoked',
+    method: 'post',
+    data: param
+  })
+}
+//审批中
+export function Approval(param) {
+  return request({
+    url: '/cpr/applicationcenter/approval',
     method: 'post',
     data: param
   })

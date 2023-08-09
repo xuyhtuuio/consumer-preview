@@ -3,11 +3,8 @@
         <div class="user">
             <div class="user-info">
                 <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
-                <span class="nickname"> {{ orderBaseInfo.approverInfo && orderBaseInfo.approverInfo.name }} /
-                    {{ orderBaseInfo.approverInfo && orderBaseInfo.approverInfo.workId }} </span>
-                <span>{{ orderBaseInfo.approverInfo && orderBaseInfo.approverInfo.institution }} <i
-                        v-if="orderBaseInfo.approverInfo && orderBaseInfo.approverInfo.dep">|
-                        {{ orderBaseInfo.approverInfo.dep }}</i></span>
+                <span class="nickname"> {{ personInfo&&personInfo.name }} / {{ personInfo&&personInfo.id }} </span>
+                <span> {{ personInfo&&personInfo.label }}</span>
             </div>
             <slot name="apply-modify"></slot>
         </div>
@@ -84,15 +81,19 @@
 </template>
 
 <script >
-import { getApplyForm, workOrderTaskInfo } from "@/api/front";
+import { getApplyForm } from "@/api/front";
 import { downloadAllFiles } from "@/api/applyCenter";
 import moment from 'moment'
 import FileType from '@/components/common/file-type.vue';
-import { getCurrentUserInfo } from '@/api/front.js'
 export default {
+    name:'order-basic-info',
     components: { FileType },
     props: {
         sidebarParam: {
+            type: Object,
+            default: () => { }
+        },
+        personInfo:{
             type: Object,
             default: () => { }
         }
@@ -111,44 +112,19 @@ export default {
         };
     },
     mounted() {
-        this.getCurrentUserInfo()
         if ((this.$route.params && this.$route.params.formId) || (this.sidebarParam && this.sidebarParam.formId)) {
-            // this.getWorkOrderTaskInfo()
-            this.getCurrentUserInfo()
             this.getOrderDetail()
         }
     },
     activated() {
         const keys = Object.keys(this.$route.params) || Object.keys(this.$route.sidebarParam)
         if (keys.length) {
-            // this.getWorkOrderTaskInfo()
-            this.getCurrentUserInfo()
             this.getOrderDetail()
         }
     },
     methods: {
         startLoading(val) {
             this.$parent.startLoading(true)
-        },
-        getWorkOrderTaskInfo() {
-            const param = {
-                formId: this.$route.params.formId || this.sidebarParam.formId,
-                originatorId: this.$route.params.originatorId || this.sidebarParam.originatorId,
-            }
-            workOrderTaskInfo(param).then(res => {
-                const { data, status, message } = res.data;
-                if (status == 200) {
-                    this.orderBaseInfo = {
-                        ...data,
-                    }
-                    this.$emit('sendbaseInfo', this.orderBaseInfo)
-                }
-            })
-        },
-        getCurrentUserInfo() {
-            getCurrentUserInfo().then((res) => {
-               
-            })
         },
         getMapping(list) {
             let len = list.length
@@ -171,7 +147,6 @@ export default {
                 const { data, status, message } = res.data;
                 if (status === 200) {
                     let { basicInformation, keyPointsForVerification, promotionChannels, reviewMaterials } = data
-
                     //大段文本过滤
                     const noTextAreaBeseInfo = basicInformation.filter(v => { return v.name !== 'TextareaInput' })
                     const textAreaBaseInfo = basicInformation.filter(v => { return v.name == 'TextareaInput' })

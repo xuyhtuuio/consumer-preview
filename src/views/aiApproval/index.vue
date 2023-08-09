@@ -1,18 +1,20 @@
 <template>
   <div class="container" v-loading="loading">
-    <div class="tools">
+    <div class="tools" >
+      <div ref="tools">
       <div v-for="(item, index) in tools" :key="index" :arrow-offset="-30" :ref="`popover-${item.toolSign}`">
         <span :ref='`sideBar-popover-` + item.toolSign'
           :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
           @click="changeTools(item)">
-          <i :class="['iconfont', item.icon]"></i>
+          <i :class="['iconfont', 'sidebar-icon', item.icon]"></i>
         </span>
       </div>
       <el-popover v-if="showPopper" ref="sidebar-popover" :reference='reference' placement="right" trigger="click"
         popper-class="sidebar-popper" @after-leave="hiddenPopover">
-        <component :is="crtToolComponent" :sidebarParam="sidebarParam" @previewFile="previewFile"></component>
+        <component :is="crtToolComponent" :sidebarParam="sidebarParam" @previewFile="previewFile" :personInfo="personInfo"></component>
       </el-popover>
     </div>
+  </div>
     <div class="content">
       <div class="content-header">
         <span class="content-title">
@@ -131,6 +133,7 @@ export default {
       crtToolComponent: '',
       showPopper: false,
       reference: {},
+      personInfo:{},
       approval: {}, // 当前审批文件的相关内容
       activeIndex: null,
       word_lines: [], // 连线
@@ -152,15 +155,19 @@ export default {
   },
 
   mounted() {
-    document.addEventListener('mousedown', (e)=>{
-      console.log('e',e)
+    document.addEventListener('mouseup', (e) => {
+      const toolsRef =this.$refs['tools']
+      if(toolsRef){
+        if (!toolsRef.contains(e.target)) {
+          this.showPopper = false;
+        }
+      }
     });
-    // if (!this.$route.params.item) {
-    //   this.$router.go(-1)
-    //   return
-    // }
+    if (!this.$route.params.item) {
+      this.$router.go(-1)
+      return
+    }
     const { item } = this.$route.params
-    // console.log('item',item)
     this.formId = item.taskNumber;
     this.inDraft = item.draftFlag === 1;
     this.formCategoryId = item.formManagementId
@@ -170,7 +177,6 @@ export default {
   },
   methods: {
     doToggle() {
-      console.log('dddd')
       this.showPopper = !this.showPopper;
     },
     reject() {
@@ -269,6 +275,7 @@ export default {
       this.crtToolComponent = item.component
       let params = {}
       const { item: param_item } = this.$route.params
+      console.log('dd',param_item )
       switch (item.component) {
         case 'applyForm':
           params = {
@@ -285,6 +292,8 @@ export default {
       }
       this.reference = this.$refs['sideBar-popover-' + item.toolSign][0].$el
       this.sidebarParam = params
+      this.personInfo=param_item.initiator
+      console.log('this.personInfo',this.personInfo)
       this.$nextTick(() => {
         this.showPopper = true
         this.$nextTick(() => {
@@ -294,21 +303,7 @@ export default {
       })
     },
     hiddenPopover() {
-      // for (const key in this.$refs) {
-      //   if (key.indexOf('popover-') !== -1) {
-      //     if (key.indexOf(i.toolSign) === -1) {
-      //       this.$refs[key].doClose();
-      //     }
-      //   }
-      // }
-      // for (const key in this.$refs) {
-      //   if (key.indexOf('popover-') !== -1) {
-      //     this.$refs[key][0].popperElm.remove()
-      //     // this.$refs[key][0]?this.$refs[key][0].doClose():'';
-      //   }
-      // }
       this.crtTools = ''
-      // document.body.click()
     },
     // 初始化文件
     initFile() {

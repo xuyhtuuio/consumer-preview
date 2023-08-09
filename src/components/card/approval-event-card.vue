@@ -30,11 +30,11 @@
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
-            <i class="tag check" v-if="item.adoptionStatus == 0&&item.taskStatus!='3'">
+            <i class="tag check" v-if="item.adoptionStatus == 0 && item.taskStatus != '3'">
               <i class="iconfont icon-guanzhu2"></i>
               不采纳
             </i>
-            <i class="tag adoption" v-if="item.adoptionStatus == 1&&item.taskStatus!='3'">
+            <i class="tag adoption" v-if="item.adoptionStatus == 1 && item.taskStatus != '3'">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tubiao"></use>
               </svg>
@@ -49,15 +49,16 @@
         <span class="sDate date">更新时间：{{ item.updateTime | timeFormate }}</span>
         <span class="sDate date">上线时间：{{ item.uptime | timeFormate }}</span>
         <!-- <span class="handler date">当前处理人：王明明</span> -->
-        <el-popover placement="bottom" trigger="hover" popper-class="popper-persons" v-if="item.originator && item.originator.name">
+        <el-popover placement="bottom" trigger="hover" popper-class="popper-persons"
+          v-if="item.originator && item.originator.name">
           <div style="text-align: center;">
             {{ item.originator && item.originator.label }}
           </div>
-          <span slot="reference" class="handler date pointer" >发起人：{{
+          <span slot="reference" class="handler date pointer">发起人：{{
             item.originator && item.originator.name
           }}</span>
         </el-popover>
-        <span  class="handler date" v-else>发起人：--</span>
+        <span class="handler date" v-else>发起人：--</span>
         <span class="handler">
           <i class="iconfont icon-dept"></i>
           {{ item.institution }}</span>
@@ -90,7 +91,7 @@
           <use xlink:href="#icon-tubiao-1"></use>
         </svg>
         关注</span>
-      <span class="attention has-attention icon-op" v-if="item.followed==1" @click="concern(item)">
+      <span class="attention has-attention icon-op" v-if="item.followed == 1" @click="concern(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-guanzhu-1"></use>
         </svg>已关注</span>
@@ -130,7 +131,7 @@ export default {
         params: {
           formId: item.recordId,
           originatorId: item.originator.id,
-          taskName:item.taskName
+          taskName: item.taskName
         },
       });
     },
@@ -147,8 +148,8 @@ export default {
         name: "approval-details",
         params: {
           formId: item.recordId,
-          originatorId:  item.originator.id,
-          taskName:item.taskName
+          originatorId: item.originator.id,
+          taskName: item.taskName
         },
       });
     },
@@ -156,14 +157,14 @@ export default {
       this.$router.push({
         name: 'editApply',
         params: {
-          id:item.taskNumber
+          id: item.taskNumber
         }
       })
     },
     concern(item) {
       const param = {
         recordId: item.taskNumber,
-        type:2
+        type: 2
       };
       concernApplication(param).then((res) => {
         if (res.status == 200) {
@@ -176,7 +177,7 @@ export default {
   },
   filters: {
     timeFormate(val) {
-      return val ? moment(val).format('YYYY-MM-DD HH:mm:ss'): '--'
+      return val ? moment(val).format('YYYY-MM-DD HH:mm:ss') : '--'
     }
   }
 };
@@ -441,7 +442,8 @@ export default {
 
 .approval-event-card:hover {
   background: #f7f8fa;
-  .event-name{
+
+  .event-name {
     color: #2d5cf6;
   }
 }
