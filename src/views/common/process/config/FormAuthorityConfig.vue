@@ -100,10 +100,12 @@ export default {
           }
         }
         if (!isLoad){
+          const isRoot = this.$store.state.selectedNode.type === 'ROOT'
+          const secondCheck = this.$store.state.selectedNode.type === 'APPROVAL-TWO'
           perms.push({
             id: form.id,
             title: form.title,
-            perm: this.$store.state.selectedNode.type === 'ROOT' ? 'E':'R'
+            perm: (isRoot || secondCheck) ? 'E':'R'
           })
         }
       })
