@@ -2,6 +2,7 @@
   <el-container>
     <el-header>
       <layout-header
+        ref="layoutHeader"
         v-model="activeSelect"
         @changeRoute="(active) => activeSelect = active"
         @save="saveProcess"
@@ -37,7 +38,7 @@
 
 <script>
 import LayoutHeader from './LayoutHeader'
-import {createForm, updateFormDetail, saveProcess, publishProcess, getProcessDetail} from '@/api/design'
+import {saveProcess, publishProcess, getProcessDetail} from '@/api/design'
 import FormBaseSetting from '@/views/admin/layout/FormBaseSetting'
 import ProcessDesign from '@/views/admin/layout/ProcessDesign'
 import FormProSetting from '@/views/admin/layout/FormProSetting'
