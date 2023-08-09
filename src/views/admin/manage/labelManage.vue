@@ -21,11 +21,11 @@
 
           <el-form-item class="form-item">
             <el-autocomplete
-              ref="autocomplete"
+            ref="autocomplete"
               v-model="search.keyword"
               placeholder="请输入标签名称进行搜索"
               :fetch-suggestions="querySearch"
-              :trigger-on-focus="false"
+              :trigger-on-focus="true"
               @select="handleSelect"
               @keyup.enter.native="getList(1)"
               clearable
@@ -62,7 +62,6 @@
         :data="data"
         :colConfig="colConfig"
         @sort-change="sortChange"
-        @submitEdit="submitEdit"
         :header-cell-style="{ 'text-align': 'center' }"
         :cell-style="{ 'text-align': 'center' }"
       >
@@ -225,7 +224,7 @@ export default {
         content: queryString
       });
       const { data } = res.data;
-      cb(data?.list || []);
+        cb(data?.list);
     },
     async getList(pageNow) {
       this.loading = true;
@@ -257,9 +256,7 @@ export default {
       this.dialogItem = row ? { ...row } : { type: 1 };
       this.dialogItem.index = index;
     },
-    submitEdit(row) {
-      // console.log(row);
-    },
+
     // 停用
     stopApllay(item) {
       // this.limitVisible = true;
@@ -629,6 +626,19 @@ export default {
     line-height: 28px;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

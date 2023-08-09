@@ -19,6 +19,7 @@
           <el-form-item class="form-item">
             <el-autocomplete
               class="onlyInput"
+              ref="autocomplete"
               popper-class="my-autocomplete"
               v-model="search.baseline"
               v-scrollLoad="load"
@@ -66,7 +67,7 @@
             <span
               style="font-size: 12px"
               class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': referSort }"
+              :class="{ 'left-icon-reverse': !referSort }"
             ></span>
           </span>
           <span
@@ -76,7 +77,7 @@
             <span
               style="font-size: 12px"
               class="iconfont icon-jiantou left-icon"
-              :class="{ 'left-icon-reverse': updateSort }"
+              :class="{ 'left-icon-reverse': !updateSort }"
             ></span>
           </span>
         </div>
@@ -159,8 +160,8 @@
             <template slot-scope="{ item }">
               <div class="option-info">
                 <span class="left" v-html="item.showItem"></span>
-                <span :class="['right', item.type === 1 ? 'right-zero' : 'right-one']">{{
-                  item.type === 1 ? '禁用词' : '敏感词'
+                <span :class="['right', item.keywordType === 1 ? 'right-zero' : 'right-one']">{{
+                  item.keywordType === 1 ? '禁用词' : '敏感词'
                 }}</span>
               </div>
             </template>
@@ -280,6 +281,7 @@ export default {
     }
   },
   methods: {
+    // 初始化数据
     initData() {
       this.isLoading = true;
       const pageData = {
@@ -296,6 +298,7 @@ export default {
       });
       this.searchList.length = 0;
     },
+    // 初始化搜索数据
     initSearchData(flag = false) {
       const data = {
         content: flag ? this.dialogItem.keywordName : this.search.baseline,
@@ -378,12 +381,10 @@ export default {
       this.dialogItem.keywordType = id;
     },
     handleClick(row) {
-      console.log(row);
       this.titleDialog = row ? '编辑意见' : '新建意见';
       this.dialogItem = row ? { ...row, keywordId: row.keywordType } : {};
       this.limitTimeVisible = true;
-      !row && this.initSearchData(false);
-      row && this.initSearchData(true);
+      this.initSearchData(true);
     },
     submitEdit(row) {
       console.log(row);
@@ -1033,6 +1034,22 @@ export default {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
