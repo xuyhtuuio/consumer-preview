@@ -61,11 +61,25 @@ export default {
       ruleForm: {},
       ruleFormLen: 0,
       judgeWarnFlag: false,
-      checkAll: 0
+      checkAll: false
     };
   },
   created() {
     this.initData();
+  },
+  watch: {
+    list: {
+      handler(val) {
+        let len = 0;
+        let valLen = 0;
+        val.forEach(listItem => {
+          len += listItem.value.length;
+          valLen += listItem.props.options.length;
+        });
+        this.checkAll = len === valLen ? true : false;
+      },
+      deep:true
+    }
   },
   methods: {
     initData() {
@@ -79,13 +93,13 @@ export default {
     },
     handleCheckAllChange(val) {
       console.log(val, this.list);
-      val &&
-        this.list.forEach(listItem => {
+      this.list.forEach(listItem => {
+        val &&
           listItem.props.options.forEach(({ id }) => {
             listItem.value.push(id);
           });
-        });
-      !val && this.list.forEach(listItem => (listItem.value = []));
+        !val && (listItem.value = []);
+      });
     },
     handleChange() {
       if (this.judgeWarnFlag) {
@@ -132,6 +146,4 @@ export default {
     padding: 16px 72px 0;
   }
 }
-
-
 </style>
