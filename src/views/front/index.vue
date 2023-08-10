@@ -137,7 +137,8 @@
                   <div
                     class="tag-item blue"
                     v-if="
-                      item.submitted === 1 && userInfo.id === item.sponsorMap.id
+                      item.submitted === 1 &&
+                      userInfo.id + '' === item.sponsorMap.id
                     "
                   >
                     <span class="iconfont icon-tijiao airplane-class"></span>
@@ -145,9 +146,13 @@
                   </div>
                   <div
                     class="tag-item"
-                    :class="estimateClass(item.currentActivityName)"
+                    :class="estimateClass(item.businessStatus)"
+                    v-if="item.businessStatus"
                   >
-                    {{ item.currentActivityName }}
+                    {{ getNodeStatus(item.businessStatus) }}
+                    <span v-if="item.currentActivityName">{{
+                      ">" + item.currentActivityName
+                    }}</span>
                   </div>
                   <div
                     class="tag-item-opt"
@@ -338,16 +343,38 @@ export default {
     },
     estimateClass(type) {
       if (type) {
-        if (type.indexOf("待确认") !== -1) {
+        if (type === "5") {
           return "deep-green";
-        } else if (type.indexOf("待修改") !== -1) {
+        } else if (type === "3") {
           return "red";
-        } else if (type === "已结束") {
+        } else if (type === "4") {
           return "green";
         } else {
           return "orange";
         }
       }
+    },
+    getNodeStatus(value) {
+      let nodeName = "";
+      switch (value) {
+        case "1":
+          nodeName = "审批中";
+          break;
+        case "2":
+          nodeName = "撤销";
+          break;
+        case "3":
+          nodeName = "待修改";
+          break;
+        case "4":
+          nodeName = "已结束";
+          break;
+        case "5":
+          nodeName = "待确认";
+          break;
+        default:
+      }
+      return nodeName;
     },
   },
 };
