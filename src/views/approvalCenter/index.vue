@@ -421,7 +421,7 @@ export default {
             ...v,
             taskNumber: v.recordId + '',
             taskName: v.entryName,
-            initiator: v.originator,
+            initiator: { ...v.originator, label: v.institutional && v.institutional[1] },
             taskStatus: v.nodeStatus
           }
         }) : [];

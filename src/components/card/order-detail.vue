@@ -60,14 +60,17 @@
           <span class="order-class tag" v-if="item.formManagementName">{{ item.formManagementName }}</span>
           <span class="event-status">
             <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
-            <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中<i v-if="item.currentActivityName">>{{
-              item.currentActivityName }}</i></i>
-            <i v-if="item.taskStatus === '2'" class="tag in-approval">撤销<i v-if="item.currentActivityName">>{{
-              item.currentActivityName }}</i></i>
-            <i v-if="item.taskStatus === '3'" class="tag in-modify">待修改<i v-if="item.currentActivityName">>{{
-              item.currentActivityName }}</i></i>
-            <i v-if="item.taskStatus === '5'" class="tag check">待确认<i v-if="item.currentActivityName">>{{
-              item.currentActivityName }}</i></i>
+            <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中<i
+                v-if="item.currentActivityName || item.nodeName">>{{
+                  item.currentActivityName || item.nodeName }}</i></i>
+            <i v-if="item.taskStatus === '2'" class="tag in-approval">撤销<i
+                v-if="item.currentActivityName || item.nodeName">>{{
+                  item.currentActivityName || item.nodeName }}</i></i>
+            <i v-if="item.taskStatus === '3'" class="tag in-modify">待修改<i
+                v-if="item.currentActivityName || item.nodeName">>{{
+                  item.currentActivityName || item.nodeName }}</i></i>
+            <i v-if="item.taskStatus === '5'" class="tag check">待确认<i v-if="item.currentActivityName || item.nodeName">>{{
+              item.currentActivityName || item.nodeName }}</i></i>
             <i v-if="item.taskStatus === '4'" class="end">
               <i class="tag end-sign"> 已结束 </i>
             </i>
@@ -218,6 +221,7 @@ export default {
         submitLoading: false,
         storageLoading: false,
       },
+      personInfo: {},
       peoples: [
         { name: "王明明", code: 1 },
         { name: "王明明", code: 2 },
@@ -269,6 +273,8 @@ export default {
       const info = JSON.parse(window.localStorage.getItem("order-detail"));
       this.info = info
       this.item = item
+
+
       // 草稿
       if (item.taskStatus == '0') {
         this.status = 0;
