@@ -127,7 +127,7 @@
                     <div class="text-style">滞留1小时</div>
                   </div> -->
                   <div class="please-time">
-                    申请时间：{{ item.create_time ? item.create_time : '--' }}
+                    申请时间：{{ item.create_time ? item.create_time : "--" }}
                   </div>
                 </div>
                 <div class="item-tag">
@@ -136,7 +136,9 @@
                   </div>
                   <div
                     class="tag-item blue"
-                    v-if="userInfo.id === item.sponsorMap.id"
+                    v-if="
+                      item.submitted === 1 && userInfo.id === item.sponsorMap.id
+                    "
                   >
                     <span class="iconfont icon-tijiao airplane-class"></span>
                     我发起的
@@ -169,9 +171,7 @@
               <Empty></Empty>
             </div>
             <div class="progress-bottom">
-              <span style="color: #306ef5">{{
-                numData.toConfirmed
-              }}</span>
+              <span style="color: #306ef5">{{ numData.toConfirmed }}</span>
               待确认 ，<span style="color: #306ef5">{{
                 numData.Approval
               }}</span>
@@ -212,7 +212,7 @@ export default {
       pageConfig: {
         pageType: "nonManage",
         isAll: 0,
-        pageSize: 5
+        pageSize: 5,
       },
       canLeft: false,
       canRight: true,
@@ -270,6 +270,7 @@ export default {
     },
     getListApi() {
       this.applyLoading = true;
+      let that = this;
       let data = {
         adoptionStatus: 0,
         approvalStage: "",
@@ -277,7 +278,7 @@ export default {
         create_time: "",
         currentActivityName: "",
         hasOpinions: 0,
-        id: "25",
+        id: that.userInfo.id,
         keywords: "",
         label: "",
         launchDate: "",
@@ -335,19 +336,16 @@ export default {
         .catch((res) => {});
     },
     estimateClass(type) {
-      console.log(type);
-      if (type.indexOf("待确认") !== -1) {
-        console.log("1");
-        return "deep-green";
-      } else if (type.indexOf("待修改") !== -1) {
-        console.log("2");
-        return "red";
-      } else if (type === "已结束") {
-        console.log("3");
-        return "green";
-      } else {
-        console.log("5");
-        return "orange";
+      if (type) {
+        if (type.indexOf("待确认") !== -1) {
+          return "deep-green";
+        } else if (type.indexOf("待修改") !== -1) {
+          return "red";
+        } else if (type === "已结束") {
+          return "green";
+        } else {
+          return "orange";
+        }
       }
     },
   },
