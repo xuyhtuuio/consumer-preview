@@ -45,6 +45,9 @@ export default {
   },
   methods: {
     validate(){
+      if (this.setup.undo && !this.setup.target) {
+        return ['请选择指定节点']
+      }
       return []
     },
     visibleChange(show) {

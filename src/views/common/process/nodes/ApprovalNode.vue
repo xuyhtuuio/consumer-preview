@@ -73,10 +73,14 @@ export default {
         console.log(this.config.props.assignedType)
         this.showError = !this[`validate_${this.config.props.assignedType}`](err)
         if (!this.config.targetPage) {
-          const error1 = err.push(`${this.config.name} 目标页面未配置`)
-          this.showError = Boolean(error1)
+          err.push(`${this.config.name} 目标页面未配置`)
+          this.showError = false
         }
-        return Boolean(this.showError)
+        if (this.config.props.refuseWay === 'TO_NODE' && !this.config.props.refuseNode) {
+          err.push(`${this.config.name} 未配置驳回到指定节点`)
+          this.showError = false
+        }
+        return this.showError
       } catch (e) {
         return true;
       }
