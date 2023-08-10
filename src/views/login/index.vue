@@ -650,7 +650,6 @@ export default {
                   window.localStorage.removeItem('AI_pwd');
                 }
                 window.localStorage.setItem('AI_token', res.access_token);
-                window.localStorage.setItem('Authorization', res.access_token);
                 const userPermis = await this.getUserRole();
                 window.localStorage.setItem('userPermis', JSON.stringify(userPermis));
 

@@ -37,7 +37,6 @@ export default {
           }).then((res) => {
             if (res.access_token) {
               window.localStorage.setItem('AI_token', res.access_token);
-              window.localStorage.setItem('Authorization', res.access_token);
               window.history.go(-1);
             }
           });
