@@ -4,33 +4,15 @@
       <div class="search">
         <el-form class="my-form form" :inline="true" :model="search">
           <el-form-item class="form-item" label="标签类型">
-            <el-select
-              v-model="search.type"
-              placeholder="请选择标签类型"
-              @change="val => getList()"
-              clearable
-            >
-              <el-option
-                v-for="item in types"
-                :key="item.id"
-                :label="item.value"
-                :value="item.id"
-              ></el-option>
+            <el-select v-model="search.type" placeholder="请选择标签类型" @change="val => getList()" clearable>
+              <el-option v-for="item in types" :key="item.id" :label="item.value" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
 
           <el-form-item class="form-item">
-            <el-autocomplete
-              ref="autocomplete"
-              v-model="search.keyword"
-              placeholder="请输入标签名称进行搜索"
-              :fetch-suggestions="querySearch"
-              :trigger-on-focus="true"
-              @select="handleSelect"
-              @keyup.enter.native="getList(1)"
-              clearable
-              @clear="getList(1)"
-            >
+            <el-autocomplete ref="autocomplete" v-model="search.keyword" placeholder="请输入标签名称进行搜索"
+              :fetch-suggestions="querySearch" :trigger-on-focus="true" @select="handleSelect"
+              @keyup.enter.native="getList(1)" clearable @clear="getList(1)">
               <i slot="suffix" class="el-icon-search el-input__icon" @click="getList(1)"> </i>
               <template slot-scope="{ item }">
                 <div class="option-info">
@@ -46,82 +28,52 @@
           <el-form-item class="form-item">
             <g-button class="g-btn" type="primary" @click="handleClick">
               <i class="iconfont icon-a-tubiaotianjiabiaoqian"></i>
-              添加标签</g-button
-            >
+              添加标签</g-button>
             <g-button class="g-btn" type="primary">
               <i class="iconfont icon-a-tubiaodaochu"></i>
-              导出</g-button
-            >
+              导出</g-button>
           </el-form-item>
         </el-form>
       </div>
     </div>
     <div class="main" v-loading="loading">
-      <TrsTable
-        theme="TRS-table-gray"
-        :data="data"
-        :colConfig="colConfig"
-        @sort-change="sortChange"
-        :header-cell-style="{ 'text-align': 'center' }"
-        :cell-style="{ 'text-align': 'center' }"
-      >
-        <template #keywordContent="{ row }">
-          <div style="text-align: left">{{ row.keywordContent }}</div>
-        </template>
-        <template #type="{ row }">
-          <span :class="[row.type === 1 ? 'class-zero' : 'class-one']">{{
-            row.type === 1 ? '禁用词' : '敏感词'
-          }}</span>
-        </template>
-        <template #operate="scope">
-          <el-button type="text" size="small" @click="handleClick(scope.row)"> 编辑</el-button>
-          <el-button
-            type="text"
-            size="small"
-            v-if="scope.row.status === 0"
-            @click="handleSubmitLimitTime(scope.row)"
-            >恢复</el-button
-          >
-          <el-button type="text" class="red" @click="stopApllay(scope.row)" v-else>停用</el-button>
-        </template>
-      </TrsTable>
-      <TrsPagination
-        :pageSize="10"
-        :pageNow="page.pageNow"
-        :total="page.total"
-        @getList="val => getList(val)"
-        scrollType="scrollCom"
-        scrollName="scrollCom"
-        v-if="page.total"
-      >
-      </TrsPagination>
+      <div class="main-body">
+        <TrsTable theme="TRS-table-gray" :data="data" :colConfig="colConfig" @sort-change="sortChange"
+          :header-cell-style="{ 'text-align': 'center' }" :cell-style="{ 'text-align': 'center' }">
+          <template #keywordContent="{ row }">
+            <div style="text-align: left">{{ row.keywordContent }}</div>
+          </template>
+          <template #type="{ row }">
+            <span :class="[row.type === 1 ? 'class-zero' : 'class-one']">{{
+              row.type === 1 ? '禁用词' : '敏感词'
+            }}</span>
+          </template>
+          <template #operate="scope">
+            <el-button type="text" size="small" @click="handleClick(scope.row)"> 编辑</el-button>
+            <el-button type="text" size="small" v-if="scope.row.status === 0"
+              @click="handleSubmitLimitTime(scope.row)">恢复</el-button>
+            <el-button type="text" class="red" @click="stopApllay(scope.row)" v-else>停用</el-button>
+          </template>
+        </TrsTable>
+        <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="val => getList(val)"
+          scrollType="scrollCom" scrollName="scrollCom" v-if="page.total">
+        </TrsPagination>
+      </div>
     </div>
     <!-- 编辑或新增 标签 -->
-    <el-dialog
-      class="trs-pagination"
-      :visible.sync="limitTimeVisible"
-      width="600px"
-      custom-class="user-dialog"
-      :show-close="false"
-      center
-    >
+    <el-dialog class="trs-pagination" :visible.sync="limitTimeVisible" width="600px" custom-class="user-dialog"
+      :show-close="false" center>
       <template slot="title">
         <span>{{ titleDialog }}</span>
         <span class="close" @click="limitTimeVisible = false"><i class="el-icon-close"></i></span>
       </template>
       <div class="label">
         标签类型
-        <span
-          v-for="item in types"
-          :key="item.id"
-          :class="[
-            'class-common',
-            item.id !== dialogItem.type ? 'class-com' : '',
-            item.id === 1 ? ' class-zero' : ' class-one'
-          ]"
-          @click="handleLabelType(item.id)"
-          >{{ item.value }}</span
-        >
+        <span v-for="item in types" :key="item.id" :class="[
+          'class-common',
+          item.id !== dialogItem.type ? 'class-com' : '',
+          item.id === 1 ? ' class-zero' : ' class-one'
+        ]" @click="handleLabelType(item.id)">{{ item.value }}</span>
       </div>
       <div class="dialog-item">
         <g-table-card :title="dialogTitle">
@@ -136,11 +88,8 @@
       </div>
     </el-dialog>
     <!-- 停用二次确认 -->
-    <secondary-confirmation
-      :option="confirmOption"
-      ref="confirmation"
-      @handleConfirm="handleSubmitLimitTime(dialogItem)"
-    ></secondary-confirmation>
+    <secondary-confirmation :option="confirmOption" ref="confirmation"
+      @handleConfirm="handleSubmitLimitTime(dialogItem)"></secondary-confirmation>
   </div>
 </template>
 <script>
@@ -317,12 +266,15 @@ export default {
 </script>
 <style lang="less" scoped>
 @color1: #1d2128;
+
 .label {
   height: 100%;
   overflow-y: auto;
+
   .el-icon-search {
     cursor: pointer;
   }
+
   .top {
     font-size: 14px;
     margin: 0 -24px;
@@ -331,11 +283,13 @@ export default {
 
     .info {
       margin-bottom: 20px;
+
       &-title {
         font-size: 20px;
         font-weight: 700;
         color: rgba(51, 51, 51, 1);
       }
+
       &-desc {
         margin-left: 20px;
         font-size: 14px;
@@ -350,15 +304,18 @@ export default {
     .search {
       .form {
         display: flex;
+
         &-item {
           // flex: 1;
           display: flex;
           width: 320px;
           margin-right: 0;
           margin-bottom: 0;
+
           &:first-child {
             margin-right: 10px;
           }
+
           &:last-child {
             flex: 1;
 
@@ -367,15 +324,19 @@ export default {
               background-color: transparent;
             }
           }
+
           /deep/.el-form-item__content {
             border-radius: 4px;
             flex: 1;
             display: flex;
+
             .g-btn {
               margin-left: 10px;
+
               .btn {
                 min-width: auto;
                 padding: 0 16px;
+
                 .iconfont {
                   margin-right: 4px;
                 }
@@ -395,11 +356,13 @@ export default {
       height: 34px;
       line-height: 26px;
       border-radius: 6px;
+
       span {
         position: relative;
         bottom: 5px;
       }
     }
+
     .el-button--primary {
       border: none;
     }
@@ -409,11 +372,16 @@ export default {
     height: calc(~'100% - 63px');
     overflow-y: auto;
     padding: 24px 0 0;
+    &-body{
+      height: 100%;
+      overflow: auto;
+    }
   }
 
   .el-button--text {
     padding: 5px;
   }
+
   /deep/.el-dialog {
     .el-dialog__header {
       padding: 0;
@@ -422,6 +390,7 @@ export default {
       color: @color1;
       line-height: 24px;
       height: 24px;
+
       .close {
         float: right;
         font-size: 24px;
@@ -431,34 +400,42 @@ export default {
         }
       }
     }
+
     .el-dialog__body {
       padding: 0;
     }
   }
+
   /deep/.el-dialog.user-dialog {
     border-radius: 10px;
     padding: 40px;
+
     .label {
       margin: 24px 20px 0;
       display: flex;
       align-items: center;
+
       .class-com {
         background-color: #f7f8fa;
         color: #86909c;
       }
+
       .class-common {
         margin-left: 12px;
 
         cursor: pointer;
+
         &:last-child {
           margin-left: 10px;
         }
       }
     }
+
     .dialog-item {
       padding: 24px 20px;
       margin-bottom: 78px;
     }
+
     .dialog-footer {
       .g-button {
         .btn {
@@ -472,36 +449,41 @@ export default {
   /deep/.el-dialog.stop-dialog {
     border-radius: 10px;
     padding: 20px 20px 40px;
+
     .dialog-item {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-bottom: 40px;
+
       .icon {
         margin-bottom: 16px;
         color: #fdb123;
         font-size: 54px;
       }
+
       .info {
         padding: 0 60px;
         text-align: center;
         color: #1d2128;
       }
     }
+
     .el-dialog__footer {
       padding: 0;
+
       .dialog-footer {
         display: flex;
         justify-content: center;
         align-items: center;
+
         .g-button {
           margin-right: 24px;
+
           .btn-primary {
-            background-image: linear-gradient(
-              to right,
-              rgba(47, 84, 235, 1),
-              rgba(81, 150, 255, 1)
-            );
+            background-image: linear-gradient(to right,
+                rgba(47, 84, 235, 1),
+                rgba(81, 150, 255, 1));
           }
         }
       }
@@ -510,11 +492,13 @@ export default {
 
   /deep/ .tableCard {
     padding: 0;
+
     .left {
       position: relative;
       left: -8px;
     }
-    & > .content {
+
+    &>.content {
       margin-top: 20px;
       font-weight: 700;
       color: @color1;
@@ -524,6 +508,7 @@ export default {
   /deep/.el-radio-group {
     display: flex;
     flex-wrap: wrap;
+
     .el-radio {
       // display: flex;
       // align-items: center;
@@ -533,22 +518,28 @@ export default {
       margin-right: 10px;
       border-radius: 4px;
       background: #f7f8fa;
+
       &:nth-child(3n) {
         margin-right: 0;
       }
     }
   }
+
   /deep/.el-dialog__footer {
     padding: 0;
+
     .dialog-footer {
       display: flex;
       justify-content: center;
       align-items: center;
+
       .g-button {
         margin-right: 20px;
+
         .btn {
           height: 36px;
         }
+
         .btn-primary {
           background: #306ef5;
         }
@@ -567,6 +558,7 @@ export default {
     border-radius: 4px;
     color: #fa8c16;
   }
+
   .class-zero {
     padding: 4px 12px;
     background: #fff1f0;
@@ -584,10 +576,12 @@ export default {
 .option-info {
   display: flex;
   justify-content: space-between;
+
   .left {
     flex: 1;
     overflow: hidden;
   }
+
   .right {
     position: relative;
     left: 10px;
@@ -595,6 +589,7 @@ export default {
     align-items: center;
     font-size: 20px;
     -webkit-transform: scale(0.5);
+
     &::before {
       display: inline-block;
       content: '';
@@ -603,14 +598,18 @@ export default {
       height: 6px;
       border-radius: 50%;
     }
+
     &-zero {
       color: #eb5757;
+
       &::before {
         background: #eb5757;
       }
     }
+
     &-one {
       color: #fa8c16;
+
       &::before {
         background: #fa8c16;
       }
@@ -625,6 +624,4 @@ export default {
     line-height: 28px;
   }
 }
-
-
 </style>

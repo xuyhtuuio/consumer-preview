@@ -123,11 +123,11 @@ export function concernApplication(param) {
   })
 }
 
-export function getApprovalRecordByFromid(param) {
+export function instanceInfo(param) {
   return request({
-    url: '/cpr/approvalrecord/getApprovalRecordByFromId',
+    url: '/cpr/workspace/process/instanceInfo',
     method: 'post',
-    contentType:'application/x-www-form-urlencoded',
+    // contentType:'application/x-www-form-urlencoded',
     data: param
   })
 }

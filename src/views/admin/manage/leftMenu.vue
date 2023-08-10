@@ -1,6 +1,6 @@
 <template>
   <el-menu router :default-active="$route.path">
-    <el-menu-item
+    <!-- <el-menu-item
       index="/admin/manage/userManage"
       :class="{ 'is-active': $route.name === 'UserManage' }"
       >用户管理</el-menu-item
@@ -9,7 +9,7 @@
       index="/admin/manage/rolePermission"
       :class="{ 'is-active': $route.name === 'RolePermission' }"
       >角色/权限</el-menu-item
-    >
+    > -->
     <el-menu-item
       index="/admin/manage/flowManage"
       :class="{ 'is-active': $route.name === 'FlowManage' }"

@@ -10,26 +10,26 @@
       </div>
       <div class="right">
         <p class="taskname-staff">
-          <span class="taskname">{{ activity.nodeId }}</span>
+          <span class="taskname">{{ activity.name }}</span>
           <span class="staff">
-            <i>{{ activity.approverName }}</i>
-            <i class="post" v-if="activity.approverOrgName">（{{ activity.approverOrgName }}）</i>
+            <i>{{ activity.nodeUser }}</i>
+            <i class="post" v-if="activity.orgName">（{{ activity.orgName }}）</i>
             <img src="@/assets/image/ai-approval/record-avatar.svg" alt="" />
           </span>
         </p>
         <div class="time-notes">
-          <div v-if="activity.taskName == '发起申请'">
-            任务发起：{{ activity.startingtime }}
+          <div v-if="activity.activityId == 'root'">
+            任务发起：{{ activity.createTime|timeFormat }}
           </div>
           <div class="time-note" v-else>
             <span>任务到达：{{ activity.createTime | timeFormat }}</span>
-            <span class="handle-time">处理：<i>{{ activity | handleTimeFormat }} 小时</i></span>
-            <span>任务结束：{{ activity.updateTime | timeFormat }}</span>
+            <span class="handle-time">处理：<i>{{ activity.handleTime }}</i></span>
+            <span>任务结束：{{ activity.endTime | timeFormat }}</span>
           </div>
         </div>
-        <div class="opinions" v-if="activity.taskName !== '发起申请'">
+        <div class="opinions" v-if="activity.activityId !== 'root'">
           <!-- ocr审批有个关联的审查要点 -->
-          <div class="point opinions-item">
+          <!-- <div class="point opinions-item">
             <div class="opinion-tag">
               <span class="approval-point-icon guanzhu" style="background: #505968;color: #fff">
                 <i class="iconfont icon icon-tubiao4"></i>审查要点
@@ -41,11 +41,12 @@
               <span>不符合以下要点</span><br />
               <span><i style="color: #86909C;">审查要点：</i>承担义务不得低于宣传所承诺的标准</span>
             </div>
-          </div>
-          <div v-for="(item, idx) in activity.editedCommentsList" :key="idx" class="opinions-item">
-            <div class="opinion-tag">
+          </div> -->
+          <div v-for="(item, idx) in activity.optionVOList" :key="idx" class="opinions-item">
+               <!-- v-if="activity.targetPage === 'ocr'" -->
+            <!-- <div class="opinion-tag">
               <span v-if="item.substantiveOpinions == 1" class="guanzhu">
-                <!-- v-if="activity.targetPage === 'ocr'" -->
+             
                 <i class="iconfont icon icon-guanzhu"></i>
                 有实质意见
               </span>
@@ -53,9 +54,9 @@
                 <i class="iconfont icon icon-guanzhu2"></i>
                 无实质意见
               </span>
-            </div>
-            <p class="opinion-text">{{ idx + 1 }} {{ item.content }}</p>
-            <div class="relevant-file">
+            </div> -->
+            <p class="opinion-text">{{ idx + 1 }} {{ item.comments }}</p>
+            <!-- <div class="relevant-file">
               关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.fileList && item.fileList[0] }} </i>
               <el-popover placement="bottom" popper-class="file-overview-popper" trigger="click"
                 v-if="item.fileList && item.fileList.length > 1">
@@ -66,7 +67,7 @@
                 </div>
                 <i slot="reference">+{{ item.fileList.length - 1 }}</i>
               </el-popover>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -76,7 +77,7 @@
 </template>
 <script>
 import moment from 'moment';
-import { getApprovalRecordByFromid } from '@/api/applyCenter'
+import { instanceInfo } from '@/api/applyCenter'
 import empty from '@/components/common/empty'
 export default {
   components: { empty },
@@ -97,20 +98,23 @@ export default {
   mounted() {
     this.init()
   },
+  activated(){
+    this.init()
+  },
   methods: {
     init() {
       this.loading = true
-      getApprovalRecordByFromid({
-        formId: this.$route.params.formId ||this.sidebarParam.formId
+      instanceInfo({
+        "processInstanceId": this.$route.params.processInstanceId||this.sidebarParam.processInstanceId||'32054c89-35d8-11ee-888e-d4d853dcb3dc',
       }).then(res => {
-        const { data } = res.data
-        if (!data) {
+        const { endDetailsList } = res.data.data
+        if (!endDetailsList) {
           return this.hasData = false
         }
-        this.recordList = data instanceof Array&&data.length ? data.map(v => {
+        this.recordList = endDetailsList instanceof Array&& endDetailsList.length ? endDetailsList.map(v => {
           return {
             ...v,
-            editedCommentsList: v.editedCommentsList.length ? v.editedCommentsList.map(m => {
+            editedCommentsList: v.editedCommentsList&&v.editedCommentsList.length ? v.editedCommentsList.map(m => {
               return {
                 ...m,
                 fileList: m.associatedAttachmentsIds.split(',')
@@ -118,7 +122,7 @@ export default {
             }) : []
           }
         }) : []
-        return this.hasData = false
+        return this.hasData = true
 
       }).finally(() => {
         this.loading = false

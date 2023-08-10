@@ -131,7 +131,8 @@ export default {
         params: {
           formId: item.recordId,
           originatorId: item.originator.id,
-          taskName: item.taskName
+          taskName: item.taskName,
+          processInstanceId:item.processInstanceId
         },
       });
     },
@@ -149,7 +150,8 @@ export default {
         params: {
           formId: item.recordId,
           originatorId: item.originator.id,
-          taskName: item.taskName
+          taskName: item.taskName,
+          processInstanceId:item.processInstanceId
         },
       });
     },

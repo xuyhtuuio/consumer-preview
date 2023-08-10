@@ -111,7 +111,6 @@ import {
   toReviseList,
   Approval
 } from "@/api/applyCenter";
-import axiosAll from '@/utils/axios-all'
 import applyEventCard from "@/components/card/apply-event-card";
 export default {
   name: 'apply-center-index',
@@ -421,7 +420,7 @@ export default {
         return {
           ...v,
           formId: v.taskNumber,
-          taskStatus:'1',
+          taskStatus:v.submitted==0?'0':'1',
           initiator:v.sponsorMap,
           currentAssignee: v.currentAssignee && v.currentAssignee.length ? v.currentAssignee.map(m => {
             return {
