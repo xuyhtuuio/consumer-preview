@@ -294,7 +294,7 @@ export default {
       this.reference = this.$refs['sideBar-popover-' + item.toolSign][0].$el
       this.sidebarParam = params
       this.personInfo=param_item.initiator
-      console.log('this.personInfo',this.personInfo)
+      console.log('this.personInfo',this.personInfo,this.sidebarParam)
       this.$nextTick(() => {
         this.showPopper = true
         this.$nextTick(() => {
@@ -770,5 +770,10 @@ export default {
 
 svg.leader-line {
   z-index: 2;
+}
+.preview-dialog{
+  .el-dialog__body{
+    height: 76vh;
+  }
 }
 </style>

@@ -13,20 +13,21 @@
           <i class="iconfont icon-xianxingtubiao"></i>
           <i class="btn">去修改</i>
         </div>
-        <div class="back flex" @click="submit('storage')" v-if="(status == 3 || status == 5) && item.taskStatus != 2">
-          <i class="iconfont icon-baocun"></i>
-          <i class="btn">保存</i>
-        </div>
-        <div class="back flex white" @click="submit('update')"
+        <el-button class="back flex" type="primary" style="border: none;" :loading="loadings.storageLoading" @click="submit('storage')"
           v-if="(status == 3 || status == 5) && item.taskStatus != 2">
-          <i class="iconfont icon-tijiao"></i>
-          <i class="btn">提交</i>
-        </div>
+          <span class="flex"> <i class="iconfont icon-baocun"></i>
+            <i class="btn">保存</i></span>
+        </el-button>
+        <el-button class="back flex white" type="primary" :loading="loadings.submitLoading" @click="submit('update')"
+          v-if="(status == 3 || status == 5) && item.taskStatus != 2">
+          <span class="flex"> <i class="iconfont icon-tijiao"></i>
+            <i class="btn">确认</i></span>
+        </el-button>
         <div v-if="isOCR" class="flex">
-          <div class="back flex" @click="transferDialog = true">
+          <!-- <div class="back flex" @click="transferDialog = true">
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
-          </div>
+          </div> -->
           <div class="back flex" v-if="!isOCR" @click="submit('storage')">
             <i class="iconfont icon-baocun"></i>
             <i class="btn">保存</i>
@@ -39,6 +40,9 @@
             <i class="iconfont icon-yijianshu"></i>
             <i class="btn">审查</i>
           </div>
+
+
+
         </div>
       </div>
     </div>
@@ -56,8 +60,8 @@
           <span class="order-class tag" v-if="item.processDefinitionName">{{ item.processDefinitionName }}</span>
           <span class="event-status">
             <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
-            <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中<i
-                v-if="item.currentActivityName">>{{ item.currentActivityName }}</i></i>
+            <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中<i v-if="item.currentActivityName">>{{
+              item.currentActivityName }}</i></i>
             <i v-if="item.taskStatus === '2'" class="tag in-modify">待修改<i v-if="item.currentActivityName">>{{
               item.currentActivityName }}</i></i>
             <i v-if="item.taskStatus === '3'" class="tag check">待确认<i v-if="item.currentActivityName">>{{
@@ -91,10 +95,10 @@
               crtComp = 'approvedOpinionCard';
             }
               ">审查意见书</span>
-            <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
+            <!-- <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
               crtComp = 'uploadFileCard';
             }
-              "><i style="color: #eb5757">*</i> 最终上线材料</span>
+              "><i style="color: #eb5757">*</i> 最终上线材料</span> -->
             <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
               crtComp = 'approvalRecordCard';
             }
@@ -106,10 +110,10 @@
               crtComp = 'approvedOpinionCard';
             }
               ">审查意见书</span>
-            <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
+            <!-- <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
               crtComp = 'uploadFileCard';
             }
-              "><i style="color: #eb5757">*</i> 最终上线材料</span>
+              "><i style="color: #eb5757">*</i> 最终上线材料</span> -->
             <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
               crtComp = 'approvalRecordCard';
             }
@@ -167,7 +171,7 @@
         <el-button type="text" @click="transferDialog = false" class="submit-btn">确定</el-button>
       </span>
     </el-dialog>
-    <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
+    <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog" >
       <filePreview :url="previewUrl"></filePreview>
     </el-dialog>
   </div>
@@ -208,6 +212,10 @@ export default {
       orderBaseInfo: {},
       item: {},
       isOCR: false,
+      loadings: {
+        submitLoading: false,
+        storageLoading: false,
+      },
       peoples: [
         { name: "王明明", code: 1 },
         { name: "王明明", code: 2 },
@@ -220,20 +228,24 @@ export default {
     };
   },
   activated() {
+    this.clearStoreStatus()
     this.judgeStatus();
   },
   mounted() {
     if (!this.$route.params.formId) {
-    const { path } = this.$route
-    const url = path.match(/\/(\S*)\//)[1]
-    this.$router.replace({
-      name: url
-    })
+      const { path } = this.$route
+      const url = path.match(/\/(\S*)\//)[1]
+      this.$router.replace({
+        name: url
+      })
     }
     this.judgeStatus();
   },
   created() { },
   methods: {
+    clearStoreStatus() {
+      this.$store.commit('setCheckApprovedFormFalse')
+    },
     startLoading() { this.loading = true },
     previewFile(url) {
       this.previewDialog = true
@@ -251,11 +263,11 @@ export default {
       // 一般进入详情页：展示返回按钮 及 审批记录详细
       // 已经结束的工单 展示: 返回按钮、审批记录详细、审查意见书、最终上线材
       // <!-- 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
-      let { item } = JSON.parse(window.sessionStorage.getItem("order-detail"));
-      const info = JSON.parse(window.sessionStorage.getItem("order-detail"));
+      let { item } = JSON.parse(window.localStorage.getItem("order-detail"));
+      const info = JSON.parse(window.localStorage.getItem("order-detail"));
       this.info = info
       this.item = item
-      item.taskStatus= 0
+
       // 草稿
       if (item.taskStatus == 0) {
         this.status = 0;
@@ -339,18 +351,27 @@ export default {
       const params = approvedOpinionForm.map(v => {
         return { ...v, cacheFlag: 1 }
       })
+      this.loadings.storageLoading = true
       updateEditedComments(params).then(res => {
         const { status } = res.data
         if (status == 200) {
+          this.loadings.storageLoading = false
           this.$store.commit('setOpinionStorage', true)
-          this.$message.success({ showClose: true, message: '已保存当前意见确认内容' })
+          this.$message.success({ message: '已保存当前意见确认内容' })
         }
+      }).catch(()=>{
+        this.loadings.storageLoading = false
       })
+
     },
     //保存编辑意见功能
     saveEditOpinion() {
+      this.loadings.storageLoading = true
       this.$store.commit('setEditOpinionStorage', true)
-      this.$message.success({ showClose: true, message: '已保存当前意见确认内容' })
+      setTimeout(() => {
+        this.$message.success({  message: '已保存当前意见确认内容' })
+        this.loadings.storageLoading = false
+      }, 2000)
     },
 
     submit(way) {
@@ -397,17 +418,17 @@ export default {
           return false
         }
         // 定位上线材料
-        if (!uploadFileRequired) {
-          this.$message({
-            type: 'warning',
-            customClass: 'el-icon-warning-one',
-            message: '当前未上传最终上线材料，请上传材料后提交'
-          })
-          this.crtComp = 'uploadFileCard'
-          return false
-        }
+        // if (!uploadFileRequired) {
+        //   this.$message({
+        //     type: 'warning',
+        //     customClass: 'el-icon-warning-one',
+        //     message: '当前未上传最终上线材料，请上传材料后提交'
+        //   })
+        //   this.crtComp = 'uploadFileCard'
+        //   return false
+        // }
         // 意见提交
-        if (approvedOpinionRequired && uploadFileRequired) {
+        if (approvedOpinionRequired) {
           if (way == 'update') {
             // 细分已采纳，存在未采纳
             const { approvedOpinionForm } = this.$store.state.checkApprovedForm
@@ -420,9 +441,11 @@ export default {
                 type: "warning",
               })
                 .then(() => {
+                  this.loadings.submitLoading =true
                   that.submitOpinion()
                 })
                 .catch(() => {
+                  this.loadings.submitLoading =false
                 });
             } else {
               this.$confirm("当前存在不采纳意见，是否继续提交？", "", {
@@ -433,9 +456,11 @@ export default {
                 type: "warning",
               })
                 .then(() => {
+                  this.loadings.submitLoading =true
                   that.submitOpinion()
                 })
                 .catch(() => {
+                  this.loadings.submitLoading =false
                 });
             }
             //上线材料提交
@@ -466,9 +491,11 @@ export default {
               type: "warning",
             })
               .then(() => {
+                this.loadings.submitLoading =true
                 that.submitOpinion(true, 1)
               })
               .catch(() => {
+                this.loadings.submitLoading =false
               });
           } else {
             this.$confirm("当前存在未采纳的“实质意见”，提交后将会进一步审核，是否继续提交？", "", {
@@ -478,10 +505,12 @@ export default {
               closeOnClickModal: false,
               type: "warning",
             })
-              .then(() => {
+              .then(() => {      
+                this.loadings.submitLoading =true
                 that.submitOpinion(true, 0)
               })
               .catch(() => {
+                this.loadings.submitLoading =false
               });
           }
 
@@ -522,6 +551,7 @@ export default {
         //上传文件的逻辑
       }
       updateAdoptEditedComments(params).then(res => {
+        this.loadings.submitLoading =false
         //有实质意见且采纳所以的有实质意见
         if (type && type == 1) {
           this.$confirm("审查意见已确认，请根据审查意见修改提单内容。", "", {
@@ -551,6 +581,8 @@ export default {
             type: "warning",
           })
         }
+      }).catch(err=>{
+        this.loadings.submitLoading =false
       })
     }
   },
@@ -856,5 +888,13 @@ export default {
   }
 
 
+}
+</style>
+<style lang="less">
+
+.preview-dialog{
+  .el-dialog__body{
+    height: 76vh;
+  }
 }
 </style>
