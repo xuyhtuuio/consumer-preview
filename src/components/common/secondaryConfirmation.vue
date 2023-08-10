@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { debounce } from 'lodash';
 export default {
   props: {
     option: {
@@ -32,10 +33,10 @@ export default {
       this.dialogVisible = false;
       this.$emit("handleClose", true)
     },
-    handleConfirm() {
+    handleConfirm: debounce(function() {
       this.dialogVisible = false;
       this.$emit("handleConfirm")
-    }
+    }, 500)
   }
 }
 </script>

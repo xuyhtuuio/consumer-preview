@@ -71,21 +71,30 @@ export default {
     validate(err){
       try {
         console.log(this.config.props.assignedType)
-        return this.showError = !this[`validate_${this.config.props.assignedType}`](err)
+        this.showError = !this[`validate_${this.config.props.assignedType}`](err)
+        if (!this.config.targetPage) {
+          const error1 = err.push(`${this.config.name} 目标页面未配置`)
+          this.showError = Boolean(error1)
+        }
+        return Boolean(this.showError)
       } catch (e) {
         return true;
       }
     },
     // 上一个审批人选中
     validate_SELF_SELECT(err){
-      if (this.config.name === '二次会签' && this.config.props.target) {
-        return true;
+      let msg = '审批'
+      if (this.config.name === '二次会签') {
+        msg = '二次会签'
+        if (this.config.props.target) {
+          return true;
+        }
       }
       if(this.config.name !== '二次会签' && this.config.props.assignedUser.length > 0){
         return true;
       }else {
-        this.errorInfo = '请指定审批人员'
-        err.push(`${this.config.name} 未指定审批人员`)
+        this.errorInfo = `请指定${msg}人员`
+        err.push(`${this.config.name} 未指定${msg}人员`)
         return false
       }
     },
