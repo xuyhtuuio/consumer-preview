@@ -127,7 +127,7 @@ export function timestampToNormal(date, format = '-') {
 }
 // 时间戳转化为yyyy-MM-dd hh:mm:ss
 export function timestampToDateTime(date, format = '-') {
-  const time = new Date(typeof date === 'string'?date: +date);
+  const time = new Date(typeof date === 'string' ? date : +date);
   const year = time.getFullYear(); // 年
   const month = ('0' + (time.getMonth() + 1)).slice(-2); // 月
   const day = ('0' + time.getDate()).slice(-2); // 日

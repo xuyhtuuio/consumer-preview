@@ -10,7 +10,8 @@
         : 'data-statistics-item active-item'
         ">
         <div class="icon">
-          <img :src="item.value == crtSign ?item.activeIcon :item.icon"  :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
+          <img :src="item.value == crtSign ? item.activeIcon : item.icon"
+            :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
         </div>
         <div class="name-count">
           <span class="name">{{ item.name }}</span>
@@ -42,8 +43,8 @@
                 :value="item.value"></el-option>
             </el-select>
             <el-cascader :options="agenciesList" placeholder="提单机构" ref="agencies" v-model="search.orgIds"
-              :show-all-levels="false" @change="changeAgencies"  
-              :props="{ checkStrictly: true,label: 'name', value: 'id', children: 'children', }" clearable></el-cascader>
+              :show-all-levels="false" @change="changeAgencies"
+              :props="{ checkStrictly: true, label: 'name', value: 'id', children: 'children', }" clearable></el-cascader>
             <el-select v-model="search.updateTime2" placeholder="排序" ref="multiSelect" multiple @change="changeSort"
               :class="search.updateTime2[1] == 'desc'
                 ? 'arrow-select descArrow'
@@ -381,7 +382,7 @@ export default {
         ...this.search,
         listType,
         nodeid: this.search.approvalStage,
-        orgIds:this.search.orgIds.length?this.search.orgIds:null,
+        orgIds: this.search.orgIds.length ? this.search.orgIds : null,
 
       };
       let sortType = "";
@@ -421,7 +422,7 @@ export default {
             taskNumber: v.recordId + '',
             taskName: v.entryName,
             initiator: v.originator,
-            taskStatus: this.taskStatusSwitch(v.nodeStatus)
+            taskStatus: v.nodeStatus
           }
         }) : [];
         this.search.loading = false;
@@ -466,11 +467,11 @@ export default {
       this.searchList();
     },
   },
-  beforeRouteEnter(to,from,next){
-    next(()=>{
+  beforeRouteEnter(to, from, next) {
+    next(() => {
       localStorage.removeItem('order-detail')
     })
-   },
+  },
 };
 </script>
 <style lang="less" scoped>

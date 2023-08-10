@@ -420,8 +420,9 @@ export default {
         return {
           ...v,
           formId: v.taskNumber,
-          taskStatus:v.submitted==0?'0':'1',
+          taskStatus:v.submitted==0?'0':v.businessStatus,
           initiator:v.sponsorMap,
+          processInstanceId:v.process_instance_id,
           currentAssignee: v.currentAssignee && v.currentAssignee.length ? v.currentAssignee.map(m => {
             return {
               ...m,

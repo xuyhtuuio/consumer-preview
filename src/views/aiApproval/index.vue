@@ -280,7 +280,7 @@ export default {
           params = {
             formId: param_item.taskNumber,
             originatorId: param_item.originatorId,
-    
+            formManagementId:param_item.formManagementId
           }
           break;
         case 'approvalRecordDetail':

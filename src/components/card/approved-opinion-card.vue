@@ -39,7 +39,7 @@
               </el-popover>
             </div>
             <!-- 审批的时候选择采纳与否 -->
-            <div class="accept-box" v-if="(status == '3' || status == '5') && taskStatus != 2">
+            <div class="accept-box" v-if="(status == '3' || status == '5') && taskStatus != 3">
               <el-radio-group v-model="child.adoptOpinions" @change="changeAccept(child, index, idx)">
                 <el-radio :label="1">采纳</el-radio>
                 <el-radio :label="0">不采纳</el-radio>
@@ -54,7 +54,7 @@
               </el-form>
             </div>
             <!-- 正常显示采纳与否 -->
-            <div class="isAdopt-box" v-if="status == '4' || taskStatus == 2">
+            <div class="isAdopt-box" v-if="status == '4' || taskStatus == 3">
               <span v-if="child.adoptOpinions == 1" class="accept">已采纳</span>
               <span v-if="child.adoptOpinions == 0" class="no-accept">不采纳</span>
               <div v-if="child.adoptOpinions == 0" class="desc">
@@ -79,7 +79,7 @@ export default {
   props: {
     // 3 5显示复选框 4 显示已采纳 不采纳
     status: { type: Number, default: 0 },
-    taskStatus: { type: Number, default: 0 },
+    taskStatus: { type: String, default: '0' },
     sidebarParam: {
       type: Object,
       default: () => { }
@@ -129,11 +129,9 @@ export default {
     },
     getEditedCommentsByFormId() {
       this.loading = true
-      getEditedCommentsByFormId({ formId: '158' }).then(res => {
+      getEditedCommentsByFormId({ formId: this.$route.params.formId }).then(res => {
         const { data } = res.data
-
         const keys = Object.keys(data)
-
         if (data?.constructor !== Object) {
           return this.hasData = false
         }
