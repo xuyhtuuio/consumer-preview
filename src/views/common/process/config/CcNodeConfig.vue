@@ -14,6 +14,8 @@
         <div class="tag-box" v-for="(item, index) in select" :key="index">
           <TrsTag :tag="{...item, ...tagConfig}" @handleClose="removeOrgItem(index)" />
         </div>
+        <i class="iconfont icon-zhankai" v-if="select?.length && !isCollapse && showCollapse" @click="handleCollapse($event, 'isCollapse')"></i>
+        <i class="iconfont icon-shouqi" v-if="select?.length && isCollapse && showCollapse" @click="handleCollapse($event, 'isCollapse')"></i>
       </div>
     </div>
     <p style="color: #86909C;font-size: 12px;margin-top:20px">抄送对象仅可查看申请单，无其他操作权限</p>
@@ -40,6 +42,8 @@ export default {
   },
   data() {
     return {
+      isCollapse: false,
+      showCollapse: false,
       showOrgSelect: false,
       tagConfig: {
         background: '#f0f6ff',
@@ -61,7 +65,36 @@ export default {
       }
     }
   },
+  mounted() {
+    this.initCollapse('.tag-action', 'showCollapse')
+  },
   methods: {
+    // 展开收起
+    handleCollapse(e, isCollapse) {
+      const height = e.target.parentNode.getBoundingClientRect().height
+      if (height > 150) {
+        e.target.parentNode.style.height = '150px'
+        this[isCollapse] = false
+      } else {
+        e.target.parentNode.style.height = 'auto'
+        this[isCollapse] = true
+      }
+       console.log(this[isCollapse])
+    },
+    initCollapse(selector, showType) {
+      this.$nextTick(() => {
+        const dom = document.querySelector(selector)
+        if (!dom) return;
+        const height = dom.getBoundingClientRect().height
+        if (height < 151) {
+          dom.style.height = 'auto'
+          this[showType] = false
+        } else {
+          dom.style.height = '150px'
+          this[showType] = true
+        }
+      })
+    },
     closeSelect(){
       this.showOrgSelect = false
     },
@@ -77,11 +110,7 @@ export default {
           label: val.label
         }))
       }
-      // select.forEach(val => this.select.push({
-      //   ...val,
-      //   label: val.name,
-      //   ...this.tagConfig
-      // }))
+      this.initCollapse('.tag-action', 'showCollapse')
     },
     removeOrgItem(index){
       console.log(index)
@@ -116,6 +145,16 @@ export default {
 }
 .tag-action {
   text-align: left;
+  position: relative;
+  overflow: hidden;
+  i {
+    position: absolute;
+    right: 0;
+    bottom: 4px;
+    color: #2d5cf6;
+    font-size: 12px;
+    cursor: pointer;
+  }
 }
 .tag-box {
   display: inline-block;

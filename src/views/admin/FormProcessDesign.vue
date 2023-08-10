@@ -104,8 +104,7 @@ export default {
     async loadFormInfo(formId){
       const res = await getProcessDetail(formId)
       const design = res.data.data
-      console.log(design)
-      design.formId = +design.formId
+      design.formId = +design.formId || ''
       design.settings = JSON.parse(design.settings)
       design.formItems = JSON.parse(design.formItems)
       design.process = JSON.parse(design.process)
@@ -189,7 +188,7 @@ export default {
     },
     async saveProcess(callback) {
       console.log(this.$refs['baseSetting'].setup.templateName)
-      if ((this.$refs['baseSetting'].setup.templateName === null) ||  (this.$refs['baseSetting'].setup.templateName?.length < 2) || (this.$refs['baseSetting'].setup.templateName?.length > 10)) {
+      if ((!this.$refs['baseSetting'].setup.templateName) ||  (this.$refs['baseSetting'].setup.templateName?.length < 2) || (this.$refs['baseSetting'].setup.templateName?.length > 10)) {
         this.$message.warning('流程名称未设置或长度不对')
         return false;
       }
@@ -300,7 +299,7 @@ export default {
   & > div{
     padding: 5px;
     margin: 2px 0;
-    width: 220px;
+    width: 250px;
     text-align: left;
     border-radius: 3px;
     background: rgb(242 242 242);

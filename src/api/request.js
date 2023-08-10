@@ -59,9 +59,6 @@ service.interceptors.request.use(
       // 产业大脑会话保持
       const satoken = window.localStorage.getItem('AI_token');
       satoken && (config.headers.Authorization = `bearer ${satoken}`)
-      // 风控请求
-      const Authorization = window.localStorage.getItem("Authorization");
-      (Authorization && config.url.indexOf('/consumer_test/') === 0) && (config.headers.Authorization = `bearer ${Authorization}`)
     }
 
 		return config;

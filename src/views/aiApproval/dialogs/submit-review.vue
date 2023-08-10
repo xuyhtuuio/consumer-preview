@@ -51,7 +51,6 @@
             <div class="submission-content" v-if="submission.length">
                 <p class="submission-name">
                     拟同意{{ params.submissionName }}活动，并提出以下消保审查意见：
-
                 </p>
                 <div class="submission-list">
                     <div class="submission-item" v-for="(item, index) in submission" :key="index" @mouseleave="mouseleave"
@@ -64,12 +63,12 @@
                         <div class="submission-op">
                             <!-- <i>无实质意见</i> -->
                             <el-tooltip class="item" content="点击意见标签切换意见类型" placement="bottom">
-                                <span v-if="item.opinion" class="opinion has-opinion" @click="item.opinion = !item.opinion">
-                                    <i class="iconfont icon icon-guanzhu"></i>
+                                <span v-if="item.opinion" class="opinion no-opinion" @click="item.opinion = !item.opinion">
+                                    <i class="iconfont icon icon-guanzhu2"></i>
                                     有实质意见
                                 </span>
-                                <span v-if="!item.opinion" class="opinion no-opinion" @click="item.opinion = !item.opinion">
-                                    <i class="iconfont icon icon-guanzhu2"></i>
+                                <span v-if="!item.opinion" class="opinion has-opinion" @click="item.opinion = !item.opinion">
+                                    <i class="iconfont icon icon-guanzhu"></i>
                                     无实质意见
                                 </span>
                             </el-tooltip>

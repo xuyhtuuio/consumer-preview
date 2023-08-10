@@ -19,8 +19,8 @@
           </span>
         </div>
         <div class="node-body-main-content">
-          <span class="placeholder" v-if="(config.props.expression || '').trim() === ''">{{placeholder}}</span>
-          <span v-else>{{config.props.expression}}</span>
+          <span class="placeholder" v-if="!content">{{placeholder}}</span>
+          <span v-else>{{content}}</span>
         </div>
         <div class="node-body-main-footer">
           <span class="level">优先级{{level}}</span>
@@ -71,7 +71,8 @@ export default {
     return {
       placeholder: '请设置条件',
       errorInfo:'',
-      showError: false
+      showError: false,
+      content: ''
     }
   },
   // computed:{
@@ -81,8 +82,17 @@ export default {
   // },
   watch: {
     config: {
-      handler(val) {
-        console.log(val)
+      handler() {
+        this.content = ''
+        this.config.props.groups.forEach((g, i) => {
+          g.conditions.forEach(c => {
+            if (c.value.length > 0) {
+             this.content = '已设置'
+             this.showError = false
+            }
+          })
+        })
+        console.log(this.config)
       },
       immediate: true,
       deep: true
@@ -90,15 +100,34 @@ export default {
   },
   methods: {
     //校验数据配置的合法性
-    validate(){
-      // if(this.config.assignedUser && this.config.assignedUser.length > 0){
-      //   this.showError = false
-      // }else {
-      //   this.showError = true
-      //   this.errorInfo = '请选择需要抄送的人员'
-      // }
-      // return !this.showError
-      return true
+    validate(err){
+      const map = {
+        0: 'A',
+        1: 'B',
+        2: 'C',
+        3: 'D',
+        4: 'E',
+        5: 'F',
+        6: 'G',
+        7: 'H',
+        8: 'I',
+        9: 'J',
+      }
+      this.config.props.groups.forEach((g, i) => {
+        if (!g.conditions.length) {
+          this.showError = true
+          this.errorInfo = '请完善条件信息'
+          err.push(`${this.config.name} 条件组${map[i]} 未设置任何条件`)
+        }
+        g.conditions.forEach(c => {
+          if (!c.value || c.value.length === 0) {
+            err.push(`${this.config.name} 条件组${map[i]} 未设置${c.title}`)
+            this.showError = true
+            this.errorInfo = '请完善条件信息'
+          }
+        })
+      })
+      return this.showError
     }
   }
 }

@@ -22,22 +22,20 @@
             <i class="tag end-sign"> 已结束 </i>
           </i>
           <!-- 有无意见 -->
-          <i v-if="item.taskStatus === '3' || item.taskStatus === '4'" class="flex">
+          <i  class="flex" v-if="item.taskStatus === '3' || item.taskStatus === '4'">
             <i class="tag has-opinion" v-if="item.hasOpinions == 1">
-              <svg class="icon" aria-hidden="true">
-                <use xlink:href="#icon-guanzhu2"></use>
-              </svg>
+              <i class="iconfont icon-guanzhu2"></i>
               有实质性意见
             </i>
             <i class="tag has-no-opinion" v-if="item.hasOpinions !== 1">
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
-            <i class="tag check" v-if="item.adoptionStatus == 0&&item.taskStatus!='3'">
+            <i class="tag check" v-if="item.adoptionStatus == 0 && item.taskStatus != '3'">
               <i class="iconfont icon-guanzhu2"></i>
               不采纳
             </i>
-            <i class="tag adoption" v-if="item.adoptionStatus == 1&&item.taskStatus!='3'">
+            <i class="tag adoption" v-if="item.adoptionStatus == 1 && item.taskStatus != '3'">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tubiao"></use>
               </svg>
@@ -171,11 +169,15 @@ export default {
   },
   methods: {
     toDetail(item) {
-      window.sessionStorage.setItem(
+      if (item.submitted == 0) {
+         this.modify(item)
+         return
+      }
+      window.localStorage.setItem(
         "order-detail",
         JSON.stringify({
           item,
-          clickPoint:'taskName',
+          clickPoint: 'taskName',
         })
       );
       this.$router.push({
@@ -183,12 +185,12 @@ export default {
         params: {
           formId: item.taskNumber,
           originatorId: item.userId,
-          taskName:item.taskName
+          taskName: item.taskName
         },
       });
     },
     check(item) {
-      window.sessionStorage.setItem(
+      window.localStorage.setItem(
         "order-detail",
         JSON.stringify({
           item: item,
@@ -201,7 +203,7 @@ export default {
         params: {
           formId: item.taskNumber,
           originatorId: item.userId,
-          taskName:item.taskName
+          taskName: item.taskName
         },
       });
     },
@@ -276,7 +278,7 @@ export default {
     concern(item) {
       const param = {
         recordId: item.taskNumber,
-        type:1
+        type: 1
       };
       concernApplication(param).then((res) => {
         if (res.status == 200) {
@@ -542,7 +544,7 @@ export default {
       background: #fff7e6;
       padding: 4px 8px 4px 4px;
     }
-    
+
     .del:hover {
       border-radius: 2px;
       background: #fff1f0;
@@ -564,7 +566,8 @@ export default {
       background: #e6fffb;
       border-radius: 2px;
     }
-    .del{
+
+    .del {
       color: #EB5D78;
     }
 
@@ -577,7 +580,8 @@ export default {
 
 .apply-event-card:hover {
   background: #f7f8fa;
-  .event-name{
+
+  .event-name {
     color: #2D5CF6;
     cursor: pointer;
   }

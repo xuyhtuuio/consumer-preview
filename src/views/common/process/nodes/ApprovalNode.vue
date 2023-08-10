@@ -70,22 +70,40 @@ export default {
     //校验数据配置的合法性
     validate(err){
       try {
-        console.log(this.config.props.assignedType)
-        return this.showError = !this[`validate_${this.config.props.assignedType}`](err)
+        this.showError = false
+        if (this.config.type === 'APPROVAL') {
+          this.showError = !this[`validate_${this.config.props.assignedType}`](err)
+          if (!this.config.props.targetPage) {
+            err.push(`${this.config.name} 目标页面未配置`)
+            this.showError = true
+          }
+          if (this.config.props.refuseWay === 'TO_NODE' && !this.config.props.refuseNode) {
+            err.push(`${this.config.name} 未配置驳回到指定节点`)
+            this.showError = true
+          }
+        } else {
+          // 二次会签
+          if (!this.config.props.target) {
+            this.errorInfo = `请指定二次会签人员`
+            err.push(`${this.config.name} 未指定二次会签人员`)
+            this.showError = true
+          } else {
+            this.showError = false
+          }
+        }
+        return this.showError
       } catch (e) {
         return true;
       }
     },
     // 上一个审批人选中
     validate_SELF_SELECT(err){
-      if (this.config.name === '二次会签' && this.config.props.target) {
-        return true;
-      }
-      if(this.config.name !== '二次会签' && this.config.props.assignedUser.length > 0){
+      const msg = '审批'
+      if(this.config.props.assignedUser.length > 0){
         return true;
       }else {
-        this.errorInfo = '请指定审批人员'
-        err.push(`${this.config.name} 未指定审批人员`)
+        this.errorInfo = `请指定${msg}人员`
+        err.push(`${this.config.name} 未指定${msg}人员`)
         return false
       }
     },

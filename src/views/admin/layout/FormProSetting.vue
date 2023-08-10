@@ -45,6 +45,9 @@ export default {
   },
   methods: {
     validate(){
+      if (this.setup.undo && !this.setup.target) {
+        return ['请选择指定节点']
+      }
       return []
     },
     visibleChange(show) {
@@ -69,6 +72,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-select:last-of-type {
+  margin-right: 0;
+}
+
+/deep/ .el-select .el-input .el-icon-arrow-up::before {
+  font-family: element-icons !important;
+  content: "\e78f";
+}
 .senior-setup {
   overflow: auto;
   margin: 0 auto;
