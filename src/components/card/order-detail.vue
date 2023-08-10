@@ -9,17 +9,17 @@
           <i class="btn">返回</i>
         </div>
         <!-- 只有有修改权限的人能看到 -->
-        <div class="back flex white" v-if="status == 5 && item.taskStatus == 2" @click="toModify">
+        <div class="back flex white" v-if="status == 5 && item.taskStatus == 3" @click="toModify">
           <i class="iconfont icon-xianxingtubiao"></i>
           <i class="btn">去修改</i>
         </div>
-        <el-button class="back flex" type="primary" style="border: none;" :loading="loadings.storageLoading" @click="submit('storage')"
-          v-if="(status == 3 || status == 5) && item.taskStatus != 2">
+        <el-button class="back flex" type="primary" style="border: none;" :loading="loadings.storageLoading"
+          @click="submit('storage')" v-if="(status == 3 || status == 5) && item.taskStatus != 3">
           <span class="flex"> <i class="iconfont icon-baocun"></i>
             <i class="btn">保存</i></span>
         </el-button>
         <el-button class="back flex white" type="primary" :loading="loadings.submitLoading" @click="submit('update')"
-          v-if="(status == 3 || status == 5) && item.taskStatus != 2">
+          v-if="(status == 3 || status == 5) && item.taskStatus != 3">
           <span class="flex"> <i class="iconfont icon-tijiao"></i>
             <i class="btn">确认</i></span>
         </el-button>
@@ -57,14 +57,16 @@
             <use xlink:href="#icon-tongyongtubiao2"></use>
           </svg>
           {{ item.taskName }}
-          <span class="order-class tag" v-if="item.processDefinitionName">{{ item.processDefinitionName }}</span>
+          <span class="order-class tag" v-if="item.formManagementName">{{ item.formManagementName }}</span>
           <span class="event-status">
             <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
             <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中<i v-if="item.currentActivityName">>{{
               item.currentActivityName }}</i></i>
-            <i v-if="item.taskStatus === '2'" class="tag in-modify">待修改<i v-if="item.currentActivityName">>{{
+            <i v-if="item.taskStatus === '2'" class="tag in-approval">撤销<i v-if="item.currentActivityName">>{{
               item.currentActivityName }}</i></i>
-            <i v-if="item.taskStatus === '3'" class="tag check">待确认<i v-if="item.currentActivityName">>{{
+            <i v-if="item.taskStatus === '3'" class="tag in-modify">待修改<i v-if="item.currentActivityName">>{{
+              item.currentActivityName }}</i></i>
+            <i v-if="item.taskStatus === '5'" class="tag check">待确认<i v-if="item.currentActivityName">>{{
               item.currentActivityName }}</i></i>
             <i v-if="item.taskStatus === '4'" class="end">
               <i class="tag end-sign"> 已结束 </i>
@@ -171,7 +173,7 @@
         <el-button type="text" @click="transferDialog = false" class="submit-btn">确定</el-button>
       </span>
     </el-dialog>
-    <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog" >
+    <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <filePreview :url="previewUrl"></filePreview>
     </el-dialog>
   </div>
@@ -267,15 +269,15 @@ export default {
       const info = JSON.parse(window.localStorage.getItem("order-detail"));
       this.info = info
       this.item = item
-
+      item.taskStatus = '5'
       // 草稿
-      if (item.taskStatus == 0) {
+      if (item.taskStatus == '0') {
         this.status = 0;
         this.crtComp = "approvalRecordCard";
         //后期扩展,审批也分好几种类型
       }
       // 审批中 主要区分是否OCR审批、部门审批  所有的的节点
-      if (item.taskStatus == 1) {
+      if (item.taskStatus == '1') {
         if (originRouter == 'applycenter') {
           this.status = 0;
           this.crtComp = "approvalRecordCard";
@@ -289,12 +291,12 @@ export default {
         }
       }
       // 状态待修改 
-      if (item.taskStatus == 2) {
+      if (item.taskStatus == '3') {
         this.status = 5;
         this.crtComp = "approvedOpinionCard";
       }
       //  待确认
-      if (item.taskStatus == 3) {
+      if (item.taskStatus == '5') {
         // 有实质性意见
         if (item.hasOpinions == 1) {
           this.status = 5;
@@ -305,7 +307,7 @@ export default {
         this.crtComp = "approvedOpinionCard";
       }
       // 已结束
-      if (item.taskStatus == 4) {
+      if (item.taskStatus == '4') {
         this.status = 4;
         this.crtComp = "approvedOpinionCard";
       }
@@ -314,7 +316,8 @@ export default {
       this.$router.push({
         name: 'editApply',
         params: {
-          id: this.item.taskNumber
+          id: this.item.taskNumber,
+          formManagementId: this.item.formManagementId
         }
       })
     },
@@ -324,7 +327,7 @@ export default {
       if (this.info) {
         const that = this
         // 当前状态属于待确认的 要保存意见书
-        if ([2, 3, 5].includes(this.status)) {
+        if ([2, 3].includes(this.status) || this.item.taskStatus == '5') {
           const { opinionStorage } = this.$store.state.checkApprovedForm
           if (!opinionStorage || !editOpinionStorage) {
             this.$confirm("是否保存已编辑的意见确认信息？", "", {
@@ -359,7 +362,7 @@ export default {
           this.$store.commit('setOpinionStorage', true)
           this.$message.success({ message: '已保存当前意见确认内容' })
         }
-      }).catch(()=>{
+      }).catch(() => {
         this.loadings.storageLoading = false
       })
 
@@ -369,7 +372,7 @@ export default {
       this.loadings.storageLoading = true
       this.$store.commit('setEditOpinionStorage', true)
       setTimeout(() => {
-        this.$message.success({  message: '已保存当前意见确认内容' })
+        this.$message.success({ message: '已保存当前意见确认内容' })
         this.loadings.storageLoading = false
       }, 2000)
     },
@@ -441,11 +444,11 @@ export default {
                 type: "warning",
               })
                 .then(() => {
-                  this.loadings.submitLoading =true
+                  this.loadings.submitLoading = true
                   that.submitOpinion()
                 })
                 .catch(() => {
-                  this.loadings.submitLoading =false
+                  this.loadings.submitLoading = false
                 });
             } else {
               this.$confirm("当前存在不采纳意见，是否继续提交？", "", {
@@ -456,11 +459,11 @@ export default {
                 type: "warning",
               })
                 .then(() => {
-                  this.loadings.submitLoading =true
+                  this.loadings.submitLoading = true
                   that.submitOpinion()
                 })
                 .catch(() => {
-                  this.loadings.submitLoading =false
+                  this.loadings.submitLoading = false
                 });
             }
             //上线材料提交
@@ -491,11 +494,11 @@ export default {
               type: "warning",
             })
               .then(() => {
-                this.loadings.submitLoading =true
+                this.loadings.submitLoading = true
                 that.submitOpinion(true, 1)
               })
               .catch(() => {
-                this.loadings.submitLoading =false
+                this.loadings.submitLoading = false
               });
           } else {
             this.$confirm("当前存在未采纳的“实质意见”，提交后将会进一步审核，是否继续提交？", "", {
@@ -505,12 +508,12 @@ export default {
               closeOnClickModal: false,
               type: "warning",
             })
-              .then(() => {      
-                this.loadings.submitLoading =true
+              .then(() => {
+                this.loadings.submitLoading = true
                 that.submitOpinion(true, 0)
               })
               .catch(() => {
-                this.loadings.submitLoading =false
+                this.loadings.submitLoading = false
               });
           }
 
@@ -551,7 +554,7 @@ export default {
         //上传文件的逻辑
       }
       updateAdoptEditedComments(params).then(res => {
-        this.loadings.submitLoading =false
+        this.loadings.submitLoading = false
         //有实质意见且采纳所以的有实质意见
         if (type && type == 1) {
           this.$confirm("审查意见已确认，请根据审查意见修改提单内容。", "", {
@@ -581,8 +584,8 @@ export default {
             type: "warning",
           })
         }
-      }).catch(err=>{
-        this.loadings.submitLoading =false
+      }).catch(err => {
+        this.loadings.submitLoading = false
       })
     }
   },
@@ -891,9 +894,8 @@ export default {
 }
 </style>
 <style lang="less">
-
-.preview-dialog{
-  .el-dialog__body{
+.preview-dialog {
+  .el-dialog__body {
     height: 76vh;
   }
 }

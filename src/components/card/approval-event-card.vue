@@ -13,13 +13,14 @@
         <span class="event-status">
           <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
           <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中>{{ item.nodeName }}</i>
-          <i v-if="item.taskStatus === '2'" class="tag in-modify">待修改>{{ item.nodeName }}</i>
-          <i v-if="item.taskStatus === '3'" class="tag check">待确认>{{ item.nodeName }}</i>
+          <i v-if="item.taskStatus === '2'" class="tag in-approval">撤销>{{ item.nodeName }}</i>
+          <i v-if="item.taskStatus === '3'" class="tag in-modify">待修改>{{ item.nodeName }}</i>
+          <i v-if="item.taskStatus === '5'" class="tag check">待确认>{{ item.nodeName }}</i>
           <i v-if="item.taskStatus === '4'" class="end">
             <i class="tag end-sign"> 已结束 </i>
           </i>
           <!-- 有无意见 -->
-          <i v-if="item.taskStatus === '3' || item.taskStatus === '4'" class="flex">
+          <i v-if="item.taskStatus === '5' || item.taskStatus === '4'" class="flex">
             <i class="tag has-opinion" v-if="item.hasOpinions == 1">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-guanzhu2"></use>
@@ -30,11 +31,11 @@
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
-            <i class="tag check" v-if="item.adoptionStatus == 0 && item.taskStatus != '3'">
+            <i class="tag check" v-if="item.adoptionStatus == 0 && item.taskStatus != '5'">
               <i class="iconfont icon-guanzhu2"></i>
               不采纳
             </i>
-            <i class="tag adoption" v-if="item.adoptionStatus == 1 && item.taskStatus != '3'">
+            <i class="tag adoption" v-if="item.adoptionStatus == 1 && item.taskStatus != '5'">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tubiao"></use>
               </svg>
@@ -48,10 +49,10 @@
         <span class="sDate date">发起时间：{{ item.createTime | timeFormate }}</span>
         <span class="sDate date">更新时间：{{ item.updateTime | timeFormate }}</span>
         <span class="sDate date">上线时间：{{ item.uptime | timeFormate }}</span>
-        <span class="handler date">发起人：{{  item.originator && item.originator.name }}</span>
-        <span class="handler">
+        <span class="handler date">发起人：{{ item.originator && item.originator.name }}</span>
+        <span class="handler" v-if="item.institutional && item.institutional[1]">
           <i class="iconfont icon-dept"></i>
-         {{ item.originator && item.originator.label }}</span>
+          {{ item.institutional && item.institutional[1] }}</span>
       </div>
     </div>
     <!-- 任务状态（0:草稿 1：审查中 2：待修改 3：待确认 4：已完成 -->
@@ -64,7 +65,7 @@
         审查
       </span>
       <!-- 待修改状态的工单 需要该审批人修改的工单显示修改-->
-      <span class="modify icon-op" v-if="item.taskStatus == 2" @click="modify(item)">
+      <span class="modify icon-op" v-if="item.taskStatus == 3" @click="modify(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-xianxingtubiao"></use>
         </svg>
@@ -72,7 +73,7 @@
       </span>
 
       <!-- 待确认状态的工单 需要该审批人确认的工单-->
-      <span class="attention check icon-op" v-if="item.taskStatus == 3" @click="check(item)">
+      <span class="attention check icon-op" v-if="item.taskStatus == 5" @click="check(item)">
         <span class="iconfont icon icon-tubiao urgent-icon"></span>
         确认</span>
       <!-- 关注 -->
@@ -122,7 +123,7 @@ export default {
           formId: item.recordId,
           originatorId: item.originator.id,
           taskName: item.taskName,
-          processInstanceId:item.processInstanceId
+          processInstanceId: item.processInstanceId
         },
       });
     },
@@ -141,17 +142,23 @@ export default {
           formId: item.recordId,
           originatorId: item.originator.id,
           taskName: item.taskName,
-          processInstanceId:item.processInstanceId
+          processInstanceId: item.processInstanceId
         },
       });
     },
     modify(item) {
+      window.localStorage.setItem("order-detail", JSON.stringify({
+        item,
+      }));
       this.$router.push({
-        name: 'editApply',
+        name: "approval-details",
         params: {
-          id: item.taskNumber
-        }
-      })
+          formId: item.recordId,
+          originatorId: item.originator.id,
+          taskName: item.taskName,
+          processInstanceId: item.processInstanceId
+        },
+      });
     },
     concern(item) {
       const param = {

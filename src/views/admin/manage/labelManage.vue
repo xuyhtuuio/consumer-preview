@@ -48,6 +48,11 @@
               row.type === 1 ? '禁用词' : '敏感词'
             }}</span>
           </template>
+          <template #count="{row}">
+          
+              {{row.count}}
+            
+          </template>
           <template #operate="scope">
             <el-button type="text" size="small" @click="handleClick(scope.row)"> 编辑</el-button>
             <el-button type="text" size="small" v-if="scope.row.status === 0"
@@ -194,7 +199,7 @@ export default {
       this.loading = false;
     },
     sortChange({ column, prop, order }) {
-      // console.log(column, prop, order);
+      // console.log(!!column?.order?.startsWith('asc'))
     },
     handleLabelType(id) {
       this.dialogItem.type = id;

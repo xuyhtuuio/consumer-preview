@@ -141,7 +141,7 @@ export default {
         getOrderDetail() {
             this.loading = true
             getApplyForm({
-                formCategoryId: '1',
+                formCategoryId:this.$route.params&&this.$route.params.formManagementId || this.sidebarParam&&this.sidebarParam.formManagementId||'1',
                 formId: this.$route.params.formId || this.sidebarParam.formId,
             }).then(res => {
                 const { data, status, message } = res.data;

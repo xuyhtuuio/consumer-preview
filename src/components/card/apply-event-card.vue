@@ -16,13 +16,14 @@
         <span class="event-status">
           <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
           <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中>{{ item.currentActivityName }}</i>
-          <i v-if="item.taskStatus === '2'" class="tag in-modify">待修改>{{ item.currentActivityName }}</i>
-          <i v-if="item.taskStatus === '3'" class="tag check">待确认>{{ item.currentActivityName }}</i>
+          <i v-if="item.taskStatus === '2'" class="tag in-approval">撤销>{{ item.currentActivityName }}</i>
+          <i v-if="item.taskStatus === '3'" class="tag in-modify">待修改>{{ item.currentActivityName }}</i>
+          <i v-if="item.taskStatus === '5'" class="tag check">待确认>{{ item.currentActivityName }}</i>
           <i v-if="item.taskStatus === '4'" class="end">
             <i class="tag end-sign"> 已结束 </i>
           </i>
           <!-- 有无意见 -->
-          <i  class="flex" v-if="item.taskStatus === '3' || item.taskStatus === '4'">
+          <i  class="flex" v-if="item.taskStatus === '5' || item.taskStatus === '4'">
             <i class="tag has-opinion" v-if="item.hasOpinions == 1">
               <i class="iconfont icon-guanzhu2"></i>
               有实质性意见
@@ -31,11 +32,11 @@
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
-            <i class="tag check" v-if="item.adoptionStatus == 0 && item.taskStatus != '3'">
+            <i class="tag check" v-if="item.adoptionStatus == 0 && item.taskStatus != '5'">
               <i class="iconfont icon-guanzhu2"></i>
               不采纳
             </i>
-            <i class="tag adoption" v-if="item.adoptionStatus == 1 && item.taskStatus != '3'">
+            <i class="tag adoption" v-if="item.adoptionStatus == 1 && item.taskStatus != '5'">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tubiao"></use>
               </svg>
@@ -93,7 +94,7 @@
         </span>
       </div>
       <!-- 待确认  展示【确认】、【关注】 流程配置中确认人配置的非工单的发起人 不展示确认按钮-->
-      <div class="flex" v-if="item.taskStatus == 3">
+      <div class="flex" v-if="item.taskStatus == 5">
         <span class="check icon-op" @click="check(item)">
           <span class="iconfont icon icon-tubiao"></span>
           确认
@@ -150,7 +151,6 @@
     </el-dialog>
   </div>
 </template>
-
 <script>
 import { concernApplication } from "@/api/applyCenter";
 export default {
@@ -184,6 +184,7 @@ export default {
         name: "details",
         params: {
           formId: item.taskNumber,
+          formManagementId: item.form_management_id,
           originatorId: item.userId,
           taskName: item.taskName
         },
@@ -202,6 +203,7 @@ export default {
         name: "details",
         params: {
           formId: item.taskNumber,
+          formManagementId: item.form_management_id,
           originatorId: item.userId,
           taskName: item.taskName
         },
@@ -223,7 +225,9 @@ export default {
       this.$router.push({
         name: 'editApply',
         params: {
-          id: item.taskNumber
+          id: item.taskNumber,
+          formManagementId:item.form_management_id
+
         }
       })
     },
