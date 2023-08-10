@@ -105,6 +105,7 @@
   </div>
 </template>
 <script>
+import { debounce } from 'lodash';
 import { belongModules } from '@/utils/dict'
 import { getFormGroups } from "@/api/front";
 import secondaryConfirmation from "@/components/common/secondaryConfirmation"
@@ -201,15 +202,15 @@ export default {
             width: 80
           }
         },
-        {
-          label: '更新时间',
-          prop: 'updateTime',
-          bind: {
-            width: 200,
-            align: 'center',
-            sortable: "custom"
-          }
-        },
+        // {
+        //   label: '更新时间',
+        //   prop: 'updateTime',
+        //   bind: {
+        //     width: 200,
+        //     align: 'center',
+        //     sortable: "custom"
+        //   }
+        // },
         {
           label: '操作',
           prop: 'operate',
@@ -314,26 +315,26 @@ export default {
       }
     },
     changeSort1(sort) {
-      let data = {
-        orderColumn: sort.prop,
-        orderType: 'asc'
-      }
-      if (sort.order.startsWith('desc')) {
-        data = {
-          orderColumn: sort.prop,
-          orderType: 'desc'
-        }
-      }
-      this.order = { ...data }
+      // let data = {
+      //   orderColumn: sort.prop,
+      //   orderType: 'asc'
+      // }
+      // if (sort.order.startsWith('desc')) {
+      //   data = {
+      //     orderColumn: sort.prop,
+      //     orderType: 'desc'
+      //   }
+      // }
+      // this.order = { ...data }
       this.editForm({
         recordId: this.currentRow.recordId,
         params: {
           itemName: this.search.title,
           itemType: this.search.type,
           currentModule: this.search.belong,
-          orderColumn: 'updateTime',
-          orderType: 'desc',
-          ...data
+          // orderColumn: 'updateTime',
+          // orderType: 'desc',
+          // ...data
         }
       })
     },
@@ -350,11 +351,11 @@ export default {
             itemName: this.search.title,
             itemType: this.search.type,
             currentModule: this.search.belong,
-            orderColumn: 'updateTime',
-            orderType: 'desc',
+            // orderColumn: 'updateTime',
+            // orderType: 'desc',
             pageSize: 10,
             pageNow: val,
-            ...this.order,
+            // ...this.order,
           }
         })
       }
@@ -367,8 +368,8 @@ export default {
           itemName: this.search.title,
           itemType: this.search.type,
           currentModule: this.search.belong,
-          orderColumn: 'updateTime',
-          orderType: 'desc',
+          // orderColumn: 'updateTime',
+          // orderType: 'desc',
           pageSize: 10,
           pageNow: 1
         }
@@ -381,7 +382,7 @@ export default {
       document.querySelector('#icon-uploader').click()
     },
     // 新增表单
-    async addForm() {
+    addForm: debounce(async function() {
       this.addLoading = true;
       const res = await addFormCategory()
       this.addLoading = false;
@@ -389,7 +390,7 @@ export default {
         this.getObtainExamineTypeList()
         this.$message.success('新增成功')
       }
-    },
+    }, 500),
     async editForm(item) {
       if (this.level === 1) {
         this.currentRow = item;
@@ -399,8 +400,8 @@ export default {
       this.loadingList = true
       const res = await itemPagingList({
         formCategoryId: item.recordId,
-        orderColumn: 'updateTime',
-        orderType: 'desc',
+        // orderColumn: 'updateTime',
+        // orderType: 'desc',
         ...item.params
       })
       this.loadingList = false
@@ -414,13 +415,13 @@ export default {
       }
     },
     // 复制表单
-    async copyForm(row) {
+    copyForm: debounce(async function(row) {
       await copyFormCategory(row.recordId)
       this.getObtainExamineTypeList({
         orderColumn: 'updateTime',
         orderType: 'desc'
       })
-    },
+    }, 500),
     // 编辑单元格
     async submitEdit(row) {
       let res;
@@ -461,7 +462,7 @@ export default {
       this.limitTimeVisible = true
     },
     // 停用
-    stopApllay(row) {
+    stopApllay: debounce(function(row) {
       this.confirmOption = {
         message: '停用此表单可能影响部分申请单，确定停用该表单吗？',
         cancelBtn: '取消',
@@ -470,8 +471,8 @@ export default {
       }
       this.$refs.confirmation.dialogVisible = true;
       this.currentRow = row
-    },
-    async enableApllay(row) {
+    }, 500),
+    enableApllay: debounce(async function(row) {
       const res = await switchFormCategoryState({
         formCategoryId: row.recordId
       })
@@ -483,7 +484,7 @@ export default {
         row.run = row.run === '0' ? '1' : '0'
         return;
       }
-    },
+    }, 500),
     async handleStop(option) {
       if (!option.fetch) {
         return;
@@ -557,7 +558,7 @@ export default {
       }
     },
     // 停用表单项
-    async changeFormItemState(item) {
+    changeFormItemState: debounce(async function(item) {
       const res = await switchFormItemState({
         formItemId: item.id
       })
@@ -567,7 +568,7 @@ export default {
       } else {
         this.$message.error(res?.data?.msg)
       }
-    },
+    }, 500),
     // 刷新表单项list
     refreshItemList() {
       this.drawer = false;
