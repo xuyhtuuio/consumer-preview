@@ -178,13 +178,14 @@
           this.$set(this.ruleForm, 'title', this.currentRow.title)
           this.$set(this.ruleForm, 'module', this.currentRow.module)
           this.$set(this.ruleForm, 'name', this.currentRow.special.name)
-          this.$set(this.ruleForm, 'required', Boolean(this.currentRow.required))
+          this.$set(this.ruleForm, 'required', Boolean(this.currentRow.special.props.required))
+          this.$set(this.ruleForm, 'isMultiple', Boolean(this.currentRow.special.props.multiple))
           this.$set(this.ruleForm, 'expanding', Boolean(this.currentRow.special.props.expanding))
           this.$set(this.ruleForm, 'placeholder', this.currentRow.special.props.placeholder)
           this.$set(this.ruleForm, 'numberOfWords', this.currentRow.special.props.numberOfWords)
           this.$set(this.ruleForm, 'exclusiveRowOrNot', this.currentRow.special.props.exclusiveRowOrNot)
-          if (this.currentRow.special.name && this.currentRow.special.props.Options) {
-            this.setOptions(this.currentRow.special.name, this.currentRow.special.props.Options)
+          if (this.currentRow.special.name && this.currentRow.special.props.options) {
+            this.setOptions(this.currentRow.special.name, this.currentRow.special.props.options)
           }
         } else {
           this.currentRow = {}
