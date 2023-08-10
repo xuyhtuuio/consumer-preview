@@ -196,7 +196,7 @@ export default {
           this.reviewMaterials = reviewMaterials;
           this.isLoading = false;
           this.isGLoading = false;
-        }else {
+        } else {
           // this.$message.error(msg)
           this.isLoading = false;
           this.isGLoading = false;
@@ -384,48 +384,48 @@ export default {
     }
   }
 }
-/deep/.el-dialog.loadingDialog {
-  padding: 40px 60px;
-  border-radius: 10px;
-  .el-dialog__header {
-    padding: 0;
-  }
-  .el-dialog__body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0;
+.loadingDialog {
+  /deep/.el-dialog {
+    padding: 40px 60px;
+    border-radius: 10px;
+    .el-dialog__header {
+      padding: 0;
+    }
+    .el-dialog__body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0;
 
-    .item {
-      position: relative;
-      z-index: 2;
-      .text {
+      .item {
         position: relative;
         z-index: 2;
-      }
-      &:nth-child(2) {
-        .img {
+        .text {
           position: relative;
-          left: 16px;
-          top: 4px;
-          width: 28px;
-          height: 20px;
-          transform: scale(4);
+          z-index: 2;
         }
-      }
-      &:not(:first-child) {
-        margin-top: 16px;
-      }
-      &:last-child {
-        line-height: 20px;
-        font-size: 12px;
-        color: #86909c;
+        &:nth-child(2) {
+          .img {
+            position: relative;
+            left: 16px;
+            top: 4px;
+            width: 28px;
+            height: 20px;
+            transform: scale(4);
+          }
+        }
+        &:not(:first-child) {
+          margin-top: 16px;
+        }
+        &:last-child {
+          line-height: 20px;
+          font-size: 12px;
+          color: #86909c;
+        }
       }
     }
   }
 }
-
-
 
 
 </style>
