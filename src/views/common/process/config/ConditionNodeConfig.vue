@@ -18,16 +18,20 @@
         <span>当审批单满足以下条件时进入此流程</span>
         <span @click="iknow=false">我知道了</span>
       </div>
-      <el-form-item label="条件组关系">
-        <el-switch v-model="config.groupsType" active-color="#409EFF"
-                   inactive-color="#c1c1c1" active-value="AND" inactive-value="OR"
-                   active-text="且" inactive-text="或">
+      <div style="margin: 24px 0;" :style="{display: conditionGroupsType === 'expression' ? 'flex' : 'block'}">
+        <el-select size="small" placeholder="判断符" style="width: 140px; margin-right: 20px;" v-model="conditionGroupsType" @change="changeConditionGroupsType">
+          <el-option label="组间条件关系" value="groupsType"></el-option>
+          <el-option label="条件组表达式" value="expression"></el-option>
+        </el-select>
+        <el-switch v-show="conditionGroupsType === 'groupsType'" v-model="config.groupsType" active-color="#409EFF"
+            inactive-color="#c1c1c1" active-value="AND" inactive-value="OR"
+            active-text="且" inactive-text="或">
         </el-switch>
-      </el-form-item>
-      <el-form-item label="条件组表达式">
-        <el-input size="mini" class="is-dark input" v-model="config.expression" placeholder="输入条件组关系表达式  &为与，|为或"/>
-        <span class="item-desc">使用表达式构建复杂逻辑，例如: (A & B) | C</span>
-      </el-form-item>
+        <div style="display: inline-block;" v-show="conditionGroupsType === 'expression'">
+          <el-input size="mini" class="is-dark input" v-model="config.expression" placeholder="输入条件组关系表达式  &为与，|为或"/>
+          <span class="item-desc">使用表达式构建复杂逻辑，例如: (A & B) | C</span>
+        </div>
+      </div>
     </el-form>
     <div>
       <el-button type="primary" size="mini" icon="el-icon-plus" style="margin: 0 15px 15px 0" round @click="addConditionGroup">
@@ -76,6 +80,7 @@ export default {
   },
   data() {
     return {
+      conditionGroupsType: 'groupsType',
       iknow: true,
       sortOption: {
         animation: 300,
@@ -86,6 +91,13 @@ export default {
     }
   },
   methods: {
+    changeConditionGroupsType(val) {
+      if (val === 'groupsType') {
+        this.config.expression = ''
+      } else {
+        this.config.groupsType = 'OR'
+      }
+    },
     addConditionGroup() {
       this.config.groups.push({
         cids:[],

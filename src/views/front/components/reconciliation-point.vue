@@ -78,7 +78,7 @@ export default {
         });
         this.checkAll = len === valLen ? true : false;
       },
-      deep:true
+      deep: true
     }
   },
   methods: {
@@ -115,7 +115,9 @@ export default {
       //     this.judgeWarnFlag = false
       //     return true
       //   }
-      if (this.list.every(item => item.value.length === item.props.options.length)) {
+      if (this.list.length === 0) {
+        return [true];
+      } else if (this.list.every(item => item.value.length === item.props.options.length)) {
         return [true];
       } else {
         const offsetTop = this.$refs[`globalRef`].offsetTop;

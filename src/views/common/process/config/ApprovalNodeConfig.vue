@@ -415,6 +415,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-select:last-of-type {
+  margin-right: 0;
+}
+
+/deep/ .el-select .el-input .el-icon-arrow-up::before {
+  font-family: element-icons !important;
+  content: "\e78f";
+}
 .user-type .radio-group {
   /deep/ .el-radio {
     min-width: 110px;

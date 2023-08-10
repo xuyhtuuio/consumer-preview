@@ -99,7 +99,7 @@
       <el-form class="my-form" :model="dialogItem" label-width="100px">
         <el-form-item class="form-item" label="标签名称">
           <el-autocomplete class="onlyInput" ref="autocomplete" popper-class="my-autocomplete"
-            v-model="dialogItem.keywordName" v-scrollLoad="load"
+            v-model="dialogItem.keywordName" v-scrollLoad="el => load(el,true)"
             :fetch-suggestions="(val, cb) => querySearch(val, cb, true)" placeholder="关键词" @select="handleSelect"
             @keyup.enter.native="onSearch" clearable>
             <i slot="suffix" class="el-icon-search el-input__icon"> </i>
@@ -178,7 +178,7 @@ export default {
           confirmBtn: '停用'
         },
         edit0: {
-          message: '恢复后将工单可能推荐此意见，确定恢复吗？',
+          message: '恢复后工单中将可能推荐此意见，确定恢复吗？',
           cancelBtn: '取消',
           confirmBtn: '恢复'
         },
@@ -307,10 +307,10 @@ export default {
       this.initData();
       this.changeStyle('none', '.el-autocomplete-suggestion');
     },
-    load(e) {
+    load(el,flag = false) {
       this.searchDialogIndex += 1;
       this.$refs.autocomplete.activated = true;
-      this.initSearchData();
+      this.initSearchData(flag);
     },
     //根据传进来的状态改变建议输入框的状态（展开|隐藏）
     changeStyle(status, className) {
@@ -1012,4 +1012,6 @@ export default {
     }
   }
 }
+
+
 </style>

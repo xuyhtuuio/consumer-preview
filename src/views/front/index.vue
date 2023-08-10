@@ -307,6 +307,7 @@ export default {
     },
     getNumApi() {
       this.applyLoading = true;
+      let that = this;
       let data = {
         adoptionStatus: 0,
         approvalStage: "",
@@ -314,7 +315,7 @@ export default {
         create_time: "",
         currentActivityName: "",
         hasOpinions: 0,
-        id: "25",
+        id: that.userInfo.id,
         keywords: "",
         label: "",
         launchDate: "",

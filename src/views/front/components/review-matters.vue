@@ -34,19 +34,29 @@ export default {
     list: {
       typeof: Array,
       required: true
+    },
+    formManagementId: {
+      typeof: Number|String,
+      required: true
     }
   },
   data() {
     return {
       title: '审查事项类型',
-      currentId: 0
+      currentId: -1
     };
   },
   created() {},
   watch: {
     list(val) {
-      this.currentId = val[0].recordId;
+      this.currentId =Number(this.currentId == -1? val[0].recordId: this.currentId)
       this.$emit('handleTo', this.currentId);
+    },
+    formManagementId(val) {
+      console.log(val,this.list)
+      if(val != -1) this.currentId = val
+      // if()
+    //  val !== -1 && this.currentId = this.list
     }
   },
   methods: {
@@ -102,6 +112,17 @@ export default {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
