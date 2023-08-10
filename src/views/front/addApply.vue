@@ -129,6 +129,7 @@ export default {
       _this.dialogVisible = false;
       this.save(() => {
         window.localStorage.removeItem('editId');
+         window.localStorage.removeItem('formManagementId');
         // this.formId = undefined;
         // this.initialData();
         next();
@@ -426,6 +427,7 @@ export default {
     }
   }
 }
+
 
 
 </style>
