@@ -20,7 +20,7 @@
       </div>
       <div style="margin: 24px 0;" :style="{display: conditionGroupsType === 'expression' ? 'flex' : 'block'}">
         <el-select size="small" placeholder="判断符" style="width: 140px; margin-right: 20px;" v-model="conditionGroupsType" @change="changeConditionGroupsType">
-          <el-option label="组件条件关系" value="groupsType"></el-option>
+          <el-option label="组间条件关系" value="groupsType"></el-option>
           <el-option label="条件组表达式" value="expression"></el-option>
         </el-select>
         <el-switch v-show="conditionGroupsType === 'groupsType'" v-model="config.groupsType" active-color="#409EFF"
