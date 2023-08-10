@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { debounce } from 'lodash';
 export default {
   props: {
     option: {
@@ -32,10 +33,10 @@ export default {
       this.dialogVisible = false;
       this.$emit("handleClose", true)
     },
-    handleConfirm() {
+    handleConfirm: debounce(function() {
       this.dialogVisible = false;
       this.$emit("handleConfirm")
-    }
+    }, 500)
   }
 }
 </script>
@@ -85,7 +86,7 @@ export default {
     }
     .el-button--primary{
       line-height: 24px;
-      background: linear-gradient(90deg, #2F54EB 0%, #5196FF 100%);
+      background: #2D5CF6;
       border: none;
     }
   }

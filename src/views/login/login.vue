@@ -129,6 +129,8 @@ export default {
     };
   },
   mounted() {
+    window.localStorage.removeItem('AI_token');
+    window.localStorage.removeItem('user_name');
     this.codeFun();
     window.onresize = () => {
       return (() => {
@@ -161,11 +163,7 @@ export default {
             }
             token = res.access_token;
             window.localStorage.setItem('AI_token', token);
-            window.localStorage.setItem('Authorization', token);
             window.localStorage.setItem('AI_name', _this.login_form.name);
-            // window.localStorage.setItem('VUEX_customerPersonalizedInformation', JSON.stringify(this.customerPersonalizedInformation));
-            // const AllPermis = await this.getPermissions();
-            // window.localStorage.setItem('AllPermis', JSON.stringify(AllPermis.data));
             const userPermis = await this.getUserRole();
             window.localStorage.setItem('userPermis', JSON.stringify(userPermis));
             if (_this.rem_pwd === true) {

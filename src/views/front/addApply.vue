@@ -93,14 +93,12 @@ export default {
   },
   beforeRouteLeave({ params: { isNoDialog } }, from, next) {
     const _this = this.$refs['RefSecondaryCon'];
-    console.log(isNoDialog);
 
     !isNoDialog && (_this.dialogVisible = true);
     isNoDialog && next();
     _this.handleConfirm = () => {
       _this.dialogVisible = false;
       this.save(() => {
-        console.log('save');
         window.localStorage.removeItem('editId');
         // this.formId = undefined;
         // this.initialData();
@@ -113,11 +111,9 @@ export default {
     };
   },
   activated() {
-    console.log('activated');
     this.initialData();
   },
   deactivated() {
-    console.log('deactivated');
     this.formId = undefined;
     this.initialData();
     this.handleClear();
@@ -140,7 +136,6 @@ export default {
         'reviewMaterialRef'
       ];
       list.forEach(el => {
-        console.log(el, this.$refs[el]);
         this.$refs[el].judgeWarnFlag = false;
       });
     },
@@ -178,7 +173,6 @@ export default {
         await this.$nextTick(() => {
           const refs = this.$refs['basicInformationRef'].$refs['refWarn'];
           result0 = refs?.length ? false : true;
-          console.log('result0', result0);
           if (refs?.length) {
             let offsetTop = refs[0].$el.offsetParent.offsetTop;
             refs.forEach(item => {
@@ -186,7 +180,6 @@ export default {
                 offsetTop = item.$el?.offsetParent?.offsetTop;
               }
             });
-            console.log('offsetTop', offsetTop);
             this.rollTo(offsetTop);
           }
         });
@@ -196,7 +189,6 @@ export default {
       const [result1, offsetTop1] = this.$refs['reconPointRef'].judgeWarn();
 
       const [result2, offsetTop2] = this.$refs['reviewMaterialRef'].judgeWarn();
-      console.log(result0, result, result1, result2);
       if (!result0 || !result || !result1 || !result2) {
         if (!result0) return;
         return this.rollTo(offsetTop ? offsetTop : offsetTop1 ? offsetTop1 : offsetTop2);
@@ -267,7 +259,6 @@ export default {
             }
           })
           .catch(err => {
-            console.log(err);
             this, $message({ type: 'error', message: '提交失败' });
           });
       }

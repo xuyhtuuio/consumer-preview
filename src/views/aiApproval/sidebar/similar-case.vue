@@ -4,7 +4,7 @@
             <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-a-Rectangle143"></use>
             </svg>
-            标签相似案例
+            相似案例
         </p>
         <div class="case-box">
             <div class="case-content">
@@ -24,9 +24,7 @@
                             <svg class="icon" aria-hidden="true" v-if="item.fileType === 'xls'">
                                 <use xlink:href="#icon-mianxingtubiao-1"></use>
                             </svg>
-
                         </div>
-
                     </div>
                     <div class="case-info">
                         <div class="name">
@@ -68,71 +66,53 @@ export default {
     data() {
         return {
             caseList: [{
-                name: '景顺长城，名字过长用...代替景顺长城，名字过长用...代替',
+                name: '涌薪添利尊享68号人民币理财产品',
                 type: '产品类',
-                applyTime: '2021-08-20',
-                organization: '北京银行XX分行',
+                applyTime: '2023-08-02',
+                organization: '北京分行',
                 tag: '理财产品',
-                desc: '景顺长城理财产品溢出景顺长城，名字过长用...代替c....',
-                fileType: 'img'
-
-            },
-            {
-                name: '景顺长城，名字过长用...代替景顺长城，名字过长用...代替',
-                type: '活动类',
-                applyTime: '2021-08-20',
-                organization: '北京银行XX分行',
-                tag: '理财产品',
-                desc: '景顺长城理财产品溢出景顺长城，名字过长用...代替c....',
-                fileType: 'img'
-
-            },
-            {
-                name: '景顺长城，名字过长用...代替景顺长城，名字过长用...代替',
-                type: '客户类',
-                applyTime: '2021-08-20',
-                organization: '北京银行XX分行',
-                tag: '理财产品',
-                desc: '景顺长城理财产品溢出景顺长城，名字过长用...代替c....',
-                fileType: 'img'
-
-            },
-            {
-                name: '景顺长城，名字过长用...代替景顺长城，名字过长用...代替',
-                type: '其他',
-                applyTime: '2021-08-20',
-                organization: '北京银行XX分行',
-                tag: '理财产品',
-                desc: '景顺长城理财产品溢出景顺长城，名字过长用...代替c....',
-                fileType: 'xls'
-
-            }, {
-                name: '景顺长城，名字过长用...代替景顺长城，名字过长用...代替',
-                type: '其他',
-                applyTime: '2021-08-20',
-                organization: '北京银行XX分行',
-                tag: '理财产品',
-                desc: '景顺长城理财产品溢出景顺长城，名字过长用...代替c....',
+                desc: '涌薪添利系列',
                 fileType: 'pdf'
-
-            }, {
-                name: '景顺长城，名字过长用...代替景顺长城，名字过长用...代替',
-                type: '其他',
-                applyTime: '2021-08-20',
-                organization: '北京银行XX分行',
+            },{
+                name: '涌薪增利尊享36号人民币理财产品',
+                type: '产品类',
+                applyTime: '2023-07-28',
+                organization: '长春分行',
                 tag: '理财产品',
-                desc: '景顺长城理财产品溢出景顺长城，名字过长用...代替c....',
-                fileType: 'xls'
-
-            }, {
-                name: '景顺长城，名字过长用...代替景顺长城，名字过长用...代替',
-                type: '其他',
-                applyTime: '2021-08-20',
-                organization: '北京银行XX分行',
-                tag: '理财产品',
-                desc: '景顺长城理财产品溢出景顺长城，名字过长用...代替c....',
+                desc: '涌薪增利系列',
                 fileType: 'doc'
-
+            },{
+                name: '聚鑫赢A周周开1号人民币理财产品',
+                type: '产品类',
+                applyTime: '2023-07-26',
+                organization: '上海分行',
+                tag: '理财产品',
+                desc: '聚鑫赢系列',
+                fileType: 'pdf'
+            },{
+                name: '南银理财鑫逸稳一年114期-B份额',
+                type: '产品类',
+                applyTime: '2023-07-22',
+                organization: '广州分行',
+                tag: '代销理财产品',
+                desc: '鑫逸稳系列',
+                fileType: 'pdf'
+            },{
+                name: '兴银理财增盈稳享封闭式44号固收类理财产品',
+                type: '产品类',
+                applyTime: '2023-07-12',
+                organization: '西安分行',
+                tag: '代销理财产品',
+                desc: '增盈稳享系列',
+                fileType: 'pdf'
+            },{
+                name: '苏银理财恒源封闭债权42期14月A',
+                type: '产品类',
+                applyTime: '2023-07-11',
+                organization: '深圳分行',
+                tag: '代销理财产品',
+                desc: '恒源系列',
+                fileType: 'doc'
             }
             ]
 

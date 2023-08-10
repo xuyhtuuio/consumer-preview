@@ -60,6 +60,7 @@
   </div>
 </template>
 <script>
+  import { debounce } from 'lodash';
   import { belongModules } from '@/utils/dict'
   import { addFormField, editItem } from '@/api/manage'
   import CascaderField from './cascaderField'
@@ -233,7 +234,7 @@
           }]
         })
       },
-      async submitForm(formName) {
+      submitForm: debounce(async function(formName) {
         this.$refs[formName].validate(async (valid) => {
           if (valid) {
             const data = this.handleForm()
@@ -241,6 +242,7 @@
               type: data.name,
               formCategoryId: this.parentForm.recordId,
               formItemId: this.currentRow?.id,
+              sort: this.currentRow?.sort,
               data
             }
             if (this.checkOptionValue(data.name)) {
@@ -267,7 +269,7 @@
             return false;
           }
         });
-      },
+      }, 500),
       checkOptionValue(type) {
         let isNullValue = false;
         switch (type) {

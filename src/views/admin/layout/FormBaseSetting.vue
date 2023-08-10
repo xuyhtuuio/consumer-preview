@@ -57,11 +57,8 @@
 
 <script>
 import orgPicker from '@/components/common/organizationPicker'
-import {getFormGroups, updateGroup} from '@/api/design'
 import { itemPagingList } from '@/api/manage'
-import {
-  obtainExamineTypeList,
-} from '@/api/manage'
+import { getFormCategoryArray } from '@/api/front'
 export default {
   name: "FormBaseSetting",
   components: {orgPicker},
@@ -104,15 +101,10 @@ export default {
       }
     },
     async getObtainExamineTypeList() {
-      const res = await obtainExamineTypeList({
-        pageNow: 1,
-        pageSize: 5000,
-        orderColumn: 'updateTime',
-        orderType: 'desc'
-      })
+      const res = await getFormCategoryArray();
       const resData = res.data.data
       if (resData) {
-        this.fromGroup = resData.data.list.map(item => {
+        this.fromGroup = resData[0].map(item => {
           return {
             name: item.examineTypesName,
             id: item.recordId
@@ -144,7 +136,7 @@ export default {
     validate(){
       this.$refs.baseSetting.validate()
       let err = []
-      if ((this.setup.templateName === null) || (this.setup.templateName?.length < 2) || (this.setup.templateName?.length > 10)){
+      if ((!this.setup.templateName) || (this.setup.templateName?.length < 2) || (this.setup.templateName?.length > 10)){
         err.push('流程名称未设置或长度不对')
       }
       if (!this.$isNotEmpty(this.setup.formId) || !this.setup.formId){

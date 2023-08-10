@@ -98,6 +98,8 @@
             <div class="tag-box" v-for="(item, index) in select" :key="index">
               <TrsTag :tag="{ ...item, ...tagConfig }" @handleClose="removeOrgItem(index)" />
             </div>
+            <i class="iconfont icon-zhankai" v-if="select?.length && !isCollapse && showCollapse" @click="handleCollapse($event, 'isCollapse')"></i>
+            <i class="iconfont icon-shouqi" v-if="select?.length && isCollapse && showCollapse" @click="handleCollapse($event, 'isCollapse')"></i>
           </div>
         </div>
       </el-form-item>
@@ -152,10 +154,12 @@
           <p>请选择【被转办人】可选用户范围</p>
           <el-button size="mini" @click="selectUser1" icon="el-icon-plus" type="primary">选择部门/人员/角色</el-button>
           <org-picker :show="showOrgSelect1" @close="closeSelect1" :selected="select1" @selectOver="selected1"></org-picker>
-          <div class="tag-action" >
+          <div class="tag-action1" >
             <div class="tag-box" v-for="(item, index) in select1" :key="index">
               <TrsTag :tag="{ ...item, ...tagConfig }" @handleClose="removeOrgItem1(index)" />
             </div>
+            <i class="iconfont icon-zhankai" v-if="select1?.length && !isCollapse1 && showCollapse1" @click="handleCollapse($event, 'isCollapse1')"></i>
+            <i class="iconfont icon-shouqi" v-if="select1?.length && isCollapse1 && showCollapse1" @click="handleCollapse($event, 'isCollapse1')"></i>
           </div>
         </div>
       </el-form-item>
@@ -229,10 +233,12 @@ export default {
   },
   data() {
     return {
+      isCollapse: false,
+      showCollapse: false,
+      isCollapse1: false,
+      showCollapse1: false,
       showOrgSelect: false,
       showOrgSelect1: false,
-      // select: [],
-      // select1: [],
       approvalTypes: [
         // {name: '指定人员', type: 'ASSIGN_USER'},
         {name: '上一审批人选择', type: 'SELF_SELECT'},
@@ -320,7 +326,39 @@ export default {
       }
     }
   },
+  mounted() {
+    // setTimeout(() => {
+      this.initCollapse('.tag-action', 'showCollapse')
+      this.initCollapse('.tag-action1', 'showCollapse1')
+    // }, 500);
+  },
   methods: {
+    // 展开收起
+    handleCollapse(e, isCollapse) {
+      const height = e.target.parentNode.getBoundingClientRect().height
+      if (height > 150) {
+        e.target.parentNode.style.height = '150px'
+        this[isCollapse] = false
+      } else {
+        e.target.parentNode.style.height = 'auto'
+        this[isCollapse] = true
+      }
+       console.log(this[isCollapse])
+    },
+    initCollapse(selector, showType) {
+      this.$nextTick(() => {
+        const dom = document.querySelector(selector)
+        if (!dom) return;
+        const height = dom.getBoundingClientRect().height
+        if (height < 151) {
+          dom.style.height = 'auto'
+          this[showType] = false
+        } else {
+          dom.style.height = '150px'
+          this[showType] = true
+        }
+      })
+    },
     changeAssignedType() {
       this.showOrgSelect = false
       this.select = []
@@ -352,21 +390,19 @@ export default {
         }))
       }
       this.$store.state.selectedNode.props.assignedUser = this.select
+      this.initCollapse('.tag-action', 'showCollapse')
     },
     selected1(select) {
       this.showOrgSelect1 = false
       this.config.changeHandleUser = []
-      // this.$store.state.selectedNode.props.changeHandleUser = []
-      // debugger
       for (let key in select) {
         select[key].forEach(val => this.select1.push({
           ...val,
           label: val.label,
         }))
       }
-      // console.log(this.select1)
-      // debugger
       this.$store.state.selectedNode.props.changeHandleUser = this.select1
+      this.initCollapse('.tag-action1', 'showCollapse1')
     },
     removeOrgItem(index) {
       this.select.splice(index, 1)
@@ -460,8 +496,19 @@ svg {
   border-radius: 17px;
   margin-bottom: 16px;
 }
-.tag-action {
+.tag-action,
+.tag-action1 {
+  position: relative;
   text-align: left;
+  overflow: hidden;
+  i {
+    position: absolute;
+    right: 0;
+    bottom: 4px;
+    color: #2d5cf6;
+    font-size: 12px;
+    cursor: pointer;
+  }
 }
 .tag-box {
   display: inline-block;

@@ -72,7 +72,6 @@ export default {
       this.addReviewDialog = false;
     },
     submit() {
-      debugger
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       const data = {
         comments: `${this.form.reason}${this.form.txt.trim() ? '-' + this.form.txt : ''}`,
@@ -85,6 +84,7 @@ export default {
         signInfo: this.formBase.signInfo,
         nodeId: this.formBase.nodeId,
         taskId: this.formBase.taskId,
+        templateId: this.formBase.templateId
       }
       rollback(data).then((res) => {
         const { status, msg } = res.data;

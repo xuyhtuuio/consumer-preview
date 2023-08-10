@@ -116,12 +116,12 @@ export default {
           icon: 'icon-xiangsianli',
           sidebarParam: {}, //侧边工具栏激活项 props
         },
-        {
-          component: 'approvedOpinion',
-          toolSign: 'approved-opinion',
-          icon: 'icon-yijianshu',
-          sidebarParam: {}, //侧边工具栏激活项 props
-        },
+        // {
+        //   component: 'approvedOpinion',
+        //   toolSign: 'approved-opinion',
+        //   icon: 'icon-yijianshu',
+        //   sidebarParam: {}, //侧边工具栏激活项 props
+        // },
         {
           component: 'aiKnowledgeBase',
           toolSign: 'ai',
