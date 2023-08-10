@@ -137,7 +137,7 @@
         </div>
         <div class="right-content">
           <keep-alive>
-            <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus">
+            <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus" :coment="coment">
               <template slot="head">
                 <div class="approved-opinion-head">
                   <h2>消保审查意见书</h2>
@@ -189,6 +189,9 @@ import approvedOpinionCard from "@/components/card/approved-opinion-card.vue";
 import uploadFileCard from "@/components/card/upload-file-card";
 import filePreview from '@/components/filePreview'
 import { workSpaceAgree } from '@/api/approvalCenter'
+import {
+  ocrApprovalSubmission
+} from "@/api/aiApproval";
 import { updateAdoptEditedComments, updateEditedComments } from '@/api/applyCenter'
 export default {
   name: "order-details",
@@ -221,6 +224,7 @@ export default {
         submitLoading: false,
         storageLoading: false,
       },
+      coment: {},
       personInfo: {},
       peoples: [
         { name: "王明明", code: 1 },
@@ -273,8 +277,6 @@ export default {
       const info = JSON.parse(window.localStorage.getItem("order-detail"));
       this.info = info
       this.item = item
-
-
       // 草稿
       if (item.taskStatus == '0') {
         this.status = 0;
@@ -558,40 +560,66 @@ export default {
       if (!opinions) {
         //上传文件的逻辑
       }
-      updateAdoptEditedComments(params).then(res => {
-        this.loadings.submitLoading = false
-        //有实质意见且采纳所以的有实质意见
-        if (type && type == 1) {
-          this.$confirm("审查意见已确认，请根据审查意见修改提单内容。", "", {
-            customClass: "confirmBox",
-            confirmButtonText: "去修改",
-            cancelButtonText: "知道了",
-            closeOnClickModal: false,
-            distinguishCancelAndClose: true,
-            type: "warning",
-          }).then(() => {
-            that.toModify()
-          }).catch((e) => {
-            switch (e) {
-              case 'close':
-                that.toModify()
-                break;
-              case 'cancel':
-                break;
-            }
-          })
-        } else {
-          this.$confirm("审查意见已确认，可在申请中心查看。", "", {
-            customClass: "confirmBox",
-            cancelButtonText: "知道了",
-            showConfirmButton: false,
-            closeOnClickModal: false,
-            type: "warning",
-          })
+      const user = JSON.parse(window.localStorage.getItem('user_name'))
+      const submission = [ ]
+      const data = {
+        approvalSubmissionDto: {
+          editedCommentsDtoList: [],
+          formId: this.item.recordId
+        },
+        processInstanceId: this.item.processInstanceId,
+        taskId: this.item.taskId,
+        currentUserInfo: {
+          id: user.id,
+          name: user.fullname
         }
-      }).catch(err => {
-        this.loadings.submitLoading = false
+      }
+      console.log('vv')
+          ocrApprovalSubmission(data).then(res => {
+        const { status, msg } = res.data;
+        if (status === 200) {
+          this.$message.success({ offset: 40, message: '审查意见已提交,可在审批中心查看' });
+          this.$router.go(-1)
+        } else {
+          this.$message.error({ offset: 40, message: msg });
+        }
+
       })
+
+      // updateAdoptEditedComments(params).then(res => {
+      //   this.loadings.submitLoading = false
+      //   //有实质意见且采纳所以的有实质意见
+      //   if (type && type == 1) {
+      //     this.$confirm("审查意见已确认，请根据审查意见修改提单内容。", "", {
+      //       customClass: "confirmBox",
+      //       confirmButtonText: "去修改",
+      //       cancelButtonText: "知道了",
+      //       closeOnClickModal: false,
+      //       distinguishCancelAndClose: true,
+      //       type: "warning",
+      //     }).then(() => {
+      //       that.toModify()
+      //     }).catch((e) => {
+      //       switch (e) {
+      //         case 'close':
+      //           that.toModify()
+      //           break;
+      //         case 'cancel':
+      //           break;
+      //       }
+      //     })
+      //   } else {
+      //     this.$confirm("审查意见已确认，可在申请中心查看。", "", {
+      //       customClass: "confirmBox",
+      //       cancelButtonText: "知道了",
+      //       showConfirmButton: false,
+      //       closeOnClickModal: false,
+      //       type: "warning",
+      //     })
+      //   }
+      // }).catch(err => {
+      //   this.loadings.submitLoading = false
+      // })
     }
   },
 

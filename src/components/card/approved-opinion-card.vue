@@ -48,7 +48,7 @@
                 :rules="child.adoptOpinions != 1 ? rules : {}" class="desc-form">
                 <el-form-item prop="notAdoptingReasons" label=" " class="flex">
                   <el-input v-model="child.notAdoptingReasons" class="input-desc" :ref="`input_${index}_${idx}`"
-                    :placeholder="child.isAccept == 1 ? '请填写采纳说明' : '请填写不采纳说明'
+                    :placeholder="child.adoptOpinions == 1 ? '请填写采纳说明' : '请填写不采纳说明'
                       " @input="updateState"></el-input>
                 </el-form-item>
               </el-form>
@@ -73,6 +73,7 @@ import empty from '@/components/common/empty'
 import moment from 'moment'
 
 import { getEditedCommentsByFormId, } from '@/api/applyCenter'
+
 export default {
   name: 'approved-opinion-card',
   components: { empty },
@@ -103,7 +104,7 @@ export default {
   },
 
   mounted() {
-    this.getEditedCommentsByFormId()
+    this.$route.params.formId?this.getEditedCommentsByFormId():''
   },
   methods: {
     // 判断是否更新数据并向state更新

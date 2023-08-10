@@ -23,7 +23,7 @@
             </div>
             <div class="time-note" v-else>
               <span>任务到达：{{ activity.createTime | timeFormat }}</span>
-              <span class="handle-time">处理：<i>{{ activity.handleTime }}</i></span>
+              <span class="handle-time">处理：<i>{{ activity|handleTimeFormat }}</i> 小时</span>
               <span>任务结束：{{ activity.endTime | timeFormat }}</span>
             </div>
           </div>
@@ -120,11 +120,13 @@ export default {
             editedCommentsList: v.editedCommentsList && v.editedCommentsList.length ? v.editedCommentsList.map(m => {
               return {
                 ...m,
+                optionVOList:JSON.parse(v.optionVOList[0].comments),
                 fileList: m.associatedAttachmentsIds.split(',')
               }
             }) : []
           }
         }) : []
+        console.log('ff',this.recordList)
         return this.hasData = true
 
       }).finally(() => {

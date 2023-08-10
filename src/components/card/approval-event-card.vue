@@ -65,12 +65,12 @@
         审查
       </span>
       <!-- 待修改状态的工单 需要该审批人修改的工单显示修改-->
-      <span class="modify icon-op" v-if="item.taskStatus == 3" @click="modify(item)">
+      <!-- <span class="modify icon-op" v-if="item.taskStatus == 3" @click="modify(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-xianxingtubiao"></use>
         </svg>
         修改
-      </span>
+      </span> -->
 
       <!-- 待确认状态的工单 需要该审批人确认的工单-->
       <span class="attention check icon-op" v-if="item.taskStatus == 5" @click="check(item)">
@@ -134,6 +134,7 @@ export default {
           item: item,
           pageFrom: "apply",
           op: "check",
+          check:item.comments
         })
       );
       this.$router.push({

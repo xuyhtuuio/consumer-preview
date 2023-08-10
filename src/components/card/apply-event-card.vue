@@ -12,7 +12,7 @@
         <span class="event-name" @click="toDetail(item)">{{
           item.taskName
         }}</span>
-        <!-- 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
+        <!--最早之前的；和最新的做比对， 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
         <span class="event-status">
           <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
           <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中>{{ item.currentActivityName }}</i>
@@ -101,8 +101,8 @@
         </span>
       </div>
       <!-- 待修改 已采纳意见所有“有实质意见”显示，显示“修改、关注”按钮 流程配置中确认人配置的非工单的发起人 不展示【确认】操作-->
-      <div v-if="item.taskStatus == 2" class="flex" @click="modify(item)">
-        <span class="modify icon-op" v-if="item.hasOpinions == 1">
+      <div v-if="item.taskStatus == '3'" class="flex" @click="modify(item)">
+        <span class="modify icon-op">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-xianxingtubiao"></use>
           </svg>
