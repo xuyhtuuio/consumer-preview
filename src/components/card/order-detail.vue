@@ -269,7 +269,6 @@ export default {
       const info = JSON.parse(window.localStorage.getItem("order-detail"));
       this.info = info
       this.item = item
-      item.taskStatus = '5'
       // 草稿
       if (item.taskStatus == '0') {
         this.status = 0;
