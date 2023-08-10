@@ -127,7 +127,7 @@ export default {
           });
       }
     },
-    'fileList.length'() {
+    'fileList.length'(val) {
       if (this.judgeWarnFlag) this.judgeWarnFlag = false;
     }
   },
@@ -141,6 +141,7 @@ export default {
           item.status = 1;
         }
       });
+      this.judgeWarnFlag = false;
     },
     handleError(id, file, fileList) {
       this.fileList.forEach(item => {

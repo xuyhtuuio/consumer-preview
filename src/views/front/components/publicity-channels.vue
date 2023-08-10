@@ -18,7 +18,10 @@
         >
           <el-form-item v-for="(item, index) in list" :key="index" prop="name">
             <label slot="label"
-              >{{ item.title }}<span :style="{ color: 'red',opacity: !item.props.required && 0 }"> * </span></label
+              >{{ item.title
+              }}<span :style="{ color: 'red', opacity: !item.props.required && 0 }">
+                *
+              </span></label
             >
             <el-checkbox-group v-model="item.value">
               <el-checkbox
@@ -59,7 +62,9 @@ export default {
       if (this.judgeWarnFlag === true) this.judgeWarnFlag = false;
     },
     judgeWarn() {
-      if (this.list.some(item => item.value.length !== 0)) {
+      if (this.list.length === 0) {
+        return [true];
+      } else if (this.list.some(item => item.value.length !== 0)) {
         return [true];
       } else {
         const offsetTop = this.$refs[`globalRef`].offsetTop;
@@ -95,6 +100,4 @@ export default {
     }
   }
 }
-
-
 </style>

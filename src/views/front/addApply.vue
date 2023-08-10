@@ -9,6 +9,7 @@
         ref="refReviewMatters"
         class="cnt-head"
         :list="reviewList"
+        :formManagementId="formManagementId"
         @handleTo="handleReviewClick"
       />
       <div class="cnt-main">
@@ -28,6 +29,25 @@
       </div>
     </div>
     <secondary-confirmation ref="RefSecondaryCon" :option="confirmOption"></secondary-confirmation>
+    <el-dialog
+      class="loadingDialog"
+      :visible.sync="submitDialogVisible"
+      width="500px"
+      append-to-body
+      :close-on-press-escape="false"
+      :close-on-click-modal="false"
+      :show-close="false"
+      center
+    >
+      <div class="item">
+        <g-icon stylePx="44" href="#icon-zhengzaishangchuan"></g-icon>
+      </div>
+      <div class="item">
+        <span class="text">正在提交申请，请耐心等待</span>
+        <img class="img" src="@/assets/image/gif/loading.gif" alt="" />
+      </div>
+      <span class="item">提交成功后可在申请中心查看，了解工单审批进度</span>
+    </el-dialog>
   </div>
 </template>
 
@@ -63,12 +83,14 @@ export default {
     cardInfo: '提醒：产品类内容审查，需于在产品上线/宣传前14天进行提交。',
     isLoading: true,
     isGLoading: false,
+    submitDialogVisible: false,
     reviewList: [],
     promotionChannels: [],
     basicInformation: [],
     keyPointsForVerification: [],
     reviewMaterials: [],
     formId: undefined,
+    formManagementId: -1,
     confirmOption: {
       message: '是否保存当前编辑内容？',
       cancelBtn: '不保存',
@@ -80,14 +102,21 @@ export default {
   created() {
     // this.initialData();
   },
-  beforeRouteEnter({ name, params: { id } }, from, next) {
+  beforeRouteEnter({ name, params: { id, formManagementId } }, from, next) {
     if (name === 'addApply') return next();
     next(vm => {
       if (id || window.localStorage.getItem('editId')) {
         vm.formId = id || window.localStorage.getItem('editId');
+        vm.formManagementId = formManagementId || window.localStorage.getItem('formManagementId');
+        console.log(vm.formManagementId);
         window.localStorage.setItem('editId', id || window.localStorage.getItem('editId'));
+        window.localStorage.setItem(
+          'formManagementId',
+          formManagementId || window.localStorage.getItem('formManagementId')
+        );
       } else {
         vm.formId = undefined;
+        vm.formManagementId = -1;
       }
     });
   },
@@ -115,6 +144,7 @@ export default {
   },
   deactivated() {
     this.formId = undefined;
+    this.formManagementId = undefined;
     this.initialData();
     this.handleClear();
   },
@@ -144,26 +174,42 @@ export default {
       this.basicInformation = [];
       this.keyPointsForVerification = [];
       this.reviewMaterials = [];
+      this.$refs['publicityChannelsRef'].judgeWarnFlag = false;
+      this.$refs['reconPointRef'].judgeWarnFlag = false;
+      this.$refs['reviewMaterialRef'].judgeWarnFlag = false;
       // this.isLoading = true
     },
     // 审查事项类型
     handleReviewClick(id) {
+      this.isLoading = true;
       this.clearForm();
       getApplyForm({
         formId: this.formId,
         formCategoryId: id
-      }).then(res => {
-        const { basicInformation, promotionChannels, keyPointsForVerification, reviewMaterials } =
-          res.data.data;
-        this.basicInformation = basicInformation;
-        this.promotionChannels = promotionChannels;
-        this.keyPointsForVerification = keyPointsForVerification;
-        this.reviewMaterials = reviewMaterials;
-        this.isLoading = false;
-        this.isGLoading = false;
+      }).then(({ data: { data: res, msg, success } }) => {
+        if (success) {
+          const { basicInformation, promotionChannels, keyPointsForVerification, reviewMaterials } =
+            res;
+          this.basicInformation = basicInformation;
+          this.promotionChannels = promotionChannels;
+          this.keyPointsForVerification = keyPointsForVerification;
+          this.reviewMaterials = reviewMaterials;
+          this.isLoading = false;
+          this.isGLoading = false;
+        }else {
+          // this.$message.error(msg)
+          this.isLoading = false;
+          this.isGLoading = false;
+        }
       });
-      externalLogicController({ formId: id }).then(({ data: { data: res } }) => {
-        (this.templateId = res.templateId), (this.processDefinitionId = res.processDefinitionId);
+      externalLogicController({ formId: id }).then(({ data: { data: res, msg, success } }) => {
+        if (success) {
+          this.templateId = res.templateId;
+          this.processDefinitionId = res.processDefinitionId;
+        } else {
+          // this.$message.error(msg)
+          this.isLoading = false;
+        }
       });
     },
     // 提交
@@ -190,17 +236,14 @@ export default {
 
       const [result2, offsetTop2] = this.$refs['reviewMaterialRef'].judgeWarn();
       if (!result0 || !result || !result1 || !result2) {
+        console.log(result0, result, result1, result2);
         if (!result0) return;
         return this.rollTo(offsetTop ? offsetTop : offsetTop1 ? offsetTop1 : offsetTop2);
       }
       this.submitTrue();
     },
     submitTrue(flag = true, success) {
-      if (this.isGLoading) return;
-      this.isGLoading = true;
-
       const result = {
-        approvalType: this.basicInformation[1].value,
         entryName: this.basicInformation[0].value,
         form_managementId: 1,
         uptime: '',
@@ -236,33 +279,39 @@ export default {
       result.formItemDataList = formItemDataList;
 
       if (flag) {
+        if (this.submitDialogVisible) return;
+        this.submitDialogVisible = true;
         // submit(result).then(res => {
         //   this.$message({ type: 'success', message: res.data.data });
         //   this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
         // });
-        const { userId:id, fullname:name } = this.$refs['refAddTag'];
+        const { userId: id, fullname: name } = this.$refs['refAddTag'];
         processStart({
           templateId: this.templateId,
           processDefinitionId: this.processDefinitionId,
           startUserInfo: {
             id,
-            name,
+            name
           },
           submitDto: result
         })
-          .then(({ data: { success ,msg:message} }) => {
+          .then(({ data: { success, msg: message } }) => {
             if (success) {
+              this.submitDialogVisible = false;
               this.$message({ type: 'success', message: '提交成功' });
               this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
-            }else {
-              this.$message({ type: 'error', message});
+            } else {
+              this.$message({ type: 'error', message });
+              this.submitDialogVisible = false;
             }
           })
           .catch(err => {
-            this, $message({ type: 'error', message: '提交失败' });
+            // this.$message({ type: 'error', message: '提交失败' });
+            this.submitDialogVisible = false;
           });
-      }
-      !flag &&
+      } else {
+        if (this.isGLoading) return;
+        this.isGLoading = true;
         saveDraft(result).then(({ data: { data, msg } }) => {
           this.formId = data;
           this.$message({ type: 'success', message: msg });
@@ -271,6 +320,7 @@ export default {
           this.handleClear();
           typeof success === 'function' && success();
         });
+      }
     },
     rollTo(offsetTop) {
       document
@@ -292,7 +342,7 @@ export default {
         return this.submitTrue(false, success);
       }
     }
-  },
+  }
 };
 </script>
 
@@ -334,11 +384,46 @@ export default {
     }
   }
 }
+/deep/.el-dialog.loadingDialog {
+  padding: 40px 60px;
+  border-radius: 10px;
+  .el-dialog__header {
+    padding: 0;
+  }
+  .el-dialog__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
 
-
-
-
-
+    .item {
+      position: relative;
+      z-index: 2;
+      .text {
+        position: relative;
+        z-index: 2;
+      }
+      &:nth-child(2) {
+        .img {
+          position: relative;
+          left: 16px;
+          top: 4px;
+          width: 28px;
+          height: 20px;
+          transform: scale(4);
+        }
+      }
+      &:not(:first-child) {
+        margin-top: 16px;
+      }
+      &:last-child {
+        line-height: 20px;
+        font-size: 12px;
+        color: #86909c;
+      }
+    }
+  }
+}
 
 
 
