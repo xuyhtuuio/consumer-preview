@@ -661,6 +661,8 @@ export default {
           }
 
           .info {
+            display: flex;
+            justify-content: start;
             &-item {
               margin-right: 24px;
 
@@ -1012,6 +1014,9 @@ export default {
     }
   }
 }
+
+
+
 
 
 </style>

@@ -77,6 +77,7 @@ export default {
           valLen += listItem.props.options.length;
         });
         this.checkAll = len === valLen ? true : false;
+        this.checkAll && (this.judgeWarnFlag = false)
       },
       deep: true
     }
@@ -148,4 +149,6 @@ export default {
     padding: 16px 72px 0;
   }
 }
+
+
 </style>
