@@ -10,7 +10,24 @@
       </div>
     </div>
     <div class="right flex">
-      <i v-for="(item, index) in iconList" :key="index" @click="toManagePage(item)" :class="['iconfont', item.href, `icon${index + 1}`]"></i>
+      <i v-for="(item, index) in iconList" :key="index" @click="toManagePage(item)"
+        :class="['iconfont', item.href, `icon${index + 1}`]"></i>
+      <!-- 个人中心 -->
+      <el-popover placement="bottom" trigger="click" @show="updateInfo" width="320">
+        <div class="userInfo">
+          <img class="ocr-avatar" src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
+          <p>
+            <span class="nickname"> {{ userInfo && userInfo.fullname }}{{ userInfo && ` / ${userInfo.id}` }} </span>
+            <span class="role" v-if="userInfo.role">{{ userInfo.role }}</span>
+          </p>
+          <p class="orgs">
+            <i class="iconfont icon-dept"></i>
+            {{ userInfo?.org?.join('/') }}
+          </p>
+          <el-button class="logout" @click="logout"><i class="iconfont icon-tuichudenglu"></i> 退出登录</el-button>
+        </div>
+        <i slot="reference" :class="['iconfont', 'icon-gerenyonghutouxiang2']"></i>
+      </el-popover>
     </div>
   </div>
 </template>
@@ -20,18 +37,19 @@ export default {
   data() {
     return {
       list: [
-        { title: "首页", name: "home",sign:'home' },
-        { title: "申请中心", name: "apply-list",sign:'applycenter' },
-        { title: "审批中心", name: 'approval-list' ,sign:'approvalcenter'},
+        { title: "首页", name: "home", sign: 'home' },
+        { title: "申请中心", name: "apply-list", sign: 'applycenter' },
+        { title: "审批中心", name: 'approval-list', sign: 'approvalcenter' },
         // { title: "人员中心" },
-        { title: "产品图谱", name: "productmap", sign: "productmap"},
+        { title: "产品图谱", name: "productmap", sign: "productmap" },
       ],
       activeMenu: 'home',
       iconList: [
         // { href: "icon-tongyongtubiao3" },
         { href: "icon-tongyongtubiao5", name: 'manage' },
-        { href: "icon-gerenyonghutouxiang2" },
-      ]
+        // { href: "icon-gerenyonghutouxiang2" },
+      ],
+      userInfo: {}
     }
   },
   watch: {
@@ -58,6 +76,30 @@ export default {
 
   },
   methods: {
+    logout() {
+      this.$router.push({
+        name: 'login'
+      })
+    },
+    updateInfo() {
+      const user = JSON.parse(window.localStorage.getItem('user_name'))
+      user.orgs[0].child = JSON.parse(JSON.stringify(user.orgs[0]))
+      const org = this.getOrgs(user.orgs[0], [])
+      const role = user.roles.filter(item => item.clientId === 'cpr')
+      this.userInfo = {
+        ...user,
+        org,
+        role: role?.[0]?.name?.split('-')?.[1]
+      }
+    },
+    getOrgs(item, org) {
+      org.push(item.name)
+      if (item?.child?.name) {
+        return this.getOrgs(item.child, org)
+      } else {
+        return org;
+      }
+    },
     handleItem(item) {
       this.activeMenu = item.sign
       this.$router.push({
@@ -158,14 +200,76 @@ export default {
   }
 }
 
+.userInfo {
+  padding: 4px 12px;
 
+  .ocr-avatar {
+    width: 32px;
+  }
 
+  p {
+    margin: 8px 0;
+  }
 
+  .nickname {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    color: #1D2128;
+  }
 
+  .role {
+    margin-left: 8px;
+    padding: 4px 12px;
+    background: linear-gradient(180deg, #FFF7E6 0%, rgba(255, 247, 230, 0) 100%);
+    color: #FA8C16;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 20px;
+  }
 
+  .orgs {
+    display: flex;
+    background: linear-gradient(180deg, #F7F8FA 0%, rgba(247, 248, 250, 0) 100%);
+    padding: 8px;
+    border-radius: 4px;
+    color: #505968;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 22px;
+    gap: 10px;
 
+    .icon-dept {
+      color: #2D5CF6;
+      font-size: 22px;
+    }
+  }
 
+  .logout {
+    width: 100%;
+    border: none;
+    background: #F7F8FA;
+    color: #1D2128;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 30px;
 
+    &:hover {
+      background: #F7F8FA;
+      color: #1D2128;
+    }
 
+    /deep/ span {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
+    .icon-tuichudenglu {
+      color: #2D5CF6;
+      margin-right: 8px;
+      font-size: 18px;
+    }
+  }
+}
 </style>

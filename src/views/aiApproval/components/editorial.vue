@@ -15,7 +15,7 @@
             v-for="(item, i) in recommend.list.slice(0, recommend.hideMore ? 3 : recommend.list.length)" :key="i"
             :class="{ active: item.id === recommend.selected, edit: item.showEdit }">
             <p style="cursor: pointer;" @dblclick="showEdit(a, i)" v-if="!item.showEdit">{{ item.str }}</p>
-            <el-input v-else :ref="`input_${a}_${i}`" @blur="hideEdit(a, i)" v-model.trim="input" placeholder="请输入意见"
+            <el-input v-else :ref="`input_${a}_${i}`" @blur="hideEdit(a, i, true)" v-model.trim="input" placeholder="请输入意见"
               type="textarea" :rows="3" class="edit-input" resize="none"
               @keyup.enter.native="hideEdit(a, i, true)"></el-input>
             <i class="checkbox" @click="changeSelect(a, i)" :class="{ active: item.id === recommend.selected }"></i>
@@ -57,8 +57,8 @@
         </div>
         <!-- 可手动新增 -->
         <div class="list-item list-item2 list-edit" :class="{ edit: newFocus }">
-          <el-input ref="input_edit" v-model.trim="newInput" placeholder="可以输入新的意见" type="textarea" :rows="3"
-            class="edit-input" resize="none" @blur="addNewComment()" @focus="inputFocus"
+          <el-input ref="input_edit" v-model.trim="newInput" placeholder="可以输入新的意见，按Enter键确认" type="textarea" :rows="3"
+            class="edit-input" resize="none" @blur="addNewComment(true)" @focus="inputFocus"
             @keyup.enter.native="addNewComment(true)"></el-input>
           <div class="item-files">
             <span>文件来源：</span>

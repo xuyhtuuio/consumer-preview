@@ -1,11 +1,11 @@
 <template>
     <div class="ocr-apply-form">
         <order-basic-info :sidebarParam="sidebarParam" @preview=preview :personInfo="personInfo">
-            <template slot="apply-modify">
+            <!-- <template slot="apply-modify">
                 <el-button type="text" class="apply-modify">
                     <i class="icon el-icon-edit-outline"></i>修改申请单
                 </el-button>
-            </template>
+            </template> -->
 
         </order-basic-info>
     </div>

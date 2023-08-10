@@ -500,6 +500,12 @@ export default {
       this.searchList();
     },
   },
+  beforeRouteEnter(to,from,next){
+    next(()=>{
+      localStorage.removeItem('order-detail')
+    })
+   },
+
 };
 </script>
 <style lang="less" scoped>
@@ -726,6 +732,7 @@ export default {
         justify-content: space-between;
         .el-select{
           margin-right: 16px;
+          flex: 1;
         }
         .el-select:last-of-type {
           margin-right: 0;

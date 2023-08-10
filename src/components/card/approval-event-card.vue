@@ -48,20 +48,10 @@
         <span class="sDate date">发起时间：{{ item.createTime | timeFormate }}</span>
         <span class="sDate date">更新时间：{{ item.updateTime | timeFormate }}</span>
         <span class="sDate date">上线时间：{{ item.uptime | timeFormate }}</span>
-        <!-- <span class="handler date">当前处理人：王明明</span> -->
-        <el-popover placement="bottom" trigger="hover" popper-class="popper-persons"
-          v-if="item.originator && item.originator.name">
-          <div style="text-align: center;">
-            {{ item.originator && item.originator.label }}
-          </div>
-          <span slot="reference" class="handler date pointer">发起人：{{
-            item.originator && item.originator.name
-          }}</span>
-        </el-popover>
-        <span class="handler date" v-else>发起人：--</span>
+        <span class="handler date">发起人：{{  item.originator && item.originator.name }}</span>
         <span class="handler">
           <i class="iconfont icon-dept"></i>
-          {{ item.institution }}</span>
+         {{ item.originator && item.originator.label }}</span>
       </div>
     </div>
     <!-- 任务状态（0:草稿 1：审查中 2：待修改 3：待确认 4：已完成 -->
@@ -122,7 +112,7 @@ export default {
       });
     },
     toDetail(item) {
-      window.sessionStorage.setItem("order-detail", JSON.stringify({
+      window.localStorage.setItem("order-detail", JSON.stringify({
         item,
         clickPoint: "taskName",
       }));
@@ -137,7 +127,7 @@ export default {
       });
     },
     check(item) {
-      window.sessionStorage.setItem(
+      window.localStorage.setItem(
         "order-detail",
         JSON.stringify({
           item: item,
@@ -177,6 +167,7 @@ export default {
       });
     },
   },
+
   filters: {
     timeFormate(val) {
       return val ? moment(val).format('YYYY-MM-DD HH:mm:ss') : '--'

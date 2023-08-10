@@ -299,7 +299,7 @@ export default {
   & > div{
     padding: 5px;
     margin: 2px 0;
-    width: 220px;
+    width: 250px;
     text-align: left;
     border-radius: 3px;
     background: rgb(242 242 242);

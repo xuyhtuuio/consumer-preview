@@ -41,9 +41,9 @@
               <el-option v-for="(item, index) in adoptionSituations" :key="index" :label="item.label"
                 :value="item.value"></el-option>
             </el-select>
-            <el-cascader :options="agenciesList" placeholder="提单机构" ref="agencies" v-model="search.institutionalCode"
-              :show-all-levels="false" @change="changeAgencies"
-              :props="{ checkStrictly: true, label: 'name', value: 'id', children: 'children', }" clearable></el-cascader>
+            <el-cascader :options="agenciesList" placeholder="提单机构" ref="agencies" v-model="search.orgIds"
+              :show-all-levels="false" @change="changeAgencies"  
+              :props="{ checkStrictly: true,label: 'name', value: 'id', children: 'children', }" clearable></el-cascader>
             <el-select v-model="search.updateTime2" placeholder="排序" ref="multiSelect" multiple @change="changeSort"
               :class="search.updateTime2[1] == 'desc'
                 ? 'arrow-select descArrow'
@@ -145,13 +145,13 @@ export default {
         urgent: "",
         hasOpinions: "",
         adoptionStatus: "",
-        updateTime: [2, "asc"],
-        updateTime2: [2, "asc"],
+        updateTime: [2, "desc"],
+        updateTime2: [2, "desc"],
         keywords: "",
         productLaunchDate: "",
         total: 0,
         loading: false,
-        institutionalCode: "",
+        orgIds: [],
       },
       agenciesList: [],
       transactionTypes: [],
@@ -380,8 +380,9 @@ export default {
         pageSize: 10,
         ...this.search,
         listType,
-        institutionalCode: this.search.institutionalCode && this.search.institutionalCode[0],
-        nodeid: this.search.approvalStage
+        nodeid: this.search.approvalStage,
+        orgIds:this.search.orgIds.length?this.search.orgIds:null,
+
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间
@@ -459,12 +460,17 @@ export default {
         productLaunchDate: "",
         total: 0,
         loading: false,
-        institutionalCode: "",
+        orgIds: [],
       };
       this.approvalPhases = [];
       this.searchList();
     },
   },
+  beforeRouteEnter(to,from,next){
+    next(()=>{
+      localStorage.removeItem('order-detail')
+    })
+   },
 };
 </script>
 <style lang="less" scoped>

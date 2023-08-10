@@ -1,35 +1,35 @@
 <template>
   <div class="record-detail" v-loading="loading">
     <empty v-if="!hasData"></empty>
-    <div v-else> 
-    <div v-for="(activity, index) in recordList" :key="index" class="task-item pointer">
-      <div class="left">
-        <div class="top-line"></div>
-        <img src="@/assets/image/ai-approval/timeline-ellipse.svg" alt="" class="dot" />
-        <div class="bottom-line"></div>
-      </div>
-      <div class="right">
-        <p class="taskname-staff">
-          <span class="taskname">{{ activity.name }}</span>
-          <span class="staff">
-            <i>{{ activity.nodeUser }}</i>
-            <i class="post" v-if="activity.orgName">（{{ activity.orgName }}）</i>
-            <img src="@/assets/image/ai-approval/record-avatar.svg" alt="" />
-          </span>
-        </p>
-        <div class="time-notes">
-          <div v-if="activity.activityId == 'root'">
-            任务发起：{{ activity.createTime|timeFormat }}
-          </div>
-          <div class="time-note" v-else>
-            <span>任务到达：{{ activity.createTime | timeFormat }}</span>
-            <span class="handle-time">处理：<i>{{ activity.handleTime }}</i></span>
-            <span>任务结束：{{ activity.endTime | timeFormat }}</span>
-          </div>
+    <div v-else>
+      <div v-for="(activity, index) in recordList" :key="index" class="task-item pointer">
+        <div class="left">
+          <div class="top-line"></div>
+          <img src="@/assets/image/ai-approval/timeline-ellipse.svg" alt="" class="dot" />
+          <div class="bottom-line"></div>
         </div>
-        <div class="opinions" v-if="activity.activityId !== 'root'">
-          <!-- ocr审批有个关联的审查要点 -->
-          <!-- <div class="point opinions-item">
+        <div class="right">
+          <p class="taskname-staff">
+            <span class="taskname">{{ activity.name }}</span>
+            <span class="staff">
+              <i>{{ activity.nodeUser }}</i>
+              <i class="post" v-if="activity.orgName">（{{ activity.orgName }}）</i>
+              <img src="@/assets/image/ai-approval/record-avatar.svg" alt="" />
+            </span>
+          </p>
+          <div class="time-notes">
+            <div v-if="activity.activityId == 'root'">
+              任务发起：{{ activity.createTime | timeFormat }}
+            </div>
+            <div class="time-note" v-else>
+              <span>任务到达：{{ activity.createTime | timeFormat }}</span>
+              <span class="handle-time">处理：<i>{{ activity.handleTime }}</i></span>
+              <span>任务结束：{{ activity.endTime | timeFormat }}</span>
+            </div>
+          </div>
+          <div class="opinions" v-if="activity.activityId !== 'root'">
+            <!-- ocr审批有个关联的审查要点 -->
+            <!-- <div class="point opinions-item">
             <div class="opinion-tag">
               <span class="approval-point-icon guanzhu" style="background: #505968;color: #fff">
                 <i class="iconfont icon icon-tubiao4"></i>审查要点
@@ -42,9 +42,9 @@
               <span><i style="color: #86909C;">审查要点：</i>承担义务不得低于宣传所承诺的标准</span>
             </div>
           </div> -->
-          <div v-for="(item, idx) in activity.optionVOList" :key="idx" class="opinions-item">
-               <!-- v-if="activity.targetPage === 'ocr'" -->
-            <!-- <div class="opinion-tag">
+            <div v-for="(item, idx) in activity.optionVOList" :key="idx" class="opinions-item">
+              <!-- v-if="activity.targetPage === 'ocr'" -->
+              <!-- <div class="opinion-tag">
               <span v-if="item.substantiveOpinions == 1" class="guanzhu">
              
                 <i class="iconfont icon icon-guanzhu"></i>
@@ -55,8 +55,8 @@
                 无实质意见
               </span>
             </div> -->
-            <p class="opinion-text">{{ idx + 1 }} {{ item.comments }}</p>
-            <!-- <div class="relevant-file">
+              <p class="opinion-text">{{ idx + 1 }} {{ item.comments }}</p>
+              <!-- <div class="relevant-file">
               关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.fileList && item.fileList[0] }} </i>
               <el-popover placement="bottom" popper-class="file-overview-popper" trigger="click"
                 v-if="item.fileList && item.fileList.length > 1">
@@ -68,11 +68,11 @@
                 <i slot="reference">+{{ item.fileList.length - 1 }}</i>
               </el-popover>
             </div> -->
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 <script>
@@ -81,40 +81,43 @@ import { instanceInfo } from '@/api/applyCenter'
 import empty from '@/components/common/empty'
 export default {
   components: { empty },
-  name:'approved-record-card',
+  name: 'approved-record-card',
   props: {
-        sidebarParam: {
-            type: Object,
-            default: () => { }
-        }
-    },
+    sidebarParam: {
+      type: Object,
+      default: () => { }
+    }
+  },
   data() {
     return {
       hasData: false,
-      loading:false,
+      loading: false,
       recordList: [],
     };
   },
   mounted() {
-    this.init()
+    if (this.sidebarParam) {
+      this.init()
+    }
   },
-  activated(){
+  activated() {
     this.init()
+
   },
   methods: {
     init() {
       this.loading = true
       instanceInfo({
-        "processInstanceId": this.$route.params.processInstanceId||this.sidebarParam.processInstanceId||'32054c89-35d8-11ee-888e-d4d853dcb3dc',
+        "processInstanceId": this.$route.params && this.$route.params.processInstanceId || this.sidebarParam && this.sidebarParam.processInstanceId || '32054c89-35d8-11ee-888e-d4d853dcb3dc',
       }).then(res => {
         const { endDetailsList } = res.data.data
         if (!endDetailsList) {
           return this.hasData = false
         }
-        this.recordList = endDetailsList instanceof Array&& endDetailsList.length ? endDetailsList.map(v => {
+        this.recordList = endDetailsList instanceof Array && endDetailsList.length ? endDetailsList.map(v => {
           return {
             ...v,
-            editedCommentsList: v.editedCommentsList&&v.editedCommentsList.length ? v.editedCommentsList.map(m => {
+            editedCommentsList: v.editedCommentsList && v.editedCommentsList.length ? v.editedCommentsList.map(m => {
               return {
                 ...m,
                 fileList: m.associatedAttachmentsIds.split(',')

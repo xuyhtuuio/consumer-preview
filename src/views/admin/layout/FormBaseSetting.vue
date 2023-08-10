@@ -58,9 +58,7 @@
 <script>
 import orgPicker from '@/components/common/organizationPicker'
 import { itemPagingList } from '@/api/manage'
-import {
-  obtainExamineTypeList,
-} from '@/api/manage'
+import { getFormCategoryArray } from '@/api/front'
 export default {
   name: "FormBaseSetting",
   components: {orgPicker},
@@ -103,15 +101,10 @@ export default {
       }
     },
     async getObtainExamineTypeList() {
-      const res = await obtainExamineTypeList({
-        pageNow: 1,
-        pageSize: 5000,
-        orderColumn: 'updateTime',
-        orderType: 'desc'
-      })
+      const res = await getFormCategoryArray();
       const resData = res.data.data
       if (resData) {
-        this.fromGroup = resData.data.list.map(item => {
+        this.fromGroup = resData[0].map(item => {
           return {
             name: item.examineTypesName,
             id: item.recordId
@@ -157,6 +150,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-select:last-of-type {
+  margin-right: 0;
+}
+
+/deep/ .el-select .el-input .el-icon-arrow-up::before {
+  font-family: element-icons !important;
+  content: "\e78f";
+}
 /deep/ .el-select-dropdown {
   display: none;
 }
