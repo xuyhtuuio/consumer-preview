@@ -137,7 +137,7 @@
                   <div
                     class="tag-item blue"
                     v-if="
-                      item.submitted === 1 &&
+                      item.submitted === 1 && item.sponsorMap &&
                       userInfo.id + '' === item.sponsorMap.id
                     "
                   >
