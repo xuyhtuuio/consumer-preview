@@ -108,6 +108,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-select:last-of-type {
+  margin-right: 0;
+}
+
+/deep/ .el-select .el-input .el-icon-arrow-up::before {
+  font-family: element-icons !important;
+  content: "\e78f";
+}
 .icon {
   width: 24px;
   height: 24px;
