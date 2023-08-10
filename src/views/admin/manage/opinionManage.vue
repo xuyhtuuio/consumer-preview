@@ -662,7 +662,7 @@ export default {
 
           .info {
             display: flex;
-            justify-content: start;
+            justify-content: flex-start;
             &-item {
               margin-right: 24px;
 

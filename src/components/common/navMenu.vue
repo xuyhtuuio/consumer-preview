@@ -20,7 +20,7 @@
             <span class="nickname"> {{ userInfo && userInfo.fullname }}{{ userInfo && ` / ${userInfo.id}` }} </span>
             <span class="role" v-if="userInfo.role">{{ userInfo.role }}</span>
           </p>
-          <p class="orgs">
+          <p class="orgs" v-if="userInfo?.org">
             <i class="iconfont icon-dept"></i>
             {{ userInfo?.org?.join('/') }}
           </p>
@@ -83,8 +83,7 @@ export default {
     },
     updateInfo() {
       const user = JSON.parse(window.localStorage.getItem('user_name'))
-      user.orgs[0].child = JSON.parse(JSON.stringify(user.orgs[0]))
-      const org = this.getOrgs(user.orgs[0], [])
+      const org = user.orgs?.[0] ? this.getOrgs(user.orgs[0], []) : ''
       const role = user.roles.filter(item => item.clientId === 'cpr')
       this.userInfo = {
         ...user,
