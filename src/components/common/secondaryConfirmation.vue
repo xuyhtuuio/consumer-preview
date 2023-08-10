@@ -85,7 +85,7 @@ export default {
     }
     .el-button--primary{
       line-height: 24px;
-      background: linear-gradient(90deg, #2F54EB 0%, #5196FF 100%);
+      background: #2D5CF6;
       border: none;
     }
   }
