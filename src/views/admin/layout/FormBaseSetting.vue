@@ -57,7 +57,6 @@
 
 <script>
 import orgPicker from '@/components/common/organizationPicker'
-import {getFormGroups, updateGroup} from '@/api/design'
 import { itemPagingList } from '@/api/manage'
 import {
   obtainExamineTypeList,
@@ -144,7 +143,7 @@ export default {
     validate(){
       this.$refs.baseSetting.validate()
       let err = []
-      if ((this.setup.templateName === null) || (this.setup.templateName?.length < 2) || (this.setup.templateName?.length > 10)){
+      if ((!this.setup.templateName) || (this.setup.templateName?.length < 2) || (this.setup.templateName?.length > 10)){
         err.push('流程名称未设置或长度不对')
       }
       if (!this.$isNotEmpty(this.setup.formId) || !this.setup.formId){

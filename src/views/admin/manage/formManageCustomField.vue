@@ -241,6 +241,7 @@
               type: data.name,
               formCategoryId: this.parentForm.recordId,
               formItemId: this.currentRow?.id,
+              sort: this.currentRow?.sort,
               data
             }
             if (this.checkOptionValue(data.name)) {
