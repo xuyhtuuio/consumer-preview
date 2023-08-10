@@ -4,7 +4,7 @@
             <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-a-Rectangle143"></use>
             </svg>
-            审批记录明细
+            审批记录
         </p>
         <div class="workflow">
             <approvalRecordCard :sidebarParam="sidebarParam"> </approvalRecordCard>
