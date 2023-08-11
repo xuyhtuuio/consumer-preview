@@ -290,7 +290,7 @@ export default {
           this.crtComp = "approvalRecordCard";
         } else if (originRouter == 'approvalcenter') {
           //区分是否OCR审批还是领导审批  先写死OCR
-          this.isOCR = this.item.nodeName.indexOf('消保') == -1
+          this.isOCR = true
           !this.isOCR ? (this.status = 2, this.crtComp = "leaderEditOpinion") : (
             this.status = 0,
             this.crtComp = "approvalRecordCard"
