@@ -42,17 +42,17 @@
             <!-- </div> -->
             <!-- <div class="floor1-item"> -->
             <el-select v-model="search.urgent" placeholder="是否加急" @change="searchList" clearable>
-              <el-option v-for="(item, index) in isUrgents" :key="index" :label="item.label"
+              <el-option v-for="(item, index) in $field('isUrgent')" :key="index" :label="item.label"
                 :value="item.value"></el-option>
             </el-select>
             <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @change="searchList" clearable>
-              <el-option v-for="(item, index) in isOpinions" :key="index" :label="item.label"
+              <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
                 :value="item.value"></el-option>
             </el-select>
             <!-- </div> -->
             <!-- <div class="floor1-item"> -->
             <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @change="searchList" clearable>
-              <el-option v-for="(item, index) in adoptionSituations" :key="index" :label="item.label"
+              <el-option v-for="(item, index) in $field('adoptionSituations')" :key="index" :label="item.label"
                 :value="item.value"></el-option>
             </el-select>
             <el-select v-model="search.updateTime2" ref="multiSelect" placeholder="排序" multiple @change="changeSort"
@@ -60,7 +60,7 @@
                 ? 'arrow-select descArrow'
                 : 'arrow-select ascArrow'
                 ">
-              <el-option-group v-for="group in updateTimeGroup" :key="group.label">
+              <el-option-group v-for="group in $field('updateTimeGroup')" :key="group.label">
                 <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
               </el-option-group>
@@ -208,44 +208,7 @@ export default {
       },
       transactionTypes: [],
       approvalPhases: [],
-      isUrgents: [
-        { label: "普通", value: "0" },
-        { label: "加急", value: "1" },
-      ],
-      isOpinions: [
-        { label: "无", value: "0" },
-        { label: "有", value: "1" },
-      ],
-      adoptionSituations: [
-        { label: "未采纳", value: "0" },
-        { label: "已采纳", value: "1" },
-      ],
-      updateTimeGroup: [
-        {
-          options: [
-            {
-              value: 1,
-              label: "发起时间",
-            },
-            {
-              value: 2,
-              label: "更新时间",
-            },
-          ],
-        },
-        {
-          options: [
-            {
-              value: "asc",
-              label: "升序",
-            },
-            {
-              value: "desc",
-              label: "降序",
-            },
-          ],
-        },
-      ],
+
       list: [],
       // list: []
     };

@@ -4,6 +4,44 @@ export default (function () {
   let messages = {}
   locales.FIELDS = fields
   locales.MESSAGES = messages
+  fields.isUrgent=[
+    { label: "普通", value: "0" },
+    { label: "加急", value: "1" },
+  ]
+  fields.isOpinions= [
+    { label: "无", value: "0" },
+    { label: "有", value: "1" },
+  ],
+  fields.adoptionSituations=[
+    { label: "未采纳", value: "0" },
+    { label: "已采纳", value: "1" },
+  ],
+  fields.updateTimeGroup= [
+    {
+      options: [
+        {
+          value: 1,
+          label: "发起时间",
+        },
+        {
+          value: 2,
+          label: "更新时间",
+        },
+      ],
+    },
+    {
+      options: [
+        {
+          value: "asc",
+          label: "升序",
+        },
+        {
+          value: "desc",
+          label: "降序",
+        },
+      ],
+    },
+  ],
   messages['NodeStatus'] = {
     '0': '草稿',
     '1': '审批中',

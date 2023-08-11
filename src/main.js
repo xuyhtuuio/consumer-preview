@@ -35,9 +35,13 @@ Vue.prototype.$GLOBAL = $GLOBAL; // 全局常量
 Vue.prototype.$http = http; // 请求库
 Vue.mixin({
   methods: {
-    $msg: (key) => {
+    $msg: function (key) {
       return $locale.MESSAGES[key]
+    },
+    $field: function (key) {
+      return $locale.FIELDS[key]
     }
+
   }
 })
 
