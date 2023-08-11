@@ -1,13 +1,15 @@
 <template>
   <div class="nav">
-    <div class="left flex">
+    <div class="left flex" @click="returnHome">
       <img src="@/assets/image/logo.png" alt="" class="logo">
       消保管控平台
     </div>
     <div class="center flex">
-      <div class="nav-item" v-for="item, index in list" :key="index" @click="handleItem(item)">
-        <span :class="[activeMenu == item.sign ? 'active-menu' : '']">{{ item.title }}</span>
-      </div>
+      <template v-if="$route.name !== 'home'">
+        <div class="nav-item" v-for="item, index in list" :key="index" @click="handleItem(item)">
+          <span :class="[activeMenu == item.sign ? 'active-menu' : '']">{{ item.title }}</span>
+        </div>
+      </template>
     </div>
     <div class="right flex">
       <i v-for="(item, index) in iconList" :key="index" @click="toManagePage(item)"
@@ -37,7 +39,7 @@ export default {
   data() {
     return {
       list: [
-        { title: "首页", name: "home", sign: 'home' },
+        // { title: "首页", name: "home", sign: 'home' },
         { title: "申请中心", name: "apply-list", sign: 'applycenter' },
         { title: "审批中心", name: 'approval-list', sign: 'approvalcenter' },
         // { title: "人员中心" },
@@ -80,6 +82,9 @@ export default {
       this.$router.push({
         name: 'login'
       })
+    },
+    returnHome() {
+      this.$router.push('/home')
     },
     updateInfo() {
       const user = JSON.parse(window.localStorage.getItem('user_name'))
@@ -140,7 +145,7 @@ export default {
 
   .left {
     font-weight: 700;
-
+    cursor: pointer;
     .logo {
       width: 32px;
       height: 32px;

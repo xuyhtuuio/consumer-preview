@@ -23,7 +23,7 @@
         <review-material class="cnt-item" ref="reviewMaterialRef" :list="reviewMaterials" />
       </div>
       <div class="footer" v-if="!isLoading">
-        <g-button class="btn">流程总览</g-button>
+        <!-- <g-button class="btn" @click.native="processDialogVisible=true">流程总览</g-button> -->
         <g-button class="btn" @click.native="save">保存草稿</g-button>
         <g-button class="btn" type="primary" @click.native="submit">提交</g-button>
       </div>
@@ -47,6 +47,9 @@
         <img class="img" src="@/assets/image/gif/loading.gif" alt="" />
       </div>
       <span class="item">提交成功后可在申请中心查看，了解工单审批进度</span>
+    </el-dialog>
+    <el-dialog class="processDialog" :visible.sync="processDialogVisible">
+      流程图
     </el-dialog>
   </div>
 </template>
@@ -84,6 +87,7 @@ export default {
     isLoading: true,
     isGLoading: false,
     submitDialogVisible: false,
+    processDialogVisible:false,
     reviewList: [],
     promotionChannels: [],
     basicInformation: [],
