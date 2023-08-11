@@ -158,7 +158,7 @@ export default {
       transactionTypes: [],
       approvalPhases: [],
       isUrgents: [
-        { label: "不加急", value: "0" },
+        { label: "普通", value: "0" },
         { label: "加急", value: "1" },
       ],
       isOpinions: [

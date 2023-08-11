@@ -12,18 +12,16 @@
         <span class="event-name" @click="toDetail(item)">{{
           item.taskName
         }}</span>
-        <!--最早之前的；和最新的做比对， 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
-        <span class="event-status">
-          <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
-          <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中>{{ item.currentActivityName }}</i>
-          <i v-if="item.taskStatus === '2'" class="tag in-approval">撤销>{{ item.currentActivityName }}</i>
-          <i v-if="item.taskStatus === '3'" class="tag in-modify">待修改>{{ item.currentActivityName }}</i>
-          <i v-if="item.taskStatus === '5'" class="tag check">待确认>{{ item.currentActivityName }}</i>
+        <span class="event-status" v-if="!item.ocr_approval_status">
+          <i v-if="item.taskStatus === '0'" class="tag draft">{{ $msg('NodeStatus')[item.taskStatus] }}</i>
+          <i v-if="['1','2'].includes(item.taskStatus)" class="tag in-approval">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }}</i>
+          <i v-if="item.taskStatus === '3'" class="tag in-modify">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }}</i>
+          <i v-if="item.taskStatus === '5'" class="tag check">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }}</i>
           <i v-if="item.taskStatus === '4'" class="end">
-            <i class="tag end-sign"> 已结束 </i>
+            <i class="tag end-sign">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }} </i>
           </i>
           <!-- 有无意见 -->
-          <i  class="flex" v-if="item.taskStatus === '5' || item.taskStatus === '4'">
+          <i class="flex" v-if="item.taskStatus === '5' || item.taskStatus === '4'">
             <i class="tag has-opinion" v-if="item.hasOpinions == 1">
               <i class="iconfont icon-guanzhu2"></i>
               有实质性意见
@@ -44,8 +42,11 @@
             </i>
           </i>
         </span>
+        <span class="event-status" v-else>
+          <i class="tag in-modify">{{ item.ocr_approval_status }}</i>
+        </span>
       </div>
-      <div class="event-infos" v-if="!item.errorinfo">
+      <div class="event-infos" v-if="!item.errorInfo">
         <span class="id">{{ item.taskNumber }}</span>
         <span class="sDate date">发起时间：{{ item.create_time || "--" }}</span>
         <span class="sDate date">更新时间：{{ item.update_time || "--" }}</span>
@@ -74,11 +75,10 @@
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-baocuo1"></use>
         </svg>
-        文件未上传成功，请检查文件名是否包含特殊符号，并重新提交
+        {{ item.errorInfo }}
       </div>
     </div>
     <div class="right-operation">
-      <!--  审核中的工单，展示“催单、关注” 工作流配置（扩展配置）中若此节点可撤销 展示撤销按钮-->
       <div v-if="item.taskStatus == 1 && item.isQuash == 1" class="flex">
         <span class="modify icon-op" @click="cancel(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
@@ -93,14 +93,12 @@
           催单
         </span>
       </div>
-      <!-- 待确认  展示【确认】、【关注】 流程配置中确认人配置的非工单的发起人 不展示确认按钮-->
       <div class="flex" v-if="item.taskStatus == 5">
         <span class="check icon-op" @click="check(item)">
           <span class="iconfont icon icon-tubiao"></span>
           确认
         </span>
       </div>
-      <!-- 待修改 已采纳意见所有“有实质意见”显示，显示“修改、关注”按钮 流程配置中确认人配置的非工单的发起人 不展示【确认】操作-->
       <div v-if="item.taskStatus == '3'" class="flex" @click="modify(item)">
         <span class="modify icon-op">
           <svg class="icon urgent-icon" aria-hidden="true">
@@ -109,8 +107,7 @@
           修改
         </span>
       </div>
-      <!-- 草稿 文件解析失败 显示修改和删除 但不显示关注按钮-->
-      <div class="flex" v-if="item.taskStatus == 0">
+      <div class="flex" v-if="item.taskStatus == 0 || item.errorInfo">
         <span class="modify icon-op" @click="modify(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-xianxingtubiao"></use>
@@ -122,8 +119,7 @@
           </svg>删除
         </span>
       </div>
-      <!--  是否显示关注：草稿；文件解析失败；不显示-->
-      <div v-if="item.taskStatus != 0">
+      <div v-if="item.taskStatus != 0&&!item.errorInfo">
         <span class="attention no-attention icon-op" v-if="item.concernId != 1" @click="concern(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-tubiao-1"></use>
@@ -135,7 +131,7 @@
           </svg>已关注</span>
       </div>
     </div>
-    <!-- 审批浮窗 -->
+    <!-- 审批浮窗 - 催单对象 -->
     <el-dialog :visible.sync="reminderDialog" align="center" custom-class="reminderDialog" :before-close="closeReminder">
       <p slot="title">请选择催单对象</p>
       <div style="max-height: 270px; overflow-y: auto" class="trs-scroll assignee-content">
@@ -154,6 +150,7 @@
 <script>
 import { concernApplication } from "@/api/applyCenter";
 export default {
+
   props: {
     item: {
       type: Object,
@@ -167,11 +164,13 @@ export default {
       persons: [],
     };
   },
+
   methods: {
     toDetail(item) {
+      //草稿去修改页
       if (item.submitted == 0) {
-         this.modify(item)
-         return
+        this.modify(item)
+        return
       }
       window.localStorage.setItem(
         "order-detail",
@@ -185,7 +184,6 @@ export default {
         params: {
           formId: item.taskNumber,
           formManagementId: item.form_management_id,
-          originatorId: item.userId,
           taskName: item.taskName
         },
       });
@@ -204,7 +202,6 @@ export default {
         params: {
           formId: item.taskNumber,
           formManagementId: item.form_management_id,
-          originatorId: item.userId,
           taskName: item.taskName
         },
       });
@@ -226,7 +223,7 @@ export default {
         name: 'editApply',
         params: {
           id: item.taskNumber,
-          formManagementId:item.form_management_id
+          formManagementId: item.form_management_id
 
         }
       })

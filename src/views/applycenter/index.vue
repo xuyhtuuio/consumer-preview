@@ -11,7 +11,8 @@
         : 'data-statistics-item active-item'
         ">
         <div class="icon">
-          <img :src="item.value == crtSign ?item.activeIcon :item.icon" alt="" :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
+          <img :src="item.value == crtSign ? item.activeIcon : item.icon" alt=""
+            :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
         </div>
         <div class="name-count">
           <span class="name">{{ item.name }}</span>
@@ -27,55 +28,68 @@
       <div class="filters">
         <div class="filters-content">
           <div class="floor1">
+
             <!-- <div class="floor1-item"> -->
-              <el-select popper-class="transaction-select" v-model="search.form_management_id" placeholder="事项类型"
-                @change="changeArrrovalType" clearable @clear="searchList">
-                <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
-              </el-select>
-              <!-- <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable
+            <el-select popper-class="transaction-select" v-model="search.form_management_id" placeholder="事项类型"
+              @change="changeArrrovalType" clearable @clear="searchList">
+              <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
+                :value="item.value"></el-option>
+            </el-select>
+            <!-- <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable
                 @clear="searchList">
                 <el-option v-for="(item, index) in approvalPhases" :key="index" :label="item.label"
                   :value="item.value"></el-option></el-select> -->
             <!-- </div> -->
             <!-- <div class="floor1-item"> -->
-              <el-select v-model="search.urgent" placeholder="是否加急" @change="searchList" clearable>
-                <el-option v-for="(item, index) in isUrgents" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
-              </el-select>
-              <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @change="searchList" clearable>
-                <el-option v-for="(item, index) in isOpinions" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
-              </el-select>
+            <el-select v-model="search.urgent" placeholder="是否加急" @change="searchList" clearable>
+              <el-option v-for="(item, index) in isUrgents" :key="index" :label="item.label"
+                :value="item.value"></el-option>
+            </el-select>
+            <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @change="searchList" clearable>
+              <el-option v-for="(item, index) in isOpinions" :key="index" :label="item.label"
+                :value="item.value"></el-option>
+            </el-select>
             <!-- </div> -->
             <!-- <div class="floor1-item"> -->
-              <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @change="searchList" clearable>
-                <el-option v-for="(item, index) in adoptionSituations" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
-              </el-select>
-              <el-select v-model="search.updateTime2" ref="multiSelect" placeholder="排序" multiple @change="changeSort"
-                :class="search.updateTime2[1] == 'desc'
-                  ? 'arrow-select descArrow'
-                  : 'arrow-select ascArrow'
-                  ">
-                <el-option-group v-for="group in updateTimeGroup" :key="group.label">
-                  <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-option-group>
-              </el-select>
+            <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @change="searchList" clearable>
+              <el-option v-for="(item, index) in adoptionSituations" :key="index" :label="item.label"
+                :value="item.value"></el-option>
+            </el-select>
+            <el-select v-model="search.updateTime2" ref="multiSelect" placeholder="排序" multiple @change="changeSort"
+              :class="search.updateTime2[1] == 'desc'
+                ? 'arrow-select descArrow'
+                : 'arrow-select ascArrow'
+                ">
+              <el-option-group v-for="group in updateTimeGroup" :key="group.label">
+                <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value">
+                </el-option>
+              </el-option-group>
+            </el-select>
             <!-- </div> -->
           </div>
           <div class="floor2">
-            <el-input v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
-              @keyup.enter.native="searchList">
-              <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
-            </el-input>
-            <el-date-picker v-model="search.startDate" value-format="yyyy-MM-dd" clearable type="date"
-              placeholder="请选择发起时间" @clear="searchList" @change="searchList">
-            </el-date-picker>
-            <el-date-picker v-model="search.productLaunchDate" value-format="yyyy-MM-dd" clearable type="date"
-              placeholder="请选择产品上线时间" @clear="searchList" @change="searchList">
-            </el-date-picker>
+            <div class="floor2-item">
+              <el-input v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
+                @keyup.enter.native="searchList">
+                <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
+              </el-input>
+            </div>
+            <div class="floor2-item">
+              <span>发起时间</span>
+              <!-- <el-date-picker v-model="search.startDate" value-format="yyyy-MM-dd" clearable type="date"
+                placeholder="请选择发起时间" @clear="searchList" @change="searchList">
+              </el-date-picker> -->
+              <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
+                value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间">
+              </el-date-picker>
+            </div>
+            <div class="floor2-item">
+              <span>上线时间</span>
+              <el-date-picker v-model="search.productLaunchDate" value-format="yyyy-MM-dd" clearable type="daterange"
+                range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" @clear="searchList"
+                @change="searchList">
+              </el-date-picker>
+            </div>
           </div>
         </div>
         <div class="export-reset">
@@ -157,7 +171,7 @@ export default {
           value: "toConfirmed",
           id: 5,
           icon: require('@/assets/image/apply-center/wait-check.svg'),
-          activeIcon:require('@/assets/image/apply-center/wait-check-active.svg'),
+          activeIcon: require('@/assets/image/apply-center/wait-check-active.svg'),
         },
         {
           name: "审批中",
@@ -186,15 +200,16 @@ export default {
         updateTime: [2, "desc"],
         updateTime2: [2, "desc"],
         keywords: "",
-        releaseTime: "",
-        productLaunchDate: "",
+        productLaunchDate: [],
         total: 0,
         loading: false,
+        startDate: [],
+
       },
       transactionTypes: [],
       approvalPhases: [],
       isUrgents: [
-        { label: "不加急", value: "0" },
+        { label: "普通", value: "0" },
         { label: "加急", value: "1" },
       ],
       isOpinions: [
@@ -326,8 +341,8 @@ export default {
         name: userinfo.fullname,
       };
       getsTheNumberOfHeaders(param).then(res => {
-        const data =res.data.data[0]
-        
+        const data = res.data.data[0]
+
         for (let key in data) {
           this.dataStatistics.forEach(m => {
             if (m.value == key) {
@@ -377,7 +392,9 @@ export default {
         currentActivityName: this.search.approvalStage,
         id: userinfo.id,
         name: userinfo.fullname,
-        form_management_id: '1'
+        form_management_id: '1',
+        startDate: this.search.startDate.length > 0 ? this.search.startDate.join('TO') : '',
+        productLaunchDate: this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate.join('TO') : ''
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间
@@ -420,9 +437,9 @@ export default {
         return {
           ...v,
           formId: v.taskNumber,
-          taskStatus:v.submitted==0?'0':v.businessStatus,
-          initiator:{ ...v.sponsorMap,label:v.industryList&&v.industryList[1]},
-          processInstanceId:v.process_instance_id,
+          taskStatus: v.submitted == 0 ? '0' : v.businessStatus,
+          initiator: { ...v.sponsorMap, label: v.industryList && v.industryList[1] },
+          processInstanceId: v.process_instance_id,
           currentAssignee: v.currentAssignee && v.currentAssignee.length ? v.currentAssignee.map(m => {
             return {
               ...m,
@@ -492,8 +509,8 @@ export default {
         updateTime: [1, "asc"],
         updateTime2: [1, "asc"],
         keywords: "",
-        releaseTime: "",
-        productLaunchDate: "",
+        startDate: [],
+        productLaunchDate: [],
         total: 0,
         loading: false,
       };
@@ -501,11 +518,11 @@ export default {
       this.searchList();
     },
   },
-  beforeRouteEnter(to,from,next){
-    next(()=>{
+  beforeRouteEnter(to, from, next) {
+    next(() => {
       localStorage.removeItem('order-detail')
     })
-   },
+  },
 
 };
 </script>
@@ -716,7 +733,8 @@ export default {
       flex-direction: column;
       flex: 1;
 
-      /deep/ .el-input__inner {
+      /deep/ .el-input__inner,
+      /deep/ .el-range-input {
         border-radius: 4px;
         border: none;
         background: #f7f8fa;
@@ -724,6 +742,9 @@ export default {
         font-size: 14px;
         font-weight: 400;
         line-height: 22px;
+        .el-range-separator{
+          padding:0 ;
+        }
       }
 
       .floor1 {
@@ -731,10 +752,12 @@ export default {
         padding-right: 16px;
         display: flex;
         justify-content: space-between;
-        .el-select{
+
+        .el-select {
           margin-right: 16px;
           flex: 1;
         }
+
         .el-select:last-of-type {
           margin-right: 0;
         }
@@ -814,29 +837,43 @@ export default {
         display: flex;
         padding-right: 16px;
 
-        .el-input {
+        .floor2-item {
           flex: 1;
           margin-right: 16px;
+          display: flex;
+          align-items: center;
+
+          .el-input {
+            width: 100%;
+          }
+
+          span {
+            color: #86909C;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 22px;
+            word-break: keep-all;
+            margin-right: 8px;
+
+          }
+
         }
 
-        .el-input:last-of-type {
+
+
+        .floor2-item:last-of-type {
           margin-right: 0;
         }
 
-        /deep/.el-date-editor {
+        /deep/.el-range-editor {
           position: relative;
-
-          .el-input__prefix {
-            position: relative;
-            right: 0;
-
-            .el-icon-date {
+          .el-icon-date {
               position: absolute;
               right: 8px;
               top: 50%;
               transform: translateY(-50%);
             }
-          }
+      
 
           .el-input__suffix {
             right: 20px;

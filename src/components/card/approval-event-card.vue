@@ -11,13 +11,12 @@
         </svg>
         <span class="event-name pointer" @click="toDetail(item)">{{ item.entryName }}</span>
         <span class="event-status">
-          <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
-          <i v-if="item.taskStatus === '1'" class="tag in-approval">审批中>{{ item.nodeName }}</i>
-          <i v-if="item.taskStatus === '2'" class="tag in-approval">撤销>{{ item.nodeName }}</i>
-          <i v-if="item.taskStatus === '3'" class="tag in-modify">待修改>{{ item.nodeName }}</i>
-          <i v-if="item.taskStatus === '5'" class="tag check">待确认>{{ item.nodeName }}</i>
+          <i v-if="item.taskStatus === '0'" class="tag draft">{{ $msg('NodeStatus')[item.taskStatus] }}</i>
+          <i v-if="['1','2'].includes(item.taskStatus)" class="tag in-approval">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i>
+          <i v-if="item.taskStatus === '3'" class="tag in-modify">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i>
+          <i v-if="item.taskStatus === '5'" class="tag check">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i>
           <i v-if="item.taskStatus === '4'" class="end">
-            <i class="tag end-sign"> 已结束 </i>
+            <i class="tag end-sign"> {{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }} </i> </i>
           </i>
           <!-- 有无意见 -->
           <i v-if="item.taskStatus === '5' || item.taskStatus === '4'" class="flex">
@@ -125,7 +124,6 @@ export default {
         name: "approval-details",
         params: {
           formId: item.recordId,
-          originatorId: item.originator.id,
           taskName: item.taskName,
           processInstanceId: item.processInstanceId
         },
@@ -145,7 +143,6 @@ export default {
         name: "approval-details",
         params: {
           formId: item.recordId,
-          originatorId: item.originator.id,
           taskName: item.taskName,
           processInstanceId: item.processInstanceId
         },
@@ -159,7 +156,6 @@ export default {
         name: "approval-details",
         params: {
           formId: item.recordId,
-          originatorId: item.originator.id,
           taskName: item.taskName,
           processInstanceId: item.processInstanceId
         },

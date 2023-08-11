@@ -1,20 +1,21 @@
 <template>
   <div class="container" v-loading="loading">
-    <div class="tools" >
+    <div class="tools">
       <div ref="tools">
-      <div v-for="(item, index) in tools" :key="index" :arrow-offset="-30" :ref="`popover-${item.toolSign}`">
-        <span :ref='`sideBar-popover-` + item.toolSign'
-          :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
-          @click="changeTools(item)">
-          <i :class="['iconfont', 'sidebar-icon', item.icon]"></i>
-        </span>
+        <div v-for="(item, index) in tools" :key="index" :arrow-offset="-30" :ref="`popover-${item.toolSign}`">
+          <span :ref='`sideBar-popover-` + item.toolSign'
+            :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
+            @click="changeTools(item)">
+            <i :class="['iconfont', 'sidebar-icon', item.icon]"></i>
+          </span>
+        </div>
+        <el-popover v-if="showPopper" ref="sidebar-popover" :reference='reference' placement="right" trigger="click"
+          popper-class="sidebar-popper" @after-leave="hiddenPopover">
+          <component :is="crtToolComponent" :sidebarParam="sidebarParam" @previewFile="previewFile"
+            :personInfo="personInfo"></component>
+        </el-popover>
       </div>
-      <el-popover v-if="showPopper" ref="sidebar-popover" :reference='reference' placement="right" trigger="click"
-        popper-class="sidebar-popper" @after-leave="hiddenPopover">
-        <component :is="crtToolComponent" :sidebarParam="sidebarParam" @previewFile="previewFile" :personInfo="personInfo"></component>
-      </el-popover>
     </div>
-  </div>
     <div class="content">
       <div class="content-header">
         <span class="content-title">
@@ -133,7 +134,7 @@ export default {
       crtToolComponent: '',
       showPopper: false,
       reference: {},
-      personInfo:{},
+      personInfo: {},
       approval: {}, // 当前审批文件的相关内容
       activeIndex: null,
       word_lines: [], // 连线
@@ -156,8 +157,8 @@ export default {
 
   mounted() {
     document.addEventListener('mouseup', (e) => {
-      const toolsRef =this.$refs['tools']
-      if(toolsRef){
+      const toolsRef = this.$refs['tools']
+      if (toolsRef) {
         if (!toolsRef.contains(e.target)) {
           this.showPopper = false;
         }
@@ -190,7 +191,7 @@ export default {
       }).then(res => {
         const { data, status, message } = res.data;
         if (status === 200) {
-          this.sidebarParam = { data, formId: item.taskNumber, originatorId: item.originator.id };
+          this.sidebarParam = { data, formId: item.taskNumber };
           this.projectName = data.basicInformation.filter(item => item.title === '项目名称')?.[0]?.value
         } else {
           this.$message.error({ offset: 40, title: "提醒", message });
@@ -201,7 +202,6 @@ export default {
     },
     previewFile(url) {
       this.previewDialog = true
-      console.log(url)
       this.previewfileUrl = url
     },
     async getFileList() {
@@ -279,22 +279,19 @@ export default {
         case 'applyForm':
           params = {
             formId: param_item.taskNumber,
-            originatorId: param_item.originatorId,
-            formManagementId:param_item.formManagementId
+            formManagementId: param_item.formManagementId
           }
           break;
         case 'approvalRecordDetail':
           params = {
             formId: param_item.taskNumber,
-            originatorId: param_item.originatorId,
-            processInstanceId:param_item.processInstanceId
+            processInstanceId: param_item.processInstanceId
           }
           break;
       }
       this.reference = this.$refs['sideBar-popover-' + item.toolSign][0].$el
       this.sidebarParam = params
-      this.personInfo=param_item.initiator
-      console.log('this.personInfo',this.personInfo,this.sidebarParam)
+      this.personInfo = param_item.initiator
       this.$nextTick(() => {
         this.showPopper = true
         this.$nextTick(() => {
@@ -771,8 +768,9 @@ export default {
 svg.leader-line {
   z-index: 2;
 }
-.preview-dialog{
-  .el-dialog__body{
+
+.preview-dialog {
+  .el-dialog__body {
     height: 76vh;
   }
 }
