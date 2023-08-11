@@ -58,7 +58,7 @@
     <!-- 任务状态（0:草稿 1：审查中 2：待修改 3：待确认 4：已完成 -->
     <div class="right-operation">
       <!-- 待审核状态显示审查 -->
-      <span class="attention icon-op" v-if="item.taskStatus == '1'" @click="toApproval(item)">
+      <span class="attention icon-op" v-if="item.taskStatus == '1'&&crtSign!=='approvedCount'" @click="toApproval(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-tubiao3"></use>
         </svg>
@@ -73,7 +73,7 @@
       </span> -->
 
       <!-- 待确认状态的工单 需要该审批人确认的工单-->
-      <span class="attention check icon-op" v-if="item.taskStatus == 5" @click="check(item)">
+      <span class="attention check icon-op" v-if="item.taskStatus == 5&&crtSign!=='approvedCount'" @click="check(item)">
         <span class="iconfont icon icon-tubiao urgent-icon"></span>
         确认</span>
       <!-- 关注 -->
@@ -99,6 +99,10 @@ export default {
       type: Object,
       default: () => { },
     },
+    crtSign:{
+      type: String,
+      default:'',
+    }
   },
   data() {
     return {

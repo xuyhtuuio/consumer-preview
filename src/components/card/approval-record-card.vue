@@ -55,19 +55,19 @@
                 无实质意见
               </span>
             </div> -->
-              <p class="opinion-text">{{ idx + 1 }} {{ item.comments }}</p>
-              <!-- <div class="relevant-file">
-              关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.fileList && item.fileList[0] }} </i>
-              <el-popover placement="bottom" popper-class="file-overview-popper" trigger="click"
-                v-if="item.fileList && item.fileList.length > 1">
+              <p class="opinion-text">{{ idx + 1 }} {{ item.str }}</p>
+              <div class="relevant-file">
+              关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.files && item.files[0] }} </i>
+              <el-popover :placement="bottom-end" popper-class="file-overview-popper" trigger="click"
+                v-if="item.files && item.files.length > 1">
                 <div class="file-list">
-                  <div class="file-list-item pointer ellipsis ellipsis_1 " v-for="(file, idx) in item.fileList" :key="idx">
+                  <div class="file-list-item pointer ellipsis ellipsis_1 " v-for="(file, idx) in item.files" :key="idx">
                     {{ file }}
                   </div>
                 </div>
-                <i slot="reference">+{{ item.fileList.length - 1 }}</i>
+                <i slot="reference">+{{ item.files.length - 1 }}</i>
               </el-popover>
-            </div> -->
+            </div>
             </div>
           </div>
         </div>
@@ -115,15 +115,17 @@ export default {
           return this.hasData = false
         }
         this.recordList = endDetailsList instanceof Array && endDetailsList.length ? endDetailsList.map(v => {
+          const comments =v.optionVOList&&v.optionVOList[0].comments
           return {
             ...v,
-            editedCommentsList: v.editedCommentsList && v.editedCommentsList.length ? v.editedCommentsList.map(m => {
-              return {
-                ...m,
-                optionVOList:JSON.parse(v.optionVOList[0].comments),
-                fileList: m.associatedAttachmentsIds.split(',')
-              }
-            }) : []
+            optionVOList:JSON.parse(comments),
+            // optionVOList: v.optionVOList && v.optionVOList.length ? v.optionVOList.map(m => {
+            //   return {
+            //     ...m,
+            //     optionVOList:JSON.parse(v.optionVOList[0].comments),
+            //     fileList: m.associatedAttachmentsIds.split(',')
+            //   }
+            // }) : []
           }
         }) : []
         console.log('ff',this.recordList)

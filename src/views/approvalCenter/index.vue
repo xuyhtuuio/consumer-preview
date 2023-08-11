@@ -77,7 +77,7 @@
       <div class="list" v-loading="search.loading">
         <div v-if="list.length">
           <div v-for="(item, index) in list" :key="index">
-            <approvalEventCard :item="item" @concern="concern"></approvalEventCard>
+            <approvalEventCard :item="item" @concern="concern" :crtSign="crtSign"></approvalEventCard>
           </div>
           <trs-pagination :total="search.total" @getList='getList' :pageNow="pageNow"></trs-pagination>
         </div>
@@ -92,7 +92,6 @@
 <script>
 import approvalEventCard from "@/components/card/approval-event-card";
 import {
-  getUserStatus,
   getDataStatistics,
   getApprovalType,
   getApprovalStage,
@@ -103,6 +102,7 @@ export default {
   components: {
     approvalEventCard,
   },
+  name:'approval-center-index',
   data() {
     return {
       crtSign: "toPending",
