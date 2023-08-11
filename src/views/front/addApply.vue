@@ -112,7 +112,6 @@ export default {
       if (id || window.localStorage.getItem('editId')) {
         vm.formId = id || window.localStorage.getItem('editId');
         vm.formManagementId = formManagementId || window.localStorage.getItem('formManagementId');
-        console.log(vm.formManagementId);
         window.localStorage.setItem('editId', id || window.localStorage.getItem('editId'));
         window.localStorage.setItem(
           'formManagementId',
@@ -241,7 +240,6 @@ export default {
 
       const [result2, offsetTop2] = this.$refs['reviewMaterialRef'].judgeWarn();
       if (!result0 || !result || !result1 || !result2) {
-        console.log(result0, result, result1, result2);
         if (!result0) return;
         return this.rollTo(offsetTop ? offsetTop : offsetTop1 ? offsetTop1 : offsetTop2);
       }
