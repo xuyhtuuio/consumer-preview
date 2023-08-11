@@ -15,7 +15,7 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      redirect: '/front'
+      redirect: '/applycenter'
     },
     // 首页
     {
