@@ -13,7 +13,7 @@ import WDialog from '@/components/common/WDialog'
 import $GLOBAL from '@/utils/const';
 import http from '@/api/request.js'; /* eslint-disable */
 import bus from '@/utils/bus';
-import { $locale } from '@/utils/service'
+
 import 'trs-web-components/lib/common.less';
 import 'trs-web-components/lib/element.less';
 import "@/assets/theme.less";
@@ -22,6 +22,7 @@ import '@/assets/icon/iconfont.css';
 import '@/assets/icon/iconfont.js';
 import '@/assets/css/common.less';
 import '@/assets/css/element.less';
+import '@/mixins'
 import onceClick from './utils/click-once';
 Vue.use(ElementUI);
 Vue.use(TrsWebComponents);
@@ -33,17 +34,7 @@ Vue.use(onceClick);
 Vue.use(bus);
 Vue.prototype.$GLOBAL = $GLOBAL; // 全局常量
 Vue.prototype.$http = http; // 请求库
-Vue.mixin({
-  methods: {
-    $msg: function (key) {
-      return $locale.MESSAGES[key]
-    },
-    $field: function (key) {
-      return $locale.FIELDS[key]
-    }
 
-  }
-})
 
 
 Vue.config.productionTip = false
