@@ -84,3 +84,11 @@ export function getCurrentUserInfo(){
     method:'get'
   })
 }
+// 单个流程
+export function getProcess(params) {
+  return request({
+    url: '/cpr/admin/form/list',
+    method: 'get',
+    params
+  })
+}

@@ -62,6 +62,15 @@
                 </template>
               </el-checkbox-group>
 
+              <div class="groups-select" v-else-if="item.name === 'MultipleGroupsSelect'">
+                <div v-for="(iten) in item.props.options" :key="iten.id">
+                  <p class="group-title">{{iten.value}}</p>
+                  <el-checkbox-group class="group-value" v-model="item.value">
+                      <el-checkbox v-for="(itenItem, indey) in iten.children" :key="indey" :label="itenItem.id">{{ itenItem.value }}
+                      </el-checkbox>
+                  </el-checkbox-group>
+                </div>
+              </div>
               <el-select
                 v-else-if="item.name === 'MultipleSelect' && !item.props.expanding"
                 v-model="item.value"
@@ -140,6 +149,10 @@ function rulesFn(data) {
       return [
         { type: 'array', required: true, message: `请至少选择一个${data.title}`, trigger: 'change' }
       ];
+      case 'MultipleGroupsSelect': 
+      return [
+         { type: 'array', required: true, message: `请至少选择一个${data.title}`, trigger: 'change' }
+      ]
     case 'TimePicker':
       return [{ type: 'date', required: true, message: '请选择日期', trigger: 'change' }];
     case 'Cascader':
@@ -341,6 +354,19 @@ export default {
     }
     .form-item {
       width: 50%;
+      
+    }
+    .groups-select {
+      .group-title {
+        margin-top: 12px;
+        line-height: 22px;
+        color: #86909C;
+      }
+      .group-value {
+        /deep/.el-checkbox {
+          min-width: 160px;
+        }
+      }
     }
     .checkbox-ipt {
       display: inline-block;
