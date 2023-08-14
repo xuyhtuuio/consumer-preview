@@ -12,7 +12,7 @@
         <span class="event-name" @click="toDetail(item)">{{
           item.taskName
         }}</span>
-        <span class="event-status" v-if="!item.ocr_approval_status">
+        <span class="event-status" v-if="!item.errorInfo">
           <i v-if="item.taskStatus === '0'" class="tag draft">{{ $msg('NodeStatus')[item.taskStatus] }}</i>
           <i v-if="['1','2'].includes(item.taskStatus)" class="tag in-approval">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }}</i>
           <i v-if="item.taskStatus === '3'" class="tag in-modify">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }}</i>

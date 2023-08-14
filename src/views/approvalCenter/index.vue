@@ -57,16 +57,25 @@
             </el-select>
           </div>
           <div class="floor2">
+            <div class="floor2-item">
             <el-input v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
               @keyup.enter.native="searchList">
               <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
             </el-input>
-            <el-date-picker v-model="search.startDate" clearable type="date" placeholder="请选择发起时间" @change="searchList"
-              @clear="searchList">
-            </el-date-picker>
-            <el-date-picker v-model="search.productLaunchDate" clearable type="date" placeholder="请选择产品上线时间"
-              @change="searchList" @clear="searchList">
-            </el-date-picker>
+          </div>
+            <div class="floor2-item">
+              <span>发起时间</span>
+              <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
+                value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间">
+              </el-date-picker>
+            </div>
+            <div class="floor2-item">
+              <span>上线时间</span>
+              <el-date-picker v-model="search.productLaunchDate" value-format="yyyy-MM-dd" clearable type="daterange"
+                range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" @clear="searchList"
+                @change="searchList">
+              </el-date-picker>
+            </div>
           </div>
         </div>
         <div class="export-reset">
@@ -149,7 +158,8 @@ export default {
         updateTime: [2, "desc"],
         updateTime2: [2, "desc"],
         keywords: "",
-        productLaunchDate: "",
+        startDate: [],
+        productLaunchDate: [],
         total: 0,
         loading: false,
         orgIds: [],
@@ -345,7 +355,10 @@ export default {
         listType,
         nodeid: this.search.approvalStage,
         orgIds: this.search.orgIds.length ? this.search.orgIds : null,
-
+        createTimeStart: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[0] : '',
+        createTimeEnd: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[1] : '',
+        productLaunchDateStart: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[0] : '',
+        productLaunchDateEnd: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[1] : '',
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间
@@ -360,6 +373,8 @@ export default {
       Reflect.deleteProperty(param, "updateTime2");
       Reflect.deleteProperty(param, "total");
       Reflect.deleteProperty(param, "loading");
+      Reflect.deleteProperty(param, "productLaunchDate");
+      Reflect.deleteProperty(param, "startDate");
       this.search.loading = true;
       const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
       const taskDTO = {
@@ -419,8 +434,8 @@ export default {
         updateTime: [1, "asc"],
         updateTime2: [1, "asc"],
         keywords: "",
-        releaseTime: "",
-        productLaunchDate: "",
+        startDate: [],
+        productLaunchDate: [],
         total: 0,
         loading: false,
         orgIds: [],
@@ -624,7 +639,8 @@ export default {
       flex-direction: column;
       flex: 1;
 
-      /deep/ .el-input__inner {
+      /deep/ .el-input__inner,
+      /deep/ .el-range-input {
         border-radius: 4px;
         border: none;
         background: #f7f8fa;
@@ -632,11 +648,14 @@ export default {
         font-size: 14px;
         font-weight: 400;
         line-height: 22px;
+        .el-range-separator {
+          padding: 0;
+        }
       }
 
       .floor1 {
         margin-bottom: 12px;
-        padding-right: 16px;
+        // padding-right: 16px;
         display: flex;
         justify-content: space-between;
 
@@ -719,30 +738,41 @@ export default {
         display: flex;
         padding-right: 16px;
 
-        .el-input {
+        .floor2-item {
           flex: 1;
           margin-right: 16px;
-        }
+          display: flex;
+          align-items: center;
 
-        // .el-input:last-of-type {
-        //   margin-right: 0;
-        // }
-
-        /deep/.el-date-editor {
-          position: relative;
-
-          .el-input__prefix {
-            position: relative;
-            right: 0;
-
-            .el-icon-date {
-              position: absolute;
-              right: 8px;
-              top: 50%;
-              transform: translateY(-50%);
-            }
+          .el-input {
+            width: 100%;
           }
 
+          span {
+            color: #86909C;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 22px;
+            word-break: keep-all;
+            margin-right: 8px;
+
+          }
+
+        }
+
+        .floor2-item:last-of-type {
+          margin-right: 0;
+        }
+
+
+        /deep/.el-range-editor  {
+          position: relative;
+          .el-icon-date {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+          }
           .el-input__suffix {
             right: 20px;
           }
