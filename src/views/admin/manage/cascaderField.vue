@@ -26,6 +26,7 @@
 </template>
 <script>
 import draggable from 'vuedraggable';
+import { getTreeId } from '@/utils/utils'
 export default {
   name: 'CascaderField',
   components: {
@@ -38,16 +39,17 @@ export default {
   methods: {
     addCascaderChildOptions(op) {
       op.children.push({
-        id: op.id + '-' + op.children.length,
+        // id: op.id + '-' + op.children.length,
+        id: getTreeId('cascader'),
         value: '',
         children: []
       })
     },
     addCascaderOptions() {
-      const ids = this.data[this.data.length - 1].id.split('-')
-      ids[ids.length - 1] = +ids[ids.length -1] + 1 + ''
+      // const ids = this.data[this.data.length - 1].id.split('-')
+      // ids[ids.length - 1] = +ids[ids.length -1] + 1 + ''
       this.data.push({
-        id: ids.join('-'),
+        id: getTreeId('cascader'),
         value: '',
         children: []
       })

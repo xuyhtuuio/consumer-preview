@@ -368,3 +368,7 @@ export function computedTextWidth2(text, fontSize = 14) {
   context.fillText(text, 0, 0);
   return context.measureText(text).width;
 }
+
+export function getTreeId(suffix = '') {
+  return suffix + (Math.floor(Math.random() * (99999 - 10000)) + 10000).toString() + new Date().getTime().toString().substring(5)
+}

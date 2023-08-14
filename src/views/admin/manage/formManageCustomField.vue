@@ -66,7 +66,7 @@
   import CascaderField from './cascaderField'
   import SelectField from './selectField'
   import SelectGroupField from './selectGroupField'
-  let id = 0
+  import { getTreeId } from '@/utils/utils'
   export default {
     components: {
       CascaderField,
@@ -111,21 +111,21 @@
         belongModules,
         cascaderOptions: [
           {
-            id: '0',
+            id: getTreeId('cascader'),
             value: '',
             children: []
           }
         ],
         selectOptions: [{
-          id: 0,
+          id: getTreeId('select'),
           value: ''
         }],
         selectGroupOptions: [{
-          id: 0,
+          id: getTreeId('selectGroup'),
           value: '组1',
           showInput: false,
           children: [{
-            id: '11',
+            id: getTreeId('selectGroup'),
             value: ''
           }]
         }],
@@ -220,18 +220,18 @@
       },
       addSelectOptions() {
         this.selectOptions.push({
-          id: ++id,
+          id: getTreeId('select'),
           value: ''
         })
       },
       addSelectGroupOptions() {
         this.selectGroupOptions.push({
-          id: ++id,
+          id: getTreeId('selectGroup'),
           value: '组' + (this.selectGroupOptions.length + 1),
           showInput: false,
           isHover: false,
           children: [{
-            id: ++id,
+            id: getTreeId('selectGroup'),
             value: ''
           }]
         })
