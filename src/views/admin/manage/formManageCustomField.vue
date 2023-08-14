@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" :disabled="isView">
       <el-form-item label="字段名称" prop="title">
         <el-input v-model="ruleForm.title" :disabled="titleDisable" placeholder="请输入字段名称" class="is-dark input"></el-input>
       </el-form-item>
@@ -52,7 +52,7 @@
       <el-form-item label="是否必填" prop="required" class="is-dark input">
         <el-switch v-model="ruleForm.required" :disabled="isRequired"></el-switch>
       </el-form-item>
-      <el-form-item style="margin-left: 100px;">
+      <el-form-item style="margin-left: 100px;" v-if="!isView">
         <el-button type="primary" @click="submitForm('ruleForm')">确认</el-button>
         <el-button @click="resetForm('ruleForm')">取消</el-button>
       </el-form-item>
@@ -75,7 +75,8 @@
     },
     props: {
       drawerTitle: String,
-      feildTypes: Array
+      feildTypes: Array,
+      isView: Boolean
     },
     data() {
       return {

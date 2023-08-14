@@ -6,7 +6,7 @@
     </div>
     <div class="title" v-else>
       <div class="title-nav">
-        <span @click="goBack" class="breadcrumb">{{ isEdit ? '表单管理' : '表单管理' }}</span>/{{ currentRow.examineTypesName }}
+        <span @click="goBack" class="breadcrumb">表单管理</span>/{{ currentRow.examineTypesName }}
       </div>
     </div>
     <div v-loading="loadingList" style="height: calc(100% - 63px); overflow-y: auto;">
@@ -22,8 +22,9 @@
         </template>
         <template #operate="scope">
           <el-button type="text" @click="copyForm(scope.row)">复制</el-button>
-          <el-button type="text" @click="editForm(scope.row)">编辑</el-button>
-          <el-button type="text" @click="editSelfForm(scope.row)">修改时限</el-button>
+          <el-button type="text" v-if="scope.row.run === '1'" @click="viewForm(scope.row)">查看</el-button>
+          <el-button type="text" v-if="scope.row.run === '0'" @click="editForm(scope.row)">编辑</el-button>
+          <el-button type="text" v-if="scope.row.run === '0'" @click="editSelfForm(scope.row)">修改时限</el-button>
           <el-button type="text" v-if="scope.row.run === '1'" class="red" @click="stopApllay(scope.row)">停用</el-button>
           <el-button type="text" v-else @click="enableApllay(scope.row)">恢复</el-button>
         </template>
@@ -48,11 +49,14 @@
         <TrsTable theme="TRS-table-gray" :data="data1" :colConfig="colConfig1" @sort-change="changeSort1"
           @submitEdit="submitEdit" :row-class-name="tableRowClassName">
           <template #operate="scope">
-            <el-button type="text" v-if="+scope.row.run === 0" @click="changeFormItemState(scope.row)">恢复</el-button>
-            <el-button type="text" v-else @click="editFormItem(scope.row)">编辑</el-button>
-            <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)"
+            <el-button type="text" v-if="isView" @click="editFormItem(scope.row)">查看</el-button>
+            <template v-else>
+              <el-button type="text" v-if="+scope.row.run === 0" @click="changeFormItemState(scope.row)">恢复</el-button>
+              <el-button type="text" v-else @click="editFormItem(scope.row)">编辑</el-button>
+              <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)"
               :style="{ visibility: +scope.row.run === 1 ? 'visible' : 'hidden' }"  @click="changeFormItemState(scope.row)">停用</el-button>
-            <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)" @click="deleteFormItem(scope.row)">删除</el-button>
+              <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)" @click="deleteFormItem(scope.row)">删除</el-button>
+            </template>
           </template>
           <template #required="scope">
             {{ scope.row.required ? '是' : '否' }}
@@ -69,7 +73,7 @@
         <!-- <i class="el-icon-edit"></i> -->
       </span>
       <div class="drawer-main">
-        <FormManageCustomField @close="drawer = false" :feildTypes="feildTypes" ref="formManageCustomField" @refreshItemList="refreshItemList" />
+        <FormManageCustomField @close="drawer = false" :isView="isView" :feildTypes="feildTypes" ref="formManageCustomField" @refreshItemList="refreshItemList" />
       </div>
     </el-drawer>
     <el-dialog title="修改" :visible.sync="limitTimeVisible" width="40%" center>
@@ -168,7 +172,7 @@ export default {
           prop: 'operate',
           bind: {
             width: 250,
-            align: 'center'
+            align: 'left'
           }
         },
       ],
@@ -215,8 +219,8 @@ export default {
           label: '操作',
           prop: 'operate',
           bind: {
-            width: 250,
-            align: 'center'
+            width: 200,
+            align: 'left'
           }
         },
       ],
@@ -244,7 +248,8 @@ export default {
       limitTimeVisible: false,
       checkType: '',
       limitTime: null,
-      imageUrl: ''
+      imageUrl: '',
+      isView: false,
     }
   },
   created() {
@@ -393,8 +398,8 @@ export default {
     }, 500),
     async editForm(item) {
       if (this.level === 1) {
+        this.isView = false;
         this.currentRow = item;
-        this.isEdit = true;
         this.level = 2;
       }
       this.loadingList = true
@@ -413,6 +418,12 @@ export default {
         this.page2.pageNow = resData.pageNow
         this.page = this.page2
       }
+    },
+    viewForm(item) {
+      this.currentRow = item;
+      this.isView = true;
+      this.level = 2;
+      this.editForm(item)
     },
     // 复制表单
     copyForm: debounce(async function(row) {
