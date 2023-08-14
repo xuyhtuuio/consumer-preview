@@ -240,12 +240,15 @@
         this.$refs[formName].validate(async (valid) => {
           if (valid) {
             const data = this.handleForm()
+            data.sort = this.currentRow?.sort
             const form = {
               type: data.name,
               formCategoryId: this.parentForm.recordId,
               formItemId: this.currentRow?.id,
               sort: this.currentRow?.sort,
-              data
+              data: {
+                ...data
+              }
             }
             if (this.checkOptionValue(data.name)) {
               this.$message.error('请完善选项设置')
