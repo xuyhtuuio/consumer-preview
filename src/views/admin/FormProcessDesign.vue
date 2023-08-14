@@ -124,7 +124,6 @@ export default {
       this.stopTimer()
       this.timer = setInterval(() => {
         this.validResult.errs = this.$refs[this.validComponents[this.validStep]].validate() || []
-        console.log(this.validComponents[this.validStep], this.validResult.errs)
         if (Array.isArray(this.validResult.errs) && this.validResult.errs.length === 0) {
           this.validStep++;
           if (this.validStep >= this.validOptions.length) {
@@ -187,14 +186,12 @@ export default {
       }
     },
     async saveProcess(callback) {
-      console.log(this.$refs['baseSetting'].setup.templateName)
       if ((!this.$refs['baseSetting'].setup.templateName) ||  (this.$refs['baseSetting'].setup.templateName?.length < 2) || (this.$refs['baseSetting'].setup.templateName?.length > 10)) {
         this.$message.warning('流程名称未设置或长度不对')
         return false;
       }
 
       const user = JSON.parse(window.localStorage.getItem('user_name'))
-      console.log(user)
       console.log('this.setup.process', this.setup.process)
       let template = {
         formId: this.setup.formId,
@@ -215,7 +212,6 @@ export default {
       }
       // 调取暂存接口
       const res = await saveProcess(template)
-      console.log(res)
       if (res.data.data) {
         this.$message.success('已保存当前内容至草稿箱')
         this.$store.state.designSave = JSON.stringify(this.$store.state.design)

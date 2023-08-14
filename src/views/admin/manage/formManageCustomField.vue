@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" :disabled="isView">
       <el-form-item label="字段名称" prop="title">
         <el-input v-model="ruleForm.title" :disabled="titleDisable" placeholder="请输入字段名称" class="is-dark input"></el-input>
       </el-form-item>
@@ -52,7 +52,7 @@
       <el-form-item label="是否必填" prop="required" class="is-dark input">
         <el-switch v-model="ruleForm.required" :disabled="isRequired"></el-switch>
       </el-form-item>
-      <el-form-item style="margin-left: 100px;">
+      <el-form-item style="margin-left: 100px;" v-if="!isView">
         <el-button type="primary" @click="submitForm('ruleForm')">确认</el-button>
         <el-button @click="resetForm('ruleForm')">取消</el-button>
       </el-form-item>
@@ -66,7 +66,7 @@
   import CascaderField from './cascaderField'
   import SelectField from './selectField'
   import SelectGroupField from './selectGroupField'
-  let id = 0
+  import { getTreeId } from '@/utils/utils'
   export default {
     components: {
       CascaderField,
@@ -75,7 +75,8 @@
     },
     props: {
       drawerTitle: String,
-      feildTypes: Array
+      feildTypes: Array,
+      isView: Boolean
     },
     data() {
       return {
@@ -110,21 +111,21 @@
         belongModules,
         cascaderOptions: [
           {
-            id: '0',
+            id: getTreeId('cascader'),
             value: '',
             children: []
           }
         ],
         selectOptions: [{
-          id: 0,
+          id: getTreeId('select'),
           value: ''
         }],
         selectGroupOptions: [{
-          id: 0,
+          id: getTreeId('selectGroup'),
           value: '组1',
           showInput: false,
           children: [{
-            id: '11',
+            id: getTreeId('selectGroup'),
             value: ''
           }]
         }],
@@ -219,18 +220,18 @@
       },
       addSelectOptions() {
         this.selectOptions.push({
-          id: ++id,
+          id: getTreeId('select'),
           value: ''
         })
       },
       addSelectGroupOptions() {
         this.selectGroupOptions.push({
-          id: ++id,
+          id: getTreeId('selectGroup'),
           value: '组' + (this.selectGroupOptions.length + 1),
           showInput: false,
           isHover: false,
           children: [{
-            id: ++id,
+            id: getTreeId('selectGroup'),
             value: ''
           }]
         })
@@ -239,12 +240,15 @@
         this.$refs[formName].validate(async (valid) => {
           if (valid) {
             const data = this.handleForm()
+            data.sort = this.currentRow?.sort
             const form = {
               type: data.name,
               formCategoryId: this.parentForm.recordId,
               formItemId: this.currentRow?.id,
               sort: this.currentRow?.sort,
-              data
+              data: {
+                ...data
+              }
             }
             if (this.checkOptionValue(data.name)) {
               this.$message.error('请完善选项设置')
