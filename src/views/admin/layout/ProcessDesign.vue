@@ -16,7 +16,7 @@
     </div>
     <el-drawer :title="selectedNode.name" :visible.sync="showConfig"
                :size="selectedNode.type === 'CONDITION' ? '600px':'550px'"
-               direction="rtl" :modal="false" destroy-on-close>
+               direction="rtl" :modal="false" destroy-on-close @close="closeConfigDrawer">
       <div slot="title">
         <template v-if="selectedNode.name !== '二次会签' && selectedNode.id !== 'root'">
           <el-input v-model.trim="selectedNode.name" size="medium" v-show="showInput"
@@ -69,6 +69,9 @@ export default {
     }
   },
   computed:{
+    disabledForm() {
+      return this.$route.name === 'FlowManage'
+    },
     selectedNode(){
       return this.$store.state.selectedNode
     },
@@ -105,8 +108,10 @@ export default {
       console.log('配置节点', node)
       this.showConfig = true
     },
+    closeConfigDrawer() {
+      this.bus.$emit('closeConfigDrawer')
+    },
     handleZoom(scale) {
-      console.log(scale)
       if (typeof scale === 'number') {
         this.scale += scale
       } else {
@@ -115,9 +120,9 @@ export default {
       // document.querySelector('#design-box').style.transform
     },
     startEditName() {
+      if (this.disabledForm) return;
       this.tempNodes = JSON.parse(JSON.stringify(this.nodes))
       this.nodeName = this.selectedNode.name
-      console.log(this.selectedNode)
       this.showInput = true
     },
     saveSelectedNodeName() {
@@ -129,7 +134,6 @@ export default {
         this.$message.warning('节点名称不能为空，请重新编辑')
       }
       this.showInput = false
-      console.log(this.nodes, this.selectedNode.name)
     }
   }
 }

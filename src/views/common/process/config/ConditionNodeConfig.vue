@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form label-width="100px">
+    <el-form label-width="100px" :disabled="disabledForm">
       <el-form-item label="调整优先级" prop="level">
         <el-popover placement="right" title="拖拽条件调整优先级顺序" width="250" trigger="click">
           <draggable style="width: 100%; min-height:25px" :list="prioritySortList" group="from" :options="sortOption">
@@ -34,7 +34,7 @@
       </div>
     </el-form>
     <div>
-      <el-button type="primary" size="mini" icon="el-icon-plus" style="margin: 0 15px 15px 0" round @click="addConditionGroup">
+      <el-button type="primary" :disabled="disabledForm" size="mini" icon="el-icon-plus" style="margin: 0 15px 15px 0" round @click="addConditionGroup">
         添加条件组
       </el-button>
       <span class="item-desc">只有必填选项才能作为审批条件</span>
@@ -59,6 +59,9 @@ export default {
     }
   },
   computed: {
+    disabledForm() {
+      return this.$route.name === 'FlowManage'
+    },
     selectedNode() {
       return this.$store.state.selectedNode
     },
@@ -112,16 +115,14 @@ export default {
       this.showOrgSelect = true
     },
     selected(select) {
-      console.log(select)
       this.showOrgSelect = false
-      // this.users = []
+      this.users.length = 0
       for (let key in select) {
         select[key].forEach(val => this.users.push({
           ...val,
           label: val.label
         }))
       }
-      // select.forEach(val => this.select.push(val))
     },
     removeOrgItem(index) {
       this.select.splice(index, 1)
