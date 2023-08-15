@@ -57,27 +57,35 @@ export default {
   watch: {
     $route: {
       handler: function (val) {
-        const { fullPath } = val
-        this.activeMenu = ''
-        if (fullPath.indexOf('home') !== -1) {
-          this.activeMenu = 'home'
-        }
-        if (fullPath.indexOf('applycenter') !== -1) {
-          this.activeMenu = 'applycenter'
-        }
-        if (fullPath.indexOf('approvalcenter') !== -1) {
-          this.activeMenu = 'approvalcenter'
-        }
-        if (fullPath.indexOf('productmap') !== -1) {
-          this.activeMenu = 'productmap'
-        }
+        this.routeActived(val)
       },
       // 深度观察监听
       deep: true
     }
+  },
+  activated() {
 
   },
+  mounted() {
+    this.routeActived(this.$route)
+  },
   methods: {
+    routeActived(val) {
+      const { fullPath } = val
+      this.activeMenu = ''
+      if (fullPath.indexOf('home') !== -1) {
+        this.activeMenu = 'home'
+      }
+      if (fullPath.indexOf('applycenter') !== -1) {
+        this.activeMenu = 'applycenter'
+      }
+      if (fullPath.indexOf('approvalcenter') !== -1) {
+        this.activeMenu = 'approvalcenter'
+      }
+      if (fullPath.indexOf('productmap') !== -1) {
+        this.activeMenu = 'productmap'
+      }
+    },
     logout() {
       this.$router.push({
         name: 'login'
@@ -146,6 +154,7 @@ export default {
   .left {
     font-weight: 700;
     cursor: pointer;
+
     .logo {
       width: 32px;
       height: 32px;

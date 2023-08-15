@@ -296,7 +296,7 @@
       },
       async queryUserList() {
         const res = await queryUserList()
-        const resData = res.data.data.data
+        const resData = res.data.data
         if (resData) {
           this.roleData = resData.map.role.map(item => {
             return {
@@ -306,7 +306,6 @@
               children: []
             }
           })
-          console.log(this.roleData)
           this.data = resData.root.children
           this.init()
         }

@@ -96,3 +96,12 @@ export function getApprovalListStation(param) {
     contentType: 'application/json'
   })
 }
+export function exportApprovalList(param){
+  return request({
+    url: '/cpr/censor/exportApprovalList',
+    method: 'post',
+    data: param,
+    responseType: 'blob',
+  })
+}
+

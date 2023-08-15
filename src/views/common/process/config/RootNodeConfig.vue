@@ -8,7 +8,7 @@
         选择{{ nodeName }}，<span style="color: #86909C;font-size: 12px;">配置可发起审批任务的人员范围</span>
       </span>
     </p>
-    <el-radio-group v-model="radio">
+    <el-radio-group v-model="radio" :disabled="disabledForm">
       <el-radio label="所有人">所有人</el-radio>
       <el-radio label="指定部门/人员/角色">
         指定部门/人员/角色
@@ -16,7 +16,7 @@
     </el-radio-group>
     <br/>
     <div v-if="radio === '指定部门/人员/角色'">
-      <el-button size="mini" @click="selectOrg" icon="el-icon-plus" type="primary">选择部门/人员/系统角色</el-button>
+      <el-button size="mini" :disabled="disabledForm" @click="selectOrg" icon="el-icon-plus" type="primary">选择部门/人员/系统角色</el-button>
       <div style="margin-top: 20px">
         <div class="tag-action" >
           <div class="tag-box" v-for="(item, index) in select" :key="index">
@@ -66,6 +66,9 @@ export default {
     }
   },
   computed:{
+    disabledForm() {
+      return this.$route.name === 'FlowManage'
+    },
     select: {
       get() {
         return this.config.assignedUser
@@ -115,7 +118,9 @@ export default {
       this.config.assignedUser = assignedUser
     },
     removeOrgItem(index){
-      console.log(index)
+      if (this.disabledForm) {
+        return;
+      }
       this.select.splice(index, 1)
     }
   }

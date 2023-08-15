@@ -83,20 +83,16 @@ export default {
   watch: {
     config: {
       handler() {
-        this.content = ''
-        this.config.props.groups.forEach((g, i) => {
-          g.conditions.forEach(c => {
-            if (c.value.length > 0) {
-             this.content = '已设置'
-             this.showError = false
-            }
-          })
-        })
-        console.log(this.config)
+        this.setContent()
       },
       immediate: true,
       deep: true
     }
+  },
+  created() {
+    this.bus.$on('closeConfigDrawer', () => {
+      this.setContent()
+    })
   },
   methods: {
     //校验数据配置的合法性
@@ -128,6 +124,17 @@ export default {
         })
       })
       return this.showError
+    },
+    setContent() {
+      this.content = ''
+      this.config.props.groups.forEach((g, i) => {
+        g.conditions.forEach(c => {
+          if (c.value.length > 0) {
+            this.content = '已设置'
+            this.showError = false
+          }
+        })
+      })
     }
   }
 }

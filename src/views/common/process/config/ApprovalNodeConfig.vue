@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form label-position="top" label-width="90px">
+    <el-form label-position="top" label-width="90px" :disabled="disabledForm">
       <el-form-item label="选择审批对象" prop="text" class="user-type">
         <template slot="label">
           <svg class="icon" aria-hidden="true">
@@ -261,6 +261,9 @@ export default {
     }
   },
   computed: {
+    disabledForm() {
+      return this.$route.name === 'FlowManage'
+    },
     nodeProps() {
       return this.$store.state.selectedNode.props
     },
@@ -343,7 +346,6 @@ export default {
         e.target.parentNode.style.height = 'auto'
         this[isCollapse] = true
       }
-       console.log(this[isCollapse])
     },
     initCollapse(selector, showType) {
       this.$nextTick(() => {
@@ -405,9 +407,11 @@ export default {
       this.initCollapse('.tag-action1', 'showCollapse1')
     },
     removeOrgItem(index) {
+      if (this.disabledForm) return;
       this.select.splice(index, 1)
     },
     removeOrgItem1(index) {
+      if (this.disabledForm) return;
       this.select1.splice(index, 1)
     }
   }
