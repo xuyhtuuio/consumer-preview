@@ -23,7 +23,7 @@
         <review-material class="cnt-item" ref="reviewMaterialRef" :list="reviewMaterials" />
       </div>
       <div class="footer" v-if="!isLoading">
-        <!-- <g-button class="btn" @click.native="processDialogVisible=true">流程总览</g-button> -->
+        <g-button class="btn" @click="previewFlow">流程总览</g-button>
         <g-button class="btn" @click.native="save">保存草稿</g-button>
         <g-button class="btn" type="primary" @click.native="submit">提交</g-button>
       </div>
@@ -48,28 +48,31 @@
       </div>
       <span class="item">提交成功后可在申请中心查看，了解工单审批进度</span>
     </el-dialog>
-    <el-dialog class="processDialog" :visible.sync="processDialogVisible">
-      流程图
-    </el-dialog>
+    <el-dialog class="processDialog" :visible.sync="processDialogVisible"> 流程图 </el-dialog>
+     <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow?.templateName + '-预览'" width="600px">
+      <process-design from="addApply" ref="processDesign" style="background: #f5f6f6;" />
+    </w-dialog>
   </div>
 </template>
 
 <script>
+import SecondaryConfirmation from '@/components/common/secondaryConfirmation';
+import ProcessDesign from '@/views/admin/layout/ProcessDesign';
+
 import AddTag from './components/add-tag.vue';
 import ReviewMatters from './components/review-matters.vue';
 import BasicInformation from './components/basic-information.vue';
 import PublicityChannels from './components/publicity-channels.vue';
 import ReconciliationPoint from './components/reconciliation-point.vue';
-import SecondaryConfirmation from '@/components/common/secondaryConfirmation';
 import ReviewMaterial from './components/review-material.vue';
 import { timestampToDateTime } from '@/utils/utils.js';
 import {
   getFormCategoryArray,
   getApplyForm,
-  submit,
   saveDraft,
   externalLogicController,
-  processStart
+  processStart,
+  getProcess
 } from '@/api/front.js';
 export default {
   components: {
@@ -79,7 +82,8 @@ export default {
     PublicityChannels,
     ReconciliationPoint,
     ReviewMaterial,
-    SecondaryConfirmation
+    SecondaryConfirmation,
+    ProcessDesign
   },
   data: () => ({
     title: '审查类型',
@@ -87,7 +91,8 @@ export default {
     isLoading: true,
     isGLoading: false,
     submitDialogVisible: false,
-    processDialogVisible:false,
+    processDialogVisible: false,
+    flowVisible: false,
     reviewList: [],
     promotionChannels: [],
     basicInformation: [],
@@ -101,7 +106,9 @@ export default {
       confirmBtn: '保存'
     },
     templateId: '',
-    processDefinitionId: ''
+    processDefinitionId: '',
+    currentRow: null,
+    currentRowInfo: ""
   }),
   created() {
     // this.initialData();
@@ -132,7 +139,7 @@ export default {
       _this.dialogVisible = false;
       this.save(() => {
         window.localStorage.removeItem('editId');
-         window.localStorage.removeItem('formManagementId');
+        window.localStorage.removeItem('formManagementId');
         // this.formId = undefined;
         // this.initialData();
         next();
@@ -215,6 +222,16 @@ export default {
           this.isLoading = false;
         }
       });
+      // 获取改表单id的流程
+      getProcess({formId:id}).then(({ data: { data: res, msg, success } }) => {
+        if(success) {
+          this.currentRow = res.list.length ? res.list[0]: null
+         
+        }else {
+          this.currentRow = null
+           this.currentRowInfo = msg
+        }
+      })
     },
     // 提交
     async submit() {
@@ -344,6 +361,21 @@ export default {
       if (result2) {
         return this.submitTrue(false, success);
       }
+    },
+    //
+    previewFlow() {
+      if(!this.currentRow) {
+        return  this.$message.error(this.currentRowInfo)
+      }
+      const design = JSON.parse(JSON.stringify( this.currentRow ))
+      design.formId = +design.formId
+      design.settings = JSON.parse(design.settings)
+      design.formItems = JSON.parse(design.formItems)
+      design.process = JSON.parse(design.process)
+      this.$store.commit('loadForm', design)
+      this.$nextTick(() => {
+        this.flowVisible = true
+      })
     }
   }
 };
@@ -429,7 +461,4 @@ export default {
     }
   }
 }
-
-
-
 </style>
