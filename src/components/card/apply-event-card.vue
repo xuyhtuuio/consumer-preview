@@ -42,7 +42,7 @@
             </i>
           </i>
         </span>
-        <span class="event-status" v-else>
+        <span class="event-status" v-if="item.errorInfo&&item.ocr_approval_status">
           <i class="tag in-modify">{{ item.ocr_approval_status }}</i>
         </span>
       </div>

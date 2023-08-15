@@ -76,21 +76,21 @@
             </div>
             <div class="floor2-item">
               <span>发起时间</span>
-              <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
+              <el-date-picker v-model="search.startDate"  type="daterange" @clear="searchList" @change="searchList"
                 value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间">
               </el-date-picker>
             </div>
             <div class="floor2-item">
               <span>上线时间</span>
-              <el-date-picker v-model="search.productLaunchDate" value-format="yyyy-MM-dd" clearable type="daterange"
-                range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" @clear="searchList"
-                @change="searchList">
+              <el-date-picker v-model="search.productLaunchDate" value-format="yyyy-MM-dd" clearable
+              type="daterange" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间"
+                @clear="searchList" @change="searchList">
               </el-date-picker>
             </div>
           </div>
         </div>
         <div class="export-reset">
-          <el-button type="text">导出</el-button>
+
           <el-button type="text" @click="reset">重置</el-button>
         </div>
       </div>
@@ -352,9 +352,9 @@ export default {
         currentActivityName: this.search.approvalStage,
         id: userinfo.id,
         name: userinfo.fullname,
-        form_management_id: '1',
-        startDate: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate.join('TO') : '',
-        productLaunchDate: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate.join('TO') : ''
+
+        startDate: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate.map(v=>{return v+' 00:00:00'}).join('TO') : '',
+        productLaunchDate: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate.map(v=>{return v+' 00:00:00'}).join('TO') : ''
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间
@@ -442,7 +442,7 @@ export default {
       });
     },
     userStatus(counts) {
-  console.log('ff',counts)
+      console.log('ff', counts)
       const modifyCount = counts['toModified']
       const toConfirmedCount = counts['toConfirmed']
       const ApprovalCount = counts['Approval']
@@ -452,10 +452,10 @@ export default {
       if (modifyCount > 0 && modifyCount <= 5) {
         return this.tipsMsg = `您有${modifyCount}笔申请单待修改哦，请尽快修改。`
       }
-      if (toConfirmedCount <= 5) {
+      if (toConfirmedCount <= 5 && toConfirmedCount > 0) {
         return this.tipsMsg = `您有${modifyCount}笔申请单待确认哦，请尽快确认。`
       }
-      if (ApprovalCount) {
+      if (ApprovalCount > 0) {
         return this.tipsMsg = `您的申请单正在处理哦，请耐心等待。`
       }
       if (finished == 0) {
@@ -811,12 +811,14 @@ export default {
         padding-right: 16px;
 
         .floor2-item {
+          // width: 33%;
           flex: 1;
           margin-right: 16px;
           display: flex;
           align-items: center;
 
-          .el-input {
+          .el-input,
+          .el-date-editor {
             width: 100%;
           }
 
@@ -841,13 +843,18 @@ export default {
         /deep/.el-range-editor {
           position: relative;
 
-          .el-icon-date {
+          .el-icon-date,
+          .el-icon-time {
             position: absolute;
             right: 8px;
             top: 50%;
             transform: translateY(-50%);
           }
 
+          .el-icon-time::before {
+            font-family: element-icons !important;
+            content: "\e78e";
+          }
 
           .el-input__suffix {
             right: 20px;
@@ -861,6 +868,8 @@ export default {
       padding-left: 16px;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
 
       .el-button {
         height: 38px;

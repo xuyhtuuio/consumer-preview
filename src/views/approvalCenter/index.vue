@@ -58,11 +58,11 @@
           </div>
           <div class="floor2">
             <div class="floor2-item">
-            <el-input v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
-              @keyup.enter.native="searchList">
-              <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
-            </el-input>
-          </div>
+              <el-input v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
+                @keyup.enter.native="searchList">
+                <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
+              </el-input>
+            </div>
             <div class="floor2-item">
               <span>发起时间</span>
               <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
@@ -111,7 +111,7 @@ export default {
   components: {
     approvalEventCard,
   },
-  name:'approval-center-index',
+  name: 'approval-center-index',
   data() {
     return {
       crtSign: "toPending",
@@ -317,7 +317,7 @@ export default {
     },
     queryUserList() {
       queryUserList().then((res) => {
-        const { root } = res.data.data.data
+        const { root } = res.data.data
         if (root) {
           this.agenciesList = root.children.map(item => {
             return {
@@ -355,10 +355,10 @@ export default {
         listType,
         nodeid: this.search.approvalStage,
         orgIds: this.search.orgIds.length ? this.search.orgIds : null,
-        createTimeStart: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[0] : '',
-        createTimeEnd: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[1] : '',
-        productLaunchDateStart: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[0] : '',
-        productLaunchDateEnd: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[1] : '',
+        createTimeStart: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[0] + ' 00:00:00' : '',
+        createTimeEnd: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[1] + ' 00:00:00' : '',
+        productLaunchDateStart: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[0] + ' 00:00:00' : '',
+        productLaunchDateEnd: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[1] + ' 00:00:00' : '',
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间
@@ -648,6 +648,7 @@ export default {
         font-size: 14px;
         font-weight: 400;
         line-height: 22px;
+
         .el-range-separator {
           padding: 0;
         }
@@ -739,12 +740,12 @@ export default {
         padding-right: 16px;
 
         .floor2-item {
-          flex: 1;
+          width: 33%;
           margin-right: 16px;
           display: flex;
           align-items: center;
 
-          .el-input {
+          .el-input, .el-date-editor {
             width: 100%;
           }
 
@@ -765,14 +766,22 @@ export default {
         }
 
 
-        /deep/.el-range-editor  {
+        /deep/.el-range-editor {
           position: relative;
-          .el-icon-date {
+
+          .el-icon-date,
+          .el-icon-time {
             position: absolute;
             right: 8px;
             top: 50%;
             transform: translateY(-50%);
           }
+
+          .el-icon-time::before {
+            font-family: element-icons !important;
+            content: "\e78e";
+          }
+
           .el-input__suffix {
             right: 20px;
           }
@@ -801,6 +810,5 @@ export default {
       }
     }
   }
-}
-</style>
+}</style>
 

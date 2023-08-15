@@ -112,9 +112,9 @@ export default {
         };
     },
     mounted() {
-        if ((this.$route.params && this.$route.params.formId) || (this.sidebarParam && this.sidebarParam.formId)) {
-            this.getOrderDetail()
-        }
+        // if ((this.$route.params && this.$route.params.formId) || (this.sidebarParam && this.sidebarParam.formId)) {
+        //     this.getOrderDetail()
+        // }
     },
     activated() {
         const keys = Object.keys(this.$route.params) || Object.keys(this.$route.sidebarParam)
@@ -170,6 +170,7 @@ export default {
             this.$emit('preview', url)
         },
         download(fileList) {
+        console.log('f',fileList)
             const list = fileList.map(v => {
                 // return {
                 //     fileName: v.fileName,
@@ -181,6 +182,8 @@ export default {
                 loadList: list
             }
             downloadAllFiles(params).then(res => {
+                console.log('ff',res)
+                return
                 const { data } = res.data
                 for (let i in data) {
                     const link = document.createElement('a');
