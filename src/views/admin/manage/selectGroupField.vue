@@ -34,6 +34,7 @@
 </template>
 <script>
 import draggable from 'vuedraggable';
+import { getTreeId } from '@/utils/utils'
 export default {
   name: 'SelectGroupField',
   components: {
@@ -52,7 +53,7 @@ export default {
     },
     addSelectOptions(data) {
       data.push({
-        id: data.length,
+        id: getTreeId('select'),
         value: ''
       })
     }

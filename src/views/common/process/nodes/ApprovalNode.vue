@@ -72,15 +72,18 @@ export default {
       try {
         this.showError = false
         if (this.config.type === 'APPROVAL') {
-          this.showError = !this[`validate_${this.config.props.assignedType}`](err)
+          console.log(this.config, this.config.props.assignedType)
           if (!this.config.props.targetPage) {
             err.push(`${this.config.name} 目标页面未配置`)
+            this.errorInfo = '目标页面未配置'
             this.showError = true
           }
           if (this.config.props.refuseWay === 'TO_NODE' && !this.config.props.refuseNode) {
             err.push(`${this.config.name} 未配置驳回到指定节点`)
+            this.errorInfo = '未配置驳回到指定节点'
             this.showError = true
           }
+          this[`validate_${this.config.props.assignedType}`](err)
         } else {
           // 二次会签
           if (!this.config.props.target) {
@@ -99,25 +102,21 @@ export default {
     // 上一个审批人选中
     validate_SELF_SELECT(err){
       const msg = '审批'
-      if(this.config.props.assignedUser.length > 0){
-        return true;
-      }else {
+      if(this.config.props.assignedUser.length === 0) {
         this.errorInfo = `请指定${msg}人员`
         err.push(`${this.config.name} 未指定${msg}人员`)
-        return false
+        this.showError = true
       }
     },
     // 指定人员/角色
-    validate_USER_ROLE(err) {
+    validate_DEPT_USER_ROLE(err) {
       this.validate_SELF_SELECT(err)
     },
     validate_SELECT_NODE(err) {
-      if(this.config.props.target){
-        return true;
-      }else {
+      if(!this.config.props.target) {
         this.errorInfo = '请指定节点审批人'
         err.push(`${this.config.name} 未指定节点审批人`)
-        return false
+        this.showError = true
       }
     },
     validate_LEADER_TOP(){

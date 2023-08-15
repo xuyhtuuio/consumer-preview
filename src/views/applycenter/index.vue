@@ -76,9 +76,6 @@
             </div>
             <div class="floor2-item">
               <span>发起时间</span>
-              <!-- <el-date-picker v-model="search.startDate" value-format="yyyy-MM-dd" clearable type="date"
-                placeholder="请选择发起时间" @clear="searchList" @change="searchList">
-              </el-date-picker> -->
               <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
                 value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间">
               </el-date-picker>
@@ -231,7 +228,6 @@ export default {
       let floor2 = document.querySelectorAll(".apply-center .floor2")[0];
       floor2 ? (floor2.style.paddingRight = 16 + "px") : "";
     });
-    this.userStatus();
     this.getApprovalType();
   },
   watch: {
@@ -313,6 +309,7 @@ export default {
             }
           })
         }
+        this.userStatus(data)
       })
     },
     changeSort() {
@@ -356,8 +353,8 @@ export default {
         id: userinfo.id,
         name: userinfo.fullname,
         form_management_id: '1',
-        startDate: this.search.startDate.length > 0 ? this.search.startDate.join('TO') : '',
-        productLaunchDate: this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate.join('TO') : ''
+        startDate: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate.join('TO') : '',
+        productLaunchDate: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate.join('TO') : ''
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间
@@ -444,14 +441,26 @@ export default {
         }
       });
     },
-    userStatus() {
-      // getUserStatus()
-      //   .then((res) => {
-      //     this.tipsMsg = res.data.data;
-      //   })
-      //   .catch((err) => {
-      //     this.tipsMsg = false;
-      //   });
+    userStatus(counts) {
+  console.log('ff',counts)
+      const modifyCount = counts['toModified']
+      const toConfirmedCount = counts['toConfirmed']
+      const ApprovalCount = counts['Approval']
+      const draftBinCount = counts['draftBin']
+      const applyAllCount = counts['applyAll']
+      const finished = ApprovalCount - modifyCount - toConfirmedCount - draftBinCount - applyAllCount
+      if (modifyCount > 0 && modifyCount <= 5) {
+        return this.tipsMsg = `您有${modifyCount}笔申请单待修改哦，请尽快修改。`
+      }
+      if (toConfirmedCount <= 5) {
+        return this.tipsMsg = `您有${modifyCount}笔申请单待确认哦，请尽快确认。`
+      }
+      if (ApprovalCount) {
+        return this.tipsMsg = `您的申请单正在处理哦，请耐心等待。`
+      }
+      if (finished == 0) {
+        return this.tipsMsg = `您今日还没有提起新的申请，快去操作吧！`
+      }
     },
     changeStatis(item) {
       if (item.value == this.crtSign) return;
@@ -705,8 +714,9 @@ export default {
         font-size: 14px;
         font-weight: 400;
         line-height: 22px;
-        .el-range-separator{
-          padding:0 ;
+
+        .el-range-separator {
+          padding: 0;
         }
       }
 
@@ -830,13 +840,14 @@ export default {
 
         /deep/.el-range-editor {
           position: relative;
+
           .el-icon-date {
-              position: absolute;
-              right: 8px;
-              top: 50%;
-              transform: translateY(-50%);
-            }
-      
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+          }
+
 
           .el-input__suffix {
             right: 20px;
