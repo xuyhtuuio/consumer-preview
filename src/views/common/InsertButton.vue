@@ -1,5 +1,5 @@
 <template>
-  <el-popover placement="bottom-start" title="添加流程节点" width="350" trigger="click">
+  <el-popover placement="bottom-start" :disabled="$route.name === 'FlowManage'" title="添加流程节点" width="350" trigger="click">
     <div class="node-select">
       <div @click="addApprovalNode">
         <i class="el-icon-s-check" style="color:rgb(255, 148, 62);"></i>

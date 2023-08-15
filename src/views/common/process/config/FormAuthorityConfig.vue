@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="margin-bottom: 20px">
-      <el-radio-group v-model="formId" @input="changeFormId" size="small">
+      <el-radio-group v-model="formId" :disabled="disabledForm" @input="changeFormId" size="small">
         <el-radio-button :label="item.id" v-for="item in formGroup" :key="item.id">{{ item.name }}</el-radio-button>
       </el-radio-group>
     </div>
@@ -14,26 +14,26 @@
       </el-table-column>
       <el-table-column prop="readOnly" label="只读" width="80">
         <template slot="header" slot-scope="scope">
-          <el-radio label="R" v-model="permSelect" @change="allSelect('R')">只读</el-radio>
+          <el-radio label="R" :disabled="disabledForm" v-model="permSelect" @change="allSelect('R')">只读</el-radio>
         </template>
         <template slot-scope="scope">
-          <el-radio v-model="scope.row.perm" label="R" :name="scope.row.id"></el-radio>
+          <el-radio :disabled="disabledForm" v-model="scope.row.perm" label="R" :name="scope.row.id"></el-radio>
         </template>
       </el-table-column>
       <el-table-column prop="editable" label="可编辑" width="90">
         <template slot="header" slot-scope="scope">
-          <el-radio label="E" v-model="permSelect" @change="allSelect('E')">可编辑</el-radio>
+          <el-radio label="E" :disabled="disabledForm" v-model="permSelect" @change="allSelect('E')">可编辑</el-radio>
         </template>
         <template slot-scope="scope">
-          <el-radio v-model="scope.row.perm" label="E" :name="scope.row.id"></el-radio>
+          <el-radio v-model="scope.row.perm" :disabled="disabledForm" label="E" :name="scope.row.id"></el-radio>
         </template>
       </el-table-column>
       <el-table-column prop="hide" label="隐藏" width="80">
         <template slot="header" slot-scope="scope">
-          <el-radio label="H" v-model="permSelect" @change="allSelect('H')">隐藏</el-radio>
+          <el-radio label="H" :disabled="disabledForm" v-model="permSelect" @change="allSelect('H')">隐藏</el-radio>
         </template>
         <template slot-scope="scope">
-          <el-radio v-model="scope.row.perm" label="H"  :name="scope.row.id"></el-radio>
+          <el-radio v-model="scope.row.perm" :disabled="disabledForm" label="H"  :name="scope.row.id"></el-radio>
         </template>
       </el-table-column>
     </el-table>
@@ -66,6 +66,9 @@ export default {
     // this.formId && this.getFormItemeById(this.formId)
   },
   computed:{
+    disabledForm() {
+      return this.$route.name === 'FlowManage'
+    },
     formData(){
       return this.$store.state.design.formItems
     },
@@ -77,7 +80,6 @@ export default {
     async getFormItemeById(formId) {
       const res = await getFormTemplateById(formId)
       const formDetail = res.data
-      console.log(formDetail)
       if (formDetail) {
         
       }

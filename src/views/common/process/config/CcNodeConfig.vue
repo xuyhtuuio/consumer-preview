@@ -8,7 +8,7 @@
         选择{{ nodeName }}，<span style="color: #86909C;font-size: 12px;">配置抄送的人员范围</span>
       </span>
     </p>
-    <el-button size="mini" @click="selectOrg" icon="el-icon-plus" type="primary">选择部门/人员/系统角色</el-button>
+    <el-button :disabled="disabledForm" size="mini" @click="selectOrg" icon="el-icon-plus" type="primary">选择部门/人员/系统角色</el-button>
     <div style="margin-top: 16px">
       <div class="tag-action" >
         <div class="tag-box" v-for="(item, index) in select" :key="index">
@@ -56,6 +56,9 @@ export default {
     }
   },
   computed:{
+    disabledForm() {
+      return this.$route.name === 'FlowManage'
+    },
     select: {
       get() {
         return this.config.assignedUser
@@ -79,7 +82,6 @@ export default {
         e.target.parentNode.style.height = 'auto'
         this[isCollapse] = true
       }
-       console.log(this[isCollapse])
     },
     initCollapse(selector, showType) {
       this.$nextTick(() => {
@@ -113,9 +115,7 @@ export default {
       this.initCollapse('.tag-action', 'showCollapse')
     },
     removeOrgItem(index){
-      console.log(index)
       this.select.splice(index, 1)
-      console.log(this.select)
     }
   }
 }

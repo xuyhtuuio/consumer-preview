@@ -5,14 +5,14 @@
         <span class="group-name">条件组 {{ groupNames[index] }}</span>
         <div class="group-cp">
           <span>组内条件关系：</span>
-          <el-switch v-model="group.groupType" active-color="#409EFF"
+          <el-switch v-model="group.groupType" :disabled="disabledForm"  active-color="#409EFF"
                      inactive-color="#c1c1c1" active-value="AND" inactive-value="OR"
                      active-text="且" inactive-text="或"/>
         </div>
         <div class="group-operation">
           <el-popover placement="bottom" title="选择审批条件" width="300" trigger="click">
             <!-- <div>以下条件将决定具体的审批流程</div>-->
-            <el-checkbox-group v-model="group.cids" value-key="id">
+            <el-checkbox-group v-model="group.cids" value-key="id" :disabled="disabledForm" >
               <el-checkbox :label="condition.id" v-for="(condition, cindex) in conditionList" :key="condition.id" @change="conditionChange(cindex, group)" style="width: 100px;">
                 {{ condition.title }}
               </el-checkbox>
@@ -25,7 +25,7 @@
       <div class="group-content">
         <p v-if="group.conditions.length === 0">点击右上角 + 为本条件组添加条件 ☝</p>
         <div v-else>
-          <el-form ref="condition-form" label-width="100px">
+          <el-form :disabled="disabledForm" ref="condition-form" label-width="100px">
             <!--构建表达式-->
             <el-form-item :label="condition.title" v-for="(condition, cindex) in group.conditions" :key="condition.id + '_' + cindex" >
               <span v-if="(condition.valueType === ValueType.string)">
@@ -44,7 +44,7 @@
                     <el-select style="width: 260px;" multiple filterable allow-create size="small" v-model="condition.value" placeholder="输入可能包含的值"></el-select>
                    </span>
                  </span>
-                 <i class="el-icon-close" @click="deleteSingleCondition(group.conditions, cindex)" style="position: absolute;right:0; top: 12px;font-size: 20px;"></i>
+                 <i class="el-icon-close" @click="deleteSingleCondition(group.conditions, cindex, group.cids)" style="position: absolute;right:0; top: 12px;font-size: 20px;"></i>
               </span>
               <span v-if="condition.valueType === ValueType.array">
                 <el-select size="small" placeholder="判断符" style="width: 120px;" v-model="condition.compare">
@@ -64,7 +64,7 @@
                     </el-select>
                    </span>
                  </span>
-                 <i class="el-icon-close" @click="deleteSingleCondition(group.conditions, cindex)" style="position: absolute;right:0; top: 12px;font-size: 20px;"></i>
+                 <i class="el-icon-close" @click="deleteSingleCondition(group.conditions, cindex, group.cids)" style="position: absolute;right:0; top: 12px;font-size: 20px;"></i>
               </span>
               <span v-else-if="condition.valueType === ValueType.number">
                 <el-select size="small" placeholder="判断符" style="width: 120px;" v-model="condition.compare">
@@ -80,12 +80,12 @@
                     </span>
                   </span>
                 </span>
-                <i class="el-icon-close" @click="deleteSingleCondition(group.conditions, cindex)" style="position: absolute;right:0; top: 12px;font-size: 20px;"></i>
+                <i class="el-icon-close" @click="deleteSingleCondition(group.conditions, cindex, group.cids)" style="position: absolute;right:0; top: 12px;font-size: 20px;"></i>
               </span>
               <span v-else-if="condition.valueType === ValueType.user">
                 <span class="item-desc" style="margin-right: 20px">属于某部门 / 为某些人其中之一</span>
                 <el-button size="mini" icon="el-icon-plus" @click="selectUser(condition.value, 'user')" round>选择人员/部门</el-button>
-                <i class="el-icon-close" @click="deleteSingleCondition(group.conditions, cindex)" style="position: absolute;right:0; top: 12px;font-size: 20px;"></i>
+                <i class="el-icon-close" @click="deleteSingleCondition(group.conditions, cindex, group.cids)" style="position: absolute;right:0; top: 12px;font-size: 20px;"></i>
                 <div style="margin: 10px">
                   <el-tag class="org-item" style="margin: 5px" :type="org.type === 'dept'?'':'info'"
                           v-for="(org, index) in condition.value" :key="index + '_org'"
@@ -97,7 +97,7 @@
               <span v-else-if="condition.valueType === ValueType.dept">
                 <span class="item-desc" style="margin-right: 20px">为某部门 / 某部门下的部门</span>
                 <el-button size="mini" icon="el-icon-plus" @click="selectUser(condition.value, 'dept')" round>选择部门</el-button>
-                <i class="el-icon-close" @click="deleteSingleCondition(group.conditions, cindex)" style="position: absolute;right:0; font-size: 20px;"></i>
+                <i class="el-icon-close" @click="deleteSingleCondition(group.conditions, cindex, group.cids)" style="position: absolute;right:0; font-size: 20px;"></i>
                 <div style="margin: 10px">
                   <el-tag class="org-item" style="margin: 5px" :type="org.type === 'dept'?'':'info'"
                           v-for="(org, index) in condition.value" :key="index + '_org'"
@@ -131,7 +131,7 @@
                     <el-select style="width: 260px;" multiple filterable allow-create size="small" v-model="condition.value" placeholder="输入可能包含的值"></el-select>
                   </span>
                 </span>
-                <i class="el-icon-close" @click="deleteSingleCondition(group.conditions, cindex)" style="position: absolute;right:0; top: 12px;font-size: 20px;"></i>
+                <i class="el-icon-close" @click="deleteSingleCondition(group.conditions, cindex, group.cids)" style="position: absolute;right:0; top: 12px;font-size: 20px;"></i>
               </span>
             </el-form-item>
           </el-form>
@@ -173,6 +173,9 @@ export default {
     }
   },
   computed: {
+    disabledForm() {
+      return this.$route.name === 'FlowManage'
+    },
     selectOptions() {
       return (id) => {
         const { formItems } = this.$store.state.design
@@ -236,25 +239,27 @@ export default {
       this.showOrgSelect = true
     },
     selected(select) {
-      console.log(select)
       this.showOrgSelect = false
-      // this.users = []
+      this.users.length = 0
       for (let key in select) {
         select[key].forEach(val => this.users.push({
           ...val,
           label: val.label
         }))
       }
-      // select.forEach(val => this.users.push(val))
     },
     removeOrgItem(values, index) {
       values.splice(index, 1)
     },
     delGroup(index) {
+      if (this.disabledForm) {
+        return;
+      }
       this.selectedNode.props.groups.splice(index, 1)
     },
-    deleteSingleCondition(cArr, index) {
+    deleteSingleCondition(cArr, index, cids) {
       cArr.splice(index, 1)
+      cids.splice(index, 1)
     },
     conditionChange(index, group) {
       //判断新增的
@@ -262,7 +267,6 @@ export default {
         if (0 > group.conditions.findIndex(cd => cd.id === cid)){
           //新增条件
           let condition = {...this.conditionList[index]}
-          console.log(condition, this.conditionList, index)
           condition.compare = '';
           condition.value = []
           group.conditions.push(condition)

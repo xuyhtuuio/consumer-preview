@@ -61,14 +61,14 @@ export default {
     //校验数据配置的合法性
     validate(err){
       this.showError = false
-      if(this.config.assignedUser && this.config.assignedUser.length > 0){
+      if(this.config.props.assignedUser && this.config.props.assignedUser.length > 0){
         this.showError = false
       }else {
         this.showError = true
-         err.push(`${this.config.name} 未指定需要抄送的人员`)
+        err.push(`${this.config.name} 未指定需要抄送的人员`)
         this.errorInfo = '请选择需要抄送的人员'
       }
-      return !this.showError
+      return this.showError
     }
   }
 }

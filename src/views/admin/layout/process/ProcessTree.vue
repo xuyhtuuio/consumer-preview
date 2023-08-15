@@ -190,6 +190,9 @@ export default {
     },
     //处理节点插入逻辑
     insertNode(type, parentNode){
+      if (this.$route.name === 'FlowManage') {
+        return;
+      }
       this.$refs['_root'].click()
       //缓存一下后面的节点
       let afterNode = parentNode.children
@@ -312,6 +315,9 @@ export default {
       return this.getBranchEndNode(conditionNode.children);
     },
     addBranchNode(node){
+      if (this.$route.name === 'FlowManage') {
+        return;
+      }
       if (node.branchs.length < 8){
         node.branchs.push({
           id: this.getRandomId(),
@@ -327,7 +333,6 @@ export default {
     },
     //删除当前节点
     delNode(node){
-      console.log("删除节点", node)
       //获取该节点的父节点
       let parentNode = this.nodeMap.get(node.parentId)
       if (parentNode){
