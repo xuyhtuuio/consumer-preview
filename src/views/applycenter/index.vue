@@ -76,15 +76,15 @@
             </div>
             <div class="floor2-item">
               <span>发起时间</span>
-              <el-date-picker v-model="search.startDate"  type="daterange" @clear="searchList" @change="searchList"
+              <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
                 value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间">
               </el-date-picker>
             </div>
             <div class="floor2-item">
               <span>上线时间</span>
-              <el-date-picker v-model="search.productLaunchDate" value-format="yyyy-MM-dd" clearable
-              type="daterange" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间"
-                @clear="searchList" @change="searchList">
+              <el-date-picker v-model="search.productLaunchDate" value-format="yyyy-MM-dd" clearable type="daterange"
+                range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" @clear="searchList"
+                @change="searchList">
               </el-date-picker>
             </div>
           </div>
@@ -352,9 +352,8 @@ export default {
         currentActivityName: this.search.approvalStage,
         id: userinfo.id,
         name: userinfo.fullname,
-
-        startDate: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate.map(v=>{return v+' 00:00:00'}).join('TO') : '',
-        productLaunchDate: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate.map(v=>{return v+' 00:00:00'}).join('TO') : ''
+        startDate: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate.map((v, index) => { return v + (index > 0 ? ' 23:59:59' : ' 00:00:00') }).join('TO') : '',
+        productLaunchDate: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate.map((v, index) => { return v + (index > 0 ? ' 23:59:59' : ' 00:00:00' )}).join('TO') : ''
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间
@@ -429,10 +428,10 @@ export default {
       });
     },
     quash(item) {
-      const param ={
-        taskId:item.taskNumber,
-        nodeId:item.nodeId,
-        currentUserInfo:item.sponsorMap
+      const param = {
+        taskId: item.taskNumber,
+        processInstanceId: item.process_instance_id,
+        currentUserInfo: item.sponsorMap
       }
       quashApplication(param).then((res) => {
         if (res.status === 200) {

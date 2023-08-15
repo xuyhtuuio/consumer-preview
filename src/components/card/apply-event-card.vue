@@ -184,7 +184,7 @@ export default {
       canRoved(params).then(res => {
         // this.revoked = true
         const {data} = res.data
-        this.revoked= data !=='true'
+        this.revoked= data =='true'
       })
 
     },

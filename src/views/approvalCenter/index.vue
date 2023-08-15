@@ -415,12 +415,13 @@ export default {
         pageSize: 10,
         ...this.search,
         listType,
+        formManagementId :this.search.approvalType,
         nodeid: this.search.approvalStage,
         orgIds: this.search.orgIds.length ? this.search.orgIds : null,
         createTimeStart: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[0] + ' 00:00:00' : '',
-        createTimeEnd: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[1] + ' 00:00:00' : '',
+        createTimeEnd: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[1] + ' 23:59:59' : '',
         productLaunchDateStart: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[0] + ' 00:00:00' : '',
-        productLaunchDateEnd: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[1] + ' 00:00:00' : '',
+        productLaunchDateEnd: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[1] + ' 23:59:59' : '',
       };
       let sortType = "";
       // desc:降序 asc 升序 1 发起时间 2 更新时间

@@ -12,21 +12,21 @@
         <span class="event-name pointer" @click="toDetail(item)">{{ item.entryName }}</span>
         <span class="event-status">
           <i v-if="item.taskStatus === '0'" class="tag draft">{{ $msg('NodeStatus')[item.taskStatus] }}</i>
-          <i v-if="['1','2'].includes(item.taskStatus)" class="tag in-approval">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i>
-          <i v-if="item.taskStatus === '3'" class="tag in-modify">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i>
-          <i v-if="item.taskStatus === '5'" class="tag check">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i>
+          <i v-if="['1', '2'].includes(item.taskStatus)" class="tag in-approval">{{ $msg('NodeStatus')[item.taskStatus]
+          }}>{{ item.nodeName }}</i>
+          <i v-if="item.taskStatus === '3'" class="tag in-modify">{{ $msg('NodeStatus')[item.taskStatus] }}>{{
+            item.nodeName }}</i>
+          <i v-if="item.taskStatus === '5'" class="tag check">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName
+          }}</i>
           <i v-if="item.taskStatus === '4'" class="end">
             <i class="tag end-sign"> {{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }} </i> </i>
-          </i>
           <!-- 有无意见 -->
           <i v-if="item.taskStatus === '5' || item.taskStatus === '4'" class="flex">
-            <i class="tag has-opinion" v-if="item.hasOpinions == 1">
-              <svg class="icon" aria-hidden="true">
-                <use xlink:href="#icon-guanzhu2"></use>
-              </svg>
+            <i class="tag has-opinion" v-if="item.substantiveOpinions == 1">
+              <i class="iconfont icon-guanzhu2"></i>
               有实质性意见
             </i>
-            <i class="tag has-no-opinion" v-if="item.hasOpinions !== 1">
+            <i class="tag has-no-opinion" v-if="item.substantiveOpinions !== 1">
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
@@ -57,7 +57,7 @@
     <!-- 任务状态（0:草稿 1：审查中 2：待修改 3：待确认 4：已完成 -->
     <div class="right-operation">
       <!-- 待审核状态显示审查 -->
-      <span class="attention icon-op" v-if="item.taskStatus == '1'&&crtSign!=='approvedCount'" @click="toApproval(item)">
+      <span class="attention icon-op" v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'" @click="toApproval(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-tubiao3"></use>
         </svg>
@@ -72,7 +72,7 @@
       </span> -->
 
       <!-- 待确认状态的工单 需要该审批人确认的工单-->
-      <span class="attention check icon-op" v-if="item.taskStatus == 5&&crtSign!=='approvedCount'" @click="check(item)">
+      <span class="attention check icon-op" v-if="item.taskStatus == 5 && crtSign !== 'approvedCount'" @click="check(item)">
         <span class="iconfont icon icon-tubiao urgent-icon"></span>
         确认</span>
       <!-- 关注 -->
@@ -98,9 +98,9 @@ export default {
       type: Object,
       default: () => { },
     },
-    crtSign:{
+    crtSign: {
       type: String,
-      default:'',
+      default: '',
     }
   },
   data() {
@@ -136,7 +136,7 @@ export default {
           item: item,
           pageFrom: "apply",
           op: "check",
-          check:item.comments
+          check: item.comments
         })
       );
       this.$router.push({
@@ -447,5 +447,4 @@ export default {
   .event-name {
     color: #2d5cf6;
   }
-}
-</style>
+}</style>
