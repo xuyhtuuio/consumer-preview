@@ -14,19 +14,31 @@
               popper-class="my-cascader"
               :options="cascaderOptions"
               @change="onSearch"
+              :props="{ label: 'name', value: 'id' }"
             ></el-cascader>
           </el-form-item>
 
           <el-form-item class="form-item" label="角色">
-            <el-select v-model="search.region" placeholder="全部" @change="onSearch">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+            <el-select
+              ref="refSelect"
+              v-model="search.region"
+              placeholder="全部"
+              @change="onSearch"
+              :loading="selectLoading"
+              @blur="handleSelectBlur"
+            >
+              <el-option
+                v-for="item in roleList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
             </el-select>
           </el-form-item>
 
           <el-form-item class="form-item">
             <el-input
-              v-model="search.user1"
+              v-model="search.name"
               placeholder="请输入姓名或一事通ID"
               @keyup.enter.native="onSearch"
               @blur="onSearch"
@@ -35,7 +47,7 @@
         </el-form>
       </div>
     </div>
-    <div class="main">
+    <div class="main" v-loading="formLoading">
       <TrsTable
         theme="TRS-table-gray"
         :data="data"
@@ -48,10 +60,15 @@
         <!-- <template #address="scope">
           <div class="template-class">地址：{{ scope.row.address }}</div>
         </template> -->
-        <template #operate="scope">
-          <el-button type="text" size="small" @click="handleClick(scope.row)">变更角色</el-button>
-          <el-button type="text" size="small">恢复</el-button>
-          <el-button type="text" class="red" @click="stopApllay(scope.row)">停用</el-button>
+        <template #operate="{ row }">
+          <el-button type="text" size="small" @click="handleClick(row)">变更角色</el-button>
+          <el-button
+            type="text"
+            :class="{ red: row.status !== 0 }"
+            size="small"
+            @click="stopApllay(row, row.status == 0 ? 'edit0' : 'edit1')"
+            >{{ row.status == 0 ? '恢复' : '停用' }}</el-button
+          >
         </template>
       </TrsTable>
       <TrsPagination
@@ -80,9 +97,9 @@
       </template>
       <div class="dialog-item">
         <g-table-card :title="dialogTitle"></g-table-card>
-        <el-radio-group v-model="dialogRadio">
-          <el-radio v-for="item in dialogRadioItem" :key="item.label" :label="item.label">{{
-            item.value
+        <el-radio-group v-model="dialog.roleId">
+          <el-radio v-for="item in roleList" :key="item.label" :label="item.id">{{
+            item.name
           }}</el-radio>
         </el-radio-group>
       </div>
@@ -91,74 +108,41 @@
         <g-button type="primary" @click="handleSubmitLimitTime">确 定</g-button>
       </div>
     </el-dialog>
-
-    <el-dialog
-      :visible.sync="limitVisible"
-      width="500px"
-      custom-class="stop-dialog"
-      :show-close="false"
-      center
-    >
-      <template slot="title">
-        <span class="close" @click="limitVisible = false"><i class="el-icon-close"></i></span>
-      </template>
-      <div class="dialog-item">
-        <i class="el-alert__icon el-icon-warning icon"></i>
-        <div class="info">停用该用户将不能登录，确定停用吗？</div>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <g-button @click="limitVisible = false">取 消</g-button>
-        <g-button class="stop" type="primary" @click="handleSubmitLimitTime">停用</g-button>
-      </div>
-    </el-dialog>
+    <SecondaryConfirmation
+      :option="saveOption[action]"
+      ref="confirmation"
+      @handleConfirm="editStatus"
+    ></SecondaryConfirmation>
   </div>
 </template>
 <script>
+import SecondaryConfirmation from '@/components/common/secondaryConfirmation';
+import {
+  queryUserList,
+  queryRoleList,
+  getUserList,
+  deactivateRecoveryUser,
+  changeUserRoles
+} from '@/api/admin/user.js';
 export default {
   name: 'UserManage',
+  components: { SecondaryConfirmation },
   data() {
     return {
       search: {
-        approvalType: ''
+        value: '',
+        name: '',
+        region: ''
       },
+      formLoading: true,
       limitTimeVisible: false,
-      limitVisible: false,
-      tabs: [
-        {
-          label: '第一个tab',
-          value: 0
-        },
-        {
-          label: '第二个tab',
-          value: 1
-        },
-        {
-          label: '第三个tab',
-          value: 2
-        }
-      ],
-      data: [
-        {
-          organization: '乌鲁木齐分行',
-          department: '办公室/消费者权益保护监督部',
-          team: '财富运营团队',
-          name: '杨xxx/123456',
-          role: '总行部门管理员',
-          updateTime: '2021-1015 11:00:34'
-        },
-        {
-          organization: '乌鲁木齐分行',
-          department: '办公室/消费者权益保护监督部',
-          team: '财富运营团队',
-          name: '杨xxx/123456',
-          role: '总行部门管理员',
-          updateTime: '2021-1015 11:00:34'
-        }
-      ],
+      noMore: false,
+      selectLoading: false,
+      data: [],
       colConfig: [
         {
           label: '所属机构',
-          prop: 'organization',
+          prop: 'org',
           bind: {
             align: 'center'
           }
@@ -173,7 +157,7 @@ export default {
         },
         {
           label: '姓名',
-          prop: 'name'
+          prop: 'userName'
         },
         {
           label: '角色',
@@ -191,98 +175,188 @@ export default {
           label: '操作',
           prop: 'operate',
           bind: {
-            width: 250,
             align: 'center'
           }
         }
       ],
-      cascaderOptions: [
-        {
-          value: 'zhinan',
-          label: '指南',
-          children: [
-            {
-              value: 'shejiyuanze',
-              label: '设计原则',
-              children: [
-                {
-                  value: 'yizhi',
-                  label: '一致'
-                },
-                {
-                  value: 'fankui',
-                  label: '反馈'
-                },
-                {
-                  value: 'xiaolv',
-                  label: '效率'
-                },
-                {
-                  value: 'kekong',
-                  label: '可控'
-                }
-              ]
-            },
-            {
-              value: 'daohang',
-              label: '导航',
-              children: [
-                {
-                  value: 'cexiangdaohang',
-                  label: '侧向导航'
-                },
-                {
-                  value: 'dingbudaohang',
-                  label: '顶部导航'
-                }
-              ]
-            }
-          ]
-        }
-      ],
+      cascaderOptions: [],
+      roleList: [],
       page: {
         pageNow: 1,
+        pageSize: 10,
         total: 3
       },
       dialogTitle: '变更角色',
-      dialogRadio: '',
+      dialog: {
+        userId: '',
+        roleId: ''
+      },
       dialogRadioItem: [
         { label: 0, value: '超级管理员' },
         { label: 1, value: '超级管理员' },
         { label: 2, value: '总行' },
         { label: 3, value: '超级管理员' },
         { label: 4, value: '总行' }
-      ]
+      ],
+      pageRole: {
+        pageNow: 1,
+        pageSize: 10
+      },
+      saveOption: {
+        edit1: {
+          message: '停用后将无法推荐此意见，确定停用吗？',
+          cancelBtn: '取消',
+          confirmBtn: '停用'
+        },
+        edit0: {
+          message: '恢复后工单中将可能推荐此意见，确定恢复吗？',
+          cancelBtn: '取消',
+          confirmBtn: '恢复'
+        }
+      },
+      action: '',
+      stopOrRun: {}
     };
   },
-  created() {},
+  created() {
+    this.initOrganizationData();
+    this.initRoleData();
+    this.initData();
+  },
+  mounted() {
+    // 监听滚动事件
+    this.$refs.refSelect.$refs.scrollbar.$refs.wrap.addEventListener(
+      'scroll',
+      _.throttle(this.scolling, 300, { leading: true, trailing: true })
+    );
+  },
   methods: {
+    async initData() {
+      this.formLoading = true;
+      const data = {
+        name: '',
+        orgId: 0,
+        orgName: '',
+        pageNow: this.page.pageNow,
+        pageSize: this.page.pageSize,
+        roleName: ''
+      };
+      const {
+        data: { data: res, success }
+      } = await getUserList(data);
+      console.log(success, res);
+      if (success) {
+        this.data = res.list;
+        this.page.total = res.totalCount;
+      }
+      this.formLoading = false;
+    },
+    initOrganizationData() {
+      queryUserList().then(res => {
+        console.log(res);
+        if (res.data.success) {
+          console.log(res.data.data);
+          this.cascaderOptions = this.getTreeData(res.data.data.root.children);
+        }
+      });
+    },
+    async initRoleData() {
+      const {
+        data: { data: res, success }
+      } = await queryRoleList(this.pageRole);
+      if (success) {
+        this.roleList.push(...res.list);
+      }
+    },
+    getTreeData(data) {
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].children.length < 1) {
+          // children若为空数组，则将children设为undefined
+          data[i].children = undefined;
+        } else {
+          // children若不为空数组，则继续 递归调用 本方法
+          this.getTreeData(data[i].children);
+        }
+      }
+      return data;
+    },
+    scolling() {
+      let e = this.$refs.refSelect.$refs.scrollbar.$refs.wrap;
+      if (this.noMore) return;
+      // 到底时触发 loadMore
+      let loadMore = e.scrollHeight - e.scrollTop <= e.clientHeight;
+      if (loadMore) {
+        this.loadMore();
+      }
+    },
+    loadMore() {
+      if (this.selectLoading) return;
+      // this.selectLoading = true
+      console.log(1);
+      this.pageRole.pageNow = 1 + this.pageRole.pageNow;
+      this.initRoleData();
+    },
+
     sortChange({ column, prop, order }) {
       console.log(column, prop, order);
     },
     onSearch() {
       console.log(this.search);
     },
+    // 失去焦点重置数据
+    handleSelectBlur() {
+      this.roleList = [];
+      this.pageRole.pageNow = 1;
+      this.initRoleData();
+    },
     handleClick(row) {
       this.limitTimeVisible = true;
       console.log(row);
+      this.dialog.roleId = row.roleId;
+      this.dialog.userId = row.userId;
     },
     submitEdit(row) {
       console.log(row);
     },
     // 停用
-    stopApllay(item) {
-      console.log(item);
-      this.limitVisible = true;
+    stopApllay({ userId }, action) {
+      this.stopOrRun = { userId, status: action === 'edit0' ? 0 : 1 };
+      this.action = action;
+      this.$refs.confirmation.dialogVisible = true;
     },
-    handleCurrentChange() {},
-    handleSubmitLimitTime() {}
+    editStatus() {
+      deactivateRecoveryUser(this.stopOrRun).then(({ data: { data: res, success } }) => {
+        if (success) {
+          this.initData();
+        }
+      });
+    },
+    handleCurrentChange(val) {
+      // console.log(val)
+      this.page.pageNow = val;
+      this.initData();
+    },
+    handleSubmitLimitTime() {
+      changeUserRoles(this.dialog).then(({ data: { data: res, msg, success } }) => {
+        if (success) {
+          console.log(res, msg, success);
+          this.$message.success(msg);
+          this.initData()
+        } else {
+          this.$message.error(msg);
+        }
+
+        this.limitTimeVisible = false;
+      });
+    }
   }
 };
 </script>
 <style lang="less" scoped>
 @color1: #1d2128;
 .user {
+  height: 100%;
+  overflow: hidden;
   .top {
     font-size: 14px;
     margin: 0 -24px;
@@ -342,7 +416,9 @@ export default {
   }
 
   .main {
-    padding: 24px 0;
+    height: calc(100% - 111px);
+    overflow-y: auto;
+    padding: 24px 0 0;
   }
 
   .el-button--text {
@@ -436,14 +512,10 @@ export default {
       // display: flex;
       // align-items: center;
       padding: 15px 20px;
-      width: 140px;
       margin-top: 20px;
       margin-right: 10px;
       border-radius: 4px;
       background: #f7f8fa;
-      &:nth-child(3n) {
-        margin-right: 0;
-      }
     }
   }
   /deep/.el-dialog__footer {
@@ -461,7 +533,4 @@ export default {
     }
   }
 }
-
-
-
 </style>
