@@ -14,9 +14,12 @@
         }}</span>
         <span class="event-status" v-if="!item.errorInfo">
           <i v-if="item.taskStatus === '0'" class="tag draft">{{ $msg('NodeStatus')[item.taskStatus] }}</i>
-          <i v-if="['1','2'].includes(item.taskStatus)" class="tag in-approval">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }}</i>
-          <i v-if="item.taskStatus === '3'" class="tag in-modify">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }}</i>
-          <i v-if="item.taskStatus === '5'" class="tag check">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }}</i>
+          <i v-if="['1', '2'].includes(item.taskStatus)" class="tag in-approval">{{ $msg('NodeStatus')[item.taskStatus]
+          }}>{{ item.currentActivityName }}</i>
+          <i v-if="item.taskStatus === '3'" class="tag in-modify">{{ $msg('NodeStatus')[item.taskStatus] }}>{{
+            item.currentActivityName }}</i>
+          <i v-if="item.taskStatus === '5'" class="tag check">{{ $msg('NodeStatus')[item.taskStatus] }}>{{
+            item.currentActivityName }}</i>
           <i v-if="item.taskStatus === '4'" class="end">
             <i class="tag end-sign">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }} </i>
           </i>
@@ -42,7 +45,7 @@
             </i>
           </i>
         </span>
-        <span class="event-status" v-if="item.errorInfo&&item.ocr_approval_status">
+        <span class="event-status" v-if="item.errorInfo && item.ocr_approval_status">
           <i class="tag in-modify">{{ item.ocr_approval_status }}</i>
         </span>
       </div>
@@ -79,7 +82,7 @@
       </div>
     </div>
     <div class="right-operation">
-      <div v-if="item.taskStatus == 1 && item.isQuash == 1" class="flex">
+      <div v-if="item.taskStatus == 1 && !item.errorInfo&&revoked" class="flex">
         <span class="modify icon-op" @click="cancel(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-tubiao1"></use>
@@ -119,7 +122,7 @@
           </svg>删除
         </span>
       </div>
-      <div v-if="item.taskStatus != 0&&!item.errorInfo">
+      <div v-if="item.taskStatus != 0 && !item.errorInfo">
         <span class="attention no-attention icon-op" v-if="item.concernId != 1" @click="concern(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-tubiao-1"></use>
@@ -148,7 +151,8 @@
   </div>
 </template>
 <script>
-import { concernApplication } from "@/api/applyCenter";
+import { concernApplication, canRoved } from "@/api/applyCenter";
+import { revoked } from "../../api/applyCenter";
 export default {
 
   props: {
@@ -162,10 +166,28 @@ export default {
       reminderDialog: false,
       allowConcernClick: true,
       persons: [],
+      revoked:false, //是否可以撤销
     };
   },
+  mounted() {
+    // 判断是否可以撤销
+    this.item.taskStatus == '1' ? this.getCanBeRoved(this.item) : ''
 
+  },
   methods: {
+    getCanBeRoved(item) {
+      const params = {
+        nodeId: item.nodeId,
+        processInstanceId: item.process_instance_id
+      }
+      this.revoked = false
+      canRoved(params).then(res => {
+        // this.revoked = true
+        const {data} = res.data
+        this.revoked= data !=='true'
+      })
+
+    },
     toDetail(item) {
       //草稿去修改页
       if (item.submitted == 0) {

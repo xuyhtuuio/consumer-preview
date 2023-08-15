@@ -79,7 +79,7 @@
           </div>
         </div>
         <div class="export-reset">
-          <el-button type="text">导出</el-button>
+          <el-button type="text" @click="exportXlsx" :loading="downloadLoading">导出</el-button>
           <el-button type="text" @click="reset">重置</el-button>
         </div>
       </div>
@@ -105,7 +105,9 @@ import {
   getApprovalType,
   getApprovalStage,
   getApprovalListStation,
+  exportApprovalList
 } from "@/api/approvalCenter";
+import { expordFile } from '@/utils/utils'
 import { queryUserList } from '@/api/org'
 export default {
   components: {
@@ -116,6 +118,7 @@ export default {
     return {
       crtSign: "toPending",
       pageNow: 1,
+      downloadLoading: false,
       // 待审批：pendingApproval 已审批：approvedCount 关注：applyAll 待修改：toModified 全部任务（本分行）：allTasksThis 总行的任务个数：allTasksOffice 驳回单的个数：overrule
       dataStatistics: [
         {
@@ -251,6 +254,73 @@ export default {
         });
       });
     },
+    exportXlsx() {
+      let listType = null;
+      const typeList = {
+        toPending: '1',
+        approvedCount: '2',
+        applyAll: '3',
+        allTask: '4',
+      }
+      listType = typeList[this.crtSign]
+      const param = {
+        pageNow: 1,
+        pageSize: 10,
+        ...this.search,
+        listType,
+        nodeid: this.search.approvalStage,
+        orgIds: this.search.orgIds.length ? this.search.orgIds : null,
+        createTimeStart: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[0] + ' 00:00:00' : '',
+        createTimeEnd: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[1] + ' 00:00:00' : '',
+        productLaunchDateStart: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[0] + ' 00:00:00' : '',
+        productLaunchDateEnd: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[1] + ' 00:00:00' : '',
+      };
+      let sortType = "";
+      // desc:降序 asc 升序 1 发起时间 2 更新时间
+      // 1：创建时间：升序 2：创建时间：降序 3：更新时间：升序 4：更新时间：降序
+      if (this.search.updateTime2[0] == 1) {
+        sortType = this.search.updateTime2[1] == "desc" ? 2 : 1;
+      } else if (this.search.updateTime2[0] == 2) {
+        sortType = this.search.updateTime2[1] == "desc" ? 4 : 3;
+      }
+      param.sort = sortType;
+      Reflect.deleteProperty(param, "updateTime");
+      Reflect.deleteProperty(param, "updateTime2");
+      Reflect.deleteProperty(param, "total");
+      Reflect.deleteProperty(param, "loading");
+      Reflect.deleteProperty(param, "productLaunchDate");
+      Reflect.deleteProperty(param, "startDate");
+      this.search.loading = true;
+      const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
+      const taskDTO = {
+        pageNo: 0,
+        pageSize: 10,
+        currentUserInfo: {
+          id: userInfo.id,
+          name: userInfo.fullname
+        }
+      }
+      const wait_param = {
+        ...param,
+        taskDTO
+      }
+      this.downloadLoading = true
+      exportApprovalList(wait_param).then(res => {
+        // expordFile(res)
+        this.downloadLoading=false
+        let url = window.URL.createObjectURL(new Blob([res.data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;"}))
+        let link = document.createElement("a")
+        link.style.display = "none"
+        link.href = url
+        link.setAttribute('download', '消保审核单.xlsx')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        // console.log('res')
+      }).catch(err=>{
+        this.downloadLoading=false
+      })
+    },
     getApprovalStage() {
       let params = {
         form_management_id: this.search.approvalType,
@@ -332,21 +402,13 @@ export default {
     },
     getList(pageNow) {
       let listType = null;
-      switch (this.crtSign) {
-        case "toPending":
-          listType = '1';
-          break;
-        case "approvedCount":
-          listType = '2';
-          break;
-        case "applyAll":
-          listType = '3';
-          break;
-        case "allTask":
-          listType = '4';
-          break;
-
+      const typeList = {
+        toPending: '1',
+        approvedCount: '2',
+        applyAll: '3',
+        allTask: '4',
       }
+      listType = typeList[this.crtSign]
       this.pageNow = pageNow;
       const param = {
         pageNow,
@@ -745,7 +807,8 @@ export default {
           display: flex;
           align-items: center;
 
-          .el-input, .el-date-editor {
+          .el-input,
+          .el-date-editor {
             width: 100%;
           }
 
@@ -797,7 +860,8 @@ export default {
 
       .el-button {
         height: 38px;
-        padding: 6px 28px;
+        padding: 6px 0px;
+        width: 84px;
         border-radius: 6px;
         border: 1px solid #a8c5ff;
         background: #f0f6ff;
@@ -810,5 +874,6 @@ export default {
       }
     }
   }
-}</style>
+}
+</style>
 

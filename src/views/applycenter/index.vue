@@ -120,7 +120,8 @@ import {
   toBeConfirmed,
   revoked,
   toReviseList,
-  Approval
+  Approval,
+  canRoved
 } from "@/api/applyCenter";
 import applyEventCard from "@/components/card/apply-event-card";
 export default {
@@ -301,7 +302,6 @@ export default {
       };
       getsTheNumberOfHeaders(param).then(res => {
         const data = res.data.data[0]
-
         for (let key in data) {
           this.dataStatistics.forEach(m => {
             if (m.value == key) {
@@ -429,20 +429,20 @@ export default {
       });
     },
     quash(item) {
-      // 0 代表不能撤销 1代表可以撤销
-      const param = {
-        recordId: item.taskNumber,
-        Revocable: 1,
-      };
+      const param ={
+        taskId:item.taskNumber,
+        nodeId:item.nodeId,
+        currentUserInfo:item.sponsorMap
+      }
       quashApplication(param).then((res) => {
         if (res.status === 200) {
           this.$message.success("撤销成功");
+          this.getDataStatistic()
           this.getApplicationList(1);
         }
       });
     },
     userStatus(counts) {
-      console.log('ff', counts)
       const modifyCount = counts['toModified']
       const toConfirmedCount = counts['toConfirmed']
       const ApprovalCount = counts['Approval']

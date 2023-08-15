@@ -102,16 +102,6 @@ export function delApplication(param) {
     data: param
   })
 }
-// 撤销
-
-export function quashApplication(param) {
-  return request({
-    url: '/cpr/applicationcenter/quash',
-    method: 'post',
-    contentType:'application/x-www-form-urlencoded',
-    data: param
-  })
-}
 //关注
 
 export function concernApplication(param) {
@@ -176,5 +166,23 @@ export function updateEditedComments(param){
     data: param
   })
 } 
+
+export function quashApplication(param){
+  return request({
+    url: '/cpr/workspace/revoke',
+    method: 'post',
+    data: param
+  })
+}
+
+export function  canRoved(param){
+  return request({
+    url: '/cpr/externalLogicController/rove',
+    method: 'GET',
+    contentType:'application/x-www-form-urlencoded',
+    params: param
+  })
+}
+
 
 
