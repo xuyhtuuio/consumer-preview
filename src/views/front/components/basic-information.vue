@@ -9,11 +9,11 @@
         </div>
       </template>
       <template v-slot:content>
-        <el-form :hide-required-asterisk="true" label-width="100px" class="ruleForm my-form">
+        <el-form :hide-required-asterisk="true" label-width="120px" class="ruleForm my-form">
           <template v-for="(item, index) in list">
             <el-form-item :class="formItemCpt(item)" :key="index">
               <label slot="label"
-                >{{ item.title
+                >{{ item.title.slice(0,6)
                 }}<span :style="{ color: 'red', opacity: !item.props.required && 0 }">
                   *
                 </span></label

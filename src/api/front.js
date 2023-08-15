@@ -89,6 +89,10 @@ export function getProcess(params) {
   return request({
     url: '/cpr/admin/form/list',
     method: 'get',
-    params
+    params:{
+      ...params,
+      pageNow: 1,
+      pageSize: 10
+    }
   })
 }

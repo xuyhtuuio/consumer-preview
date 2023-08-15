@@ -49,7 +49,7 @@
       <span class="item">提交成功后可在申请中心查看，了解工单审批进度</span>
     </el-dialog>
     <el-dialog class="processDialog" :visible.sync="processDialogVisible"> 流程图 </el-dialog>
-     <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow.templateName + '-预览'" width="600px">
+     <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow?.templateName + '-预览'" width="600px">
       <process-design from="addApply" ref="processDesign" style="background: #f5f6f6;" />
     </w-dialog>
   </div>
@@ -107,7 +107,8 @@ export default {
     },
     templateId: '',
     processDefinitionId: '',
-    currentRow: {}
+    currentRow: null,
+    currentRowInfo: ""
   }),
   created() {
     // this.initialData();
@@ -222,11 +223,15 @@ export default {
         }
       });
       // 获取改表单id的流程
-      // getProcess(id).then(({ data: { data: res, msg, success } }) => {
-      //   if(success) {
-      //     this.currentRow = res
-      //   }
-      // })
+      getProcess({formId:id}).then(({ data: { data: res, msg, success } }) => {
+        if(success) {
+          this.currentRow = res.list.length ? res.list[0]: null
+         
+        }else {
+          this.currentRow = null
+           this.currentRowInfo = msg
+        }
+      })
     },
     // 提交
     async submit() {
@@ -359,38 +364,10 @@ export default {
     },
     //
     previewFlow() {
-      const row = {
-        background: null,
-        createUserId: '1142',
-        createUserName: '张玮桓',
-        created: '2023-08-10 17:33:32',
-        formId: '59',
-        formItems:
-          '[{"module":"基本信息","valueType":"String","name":"TextInput","id":"418","title":"项目名称","value":"","props":{"numberOfWords":0,"placeholder":"","exclusiveRowOrNot":false,"required":true}},{"module":"基本信息","valueType":"String","name":"TimePicker","id":"419","title":"上线时间","value":"","props":{"format":"","required":true}},{"module":"基本信息","valueType":"String","name":"TimePicker","id":"420","title":"下线时间","value":"","props":{"format":"","required":false}},{"module":"基本信息","valueType":"Array","name":"MultipleGroupsSelect","id":"421","title":"宣传渠道","value":[],"props":{"expanding":true,"options":[{"children":[{"id":"11","value":"网点"},{"id":"1","value":"官网"}],"showInput":false,"id":"0","value":"线上渠道"},{"children":[{"id":"3","value":"线下网点"},{"id":"1","value":"线下投递"}],"showInput":false,"id":"2","value":"线下渠道"},{"children":[{"id":"5","value":"员工电话"},{"id":"1","value":"员工自行投递"}],"showInput":false,"id":"4","value":"内部渠道"},{"children":[{"id":"7","value":"线上媒体"},{"id":"1","value":"纸质媒体"},{"id":"2","value":"线下媒体"}],"showInput":false,"id":"6","value":"外部渠道"}],"placeholder":"","required":true}},{"module":"基本信息","valueType":"String","name":"SelectInput","id":"439","title":"审批类型","value":"","props":{"expanding":true,"options":[{"id":"0","value":"新产品"},{"id":"9","value":"产品营销类"},{"id":"10","value":"产品引导类"},{"id":"11","value":"流程介绍类"},{"id":"12","value":"其他"}],"placeholder":"","required":true}},{"module":"基本信息","valueType":"Array","name":"MultipleSelect","id":"453","title":"审查内容","value":[],"props":{"expanding":true,"options":[{"id":"0","value":"产品要点"},{"id":"9","value":"办理流程"},{"id":"10","value":"广告样本"},{"id":"11","value":"客户通知"},{"id":"12","value":"营销短信"},{"id":"13","value":"其他"}],"placeholder":"","required":true}},{"module":"基本信息","valueType":"String","name":"SelectInput","id":"454","title":"产品类型","value":"","props":{"expanding":false,"options":[{"id":"0","value":"理财"},{"id":"1","value":"基金"}],"placeholder":"请选择产品类型","required":true}},{"module":"基本信息","valueType":"String","name":"TextInput","id":"455","title":"产品名称","value":"","props":{"numberOfWords":50,"placeholder":"请输入产品名称","exclusiveRowOrNot":false,"required":true}},{"module":"基本信息","valueType":"String","name":"TextareaInput","id":"456","title":"申请说明","value":"","props":{"numberOfWords":"300","placeholder":"请输入申请说明","required":false}},{"module":"核对要点","valueType":"Array","name":"MultipleSelect","id":"457","title":"产品要点","value":[],"props":{"expanding":true,"options":[{"id":"0","value":"产品基本信息：起购金额、起购时间、销售渠道、年化利率(含历史)、起息方式、投资方式(存款)"},{"id":"8","value":"免责条款"},{"id":"9","value":"重要提示(理财有风险、投资需谨慎等）"},{"id":"10","value":"信息披露：咨询方式、投诉方式等"}],"placeholder":"","required":true}},{"module":"核对要点","valueType":"Array","name":"MultipleSelect","id":"458","title":"审查要点","value":[],"props":{"expanding":true,"options":[{"id":"0","value":"信息披露：咨询方式、投诉方式等"},{"id":"12","value":"不得虚假欺诈隐瞒或者误导宣传"},{"id":"13","value":"资料真实准确、不得隐瞒限制条件"}],"placeholder":"","required":true}}]',
-        formName: '表单类别——产品',
-        icon: null,
-        isRevoke: 'false',
-        isStop: null,
-        logo: null,
-        node: '',
-        notify: null,
-        process:
-          '{"id":"root","parentId":null,"type":"ROOT","name":"申请人","desc":"任何人","props":{"assignedUser":[],"formPerms":[]},"children":{}}',
-        processDefinitionId: null,
-        remark: '',
-        settings: '{"undo":false,"target":"","notify":{"types":["APP"],"title":"消息通知标题"}}',
-        showIcon: false,
-        showInput: false,
-        status: '草稿',
-        templateId: '1689570664567328768',
-        templateName: 'test',
-        updated: '2023-08-10 17:33:32',
-        whoCommit: null,
-        whoEdit: null,
-        whoExport: null
-      };
-      this.currentRow = row
-      const design = JSON.parse(JSON.stringify(row))
+      if(!this.currentRow) {
+        return  this.$message.error(this.currentRowInfo)
+      }
+      const design = JSON.parse(JSON.stringify( this.currentRow ))
       design.formId = +design.formId
       design.settings = JSON.parse(design.settings)
       design.formItems = JSON.parse(design.formItems)
