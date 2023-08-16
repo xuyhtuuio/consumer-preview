@@ -4,7 +4,7 @@
     <div class="top">
       <div class="info">
         <span class="info-title">全部用户</span>
-        <span class="info-desc">共<span class="desc-blue">12000</span>/15000 个</span>
+        <span class="info-desc">共<span class="desc-blue">{{totalCountInitiated}}</span>/{{count}} 个</span>
       </div>
       <div class="search">
         <el-form class="my-form form" :inline="true" :model="search">
@@ -15,17 +15,19 @@
               :options="cascaderOptions"
               @change="onSearch"
               :props="{ label: 'name', value: 'id' }"
+              clearable
             ></el-cascader>
           </el-form-item>
 
           <el-form-item class="form-item" label="角色">
             <el-select
               ref="refSelect"
-              v-model="search.region"
+              v-model="search.roleId"
               placeholder="全部"
               @change="onSearch"
               :loading="selectLoading"
               @blur="handleSelectBlur"
+              clearable
             >
               <el-option
                 v-for="item in roleList"
@@ -132,7 +134,7 @@ export default {
       search: {
         value: '',
         name: '',
-        region: ''
+        roleId: ''
       },
       formLoading: true,
       limitTimeVisible: false,
@@ -191,31 +193,23 @@ export default {
         userId: '',
         roleId: ''
       },
-      dialogRadioItem: [
-        { label: 0, value: '超级管理员' },
-        { label: 1, value: '超级管理员' },
-        { label: 2, value: '总行' },
-        { label: 3, value: '超级管理员' },
-        { label: 4, value: '总行' }
-      ],
       pageRole: {
         pageNow: 1,
         pageSize: 10
       },
       saveOption: {
         edit1: {
-          message: '停用后将无法推荐此意见，确定停用吗？',
+          message: '停用该用户将不能登录，确定停用吗？',
           cancelBtn: '取消',
           confirmBtn: '停用'
         },
-        edit0: {
-          message: '恢复后工单中将可能推荐此意见，确定恢复吗？',
-          cancelBtn: '取消',
-          confirmBtn: '恢复'
-        }
       },
-      action: '',
-      stopOrRun: {}
+      action: 'edit1',
+      stopOrRun: {},
+      sortType:2,
+      count: 0,
+      totalCountInitiated: 0
+
     };
   },
   created() {
@@ -223,8 +217,14 @@ export default {
     this.initRoleData();
     this.initData();
   },
+  activated() {
+    this.initOrganizationData();
+    this.initRoleData();
+    this.initData();
+  },
   mounted() {
     // 监听滚动事件
+    // 暂时没用
     this.$refs.refSelect.$refs.scrollbar.$refs.wrap.addEventListener(
       'scroll',
       _.throttle(this.scolling, 300, { leading: true, trailing: true })
@@ -234,28 +234,27 @@ export default {
     async initData() {
       this.formLoading = true;
       const data = {
-        name: '',
-        orgId: 0,
-        orgName: '',
+        name: this.search.name || '',
+        orgId: this.search.value[this.search.value.length-1] || 0,
         pageNow: this.page.pageNow,
         pageSize: this.page.pageSize,
-        roleName: ''
+        roleId: this.search.roleId || 0,
+        sortType: this.sortType
       };
       const {
-        data: { data: res, success }
+        data: { data: {pageData:res,count,totalCountInitiated}, success }
       } = await getUserList(data);
-      console.log(success, res);
       if (success) {
         this.data = res.list;
         this.page.total = res.totalCount;
+        this.count = count
+        this.totalCountInitiated = totalCountInitiated
       }
       this.formLoading = false;
     },
     initOrganizationData() {
       queryUserList().then(res => {
-        console.log(res);
         if (res.data.success) {
-          console.log(res.data.data);
           this.cascaderOptions = this.getTreeData(res.data.data.root.children);
         }
       });
@@ -265,7 +264,7 @@ export default {
         data: { data: res, success }
       } = await queryRoleList(this.pageRole);
       if (success) {
-        this.roleList.push(...res.list);
+        this.roleList = [...res.list]
       }
     },
     getTreeData(data) {
@@ -286,48 +285,51 @@ export default {
       // 到底时触发 loadMore
       let loadMore = e.scrollHeight - e.scrollTop <= e.clientHeight;
       if (loadMore) {
-        this.loadMore();
+        // this.loadMore();
       }
     },
     loadMore() {
       if (this.selectLoading) return;
       // this.selectLoading = true
-      console.log(1);
       this.pageRole.pageNow = 1 + this.pageRole.pageNow;
       this.initRoleData();
     },
 
     sortChange({ column, prop, order }) {
-      console.log(column, prop, order);
+      if(!order)return
+      this.sortType =order.includes('asc')? 1: 2
+      this.initData()
     },
     onSearch() {
-      console.log(this.search);
+      this.initData()
     },
     // 失去焦点重置数据
     handleSelectBlur() {
-      this.roleList = [];
+      // this.roleList = [];
       this.pageRole.pageNow = 1;
-      this.initRoleData();
+      // this.initRoleData();
     },
     handleClick(row) {
       this.limitTimeVisible = true;
-      console.log(row);
+      this.dialog.roleIdOne = row.roleId;
       this.dialog.roleId = row.roleId;
       this.dialog.userId = row.userId;
     },
     submitEdit(row) {
-      console.log(row);
+      // console.log(row);
     },
     // 停用
     stopApllay({ userId }, action) {
-      this.stopOrRun = { userId, status: action === 'edit0' ? 0 : 1 };
-      this.action = action;
-      this.$refs.confirmation.dialogVisible = true;
+      this.stopOrRun = { userId, status: action === 'edit0'? 0 : 1 };
+     action === 'edit1' && (this.$refs.confirmation.dialogVisible = true);
+      action === 'edit0' && this.editStatus(true)
     },
-    editStatus() {
+    editStatus(flag=false) {
       deactivateRecoveryUser(this.stopOrRun).then(({ data: { data: res, success } }) => {
         if (success) {
           this.initData();
+          flag && this.$message.success('已恢复该用户所有操作权限。')
+          !flag && this.$message.success('停用成功')
         }
       });
     },
@@ -339,13 +341,11 @@ export default {
     handleSubmitLimitTime() {
       changeUserRoles(this.dialog).then(({ data: { data: res, msg, success } }) => {
         if (success) {
-          console.log(res, msg, success);
           this.$message.success(msg);
-          this.initData()
         } else {
           this.$message.error(msg);
         }
-
+        this.initData();
         this.limitTimeVisible = false;
       });
     }
