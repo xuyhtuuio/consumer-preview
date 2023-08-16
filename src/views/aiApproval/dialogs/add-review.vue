@@ -46,6 +46,10 @@ export default {
             this.addReviewDialog = false;
         },
         addRecommend() {
+            if (!this.params.content.trim()) {
+                this.$message.info('请输入审查话术内容')
+                return;
+            }
             const newId = Date.parse(new Date()).toString();
             this.$emit('addRecommend', {
                 word: this.params.keywords,

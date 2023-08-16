@@ -1,14 +1,14 @@
 <template>
   <div class="editorial">
     <div class="header">
-      <span v-show="showRecommend" :class="{ active: active === 1 }" @click="changeType(1)">推荐意见</span>
-      <i v-show="showRecommend">|</i>
+      <span v-show="showRecommend && showOcr" :class="{ active: active === 1 }" @click="changeType(1)">推荐意见</span>
+      <i v-show="showRecommend && showOcr">|</i>
       <span :class="{ active: active === 2 }" @click="changeType(2)">编辑意见</span>
     </div>
     <div class="results" ref="results">
       <!-- 推荐意见 -->
       <template v-if="active === 1">
-        <div class="recommend" v-for="(recommend, a) in recommends" :key="recommend.word" :word="recommend.word"
+        <div class="recommend" v-for="(recommend, a) in recommends" :key="recommend.word" :word="recommend.word + recommend.wordType"
           :class="{ hidden: lineWordItem?.word && lineWordItem.word !== recommend.word }">
           <span class="recommend-word" :wordType="recommend.wordType">{{ recommend.word }}</span>
           <div class="list-item"
@@ -104,6 +104,10 @@ export default {
       type: Array,
       default: () => ([])
     },
+    showOcr: {
+      type: Boolean,
+      default: true
+    },
   },
   data() {
     return {
@@ -124,6 +128,11 @@ export default {
         this.init(val)
       },
       // deep: true
+    },
+    showOcr(val) {
+      if (val === false && this.showRecommend) {
+        this.changeType(2)
+      }
     }
   },
   methods: {

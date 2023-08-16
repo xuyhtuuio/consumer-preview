@@ -8,7 +8,7 @@
 </template>
 
 <script>
-const paramsInit = {
+const paramsInit = Object.freeze({
   zoomVal: 1,
   left: 0,
   top: 0,
@@ -20,7 +20,7 @@ const paramsInit = {
   border_top: 0,
   border_bottom: 0,
   moved: false
-}
+})
 export default {
   props: {
     lineWordItem: {
@@ -87,8 +87,10 @@ export default {
     },
     // 图片加载完后,初始化
     handleImageLoaded() {
+      this.$refs.imgDom.style.left = '0px'
+      this.$refs.imgDom.style.top = '0px'
       this.params = JSON.parse(JSON.stringify(paramsInit)),
-        this.loaded = true;
+      this.loaded = true;
       this.naturalWidth = this.$refs.imgDom.naturalWidth;
       this.naturalHeight = this.$refs.imgDom.naturalHeight;
       this.scale = this.$refs.imgDom.clientWidth / this.$refs.imgDom.naturalWidth;

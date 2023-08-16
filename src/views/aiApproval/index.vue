@@ -5,7 +5,7 @@
         <div v-for="(item, index) in tools" :key="index" :arrow-offset="-30" :ref="`popover-${item.toolSign}`">
           <span :ref='`sideBar-popover-` + item.toolSign'
             :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
-            @click="changeTools(item)">
+            @click="changeTools(item)" v-if="item.show !== false">
             <i :class="['iconfont', 'sidebar-icon', item.icon]"></i>
           </span>
         </div>
@@ -19,7 +19,7 @@
     <div class="content">
       <div class="content-header">
         <span class="content-title">
-          <i class="iconfont icon-shenpiyemiantubiao" v-if="tools?.[0]?.sidebarParam?.urgent === 1"></i>{{ projectName
+          <i class="iconfont icon-shenpiyemiantubiao" v-if="formBase?.urgent === '1'"></i>{{ projectName
           }}</span>
         <span class="content-btns">
           <el-button @click="goBack"><i class="iconfont icon-fanhui1"></i>返回</el-button>
@@ -42,7 +42,7 @@
         </orcTxt>
         <editorial ref="editorial" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
           :lineWordItem="lineWordItem" @upDateComments="upDateComments" @drawLine="drawLine"
-          @changeEditorialType="changeEditorialType">
+          @changeEditorialType="changeEditorialType" :showOcr="showOcr">
         </editorial>
       </div>
     </div>
@@ -117,12 +117,13 @@ export default {
           icon: 'icon-xiangsianli',
           sidebarParam: {}, //侧边工具栏激活项 props
         },
-        // {
-        //   component: 'approvedOpinion',
-        //   toolSign: 'approved-opinion',
-        //   icon: 'icon-yijianshu',
-        //   sidebarParam: {}, //侧边工具栏激活项 props
-        // },
+        {
+          component: 'approvedOpinion',
+          toolSign: 'approved-opinion',
+          icon: 'icon-yijianshu',
+          sidebarParam: {}, //侧边工具栏激活项 props
+          show: false
+        },
         {
           component: 'aiKnowledgeBase',
           toolSign: 'ai',
@@ -192,7 +193,8 @@ export default {
         const { data, status, message } = res.data;
         if (status === 200) {
           this.sidebarParam = { data, formId: item.taskNumber };
-          this.projectName = data.basicInformation.filter(item => item.title === '项目名称')?.[0]?.value
+          this.tools[0].sidebarParam = { data, formId: item.taskNumber };
+          this.projectName = data?.basicInformation.filter(item => item.title === '项目名称')?.[0]?.value
         } else {
           this.$message.error({ offset: 40, title: "提醒", message });
         }
