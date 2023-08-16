@@ -33,11 +33,11 @@
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
-            <i class="tag check" v-if="item.adoptionStatus == 0 && item.taskStatus != '5'">
+            <i class="tag check" v-if="item.isAdopted == 0 && item.taskStatus != '5'">
               <i class="iconfont icon-guanzhu2"></i>
               不采纳
             </i>
-            <i class="tag adoption" v-if="item.adoptionStatus == 1 && item.taskStatus != '5'">
+            <i class="tag adoption" v-if="item.isAdopted == 1 && item.taskStatus != '5'">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tubiao"></use>
               </svg>
@@ -53,7 +53,7 @@
         <span class="id">{{ item.taskNumber }}</span>
         <span class="sDate date">发起时间：{{ item.create_time || "--" }}</span>
         <span class="sDate date">更新时间：{{ item.update_time || "--" }}</span>
-        <span class="sDate date">上线时间：{{ item.launchDate || "--" }}</span>
+        <span class="sDate date">上线时间：{{ item.productLaunchDate || "--" }}</span>
         <el-popover placement="bottom" trigger="click" popper-class="popper-persons"
           v-if="item.currentAssignee && item.currentAssignee.length">
           <div style="max-height: 270px; overflow-y: auto" class="trs-scroll assignee-content">
