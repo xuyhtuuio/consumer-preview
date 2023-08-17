@@ -5,6 +5,7 @@
     <p class="tips" v-if="tipsMsg">
       <i class="iconfont icon-xiaoxi-tongzhi"></i>{{ tipsMsg }}
     </p>
+    <div class="apply-center-box"> 
     <div class="data-statistics">
       <div v-for="(item, index) in dataStatistics" :key="index" @click="changeStatis(item)" :class="item.value !== crtSign
         ? 'data-statistics-item'
@@ -35,10 +36,10 @@
               <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
                 :value="item.value"></el-option>
             </el-select>
-            <!-- <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable
+             <!-- <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable
                 @clear="searchList">
                 <el-option v-for="(item, index) in approvalPhases" :key="index" :label="item.label"
-                  :value="item.value"></el-option></el-select> -->
+                  :value="item.value"></el-option></el-select>  -->
             <!-- </div> -->
             <!-- <div class="floor1-item"> -->
             <el-select v-model="search.urgent" placeholder="是否加急" @change="searchList" clearable>
@@ -52,6 +53,10 @@
             <!-- </div> -->
             <!-- <div class="floor1-item"> -->
             <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @change="searchList" clearable>
+              <el-option v-for="(item, index) in $field('adoptionSituations')" :key="index" :label="item.label"
+                :value="item.value"></el-option>
+            </el-select>
+            <el-select v-model="search.adoptionStatus" placeholder="是否一次通过" @change="searchList" clearable>
               <el-option v-for="(item, index) in $field('adoptionSituations')" :key="index" :label="item.label"
                 :value="item.value"></el-option>
             </el-select>
@@ -90,7 +95,6 @@
           </div>
         </div>
         <div class="export-reset">
-
           <el-button type="text" @click="reset">重置</el-button>
         </div>
       </div>
@@ -99,13 +103,14 @@
           <div v-for="(item, index) in list" :key="index">
             <applyEventCard :item="item" @del="del" @quash="quash" @concern="concern"></applyEventCard>
           </div>
-          <trs-pagination :total="search.total" @getList="getApplicationList" :pageNow="pageNow"></trs-pagination>
+          <trs-pagination :total="search.total" @getList="getApplicationListAll" :pageNow="pageNow"></trs-pagination>
         </div>
         <div v-else>
           <Empty></Empty>
         </div>
       </div>
     </div>
+  </div>
   </div>
 </template>
 <script>
@@ -340,7 +345,7 @@ export default {
         this.searchList();
       });
     },
-    async getApplicationList(pageNow) {
+    async getApplicationListAll(pageNow) {
       //在此时分流  调不同的接口
       this.pageNow = pageNow
       const userinfo = JSON.parse(window.localStorage.getItem('user_name'))
@@ -411,18 +416,17 @@ export default {
     },
     concern() {
       this.getDataStatistic()
-      this.getApplicationList(1)
+      this.getApplicationListAll(1)
     },
     del(id) {
       const param = {
         recordId: id,
       };
       delApplication(param).then((res) => {
-
         if (res.status === 200) {
           this.$message.success("删除成功");
           this.getDataStatistic()
-          this.getApplicationList(1);
+          this.getApplicationListAll(1);
 
         }
       });
@@ -437,7 +441,7 @@ export default {
         if (res.status === 200) {
           this.$message.success("撤销成功");
           this.getDataStatistic()
-          this.getApplicationList(1);
+          this.getApplicationListAll(1);
         }
       });
     },
@@ -465,10 +469,10 @@ export default {
       if (item.value == this.crtSign) return;
       this.crtSign = item.value;
       this.crtId = item.id;
-      this.getApplicationList(1);
+      this.getApplicationListAll(1);
     },
     searchList() {
-      this.getApplicationList(1);
+      this.getApplicationListAll(1);
     },
     reset() {
       this.search = {
@@ -536,7 +540,11 @@ export default {
       line-height: 22px;
     }
   }
-
+.apply-center-box{
+  border-radius: 10px;
+background: #FFF;
+padding: 24px;
+}
   .data-statistics {
     display: flex;
     align-items: center;
@@ -634,17 +642,7 @@ export default {
       }
     }
 
-    .active-item::after {
-      position: absolute;
-      content: "";
-      top: 70px;
-      left: 50%;
-      background-image: url("../../assets/image/apply-center/triangle.svg");
-      transform: translateX(-50%);
-      width: 18px;
-      height: 18px;
-      background-size: 100% 100%;
-    }
+
 
     .new-apply {
       width: 120px !important;
@@ -669,9 +667,7 @@ export default {
       font-weight: 700;
       line-height: 22px;
       /* 157.143% */
-      background: linear-gradient(90deg,
-        rgba(123, 97, 255, 0.15) 0%,
-        rgba(97, 160, 255, 0.15) 100%);
+
     }
 
     .new-apply:hover {
@@ -688,9 +684,6 @@ export default {
   }
 
   .apply-content {
-    border-radius: 10px;
-    background: #fff;
-    padding: 24px;
     margin-top: 16px;
   }
 
@@ -749,12 +742,12 @@ export default {
             content: "\e6e6";
             display: inline-block;
             position: absolute;
-            top: 52%;
+            top: 50%;
             transform: translateY(-50%);
             left: 12px;
             color: #86909c;
             z-index: 10;
-            font-size: 20px;
+            font-size: 18px;
           }
 
           /deep/ .el-select__tags {
@@ -779,12 +772,12 @@ export default {
             content: "\e6eb";
             display: inline-block;
             position: absolute;
-            top: 52%;
+            top: 50%;
             transform: translateY(-50%);
             left: 12px;
             color: #86909c;
             z-index: 10;
-            font-size: 20px;
+            font-size: 18px;
           }
         }
 

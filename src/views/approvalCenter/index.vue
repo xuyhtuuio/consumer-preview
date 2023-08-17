@@ -1,100 +1,118 @@
 <template>
-  <div class="approval-center">
+  <div class="approval-center" ref="box">
     <p class="welcoming">欢迎来到消保管控平台！</p>
     <p class="tips" v-if="tipsMsg">
       <i class="iconfont icon-xiaoxi-tongzhi"></i>{{ tipsMsg }}
     </p>
-    <div class="data-statistics">
-      <div v-for="(item, index) in dataStatistics" :key="index" @click="changeStatis(item)" :class="item.value !== crtSign
-        ? 'data-statistics-item'
-        : 'data-statistics-item active-item'
-        ">
-        <div class="icon">
-          <img :src="item.value == crtSign ? item.activeIcon : item.icon"
-            :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
-        </div>
-        <div class="name-count">
-          <span class="name">{{ item.name }}</span>
-          <span class="count"><i>{{ item.count }}</i> 个</span>
-        </div>
-      </div>
-    </div>
-    <div class="apply-content">
-      <div class="filters">
-        <div class="filters-content">
-          <div class="floor1">
-            <el-select v-model="search.approvalType" placeholder="审批类型" @change="changeArrrovalType" clearable>
-              <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
-                :value="item.value"></el-option>
-            </el-select>
-            <!-- <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable>
-              <el-option v-for="(item, index) in approvalPhases" :key="index" :label="item.label"
-                :value="item.value"></el-option></el-select> -->
-            <el-select v-model="search.urgent" placeholder="是否加急" @change="searchList" clearable>
-              <el-option v-for="(item, index) in $field('isUrgent')" :key="index" :label="item.label"
-                :value="item.value"></el-option>
-            </el-select>
-            <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @change="searchList" clearable>
-              <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
-                :value="item.value"></el-option>
-            </el-select>
-            <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @change="searchList" clearable>
-              <el-option v-for="(item, index) in $field('adoptionSituations')" :key="index" :label="item.label"
-                :value="item.value"></el-option>
-            </el-select>
-            <el-cascader :options="agenciesList" placeholder="提单机构" ref="agencies" v-model="search.orgIds"
-              :show-all-levels="false" @change="changeAgencies"
-              :props="{ checkStrictly: true, label: 'name', value: 'id', children: 'children', }" clearable></el-cascader>
-            <el-select v-model="search.updateTime2" placeholder="排序" ref="multiSelect" multiple @change="changeSort"
-              :class="search.updateTime2[1] == 'desc'
-                ? 'arrow-select descArrow'
-                : 'arrow-select ascArrow'
-                ">
-              <el-option-group v-for="group in $field('updateTimeGroup')" :key="group.label">
-                <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value">
-                </el-option>
-              </el-option-group>
-            </el-select>
+    <div class="approval-center-box">
+      <div class="data-statistics">
+        <div v-for="(item, index) in dataStatistics" :key="index" @click="changeStatis(item)" :class="item.value !== crtSign
+          ? 'data-statistics-item'
+          : 'data-statistics-item active-item'
+          ">
+          <div class="icon">
+            <img :src="item.value == crtSign ? item.activeIcon : item.icon"
+              :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
           </div>
-          <div class="floor2">
-            <div class="floor2-item">
-              <el-input v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
-                @keyup.enter.native="searchList">
-                <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
-              </el-input>
-            </div>
-            <div class="floor2-item">
-              <span>发起时间</span>
-              <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
-                value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间">
-              </el-date-picker>
-            </div>
-            <div class="floor2-item">
-              <span>上线时间</span>
-              <el-date-picker v-model="search.productLaunchDate" value-format="yyyy-MM-dd" clearable type="daterange"
-                range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" @clear="searchList"
-                @change="searchList">
-              </el-date-picker>
-            </div>
+          <div class="name-count">
+            <span class="name">{{ item.name }}</span>
+            <span class="count"><i>{{ item.count }}</i> 个</span>
           </div>
         </div>
-        <div class="export-reset">
-          <el-button type="text" @click="exportXlsx" :loading="downloadLoading">导出</el-button>
-          <el-button type="text" @click="reset">重置</el-button>
-        </div>
       </div>
-      <div class="list" v-loading="search.loading">
-        <div v-if="list.length">
-          <div v-for="(item, index) in list" :key="index">
-            <approvalEventCard :item="item" @concern="concern" :crtSign="crtSign"></approvalEventCard>
+      <div class="apply-content">
+        <div class="filters">
+          <div class="filters-content">
+            <div class="floor1">
+              <el-select v-model="search.approvalType" placeholder="审批事项类型" @change="changeArrrovalType" clearable>
+                <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
+                  :value="item.value"></el-option>
+              </el-select>
+              <!-- <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable>
+                <el-option v-for="(item, index) in approvalPhases" :key="index" :label="item.label"
+                  :value="item.value"></el-option></el-select> -->
+              <el-select v-model="search.urgent" placeholder="是否加急" @change="searchList" clearable>
+                <el-option v-for="(item, index) in $field('isUrgent')" :key="index" :label="item.label"
+                  :value="item.value"></el-option>
+              </el-select>
+              <el-cascader :options="agenciesList" placeholder="提单机构" ref="agencies" v-model="search.orgIds"
+                :show-all-levels="false" @change="changeAgencies"
+                :props="{ checkStrictly: true, label: 'name', value: 'id', children: 'children', }"
+                clearable></el-cascader>
+ 
+              <!-- <el-select v-model="search.hasOpinions" placeholder="驳回次数" @change="searchList" clearable>
+                <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
+                  :value="item.value"></el-option>
+              </el-select>
+              <el-select v-model="search.hasOpinions" placeholder="是否一次通过" @change="searchList" clearable>
+                <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
+                  :value="item.value"></el-option>
+              </el-select> -->
+              <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @change="searchList" clearable>
+                <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
+                  :value="item.value"></el-option>
+              </el-select>
+              <el-select v-model="search.updateTime2" placeholder="排序" ref="multiSelect" multiple @change="changeSort"
+                :class="search.updateTime2[1] == 'desc'
+                  ? 'arrow-select descArrow'
+                  : 'arrow-select ascArrow'
+                  ">
+                <el-option-group v-for="group in $field('updateTimeGroup')" :key="group.label">
+                  <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-option-group>
+              </el-select>
+              <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @change="searchList" clearable>
+                <el-option v-for="(item, index) in $field('adoptionSituations')" :key="index" :label="item.label"
+                  :value="item.value"></el-option>
+              </el-select>
+              <div class="el-select" style="margin-left: 0;">
+              </div>
+              <div class="el-select" style="margin-left: 0;">
+              </div>
+              <div class="el-select" style="margin-left: 0;">
+              </div>
+            </div>
+            <div class="floor2">
+              <div class="floor2-item">
+                <el-input v-model="search.keywords" placeholder="请输入任务名称/发起人关键词查询" clearable @clear="searchList"
+                  @keyup.enter.native="searchList">
+                  <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
+                </el-input>
+              </div>
+              <div class="floor2-item">
+                <span>发起时间</span>
+                <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
+                  value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间">
+                </el-date-picker>
+              </div>
+              <div class="floor2-item">
+                <span>上线时间</span>
+                <el-date-picker v-model="search.productLaunchDate" value-format="yyyy-MM-dd" clearable type="daterange"
+                  range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" @clear="searchList"
+                  @change="searchList">
+                </el-date-picker>
+              </div>
+            </div>
           </div>
-          <trs-pagination :total="search.total" @getList='getList' :pageNow="pageNow"></trs-pagination>
+          <div class="export-reset">
+            <el-button type="text" @click="exportXlsx" :loading="downloadLoading">导出</el-button>
+            <el-button type="text" @click="reset">重置</el-button>
+          </div>
         </div>
-        <div v-loading="search.loading" v-else>
-          <Empty></Empty>
+        <div class="list" v-loading="search.loading">
+          <div v-if="list.length">
+            <div v-for="(item, index) in list" :key="index">
+              <approvalEventCard :item="item" @concern="concern" :crtSign="crtSign" @del="del"></approvalEventCard>
+            </div>
+            <trs-pagination :total="search.total" @getList='getList' :pageNow="pageNow"></trs-pagination>
+          </div>
+          <div v-loading="search.loading" v-else>
+            <Empty></Empty>
+          </div>
         </div>
-      </div>
 
+      </div>
     </div>
   </div>
 </template>
@@ -182,10 +200,6 @@ export default {
       const text = this.search.updateTime[0] == 1 ? "发起时间" : "更新时间";
       dom.innerText = text;
     });
-    this.resize();
-    window.addEventListener("resize", () => {
-      this.resize();
-    });
     this.userStatus();
     this.getApprovalType();
     this.queryUserList();
@@ -243,6 +257,18 @@ export default {
     concern() {
       this.getDataStatistic()
       this.searchList();
+    },
+    del(id) {
+      const param = {
+        recordId: id,
+      };
+      delApplication(param).then((res) => {
+        if (res.status === 200) {
+          this.$message.success("删除成功");
+          this.getDataStatistic()
+          this.getApplicationListAll(1);
+        }
+      });
     },
     getApprovalType() {
       getApprovalType().then((res) => {
@@ -307,8 +333,8 @@ export default {
       this.downloadLoading = true
       exportApprovalList(wait_param).then(res => {
         // expordFile(res)
-        this.downloadLoading=false
-        let url = window.URL.createObjectURL(new Blob([res.data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;"}))
+        this.downloadLoading = false
+        let url = window.URL.createObjectURL(new Blob([res.data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;" }))
         let link = document.createElement("a")
         link.style.display = "none"
         link.href = url
@@ -317,8 +343,8 @@ export default {
         link.click()
         document.body.removeChild(link)
         // console.log('res')
-      }).catch(err=>{
-        this.downloadLoading=false
+      }).catch(err => {
+        this.downloadLoading = false
       })
     },
     getApprovalStage() {
@@ -401,6 +427,10 @@ export default {
       });
     },
     getList(pageNow) {
+      this.$refs['box'].scrollTo({
+        top: 0,
+        behavior: "smooth"
+      })
       let listType = null;
       const typeList = {
         toPending: '1',
@@ -415,7 +445,7 @@ export default {
         pageSize: 10,
         ...this.search,
         listType,
-        formManagementId :this.search.approvalType,
+        formManagementId: this.search.approvalType,
         nodeid: this.search.approvalStage,
         orgIds: this.search.orgIds.length ? this.search.orgIds : null,
         createTimeStart: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[0] + ' 00:00:00' : '',
@@ -548,6 +578,12 @@ export default {
     }
   }
 
+  .approval-center-box {
+    border-radius: 10px;
+    background: #fff;
+    padding: 24px;
+  }
+
   .data-statistics {
     display: flex;
     align-items: center;
@@ -645,18 +681,6 @@ export default {
       }
     }
 
-    .active-item::after {
-      position: absolute;
-      content: "";
-      top: 70px;
-      left: 50%;
-      background-image: url("../../assets/image/apply-center/triangle.svg");
-      transform: translateX(-50%);
-      width: 18px;
-      height: 18px;
-      background-size: 100% 100%;
-    }
-
     .new-apply {
       img {
         margin-bottom: 8px;
@@ -686,9 +710,7 @@ export default {
   }
 
   .apply-content {
-    border-radius: 10px;
-    background: #fff;
-    padding: 24px;
+
     margin-top: 16px;
   }
 
@@ -698,6 +720,7 @@ export default {
     justify-content: space-between;
 
     .filters-content {
+
       display: flex;
       flex-direction: column;
       flex: 1;
@@ -718,15 +741,18 @@ export default {
       }
 
       .floor1 {
-        margin-bottom: 12px;
+
         // padding-right: 16px;
         display: flex;
         justify-content: space-between;
+        flex-wrap: wrap;
 
         .el-select,
         .el-cascader {
-          margin-right: 16px;
-          flex: 1;
+          margin-bottom: 12px;
+          // margin-right: 16px;
+          width: 20%;
+          padding-right: 16px;
         }
 
         .el-cascader {
@@ -762,7 +788,7 @@ export default {
             left: 12px;
             color: #86909c;
             z-index: 10;
-            font-size: 20px;
+            font-size: 18px;
           }
 
           /deep/ .el-select__tags {
@@ -792,7 +818,7 @@ export default {
             left: 12px;
             color: #86909c;
             z-index: 10;
-            font-size: 20px;
+            font-size: 18px;
           }
         }
       }

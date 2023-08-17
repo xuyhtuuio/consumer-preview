@@ -63,6 +63,13 @@
         </svg>
         审查
       </span>
+      <!-- 超级管理员的删除功能 -->
+      <!-- <span class="attention icon-op del" v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'" @click="del(item)">
+        <svg class="icon urgent-icon" aria-hidden="true">
+          <use xlink:href="#icon-xianxingtubiao-1"></use>
+        </svg>
+        删除
+      </span> -->
       <!-- 待修改状态的工单 需要该审批人修改的工单显示修改-->
       <!-- <span class="modify icon-op" v-if="item.taskStatus == 3" @click="modify(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
@@ -147,6 +154,25 @@ export default {
           processInstanceId: item.processInstanceId
         },
       });
+    },
+    // 超级管理员的删除功能
+    del(item){
+      return this.$message.info("此功能暂未开放");
+      this.$confirm("确定删除该工单吗？", "", {
+        customClass: "confirmBox",
+        confirmButtonText: "删除",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$emit("del", item.taskNumber);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
     },
     modify(item) {
       window.localStorage.setItem("order-detail", JSON.stringify({
@@ -433,7 +459,14 @@ export default {
       background: #fff7e6;
       padding: 4px 8px 4px 4px;
     }
-
+    .del {
+      color: #F76560;
+    }
+    .del:hover {
+      border-radius: 2px;
+      background: #fff1f0;
+      padding: 4px 8px 4px 4px;
+    }
     .no-attention,
     .del {
       margin-right: 16px !important;
