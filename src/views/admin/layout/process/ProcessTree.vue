@@ -84,14 +84,16 @@ export default {
           events = {}
         }
         //插入添加分支/条件的按钮
-        branchItems.unshift(h('div',{'class':{'add-branch-btn': true}}, [
-          h('el-button', {
-           'class':{'add-branch-btn-el': true},
-            props: {size: 'small', round: true},
-            on: events,
-            domProps: {innerHTML: `添加${this.isConditionNode(node)?'条件':'分支'}`},
-          }, [])
-        ]));
+        if (!this.$store.state.isPreview) {
+          branchItems.unshift(h('div',{'class':{'add-branch-btn': true}}, [
+            h('el-button', {
+              'class':{'add-branch-btn-el': true},
+              props: {size: 'small', round: true},
+              on: events,
+              domProps: {innerHTML: `添加${this.isConditionNode(node)?'条件':'分支'}`},
+            }, [])
+          ]));
+        }
         let bchDom = [h('div', {'class':{'branch-node': true}}, branchItems)]
         //继续遍历分支后的节点
         let afterChildDoms = this.getDomTree(h, node.children)

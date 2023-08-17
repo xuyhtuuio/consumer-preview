@@ -373,6 +373,7 @@ export default {
       design.formItems = JSON.parse(design.formItems)
       design.process = JSON.parse(design.process)
       this.$store.commit('loadForm', design)
+      this.$store.commit("setIsPreview", true);
       this.$nextTick(() => {
         this.flowVisible = true
       })

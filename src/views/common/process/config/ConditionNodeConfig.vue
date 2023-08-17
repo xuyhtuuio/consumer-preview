@@ -45,7 +45,7 @@
 
 <script>
 import draggable from "vuedraggable";
-import GroupItem from "./ConditionGroupItemConfig.vue"
+import GroupItem from "./ConditionGroupItemConfig"
 
 export default {
   name: "ConditionNodeConfig",

@@ -8,24 +8,28 @@
     <div class="results" ref="results">
       <!-- 推荐意见 -->
       <template v-if="active === 1">
-        <div class="recommend" v-for="(recommend, a) in recommends" :key="recommend.word" :word="recommend.word + recommend.wordType"
+        <div class="recommend" v-for="(recommend, a) in recommends" :key="recommend.word + recommend.wordType"
+          :word="recommend.word + recommend.wordType"
           :class="{ hidden: lineWordItem?.word && lineWordItem.word !== recommend.word }">
-          <span class="recommend-word" :wordType="recommend.wordType">{{ recommend.word }}</span>
-          <div class="list-item"
-            v-for="(item, i) in recommend.list.slice(0, recommend.hideMore ? 3 : recommend.list.length)" :key="i"
-            :class="{ active: item.id === recommend.selected, edit: item.showEdit }">
-            <p style="cursor: pointer;" @dblclick="showEdit(a, i)" v-if="!item.showEdit">{{ item.str }}</p>
-            <el-input v-else :ref="`input_${a}_${i}`" @blur="hideEdit(a, i, true)" v-model.trim="input" placeholder="请输入意见"
-              type="textarea" :rows="3" class="edit-input" resize="none"
-              @keyup.enter.native="hideEdit(a, i, true)"></el-input>
-            <i class="checkbox" @click="changeSelect(a, i)" :class="{ active: item.id === recommend.selected }"></i>
-          </div>
-          <!-- 展开收起 -->
-          <p class="list-btns">
-            <i class="iconfont icon-zhankai" @click="getMoreList(a)"
-              v-if="recommend.hideMore || recommend.totalPage > recommend.pageNow"></i>
-            <i class="iconfont icon-shouqi" @click="hideList(a)" v-if="recommend.pageNow > 1 && !recommend.hideMore"></i>
-          </p>
+          <template v-if="activeWordType === 0 || activeWordType === recommend.wordType">
+            <span class="recommend-word" :wordType="recommend.wordType">{{ recommend.word }}</span>
+            <div class="list-item"
+              v-for="(item, i) in recommend.list.slice(0, recommend.hideMore ? 3 : recommend.list.length)" :key="i"
+              :class="{ active: item.id === recommend.selected, edit: item.showEdit }">
+              <p style="cursor: pointer;" @dblclick="showEdit(a, i)" v-if="!item.showEdit">{{ item.str }}</p>
+              <el-input v-else :ref="`input_${a}_${i}`" @blur="hideEdit(a, i, true)" v-model.trim="input"
+                placeholder="请输入意见" type="textarea" :rows="3" class="edit-input" resize="none"
+                @keyup.enter.native="hideEdit(a, i, true)"></el-input>
+              <i class="checkbox" @click="changeSelect(a, i)" :class="{ active: item.id === recommend.selected }"></i>
+            </div>
+            <!-- 展开收起 -->
+            <p class="list-btns">
+              <i class="iconfont icon-zhankai" @click="getMoreList(a)"
+                v-if="recommend.hideMore || recommend.totalPage > recommend.pageNow"></i>
+              <i class="iconfont icon-shouqi" @click="hideList(a)"
+                v-if="recommend.pageNow > 1 && !recommend.hideMore"></i>
+            </p>
+          </template>
         </div>
         <div v-if="recommends?.length === 0" class="nodata">
           <img src="@/assets/image/ai-approval/nodata.svg" alt="" class="暂无推荐的意见">
@@ -107,6 +111,14 @@ export default {
     showOcr: {
       type: Boolean,
       default: true
+    },
+    formBase: {
+      type: Object,
+      default: () => ({})
+    },
+    activeWordType: {
+      type: Number,
+      default: 0
     },
   },
   data() {
@@ -218,6 +230,7 @@ export default {
         await RecommendedListLoadMore({
           formId: this.formId,
           keywordId: this.recommends[a].id,
+          processInstanceId: this.formBase.processInstanceId,
           pageNow,
         })
           .then(res => {
@@ -231,13 +244,13 @@ export default {
           });
       }
       this.$nextTick(() => {
-        this.$emit('drawLine')
+        this.$emit('showLine')
       })
     },
     hideList(a) {
       this.$set(this.recommends[a], 'hideMore', true);
       this.$nextTick(() => {
-        this.$emit('drawLine')
+        this.$emit('showLine')
       })
     },
     showEdit(a, i) {

@@ -135,6 +135,7 @@ export default {
       this.tableLoading = false
     },
     addFlow() {
+      this.$store.commit("setIsPreview", false);
       this.$router.push({
         name: 'design'
       })
@@ -152,11 +153,13 @@ export default {
       design.formItems = JSON.parse(design.formItems)
       design.process = JSON.parse(design.process)
       this.$store.commit('loadForm', design)
+      this.$store.commit("setIsPreview", true);
       this.$nextTick(() => {
         this.flowVisible = true
       })
     },
     editFlow(row) {
+      this.$store.commit("setIsPreview", false);
       this.$store.state.design = {
         ...row
       }

@@ -101,6 +101,7 @@ export default {
     // 修改高亮  关键词类型
     changeWorkType(type) {
       this.activeWordType = this.activeWordType === type ? 0 : type;
+      this.$emit('lineRemove', this.activeWordType)
     },
     // 标记命中关键词(敏感词,禁用词)
     getInitContent(approval) {
