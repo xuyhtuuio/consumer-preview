@@ -15,7 +15,7 @@
             <!-- <el-tooltip effect="dark" content="复制条件" placement="top">
               <i class="el-icon-copy-document" @click.stop="$emit('copy')"></i>
             </el-tooltip> -->
-            <i class="el-icon-close" @click.stop="$emit('delNode')"></i>
+            <i class="el-icon-close" v-if="!$store.state.isPreview" @click.stop="$emit('delNode')"></i>
           </span>
         </div>
         <div class="node-body-main-content">

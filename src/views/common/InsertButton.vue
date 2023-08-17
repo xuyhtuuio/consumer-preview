@@ -33,7 +33,7 @@
         <span>触发器</span>
       </div> -->
     </div>
-    <el-button icon="el-icon-plus" slot="reference" type="primary" size="small" circle></el-button>
+    <el-button v-if="!$store.state.isPreview" icon="el-icon-plus" slot="reference" type="primary" size="small" circle></el-button>
   </el-popover>
 </template>
 

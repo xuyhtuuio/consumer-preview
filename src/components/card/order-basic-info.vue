@@ -3,8 +3,8 @@
         <div class="user">
             <div class="user-info">
                 <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
-                <span class="nickname"> {{ personInfo&&personInfo.name }} / {{ personInfo&&personInfo.id }} </span>
-                <span> {{ personInfo&&personInfo.label }}</span>
+                <span class="nickname"> {{ personInfo && personInfo.name }} / {{ personInfo && personInfo.id }} </span>
+                <span> {{ personInfo && personInfo.label }}</span>
             </div>
             <slot name="apply-modify"></slot>
         </div>
@@ -86,14 +86,14 @@ import { downloadAllFiles } from "@/api/applyCenter";
 import moment from 'moment'
 import FileType from '@/components/common/file-type.vue';
 export default {
-    name:'order-basic-info',
+    name: 'order-basic-info',
     components: { FileType },
     props: {
         sidebarParam: {
             type: Object,
             default: () => { }
         },
-        personInfo:{
+        personInfo: {
             type: Object,
             default: () => { }
         }
@@ -112,9 +112,9 @@ export default {
         };
     },
     mounted() {
-        // if ((this.$route.params && this.$route.params.formId) || (this.sidebarParam && this.sidebarParam.formId)) {
-        //     this.getOrderDetail()
-        // }
+        if (this.sidebarParam) {
+            this.getBsicData(this.sidebarParam)
+        }
     },
     activated() {
         const keys = Object.keys(this.$route.params) || Object.keys(this.$route.sidebarParam)
@@ -137,28 +137,15 @@ export default {
             }
             return newList
         },
-
         getOrderDetail() {
             this.loading = true
             getApplyForm({
-                formCategoryId:this.$route.params&&this.$route.params.formManagementId || this.sidebarParam&&this.sidebarParam.formManagementId||'1',
+                formCategoryId: this.$route.params && this.$route.params.formManagementId || this.sidebarParam && this.sidebarParam.formManagementId || '1',
                 formId: this.$route.params.formId || this.sidebarParam.formId,
             }).then(res => {
                 const { data, status, message } = res.data;
                 if (status === 200) {
-                    let { basicInformation, keyPointsForVerification, promotionChannels, reviewMaterials } = data
-                    //大段文本过滤
-                    const noTextAreaBeseInfo = basicInformation.filter(v => { return v.name !== 'TextareaInput' })
-                    const textAreaBaseInfo = basicInformation.filter(v => { return v.name == 'TextareaInput' })
-                    this.orderInfo = {
-                        baseInfo: noTextAreaBeseInfo,
-                        textAreaBaseInfo: textAreaBaseInfo,
-                        newBaseInfo: this.getMapping(noTextAreaBeseInfo),
-                        reviewPointer: keyPointsForVerification,
-                        promotionChannels,
-                        fileList: reviewMaterials && reviewMaterials[0].value
-
-                    }
+                    this.getBsicData(data)
                 } else {
                     this.$message.error({ offset: 40, title: "提醒", message });
                 }
@@ -166,11 +153,25 @@ export default {
                 this.loading = false
             });
         },
+        getBsicData(data) {
+            const { basicInformation, keyPointsForVerification, promotionChannels, reviewMaterials } = data
+            //大段文本过滤
+            const noTextAreaBeseInfo = basicInformation.filter(v => { return v.name !== 'TextareaInput' })
+            const textAreaBaseInfo = basicInformation.filter(v => { return v.name == 'TextareaInput' })
+            this.orderInfo = {
+                baseInfo: noTextAreaBeseInfo,
+                textAreaBaseInfo: textAreaBaseInfo,
+                newBaseInfo: this.getMapping(noTextAreaBeseInfo),
+                reviewPointer: keyPointsForVerification,
+                promotionChannels,
+                fileList: reviewMaterials && reviewMaterials[0].value
+            }
+        },
         preview(url) {
             this.$emit('preview', url)
         },
         download(fileList) {
-        console.log('f',fileList)
+            console.log('f', fileList)
             const list = fileList.map(v => {
                 // return {
                 //     fileName: v.fileName,
@@ -182,7 +183,7 @@ export default {
                 loadList: list
             }
             downloadAllFiles(params).then(res => {
-                console.log('ff',res)
+                console.log('ff', res)
                 return
                 const { data } = res.data
                 for (let i in data) {

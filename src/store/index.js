@@ -6,6 +6,7 @@ export default new Vuex.Store({
   state: {
     nodeMap: new Map(),
     isEdit: null,
+    isPreview: false,
     breadcrumbList: [],
     selectedNode: {},
     design: {},
@@ -188,6 +189,9 @@ export default new Vuex.Store({
     },
     setIsEdit(state, val) {
       state.isEdit = val
+    },
+    setIsPreview(state, val) {
+      state.isPreview = val
     },
     setBreadcrumbList(state, val) {
       state.breadcrumbList = val

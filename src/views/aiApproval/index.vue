@@ -19,7 +19,7 @@
     <div class="content">
       <div class="content-header">
         <span class="content-title">
-          <i class="iconfont icon-shenpiyemiantubiao" v-if="formBase?.urgent === '1'"></i>{{ projectName
+          <i class="iconfont icon-shenpiyemiantubiao" v-if="formBase?.urgent === '1'"></i>{{ formBase?.entryName
           }}</span>
         <span class="content-btns">
           <el-button @click="goBack"><i class="iconfont icon-fanhui1"></i>返回</el-button>
@@ -36,13 +36,13 @@
       <div class="content-cont" v-loading="fileloading">
         <file-preview ref="filePreview" :files="files" :activeIndex="activeIndex" @changeFile="changeFile"
           :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"></file-preview>
-        <orcTxt ref="ocrTxt" :approval="approval" @addWord="addWord"
+        <orcTxt ref="ocrTxt" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
           v-if="specialFileType.includes(approval?.fileName?.split('.')[1]) && showOcr" @showLine="showLine"
           :lineWordItem="lineWordItem">
         </orcTxt>
         <editorial ref="editorial" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
-          :lineWordItem="lineWordItem" @upDateComments="upDateComments" @drawLine="drawLine"
-          @changeEditorialType="changeEditorialType" :showOcr="showOcr">
+          :lineWordItem="lineWordItem" @upDateComments="upDateComments" @showLine="showLine" :activeWordType="activeWordType"
+          @changeEditorialType="changeEditorialType" :showOcr="showOcr" :formBase="formBase">
         </editorial>
       </div>
     </div>
@@ -89,7 +89,6 @@ export default {
   data() {
     return {
       formBase: {},
-      projectName: '',
       previewDialog: false,
       previewfileUrl: '',
       loading: false,
@@ -152,7 +151,8 @@ export default {
         message: '是否保存本审查项目的审查意见？',
         cancelBtn: '不保存',
         confirmBtn: '保存',
-      }
+      },
+      activeWordType: 0, // 高亮禁用词或敏感词, 1 禁用词,  2 敏感词
     }
   },
 
@@ -192,9 +192,7 @@ export default {
       }).then(res => {
         const { data, status, message } = res.data;
         if (status === 200) {
-          this.sidebarParam = { data, formId: item.taskNumber };
-          this.tools[0].sidebarParam = { data, formId: item.taskNumber };
-          this.projectName = data?.basicInformation.filter(item => item.title === '项目名称')?.[0]?.value
+          this.tools[0].sidebarParam = { ...data};
         } else {
           this.$message.error({ offset: 40, title: "提醒", message });
         }
@@ -278,12 +276,12 @@ export default {
       let params = {}
       const { item: param_item } = this.$route.params
       switch (item.component) {
-        case 'applyForm':
-          params = {
-            formId: param_item.taskNumber,
-            formManagementId: param_item.formManagementId
-          }
-          break;
+        // case 'applyForm':
+        //   params = {
+        //     formId: param_item.taskNumber,
+        //     formManagementId: param_item.formManagementId
+        //   }
+        //   break;
         case 'approvalRecordDetail':
           params = {
             formId: param_item.taskNumber,
@@ -291,14 +289,18 @@ export default {
           }
           break;
       }
+      if (Object.keys(params).length) {
+        this.sidebarParam = params
+      } else {
+        this.sidebarParam = item.sidebarParam;
+      }
       this.reference = this.$refs['sideBar-popover-' + item.toolSign][0].$el
-      this.sidebarParam = params
       this.personInfo = param_item.initiator
       this.$nextTick(() => {
         this.showPopper = true
         this.$nextTick(() => {
           // 此时才能获取refs引用
-          this.$refs['sidebar-popover'].doShow()
+          this.$refs['sidebar-popover']?.doShow()
         })
       })
     },
@@ -314,6 +316,7 @@ export default {
       if (this.activeIndex === i) {
         return;
       }
+      this.activeWordType = 0;
       this.fileloading = true;
       this.showOcr = true;
       this.lineRemove()
@@ -328,10 +331,11 @@ export default {
       const temp = this.files[i];
       const suffer = ['jpeg', 'jpg', 'png', 'pdf'].includes(temp?.fileName?.split('.')[1])
       if (!temp.ocr && !temp.recommends && suffer) {
-        await this.getOcr(temp)
+        temp.ocr = await this.getOcr(temp);
         await getOcrExamineShow({
           formId: this.formId,
-          fileId: temp.id
+          fileId: temp.id,
+          processInstanceId: this.formBase.processInstanceId
         })
           .then((res) => {
             const { data, status } = res.data;
@@ -346,23 +350,20 @@ export default {
       this.approval = temp;
       this.fileloading = false;
     },
-    getOcr(temp) {
-      getOCRAnalysisResults({
+    async getOcr(temp) {
+      let ocr = [];
+      await getOCRAnalysisResults({
         fileId: temp.id
       })
         .then((res) => {
           const { data, status } = res.data;
           if (status === 200) {
-            let ocr = [];
             for (let key in data.results) {
               ocr.push(...data.results[key])
             }
-            temp.ocr = ocr;
           }
         })
-        .catch(() => {
-          temp.ocr = []
-        })
+      return ocr;
     },
     changeOcrView() {
       this.lineRemove()
@@ -370,19 +371,20 @@ export default {
     },
     // 展示连线
     showLine(wordItem) {
-      const onlyHide = wordItem.ocrWordId === this.lineWordItem.ocrWordId;
-      this.lineRemove();
+      const onlyHide = wordItem?.ocrWordId === this.lineWordItem.ocrWordId;
       if (onlyHide) {
+        this.lineRemove()
         return;
       }
-      this.lineWordItem = wordItem;
+      this.lineRemoveOnly();
+      this.lineWordItem = wordItem || this.lineWordItem;
       this.$nextTick(() => {
         this.drawLine()
       })
     },
     drawLine() {
       const start = document.querySelector('#' + this.lineWordItem.ocrWordId)
-      const ends = [...document.querySelectorAll(`[word="${this.lineWordItem.word}"] .list-item`)]
+      const ends = [...document.querySelectorAll(`[word="${this.lineWordItem.word + this.lineWordItem.wordType}"] .list-item`)]
       const imgLight = document.querySelector('#imgLight');
       imgLight && ends.push(imgLight)
       if (start) {
@@ -413,13 +415,20 @@ export default {
         line.position()
       })
     },
-    // 移除连线
-    lineRemove() {
+    // 仅移除连线不做其他操作
+    lineRemoveOnly() {
       (this.word_lines || []).forEach((item) => {
         item.remove();
       });
-      this.lineWordItem = {}
       this.word_lines = [];
+    },
+    // 移除连线
+    lineRemove(activeWordType) {
+      this.lineRemoveOnly()
+      this.lineWordItem = {}
+      if (activeWordType !== undefined) {
+        this.activeWordType = activeWordType
+      }
     },
     // 切换意见编辑
     changeEditorialType(val) {
