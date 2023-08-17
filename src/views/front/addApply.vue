@@ -265,7 +265,7 @@ export default {
     submitTrue(flag = true, success) {
       const result = {
         entryName: this.basicInformation[0].value,
-        form_managementId: 1,
+        form_managementId: this.$refs.refReviewMatters.currentId,
         uptime: '',
         formId: this.formId
       };
@@ -373,6 +373,7 @@ export default {
       design.formItems = JSON.parse(design.formItems)
       design.process = JSON.parse(design.process)
       this.$store.commit('loadForm', design)
+      this.$store.commit("setIsPreview", true);
       this.$nextTick(() => {
         this.flowVisible = true
       })

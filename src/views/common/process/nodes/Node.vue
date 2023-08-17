@@ -8,7 +8,7 @@
             <use :xlink:href="headerIcon"></use>
           </svg>
           <span>{{title}}</span>
-          <i class="el-icon-close" v-if="!isRoot" style="float:right;" @click="$emit('delNode')"></i>
+          <i class="el-icon-close" v-if="!isRoot && !$store.state.isPreview" style="float:right;" @click="$emit('delNode')"></i>
         </div>
         <div class="node-body-content">
           <i :class="leftIcon" v-if="leftIcon"></i>
