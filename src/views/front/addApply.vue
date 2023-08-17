@@ -265,7 +265,7 @@ export default {
     submitTrue(flag = true, success) {
       const result = {
         entryName: this.basicInformation[0].value,
-        form_managementId: 1,
+        form_managementId: this.$refs.refReviewMatters.currentId,
         uptime: '',
         formId: this.formId
       };
