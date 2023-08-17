@@ -8,7 +8,7 @@
         <template v-else>
           <span class="title">编辑权限/总行管理员</span>
           <div class="btn">
-            <g-button class="btn-item" @click="level = true">
+            <g-button class="btn-item" @click="handleReturn">
               <i class="iconfont icon-fanhui1 icon"></i>
               返回</g-button
             >
@@ -20,7 +20,7 @@
         </template>
       </div>
 
-      <div class="main">
+      <div class="main" v-loading="mainLoading">
         <template v-if="level">
           <TrsTable
             theme="TRS-table-gray"
@@ -31,13 +31,18 @@
             :header-cell-style="{ 'text-align': 'center' }"
             :cell-style="{ 'text-align': 'center' }"
           >
-            <template #operate="scope">
-              <el-button type="text" size="small" @click="handleClick(scope.row)"
-                >编辑权限</el-button
-              >
-              <el-button type="text" size="small" v-if="!scope.row.isStop">恢复</el-button>
+            <template #operate="{ row }">
+              <el-button type="text" size="small" @click="handleClick(row)">编辑权限</el-button>
+              <!-- <el-button type="text" size="small" v-if="!scope.row.isStop">恢复</el-button>
               <el-button type="text" class="red" v-else @click="stopApllay(scope.row)"
                 >停用</el-button
+              > -->
+              <el-button
+                type="text"
+                :class="{ red: row.status !== 0 }"
+                size="small"
+                @click="stopApllay(row, row.status == 0 ? 'edit0' : 'edit1')"
+                >{{ row.status == 0 ? '恢复' : '停用' }}</el-button
               >
             </template>
           </TrsTable>
@@ -53,19 +58,25 @@
           </TrsPagination>
         </template>
         <template v-else>
-          <g-table-card title="消保审查">
+          <g-table-card title="消保审查" v-loading="cardLoading">
             <template #cardInfo>
-              <span class="main-info">共<span class="high"> 8</span>/13</span>
+              <span class="main-info"
+                >共<span class="high"> {{ checkedPermission.length }}</span
+                >/{{ checkedPermissions.length }}</span
+              >
             </template>
             <template #content>
               <div class="main-content">
-                <div class="con-top">功能权限 <span class="normal">6</span></div>
+                <div class="con-top">
+                  功能权限 <span class="normal">{{ checkedPermissions.length }}</span>
+                </div>
                 <el-checkbox-group v-model="checkedPermission" @change="handleChecked">
                   <el-checkbox
                     v-for="check in checkedPermissions"
-                    :label="check.label"
-                    :key="check.label"
-                    >{{ check.value }}</el-checkbox
+                    :label="check.id"
+                    :key="check.id"
+                    @change="isSave = false"
+                    >{{ check.name }}</el-checkbox
                   >
                 </el-checkbox-group>
               </div>
@@ -74,37 +85,31 @@
         </template>
       </div>
     </template>
-
-    <el-dialog
-      :visible.sync="limitVisible"
-      width="500px"
-      custom-class="stop-dialog"
-      :show-close="false"
-      center
-    >
-      <template slot="title">
-        <span class="close" @click="limitVisible = false"><i class="el-icon-close"></i></span>
-      </template>
-      <div class="dialog-item">
-        <i class="el-alert__icon el-icon-warning icon"></i>
-        <div class="info">停用与此角色相关的用户权限将受到影响，确定停用吗？</div>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <g-button @click="limitVisible = false">取 消</g-button>
-        <g-button class="stop" type="primary" @click="handleSubmitLimitTime">停用</g-button>
-      </div>
-    </el-dialog>
+    <SecondaryConfirmation
+      :option="saveOption[action]"
+      ref="confirmation"
+      @handleConfirm="editStatus"
+    ></SecondaryConfirmation>
   </div>
 </template>
 
 <script>
+import SecondaryConfirmation from '@/components/common/secondaryConfirmation';
+import {
+  getRoleList,
+  deactivateRecoveryRole,
+  editThePermissionsPage,
+  updateRolePermission
+} from '@/api/admin/role.js';
 export default {
   name: 'rolePermission',
+  components: { SecondaryConfirmation },
   data() {
     return {
       level: true,
       isSave: false,
-      limitVisible: false,
+      mainLoading: false,
+      cardLoading: false,
       data: [
         {
           role: '总行部门管理员',
@@ -119,14 +124,14 @@ export default {
       colConfig: [
         {
           label: '角色',
-          prop: 'role'
+          prop: 'roleName'
         },
         {
           label: '更新时间',
           prop: 'updateTime',
           bind: {
-            align: 'center',
-            sortable: 'custom'
+            align: 'center'
+            // sortable: 'custom'
           }
         },
         {
@@ -139,37 +144,102 @@ export default {
       ],
       page: {
         pageNow: 1,
+        pageSize: 10,
         total: 3
       },
       checkedPermission: [],
-      checkedPermissions: [
-        { label: 1, value: '提单' },
-        { label: 2, value: '审批' },
-        { label: 3, value: '消保审批（智能审批）' },
-        { label: 4, value: '统计中心' },
-        { label: 5, value: '后台管理' },
-        { label: 6, value: '附件下载' },
-        { label: 7, value: '审查任务删除' }
-      ]
+      checkedPermissions: [],
+      saveOption: {
+        edit1: {
+          message: '停用与此角色相关的用户权限将受到影响，确定停用吗？',
+          cancelBtn: '取消',
+          confirmBtn: '停用'
+        }
+      },
+      action: 'edit1',
+      stopOrRun: {},
+      roleId: ''
     };
   },
+  created() {
+    this.initData();
+  },
+  activated() {
+    this.initData();
+  },
   methods: {
-    handleClick() {
+    async initData() {
+      if (this.mainLoading) return;
+      this.mainLoading = true;
+      const { pageNow, pageSize } = this.page;
+      const {
+        data: { data: res, success, msg }
+      } = await getRoleList({ pageNow, pageSize });
+      if (success) {
+        this.data = res.list;
+        this.page.total = res.totalCount;
+      } else {
+        this.$message.error(msg);
+      }
+      this.mainLoading = false;
+    },
+    async handleClick({ roleId }) {
       this.level = false;
       this.isSave = false;
+      this.cardLoading = true;
+      this.checkedPermission.length = 0;
+      this.roleId = roleId;
+      const {
+        data: { data: res, success, msg }
+      } = await editThePermissionsPage({ roleId });
+      if (success) {
+        this.checkedPermissions = res;
+        res.filter(item => item.status === 1).forEach(({ id }) => this.checkedPermission.push(id));
+      } else {
+        this.$message.error(msg);
+      }
+      this.cardLoading = false;
     },
-    stopApllay() {
-      this.limitVisible = true;
+    stopApllay({ roleId }, action) {
+      this.stopOrRun = { roleId, status: action === 'edit0' ? 0 : 1 };
+      action === 'edit1' && (this.$refs.confirmation.dialogVisible = true);
+      action === 'edit0' && this.editStatus(true);
     },
-    getList() {},
+    editStatus(flag = false) {
+      deactivateRecoveryRole(this.stopOrRun).then(({ data: { data: res, success } }) => {
+        if (success) {
+          this.initData();
+          flag && this.$message.success('已恢复该角色所有操作权限。');
+          !flag && this.$message.success('停用成功');
+        }
+      });
+    },
     sortChange() {},
     submitEdit() {},
-    handleCurrentChange() {},
-    handleSave() {
+    handleCurrentChange(val) {
+      this.page.pageNow = val;
+      this.initData();
+    },
+    async handleSave() {
+      if (this.isSave) return;
+      this.cardLoading = true
+      const {
+        data: { data: res, success, msg }
+      } = await updateRolePermission({
+        roleId: this.roleId,
+        permissionIdList: this.checkedPermission
+      });
+        this.$message.success(msg);
+      
       this.isSave = true;
+      this.cardLoading = false
     },
     handleChecked() {},
-    handleSubmitLimitTime() {}
+    handleSubmitLimitTime() {},
+    handleReturn() {
+      this.level = true;
+      this.roleId = '';
+    }
   }
 };
 </script>
@@ -177,6 +247,7 @@ export default {
 <style lang="less" scoped>
 @color1: #1d2128;
 .rolePermission {
+  font-size: 14px;
   .el-button--text {
     padding: 5px;
   }
