@@ -2,7 +2,10 @@
   <div class="groups">
     <div class="groups-item" v-for="(item, index) in data" :key="item.id">
       <el-input v-model="item.value" size="medium" v-show="item.showInput"
-                style="width: 300px" @blur="showInput = false">
+        maxlength="10"
+        minlength="1"
+        style="width: 300px"
+        @blur="showInput = false">
         <i
           class="el-icon-success el-input__icon"
           style="color: #2D5CF6;"
@@ -66,5 +69,9 @@ export default {
   margin-top: 16px;
   border-radius: 6px;
   background: #F7F8FA;
+}
+.header-title {
+  max-width: 330px;
+  line-height: 1.4em;
 }
 </style>

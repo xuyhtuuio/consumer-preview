@@ -192,7 +192,7 @@ export default {
     },
     //处理节点插入逻辑
     insertNode(type, parentNode){
-      if (this.$route.name === 'FlowManage') {
+      if (this.from === 'flowManage') {
         return;
       }
       this.$refs['_root'].click()
@@ -317,7 +317,7 @@ export default {
       return this.getBranchEndNode(conditionNode.children);
     },
     addBranchNode(node){
-      if (this.$route.name === 'FlowManage') {
+      if (this.from === 'flowManage') {
         return;
       }
       if (node.branchs.length < 8){

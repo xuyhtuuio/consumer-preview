@@ -27,6 +27,11 @@ export const feildTypes = [
     disable: true
   },
   {
+    label: '单选选项组',
+    value: 'SingleGroupsSelect',
+    valueType: 'Array'
+  },
+  {
     label: '级联选择框',
     value: 'Cascader',
     valueType: 'Tree',
@@ -55,5 +60,9 @@ export const belongModules = [
     label: '核对要点',
     value: '核对要点',
     // disable: true
+  },
+  {
+    label: '审批人填写',
+    value: '审批人填写',
   }
 ]

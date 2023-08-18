@@ -142,6 +142,13 @@
           <el-radio label="CONFIRM">确认意见</el-radio>
         </el-radio-group>
       </el-form-item>
+      <el-form-item class="xiaobao-check" v-if="nodeProps.targetPage === 'XIAOBAO'" label="消保审批权限" prop="xiaobaoCheckAuth">
+        <el-radio-group class="radio-group" v-model="nodeProps.xiaobaoCheckAuth">
+          <el-radio label="allow" style="margin-top: 10px;">允许提有/无实质意见</el-radio>
+          <el-radio label="XIAOBAO1" style="margin-top: 10px;">不允许提有/无实质意见 - 可选择通过或驳回申请</el-radio>
+          <el-radio label="XIAOBAO2" style="margin-top: 10px;">不允许提有/无实质意见 - 不可选择通过或驳回申请</el-radio>
+        </el-radio-group>
+      </el-form-item>
       <div class="zhuanban" v-if="!['SELECT_NODE'].includes(nodeProps.assignedType)">
         <svg class="icon" aria-hidden="true">
           <use xlink:href="#icon-zhuanban"></use>
@@ -163,7 +170,7 @@
           </div>
         </div>
       </el-form-item>
-      <el-form-item prop="text" class="line-mode">
+      <el-form-item prop="text" class="line-mode" v-if="nodeProps.targetPage !== 'CONFIRM'">
         <template slot="label">
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#icon-reject"></use>
@@ -262,7 +269,7 @@ export default {
   },
   computed: {
     disabledForm() {
-      return this.$route.name === 'FlowManage'
+      return this.$route.name === 'FlowManage' || this.$route.meta.pTitle === '申请中心'
     },
     nodeProps() {
       return this.$store.state.selectedNode.props
@@ -537,6 +544,14 @@ svg {
     span {
       color: #2D5CF6;
     }
+  }
+}
+.xiaobao-check {
+  border-radius: 4px;
+  background: #F7F8FA;
+  padding: 8px 12px;
+  .radio-group {
+
   }
 }
 </style>
