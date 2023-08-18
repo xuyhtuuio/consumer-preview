@@ -205,6 +205,7 @@ export default {
         name: "details",
         params: {
           formId: item.taskNumber,
+          processInstanceId:item.processInstanceId,
           formManagementId: item.form_management_id,
           taskName: item.taskName
         },
