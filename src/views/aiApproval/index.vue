@@ -1,21 +1,6 @@
 <template>
   <div class="container" v-loading="loading">
-    <div class="tools">
-      <div ref="tools">
-        <div v-for="(item, index) in tools" :key="index" :arrow-offset="-30" :ref="`popover-${item.toolSign}`">
-          <span :ref='`sideBar-popover-` + item.toolSign'
-            :class="crtTools == item.toolSign ? 'active-tools el-popover__reference' : 'el-popover__reference'"
-            @click="changeTools(item)" v-if="item.show !== false">
-            <i :class="['iconfont', 'sidebar-icon', item.icon]"></i>
-          </span>
-        </div>
-        <el-popover v-if="showPopper" ref="sidebar-popover" :reference='reference' placement="right" trigger="click"
-          popper-class="sidebar-popper" @after-leave="hiddenPopover">
-          <component :is="crtToolComponent" :sidebarParam="sidebarParam" @previewFile="previewFile"
-            :personInfo="personInfo"></component>
-        </el-popover>
-      </div>
-    </div>
+    <sidebar ref="sidebar"></sidebar>
     <div class="content">
       <div class="content-header">
         <span class="content-title">
@@ -59,19 +44,16 @@
 
 <script>
 import LeaderLine from '@/utils/leader-line';
+import applyFormFilePreview from '@/components/filePreview'
+import secondaryConfirmation from "@/components/common/secondaryConfirmation"
+import sidebar from './sidebar/sidebar'
 import filePreview from './components/file-preview'
 import orcTxt from './components/ocr-txt'
 import editorial from './components/editorial'
 import addReview from './dialogs/add-review'
 import submitReview from './dialogs/submit-review'
 import rejectDialog from './dialogs/reject-dialog';
-import applyForm from './sidebar/apply-form'
-import approvalRecordDetail from './sidebar/approval-record-detail'
-import similarCase from './sidebar/similar-case'
-import approvedOpinion from './sidebar/approved-opinion'
-import aiKnowledgeBase from './sidebar/ai-knowledge-base'
-import applyFormFilePreview from '@/components/filePreview'
-import secondaryConfirmation from "@/components/common/secondaryConfirmation"
+
 import {
   getUploadedFilesList,
   getOCRAnalysisResults,
@@ -85,7 +67,7 @@ import {
 } from "@/api/front";
 export default {
   name: 'aiApproval',
-  components: { applyFormFilePreview, filePreview, orcTxt, editorial, addReview, submitReview, applyForm, similarCase, approvalRecordDetail, approvedOpinion, aiKnowledgeBase, secondaryConfirmation, rejectDialog },
+  components: { applyFormFilePreview, filePreview, orcTxt, editorial, addReview, submitReview, secondaryConfirmation, rejectDialog, sidebar },
   data() {
     return {
       formBase: {},
@@ -96,45 +78,6 @@ export default {
       specialFileType: ['jpeg', 'jpg', 'png', 'pdf'],
       files: [], // 文件相关信息
       comments: [], // 编辑意见
-      crtTools: '',//当前侧边工具栏激活项
-      tools: [
-        {
-          component: 'applyForm',
-          toolSign: 'apply-form',
-          icon: 'icon-shenqingdan',
-          sidebarParam: {}, //侧边工具栏激活项 props
-        },
-        {
-          component: 'approvalRecordDetail',
-          toolSign: 'approval-record',
-          icon: 'icon-jilumingxi',
-          sidebarParam: {}, //侧边工具栏激活项 props
-        },
-        {
-          component: 'similarCase',
-          toolSign: 'similar-case',
-          icon: 'icon-xiangsianli',
-          sidebarParam: {}, //侧边工具栏激活项 props
-        },
-        {
-          component: 'approvedOpinion',
-          toolSign: 'approved-opinion',
-          icon: 'icon-yijianshu',
-          sidebarParam: {}, //侧边工具栏激活项 props
-          show: false
-        },
-        {
-          component: 'aiKnowledgeBase',
-          toolSign: 'ai',
-          icon: 'icon-ciku',
-          sidebarParam: {}, //侧边工具栏激活项 props
-        }
-      ],
-      sidebarParam: {},
-      crtToolComponent: '',
-      showPopper: false,
-      reference: {},
-      personInfo: {},
       approval: {}, // 当前审批文件的相关内容
       activeIndex: null,
       word_lines: [], // 连线
@@ -157,14 +100,6 @@ export default {
   },
 
   mounted() {
-    document.addEventListener('mouseup', (e) => {
-      const toolsRef = this.$refs['tools']
-      if (toolsRef) {
-        if (!toolsRef.contains(e.target)) {
-          this.showPopper = false;
-        }
-      }
-    });
     if (!this.$route.params.item) {
       this.$router.go(-1)
       return
@@ -178,9 +113,6 @@ export default {
     this.formBase = item;
   },
   methods: {
-    doToggle() {
-      this.showPopper = !this.showPopper;
-    },
     reject() {
       this.$refs.rejectDialog.init()
     },
@@ -192,7 +124,7 @@ export default {
       }).then(res => {
         const { data, status, message } = res.data;
         if (status === 200) {
-          this.tools[0].sidebarParam = { ...data};
+          this.$refs.sidebar.tools[0].sidebarParam = { ...data};
         } else {
           this.$message.error({ offset: 40, title: "提醒", message });
         }
@@ -267,45 +199,6 @@ export default {
     addWord(word) {
       this.$refs.addReview.init(word)
       window.getSelection().removeAllRanges();
-    },
-    changeTools(item) {
-      if (this.crtTools === item.toolSign && this.showPopper) return
-      this.showPopper = false
-      this.crtTools = item.toolSign
-      this.crtToolComponent = item.component
-      let params = {}
-      const { item: param_item } = this.$route.params
-      switch (item.component) {
-        // case 'applyForm':
-        //   params = {
-        //     formId: param_item.taskNumber,
-        //     formManagementId: param_item.formManagementId
-        //   }
-        //   break;
-        case 'approvalRecordDetail':
-          params = {
-            formId: param_item.taskNumber,
-            processInstanceId: param_item.processInstanceId
-          }
-          break;
-      }
-      if (Object.keys(params).length) {
-        this.sidebarParam = params
-      } else {
-        this.sidebarParam = item.sidebarParam;
-      }
-      this.reference = this.$refs['sideBar-popover-' + item.toolSign][0].$el
-      this.personInfo = param_item.initiator
-      this.$nextTick(() => {
-        this.showPopper = true
-        this.$nextTick(() => {
-          // 此时才能获取refs引用
-          this.$refs['sidebar-popover']?.doShow()
-        })
-      })
-    },
-    hiddenPopover() {
-      this.crtTools = ''
     },
     // 初始化文件
     initFile() {
@@ -639,46 +532,7 @@ export default {
   display: flex;
 
   // height: 100%;
-  .tools {
-    background: #ffffff;
-    width: 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 60px;
-
-    .iconfont {
-      font-size: 22px;
-      color: #506197;
-
-    }
-
-    span {
-      display: inline-block;
-      cursor: pointer;
-      margin-bottom: 24px;
-      padding: 6px !important;
-    }
-
-    span:hover {
-      background: #F2F3F5;
-      border-radius: 4px;
-      padding: 6px;
-
-
-
-    }
-
-    .active-tools {
-      background: #F2F3F5;
-      border-radius: 4px;
-      padding: 6px;
-
-
-
-    }
-
-  }
+  
 
   .content {
     flex: 1;
