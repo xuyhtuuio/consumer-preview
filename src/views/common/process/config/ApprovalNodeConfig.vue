@@ -269,7 +269,7 @@ export default {
   },
   computed: {
     disabledForm() {
-      return this.$route.name === 'FlowManage'
+      return this.$route.name === 'FlowManage' || this.$route.meta.pTitle === '申请中心'
     },
     nodeProps() {
       return this.$store.state.selectedNode.props
