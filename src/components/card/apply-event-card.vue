@@ -128,7 +128,7 @@
             <use xlink:href="#icon-tubiao-1"></use>
           </svg>
           关注</span>
-        <span class="attention has-attention icon-op" v-else @click="concern(item)">
+        <span class="attention icon-op has-attention" v-else @click="concern(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-guanzhu-1"></use>
           </svg>已关注</span>
@@ -552,6 +552,7 @@ export default {
 
     .has-attention {
       color: #1d2128;
+      margin-right: 0;
     }
 
     .modify {
