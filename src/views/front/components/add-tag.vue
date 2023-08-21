@@ -39,7 +39,6 @@ export default {
         method: 'get',
         url: '/cpr/user/getCurrentUser'
       });
-      console.log(data)
       this.userId = data.id;
       this.fullname = data.fullname;
     },
@@ -93,6 +92,7 @@ export default {
     }
   }
 }
+
 
 
 

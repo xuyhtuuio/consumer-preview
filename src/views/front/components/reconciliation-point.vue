@@ -102,7 +102,6 @@ export default {
   methods: {
     initData() {
       this.list.forEach(item => {
-        // console.log(item);
         if (item.valueType === 'Array') {
           this.$set(this.ruleForm, item.id, []);
         }
@@ -216,6 +215,7 @@ export default {
     }
   }
 }
+
 
 
 

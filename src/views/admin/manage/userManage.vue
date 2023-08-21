@@ -316,7 +316,6 @@ export default {
       this.dialog.userId = row.userId;
     },
     submitEdit(row) {
-      // console.log(row);
     },
     // 停用
     stopApllay({ userId }, action) {
@@ -334,7 +333,6 @@ export default {
       });
     },
     handleCurrentChange(val) {
-      // console.log(val)
       this.page.pageNow = val;
       this.initData();
     },
@@ -533,4 +531,5 @@ export default {
     }
   }
 }
+
 </style>
