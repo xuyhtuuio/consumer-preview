@@ -17,7 +17,7 @@ export default {
   components: { NavMenu},
   data() {
     return {
-      noPaddingRoute:['aiApproval','approval-aiApproval'],
+      noPaddingRoute:['aiApproval','approval-aiApproval', 'compare'],
       noBodyScroll: ['baseSetting', 'processDesign', 'proSetting']
     }
   },
