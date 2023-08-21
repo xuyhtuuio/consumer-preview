@@ -20,7 +20,8 @@
               <el-input v-else :ref="`input_${a}_${i}`" @blur="hideEdit(a, i, true)" v-model.trim="input"
                 placeholder="请输入意见" type="textarea" :rows="3" class="edit-input" resize="none"
                 @keyup.enter.native="hideEdit(a, i, true)"></el-input>
-              <i class="checkbox" @click="changeSelect(a, i)" :class="{ active: item.id === recommend.selected }"></i>
+              <i class="iconfont icon-tubiao3 previousApprover"  v-if="item.previousApprover"></i>
+              <i v-else class="checkbox" @click="changeSelect(a, i)" :class="{ active: item.id === recommend.selected }"></i>
             </div>
             <!-- 展开收起 -->
             <p class="list-btns">
@@ -254,6 +255,9 @@ export default {
       })
     },
     showEdit(a, i) {
+      if (this.recommends[a].list[i].previousApprover) {
+        return;
+      }
       this.$set(this.recommends[a].list[i], 'showEdit', true);
       this.input = this.recommends[a].list[i].str;
       this.$nextTick(() => {
@@ -386,6 +390,15 @@ export default {
 
     position: absolute;
     left: 20px;
+  }
+
+  .previousApprover {
+    display: inline-block;
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    color: #505968;
+    font-size: 24px;
   }
 
   .checkbox {

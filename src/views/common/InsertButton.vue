@@ -1,5 +1,5 @@
 <template>
-  <el-popover placement="bottom-start" :disabled="$route.name === 'FlowManage'" title="添加流程节点" width="350" trigger="click">
+  <el-popover placement="bottom-start" :disabled="disabledForm" title="添加流程节点" width="350" trigger="click">
     <div class="node-select">
       <div @click="addApprovalNode">
         <i class="el-icon-s-check" style="color:rgb(255, 148, 62);"></i>
@@ -47,6 +47,9 @@ export default {
   computed:{
     selectedNode(){
       this.$store.state.selectedNode
+    },
+    disabledForm() {
+      return this.$route.name === 'FlowManage' || this.$route.meta.pTitle === '申请中心'
     }
   },
   methods: {

@@ -112,17 +112,20 @@ export default {
         };
     },
     mounted() {
-        if (this.sidebarParam) {
-            this.getBsicData(this.sidebarParam)
-        }
+        this.init()
     },
     activated() {
-        const keys = Object.keys(this.$route.params) || Object.keys(this.$route.sidebarParam)
-        if (keys.length) {
-            this.getOrderDetail()
-        }
+        this.init()
     },
     methods: {
+        init() {
+            const keys = Object.keys(this.$route.params) || Object.keys(this.$route.sidebarParam)
+            if (this.sidebarParam && Object.keys(this.sidebarParam)?.length > 2) {
+                this.getBsicData(this.sidebarParam)
+            } else if (keys.length) {
+                this.getOrderDetail()
+            }
+        },
         startLoading(val) {
             this.$parent.startLoading(true)
         },

@@ -67,7 +67,7 @@ export default {
   },
   computed:{
     disabledForm() {
-      return this.$route.name === 'FlowManage'
+      return this.$route.name === 'FlowManage' || this.$route.meta.pTitle === '申请中心'
     },
     formData(){
       return this.$store.state.design.formItems
@@ -97,6 +97,7 @@ export default {
         for (let i in perms) {
           if (perms[i].id === form.id){
             perms[i].title = form.title
+            perms[i].module = form.module
             isLoad = true
             break;
           }
@@ -104,10 +105,15 @@ export default {
         if (!isLoad){
           const isRoot = this.$store.state.selectedNode.type === 'ROOT'
           const secondCheck = this.$store.state.selectedNode.type === 'APPROVAL-TWO'
+          let perm = (isRoot || secondCheck) ? 'E':'R'
+          if (form.module === '审批人填写') {
+            perm = 'H'
+          }
           perms.push({
             id: form.id,
             title: form.title,
-            perm: (isRoot || secondCheck) ? 'E':'R'
+            module: form.module,
+            perm
           })
         }
       })
