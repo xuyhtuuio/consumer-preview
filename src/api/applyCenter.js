@@ -115,7 +115,7 @@ export function concernApplication(param) {
 
 export function instanceInfo(param) {
   return request({
-    url: '/cpr/workspace/process/instanceInfo',
+    url: '/cpr/workProcessQuery/process/instanceInfo',
     method: 'post',
     // contentType:'application/x-www-form-urlencoded',
     data: param

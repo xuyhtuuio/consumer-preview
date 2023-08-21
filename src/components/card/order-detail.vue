@@ -137,7 +137,8 @@
         </div>
         <div class="right-content">
           <keep-alive>
-            <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus" :coment="coment">
+            <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus" :coment="coment"
+              @sendOpinionInfo="sendOpinionInfo">
               <template slot="head">
                 <div class="approved-opinion-head">
                   <h2>消保审查意见书</h2>
@@ -151,7 +152,7 @@
                   <p>以上为消保审查办公室建议，请酌情考虑。</p>
                   <p style="text-align: right; color: #1d2128; padding: 16px 0">
                     消保审查中心<br />
-                    2021-09-08 12：20：30
+                    {{ timeNow }}
                   </p>
                 </div>
               </template>
@@ -193,6 +194,7 @@ import {
   ocrApprovalSubmission
 } from "@/api/aiApproval";
 import { updateAdoptEditedComments, updateEditedComments } from '@/api/applyCenter'
+import moment from 'moment';
 export default {
   name: "order-details",
   components: {
@@ -214,6 +216,7 @@ export default {
         keyword: "",
         people: "",
       },
+      timeNow: '',
       info: {},
       previewDialog: false,
       previewUrl: '',
@@ -383,7 +386,11 @@ export default {
         this.loadings.storageLoading = false
       }, 2000)
     },
-
+    sendOpinionInfo(info) {
+      const arr = info[info.length - 1]
+      const time = moment(arr.substantiveopinion[arr.substantiveopinion.length - 1].updateTime).format('YYYY-MM-DD HH:mm:ss') || moment('YYYY-MM-DD HH:mm:ss')
+      this.timeNow = time
+    },
     submit(way) {
       const that = this
       //  待确认的 分有实质性意见和无实质性意见 status:3无/5有
@@ -561,7 +568,7 @@ export default {
         //上传文件的逻辑
       }
       const user = JSON.parse(window.localStorage.getItem('user_name'))
-      const submission = [ ]
+      const submission = []
       const data = {
         approvalSubmissionDto: {
           editedCommentsDtoList: [],
@@ -574,8 +581,7 @@ export default {
           name: user.fullname
         }
       }
-      console.log('vv')
-          ocrApprovalSubmission(data).then(res => {
+      ocrApprovalSubmission(data).then(res => {
         const { status, msg } = res.data;
         if (status === 200) {
           this.$message.success({ offset: 40, message: '审查意见已提交,可在审批中心查看' });
@@ -615,7 +621,9 @@ export default {
       //       showConfirmButton: false,
       //       closeOnClickModal: false,
       //       type: "warning",
-      //     })
+      //     }).then(res=>{
+      //       this.$router.replace('/approval-list')
+      // })
       //   }
       // }).catch(err => {
       //   this.loadings.submitLoading = false

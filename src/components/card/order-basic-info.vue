@@ -55,7 +55,17 @@
         ]">
             <div class="item" v-for="(item, index) in orderInfo.reviewPointer" :key="index">
                 <span class="label">{{ item.title }}</span>
-                <span class="value"> {{ item | valueFormat }}</span>
+                <span class="value" v-if="item.name == 'MultipleSelect'">
+                    <i v-for="(points, index) in formatePoints(item)" :key="index" style="display: block;">
+                        {{ points }}</i>
+                </span>
+                <span class="value" v-if="item.name == 'SingleGroupsSelect'">
+                    <span v-for="(points, index) in formatePoints(item)" :key="index"
+                        style="justify-content: space-between;" class="flex">
+                        <i>-{{ points.point }}</i>
+                        <i>{{ points.isRelative }}</i>
+                    </span>
+                </span>
             </div>
         </div>
         <div class="line"></div>
@@ -112,13 +122,14 @@ export default {
         };
     },
     mounted() {
-        this.init()
+        // this.init()
     },
     activated() {
         this.init()
     },
     methods: {
         init() {
+            this.getOrderDetail()
             const keys = Object.keys(this.$route.params) || Object.keys(this.$route.sidebarParam)
             if (this.sidebarParam && Object.keys(this.sidebarParam)?.length > 2) {
                 this.getBsicData(this.sidebarParam)
@@ -145,6 +156,9 @@ export default {
             getApplyForm({
                 formCategoryId: this.$route.params && this.$route.params.formManagementId || this.sidebarParam && this.sidebarParam.formManagementId || '1',
                 formId: this.$route.params.formId || this.sidebarParam.formId,
+                // formCategoryId: 121,
+                // formId: 1257
+                // formManagementId: 121,processInstanceId: "3c186340-3ff6-11ee-bd1a-d4d853dcb3dc"
             }).then(res => {
                 const { data, status, message } = res.data;
                 if (status === 200) {
@@ -174,7 +188,6 @@ export default {
             this.$emit('preview', url)
         },
         download(fileList) {
-            console.log('f', fileList)
             const list = fileList.map(v => {
                 // return {
                 //     fileName: v.fileName,
@@ -186,8 +199,6 @@ export default {
                 loadList: list
             }
             downloadAllFiles(params).then(res => {
-                console.log('ff', res)
-                return
                 const { data } = res.data
                 for (let i in data) {
                     const link = document.createElement('a');
@@ -200,7 +211,32 @@ export default {
                 }
             })
 
+        },
+        formatePoints(val) {
+            if (val.name == 'MultipleSelect') {
+                const { options } = val.props
+                let array = []
+                val.value.forEach(id => {
+                    let strings = options.filter(v => v.id == id)[0]
+                    array.push(strings)
+                })
+                const label = array.map(m => { return m.value })
+                return label || '--'
+            }
+            else if (val.name == 'SingleGroupsSelect') {
+                const { options } = val.props
+                //展示所有的 label
+                const label = options.map(labelItem => {
+                    const isRelative = labelItem.children.filter(childValue => val.value.includes(childValue.id))[0].value
+                    return {
+                        point: labelItem.value,
+                        isRelative: isRelative
+                    }
+                })
+                return label || '--'
+            }
         }
+
     },
     filters: {
         valueFormat(val) {
