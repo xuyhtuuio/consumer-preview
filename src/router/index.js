@@ -180,6 +180,11 @@ const router = new Router({
           name: "aiApproval",
           component: () => import("@/views/aiApproval/index.vue"),
           meta: { title: '智能审批', viewport: viewport }
+        }, {
+          path: "compare",
+          name: "compare",
+          component: () => import("@/views/approvalCenter/text-compare.vue"),
+          meta: { title: '线上对比', viewport: viewport }
         },
       ]
     },

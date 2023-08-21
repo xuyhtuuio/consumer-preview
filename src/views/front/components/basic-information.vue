@@ -226,7 +226,6 @@ export default {
         disabledDate: time => {
           // 既不能大于当前日期 也不能大于开始日期
           if (value) {
-            // console.log(value);
             return time.getTime() < new Date(value).getTime();
           }
           return time.getTime() < new Date() - 8.64e7;
@@ -323,7 +322,6 @@ export default {
 
     // 其他输入框
     checkRow(check, item) {
-      console.log(check, item);
       if (!check) {
         this.checkBox[item.id] = '';
       }
@@ -411,4 +409,5 @@ export default {
     }
   }
 }
+
 </style>

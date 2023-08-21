@@ -13,7 +13,7 @@
         <el-form
           ref="ruleForm"
           :hide-required-asterisk="true"
-          label-width="100px"
+          label-width="120px"
           class="ruleForm my-form"
         >
           <el-form-item v-for="(item, index) in list" :key="index" prop="name">
@@ -100,4 +100,5 @@ export default {
     }
   }
 }
+
 </style>

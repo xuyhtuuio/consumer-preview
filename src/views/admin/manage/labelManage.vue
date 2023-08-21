@@ -4,15 +4,33 @@
       <div class="search">
         <el-form class="my-form form" :inline="true" :model="search">
           <el-form-item class="form-item" label="标签类型">
-            <el-select v-model="search.type" placeholder="请选择标签类型" @change="val => getList()" clearable>
-              <el-option v-for="item in types" :key="item.id" :label="item.value" :value="item.id"></el-option>
+            <el-select
+              v-model="search.type"
+              placeholder="请选择标签类型"
+              @change="val => getList()"
+              clearable
+            >
+              <el-option
+                v-for="item in types"
+                :key="item.id"
+                :label="item.value"
+                :value="item.id"
+              ></el-option>
             </el-select>
           </el-form-item>
 
           <el-form-item class="form-item">
-            <el-autocomplete ref="autocomplete" v-model="search.keyword" placeholder="请输入标签名称进行搜索"
-              :fetch-suggestions="querySearch" :trigger-on-focus="true" @select="handleSelect"
-              @keyup.enter.native="getList(1)" clearable @clear="getList(1)">
+            <el-autocomplete
+              ref="autocomplete"
+              v-model="search.keyword"
+              placeholder="请输入标签名称进行搜索"
+              :fetch-suggestions="querySearch"
+              :trigger-on-focus="true"
+              @select="handleSelect"
+              @keyup.enter.native="getList(1)"
+              clearable
+              @clear="getList(1)"
+            >
               <i slot="suffix" class="el-icon-search el-input__icon" @click="getList(1)"> </i>
               <template slot-scope="{ item }">
                 <div class="option-info">
@@ -28,18 +46,26 @@
           <el-form-item class="form-item">
             <g-button class="g-btn" type="primary" @click="handleClick">
               <i class="iconfont icon-a-tubiaotianjiabiaoqian"></i>
-              添加标签</g-button>
+              添加标签</g-button
+            >
             <g-button class="g-btn" type="primary">
               <i class="iconfont icon-a-tubiaodaochu"></i>
-              导出</g-button>
+              导出</g-button
+            >
           </el-form-item>
         </el-form>
       </div>
     </div>
     <div class="main" v-loading="loading">
       <div class="main-body">
-        <TrsTable theme="TRS-table-gray" :data="data" :colConfig="colConfig" @sort-change="sortChange"
-          :header-cell-style="{ 'text-align': 'center' }" :cell-style="{ 'text-align': 'center' }">
+        <TrsTable
+          theme="TRS-table-gray"
+          :data="data"
+          :colConfig="colConfig"
+          @sort-change="sortChange"
+          :header-cell-style="{ 'text-align': 'center' }"
+          :cell-style="{ 'text-align': 'center' }"
+        >
           <template #keywordContent="{ row }">
             <div style="text-align: left">{{ row.keywordContent }}</div>
           </template>
@@ -48,37 +74,64 @@
               row.type === 1 ? '禁用词' : '敏感词'
             }}</span>
           </template>
-          <template #count="{row}">
-          
-              {{row.count}}
-            
+          <template #updateTime="{row:{updateTime}}">
+              {{updateTime | handleTime}} 
+          </template>
+          <template #count="{ row }">
+            {{ row.count }}
           </template>
           <template #operate="scope">
             <el-button type="text" size="small" @click="handleClick(scope.row)"> 编辑</el-button>
-            <el-button type="text" size="small" v-if="scope.row.status === 0"
-              @click="handleSubmitLimitTime(scope.row)">恢复</el-button>
-            <el-button type="text" class="red" @click="stopApllay(scope.row)" v-else>停用</el-button>
+            <el-button
+              type="text"
+              size="small"
+              v-if="scope.row.status === 0"
+              @click="handleSubmitLimitTime(scope.row)"
+              >恢复</el-button
+            >
+            <el-button type="text" class="red" @click="stopApllay(scope.row)" v-else
+              >停用</el-button
+            >
           </template>
         </TrsTable>
-        <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="val => getList(val)"
-          scrollType="scrollCom" scrollName="scrollCom" v-if="page.total">
+        <TrsPagination
+          :pageSize="10"
+          :pageNow="page.pageNow"
+          :total="page.total"
+          @getList="val => getList(val)"
+          scrollType="scrollCom"
+          scrollName="scrollCom"
+          v-if="page.total"
+        >
         </TrsPagination>
       </div>
     </div>
     <!-- 编辑或新增 标签 -->
-    <el-dialog class="trs-pagination" :visible.sync="limitTimeVisible" width="600px" custom-class="user-dialog"
-      :show-close="false" center>
+    <el-dialog
+      class="trs-pagination"
+      :visible.sync="limitTimeVisible"
+      width="600px"
+      custom-class="user-dialog"
+      :show-close="false"
+      center
+    >
       <template slot="title">
         <span>{{ titleDialog }}</span>
         <span class="close" @click="limitTimeVisible = false"><i class="el-icon-close"></i></span>
       </template>
       <div class="label">
         标签类型
-        <span v-for="item in types" :key="item.id" :class="[
-          'class-common',
-          item.id !== dialogItem.type ? 'class-com' : '',
-          item.id === 1 ? ' class-zero' : ' class-one'
-        ]" @click="handleLabelType(item.id)">{{ item.value }}</span>
+        <span
+          v-for="item in types"
+          :key="item.id"
+          :class="[
+            'class-common',
+            item.id !== dialogItem.type ? 'class-com' : '',
+            item.id === 1 ? ' class-zero' : ' class-one'
+          ]"
+          @click="handleLabelType(item.id)"
+          >{{ item.value }}</span
+        >
       </div>
       <div class="dialog-item">
         <g-table-card :title="dialogTitle">
@@ -93,8 +146,11 @@
       </div>
     </el-dialog>
     <!-- 停用二次确认 -->
-    <secondary-confirmation :option="confirmOption" ref="confirmation"
-      @handleConfirm="handleSubmitLimitTime(dialogItem)"></secondary-confirmation>
+    <secondary-confirmation
+      :option="confirmOption"
+      ref="confirmation"
+      @handleConfirm="handleSubmitLimitTime(dialogItem)"
+    ></secondary-confirmation>
   </div>
 </template>
 <script>
@@ -138,7 +194,14 @@ export default {
           label: '使用频率',
           prop: 'count',
           bind: {
-            width: 250,
+            align: 'center',
+            sortable: 'custom'
+          }
+        },
+        {
+          label: '更新时间',
+          prop: 'updateTime',
+          bind: {
             align: 'center',
             sortable: 'custom'
           }
@@ -158,11 +221,17 @@ export default {
       },
       titleDialog: '新建标签',
       dialogTitle: '标签名称',
-      dialogItem: []
+      dialogItem: [],
+      orderType: 1
     };
   },
   created() {
     this.getList();
+  },
+  filters: {
+    handleTime(val) {
+      return val.replace('T',' ')
+    }
   },
   methods: {
     handleSelect({ keywordContent }) {
@@ -183,12 +252,14 @@ export default {
     async getList(pageNow) {
       this.loading = true;
       const pageNum = pageNow || 1;
+      // 排序方式，1-更新时间倒序，2-更新时间正序，3-引用次数倒序，4-引用次数正序
       const res = await getList({
         pageNum,
         pageSize: 10,
         isAll: 1,
         type: this.search.type,
-        content: this.search.keyword
+        content: this.search.keyword,
+        orderType: this.orderType
       });
       const { data, success } = res.data;
       if (success) {
@@ -199,7 +270,18 @@ export default {
       this.loading = false;
     },
     sortChange({ column, prop, order }) {
-      // console.log(!!column?.order?.startsWith('asc'))
+      if(!order) return
+      const orderType = !!column?.order?.startsWith('asc');
+      let result = 1
+      switch (prop) {
+        case 'count':
+          result = orderType ? 4 : 3;
+          break;
+        case 'updateTime':
+          result= orderType ? 2 : 1;
+      }
+      this.orderType = result
+      this.getList(1)
     },
     handleLabelType(id) {
       this.dialogItem.type = id;
@@ -377,7 +459,7 @@ export default {
     height: calc(~'100% - 63px');
     overflow-y: auto;
     padding: 24px 0 0;
-    &-body{
+    &-body {
       height: 100%;
       overflow: auto;
     }
@@ -486,9 +568,11 @@ export default {
           margin-right: 24px;
 
           .btn-primary {
-            background-image: linear-gradient(to right,
-                rgba(47, 84, 235, 1),
-                rgba(81, 150, 255, 1));
+            background-image: linear-gradient(
+              to right,
+              rgba(47, 84, 235, 1),
+              rgba(81, 150, 255, 1)
+            );
           }
         }
       }
@@ -503,7 +587,7 @@ export default {
       left: -8px;
     }
 
-    &>.content {
+    & > .content {
       margin-top: 20px;
       font-weight: 700;
       color: @color1;
@@ -629,4 +713,19 @@ export default {
     line-height: 28px;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </style>
