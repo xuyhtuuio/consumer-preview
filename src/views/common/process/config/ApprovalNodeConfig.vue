@@ -144,7 +144,7 @@
       </el-form-item>
       <el-form-item class="xiaobao-check" v-if="nodeProps.targetPage === 'XIAOBAO'" label="消保审批权限" prop="xiaobaoCheckAuth">
         <el-radio-group class="radio-group" v-model="nodeProps.cpAuthority">
-          <el-radio label="allow" style="margin-top: 10px;">允许提有/无实质意见</el-radio>
+          <el-radio label="passAllow" style="margin-top: 10px;">允许提有/无实质意见</el-radio>
           <el-radio label="passNotAllow" style="margin-top: 10px;">不允许提有/无实质意见 - 可选择通过或驳回申请</el-radio>
           <el-radio label="disPassNotAllow" style="margin-top: 10px;">不允许提有/无实质意见 - 不可选择通过或驳回申请</el-radio>
         </el-radio-group>
