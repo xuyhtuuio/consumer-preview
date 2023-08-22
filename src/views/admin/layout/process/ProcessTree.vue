@@ -274,12 +274,14 @@ export default {
           id: this.getRandomId(),
           parentId: parentNode.children.id,
           type: "CONDITION",
+          typeElse: false,
           props: this.$deepCopy(DefaultProps.CONDITION_PROPS),
           name: "条件1",
         },{
           id: this.getRandomId(),
           parentId: parentNode.children.id,
           type: "CONDITION",
+          typeElse: false,
           props: this.$deepCopy(DefaultProps.CONDITION_PROPS),
           name: "条件2",
         }
@@ -326,6 +328,7 @@ export default {
           parentId: node.id,
           props: this.isConditionNode(node) ? this.$deepCopy(DefaultProps.CONDITION_PROPS):{},
           type: this.isConditionNode(node) ? "CONDITION":"CONCURRENT",
+          typeElse: false,
           children:{}
         })
         this.$forceUpdate()
