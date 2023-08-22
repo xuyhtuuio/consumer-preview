@@ -456,7 +456,7 @@ export default {
         return this.tipsMsg = `您有${modifyCount}笔申请单待修改哦，请尽快修改。`
       }
       if (toConfirmedCount <= 5 && toConfirmedCount > 0) {
-        return this.tipsMsg = `您有${modifyCount}笔申请单待确认哦，请尽快确认。`
+        return this.tipsMsg = `您有${toConfirmedCount}笔申请单待确认哦，请尽快确认。`
       }
       if (ApprovalCount > 0) {
         return this.tipsMsg = `您的申请单正在处理哦，请耐心等待。`
