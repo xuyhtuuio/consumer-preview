@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" :disabled="isView">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" :disabled="isView || currentRow.isView">
       <el-form-item label="字段名称" prop="title">
         <el-input v-model="ruleForm.title" :disabled="titleDisable" placeholder="请输入字段名称" class="is-dark input"></el-input>
       </el-form-item>

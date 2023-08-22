@@ -49,10 +49,10 @@
         <TrsTable theme="TRS-table-gray" :data="data1" :colConfig="colConfig1" @sort-change="changeSort1"
           @submitEdit="submitEdit" :row-class-name="tableRowClassName">
           <template #operate="scope">
-            <el-button type="text" v-if="isView" @click="editFormItem(scope.row)">查看</el-button>
+            <el-button type="text" v-if="isView || scope.row.canEdited === 0" @click="editFormItem(scope.row)">查看</el-button>
             <template v-else>
               <el-button type="text" v-if="+scope.row.run === 0" @click="changeFormItemState(scope.row)">恢复</el-button>
-              <el-button type="text" v-else @click="editFormItem(scope.row)">编辑</el-button>
+              <el-button type="text" v-else-if="scope.row.canEdited" @click="editFormItem(scope.row)">编辑</el-button>
               <el-button type="text" class="red" v-if="scope.row.canDeleted"
               :style="{ visibility: +scope.row.run === 1 ? 'visible' : 'hidden' }"  @click="changeFormItemState(scope.row)">停用</el-button>
               <el-button type="text" class="red" v-if="scope.row.canDeleted" @click="deleteFormItem(scope.row)">删除</el-button>
@@ -412,7 +412,10 @@ export default {
       this.loadingList = false
       const resData = res.data.data
       if (resData) {
-        this.data1 = resData.list;
+        this.data1 = resData.list.map(item => {
+          item.isView = (this.isView || item.canEdited === 0)
+          return item;
+        });
         this.resData1 = JSON.parse(JSON.stringify(resData.list))
         this.page2.total = resData.totalCount
         this.page2.pageNow = resData.pageNow
