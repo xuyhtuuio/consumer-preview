@@ -53,9 +53,9 @@
             <template v-else>
               <el-button type="text" v-if="+scope.row.run === 0" @click="changeFormItemState(scope.row)">恢复</el-button>
               <el-button type="text" v-else @click="editFormItem(scope.row)">编辑</el-button>
-              <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)"
+              <el-button type="text" class="red" v-if="scope.row.canDeleted"
               :style="{ visibility: +scope.row.run === 1 ? 'visible' : 'hidden' }"  @click="changeFormItemState(scope.row)">停用</el-button>
-              <el-button type="text" class="red" v-if="!defalutField.includes(scope.row.title)" @click="deleteFormItem(scope.row)">删除</el-button>
+              <el-button type="text" class="red" v-if="scope.row.canDeleted" @click="deleteFormItem(scope.row)">删除</el-button>
             </template>
           </template>
           <template #required="scope">
@@ -176,7 +176,7 @@ export default {
           }
         },
       ],
-      defalutField: ['项目名称', '上线时间', '下线时间', '宣传渠道'],
+      // defalutField: ['项目名称', '上线时间', '下线时间', '宣传渠道'],
       data1: [],
       colConfig1: [
         {
