@@ -87,16 +87,19 @@ export default {
   watch: {
     list: {
       handler(val) {
-        let len = 0;
-        let valLen = 0;
-        val.forEach(listItem => {
-          len += listItem.value.length;
-          valLen += listItem.props.options.length;
-        });
-        this.checkAll = len === valLen ? true : false;
-        this.checkAll && (this.judgeWarnFlag = false);
+        // this.handleCheckAll(val)
+        val.length &&
+          val.forEach(item => {
+            if(item.name=== "SingleGroupsSelect" && item.value.length === item.props.options.length) {
+              item.props.options.forEach((propItem,propIndex) => {
+                this.$set(propItem, 'value1','')
+                propItem.value1 = item.value[propIndex]
+              })
+            }
+          })
+        
       },
-      deep: true
+      // deep: true
     }
   },
   methods: {
@@ -107,6 +110,16 @@ export default {
         }
         this.ruleFormLen += item.props.options.length;
       });
+    },
+    handleCheckAll(val) {
+      let len = 0;
+        let valLen = 0;
+        val.forEach(listItem => {
+          len += listItem.value.length;
+          valLen += listItem.props.options.length;
+        });
+        this.checkAll = len === valLen ? true : false;
+        this.checkAll && (this.judgeWarnFlag = false);
     },
     // 全选
     // handleCheckAllChange(val) {

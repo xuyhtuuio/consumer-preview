@@ -44,7 +44,7 @@
             <el-option v-for="item in belongModules" :label="item.label" :value="item.value"
               :key="item.value"></el-option>
           </el-select>
-          <el-button type="primary" @click="addFormItem" size="small" style="margin-left: 16px;">新增字段</el-button>
+          <el-button type="primary" @click="addFormItem" size="small" style="margin-left: 16px;" :disabled="isView">新增字段</el-button>
         </div>
         <TrsTable theme="TRS-table-gray" :data="data1" :colConfig="colConfig1" @sort-change="changeSort1"
           @submitEdit="submitEdit" :row-class-name="tableRowClassName">

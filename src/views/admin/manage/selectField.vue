@@ -1,6 +1,6 @@
 <template>
   <div>
-    <draggable :list="data" group="option" handler=".el-icon-rank" :options="{animation: 300, sort: true}">
+    <draggable :list="data" group="option" handler=".el-icon-rank" :options="{animation: 300, sort: true, disabled: viewDisable}">
       <div v-for="(op, index) in data" :key="op.id">
         <i class="el-icon-rank" style="margin-right: 6px;color:#bbb;"></i>
         <el-input v-model="data[index].value" size="small" style="width: calc(100% - 20px);"
@@ -19,10 +19,12 @@ export default {
     draggable
   },
   props: {
-    data: Array
+    data: Array,
+    viewDisable: Boolean
   },
   methods: {
     deleteOptions(data, index) {
+      if (this.viewDisable) return;
       if (data.length <= 1) {
         this.$message.warning('至少有一个选项')
         return;

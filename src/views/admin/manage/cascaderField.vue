@@ -1,6 +1,6 @@
 <template>
   <div :style="{ 'margin-left': leval * 10 + 'px' }">
-    <draggable :list="data" group="option" handler=".el-icon-rank" :options="{animation: 300, sort: true}">
+    <draggable :list="data" group="option" handler=".el-icon-rank" :options="{animation: 300, sort: true, disabled: viewDisable}">
       <div v-for="(op, index) in data" :key="op.id">
         <i class="el-icon-rank" style="margin-right: 6px;color:#bbb;"></i>
         <el-input v-model="data[index].value" size="small" style="width: 160px;"
@@ -34,10 +34,12 @@ export default {
   },
   props: {
     leval: Number,
-    data: Array
+    data: Array,
+    viewDisable: Boolean
   },
   methods: {
     addCascaderChildOptions(op) {
+      if (this.viewDisable) return;
       op.children.push({
         // id: op.id + '-' + op.children.length,
         id: getTreeId('cascader'),
@@ -46,6 +48,7 @@ export default {
       })
     },
     addCascaderOptions() {
+      if (this.viewDisable) return;
       // const ids = this.data[this.data.length - 1].id.split('-')
       // ids[ids.length - 1] = +ids[ids.length -1] + 1 + ''
       this.data.push({
@@ -55,6 +58,7 @@ export default {
       })
     },
     deleteOptions(data, index, level) {
+      if (this.viewDisable) return;
       if ((data.length <= 1) && (level === 1)) {
         this.$message.warning('至少有一个选项')
         return;
