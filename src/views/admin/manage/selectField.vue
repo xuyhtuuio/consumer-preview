@@ -19,10 +19,12 @@ export default {
     draggable
   },
   props: {
-    data: Array
+    data: Array,
+    viewDisable: Boolean
   },
   methods: {
     deleteOptions(data, index) {
+      if (this.viewDisable) return;
       if (data.length <= 1) {
         this.$message.warning('至少有一个选项')
         return;

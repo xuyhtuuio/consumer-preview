@@ -34,10 +34,12 @@ export default {
   },
   props: {
     leval: Number,
-    data: Array
+    data: Array,
+    viewDisable: Boolean
   },
   methods: {
     addCascaderChildOptions(op) {
+      if (this.viewDisable) return;
       op.children.push({
         // id: op.id + '-' + op.children.length,
         id: getTreeId('cascader'),
@@ -46,6 +48,7 @@ export default {
       })
     },
     addCascaderOptions() {
+      if (this.viewDisable) return;
       // const ids = this.data[this.data.length - 1].id.split('-')
       // ids[ids.length - 1] = +ids[ids.length -1] + 1 + ''
       this.data.push({
@@ -55,6 +58,7 @@ export default {
       })
     },
     deleteOptions(data, index, level) {
+      if (this.viewDisable) return;
       if ((data.length <= 1) && (level === 1)) {
         this.$message.warning('至少有一个选项')
         return;

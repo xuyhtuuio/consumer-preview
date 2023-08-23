@@ -14,7 +14,7 @@
         </i>
       </el-input>
       <div @mouseover="item.isHover = true" @mouseout="item.isHover=false" style="display: inline-block;">
-        <div class="header-title" v-show="!item.showInput" @click="item.showInput = true" style="font-size: medium">
+        <div class="header-title" v-show="!item.showInput" @click="editInputName" style="font-size: medium">
           {{item.value}}
           <i class="iconfont icon-bi"></i>
         </div>
@@ -23,7 +23,7 @@
         <el-button icon="el-icon-plus" type="text" size="mini" @click="addSelectOptions(item.children)">新增选项</el-button>
         <i slot="suffix" class="el-input__icon el-icon-delete" style="position: absolute;right:0;top: 8px;height: 25px;" @click="deleteOptions(data, index)"></i>
       </div>
-      <draggable :list="item.children" group="option" handler=".el-icon-rank" :options="{animation: 300, sort: true}">
+      <draggable :list="item.children" :draggable="!viewDisable" group="option" handler=".el-icon-rank" :options="{animation: 300, sort: true}">
         <div v-for="(op, index) in item.children" :key="op.id">
           <i class="el-icon-rank" style="margin-right: 6px;color:#bbb;"></i>
           <el-input v-model="item.children[index].value" size="small" style="width: 260px;"
@@ -44,10 +44,17 @@ export default {
     draggable
   },
   props: {
-    data: Array
+    data: Array,
+    viewDisable: Boolean
   },
   methods: {
+    editInputName(item) {
+      console.log(this.viewDisable)
+      if (this.viewDisable) return;
+      item.showInput = true
+    },
     deleteOptions(data, index) {
+      if (this.viewDisable) return;
       if (data.length <= 1) {
         this.$message.warning('至少有一个选项')
         return;
@@ -55,6 +62,7 @@ export default {
       data.splice(index, 1)
     },
     addSelectOptions(data) {
+      if (this.viewDisable) return;
       data.push({
         id: getTreeId('select'),
         value: ''

@@ -60,10 +60,9 @@ export default {
     }
   },
   created() {
-    this.formPermsLoad()
     this.formGroup = JSON.parse(window.sessionStorage.getItem('formGroup')) || []
     this.formId = this.formGroup[0]?.id
-    // this.formId && this.getFormItemeById(this.formId)
+    this.formPermsLoad()
   },
   computed:{
     disabledForm() {
@@ -77,13 +76,6 @@ export default {
     }
   },
   methods: {
-    async getFormItemeById(formId) {
-      const res = await getFormTemplateById(formId)
-      const formDetail = res.data
-      if (formDetail) {
-        
-      }
-    },
     allSelect(type){
       this.formPerms.forEach(f => f.perm = type)
       this.$nextTick(() => {
@@ -92,12 +84,15 @@ export default {
     },
     formPermsLoad(){
       let perms = this.$store.state.selectedNode.props.formPerms
+      const { id, name } = this.formGroup.find(item => item.id === this.formId) || {}
       this.formData.forEach(form => {
         let isLoad = false
         for (let i in perms) {
           if (perms[i].id === form.id){
             perms[i].title = form.title
             perms[i].module = form.module
+            perms[i].formCategoryId = id
+            perms[i].formCategoryName = name
             isLoad = true
             break;
           }
@@ -113,6 +108,8 @@ export default {
             id: form.id,
             title: form.title,
             module: form.module,
+            formCategoryId: id,
+            formCategoryName: name,
             perm
           })
         }
