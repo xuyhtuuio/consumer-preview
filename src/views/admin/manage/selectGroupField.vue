@@ -23,7 +23,7 @@
         <el-button icon="el-icon-plus" type="text" size="mini" @click="addSelectOptions(item.children)">新增选项</el-button>
         <i slot="suffix" class="el-input__icon el-icon-delete" style="position: absolute;right:0;top: 8px;height: 25px;" @click="deleteOptions(data, index)"></i>
       </div>
-      <draggable :list="item.children" :draggable="!viewDisable" group="option" handler=".el-icon-rank" :options="{animation: 300, sort: true}">
+      <draggable :list="item.children" group="option" handler=".el-icon-rank" :options="{animation: 300, sort: true, disabled: viewDisable}">
         <div v-for="(op, index) in item.children" :key="op.id">
           <i class="el-icon-rank" style="margin-right: 6px;color:#bbb;"></i>
           <el-input v-model="item.children[index].value" size="small" style="width: 260px;"
