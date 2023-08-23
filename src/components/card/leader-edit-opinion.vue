@@ -3,52 +3,85 @@
     <el-form :model="form" :rules="rules" label-position="left" ref="form">
       <el-form-item label="请选择" prop="isAccept">
         <el-radio-group v-model="form.isAccept" @change="updateForm">
-          <el-radio :label="1">通过</el-radio>
-          <el-radio :label="0">驳回</el-radio>
+          <el-radio :label="'1'">通过</el-radio>
+          <el-radio :label="'0'">驳回</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="请选择驳回人" prop="disavower" v-if="form.isAccept == '0'">
+      <!-- &&refuseWay=='TO_BEFORE' -->
+      <el-form-item label="请选择驳回人" prop="disavower" v-if="form.isAccept == '0'&&refuseWay=='TO_BEFORE'">
         <el-select v-model="form.disavower" placeholder="请选择驳回节点/驳回人" @change="updateForm">
-          <el-option v-for="item in peoples" :key="item.value" :label="item.label" :value="item.value">
+          <el-option v-for="item in disavower" :key="item.id"  :label="item.name+'/'+item.label+ ' 【' + item.nodeName+'】'" :value="item.id">
             <span style="
-                float: left;
+             width: 33%;
                 font-weight: 700;
                 color: #1d2128;
                 font-size: 14px;
                 line-height: 34px;
-              ">{{ item.label }}</span>
+                display: inline-block;
+              ">{{ item.name }}</span>
             <span style="
-                float: right;
+                 width: 33%;
                 color: #505968;
                 font-size: 14px;
                 line-height: 34px;
+                display: inline-block;
                 font-weight: 400;
-              ">{{ item.dep1 }} | {{ item.dep2 }} | {{ item.dep3 }}</span>
+              ">{{ item.label }}
+
+            </span>
+            <span style="
+                 width: 33%;
+                color: #505968;
+                font-size: 14px;
+                line-height: 34px;
+                display: inline-block;
+                font-weight: 400;
+              "> · {{ item.nodeName }}
+            </span>
+
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="请选择驳回原因" prop="reason" v-if="form.isAccept == '0'">
         <el-select v-model="form.reason" placeholder="请选择驳回原因" @change="updateForm">
-          <el-option v-for="item in reasons" :key="item.value" :label="item.label" :value="item.value"></el-option>
+          <el-option v-for="item in reasons" :key="item.value" :label="item" :value="item"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="请选择审批人" prop="approver">
+      <!--  && assignedType == 'SELF_SELECT' -->
+      <el-form-item label="请选择审批人" prop="approver" v-if="form.isAccept == '1'&& assignedType == 'SELF_SELECT'">
         <el-select v-model="form.approver" placeholder="需【下一节点名称】审批，请选择审批人" @change="updateForm">
-          <el-option v-for="item in peoples" :key="item.value" :label="item.label" :value="item.value">
+          <el-option v-for="item in approver" :key="item.id"   :label="item.name+'/'+item.label+ ' 【' + item.nodeName+'】'" :value="item.id">
+            <p class="flex"> 
             <span style="
-                float: left;
+             width: 33%;
                 font-weight: 700;
                 color: #1d2128;
                 font-size: 14px;
                 line-height: 34px;
-              ">{{ item.label }}</span>
+                display: inline-block;
+              " class="ellipsis ellipsis_1">{{ item.name }}</span>
             <span style="
-                float: right;
+                 width: 33%;
                 color: #505968;
                 font-size: 14px;
                 line-height: 34px;
+                display: inline-block;
                 font-weight: 400;
-              ">{{ item.dep1 }} | {{ item.dep2 }} | {{ item.dep3 }}</span>
+
+              " class="ellipsis ellipsis_1">{{ item.label }}
+
+            </span>
+            <span style="
+                 width: 33%;
+                color: #505968;
+                font-size: 14px;
+                line-height: 34px;
+                display: inline-block;
+                font-weight: 400;
+              "> · {{ item.nodeName }}
+              
+            </span>
+          </p>
           </el-option>
         </el-select>
       </el-form-item>
@@ -62,31 +95,12 @@
 import { workSpaceAgree } from '@/api/approvalCenter'
 export default {
   name: "leader-edit-opinion",
+  props: {
+  },
   data() {
     return {
-      peoples: [
-        {
-          value: "Beijing",
-          dep1: "总行",
-          dep2: "财富平台部",
-          dep3: "财富客群团队",
-          label: "谭新宇",
-        },
-        {
-          value: "Shanghai",
-          dep1: "总行",
-          dep2: "财富平台部",
-          dep3: "财富客群团队",
-          label: "谭新宇",
-        },
-        {
-          value: "Nanjing",
-          dep1: "总行",
-          dep2: "财富平台部",
-          dep3: "财富客群团队",
-          label: "谭新宇",
-        },
-      ],
+      disavower: [],
+      approver: [],
       rules: {
         isAccept: [{ required: true, message: "请选择", trigger: ["blur"] }],
         approver: [
@@ -101,15 +115,29 @@ export default {
       },
       reasons: ['文件预览失败（文件损坏/清晰度过低）', '附件材料与审批项目不匹配', '其他'],
       form: {
-        isAccept: "",
+        isAccept: "1",
         approver: "",
         content: "",
         reason: '',
         disavower: '',
       },
+      refuseWay: '',
+      assignedType: '',
     };
   },
+  watch: {
+    leaderApproveInfo(val) {
+      console.log('watch', val)
+    }
+  },
   methods: {
+    initData(data) {
+      this.disavower = data.disavower
+      this.approver = data.approver
+      this.refuseWay = data.refuseWay
+      this.assignedType = data.assignedType
+
+    },
     updateForm() {
       this.$refs["form"].validate((valid) => {
         this.$store.commit('setEditOpinionRequired', valid)

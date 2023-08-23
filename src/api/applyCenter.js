@@ -115,7 +115,7 @@ export function concernApplication(param) {
 
 export function instanceInfo(param) {
   return request({
-    url: '/cpr/workspace/process/instanceInfo',
+    url: '/cpr/workProcessQuery/process/instanceInfo',
     method: 'post',
     // contentType:'application/x-www-form-urlencoded',
     data: param
@@ -186,3 +186,12 @@ export function  canRoved(param){
 
 
 
+// 获取当前process-id对应的流程配置信息
+export function  getTemplatedetail(param){
+  return request({
+    url: '/cpr/workspace/process/templateDetail',
+    method: 'post',
+    contentType:'application/x-www-form-urlencoded',
+    data: param
+  })
+}

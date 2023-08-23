@@ -32,10 +32,10 @@
             </div>
         </div>
         <div class="line"></div>
-        <div class="channel-info">
-            <div class="item" v-for="(item, index) in orderInfo.promotionChannels" :key="index">
-                <span class="label">{{ item.title }}</span>
-                <span class="value">{{ item | valueFormat }}</span>
+        <div class="channel-info" v-for="(item, index) in orderInfo.promotionChannels" :key="index">
+            <div class="item" v-for="(child, idx) in item.props.options" :key="idx">
+                <span class="label">{{ child.value }}</span>
+                <span class="value">{{ multipleSelect(child, item) }}</span>
             </div>
             <slot name="personal-channel"></slot>
         </div>
@@ -122,14 +122,12 @@ export default {
         };
     },
     mounted() {
-        // this.init()
     },
     activated() {
         this.init()
     },
     methods: {
         init() {
-            this.getOrderDetail()
             const keys = Object.keys(this.$route.params) || Object.keys(this.$route.sidebarParam)
             if (this.sidebarParam && Object.keys(this.sidebarParam)?.length > 2) {
                 this.getBsicData(this.sidebarParam)
@@ -162,25 +160,43 @@ export default {
             }).then(res => {
                 const { data, status, message } = res.data;
                 if (status === 200) {
-                    this.getBsicData(data)
+                    this.getBsicData(data,true)
                 } else {
+                    this.getBsicData({
+                        basicInformation: [], keyPointsForVerification: [], promotionChannels: [], reviewMaterials: []
+                    }, false)
                     this.$message.error({ offset: 40, title: "提醒", message });
                 }
-            }).finally(() => {
-                this.loading = false
-            });
+            }).catch(error => {
+
+            }).
+                finally(() => {
+                    this.loading = false
+                });
         },
-        getBsicData(data) {
-            const { basicInformation, keyPointsForVerification, promotionChannels, reviewMaterials } = data
+        getBsicData(data, flag) {
+            if (!flag) {
+                this.orderInfo = {
+                    baseInfo: [],
+                    textAreaBaseInfo: [],
+                    newBaseInfo: [],
+                    reviewPointer: [],
+                    promotionChannels: [],
+                    fileList: []
+                }
+                return
+            }
+            const { basicInformation, keyPointsForVerification, reviewMaterials } = data
             //大段文本过滤
-            const noTextAreaBeseInfo = basicInformation.filter(v => { return v.name !== 'TextareaInput' })
-            const textAreaBaseInfo = basicInformation.filter(v => { return v.name == 'TextareaInput' })
+            const noTextAreaBeseInfo = basicInformation.filter(v => { return !['TextareaInput', 'MultipleGroupsSelect'].includes(v.name) }) || []
+            const textAreaBaseInfo = basicInformation.filter(v => { return ['TextareaInput'].includes(v.name) }) || []
+            const MultipleGroupsSelect = basicInformation.filter(v => { return ['MultipleGroupsSelect'].includes(v.name) }) || []
             this.orderInfo = {
                 baseInfo: noTextAreaBeseInfo,
                 textAreaBaseInfo: textAreaBaseInfo,
                 newBaseInfo: this.getMapping(noTextAreaBeseInfo),
                 reviewPointer: keyPointsForVerification,
-                promotionChannels,
+                promotionChannels: MultipleGroupsSelect,
                 fileList: reviewMaterials && reviewMaterials[0].value
             }
         },
@@ -222,8 +238,7 @@ export default {
                 })
                 const label = array.map(m => { return m.value })
                 return label || '--'
-            }
-            else if (val.name == 'SingleGroupsSelect') {
+            } else if (val.name == 'SingleGroupsSelect') {
                 const { options } = val.props
                 //展示所有的 label
                 const label = options.map(labelItem => {
@@ -235,6 +250,17 @@ export default {
                 })
                 return label || '--'
             }
+        },
+        multipleSelect(child, item) {
+            let strings = ''
+            let array = []
+            item.value.forEach(n => {
+                let filters = child.children.filter(v => v.id == n)
+                array.push(...filters)
+            })
+            strings = array.map(m => { return m.value }).join('、')
+            return strings || '--'
+
         }
 
     },
@@ -262,6 +288,7 @@ export default {
                 const label = array.map(m => { return m.value }).join('、')
                 return label || '--'
             }
+
         }
     }
 };

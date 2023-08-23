@@ -23,7 +23,7 @@
           <span class="flex"> <i class="iconfont icon-tijiao"></i>
             <i class="btn">确认</i></span>
         </el-button>
-        <div v-if="isOCR" class="flex">
+        <div v-if="item.taskStatus == 1" class="flex">
           <!-- <div class="back flex" @click="transferDialog = true">
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
@@ -40,9 +40,6 @@
             <i class="iconfont icon-yijianshu"></i>
             <i class="btn">审查</i>
           </div>
-
-
-
         </div>
       </div>
     </div>
@@ -138,7 +135,7 @@
         <div class="right-content">
           <keep-alive>
             <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus" :coment="coment"
-              @sendOpinionInfo="sendOpinionInfo">
+              @sendOpinionInfo="sendOpinionInfo" :leaderApproveInfo="leaderApproveInfo">
               <template slot="head">
                 <div class="approved-opinion-head">
                   <h2>消保审查意见书</h2>
@@ -190,10 +187,11 @@ import approvedOpinionCard from "@/components/card/approved-opinion-card.vue";
 import uploadFileCard from "@/components/card/upload-file-card";
 import filePreview from '@/components/filePreview'
 import { workSpaceAgree } from '@/api/approvalCenter'
+
 import {
   ocrApprovalSubmission
 } from "@/api/aiApproval";
-import { updateAdoptEditedComments, updateEditedComments } from '@/api/applyCenter'
+import { updateAdoptEditedComments, updateEditedComments, getTemplatedetail } from '@/api/applyCenter'
 import moment from 'moment';
 export default {
   name: "order-details",
@@ -229,6 +227,7 @@ export default {
       },
       coment: {},
       personInfo: {},
+      leaderApproveInfo: {},//TO_NODE TO_BEFORE
       peoples: [
         { name: "王明明", code: 1 },
         { name: "王明明", code: 2 },
@@ -270,7 +269,7 @@ export default {
         params: { item: this.item }
       });
     },
-    judgeStatus() {
+    async judgeStatus() {
       const { path } = this.$route
       const originRouter = path.match(/\/(\S*)\//)[1]
       // 一般进入详情页：展示返回按钮 及 审批记录详细
@@ -292,12 +291,17 @@ export default {
           this.status = 0;
           this.crtComp = "approvalRecordCard";
         } else if (originRouter == 'approvalcenter') {
-          //区分是否OCR审批还是领导审批  先写死OCR
-          this.isOCR = true
+          //区分是否OCR审批还是领导审批  先写死targetPage  LEADER XIAOBAO CONFIRM
+          const res = await this.getTemplatedetail()
+          this.isOCR = res.targetPage == 'LEADER'
+          this.refuseWay = res.refuseWay
           !this.isOCR ? (this.status = 2, this.crtComp = "leaderEditOpinion") : (
             this.status = 0,
             this.crtComp = "approvalRecordCard"
           )
+          this.$nextTick(()=>{
+            this.$refs['child'].initData(res)
+          })
         }
       }
       // 状态待修改 
@@ -322,6 +326,61 @@ export default {
         this.crtComp = "approvedOpinionCard";
       }
     },
+    // 获取当前的节点的配置信息
+    async getTemplatedetail() {
+      let targetPage = ''
+      let refuseWay = ''
+      let assignedType=''
+      let disavower = []
+      const params = {
+        processInstanceId: this.$route.query.processInstanceId || '3c186340-3ff6-11ee-bd1a-d4d853dcb3dc'
+      }
+      const res = await getTemplatedetail(params)
+      if (res.data) {
+        const { data } = res.data
+        //驳回人列表处理
+        // 发起人
+        const { name, id } = this.item['originator']
+        const { institutional } = this.item
+        const initiator = {
+          label: institutional?.[institutional.length - 1],
+          name,
+          id,
+          nodeName: data[0].name
+        }
+        disavower.push(initiator)
+        if (data.length > 2) {
+          let othersArray = data.slice(1, data.length - 1)
+          let other_disavower = []
+          for (let i = 0; i < othersArray.length; i++) {
+            let arr = othersArray[i].map(m => {
+              return {
+                ...m,
+                nodeName: othersArray[i].name
+              }
+            })
+            other_disavower.concat(arr)
+          }
+          disavower.concat(other_disavower)
+        }
+        // 选中通过时的下一级审批人
+        let approver = []
+        let nextApprovers = data[data.length - 1]?.children?.props?.assignedUser || []
+        nextApprovers = nextApprovers?.map(v => {
+          return {
+            ...v,
+            nodeName: data[data.length - 1]?.children?.name
+          }
+        })
+        approver=nextApprovers
+        assignedType =data[data.length - 1]?.children?.props?.assignedType
+        targetPage = data[data.length - 1].props['targetPage']
+        refuseWay = data[data.length - 1].props['refuseWay']
+        return { targetPage, refuseWay, disavower ,approver,assignedType}
+      }
+
+    },
+
     toModify() {
       this.$router.push({
         name: 'editApply',
