@@ -1,9 +1,9 @@
 import qs from 'qs';
 import request from '@/api/request.js';
 // 获取列表
-export function getPageList(params) {
+export function getPageList(params,url="/cpr/opinion/list") {
   return request({
-    url: '/cpr/opinion/list',
+    url,
     method: 'get',
     params,
   }).then(({ data: { data: res } }) => {
