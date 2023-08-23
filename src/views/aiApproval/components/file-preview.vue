@@ -362,7 +362,11 @@ export default {
   background: rgb(0 0 0 / 23%);
 
   .preview {
-    background: rgb(0 0 0 / 23%);
+    // background: rgb(0 0 0 / 23%);
+    background: none;
+    margin: 30px;
+    width: calc(100% - 60px);
+    height: calc(100% - 60px);
   }
 
   .el-icon-circle-close {
