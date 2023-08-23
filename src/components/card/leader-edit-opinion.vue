@@ -48,7 +48,7 @@
         </el-select>
       </el-form-item>
       <!--  && assignedType == 'SELF_SELECT' -->
-      <el-form-item label="请选择审批人" prop="approver" v-if="form.isAccept == '1'&& assignedType == 'SELF_SELECT'">
+      <el-form-item label="请选择审批人" prop="approver" v-if="form.isAccept == '1'">
         <el-select v-model="form.approver" placeholder="需【下一节点名称】审批，请选择审批人" @change="updateForm">
           <el-option v-for="item in approver" :key="item.id"   :label="item.name+'/'+item.label+ ' 【' + item.nodeName+'】'" :value="item.id">
             <p class="flex"> 
@@ -86,7 +86,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="审查意见" class="opinion">
-        <el-input type="textarea" placeholder="请输入审查话术内容" v-model="form.content" resize="none"></el-input>
+        <el-input type="textarea" placeholder="请输入审查话术内容" v-model="form.content" resize="none" @blur="updateForm"></el-input>
       </el-form-item>
     </el-form>
   </div>
@@ -115,7 +115,7 @@ export default {
       },
       reasons: ['文件预览失败（文件损坏/清晰度过低）', '附件材料与审批项目不匹配', '其他'],
       form: {
-        isAccept: "1",
+        isAccept: "",
         approver: "",
         content: "",
         reason: '',
@@ -125,11 +125,7 @@ export default {
       assignedType: '',
     };
   },
-  watch: {
-    leaderApproveInfo(val) {
-      console.log('watch', val)
-    }
-  },
+  watch: {},
   methods: {
     initData(data) {
       this.disavower = data.disavower
@@ -139,9 +135,14 @@ export default {
 
     },
     updateForm() {
+      const params ={
+        ...this.form,
+        assignedType:this.assignedType
+      }
+      console.log('dd',params)
       this.$refs["form"].validate((valid) => {
         this.$store.commit('setEditOpinionRequired', valid)
-        this.$store.commit('setEditOpinionForm', this.form)
+        this.$store.commit('setEditOpinionForm', params)
       });
     },
   },
