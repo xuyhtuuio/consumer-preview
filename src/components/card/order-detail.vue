@@ -186,13 +186,14 @@ import approvalRecordCard from "@/components/card/approval-record-card.vue";
 import approvedOpinionCard from "@/components/card/approved-opinion-card.vue";
 import uploadFileCard from "@/components/card/upload-file-card";
 import filePreview from '@/components/filePreview'
-import { workSpaceAgree } from '@/api/approvalCenter'
+import { leaderEdit } from '@/api/approvalCenter'
 
 import {
   ocrApprovalSubmission
 } from "@/api/aiApproval";
 import { updateAdoptEditedComments, updateEditedComments, getTemplatedetail } from '@/api/applyCenter'
 import moment from 'moment';
+import { set } from 'vue';
 export default {
   name: "order-details",
   components: {
@@ -299,7 +300,7 @@ export default {
             this.status = 0,
             this.crtComp = "approvalRecordCard"
           )
-          this.$nextTick(()=>{
+          this.$nextTick(() => {
             this.$refs['child'].initData(res)
           })
         }
@@ -330,7 +331,7 @@ export default {
     async getTemplatedetail() {
       let targetPage = ''
       let refuseWay = ''
-      let assignedType=''
+      let assignedType = ''
       let disavower = []
       const params = {
         processInstanceId: this.$route.query.processInstanceId || '3c186340-3ff6-11ee-bd1a-d4d853dcb3dc'
@@ -346,7 +347,9 @@ export default {
           label: institutional?.[institutional.length - 1],
           name,
           id,
-          nodeName: data[0].name
+          nodeName: data[0].name,
+          targetNodeId: 'root'
+
         }
         disavower.push(initiator)
         if (data.length > 2) {
@@ -356,7 +359,8 @@ export default {
             let arr = othersArray[i].map(m => {
               return {
                 ...m,
-                nodeName: othersArray[i].name
+                nodeName: othersArray[i].name,
+                targetNodeId: othersArray[i].id
               }
             })
             other_disavower.concat(arr)
@@ -372,11 +376,11 @@ export default {
             nodeName: data[data.length - 1]?.children?.name
           }
         })
-        approver=nextApprovers
-        assignedType =data[data.length - 1]?.children?.props?.assignedType
+        approver = nextApprovers
+        assignedType = data[data.length - 1]?.children?.props?.assignedType
         targetPage = data[data.length - 1].props['targetPage']
         refuseWay = data[data.length - 1].props['refuseWay']
-        return { targetPage, refuseWay, disavower ,approver,assignedType}
+        return { targetPage, refuseWay, disavower, approver, assignedType }
       }
 
     },
@@ -592,6 +596,7 @@ export default {
 
         }
       }
+      // 领导审批提交
       if (this.status == 2 && way == 'update') {
         if (!editOpinionRequired) {
           this.crtComp = 'leaderEditOpinion'
@@ -599,15 +604,27 @@ export default {
           return false
         }
         let params = {}
+        console.log('editOpinionForm', editOpinionForm)
         if (editOpinionForm.isAccept == '1') {
           params = {
+            success: true,
+            taskId: this.item.taskId,
+            msg: editOpinionForm.content,
+            targetUser: editOpinionForm.approver
+          }
+          //流程配置中下一节点审批人设置时选择“上一审批人选择”，增加选择审批人选择则框
+          if (editOpinionForm.assignedType == 'SELF_SELECT') {
+            params.targetUser = editOpinionForm.approver
           }
         } else {
           params = {
           }
         }
-        workSpaceAgree(params).then(res => {
+        leaderEdit(params).then(res => {
           this.$message.success('审查意见已提交')
+          setTimeout(() => {
+            this.$router.replace({ name: 'approval-list' })
+          }, 1000)
         })
       }
     },

@@ -195,3 +195,4 @@ export function  getTemplatedetail(param){
     data: param
   })
 }
+

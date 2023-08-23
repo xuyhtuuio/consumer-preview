@@ -104,4 +104,12 @@ export function exportApprovalList(param){
     responseType: 'blob',
   })
 }
-
+//领导审批通过
+export function leaderEdit(param){
+  return request({
+    url: '/cpr/workspace/process/edit',
+    method: 'post',
+    contentType: 'application/json',
+    data: param,
+  })
+}
