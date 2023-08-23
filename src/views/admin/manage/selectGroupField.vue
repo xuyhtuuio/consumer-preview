@@ -2,7 +2,7 @@
   <div class="groups">
     <div class="groups-item" v-for="(item, index) in data" :key="item.id">
       <el-input v-model="item.value" size="medium" v-show="item.showInput"
-        maxlength="10"
+        maxlength="40"
         minlength="1"
         style="width: 300px"
         @blur="showInput = false">
@@ -71,6 +71,7 @@ export default {
   background: #F7F8FA;
 }
 .header-title {
+  word-break: break-all;
   max-width: 330px;
   line-height: 1.4em;
 }
