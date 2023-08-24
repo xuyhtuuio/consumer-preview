@@ -78,7 +78,7 @@ export default {
             this.errorInfo = '目标页面未配置'
             this.showError = true
           }
-          if (this.config.props.refuseWay === 'TO_NODE' && !this.config.props.refuseNode) {
+          if (this.config.props.targetPage !== 'CONFIRM' && this.config.props.refuseWay === 'TO_NODE' && !this.config.props.refuseNode) {
             err.push(`${this.config.name} 未配置驳回到指定节点`)
             this.errorInfo = '未配置驳回到指定节点'
             this.showError = true
