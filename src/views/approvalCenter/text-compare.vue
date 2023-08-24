@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="tools"></div>
+    <SideBar ref="sidebar"></SideBar>
     <div class="content">
       <div class="content-header">
         <span class="content-title">
@@ -364,20 +364,75 @@
             </div>
           </div>
         </div>
+        <div class="file-view">
+          <div class="view-left">
+            <div class="view-top">
+              <div class="top-page">
+                共 <span class="page-weight">3</span> /6
+              </div>
+              <div class="view-name">初版材料</div>
+              <span class="header-btns">
+                <i class="iconfont" @click="saveFile">&#xe62e;</i>
+                <i class="iconfont" @click="fullScreen">&#xe62f;</i>
+              </span>
+            </div>
+            <!-- <ImagePreview
+              url="http://192.168.210.51:9090/cpr/cpr_1692588542064_Snipaste_test.png"
+            ></ImagePreview> -->
+            <FilePreview :url="approval.url"></FilePreview>
+          </div>
+          <div class="view-right">
+            <div class="view-top">
+              <div class="top-page">
+                共 <span class="page-weight">3</span> /6
+              </div>
+              <div class="view-name">初版材料</div>
+              <span class="header-btns">
+                <i class="iconfont" @click="saveFile">&#xe62e;</i>
+                <i class="iconfont" @click="fullScreen">&#xe62f;</i>
+              </span>
+            </div>
+            <!-- <ImagePreview
+              url="http://192.168.210.51:9090/cpr/cpr_1692588542064_Snipaste_test.png"
+            ></ImagePreview> -->
+            <FilePreview :url="approval.url"></FilePreview>
+          </div>
+        </div>
       </div>
     </div>
     <reject-dialog ref="rejectDialog" :formBase="{}"></reject-dialog>
+    <div :class="{ fullScreen: showFullScreen }">
+      <!-- 全屏关闭按钮 -->
+      <i
+        class="el-icon-circle-close"
+        v-show="showFullScreen"
+        @click="fullScreen"
+      ></i>
+      <!-- 图片 -->
+      <!-- <ImagePreview
+        url="http://192.168.210.51:9090/cpr/cpr_1692588542064_Snipaste_test.png"
+      ></ImagePreview> -->
+      <!-- 其他类型文件 -->
+      <FilePreview :url="approval.url"></FilePreview>
+    </div>
   </div>
 </template>
 
 <script>
 import rejectDialog from "./dialogs/reject-dialog";
+import SideBar from "../aiApproval/sidebar/sidebar";
 import FileType from "@/components/common/file-type";
+import ImagePreview from "./image-preview";
+import FilePreview from "@/components/filePreview";
+import { download } from "@/api/aiApproval";
 export default {
   name: "compare",
   components: {
     rejectDialog,
     FileType,
+    SideBar,
+    ImagePreview,
+    FilePreview,
   },
   data() {
     return {
@@ -387,20 +442,28 @@ export default {
       itemBodyWidth: 0,
       bodyClientWidth: 0,
       scrollX: 0,
+      showFullScreen: false,
+      approval: {
+        url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      },
     };
   },
 
   mounted() {
-    this.carouselWidth = Number(((this.$refs.carouselBody.clientWidth - 40) / 6).toFixed(2));
-    this.itemBodyWidth = (this.$refs.itemBodyRef.clientWidth).toFixed(2);
-    this.bodyClientWidth = (this.$refs.carouselBody.clientWidth).toFixed(2);
-    window.addEventListener('resize', this.resize, true)
+    this.carouselWidth = Number(
+      ((this.$refs.carouselBody.clientWidth - 40) / 6).toFixed(2)
+    );
+    this.itemBodyWidth = this.$refs.itemBodyRef.clientWidth.toFixed(2);
+    this.bodyClientWidth = this.$refs.carouselBody.clientWidth.toFixed(2);
+    window.addEventListener("resize", this.resize, true);
   },
   methods: {
     resize() {
-      this.carouselWidth = Number(((this.$refs.carouselBody.clientWidth - 40) / 6).toFixed(2));
-    this.itemBodyWidth = (this.$refs.itemBodyRef.clientWidth).toFixed(2);
-    this.bodyClientWidth = (this.$refs.carouselBody.clientWidth).toFixed(2);
+      this.carouselWidth = Number(
+        ((this.$refs.carouselBody.clientWidth - 40) / 6).toFixed(2)
+      );
+      this.itemBodyWidth = this.$refs.itemBodyRef.clientWidth.toFixed(2);
+      this.bodyClientWidth = this.$refs.carouselBody.clientWidth.toFixed(2);
     },
     moveLeft() {
       if (this.canLeft) {
@@ -423,7 +486,7 @@ export default {
         element.style.transition = "all 0.5s";
         if (
           this.scrollX <=
-          (this.bodyClientWidth - (this.carouselWidth + 8) * length + 8)
+          this.bodyClientWidth - (this.carouselWidth + 8) * length + 8
         ) {
           this.canLeft = true;
           this.canRight = false;
@@ -460,10 +523,28 @@ export default {
         this.$router.go(-1);
       }
     },
+    saveFile() {
+      download({ key: this.approval.id })
+        .then((res) => {
+          const { data, status } = res.data;
+          if (status === 200) {
+            window.open(data);
+          }
+        })
+        .catch(() => {
+          this.list = [];
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    fullScreen() {
+      this.showFullScreen = !this.showFullScreen;
+    },
   },
   beforeDestroy() {
-    window.removeEventListener('resize', this.resize, true);
-  }
+    window.removeEventListener("resize", this.resize, true);
+  },
 };
 </script>
 
@@ -540,6 +621,7 @@ export default {
   display: flex;
   gap: 12px;
   overflow: hidden;
+  flex-direction: column;
   .content-cont-header {
     width: 100%;
     height: 118px;
@@ -634,8 +716,96 @@ export default {
       }
     }
   }
+  .file-view {
+    flex: 1;
+    display: flex;
+    .view-left,
+    .view-right {
+      flex: 1;
+      flex-shrink: 0;
+      border-radius: 10px 10px 0px 0px;
+      background: #fff;
+      padding: 16px;
+      .view-top {
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        .top-page {
+          color: #1d2128;
+          font-size: 12px;
+          font-style: normal;
+          font-weight: 700;
+          line-height: 20px;
+          .page-weight {
+            color: #2d5cf6;
+            font-size: 14px;
+          }
+        }
+        .view-name {
+          color: #1d2128;
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 700;
+          line-height: 22px;
+        }
+        i + i::before {
+          content: " ";
+          width: 1px;
+          height: 12px;
+          display: inline-block;
+          margin: 0 10px;
+          background: #cacdd3;
+          cursor: default;
+        }
+        .iconfont {
+          font-size: 20px;
+          margin-right: 4px;
+          color: #505968;
+          cursor: pointer;
+        }
+      }
+    }
+    .view-left {
+      margin-right: 16px;
+    }
+  }
 }
 
+.preview {
+  background: #ffffff;
+  flex: 1;
+}
+
+.fullScreen {
+  position: fixed;
+  z-index: 10;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background: rgb(0 0 0 / 23%);
+
+  .preview {
+    background: rgb(0 0 0 / 23%);
+  }
+
+  .el-icon-circle-close {
+    position: absolute;
+    font-size: 30px;
+    color: #ffffff;
+    right: 20px;
+    top: 20px;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  iframe {
+    width: calc(100% - 80px);
+    margin-left: 40px;
+  }
+}
 /deep/ .preview-dialog {
   height: 80vh;
 
