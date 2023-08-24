@@ -314,26 +314,17 @@ export default {
       this.applyLoading = true;
       let that = this;
       let data = {
-        adoptionStatus: 0,
+        adoptionStatus: "",
         approvalStage: "",
         approvalType: "",
-        create_time: "",
         currentActivityName: "",
-        hasOpinions: 0,
+        hasOpinions: "",
         id: that.userInfo.id,
-        keywords: "",
-        label: "",
-        launchDate: "",
-        name: "",
-        pageNo: 1,
-        pageSize: 1,
-        roleRange: "",
-        selected: true,
-        sex: "",
-        type: "",
-        urgent: 0,
+        name: that.userInfo.fullname,
+        pageNow: 1,
+        pageSize: 10,
+        urgent: "",
         sortType: 1,
-        form_management_id: 1,
       };
       getNum(data)
         .then((res) => {

@@ -132,6 +132,7 @@ export default {
     },
     getEditedCommentsByFormId() {
       this.loading = true
+      console.log('getEditedCommentsByFormId',this.$route.params.formId)
       getEditedCommentsByFormId({ formId: this.$route.params.formId }).then(res => {
         const { data } = res.data
         const keys = Object.keys(data)

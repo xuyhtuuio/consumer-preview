@@ -43,10 +43,10 @@
           </el-form-item> -->
 
           <el-form-item class="form-item" v-if="pageConfig?.pageType !== 'nonManage'">
-            <g-button class="g-btn" type="primary" @click="handleClick">
+            <!-- <g-button class="g-btn" type="primary" @click="handleClick">
               <i class="add-icon">+</i>
               添加意见</g-button
-            >
+            > -->
           </el-form-item>
         </el-form>
       </div>
