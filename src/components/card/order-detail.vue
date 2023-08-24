@@ -32,10 +32,11 @@
             <i class="iconfont icon-baocun"></i>
             <i class="btn">保存</i>
           </div>
-          <div class="back flex white" @click="submit('update')" v-if="!isOCR">
+          <el-button class="back flex white" type="primary" :loading="loadings.submitLoading" @click="submit('update')"
+            v-if="!isOCR">
             <i class="iconfont icon-tijiao"></i>
             <i class="btn">提交</i>
-          </div>
+          </el-button>
           <div class="back flex white" @click="toApproval" v-if="isOCR">
             <i class="iconfont icon-yijianshu"></i>
             <i class="btn">审查</i>
@@ -294,14 +295,14 @@ export default {
         } else if (originRouter == 'approvalcenter') {
           //区分是否OCR审批还是领导审批  先写死targetPage  LEADER XIAOBAO CONFIRM
           const res = await this.getTemplatedetail()
-          this.isOCR = res.targetPage == 'LEADER'
+          this.isOCR = res.targetPage !== 'LEADER'
           this.refuseWay = res.refuseWay
           !this.isOCR ? (this.status = 2, this.crtComp = "leaderEditOpinion") : (
             this.status = 0,
             this.crtComp = "approvalRecordCard"
           )
           this.$nextTick(() => {
-            this.$refs['child'].initData(res)
+            res.targetPage == 'LEADER' ? this.$refs['child'].initData(res) : ''
           })
         }
       }
@@ -334,11 +335,18 @@ export default {
       let assignedType = ''
       let disavower = []
       const params = {
-        processInstanceId: this.$route.query.processInstanceId || '3c186340-3ff6-11ee-bd1a-d4d853dcb3dc'
+        processInstanceId: this.item.processInstanceId
       }
       const res = await getTemplatedetail(params)
       if (res.data) {
         const { data } = res.data
+        //如果是消保审批，就不用走下面的判断了
+        targetPage = data[data.length - 1].props['targetPage']
+        refuseWay = data[data.length - 1].props['refuseWay']
+        if (targetPage !== 'LEADER') {
+          return { targetPage, refuseWay, }
+        }
+        //如果是领导审批，走下面的判断
         //驳回人列表处理
         // 发起人
         const { name, id } = this.item['originator']
@@ -356,7 +364,7 @@ export default {
           let othersArray = data.slice(1, data.length - 1)
           let other_disavower = []
           for (let i = 0; i < othersArray.length; i++) {
-            let arr = othersArray[i].map(m => {
+            let arr = othersArray.map(m => {
               return {
                 ...m,
                 nodeName: othersArray[i].name,
@@ -369,7 +377,7 @@ export default {
         }
         // 选中通过时的下一级审批人
         let approver = []
-        let nextApprovers = data[data.length - 1]?.children?.props?.assignedUser || []
+        let nextApprovers = data[data.length - 1]?.children?.props?.assignedUser.filter(v => v.type == 'user') || []
         nextApprovers = nextApprovers?.map(v => {
           return {
             ...v,
@@ -378,11 +386,8 @@ export default {
         })
         approver = nextApprovers
         assignedType = data[data.length - 1]?.children?.props?.assignedType
-        targetPage = data[data.length - 1].props['targetPage']
-        refuseWay = data[data.length - 1].props['refuseWay']
         return { targetPage, refuseWay, disavower, approver, assignedType }
       }
-
     },
 
     toModify() {
@@ -604,7 +609,6 @@ export default {
           return false
         }
         let params = {}
-        console.log('editOpinionForm', editOpinionForm)
         if (editOpinionForm.isAccept == '1') {
           params = {
             success: true,
@@ -620,11 +624,18 @@ export default {
           params = {
           }
         }
+        this.loadings.submitLoading = true
         leaderEdit(params).then(res => {
-          this.$message.success('审查意见已提交')
-          setTimeout(() => {
-            this.$router.replace({ name: 'approval-list' })
-          }, 1000)
+          if (res.status == 200) {
+            this.loadings.submitLoading = false
+            this.$message.success('审查意见已提交')
+            setTimeout(() => {
+              this.$router.replace({ name: 'approval-list' })
+            }, 1000)
+          }
+        }).catch(err => {
+          this.loadings.submitLoading = false
+          this.$message.error('审查意见提交失败')
         })
       }
     },
@@ -743,6 +754,10 @@ export default {
         font-size: 14px;
       }
     }
+
+    .el-button{
+        height: 34px;
+      }
 
     .white {
       color: #fff;
