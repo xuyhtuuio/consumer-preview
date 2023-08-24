@@ -148,7 +148,7 @@
         return (name) => {
           const arr = ['MultipleSelect', 'SingleGroupsSelect']
           const jude1 = !arr.includes(name) && this.ruleForm.module === '核对要点'
-          const jude2 = this.ruleForm.module === '审批人填写' && name === 'SingleGroupsSelect'
+          const jude2 = (this.ruleForm.module !== '核对要点') && name === 'SingleGroupsSelect'
           return jude1 || jude2
           
         }
