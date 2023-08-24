@@ -321,7 +321,7 @@ export default {
         hasOpinions: "",
         id: that.userInfo.id,
         name: that.userInfo.fullname,
-        pageNo: 1,
+        pageNow: 1,
         pageSize: 10,
         urgent: "",
         sortType: 1,
