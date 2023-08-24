@@ -52,7 +52,7 @@
       </div>
     </div>
     <div class="main" v-loading="isLoading">
-      <div class="main-body">
+      <div ref="refMainBody" class="main-body">
         <div class="info">
           <div class="left">
             共
@@ -92,8 +92,8 @@
                   <span
                     class="title-top-item"
                     :class="'class-two'"
-                    v-for="equityListItem in item.equityListOther"
-                    :key="equityListItem"
+                    v-for="(equityListItem,equityListIndex) in item.equityListOther"
+                    :key="equityListIndex+equityListItem"
                   >
                     {{ equityListItem }}
                   </span>
@@ -101,10 +101,10 @@
                     <span
                       class="title-top-item"
                       :class="'class-one'"
-                      v-for="equityListItem in item.equities"
-                      :key="equityListItem"
+                      v-for="(equitiesItem,equitiesIndex) in item.equities"
+                      :key="equitiesIndex+equitiesItem"
                     >
-                      {{ equityListItem }}
+                      {{ equitiesItem }}
                     </span>
                   </template>
                 </div>
@@ -314,19 +314,19 @@ export default {
   },
   methods: {
     // 初始化数据
-    initData() {
+    initData(pageNow) {
       this.isLoading = true;
       const pageData = {
         keywordContent: this.search.baseline,
         opinionContent: this.search.review,
         orderType: this.currentSort ? (this.referSort ? 1 : 2) : this.updateSort ? 3 : 4,
-        pageNum: this.page.pageNow,
+        pageNum: pageNow || this.page.pageNow,
         pageSize: this.page.pageSize,
         isAll: this.pageConfig.isAll !== undefined ? this.pageConfig.isAll : 1
       };
       getPageList(pageData,'/cpr/opinion/listZhongAn').then(({ totalCount, list }) => {
         this.page.total = totalCount;
-        this.isLoading = false;
+         this.isLoading = false;
         list.forEach((item, index) => {
           item.equityListOther = ([item.productType, item.businessProcess]).filter(item=>Boolean(item));
         });
@@ -338,8 +338,10 @@ export default {
           recommendedOpinions: ['showItem', this.search.review],
           cases: ['showItemCase', this.search.review]
         });
-        console.log(this.data);
+        
       });
+      this.scrollTop()
+       
       this.searchList.length = 0;
     },
     // 初始化搜索数据
@@ -381,7 +383,7 @@ export default {
           const keyword = originValue[1];
           let reg = new RegExp(keyword, 'gi');
           const regRes = reg.exec(item[originKey]);
-          if (regRes[0]) {
+          if (regRes && regRes[0]) {
             let replaceString = `<span style="color:#2D5CF6;">${regRes[0]}</span>`;
             item[originValue[0]] = item[originKey].replace(regRes, replaceString);
           }
@@ -390,8 +392,8 @@ export default {
     },
 
     onSearch() {
-      this.initData();
-      this.changeStyle('none', '.el-autocomplete-suggestion');
+      this.initData(1);
+      // this.changeStyle('none', '.el-autocomplete-suggestion');
     },
     load(el, flag = false) {
       this.searchDialogIndex += 1;
@@ -539,6 +541,10 @@ export default {
           this.$message.success(err);
         }
       );
+    },
+    // 滚动到顶部
+    scrollTop(){
+     this.$refs.refMainBody.scrollTop=0
     }
   }
 };
