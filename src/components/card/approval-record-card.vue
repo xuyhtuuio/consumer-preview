@@ -96,39 +96,32 @@ export default {
     };
   },
   mounted() {
-    if (this.sidebarParam) {
-      this.init()
-    }
+
   },
   activated() {
-    this.init()
-
+    if (this.sidebarParam||this.$route.params) {
+      this.init()
+    }
   },
   methods: {
     init() {
       this.loading = true
       instanceInfo({
-        "processInstanceId": this.$route.params && this.$route.params.processInstanceId || this.sidebarParam && this.sidebarParam.processInstanceId || '32054c89-35d8-11ee-888e-d4d853dcb3dc',
+        "processInstanceId": this.$route.params && this.$route.params.processInstanceId || this.sidebarParam && this.sidebarParam.processInstanceId,
       }).then(res => {
-        const { endDetailsList } = res.data.data
-        if (!endDetailsList) {
+        const { detailVOList } = res.data.data
+        if (!detailVOList) {
           return this.hasData = false
         }
-        this.recordList = endDetailsList instanceof Array && endDetailsList.length ? endDetailsList.map(v => {
-          const comments =v.optionVOList&&v.optionVOList[0].comments
-          return {
-            ...v,
-            optionVOList:JSON.parse(comments),
-            // optionVOList: v.optionVOList && v.optionVOList.length ? v.optionVOList.map(m => {
-            //   return {
-            //     ...m,
-            //     optionVOList:JSON.parse(v.optionVOList[0].comments),
-            //     fileList: m.associatedAttachmentsIds.split(',')
-            //   }
-            // }) : []
-          }
-        }) : []
-        console.log('ff',this.recordList)
+        //  detailVOList 倒叙
+
+        // this.recordList = detailVOList instanceof Array && detailVOList.length ? detailVOList.map(v => {
+        //   const comments =v.optionVOList&&v.optionVOList[0].comments
+        //   return {
+        //     ...v,
+        //     optionVOList:JSON.parse(comments),
+        //   }
+        // }) : []
         return this.hasData = true
 
       }).finally(() => {

@@ -23,7 +23,7 @@
           <span class="flex"> <i class="iconfont icon-tijiao"></i>
             <i class="btn">确认</i></span>
         </el-button>
-        <div v-if="isOCR" class="flex">
+        <div v-if="item.taskStatus == 1" class="flex">
           <!-- <div class="back flex" @click="transferDialog = true">
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
@@ -32,17 +32,15 @@
             <i class="iconfont icon-baocun"></i>
             <i class="btn">保存</i>
           </div>
-          <div class="back flex white" @click="submit('update')" v-if="!isOCR">
+          <el-button class="back flex white" type="primary" :loading="loadings.submitLoading" @click="submit('update')"
+            v-if="!isOCR">
             <i class="iconfont icon-tijiao"></i>
             <i class="btn">提交</i>
-          </div>
+          </el-button>
           <div class="back flex white" @click="toApproval" v-if="isOCR">
             <i class="iconfont icon-yijianshu"></i>
             <i class="btn">审查</i>
           </div>
-
-
-
         </div>
       </div>
     </div>
@@ -137,7 +135,8 @@
         </div>
         <div class="right-content">
           <keep-alive>
-            <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus" :coment="coment">
+            <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus" :coment="coment"
+              @sendOpinionInfo="sendOpinionInfo" :leaderApproveInfo="leaderApproveInfo">
               <template slot="head">
                 <div class="approved-opinion-head">
                   <h2>消保审查意见书</h2>
@@ -151,7 +150,7 @@
                   <p>以上为消保审查办公室建议，请酌情考虑。</p>
                   <p style="text-align: right; color: #1d2128; padding: 16px 0">
                     消保审查中心<br />
-                    2021-09-08 12：20：30
+                    {{ timeNow }}
                   </p>
                 </div>
               </template>
@@ -188,11 +187,14 @@ import approvalRecordCard from "@/components/card/approval-record-card.vue";
 import approvedOpinionCard from "@/components/card/approved-opinion-card.vue";
 import uploadFileCard from "@/components/card/upload-file-card";
 import filePreview from '@/components/filePreview'
-import { workSpaceAgree } from '@/api/approvalCenter'
+import { leaderEdit } from '@/api/approvalCenter'
+
 import {
   ocrApprovalSubmission
 } from "@/api/aiApproval";
-import { updateAdoptEditedComments, updateEditedComments } from '@/api/applyCenter'
+import { updateAdoptEditedComments, updateEditedComments, getTemplatedetail } from '@/api/applyCenter'
+import moment from 'moment';
+import { set } from 'vue';
 export default {
   name: "order-details",
   components: {
@@ -214,6 +216,7 @@ export default {
         keyword: "",
         people: "",
       },
+      timeNow: '',
       info: {},
       previewDialog: false,
       previewUrl: '',
@@ -226,6 +229,7 @@ export default {
       },
       coment: {},
       personInfo: {},
+      leaderApproveInfo: {},//TO_NODE TO_BEFORE
       peoples: [
         { name: "王明明", code: 1 },
         { name: "王明明", code: 2 },
@@ -267,7 +271,7 @@ export default {
         params: { item: this.item }
       });
     },
-    judgeStatus() {
+    async judgeStatus() {
       const { path } = this.$route
       const originRouter = path.match(/\/(\S*)\//)[1]
       // 一般进入详情页：展示返回按钮 及 审批记录详细
@@ -289,12 +293,17 @@ export default {
           this.status = 0;
           this.crtComp = "approvalRecordCard";
         } else if (originRouter == 'approvalcenter') {
-          //区分是否OCR审批还是领导审批  先写死OCR
-          this.isOCR = true
+          //区分是否OCR审批还是领导审批  先写死targetPage  LEADER XIAOBAO CONFIRM
+          const res = await this.getTemplatedetail()
+          this.isOCR = res.targetPage !== 'LEADER'
+          this.refuseWay = res.refuseWay
           !this.isOCR ? (this.status = 2, this.crtComp = "leaderEditOpinion") : (
             this.status = 0,
             this.crtComp = "approvalRecordCard"
           )
+          this.$nextTick(() => {
+            res.targetPage == 'LEADER' ? this.$refs['child'].initData(res) : ''
+          })
         }
       }
       // 状态待修改 
@@ -319,6 +328,68 @@ export default {
         this.crtComp = "approvedOpinionCard";
       }
     },
+    // 获取当前的节点的配置信息
+    async getTemplatedetail() {
+      let targetPage = ''
+      let refuseWay = ''
+      let assignedType = ''
+      let disavower = []
+      const params = {
+        processInstanceId: this.item.processInstanceId
+      }
+      const res = await getTemplatedetail(params)
+      if (res.data) {
+        const { data } = res.data
+        //如果是消保审批，就不用走下面的判断了
+        targetPage = data[data.length - 1].props['targetPage']
+        refuseWay = data[data.length - 1].props['refuseWay']
+        if (targetPage !== 'LEADER') {
+          return { targetPage, refuseWay, }
+        }
+        //如果是领导审批，走下面的判断
+        //驳回人列表处理
+        // 发起人
+        const { name, id } = this.item['originator']
+        const { institutional } = this.item
+        const initiator = {
+          label: institutional?.[institutional.length - 1],
+          name,
+          id,
+          nodeName: data[0].name,
+          targetNodeId: 'root'
+
+        }
+        disavower.push(initiator)
+        if (data.length > 2) {
+          let othersArray = data.slice(1, data.length - 1)
+          let other_disavower = []
+          for (let i = 0; i < othersArray.length; i++) {
+            let arr = othersArray.map(m => {
+              return {
+                ...m,
+                nodeName: othersArray[i].name,
+                targetNodeId: othersArray[i].id
+              }
+            })
+            other_disavower.concat(arr)
+          }
+          disavower.concat(other_disavower)
+        }
+        // 选中通过时的下一级审批人
+        let approver = []
+        let nextApprovers = data[data.length - 1]?.children?.props?.assignedUser.filter(v => v.type == 'user') || []
+        nextApprovers = nextApprovers?.map(v => {
+          return {
+            ...v,
+            nodeName: data[data.length - 1]?.children?.name
+          }
+        })
+        approver = nextApprovers
+        assignedType = data[data.length - 1]?.children?.props?.assignedType
+        return { targetPage, refuseWay, disavower, approver, assignedType }
+      }
+    },
+
     toModify() {
       this.$router.push({
         name: 'editApply',
@@ -383,7 +454,11 @@ export default {
         this.loadings.storageLoading = false
       }, 2000)
     },
-
+    sendOpinionInfo(info) {
+      const arr = info[info.length - 1]
+      const time = moment(arr.substantiveopinion[arr.substantiveopinion.length - 1].updateTime).format('YYYY-MM-DD HH:mm:ss') || moment('YYYY-MM-DD HH:mm:ss')
+      this.timeNow = time
+    },
     submit(way) {
       const that = this
       //  待确认的 分有实质性意见和无实质性意见 status:3无/5有
@@ -526,6 +601,7 @@ export default {
 
         }
       }
+      // 领导审批提交
       if (this.status == 2 && way == 'update') {
         if (!editOpinionRequired) {
           this.crtComp = 'leaderEditOpinion'
@@ -535,13 +611,31 @@ export default {
         let params = {}
         if (editOpinionForm.isAccept == '1') {
           params = {
+            success: true,
+            taskId: this.item.taskId,
+            msg: editOpinionForm.content,
+            targetUser: editOpinionForm.approver
+          }
+          //流程配置中下一节点审批人设置时选择“上一审批人选择”，增加选择审批人选择则框
+          if (editOpinionForm.assignedType == 'SELF_SELECT') {
+            params.targetUser = editOpinionForm.approver
           }
         } else {
           params = {
           }
         }
-        workSpaceAgree(params).then(res => {
-          this.$message.success('审查意见已提交')
+        this.loadings.submitLoading = true
+        leaderEdit(params).then(res => {
+          if (res.status == 200) {
+            this.loadings.submitLoading = false
+            this.$message.success('审查意见已提交')
+            setTimeout(() => {
+              this.$router.replace({ name: 'approval-list' })
+            }, 1000)
+          }
+        }).catch(err => {
+          this.loadings.submitLoading = false
+          this.$message.error('审查意见提交失败')
         })
       }
     },
@@ -561,7 +655,7 @@ export default {
         //上传文件的逻辑
       }
       const user = JSON.parse(window.localStorage.getItem('user_name'))
-      const submission = [ ]
+      const submission = []
       const data = {
         approvalSubmissionDto: {
           editedCommentsDtoList: [],
@@ -574,8 +668,7 @@ export default {
           name: user.fullname
         }
       }
-      console.log('vv')
-          ocrApprovalSubmission(data).then(res => {
+      ocrApprovalSubmission(data).then(res => {
         const { status, msg } = res.data;
         if (status === 200) {
           this.$message.success({ offset: 40, message: '审查意见已提交,可在审批中心查看' });
@@ -615,7 +708,9 @@ export default {
       //       showConfirmButton: false,
       //       closeOnClickModal: false,
       //       type: "warning",
-      //     })
+      //     }).then(res=>{
+      //       this.$router.replace('/approval-list')
+      // })
       //   }
       // }).catch(err => {
       //   this.loadings.submitLoading = false
@@ -659,6 +754,10 @@ export default {
         font-size: 14px;
       }
     }
+
+    .el-button{
+        height: 34px;
+      }
 
     .white {
       color: #fff;

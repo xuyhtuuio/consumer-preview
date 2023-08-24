@@ -133,7 +133,6 @@ export default {
   },
   methods: {
     handleSuccess(data, id) {
-      console.log('handleSuccess', data);
       this.fileList.forEach(item => {
         if (item.id === id) {
           item.key = data.key;
@@ -147,7 +146,6 @@ export default {
       this.fileList.forEach(item => {
         if (item.id === id) {
           item.status = -2;
-          console.log('handleError', id, item);
         }
       });
     },
@@ -182,12 +180,10 @@ export default {
     // 上传文件
     uploadBpmn(param) {
       const formData = new FormData();
-      console.log(param);
       formData.append('mf', param.file); // 传入bpmn文件
       getFormGroups(formData)
         .then(res => {
           if (res.data.success) {
-            console.log(res.data.data);
             // param.onSuccess(res.data.data)
             this.handleSuccess(res.data.data, param.file.uid);
           } else {
@@ -357,4 +353,5 @@ export default {
 //     }
 //   }
 // }
+
 </style>

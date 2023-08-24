@@ -104,6 +104,9 @@ export default {
   },
 
   mounted() {
+   
+  },
+  activated(){
     this.$route.params.formId?this.getEditedCommentsByFormId():''
   },
   methods: {
@@ -116,7 +119,6 @@ export default {
         return v.substantiveopinion
       }).flat()
       this.$store.commit('setApprovedOpinionForm', opinions)
-
     },
     // 先获取详情
     changeAccept(child, index, idx) {
@@ -151,7 +153,7 @@ export default {
             _newInfo = _info.map(v => {
               return {
                 ...v,
-                adoptOpinions: v.cacheFlag === '1' ? v.adoptOpinions : 1,
+                adoptOpinions: v.cacheFlag === '1' ? Number(v.adoptOpinions) : 1,
                 notAdoptingReasons: v.cacheFlag === '1' ? v.notAdoptingReasons : '',
                 relevantfile: v.associatedAttachmentsIds ? v.associatedAttachmentsIds.split(';') : []
               }
@@ -160,7 +162,7 @@ export default {
             _newInfo = _info.map(v => {
               return {
                 ...v,
-                adoptOpinions: v.adoptOpinions,
+                adoptOpinions: v.cacheFlag === '1' ? Number(v.adoptOpinions) : 1,
                 notAdoptingReasons: v.notAdoptingReasons,
                 relevantfile: v.associatedAttachmentsIds ? v.associatedAttachmentsIds.split(';') : []
               }
@@ -174,6 +176,7 @@ export default {
           return v.substantiveopinion
         }).flat()
         this.$store.commit('setApprovedOpinionForm', newOpinions)
+        this.$emit('sendOpinionInfo',opinions)
       }).finally(() => {
         this.loading = false
       })

@@ -21,7 +21,9 @@
                 placeholder="请输入意见" type="textarea" :rows="3" class="edit-input" resize="none"
                 @keyup.enter.native="hideEdit(a, i, true)"></el-input>
               <i class="iconfont icon-tubiao3 previousApprover"  v-if="item.previousApprover"></i>
-              <i v-else class="checkbox" @click="changeSelect(a, i)" :class="{ active: item.id === recommend.selected }"></i>
+              <i v-else class="checkbox" @click="changeSelect(a, i)" :class="{active: item.id === recommend.selected}">
+                <i class="el-icon-check" v-if="item.id === recommend.selected"></i>
+              </i>
             </div>
             <!-- 展开收起 -->
             <p class="list-btns">
@@ -418,11 +420,6 @@ export default {
     &.active {
       text-align: center;
       background: #2D5CF6;
-
-      &::before {
-        content: '√';
-        display: inline-block;
-      }
     }
   }
 

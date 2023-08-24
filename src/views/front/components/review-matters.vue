@@ -53,7 +53,6 @@ export default {
       this.$emit('handleTo', this.currentId);
     },
     formManagementId(val) {
-      console.log(val,this.list)
       if(val != -1) this.currentId = val
       // if()
     //  val !== -1 && this.currentId = this.list
@@ -112,6 +111,7 @@ export default {
     }
   }
 }
+
 
 
 

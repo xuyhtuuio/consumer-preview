@@ -57,7 +57,8 @@
     <!-- 任务状态（0:草稿 1：审查中 2：待修改 3：待确认 4：已完成 -->
     <div class="right-operation">
       <!-- 待审核状态显示审查 -->
-      <span class="attention icon-op" v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'" @click="toApproval(item)">
+      <span class="attention icon-op" v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'"
+        @click="toApproval(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-tubiao3"></use>
         </svg>
@@ -79,7 +80,8 @@
       </span> -->
 
       <!-- 待确认状态的工单 需要该审批人确认的工单-->
-      <span class="attention check icon-op" v-if="item.taskStatus == 5 && crtSign !== 'approvedCount'" @click="check(item)">
+      <span class="attention check icon-op" v-if="item.taskStatus == 5 && crtSign !== 'approvedCount'"
+        @click="check(item)">
         <span class="iconfont icon icon-tubiao urgent-icon"></span>
         确认</span>
       <!-- 关注 -->
@@ -97,6 +99,8 @@
 </template>
 <script>
 import { concernApplication } from "@/api/approvalCenter";
+import { getTemplatedetail } from '@/api/applyCenter'
+
 import moment from 'moment'
 export default {
   name: "applyEventCard",
@@ -116,11 +120,20 @@ export default {
     };
   },
   methods: {
-    toApproval(item) {
-      this.$router.push({
-        name: "aiApproval",
-        params: { item }
-      });
+    async toApproval(item) {
+      // 判断是领导审批 还是 OCR 审批
+      const params = {
+        processInstanceId:item.processInstanceId
+      }
+      const res = await getTemplatedetail(params)
+      if (res.data) {
+        const { data } = res.data
+        const targetPage = data[data.length - 1].props['targetPage']
+        targetPage == 'LEADER' ? this.toDetail(item) : (this.$router.push({
+          name: "aiApproval",
+          params: { item }
+        }))
+      }
     },
     toDetail(item) {
       window.localStorage.setItem("order-detail", JSON.stringify({
@@ -132,7 +145,8 @@ export default {
         params: {
           formId: item.recordId,
           taskName: item.taskName,
-          processInstanceId: item.processInstanceId
+          processInstanceId: item.processInstanceId,
+          formManagementId: item.formManagementId
         },
       });
     },
@@ -156,7 +170,7 @@ export default {
       });
     },
     // 超级管理员的删除功能
-    del(item){
+    del(item) {
       return this.$message.info("此功能暂未开放");
       this.$confirm("确定删除该工单吗？", "", {
         customClass: "confirmBox",
@@ -459,14 +473,17 @@ export default {
       background: #fff7e6;
       padding: 4px 8px 4px 4px;
     }
+
     .del {
       color: #F76560;
     }
+
     .del:hover {
       border-radius: 2px;
       background: #fff1f0;
       padding: 4px 8px 4px 4px;
     }
+
     .no-attention,
     .del {
       margin-right: 16px !important;
@@ -480,4 +497,5 @@ export default {
   .event-name {
     color: #2d5cf6;
   }
-}</style>
+}
+</style>

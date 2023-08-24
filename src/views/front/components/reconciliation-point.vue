@@ -9,11 +9,11 @@
         <div class="warn" v-if="judgeWarnFlag">
           <warn-info :info="warnInfo"> </warn-info>
         </div>
-        <el-checkbox v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
+        <!-- <el-checkbox v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox> -->
       </template>
       <template #content>
         <div class="content">
-          <el-form :hide-required-asterisk="true" label-width="100px" class="ruleForm my-form">
+          <el-form :hide-required-asterisk="true" label-width="120px" class="ruleForm my-form">
             <template v-for="(item, index) in list">
               <el-form-item :key="index">
                 <label slot="label"
@@ -22,7 +22,7 @@
                     *
                   </span></label
                 >
-                <el-checkbox-group v-model="item.value">
+                <el-checkbox-group v-if="item.name==='MultipleSelect'" v-model="item.value">
                   <el-checkbox
                     v-for="iten in item.props.options"
                     @change="handleChange"
@@ -31,6 +31,23 @@
                     >{{ iten.value }}</el-checkbox
                   >
                 </el-checkbox-group>
+                <div v-else-if="item.name==='SingleGroupsSelect'" class="form-item-1">
+                  <div
+                    class="form-content-item"
+                    v-for="(iten, indey) in item.props.options"
+                    :key="indey"
+                  >
+                    <p class="item-label">{{ iten.value }}</p>
+                    <el-radio-group v-model="iten.value1" class="content-item" @change="(val)=>handleRadioChange(val,indey,item.value)">
+                      <el-radio
+                        v-for="(itev, indev) in iten?.children"
+                        :key="indev"
+                        :label="itev.id"
+                        >{{ itev.value }}</el-radio
+                      >
+                    </el-radio-group>
+                  </div>
+                </div>
               </el-form-item>
             </template>
           </el-form>
@@ -70,42 +87,57 @@ export default {
   watch: {
     list: {
       handler(val) {
-        let len = 0;
-        let valLen = 0;
-        val.forEach(listItem => {
-          len += listItem.value.length;
-          valLen += listItem.props.options.length;
-        });
-        this.checkAll = len === valLen ? true : false;
-        this.checkAll && (this.judgeWarnFlag = false)
+        // this.handleCheckAll(val)
+        val.length &&
+          val.forEach(item => {
+            if(item.name=== "SingleGroupsSelect" && item.value.length === item.props.options.length) {
+              item.props.options.forEach((propItem,propIndex) => {
+                this.$set(propItem, 'value1','')
+                propItem.value1 = item.value[propIndex]
+              })
+            }
+          })
+        
       },
-      deep: true
+      // deep: true
     }
   },
   methods: {
     initData() {
       this.list.forEach(item => {
-        // console.log(item);
         if (item.valueType === 'Array') {
           this.$set(this.ruleForm, item.id, []);
         }
         this.ruleFormLen += item.props.options.length;
       });
     },
-    handleCheckAllChange(val) {
-      console.log(val, this.list);
-      this.list.forEach(listItem => {
-        val &&
-          listItem.props.options.forEach(({ id }) => {
-            listItem.value.push(id);
-          });
-        !val && (listItem.value = []);
-      });
+    handleCheckAll(val) {
+      let len = 0;
+        let valLen = 0;
+        val.forEach(listItem => {
+          len += listItem.value.length;
+          valLen += listItem.props.options.length;
+        });
+        this.checkAll = len === valLen ? true : false;
+        this.checkAll && (this.judgeWarnFlag = false);
     },
+    // 全选
+    // handleCheckAllChange(val) {
+    //   this.list.forEach(listItem => {
+    //     val &&
+    //       listItem.props.options.forEach(({ id }) => {
+    //         listItem.value.push(id);
+    //       });
+    //     !val && (listItem.value = []);
+    //   });
+    // },
     handleChange() {
       if (this.judgeWarnFlag) {
         this.judgeWarnFlag = false;
       }
+    },
+    handleRadioChange(val,idx,originArr) {
+      originArr[idx] = val
     },
     judgeWarn() {
       // const rulelen =  Object.values(this.ruleForm).reduce((item,next)=> item.length + next.length)
@@ -118,7 +150,7 @@ export default {
       //   }
       if (this.list.length === 0) {
         return [true];
-      } else if (this.list.every(item => item.value.length === item.props.options.length)) {
+      } else if (this.list.every(item => Object.keys(item.value).length === item.props.options.length)) {
         return [true];
       } else {
         const offsetTop = this.$refs[`globalRef`].offsetTop;
@@ -148,7 +180,87 @@ export default {
   .content {
     padding: 16px 72px 0;
   }
+
+  .my-form {
+    /deep/.el-form-item {
+      position: relative;
+      .el-form-item__label {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+      }
+    }
+    .form-item-1 {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      margin-left: -16px;
+      background-color: #fff;
+      .form-content-item {
+        margin: 0 8px 8px 0;
+        width: 30%;
+        width: calc((100% - 16px) / 3);
+        min-width: calc((100% - 16px) / 3);
+        max-width: calc((100% - 16px) / 3);
+        padding: 12px;
+        border-radius: 4px;
+        background-color: #f7f8fa;
+        &:nth-child(3n) {
+          // 去除第3n个的margin-right
+          margin-right: 0;
+        }
+        .item-label {
+          line-height: 22px;
+          margin-bottom: 8px;
+        }
+        .content-item {
+          display: flex;
+          
+          /deep/.el-radio {
+            flex: 1;
+            line-height: 22px;
+          }
+        }
+      }
+    }
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 </style>

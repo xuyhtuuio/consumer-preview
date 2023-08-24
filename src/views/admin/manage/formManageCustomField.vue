@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" :disabled="isView">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" :disabled="viewDisable">
       <el-form-item label="字段名称" prop="title">
         <el-input v-model="ruleForm.title" :disabled="titleDisable" placeholder="请输入字段名称" class="is-dark input"></el-input>
       </el-form-item>
@@ -27,15 +27,15 @@
       </el-form-item>
       <el-form-item v-if="ruleForm.name === 'Cascader'" label="选项设置" prop="cascaderItem" class="is-dark input">
         <!-- <el-button icon="el-icon-plus" type="text" size="mini" style="position: relative;left:260px;" @click="addCascaderOptions">新增选项</el-button> -->
-        <CascaderField :leval="1" :data="cascaderOptions" class="cascader-content" style="position: relative;top: 35px;margin-bottom: 30px"/>
+        <CascaderField :leval="1" :data="cascaderOptions" :viewDisable="viewDisable" class="cascader-content" style="position: relative;top: 35px;margin-bottom: 30px"/>
       </el-form-item>
       <el-form-item v-if="ruleForm.name === 'SelectInput' || ruleForm.name === 'MultipleSelect'" label="选项设置" prop="cascaderItem" class="is-dark input">
         <el-button icon="el-icon-plus" type="text" size="mini" style="position: relative;left:260px;" @click="addSelectOptions">新增选项</el-button>
-        <SelectField :data="selectOptions" class="cascader-content"/>
+        <SelectField :data="selectOptions" :viewDisable="viewDisable" class="cascader-content"/>
       </el-form-item>
       <el-form-item v-if="ruleForm.name === 'MultipleGroupsSelect' || ruleForm.name === 'SingleGroupsSelect' " label="选项设置" prop="cascaderItem" class="is-dark input">
         <el-button icon="el-icon-plus" type="primary" size="mini" style="position: relative;left:333px;padding: 4px 20px;" @click="addSelectGroupOptions">添加选项组</el-button>
-        <SelectGroupField :data="selectGroupOptions" class="cascader-content"/>
+        <SelectGroupField :data="selectGroupOptions" :viewDisable="viewDisable" class="cascader-content"/>
       </el-form-item>
       <el-form-item v-if="ruleForm.name === 'TextInput' || ruleForm.name === 'TextareaInput'" label="文字个数" prop="numberOfWords" class="is-dark input">
         <el-input v-model="ruleForm.numberOfWords" maxlength="7" placeholder="请输入文字个数" oninput="value=value.replace(/^0|[^0-9]/g, '')" class="is-dark input"></el-input>
@@ -134,6 +134,9 @@
       };
     },
     computed: {
+      viewDisable() {
+        return this.isView || this.currentRow.isView
+      },
       titleDisable() {
         const arr = ['宣传渠道', '项目名称', '上线时间', '下线时间']
         return arr.includes(this.ruleForm.title)
@@ -144,7 +147,10 @@
       nameOptionDisable() {
         return (name) => {
           const arr = ['MultipleSelect', 'SingleGroupsSelect']
-          return !arr.includes(name) && this.ruleForm.module === '核对要点'
+          const jude1 = !arr.includes(name) && this.ruleForm.module === '核对要点'
+          const jude2 = (this.ruleForm.module !== '核对要点') && name === 'SingleGroupsSelect'
+          return jude1 || jude2
+          
         }
       },
       isSingleGroupsSelect() {

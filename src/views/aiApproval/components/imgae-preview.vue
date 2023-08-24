@@ -126,12 +126,13 @@ export default {
     initCenter() {
       let params = this.params;
       let target = this.$refs.imgDom;
-      if (params.border_left == params.border_right) {
-        //调整上下位置
-        target.style.top = (params.border_top / 2) + "px";
-      } else {
+      if (params.border_left !== params.border_right) {
         // 调整左右位置
         target.style.left = (params.border_left / 2) + "px";
+      }
+      if (params.border_top !== params.border_bottom) {
+        //调整上下位置
+        target.style.top = (params.border_top / 2) + "px";
       }
       if (this.getCss(target, "left") !== "auto") {
         this.params.left = this.getCss(target, "left");

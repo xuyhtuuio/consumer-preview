@@ -32,10 +32,10 @@
             </div>
         </div>
         <div class="line"></div>
-        <div class="channel-info">
-            <div class="item" v-for="(item, index) in orderInfo.promotionChannels" :key="index">
-                <span class="label">{{ item.title }}</span>
-                <span class="value">{{ item | valueFormat }}</span>
+        <div class="channel-info" v-for="(item, index) in orderInfo.promotionChannels" :key="index">
+            <div class="item" v-for="(child, idx) in item.props.options" :key="idx">
+                <span class="label">{{ child.value }}</span>
+                <span class="value">{{ multipleSelect(child, item) }}</span>
             </div>
             <slot name="personal-channel"></slot>
         </div>
@@ -55,7 +55,17 @@
         ]">
             <div class="item" v-for="(item, index) in orderInfo.reviewPointer" :key="index">
                 <span class="label">{{ item.title }}</span>
-                <span class="value"> {{ item | valueFormat }}</span>
+                <span class="value" v-if="item.name == 'MultipleSelect'">
+                    <i v-for="(points, index) in formatePoints(item)" :key="index" style="display: block;">
+                        {{ points }}</i>
+                </span>
+                <span class="value" v-if="item.name == 'SingleGroupsSelect'">
+                    <span v-for="(points, index) in formatePoints(item)" :key="index"
+                        style="justify-content: space-between;" class="flex">
+                        <i>-{{ points.point }}</i>
+                        <i>{{ points.isRelative }}</i>
+                    </span>
+                </span>
             </div>
         </div>
         <div class="line"></div>
@@ -112,7 +122,6 @@ export default {
         };
     },
     mounted() {
-        this.init()
     },
     activated() {
         this.init()
@@ -145,28 +154,49 @@ export default {
             getApplyForm({
                 formCategoryId: this.$route.params && this.$route.params.formManagementId || this.sidebarParam && this.sidebarParam.formManagementId || '1',
                 formId: this.$route.params.formId || this.sidebarParam.formId,
+                // formCategoryId: 121,
+                // formId: 1257
+                // formManagementId: 121,processInstanceId: "3c186340-3ff6-11ee-bd1a-d4d853dcb3dc"
             }).then(res => {
                 const { data, status, message } = res.data;
                 if (status === 200) {
-                    this.getBsicData(data)
+                    this.getBsicData(data,true)
                 } else {
+                    this.getBsicData({
+                        basicInformation: [], keyPointsForVerification: [], promotionChannels: [], reviewMaterials: []
+                    }, false)
                     this.$message.error({ offset: 40, title: "提醒", message });
                 }
-            }).finally(() => {
-                this.loading = false
-            });
+            }).catch(error => {
+
+            }).
+                finally(() => {
+                    this.loading = false
+                });
         },
-        getBsicData(data) {
-            const { basicInformation, keyPointsForVerification, promotionChannels, reviewMaterials } = data
+        getBsicData(data, flag) {
+            if (!flag) {
+                this.orderInfo = {
+                    baseInfo: [],
+                    textAreaBaseInfo: [],
+                    newBaseInfo: [],
+                    reviewPointer: [],
+                    promotionChannels: [],
+                    fileList: []
+                }
+                return
+            }
+            const { basicInformation, keyPointsForVerification, reviewMaterials } = data
             //大段文本过滤
-            const noTextAreaBeseInfo = basicInformation.filter(v => { return v.name !== 'TextareaInput' })
-            const textAreaBaseInfo = basicInformation.filter(v => { return v.name == 'TextareaInput' })
+            const noTextAreaBeseInfo = basicInformation.filter(v => { return !['TextareaInput', 'MultipleGroupsSelect'].includes(v.name) }) || []
+            const textAreaBaseInfo = basicInformation.filter(v => { return ['TextareaInput'].includes(v.name) }) || []
+            const MultipleGroupsSelect = basicInformation.filter(v => { return ['MultipleGroupsSelect'].includes(v.name) }) || []
             this.orderInfo = {
                 baseInfo: noTextAreaBeseInfo,
                 textAreaBaseInfo: textAreaBaseInfo,
                 newBaseInfo: this.getMapping(noTextAreaBeseInfo),
                 reviewPointer: keyPointsForVerification,
-                promotionChannels,
+                promotionChannels: MultipleGroupsSelect,
                 fileList: reviewMaterials && reviewMaterials[0].value
             }
         },
@@ -174,7 +204,6 @@ export default {
             this.$emit('preview', url)
         },
         download(fileList) {
-            console.log('f', fileList)
             const list = fileList.map(v => {
                 // return {
                 //     fileName: v.fileName,
@@ -186,8 +215,6 @@ export default {
                 loadList: list
             }
             downloadAllFiles(params).then(res => {
-                console.log('ff', res)
-                return
                 const { data } = res.data
                 for (let i in data) {
                     const link = document.createElement('a');
@@ -200,7 +227,42 @@ export default {
                 }
             })
 
+        },
+        formatePoints(val) {
+            if (val.name == 'MultipleSelect') {
+                const { options } = val.props
+                let array = []
+                val.value.forEach(id => {
+                    let strings = options.filter(v => v.id == id)[0]
+                    array.push(strings)
+                })
+                const label = array.map(m => { return m.value })
+                return label || '--'
+            } else if (val.name == 'SingleGroupsSelect') {
+                const { options } = val.props
+                //展示所有的 label
+                const label = options.map(labelItem => {
+                    const isRelative = labelItem.children.filter(childValue => val.value.includes(childValue.id))[0].value
+                    return {
+                        point: labelItem.value,
+                        isRelative: isRelative
+                    }
+                })
+                return label || '--'
+            }
+        },
+        multipleSelect(child, item) {
+            let strings = ''
+            let array = []
+            item.value.forEach(n => {
+                let filters = child.children.filter(v => v.id == n)
+                array.push(...filters)
+            })
+            strings = array.map(m => { return m.value }).join('、')
+            return strings || '--'
+
         }
+
     },
     filters: {
         valueFormat(val) {
@@ -226,6 +288,7 @@ export default {
                 const label = array.map(m => { return m.value }).join('、')
                 return label || '--'
             }
+
         }
     }
 };
