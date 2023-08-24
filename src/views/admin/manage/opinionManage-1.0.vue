@@ -15,7 +15,7 @@
               <i slot="suffix" class="el-icon-search" @click="onSearch"></i>
             </el-input>
           </el-form-item>
-          <!-- 
+
           <el-form-item class="form-item">
             <el-autocomplete
               class="onlyInput"
@@ -40,7 +40,7 @@
                 </div>
               </template>
             </el-autocomplete>
-          </el-form-item> -->
+          </el-form-item>
 
           <el-form-item class="form-item" v-if="pageConfig?.pageType !== 'nonManage'">
             <g-button class="g-btn" type="primary" @click="handleClick">
@@ -52,7 +52,7 @@
       </div>
     </div>
     <div class="main" v-loading="isLoading">
-      <div ref="refMainBody" class="main-body">
+      <div class="main-body">
         <div class="info">
           <div class="left">
             共
@@ -87,28 +87,7 @@
           <div class="b-item" v-for="item in data" :key="item.id">
             <div class="left">
               <div class="title">
-                <div class="title-top">
-                  <span class="title-top-item" v-html="item.problemType || item.goalName"></span>
-                  <span
-                    class="title-top-item"
-                    :class="'class-two'"
-                    v-for="(equityListItem,equityListIndex) in item.equityListOther"
-                    :key="equityListIndex+equityListItem"
-                  >
-                    {{ equityListItem }}
-                  </span>
-                  <template v-if="item.cases">
-                    <span
-                      class="title-top-item"
-                      :class="'class-one'"
-                      v-for="(equitiesItem,equitiesIndex) in item.equities"
-                      :key="equitiesIndex+equitiesItem"
-                    >
-                      {{ equitiesItem }}
-                    </span>
-                  </template>
-                </div>
-
+                <span v-html="item.goalName"></span>
                 <g-icon
                   class="left-icon"
                   stylePx="20"
@@ -117,10 +96,12 @@
                 />
               </div>
               <div class="content" v-html="item.showItem"></div>
-              <div v-if="item.showItemCase" class="content" v-html="`案例：${item.showItemCase}`"></div>
               <div class="info">
+                <span :class="['info-item', item.keywordType === 1 ? 'class-zero' : 'class-one']">
+                  {{ item.keywordType === 1 ? '禁用词' : '敏感词' }}
+                </span>
                 <span class="info-item"
-                  ><g-icon class="left-icon" stylePx="20" href="#icon-yinyong" />已引用：<i
+                  ><g-icon class="left-icon" stylePx="20" href="#icon-yinyong" />已引用<i
                     class="high"
                     >{{ item.citationsCount }}</i
                   >次</span
@@ -168,7 +149,7 @@
         <span class="close" @click="limitTimeVisible = false"><i class="el-icon-close"></i></span>
       </template>
       <el-form class="my-form" :model="dialogItem" label-width="100px">
-        <!-- <el-form-item class="form-item" label="标签名称">
+        <el-form-item class="form-item" label="标签名称">
           <el-autocomplete
             class="onlyInput"
             ref="autocomplete"
@@ -191,7 +172,7 @@
               </div>
             </template>
           </el-autocomplete>
-        </el-form-item> -->
+        </el-form-item>
         <el-form-item class="item-form" label="审查话术">
           <el-input
             type="textarea"
@@ -314,34 +295,27 @@ export default {
   },
   methods: {
     // 初始化数据
-    initData(pageNow) {
+    initData() {
       this.isLoading = true;
       const pageData = {
         keywordContent: this.search.baseline,
         opinionContent: this.search.review,
         orderType: this.currentSort ? (this.referSort ? 1 : 2) : this.updateSort ? 3 : 4,
-        pageNum: pageNow || this.page.pageNow,
+        pageNum: this.page.pageNow,
         pageSize: this.page.pageSize,
         isAll: this.pageConfig.isAll !== undefined ? this.pageConfig.isAll : 1
       };
-      getPageList(pageData,'/cpr/opinion/listZhongAn').then(({ totalCount, list }) => {
+      getPageList(pageData).then(({ totalCount, list }) => {
         this.page.total = totalCount;
-         this.isLoading = false;
-        list.forEach((item, index) => {
-          item.equityListOther = ([item.productType, item.businessProcess]).filter(item=>Boolean(item));
-        });
+        this.isLoading = false;
         this.data = list;
         this.handleTextHigh(this.data, {
           // keywordName: ['goalName', this.search.baseline],
           // keywordName: 需要转换的key goalName: 转后以后新增的字段， this.search.baseline:需要高亮显示的关键字
           keywordName: ['goalName', this.search.baseline],
-          recommendedOpinions: ['showItem', this.search.review],
-          cases: ['showItemCase', this.search.review]
+          recommendedOpinions: ['showItem', this.search.review]
         });
-        
       });
-      this.scrollTop()
-       
       this.searchList.length = 0;
     },
     // 初始化搜索数据
@@ -369,8 +343,7 @@ export default {
           label,
           value,
           keywordType,
-          showItem: value,
-          showItemCase: value
+          showItem: value
         };
       });
     },
@@ -383,7 +356,7 @@ export default {
           const keyword = originValue[1];
           let reg = new RegExp(keyword, 'gi');
           const regRes = reg.exec(item[originKey]);
-          if (regRes && regRes[0]) {
+          if (regRes) {
             let replaceString = `<span style="color:#2D5CF6;">${regRes[0]}</span>`;
             item[originValue[0]] = item[originKey].replace(regRes, replaceString);
           }
@@ -392,8 +365,8 @@ export default {
     },
 
     onSearch() {
-      this.initData(1);
-      // this.changeStyle('none', '.el-autocomplete-suggestion');
+      this.initData();
+      this.changeStyle('none', '.el-autocomplete-suggestion');
     },
     load(el, flag = false) {
       this.searchDialogIndex += 1;
@@ -419,14 +392,6 @@ export default {
       this.initData();
     },
     async changeIsTop(item, i) {
-      // this.isLoading = true;
-      // const that = this
-      // setTimeout(() => {
-      //   this.$message.success('操作成功!');
-      //   item.isTop = item.isTop !==0? 0:1;
-      //    that.isLoading=false
-      // },500);
-      return;
       this.isLoading = true;
       const isTop = item.isTop === 0 ? 1 : 0;
       const res = await edit({
@@ -444,7 +409,6 @@ export default {
       this.dialogItem.keywordType = id;
     },
     handleClick(row) {
-      return;
       this.titleDialog = row ? '编辑意见' : '新建意见';
       this.dialogItem = row ? { ...row, keywordId: row.keywordType } : {};
       this.limitTimeVisible = true;
@@ -455,7 +419,6 @@ export default {
     // },
     // 停用
     stopApllay(item, action) {
-      return;
       this.dialogItem = item;
       this.action = action;
       this.$refs.confirmation.dialogVisible = true;
@@ -466,7 +429,6 @@ export default {
     },
     // 停用 或启用 意见， 或删除意见
     async editStatus() {
-      return;
       let res;
       if (this.action === 'remove') {
         res = await remove({
@@ -541,10 +503,6 @@ export default {
           this.$message.success(err);
         }
       );
-    },
-    // 滚动到顶部
-    scrollTop(){
-     this.$refs.refMainBody.scrollTop=0
     }
   }
 };
@@ -729,15 +687,7 @@ export default {
         padding: 12px 16px;
         font-size: 14px;
         border-radius: 10px;
-        .left {
-          .title {
-            .title-top {
-              &-item:not(:first-child) {
-                margin-left: 8px;
-              }
-            }
-          }
-        }
+
         &:hover {
           background: @color9;
 
@@ -773,7 +723,6 @@ export default {
           .info {
             display: flex;
             justify-content: flex-start;
-            margin-left: 0;
             &-item {
               margin-right: 24px;
 
@@ -1018,20 +967,11 @@ export default {
     line-height: 36px;
   }
 
-  .class-two {
-    padding: 4px 12px;
-    background: #d1e2ff;
-    border-radius: 4px;
-    color: #2d5cf6;
-    font-weight: normal;
-  }
-
   .class-one {
     padding: 4px 12px;
     background: #fff7e6;
     border-radius: 4px;
     color: #fa8c16;
-    font-weight: normal;
   }
 
   .class-zero {
@@ -1039,7 +979,6 @@ export default {
     background: #fff1f0;
     border-radius: 4px;
     color: #eb5757;
-    font-weight: normal;
   }
 }
 
@@ -1136,7 +1075,4 @@ export default {
     }
   }
 }
-
-
-
 </style>
