@@ -13,14 +13,30 @@
         @handleTo="handleReviewClick"
       />
       <div class="cnt-main">
-        <basic-information class="cnt-item" ref="basicInformationRef" :list="basicInformation" />
-        <publicity-channels class="cnt-item" ref="publicityChannelsRef" :list="promotionChannels" />
+        <basic-information
+          v-if="basicInformation.length"
+          class="cnt-item"
+          ref="basicInformationRef"
+          :list="basicInformation"
+        />
+        <publicity-channels
+          v-if="promotionChannels.length"
+          class="cnt-item"
+          ref="publicityChannelsRef"
+          :list="promotionChannels"
+        />
         <reconciliation-point
+          v-if="keyPointsForVerification.length"
           class="cnt-item"
           ref="reconPointRef"
           :list="keyPointsForVerification"
         />
-        <review-material class="cnt-item" ref="reviewMaterialRef" :list="reviewMaterials" />
+        <review-material
+          v-if="reviewMaterials.length"
+          class="cnt-item"
+          ref="reviewMaterialRef"
+          :list="reviewMaterials"
+        />
       </div>
       <div class="footer" v-if="!isLoading">
         <g-button class="btn" @click="previewFlow">流程总览</g-button>
@@ -49,8 +65,13 @@
       <span class="item">提交成功后可在申请中心查看，了解工单审批进度</span>
     </el-dialog>
     <el-dialog class="processDialog" :visible.sync="processDialogVisible"> 流程图 </el-dialog>
-     <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow?.templateName + '-预览'" width="600px">
-      <process-design from="flowManage" ref="processDesign" style="background: #f5f6f6;" />
+    <w-dialog
+      :showFooter="false"
+      v-model="flowVisible"
+      :title="currentRow?.templateName + '-预览'"
+      width="600px"
+    >
+      <process-design from="flowManage" ref="processDesign" style="background: #f5f6f6" />
     </w-dialog>
   </div>
 </template>
@@ -98,7 +119,7 @@ export default {
     basicInformation: [],
     keyPointsForVerification: [],
     reviewMaterials: [],
-    formId: undefined,
+    formId: '',
     formManagementId: -1,
     confirmOption: {
       message: '是否保存当前编辑内容？',
@@ -108,7 +129,7 @@ export default {
     templateId: '',
     processDefinitionId: '',
     currentRow: null,
-    currentRowInfo: ""
+    currentRowInfo: ''
   }),
   created() {
     // this.initialData();
@@ -125,14 +146,13 @@ export default {
           formManagementId || window.localStorage.getItem('formManagementId')
         );
       } else {
-        vm.formId = undefined;
+        vm.formId = '';
         vm.formManagementId = -1;
       }
     });
   },
   beforeRouteLeave({ params: { isNoDialog } }, from, next) {
     const _this = this.$refs['RefSecondaryCon'];
-
     !isNoDialog && (_this.dialogVisible = true);
     isNoDialog && next();
     _this.handleConfirm = () => {
@@ -140,13 +160,13 @@ export default {
       this.save(() => {
         window.localStorage.removeItem('editId');
         window.localStorage.removeItem('formManagementId');
-        // this.formId = undefined;
-        // this.initialData();
         next();
       });
     };
     _this.handleClose = () => {
       _this.dialogVisible = false;
+      window.localStorage.removeItem('editId');
+      window.localStorage.removeItem('formManagementId');
       next();
     };
   },
@@ -154,50 +174,38 @@ export default {
     this.initialData();
   },
   deactivated() {
-    this.formId = undefined;
-    this.formManagementId = undefined;
-    this.initialData();
-    this.handleClear();
+    this.formId = '';
+    this.formManagementId = -1;
+    this.clearForm();
+    this.reviewList.length = 0;
+    this.$refs.refReviewMatters.clearData();
   },
   methods: {
     initialData() {
+      this.isLoading = true;
       getFormCategoryArray().then(res => {
-        this.isLoading = true;
         this.reviewList = res.data.data[0];
       });
     },
-    // handleConfirm() {
-    //   this.initialData()
-    // },
-    handleClear() {
-      const list = [
-        'basicInformationRef',
-        'publicityChannelsRef',
-        'reconPointRef',
-        'reviewMaterialRef'
-      ];
-      list.forEach(el => {
-        this.$refs[el].judgeWarnFlag = false;
-      });
-    },
     clearForm() {
-      this.promotionChannels = [];
-      this.basicInformation = [];
-      this.keyPointsForVerification = [];
-      this.reviewMaterials = [];
-      this.$refs['publicityChannelsRef'].judgeWarnFlag = false;
-      this.$refs['reconPointRef'].judgeWarnFlag = false;
-      this.$refs['reviewMaterialRef'].judgeWarnFlag = false;
-      // this.isLoading = true
+      this.promotionChannels.length = 0;
+      this.basicInformation.length = 0;
+      this.keyPointsForVerification.length = 0;
+      this.reviewMaterials.length = 0;
     },
     // 审查事项类型
-    handleReviewClick(id) {
+    async handleReviewClick(id) {
       this.isLoading = true;
       this.clearForm();
+      await this.handleAllListprefix(id);
       getApplyForm({
         formId: this.formId,
+        processTemplateId: '1694542436256124928',
+        nodeId: 'root',
         formCategoryId: id
       }).then(({ data: { data: res, msg, success } }) => {
+        this.isLoading = false;
+        this.isGLoading = false;
         if (success) {
           const { basicInformation, promotionChannels, keyPointsForVerification, reviewMaterials } =
             res;
@@ -205,33 +213,55 @@ export default {
           this.promotionChannels = promotionChannels;
           this.keyPointsForVerification = keyPointsForVerification;
           this.reviewMaterials = reviewMaterials;
-          this.isLoading = false;
-          this.isGLoading = false;
         } else {
           // this.$message.error(msg)
-          this.isLoading = false;
-          this.isGLoading = false;
         }
+        
       });
-      externalLogicController({ formId: id }).then(({ data: { data: res, msg, success } }) => {
-        if (success) {
-          this.templateId = res.templateId;
-          this.processDefinitionId = res.processDefinitionId;
-        } else {
-          // this.$message.error(msg)
-          this.isLoading = false;
+    },
+    handleAllListprefix(id) {
+      // externalLogicController({ formId: id }).then(({ data: { data: res, msg, success } }) => {
+      //   if (success) {
+      //     this.templateId = res.templateId;
+      //     this.processDefinitionId = res.processDefinitionId;
+      //   } else {
+      //     // this.$message.error(msg)
+      //     this.isLoading = false;
+      //   }
+      // });
+      // // 获取该表单id的流程
+      // getProcess({ formId: id }).then(({ data: { data: res, msg, success } }) => {
+      //   if (success) {
+      //     this.currentRow = res.list.length ? res.list[0] : null;
+      //   } else {
+      //     this.currentRow = null;
+      //     this.currentRowInfo = msg;
+      //   }
+      // });
+      Promise.all([externalLogicController({ formId: id }), getProcess({ formId: id })]).then(
+        ([res1, res2]) => {
+          const {
+            data: { data: result1, msg: msg1, success: success1 }
+          } = res1;
+          if (success1) {
+            this.templateId = result1.templateId;
+            this.processDefinitionId = result1.processDefinitionId;
+          } else {
+            // this.$message.error(msg1)
+          }
+
+          const {
+            data: { data: result2, msg: msg2, success: success2 }
+          } = res2;
+          if (success2) {
+            this.currentRow = result2.list.length ? result2.list[0] : null;
+          } else {
+            this.currentRow = null;
+            this.currentRowInfo = msg2;
+          }
+          // this.isLoading = false;
         }
-      });
-      // 获取改表单id的流程
-      getProcess({formId:id}).then(({ data: { data: res, msg, success } }) => {
-        if(success) {
-          this.currentRow = res.list.length ? res.list[0]: null
-         
-        }else {
-          this.currentRow = null
-           this.currentRowInfo = msg
-        }
-      })
+      );
     },
     // 提交
     async submit() {
@@ -364,19 +394,19 @@ export default {
     },
     //
     previewFlow() {
-      if(!this.currentRow) {
-        return  this.$message.error(this.currentRowInfo)
+      if (!this.currentRow) {
+        return this.$message.error(this.currentRowInfo);
       }
-      const design = JSON.parse(JSON.stringify( this.currentRow ))
-      design.formId = +design.formId
-      design.settings = JSON.parse(design.settings)
-      design.formItems = JSON.parse(design.formItems)
-      design.process = JSON.parse(design.process)
-      this.$store.commit('loadForm', design)
-      this.$store.commit("setIsPreview", true);
+      const design = JSON.parse(JSON.stringify(this.currentRow));
+      design.formId = +design.formId;
+      design.settings = JSON.parse(design.settings);
+      design.formItems = JSON.parse(design.formItems);
+      design.process = JSON.parse(design.process);
+      this.$store.commit('loadForm', design);
+      this.$store.commit('setIsPreview', true);
       this.$nextTick(() => {
-        this.flowVisible = true
-      })
+        this.flowVisible = true;
+      });
     }
   }
 };
