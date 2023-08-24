@@ -5,7 +5,7 @@
         maxlength="40"
         minlength="1"
         style="width: 300px"
-        @blur="showInput = false">
+        @blur="item.showInput = false">
         <i
           class="el-icon-success el-input__icon"
           style="color: #2D5CF6;"
@@ -14,7 +14,7 @@
         </i>
       </el-input>
       <div @mouseover="item.isHover = true" @mouseout="item.isHover=false" style="display: inline-block;">
-        <div class="header-title" v-show="!item.showInput" @click="editInputName" style="font-size: medium">
+        <div class="header-title" v-show="!item.showInput" @click="editInputName(item)" style="font-size: medium">
           {{item.value}}
           <i class="iconfont icon-bi"></i>
         </div>
@@ -49,7 +49,6 @@ export default {
   },
   methods: {
     editInputName(item) {
-      console.log(this.viewDisable)
       if (this.viewDisable) return;
       item.showInput = true
     },
