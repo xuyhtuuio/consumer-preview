@@ -25,11 +25,11 @@
           </i>
           <!-- 有无意见 -->
           <i class="flex" v-if="item.taskStatus === '5' || item.taskStatus === '4'">
-            <i class="tag has-opinion" v-if="item.hasOpinions == 1">
+            <i class="tag has-opinion" v-if="item.substantiveOpinions == 1">
               <i class="iconfont icon-guanzhu2"></i>
               有实质性意见
             </i>
-            <i class="tag has-no-opinion" v-if="item.hasOpinions !== 1">
+            <i class="tag has-no-opinion" v-if="item.substantiveOpinions !== 1">
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>

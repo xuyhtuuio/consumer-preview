@@ -141,13 +141,15 @@
                 <div class="approved-opinion-head">
                   <h2>消保审查意见书</h2>
                   <p>
-                    <i>拟同意{{ item.taskName }}活动，并提出以下消保审查意见，</i>请您确认是否采纳以下意见：
+                    <i>拟同意该申请项目，并提出以下消保审查意见，</i>请您确认是否采纳以下意见：
                   </p>
                 </div>
               </template>
               <template slot="foot">
                 <div class="approved-opinion-foot">
                   <p>以上为消保审查办公室建议，请酌情考虑。</p>
+                  <p style="color: #505968;margin-top: 12px; text-indent: 2em;">
+                    送审单位应落实消费者权益保护审查工作主体责任，并根据业务实际情况决定意见采纳情况。活动过程之中，应紧密监控开展情况，优化服务流程，提升客户体验，妥善处理客户投诉，并及时向消保部门反馈。敬请知悉。</p>
                   <p style="text-align: right; color: #1d2128; padding: 16px 0">
                     消保审查中心<br />
                     {{ timeNow }}
@@ -607,8 +609,8 @@ export default {
         const { mode, assignedUser } = editOpinionForm
         let params = {
           success: editOpinionForm.isAccept == '1',
-          // taskId: this.item.taskId,
-          processInstanceId: this.item.processInstanceId,
+          taskId: this.item.taskId,
+          // processInstanceId: this.item.processInstanceId,
           msg: editOpinionForm.content,
           mode,
           userIds: assignedUser,
@@ -625,14 +627,14 @@ export default {
         }
         this.loadings.submitLoading = true
         leaderEdit(params).then(res => {
-          const {success,msg} = res.data
-          if ( success) {
+          const { success, msg } = res.data
+          if (success) {
             this.loadings.submitLoading = false
             this.$message.success('审查意见已提交')
             setTimeout(() => {
               this.$router.replace({ name: 'approvalcenter' })
             }, 600)
-          }else{
+          } else {
             this.$message.error(msg)
           }
         }).catch(err => {
@@ -670,7 +672,7 @@ export default {
           name: user.fullname
         }
       }
-      updateAdoptEditedComments(params).then(res => {
+      updateAdoptEditedComments(params, this.item.taskId).then(res => {
         this.loadings.submitLoading = false
         //有实质意见且采纳所以的有实质意见
         if (type && type == 1) {
@@ -699,9 +701,11 @@ export default {
             showConfirmButton: false,
             closeOnClickModal: false,
             type: "warning",
-          }).then(res=>{
-            this.$router.replace('/approval-list')
-      })
+          }).then(res => {
+            this.$router.replace('/applycenter')
+          }).catch(err=>{
+            this.$router.replace('/applycenter')
+          })
         }
       }).catch(err => {
         this.loadings.submitLoading = false
