@@ -1,5 +1,5 @@
 <template>
-  <div class="leader-edit-opinion">
+  <div class="leader-edit-opinion" v-loading="searchLoading">
     <el-form :model="form" :rules="rules" label-position="left" ref="form">
       <el-form-item label="请选择" prop="isAccept">
         <el-radio-group v-model="form.isAccept" @change="updateForm">
@@ -94,6 +94,7 @@
   </div>
 </template>
 <script>
+import { getEditById } from '@/api/approvalCenter'
 export default {
 
   props: {
@@ -114,6 +115,7 @@ export default {
           { required: true, message: "请选择驳回原因", trigger: ["blur"] },
         ],
       },
+      searchLoading:false,
       reasons: ['文件预览失败（文件损坏/清晰度过低）', '附件材料与审批项目不匹配', '其他'],
       form: {
         isAccept: "",
@@ -128,17 +130,49 @@ export default {
     };
   },
   watch: {},
-  mounted(){
-    this.form.isAccept =''
+
+  mounted() {
+    this.form.isAccept = ''
   },
   methods: {
     initData(data) {
+      // 查询是否保存过东西
+      const { taskId, processInstanceId } = data
+      this.getEditById(taskId, processInstanceId)
       this.externalData = data
       this.disavower = data.disavower
       this.approver = data.approver
       this.refuseWay = data.refuseWay
       this.assignedType = data.assignedType
-      this.form.isAccept =''
+    },
+    getEditById(taskId, processInstanceId) {
+      const param = {
+        taskId,
+        processInstanceId,
+      }
+      this.searchLoading=true
+      getEditById(param).then(res => {
+        const { data } = res.data
+        this.searchLoading=false
+        // 如果 data为空
+        if (!data) {
+          this.$refs['form'].resetFields()
+        } else {
+          // 区分通过与驳回
+          const { success, msg, targetUser, reason } = data
+          this.form.isAccept = success ? '1' : '0'
+          this.form.content = msg
+          if (success) {
+            this.form.crtApprover = targetUser || ''
+          } else {
+            this.form.crtDisavower = targetUser || ''
+            this.form.reason = reason
+          }
+        }
+      }).catch(err=>{
+          this.searchLoading=false
+      })
+
     },
     updateForm(flag) {
       let params = {

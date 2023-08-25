@@ -1,6 +1,7 @@
 
 <template>
   <div class="order-detail">
+    <!-- 头部 -按钮区域 -->
     <div class="header">
       <slot name="breadcrumb"> </slot>
       <div class="flex pointer">
@@ -28,10 +29,10 @@
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
           </div> -->
-          <div class="back flex" v-if="!isOCR" @click="submit('storage')">
-            <i class="iconfont icon-baocun"></i>
-            <i class="btn">保存</i>
-          </div>
+          <el-button class="back flex" style='border:none;' v-if="!isOCR" :loading="loadings.storageLoading" @click="submit('storage')">
+            <span class="flex"> <i class="iconfont icon-baocun"></i>
+              <i class="btn">保存</i></span>
+          </el-button>
           <el-button class="back flex white" type="primary" :loading="loadings.submitLoading" @click="submit('update')"
             v-if="!isOCR">
             <i class="iconfont icon-tijiao"></i>
@@ -333,23 +334,25 @@ export default {
       let mode = ''
       let assignedUser = []
       let disavower = []
+      let taskId = this.item.taskId,
+      processInstanceId=this.item.processInstanceId
       const params = {
         processInstanceId: this.item.processInstanceId
       }
       const res = await getTemplatedetail(params)
       if (res.data) {
         const { data } = res.data
-        //如果是消保审批，就不用走下面的判断了
         targetPage = data[data.length - 1].props['targetPage']
         refuseWay = data[data.length - 1].props['refuseWay']
         mode = data[data.length - 1].props['mode']
         assignedUser = data[data.length - 1].props['assignedUser']?.filter(v => v.type !== 'dept')?.map(v => v.id)
         if (targetPage !== 'LEADER') {
+         //如果是消保审批
           return { targetPage, refuseWay, mode, assignedUser }
+        //如果是消保审批
         }
         //如果是领导审批，走下面的判断
-        //驳回人列表处理
-        // 发起人
+        //驳回人列表处理    发起人
         const { name, id } = this.item['originator']
         const { institutional } = this.item
         const initiator = {
@@ -386,7 +389,7 @@ export default {
         })
         approver = nextApprovers
         assignedType = data[data.length - 1]?.children?.props?.assignedType
-        return { targetPage, refuseWay, disavower, approver, assignedType, mode, assignedUser }
+        return { targetPage, refuseWay, disavower, approver, assignedType, mode, assignedUser,taskId,processInstanceId }
       }
     },
     toModify() {
@@ -447,10 +450,47 @@ export default {
     saveEditOpinion() {
       this.loadings.storageLoading = true
       this.$store.commit('setEditOpinionStorage', true)
-      setTimeout(() => {
-        this.$message.success({ message: '已保存当前意见确认内容' })
-        this.loadings.storageLoading = false
-      }, 2000)
+      // setTimeout(() => {
+      //   this.$message.success({ message: '已保存当前意见确认内容' })
+      //   this.loadings.storageLoading = false
+      // }, 2000)
+      const { editOpinionForm } = this.$store.state.checkApprovedForm
+      const { assignedUser } = editOpinionForm
+      let params = {
+        isSave: true,
+        success: editOpinionForm.isAccept == '1',
+        taskId: this.item.taskId,
+        msg: editOpinionForm.content,
+        userIds: assignedUser,
+        processInstanceId: this.item.processInstanceId
+      }
+      //通过时候，流程配置中下一节点审批人设置时选择“上一审批人选择”，增加选择审批人选择则框
+      if (editOpinionForm.isAccept == '1' && editOpinionForm.assignedType == 'SELF_SELECT') {
+        params.targetUser = editOpinionForm.crtApprover
+      }
+      //驳回时候，
+      if (editOpinionForm.isAccept == '0') {
+        params.reason = editOpinionForm.reason
+        params.targetNodeId = editOpinionForm.targetNodeId
+        params.targetUser = editOpinionForm.id
+      }
+      this.loadings.storageLoading = true
+      leaderEdit(params).then(res => {
+          const { success, msg } = res.data
+          if (success) {
+            this.loadings.storageLoading = false
+            this.$message.success('审查意见已保存')
+            setTimeout(() => {
+              this.$router.replace({ name: 'approvalcenter' })
+            }, 600)
+          } else {
+            this.$message.error(msg)
+          }
+        }).catch(err => {
+          this.loadings.storageLoading = false
+          this.$message.error('审查意见保存失败')
+        })
+
     },
     sendOpinionInfo(info) {
       const arr = info[info.length - 1]
@@ -475,6 +515,7 @@ export default {
           })
         return false
       }
+      //状态审批中；编辑意见-保存功能
       if (this.status == 2 && way == 'storage') {
         this.$confirm("是否保存已编辑的意见确认信息？", "", {
           customClass: "confirmBox",
@@ -606,13 +647,13 @@ export default {
           this.$message.error('请在编辑意见后提交')
           return false
         }
-        const { mode, assignedUser } = editOpinionForm
+        const { assignedUser } = editOpinionForm
         let params = {
           success: editOpinionForm.isAccept == '1',
           taskId: this.item.taskId,
-          // processInstanceId: this.item.processInstanceId,
+          processInstanceId: this.item.processInstanceId,
           msg: editOpinionForm.content,
-          mode,
+          isSave: false,
           userIds: assignedUser,
         }
         //通过时候，流程配置中下一节点审批人设置时选择“上一审批人选择”，增加选择审批人选择则框
@@ -703,7 +744,7 @@ export default {
             type: "warning",
           }).then(res => {
             this.$router.replace('/applycenter')
-          }).catch(err=>{
+          }).catch(err => {
             this.$router.replace('/applycenter')
           })
         }

@@ -152,7 +152,7 @@ export default {
         getOrderDetail() {
             this.loading = true
             getApplyForm({
-                formCategoryId: this.$route.params && this.$route.params.formManagementId || this.sidebarParam && this.sidebarParam.formManagementId || '1',
+                formCategoryId: this.$route.params && this.$route.params.formManagementId || this.sidebarParam && this.sidebarParam.formManagementId,
                 formId: this.$route.params.formId || this.sidebarParam.formId,
                 // formCategoryId: 121,
                 // formId: 1257

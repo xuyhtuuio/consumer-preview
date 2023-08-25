@@ -113,3 +113,12 @@ export function leaderEdit(param){
     data: param,
   })
 }
+//领导审批保存后的查询
+export function getEditById(param){
+  return request({
+    url: '/cpr/workspace/process/getEditById',
+    method: 'post',
+    contentType: 'application/json',
+    data: param,
+  })
+}

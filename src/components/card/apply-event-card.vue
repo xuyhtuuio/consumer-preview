@@ -247,7 +247,6 @@ export default {
         params: {
           id: item.taskNumber,
           formManagementId: item.form_management_id
-
         }
       })
     },

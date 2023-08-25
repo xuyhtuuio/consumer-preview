@@ -55,10 +55,12 @@
                 <div class="submission-list">
                     <div class="submission-item" v-for="(item, index) in submission" :key="index" @mouseleave="mouseleave"
                         @mouseenter="mouseenter(item, index)">
-                        <div class="submission-text"  @dblclick="showEdit_collection(index)">
+                        <div class="submission-text" @dblclick="showEdit_collection(index)">
                             <span class="sort">{{ index + 1 }}.</span>
                             <span v-if="!item.showEdit">{{ item.str }}</span>
-                            <el-input v-else :ref="`input_${index}`" v-model.trim="item.str" placeholder="请输入意见" type="textarea" :rows="3" class="edit-input" resize="none" @blur="item.showEdit = false" @keyup.enter.native="item.showEdit = false"></el-input>
+                            <el-input v-else :ref="`input_${index}`" v-model.trim="item.str" placeholder="请输入意见"
+                                type="textarea" :rows="3" class="edit-input" resize="none" @blur="item.showEdit = false"
+                                @keyup.enter.native="item.showEdit = false"></el-input>
                         </div>
                         <div class="submission-op">
                             <!-- <i>无实质意见</i> -->
@@ -67,7 +69,8 @@
                                     <i class="iconfont icon icon-guanzhu2"></i>
                                     有实质意见
                                 </span>
-                                <span v-if="!item.opinion" class="opinion has-opinion" @click="item.opinion = !item.opinion">
+                                <span v-if="!item.opinion" class="opinion has-opinion"
+                                    @click="item.opinion = !item.opinion">
                                     <i class="iconfont icon icon-guanzhu"></i>
                                     无实质意见
                                 </span>
@@ -84,8 +87,10 @@
                 </div>
                 <p class="submission-name">
                     以上为消保审查办公室建议，请酌情考虑。<br />
-                    <span style="margin-top: 12px; color: #505968;text-indent: 2em;">送审单位应落实消费者权益保护审查工作主体责任，并根据业务实际情况决定意见采纳情况。活动过程之中，应紧密监控开展情况，优化服务流程，提升客户体验，妥善处理客户投诉，并及时向消保部门反馈。敬请知悉。</span>
                 </p>
+                <p
+                    style="font-size:24px;margin-top: 12px; font-weight: 400;line-height: 22px;color: #505968;text-indent: 2em;">
+                    送审单位应落实消费者权益保护审查工作主体责任，并根据业务实际情况决定意见采纳情况。活动过程之中，应紧密监控开展情况，优化服务流程，提升客户体验，妥善处理客户投诉，并及时向消保部门反馈。敬请知悉。</p>
                 <p class="organization">
                     <span>消保审查中心</span><br />
                     <span>{{ timeNow }}</span>
@@ -164,7 +169,6 @@ export default {
                 productEssentials: [],
                 reviewPoints: [],
                 submissionName: 'xxxxx',
-                organization: '消保审查办公室'
             }
         }
     },
@@ -291,6 +295,7 @@ export default {
             color: #80A6FF;
             margin-right: 8px;
         }
+
         .line {
             width: 100%;
             height: 1px;
@@ -367,7 +372,7 @@ export default {
             height: 18px;
         }
 
-        
+
         .title {
             color: #1D2128;
             text-align: center;
@@ -508,5 +513,4 @@ export default {
         font-weight: 400;
         line-height: 28px;
     }
-}
-</style>
+}</style>

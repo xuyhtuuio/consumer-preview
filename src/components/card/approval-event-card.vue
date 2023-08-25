@@ -165,7 +165,8 @@ export default {
         params: {
           formId: item.recordId,
           taskName: item.taskName,
-          processInstanceId: item.processInstanceId
+          processInstanceId: item.processInstanceId,
+          formManagementId:item.formManagementId
         },
       });
     },
@@ -197,7 +198,8 @@ export default {
         params: {
           formId: item.recordId,
           taskName: item.taskName,
-          processInstanceId: item.processInstanceId
+          processInstanceId: item.processInstanceId,
+          formManagementId:item.formManagementId
         },
       });
     },
