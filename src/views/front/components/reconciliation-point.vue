@@ -1,5 +1,5 @@
 <template>
-  <div class="reconciliation-point" ref="globalRef" v-if="list.length">
+  <div class="reconciliation-point" ref="globalRef">
     <g-table-card :title="title">
       <template v-slot:cardInfo>
         <div class="cardInfo">

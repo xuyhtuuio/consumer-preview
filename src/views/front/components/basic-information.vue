@@ -1,5 +1,5 @@
 <template>
-  <div class="basic-information" v-if="list.length">
+  <div class="basic-information">
     <g-table-card :title="title">
       <template v-slot:cardInfo>
         <div class="cardInfo">
