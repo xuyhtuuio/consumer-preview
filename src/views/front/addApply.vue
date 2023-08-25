@@ -12,27 +12,23 @@
         :formManagementId="formManagementId"
         @handleTo="handleReviewClick"
       />
-      <div class="cnt-main">
+      <div class="cnt-main" v-show="basicInformation.length">
         <basic-information
-          v-if="basicInformation.length"
           class="cnt-item"
           ref="basicInformationRef"
           :list="basicInformation"
         />
         <publicity-channels
-          v-if="promotionChannels.length"
           class="cnt-item"
           ref="publicityChannelsRef"
           :list="promotionChannels"
         />
         <reconciliation-point
-          v-if="keyPointsForVerification.length"
           class="cnt-item"
           ref="reconPointRef"
           :list="keyPointsForVerification"
         />
         <review-material
-          v-if="reviewMaterials.length"
           class="cnt-item"
           ref="reviewMaterialRef"
           :list="reviewMaterials"
@@ -176,6 +172,7 @@ export default {
   deactivated() {
     this.formId = '';
     this.formManagementId = -1;
+    console.log(this.clearForm)
     this.clearForm();
     this.reviewList.length = 0;
     this.$refs.refReviewMatters.clearData();

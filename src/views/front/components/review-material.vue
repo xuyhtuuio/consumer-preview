@@ -1,5 +1,5 @@
 <template>
-  <div class="review-material" ref="globalRef">
+  <div class="review-material" v-if="list.length" ref="globalRef">
     <g-table-card :title="title">
       <template v-slot:cardInfo>
         <div class="cardInfo">
@@ -117,6 +117,7 @@ export default {
   watch: {
     list(newVal) {
       if (newVal.length) {
+         this.judgeWarnFlag = false
         this.fileList = newVal[0].value;
         this.fileList.length &&
           this.fileList.forEach(item => {

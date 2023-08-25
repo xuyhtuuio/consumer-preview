@@ -1,5 +1,5 @@
 <template>
-  <div class="reconciliation-point" ref="globalRef">
+  <div class="reconciliation-point" v-if="list.length" ref="globalRef">
     <g-table-card :title="title">
       <template v-slot:cardInfo>
         <div class="cardInfo">
@@ -87,6 +87,7 @@ export default {
   watch: {
     list: {
       handler(val) {
+        this.judgeWarnFlag = false
         // this.handleCheckAll(val)
         val.length &&
           val.forEach(item => {
@@ -99,7 +100,7 @@ export default {
           })
         
       },
-      // deep: true
+      deep: true
     }
   },
   methods: {

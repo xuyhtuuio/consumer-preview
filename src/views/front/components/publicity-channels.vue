@@ -1,5 +1,5 @@
 <template>
-  <div class="publicity-channels" ref="globalRef">
+  <div class="publicity-channels" v-if="list.length" ref="globalRef" >
     <g-table-card :title="title">
       <template v-slot:cardInfo>
         <div class="cardInfo">
