@@ -9,18 +9,18 @@
         </div>
       </template>
       <template v-slot:content>
-        <el-form :hide-required-asterisk="true" label-width="120px" class="ruleForm my-form">
+        <el-form hide-required-asterisk label-width="120px" class="ruleForm my-form">
           <template v-for="(item, index) in list">
             <el-form-item :class="formItemCpt(item)" :key="index">
               <label slot="label"
-                >{{ item.title.slice(0,6)
-                }}<span :style="{ color: 'red', opacity: !item.props.required && 0 }">
+                >{{ item.title
+                }}<span :style="{ color: 'red', opacity: item.props.required || 0 }">
                   *
                 </span></label
               >
               <el-input
                 v-if="item.name === 'TextInput'"
-                v-model="item.value"
+                v-model.trim="item.value"
                 :placeholder="item.props.placeholder"
               ></el-input>
 
@@ -63,11 +63,15 @@
               </el-checkbox-group>
 
               <div class="groups-select" v-else-if="item.name === 'MultipleGroupsSelect'">
-                <div v-for="(iten) in item.props.options" :key="iten.id">
-                  <p class="group-title">{{iten.value}}</p>
+                <div v-for="iten in item.props.options" :key="iten.id">
+                  <p class="group-title">{{ iten.value }}</p>
                   <el-checkbox-group class="group-value" v-model="item.value">
-                      <el-checkbox v-for="(itenItem, indey) in iten.children" :key="indey" :label="itenItem.id">{{ itenItem.value }}
-                      </el-checkbox>
+                    <el-checkbox
+                      v-for="(itenItem, indey) in iten.children"
+                      :key="indey"
+                      :label="itenItem.id"
+                      >{{ itenItem.value }}
+                    </el-checkbox>
                   </el-checkbox-group>
                 </div>
               </div>
@@ -75,7 +79,7 @@
                 v-else-if="item.name === 'MultipleSelect' && !item.props.expanding"
                 v-model="item.value"
                 :placeholder="item.props.placeholder"
-                :multiple="true"
+                multiple
               >
                 <el-option
                   v-for="(iten, indey) in item.props.options"
@@ -149,10 +153,10 @@ function rulesFn(data) {
       return [
         { type: 'array', required: true, message: `请至少选择一个${data.title}`, trigger: 'change' }
       ];
-      case 'MultipleGroupsSelect': 
+    case 'MultipleGroupsSelect':
       return [
-         { type: 'array', required: true, message: `请至少选择一个${data.title}`, trigger: 'change' }
-      ]
+        { type: 'array', required: true, message: `请至少选择一个${data.title}`, trigger: 'change' }
+      ];
     case 'TimePicker':
       return [{ type: 'date', required: true, message: '请选择日期', trigger: 'change' }];
     case 'Cascader':
@@ -193,7 +197,7 @@ export default {
     }
   },
   watch: {
-    list(newVal) {
+    list() {
       this.initWarn();
     }
   },
@@ -352,13 +356,12 @@ export default {
     }
     .form-item {
       width: 50%;
-      
     }
     .groups-select {
       .group-title {
         margin-top: 12px;
         line-height: 22px;
-        color: #86909C;
+        color: #86909c;
       }
       .group-value {
         /deep/.el-checkbox {
@@ -409,5 +412,4 @@ export default {
     }
   }
 }
-
 </style>
