@@ -115,7 +115,7 @@ export function concernApplication(param) {
 
 export function instanceInfo(param) {
   return request({
-    url: '/cpr/workProcessQuery/process/instanceInfo',
+    url: '/cpr/workProcessQuery/instanceInfo',
     method: 'post',
     // contentType:'application/x-www-form-urlencoded',
     data: param
@@ -149,9 +149,9 @@ export function insertApprovalRecordAndEditedComments(param){
   })
 } 
 //审查意见书 提交
-export function updateAdoptEditedComments(param){
+export function updateAdoptEditedComments(param,id){
   return request({
-    url: '/cpr/approvalrecord/updateAdoptEditedComments',
+    url: `/cpr/approvalrecord/updateAdoptEditedComments?taskId=${id}`,
     method: 'post',
     data: param
   })

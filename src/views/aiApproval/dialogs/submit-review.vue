@@ -50,7 +50,7 @@
             <p class="title">消保审查意见书</p>
             <div class="submission-content" v-if="submission.length">
                 <p class="submission-name">
-                    拟同意{{ params.submissionName }}活动，并提出以下消保审查意见：
+                    拟同意该申请项目，并提出以下消保审查意见，<i style="color: #505968;">请您确认是否采纳以下意见：</i>
                 </p>
                 <div class="submission-list">
                     <div class="submission-item" v-for="(item, index) in submission" :key="index" @mouseleave="mouseleave"
@@ -83,7 +83,8 @@
                     </div>
                 </div>
                 <p class="submission-name">
-                    以上为{{ params.organization }}建议，请酌情考虑。
+                    以上为消保审查办公室建议，请酌情考虑。<br />
+                    <span style="margin-top: 12px; color: #505968;text-indent: 2em;">送审单位应落实消费者权益保护审查工作主体责任，并根据业务实际情况决定意见采纳情况。活动过程之中，应紧密监控开展情况，优化服务流程，提升客户体验，妥善处理客户投诉，并及时向消保部门反馈。敬请知悉。</span>
                 </p>
                 <p class="organization">
                     <span>消保审查中心</span><br />

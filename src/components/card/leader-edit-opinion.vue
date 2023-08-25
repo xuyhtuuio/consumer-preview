@@ -128,6 +128,9 @@ export default {
     };
   },
   watch: {},
+  mounted(){
+    this.form.isAccept =''
+  },
   methods: {
     initData(data) {
       this.externalData = data
