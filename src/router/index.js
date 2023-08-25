@@ -213,7 +213,6 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  console.log();
   if (to.path.split("/").length>1) {
     const data = [{ name: to.path.split("/")[1], title: to.meta.pTitle }, { name: to.path.split("/")[2], title: to.meta.title }]
     store.commit("setBreadcrumbList", data)
