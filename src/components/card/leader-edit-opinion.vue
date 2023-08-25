@@ -8,7 +8,7 @@
         </el-radio-group>
       </el-form-item>
       <!-- &&refuseWay=='TO_BEFORE' -->
-      <el-form-item label="请选择驳回人" prop="crtDisavower" v-if="form.isAccept == '0'&&refuseWay=='TO_BEFORE'">
+      <el-form-item label="请选择驳回人" prop="crtDisavower" v-if="form.isAccept == '0' && refuseWay == 'TO_BEFORE'">
         <el-select v-model="form.crtDisavower" placeholder="请选择驳回节点/驳回人" @change="updateForm('disavower')">
           <el-option v-for="(item, index) in disavower" :key="index"
             :label="item.name + '/' + item.label + ' 【' + item.nodeName + '】'" :value="item">
@@ -124,7 +124,7 @@ export default {
       },
       refuseWay: '',  // TO_NODE 驳回到指定节点 / TO_BEFORE 审批人自选（前序节点）
       assignedType: '', // SELF_SELECT 流程配置中下一节点审批人设置时选择“上一审批人选择”，增加选择审批人选择则框
-      externalData:{},// 
+      externalData: {},// 
     };
   },
   watch: {},
@@ -135,6 +135,7 @@ export default {
       this.approver = data.approver
       this.refuseWay = data.refuseWay
       this.assignedType = data.assignedType
+      this.form.isAccept =''
     },
     updateForm(flag) {
       let params = {
@@ -142,8 +143,8 @@ export default {
         ...this.form,
         assignedType: this.assignedType,
       }
-      if(this.form.isAccept=='0'){
-        params={
+      if (this.form.isAccept == '0') {
+        params = {
           ...params,
           ...this.form.crtDisavower
         }

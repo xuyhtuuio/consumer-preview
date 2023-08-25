@@ -249,7 +249,7 @@ export default {
         name: url
       })
     }
-    this.judgeStatus();
+    // this.judgeStatus();
   },
   created() { },
   methods: {
@@ -607,7 +607,8 @@ export default {
         const { mode, assignedUser } = editOpinionForm
         let params = {
           success: editOpinionForm.isAccept == '1',
-          taskId: this.item.taskId,
+          // taskId: this.item.taskId,
+          processInstanceId: this.item.processInstanceId,
           msg: editOpinionForm.content,
           mode,
           userIds: assignedUser,
@@ -624,12 +625,15 @@ export default {
         }
         this.loadings.submitLoading = true
         leaderEdit(params).then(res => {
-          if (res.status == 200) {
+          const {success,msg} = res.data
+          if ( success) {
             this.loadings.submitLoading = false
             this.$message.success('审查意见已提交')
             setTimeout(() => {
               this.$router.replace({ name: 'approvalcenter' })
             }, 600)
+          }else{
+            this.$message.error(msg)
           }
         }).catch(err => {
           this.loadings.submitLoading = false
