@@ -22,7 +22,7 @@
                     *
                   </span></label
                 >
-                <el-checkbox-group v-if="item.name==='MultipleSelect'" v-model="item.value">
+                <el-checkbox-group v-if="item.name==='MultipleSelect'" v-model="item.value" :disabled="item.perm === 'R'">
                   <el-checkbox
                     v-for="iten in item.props.options"
                     @change="handleChange"
@@ -38,7 +38,7 @@
                     :key="indey"
                   >
                     <p class="item-label">{{ iten.value }}</p>
-                    <el-radio-group v-model="iten.value1" class="content-item" @change="(val)=>handleRadioChange(val,indey,item.value)">
+                    <el-radio-group v-model="iten.value1" class="content-item" :disabled="item.perm === 'R'" @change="(val)=>handleRadioChange(val,indey,item.value)">
                       <el-radio
                         v-for="(itev, indev) in iten?.children"
                         :key="indev"

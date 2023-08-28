@@ -172,7 +172,6 @@ export default {
   deactivated() {
     this.formId = '';
     this.formManagementId = -1;
-    console.log(this.clearForm)
     this.clearForm();
     this.reviewList.length = 0;
     this.$refs.refReviewMatters.clearData();

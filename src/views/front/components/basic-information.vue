@@ -20,13 +20,15 @@
               >
               <el-input
                 v-if="item.name === 'TextInput'"
+                :disabled="item.perm === 'R'"
                 v-model.trim="item.value"
                 :placeholder="item.props.placeholder"
               ></el-input>
 
               <el-select
                 v-else-if="item.name === 'SelectInput' && !item.props.expanding"
-                v-model="item.value"
+                :disabled="item.perm === 'R'"
+                v-model.trim="item.value"
                 :placeholder="item.props.placeholder"
               >
                 <el-option
@@ -39,7 +41,8 @@
 
               <el-radio-group
                 v-else-if="item.name === 'SelectInput' && item.props.expanding"
-                v-model="item.value"
+                :disabled="item.perm === 'R'"
+                v-model.trim="item.value"
               >
                 <el-radio
                   v-for="(iten, indey) in item.props.options"
@@ -51,7 +54,8 @@
 
               <el-checkbox-group
                 v-else-if="item.name === 'MultipleSelect' && item.props.expanding"
-                v-model="item.value"
+                v-model.trim="item.value"
+                :disabled="item.perm === 'R'"
               >
                 <template v-for="(iten, indey) in item.props.options">
                   <!-- <template v-if="iten.id == 9999">
@@ -65,7 +69,11 @@
               <div class="groups-select" v-else-if="item.name === 'MultipleGroupsSelect'">
                 <div v-for="iten in item.props.options" :key="iten.id">
                   <p class="group-title">{{ iten.value }}</p>
-                  <el-checkbox-group class="group-value" v-model="item.value">
+                  <el-checkbox-group
+                    class="group-value"
+                    v-model="item.value"
+                    :disabled="item.perm === 'R'"
+                  >
                     <el-checkbox
                       v-for="(itenItem, indey) in iten.children"
                       :key="indey"
@@ -77,7 +85,8 @@
               </div>
               <el-select
                 v-else-if="item.name === 'MultipleSelect' && !item.props.expanding"
-                v-model="item.value"
+                :disabled="item.perm === 'R'"
+                v-model.trim="item.value"
                 :placeholder="item.props.placeholder"
                 multiple
               >
@@ -91,10 +100,11 @@
 
               <el-date-picker
                 v-else-if="item.name === 'TimePicker'"
+                :disabled="item.perm === 'R'"
                 type="datetime"
                 :placeholder="item.props.placeholder"
                 :format="item.props.format"
-                v-model="item.value"
+                v-model.trim="item.value"
                 :picker-options="pickerTime(item.props.gl, item.props.order)"
                 @change="handlePickerChange(item)"
                 style="width: 100%"
@@ -102,13 +112,15 @@
 
               <el-input
                 v-else-if="item.name === 'TextareaInput'"
+                :disabled="item.perm === 'R'"
                 type="textarea"
-                v-model="item.value"
+                v-model.trim="item.value"
                 :placeholder="item.props.placeholder"
               ></el-input>
 
               <el-cascader
                 v-else-if="item.name === 'Cascader'"
+                :disabled="item.perm === 'R'"
                 v-model="item.value"
                 :options="item.props.options"
               >

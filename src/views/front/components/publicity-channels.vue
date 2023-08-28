@@ -23,7 +23,7 @@
                 *
               </span></label
             >
-            <el-checkbox-group v-model="item.value">
+            <el-checkbox-group v-model="item.value" :disabled="item.perm === 'R'">
               <el-checkbox
                 v-for="item in item.props.options"
                 :key="item.id"
