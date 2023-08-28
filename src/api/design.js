@@ -1,5 +1,12 @@
 import request from '@/api/request.js'
 
+export function getFormCategoryNotAssociated() {
+  return request({
+    url: '/cpr/applicationForm/getFormCategoryNotAssociated',
+    method: 'get',
+    params: {}
+  })
+}
 
 // 根据id 查询表单详情
 export function getFormTemplateById(formId) {

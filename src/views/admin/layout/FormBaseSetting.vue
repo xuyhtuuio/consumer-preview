@@ -58,7 +58,7 @@
 <script>
 import orgPicker from '@/components/common/organizationPicker'
 import { itemPagingList } from '@/api/manage'
-import { getFormCategoryArray } from '@/api/front'
+import { getFormCategoryNotAssociated } from '@/api/design'
 export default {
   name: "FormBaseSetting",
   components: {orgPicker},
@@ -101,10 +101,10 @@ export default {
       }
     },
     async getObtainExamineTypeList() {
-      const res = await getFormCategoryArray();
+      const res = await getFormCategoryNotAssociated();
       const resData = res.data.data
       if (resData) {
-        this.fromGroup = resData[0].map(item => {
+        this.fromGroup = resData.map(item => {
           return {
             name: item.examineTypesName,
             id: item.recordId

@@ -7,6 +7,26 @@
 		<div class="picker">
 			<div style="float:left;">
 				<div class="box left-box">
+          <div class="right-item-box">
+            <div style="font-size: 12px;margin-bottom: 11px;line-height: 1em;">请选择该节点对应人员可审批任务的数据权限：
+              <el-popover
+                placement="bottom-end"
+                title=""
+                width="200"
+                trigger="hover">
+                <div ><b style="display: inline-block;margin-bottom: 10px;">选择【本部门】</b><br/>当前节点配置的角色用户可审批自己【所在部门】的任务单；（二级机构）<br/><br/><b style="display: inline-block;margin-bottom: 10px;">选择【本行】</b><br/>当前节点配置的角色可审批自己【所在分行】的任务单；（一级机构）</div>
+                <svg slot="reference" class="icon" aria-hidden="true" style="font-size: 16px;">
+                  <use xlink:href="#icon-wenhao"></use>
+                </svg>
+              </el-popover>
+
+            </div>
+            <el-radio-group v-model="roleRange" style="display: block;">
+              <el-radio label="全行">全行</el-radio>
+              <el-radio label="本行">本行</el-radio>
+              <el-radio label="本部门">本部门</el-radio>
+            </el-radio-group>
+          </div>
           <div class="tabs">
             <div class="user tab" :class="{ 'is-active': active === 'user' }" @click="changeTabType('user')">
               <i class="iconfont icon-dept"></i>
@@ -18,26 +38,6 @@
             </div>
           </div>
 					<div>
-            <div class="right-item-box" v-if="active === 'role'">
-              <div style="font-size: 12px;margin-bottom: 11px;line-height: 1em;">请选择该节点对应角色可审批任务的数据权限：
-                <el-popover
-                  placement="bottom-end"
-                  title=""
-                  width="200"
-                  trigger="hover">
-                  <div ><b style="display: inline-block;margin-bottom: 10px;">选择【本部门】</b><br/>当前节点配置的角色用户可审批自己【所在部门】的任务单；（二级机构）<br/><br/><b style="display: inline-block;margin-bottom: 10px;">选择【本行】</b><br/>当前节点配置的角色可审批自己【所在分行】的任务单；（一级机构）</div>
-                  <svg slot="reference" class="icon" aria-hidden="true" style="font-size: 16px;">
-                    <use xlink:href="#icon-wenhao"></use>
-                  </svg>
-                </el-popover>
-
-              </div>
-              <el-radio-group v-model="roleRange" style="display: block;">
-                <el-radio label="全行">全行</el-radio>
-                <el-radio label="本行">本行</el-radio>
-                <el-radio label="本部门">本部门</el-radio>
-              </el-radio-group>
-            </div>
 						<el-input v-if="type !== 'dept'" :placeholder="active === 'user' ? '搜索部门/人员' : '搜索系统角色'" prefix-icon="el-icon-search" size="medium"
 						          v-model="search" :maxlength="50" clearable>
 						</el-input>
@@ -51,7 +51,7 @@
 						<!-- <span style="margin-left: 20px; cursor: pointer; color:#38adff;" @click="beforeNode">上一级</span> -->
 					</div>
 					<div style="margin-top: 8px; width: 100%;height: 400px;">
-						<div style="margin-top: 8px; overflow-y: auto;" :style="{ height: active === 'user' ? 'calc(100% - 100px)' : 'calc(100% - 160px)' }">
+						<div style="margin-top: 8px; overflow-y: auto;" :style="{ height: active === 'user' ? 'calc(100% - 170px)' : 'calc(100% - 160px)' }">
               <el-tree
                 v-show="active === 'user'"
                 :data="data"
@@ -326,7 +326,8 @@
             id: item.id,
             label: item.name,
             name: item.name,
-            type: 'dept'
+            type: 'dept',
+            roleRange: this.roleRange
           }
         })
         const user = data.checkedNodes.filter(e => e.type === 'user').map(item => {
@@ -334,7 +335,8 @@
             id: item.id,
             label: item.name,
             name: item.name,
-            type: 'user'
+            type: 'user',
+            roleRange: this.roleRange
           }
         })
         this.rightCheckedList = {
