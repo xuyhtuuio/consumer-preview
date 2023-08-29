@@ -23,7 +23,7 @@ export function deleteFormGroups(params) {
 
 export function getFormCategoryArray(params) {
   return request({
-    url: '/cpr/applicationForm/getFormCategoryArray',
+    url: '/cpr/applicationForm/getFormCategoryAssociated',
     method: 'get',
     params
   })

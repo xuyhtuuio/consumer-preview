@@ -168,7 +168,7 @@ export default {
     initialData() {
       this.isLoading = true;
       getFormCategoryArray().then(res => {
-        this.reviewList = res.data.data[0];
+        this.reviewList = res.data.data;
       });
     },
     clearForm() {
@@ -250,7 +250,8 @@ export default {
           if(!flag) {
             // return Promise.reject()
           }
-        }).finally(()=>{
+        }).
+        finally(()=>{
           this.isLoading = false;
         })
     },
