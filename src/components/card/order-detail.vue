@@ -137,7 +137,7 @@
           </nav>
         </div>
         <div class="right-content">
-          <keep-alive exclude="leader-edit-opinion">
+          <keep-alive>
             <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus" :coment="coment"
               @sendOpinionInfo="sendOpinionInfo" :leaderApproveInfo="leaderApproveInfo" :reviewMaterial="reviewMaterials">
               <template slot="head">
@@ -243,8 +243,7 @@ export default {
     };
   },
   activated() {
-    this.clearStoreStatus()
-    this.judgeStatus();
+
   },
   mounted() {
     if (!this.$route.params.formId) {
@@ -255,6 +254,8 @@ export default {
       })
     }
     // this.judgeStatus();
+    this.clearStoreStatus()
+    this.judgeStatus();
   },
   created() { },
   methods: {
@@ -597,7 +598,7 @@ export default {
         if (!approvedOpinionRequired) {
           this.crtComp == 'approvedOpinionCard'
           this.$nextTick(() => {
-            this.$refs['child'].checkParam()
+            this.$refs['child'].checkParam(true)
           })
           return
         }

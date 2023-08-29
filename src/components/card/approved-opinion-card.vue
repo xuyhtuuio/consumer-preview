@@ -104,10 +104,11 @@ export default {
   },
 
   mounted() {
-   
+    console.log('v', this.$route.params.formId)
+    this.$route.params.formId ? this.getEditedCommentsByFormId() : ''
   },
-  activated(){
-    this.$route.params.formId?this.getEditedCommentsByFormId():''
+  activated() {
+
   },
   methods: {
     // 判断是否更新数据并向state更新
@@ -132,7 +133,7 @@ export default {
     },
     getEditedCommentsByFormId() {
       this.loading = true
-      console.log('getEditedCommentsByFormId',this.$route.params.formId)
+      console.log('getEditedCommentsByFormId', this.$route.params.formId)
       getEditedCommentsByFormId({ formId: this.$route.params.formId }).then(res => {
         const { data } = res.data
         const keys = Object.keys(data)
@@ -177,12 +178,13 @@ export default {
           return v.substantiveopinion
         }).flat()
         this.$store.commit('setApprovedOpinionForm', newOpinions)
-        this.$emit('sendOpinionInfo',opinions)
+        this.$emit('sendOpinionInfo', opinions)
       }).finally(() => {
         this.loading = false
       })
     },
-    checkParam() {
+
+    checkParam(submit) {
       const inputArr = [];
       for (let i = 0; i < this.opinions.length; i++) {
         for (let j = 0; j < this.opinions[i].substantiveopinion.length; j++) {
@@ -195,10 +197,18 @@ export default {
           });
         }
       }
-      inputArr.length ? this.$refs[inputArr[0]][0].focus() : ''
-      return inputArr.length < 1
+      if (submit) {
+        inputArr.length ? this.$refs[inputArr[0]][0].focus() : ''
+      } else {
+        return inputArr.length < 1
+      }
     },
   },
+  beforeRouterEnter(to, next) {
+    next(() => {
+      console.log('dd')
+    })
+  }
 };
 </script>
 <style lang="less" scoped>
