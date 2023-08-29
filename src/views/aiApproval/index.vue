@@ -205,63 +205,9 @@ export default {
         const { data, status, message } = res.data;
         if (status === 200) {
           this.$refs.sidebar.tools[0].sidebarParam = { ...data };
-          const data1 = {
-            module: '核对要点',
-            name: 'SingleGroupsSelect',
-            title: '核对要点1',
-            value: ['1-1', '2-2', '3-3'],
-            props: {
-              options: [
-                {
-                  id: 'selectGroup3422284479233',
-                  showInput: true,
-                  value:
-                    '承担义务不得低于宣传所承诺的标准承担义务不得低于宣传所承诺的标准承担义务不得低于宣传所承',
-                  children: [
-                    { id: '1-1', value: '是' },
-                    { id: '1-2', value: '否' },
-                    { id: '1-3', value: '无关' }
-                  ],
-                  value1: '1-1'
-                },
-                {
-                  id: 'selectGroup34222844792332',
-                  showInput: true,
-                  value: '不得承诺',
-                  children: [
-                    { id: '2-1', value: '是' },
-                    { id: '2-2', value: '否' },
-                    { id: '2-3', value: '无关' }
-                  ],
-                  value1: '2-1'
-                },
-                {
-                  id: 'selectGroup3422284479233',
-                  showInput: true,
-                  value: '不得承诺',
-                  children: [
-                    { id: '3-1', value: '是' },
-                    { id: '3-2', value: '否' },
-                    { id: '3-3', value: '无关' }
-                  ],
-                  value1: '3-1'
-                },
-                {
-                  id: 'selectGroup3422284479233',
-                  showInput: true,
-                  value: '不得承诺',
-                  children: [
-                    { id: '4-1', value: '是' },
-                    { id: '4-2', value: '否' },
-                    { id: '4-3', value: '无关' }
-                  ],
-                  value1: '4-1'
-                }
-              ]
-            },
-            value: ['1-1', '2-2', '3-3']
-          };
-          this.$refs.refExamine.list = [data1];
+          if(data.keyPointsForVerification) {
+            this.$refs.refExamine.list = [...data.keyPointsForVerification];
+          }
         } else {
           this.$message.error({ offset: 40, title: '提醒', message });
         }

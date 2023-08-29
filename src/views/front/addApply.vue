@@ -13,26 +13,14 @@
         @handleTo="handleReviewClick"
       />
       <div class="cnt-main" v-show="basicInformation.length">
-        <basic-information
-          class="cnt-item"
-          ref="basicInformationRef"
-          :list="basicInformation"
-        />
-        <publicity-channels
-          class="cnt-item"
-          ref="publicityChannelsRef"
-          :list="promotionChannels"
-        />
+        <basic-information class="cnt-item" ref="basicInformationRef" :list="basicInformation" />
+        <publicity-channels class="cnt-item" ref="publicityChannelsRef" :list="promotionChannels" />
         <reconciliation-point
           class="cnt-item"
           ref="reconPointRef"
           :list="keyPointsForVerification"
         />
-        <review-material
-          class="cnt-item"
-          ref="reviewMaterialRef"
-          :list="reviewMaterials"
-        />
+        <review-material class="cnt-item" ref="reviewMaterialRef" :list="reviewMaterials" />
       </div>
       <div class="footer" v-if="!isLoading">
         <g-button class="btn" @click="previewFlow">流程总览</g-button>
@@ -196,7 +184,7 @@ export default {
       await this.handleAllListprefix(id);
       getApplyForm({
         formId: this.formId,
-        processTemplateId: '1694542436256124928',
+        processTemplateId: this.templateId,
         nodeId: 'root',
         formCategoryId: id
       }).then(({ data: { data: res, msg, success } }) => {
@@ -212,7 +200,6 @@ export default {
         } else {
           // this.$message.error(msg)
         }
-        
       });
     },
     handleAllListprefix(id) {
@@ -234,8 +221,13 @@ export default {
       //     this.currentRowInfo = msg;
       //   }
       // });
-      Promise.all([externalLogicController({ formId: id }), getProcess({ formId: id })]).then(
-        ([res1, res2]) => {
+      return Promise.all([
+        externalLogicController({ formId: id }),
+        getProcess({ formId: id })
+      ])
+        .then(([res1, res2]) => {
+          this.isLoading = false;
+          let flag= true
           const {
             data: { data: result1, msg: msg1, success: success1 }
           } = res1;
@@ -243,9 +235,9 @@ export default {
             this.templateId = result1.templateId;
             this.processDefinitionId = result1.processDefinitionId;
           } else {
-            // this.$message.error(msg1)
+            this.templateId = '';
+            flag = false
           }
-
           const {
             data: { data: result2, msg: msg2, success: success2 }
           } = res2;
@@ -255,9 +247,12 @@ export default {
             this.currentRow = null;
             this.currentRowInfo = msg2;
           }
-          // this.isLoading = false;
-        }
-      );
+          if(!flag) {
+            // return Promise.reject()
+          }
+        }).finally(()=>{
+          this.isLoading = false;
+        })
     },
     // 提交
     async submit() {
@@ -488,4 +483,18 @@ export default {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </style>

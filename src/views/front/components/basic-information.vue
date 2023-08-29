@@ -120,9 +120,10 @@
 
               <el-cascader
                 v-else-if="item.name === 'Cascader'"
-                :disabled="item.perm === 'R'"
                 v-model="item.value"
-                :options="item.props.options"
+                :options="item.props.childrens"
+                 :props="{label:'value',value:'id',checkStrictly :true,multiple: item.props.multiple }"
+                 clearable
               >
               </el-cascader>
 
@@ -424,4 +425,13 @@ export default {
     }
   }
 }
+
+
+
+
+
+
+
+
+
 </style>

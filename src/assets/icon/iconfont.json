@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "37136431",
+      "name": "图标=固定",
+      "font_class": "a-tubiaoguding",
+      "unicode": "e65b",
+      "unicode_decimal": 58971
+    },
+    {
       "icon_id": "37131710",
       "name": "compare",
       "font_class": "compare",
