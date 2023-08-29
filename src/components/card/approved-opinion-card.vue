@@ -104,7 +104,6 @@ export default {
   },
 
   mounted() {
-    console.log('v', this.$route.params.formId)
     this.$route.params.formId ? this.getEditedCommentsByFormId() : ''
   },
   activated() {
@@ -133,7 +132,6 @@ export default {
     },
     getEditedCommentsByFormId() {
       this.loading = true
-      console.log('getEditedCommentsByFormId', this.$route.params.formId)
       getEditedCommentsByFormId({ formId: this.$route.params.formId }).then(res => {
         const { data } = res.data
         const keys = Object.keys(data)
@@ -204,11 +202,6 @@ export default {
       }
     },
   },
-  beforeRouterEnter(to, next) {
-    next(() => {
-      console.log('dd')
-    })
-  }
 };
 </script>
 <style lang="less" scoped>

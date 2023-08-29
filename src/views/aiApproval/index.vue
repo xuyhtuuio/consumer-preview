@@ -285,10 +285,6 @@ export default {
       this.$refs.addReview.init(word);
       window.getSelection().removeAllRanges();
     },
-    // 初始化文件
-    initFile() {
-      this.$refs['addFileSource'].init();
-    },
     // 切换审批文件
     async changeFile(i) {
       if (this.activeIndex === i) {

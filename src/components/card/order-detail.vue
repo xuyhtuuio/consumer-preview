@@ -1,3 +1,11 @@
+<!--
+ * @Author: nimeimix huo.linchun@trs.com.cn
+ * @Date: 2023-08-29 13:49:23
+ * @LastEditors: nimeimix huo.linchun@trs.com.cn
+ * @LastEditTime: 2023-08-29 17:18:58
+ * @FilePath: /consumer-preview/src/components/card/order-detail.vue
+ * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
+-->
 
 <template>
   <div class="order-detail">
@@ -23,6 +31,11 @@
           v-if="(status == 3 || status == 5) && item.taskStatus != 3">
           <span class="flex"> <i class="iconfont icon-tijiao"></i>
             <i class="btn">确认</i></span>
+        </el-button>
+        <el-button class="back flex white" type="primary"  @click="compare"
+          v-if="item.taskStatus==6">
+          <span class="flex"> <i class="iconfont icon-tijiao"></i>
+            <i class="btn">去比对</i></span>
         </el-button>
         <div v-if="item.taskStatus == 1" class="flex">
           <!-- <div class="back flex" @click="transferDialog = true">
@@ -139,8 +152,9 @@
         <div class="right-content">
           <keep-alive>
             <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus" :coment="coment"
-              @sendOpinionInfo="sendOpinionInfo" :leaderApproveInfo="leaderApproveInfo" :reviewMaterial="reviewMaterials" :processInstanceId="item.processInstanceId" :taskId="item.taskId" @preview='previewFile'>
-              <template slot="head" >
+              @sendOpinionInfo="sendOpinionInfo" :leaderApproveInfo="leaderApproveInfo" :reviewMaterial="reviewMaterials"
+              :processInstanceId="item.processInstanceId" :taskId="item.taskId" @preview='previewFile'>
+              <template slot="head">
                 <div class="approved-opinion-head">
                   <h2>消保审查意见书</h2>
                   <p>
@@ -242,9 +256,6 @@ export default {
       ],
     };
   },
-  activated() {
-
-  },
   mounted() {
     if (!this.$route.params.formId) {
       const { path } = this.$route
@@ -253,16 +264,24 @@ export default {
         name: url
       })
     }
-    // this.judgeStatus();
     this.clearStoreStatus()
     this.judgeStatus();
   },
   created() { },
   methods: {
+    /**
+     * description:  store置为默认值
+     * return {*}
+     */
     clearStoreStatus() {
       this.$store.commit('setCheckApprovedFormFalse')
     },
     startLoading() { this.loading = true },
+    /**
+     * description: 打开弹窗，预览文件
+     * param {*} url
+     * return {*}
+     */
     previewFile(url) {
       this.previewDialog = true
       this.previewUrl = url
@@ -281,8 +300,6 @@ export default {
       const { path } = this.$route
       const originRouter = path.match(/\/(\S*)\//)[1]
       // 一般进入详情页：展示返回按钮 及 审批记录详细
-      // 已经结束的工单 展示: 返回按钮、审批记录详细、审查意见书、最终上线材
-      // <!-- 任务状态（1：审查中 2：待修改 3：待确认 4：已完成 -->
       let { item } = JSON.parse(window.localStorage.getItem("order-detail"));
       const info = JSON.parse(window.localStorage.getItem("order-detail"));
       this.info = info
@@ -293,7 +310,7 @@ export default {
         this.crtComp = "approvalRecordCard";
         //后期扩展,审批也分好几种类型
       }
-      // 工单-审批中状态 主要区分是否OCR审批、部门审批  所有的的节点
+      // 工单-审批中状态 主要区分是否OCR审批、部门审批  
       if (item.taskStatus == '1') {
         if (originRouter == 'applycenter') {
           this.status = 0;
@@ -318,19 +335,19 @@ export default {
       }
       //  工单-待确认状态
       if (item.taskStatus == '5') {
-        // 工单-有实质性意见
-        if (item.hasOpinions == 1) {
-          this.status = 5;
-        } else {
-          //工单-无实质性意见
-          this.status = 3;
-        }
+        // 工单-有实质性意见 status=5 ；无实质性意见：status=3
+        this.status = item.hasOpinions == 1 ? 5 : 3
         this.crtComp = "approvedOpinionCard";
       }
-      // 工单-已结束状态
+      // 工单-已结束状态  页面回显: 返回按钮、审批记录详细、审查意见书、最终上线材
       if (item.taskStatus == '4') {
         this.status = 4;
         this.crtComp = "approvedOpinionCard";
+      }
+      // 工单-待对比状态
+      if (item.taskStaus == '6') {
+        this.status = 0;
+        this.crtComp = "approvalRecordCard";
       }
     },
     // 获取当前的节点的配置信息
@@ -407,11 +424,26 @@ export default {
         }
       })
     },
+    /**
+     * description: 待比对状态，去比对页面
+     * return {*}
+     */    
+    compare(){
+      this.$router.push({
+        name: 'compare',
+        params:{
+          item
+        }
+      })
+    },
+    /**
+     * description: 页面右上角返回功能
+     * return {*}
+     */    
     goback() {
-      // 申请页 正常返回
       if (this.info) {
         const that = this
-        // 当前状态属于待确认的 要保存意见书
+        // 当前审核模块页面显示为领导审批的或者工单处于待确认的，点击返回的时候，要弹窗提示是否保存当前的操作
         if ([2, 3].includes(this.status) || this.item.taskStatus == '5') {
           const { opinionStorage } = this.$store.state.checkApprovedForm
           if (!opinionStorage || !editOpinionStorage) {
@@ -422,6 +454,7 @@ export default {
               type: "warning",
             })
               .then(() => {
+                //  2：编辑意见   3：待确认模块
                 that.status == 2 ? that.saveEditOpinion() : that.saveOpinion()
               })
               .catch(() => {
@@ -452,7 +485,11 @@ export default {
       })
 
     },
-    //保存编辑意见功能
+  
+    /**
+     * description: 保存编辑意见功能
+     * return {*}
+     */    
     saveEditOpinion() {
       this.loadings.storageLoading = true
       this.$store.commit('setEditOpinionStorage', true)
@@ -494,16 +531,25 @@ export default {
       })
 
     },
+    /**
+     * description: 用于审查意见书显示最下面的时间
+     * param {*} info
+     * return {*}
+     */    
     sendOpinionInfo(info) {
       const arr = info[info.length - 1]
       const time = moment(arr.substantiveopinion[arr.substantiveopinion.length - 1].updateTime).format('YYYY-MM-DD HH:mm:ss') || moment('YYYY-MM-DD HH:mm:ss')
       this.timeNow = time
     },
+    /**
+     * description: 合并右上角的保存、提交功能，由 way区分， storage 保存，update：提交
+     * param {*} way
+     * return {*}
+     */    
     submit(way) {
       const that = this
-      //  待确认的 分有实质性意见和无实质性意见 status:3无/5有
       const { approvedOpinionRequired, uploadFileRequired, editOpinionRequired, editOpinionForm, uploadFileRadio } = this.$store.state.checkApprovedForm
-      //保存功能
+      //保存功能  待确认的工单  分有实质性意见和无实质性意见 status:3无 /5有
       if (way == 'storage' && [3, 5].includes(this.status)) {
         this.$confirm("是否保存已编辑的意见确认信息？", "", {
           customClass: "confirmBox",
@@ -517,7 +563,7 @@ export default {
           })
         return false
       }
-      //状态-审批中；编辑意见-保存功能
+      //保存功能  状态-审批中；编辑意见
       if (this.status == 2 && way == 'storage') {
         this.$confirm("是否保存已编辑的意见确认信息？", "", {
           customClass: "confirmBox",
@@ -532,18 +578,17 @@ export default {
         return false
 
       }
-      // 无实质性意见
+      // 提交功能   工单待确认状态，为无实质性意见的，需要提交审查意见书和最终上线材料
       if (this.status == 3 && way == 'update') {
-        // 有意见书和上线材料
         if (!approvedOpinionRequired) {
-          // 审批页定位第一个未输入项
+          // 审查意见书校验不通过时，要定位第一个未输入项
           this.crtComp = 'approvedOpinionCard'
           this.$nextTick(() => {
             this.$refs['child'].checkParam()
           })
           return false
         }
-        // 定位上线材料
+        // 最终上线材料模块：选中活动正常上线：radio=1,需要上传材料; 选中活动未开展：radio=0，不需要上传材料
         if (uploadFileRadio == 1 && !uploadFileRequired) {
           this.$message({
             type: 'warning',
@@ -592,9 +637,8 @@ export default {
           }
         }
       }
-      //有实质性意见
+      // 提交功能  工单待确认状态，为有实质性意见的，需要提交审查意见书
       if (this.status == 5 && way == 'update') {
-        // 有意见书
         if (!approvedOpinionRequired) {
           this.crtComp == 'approvedOpinionCard'
           this.$nextTick(() => {
@@ -684,6 +728,12 @@ export default {
         })
       }
     },
+    /**
+     * description: 审查意见书提交功能
+     * param {*} opinions
+     * param {*} type
+     * return {*}
+     */    
     async submitOpinion(opinions, type) {
       const that = this
       const { approvedOpinionForm, fileUploadForm, uploadFileRadio } = this.$store.state.checkApprovedForm
