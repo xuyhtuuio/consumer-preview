@@ -277,7 +277,7 @@ export default {
       this.applyLoading = true;
       let that = this;
       let data = {
-        adoptionStatus: 0,
+        adoptionStatus: "",
         approvalStage: "",
         approvalType: "",
         create_time: "",
@@ -287,8 +287,8 @@ export default {
         keywords: "",
         label: "",
         launchDate: "",
-        name: "",
-        pageNo: 1,
+        name: that.userInfo.fullname,
+        pageNow: 1,
         pageSize: 5,
         roleRange: "",
         selected: true,

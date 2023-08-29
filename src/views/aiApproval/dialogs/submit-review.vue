@@ -91,7 +91,7 @@
                     以上为消保审查办公室建议，请酌情考虑。<br />
                 </p>
                 <p
-                    style="font-size:24px;margin-top: 12px; font-weight: 400;line-height: 22px;color: #505968;text-indent: 2em;">
+                    style="font-size 12px;margin-top: 12px; font-weight: 400;line-height: 22px;color: #505968;text-indent: 2em;">
                     送审单位应落实消费者权益保护审查工作主体责任，并根据业务实际情况决定意见采纳情况。活动过程之中，应紧密监控开展情况，优化服务流程，提升客户体验，妥善处理客户投诉，并及时向消保部门反馈。敬请知悉。</p>
                 <p class="organization">
                     <span>消保审查中心</span><br />

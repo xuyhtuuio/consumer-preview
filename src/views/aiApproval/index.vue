@@ -285,10 +285,6 @@ export default {
       this.$refs.addReview.init(word);
       window.getSelection().removeAllRanges();
     },
-    // 初始化文件
-    initFile() {
-      this.$refs['addFileSource'].init();
-    },
     // 切换审批文件
     async changeFile(i) {
       if (this.activeIndex === i) {
@@ -682,7 +678,10 @@ export default {
 
 .content-cont {
   position: relative;
-
+  flex: 1;
+  display: flex;
+  gap: 12px;
+  overflow: hidden;
   &-body {
     flex: 1;
     display: flex;
