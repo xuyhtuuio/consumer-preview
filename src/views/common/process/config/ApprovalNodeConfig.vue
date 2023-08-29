@@ -140,6 +140,7 @@
           <el-radio label="LEADER">领导审批</el-radio>
           <el-radio label="XIAOBAO">消保审批</el-radio>
           <el-radio label="CONFIRM">确认意见</el-radio>
+          <el-radio label="CONTRAST">线上比对</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item class="xiaobao-check" v-if="nodeProps.targetPage === 'XIAOBAO'" label="消保审批权限" prop="xiaobaoCheckAuth">
