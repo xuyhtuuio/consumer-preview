@@ -15,8 +15,8 @@
             <div class="line"></div>
         </div>
         <div>
-            <el-form v-if="false" :model="params" ref="paramsForm" label-width="86px" label-position="left" :rules="rules">
-                <el-form-item label="请选择">
+            <el-form :model="params" ref="paramsForm" label-width="86px" label-position="left" :rules="rules">
+                <!-- <el-form-item label="请选择">
                     <el-radio-group v-model="params.isPasses">
                         <el-radio :label="item.id" v-for="item in passlist" :key="item.id">
                             {{ item.name }}
@@ -45,7 +45,9 @@
                             {{ item.label }}
                         </el-checkbox>
                     </el-checkbox-group>
-                </el-form-item>
+                </el-form-item> -->
+
+                <ExaminePivot ref="refExamine" :titleShow="true" :isWidthDiff="true"></ExaminePivot>
             </el-form>
             <p class="title">消保审查意见书</p>
             <div class="submission-content" v-if="submission.length">
@@ -111,8 +113,9 @@ import {
     ocrApprovalSubmission
 } from "@/api/aiApproval";
 import secondaryConfirmation from "@/components/common/secondaryConfirmation"
+import ExaminePivot from '../components/examine-pivot';
 export default {
-    components: { secondaryConfirmation },
+    components: { secondaryConfirmation,ExaminePivot },
     props: {
         formId: {
             type: String,
@@ -169,7 +172,8 @@ export default {
                 productEssentials: [],
                 reviewPoints: [],
                 submissionName: 'xxxxx',
-            }
+            },
+            examineList: []
         }
     },
     watch: {
@@ -177,6 +181,11 @@ export default {
             if (val) {
                 this.timeNow = moment().format('YYYY-MM-DD HH:mm:ss');
             }
+        },
+        examineList(val) {
+            this.$nextTick(()=>{
+                this.$refs.refExamine.list = val
+            })
         }
     },
     methods: {
@@ -513,4 +522,19 @@ export default {
         font-weight: 400;
         line-height: 28px;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }</style>

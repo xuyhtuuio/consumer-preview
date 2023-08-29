@@ -91,16 +91,15 @@ export default {
         // this.handleCheckAll(val)
         val.length &&
           val.forEach(item => {
-            if(item.name=== "SingleGroupsSelect" && item.value.length === item.props.options.length) {
+            if(item.name=== "SingleGroupsSelect") {
               item.props.options.forEach((propItem,propIndex) => {
                 this.$set(propItem, 'value1','')
-                propItem.value1 = item.value[propIndex]
+                propItem.value1 = item.value[propIndex] || ''
               })
             }
           })
         
       },
-      deep: true
     }
   },
   methods: {
@@ -229,6 +228,13 @@ export default {
     }
   }
 }
+
+
+
+
+
+
+
 
 
 
