@@ -23,7 +23,7 @@
             </div>
             <div class="time-note" v-else>
               <span>任务到达：{{ activity.createTime | timeFormat }}</span>
-              <span class="handle-time">处理：<i>{{ activity|handleTimeFormat }}</i> 小时</span>
+              <span class="handle-time">处理：<i>{{ activity | handleTimeFormat }}</i> 小时</span>
               <span>任务结束：{{ activity.endTime | timeFormat }}</span>
             </div>
           </div>
@@ -57,17 +57,17 @@
             </div> -->
               <p class="opinion-text">{{ idx + 1 }} {{ item.str }}</p>
               <div class="relevant-file">
-              关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.files && item.files[0] }} </i>
-              <el-popover :placement="bottom-end" popper-class="file-overview-popper" trigger="click"
-                v-if="item.files && item.files.length > 1">
-                <div class="file-list">
-                  <div class="file-list-item pointer ellipsis ellipsis_1 " v-for="(file, idx) in item.files" :key="idx">
-                    {{ file }}
+                关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.files && item.files[0] }} </i>
+                <el-popover :placement="bottom - end" popper-class="file-overview-popper" trigger="click"
+                  v-if="item.files && item.files.length > 1">
+                  <div class="file-list">
+                    <div class="file-list-item pointer ellipsis ellipsis_1 " v-for="(file, idx) in item.files" :key="idx">
+                      {{ file }}
+                    </div>
                   </div>
-                </div>
-                <i slot="reference">+{{ item.files.length - 1 }}</i>
-              </el-popover>
-            </div>
+                  <i slot="reference">+{{ item.files.length - 1 }}</i>
+                </el-popover>
+              </div>
             </div>
           </div>
         </div>
@@ -99,7 +99,7 @@ export default {
 
   },
   activated() {
-    if (this.sidebarParam||this.$route.params) {
+    if (this.sidebarParam || this.$route.params) {
       this.init()
     }
   },
@@ -113,15 +113,25 @@ export default {
         if (!detailVOList) {
           return this.hasData = false
         }
-        //  detailVOList 倒叙
+        // detailVOList
+        const keys = Object.keys(detailVOList)
+        let arr = []
+        for (let i in keys) {
+          let obj = {
+          ...detailVOList[keys[i]][0]
+          }
+          arr.push(obj)
+        }
+        const arr_handler = arr.reverse()
+        console.log('d',arr_handler)
 
-        // this.recordList = detailVOList instanceof Array && detailVOList.length ? detailVOList.map(v => {
-        //   const comments =v.optionVOList&&v.optionVOList[0].comments
-        //   return {
-        //     ...v,
-        //     optionVOList:JSON.parse(comments),
-        //   }
-        // }) : []
+        this.recordList = arr_handler instanceof Array && arr_handler.length ? arr_handler.map(v => {
+          const comments = v.optionVOList && v.optionVOList[0].comments
+          return {
+            ...v,
+            optionVOList: JSON.parse(comments),
+          }
+        }) : []
         return this.hasData = true
 
       }).finally(() => {
@@ -131,13 +141,12 @@ export default {
   },
   filters: {
     timeFormat(val) {
-      return moment(val).format('MM-DD HH:mm')
+      return val? moment(val).format('MM-DD HH:mm'):'--'
     },
     handleTimeFormat(val) {
-      let timediff = moment(val.updateTime).diff(moment(val.createTime), 'seconds');
+      let timediff = moment(val.endTime).diff(moment(val.createTime), 'seconds');
       timediff = timediff > 0 ? (timediff / 3600).toFixed(1) : 0
-      return timediff
-
+      return val.endTime? timediff:'--'
     }
   }
 };

@@ -134,7 +134,7 @@ export function downloadAllFiles(param) {
 // 用id获取意见详情
 export function getEditedCommentsByFormId(param){
   return request({
-    url: '/cpr/approvalrecord/getEditedCommentsByFormId',
+    url: '/cpr/approvalrecord/getOpinionLetterByFormId',
     contentType:'application/x-www-form-urlencoded',
     method: 'post',
     data: param
@@ -151,7 +151,7 @@ export function insertApprovalRecordAndEditedComments(param){
 //审查意见书 提交
 export function updateAdoptEditedComments(param,id){
   return request({
-    url: `/cpr/approvalrecord/updateAdoptEditedComments?taskId=${id}`,
+    url: `/cpr/approvalrecord/opinionConfirmation?taskId=${id}`,
     method: 'post',
     data: param
   })
@@ -159,7 +159,7 @@ export function updateAdoptEditedComments(param,id){
 // 保存审查意见书
 export function updateEditedComments(param){
   return request({
-    url: '/cpr/approvalrecord/updateEditedComments',
+    url: '/cpr/approvalrecord/temporaryOpinions',
     method: 'post',
     contentType:'application/json',
     data: param
@@ -194,4 +194,5 @@ export function  getTemplatedetail(param){
     data: param
   })
 }
+
 

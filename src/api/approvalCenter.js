@@ -131,3 +131,12 @@ export function finalMaterial(param,processInstanceId,taskId){
     data: param,
   })
 }
+
+//上线材料查询
+export function findFinalMaterial(processInstanceId,taskId){
+  return request({
+    url: `/cpr/workspace/findFinalMaterial/${processInstanceId}/${taskId}`,
+    method: 'get',
+  })
+}
+
