@@ -160,7 +160,7 @@ export default {
             }).then(res => {
                 const { data, status, message } = res.data;
                 if (status === 200) {
-                    this.getBsicData(data,true)
+                    this.getBsicData(data, true)
                 } else {
                     this.getBsicData({
                         basicInformation: [], keyPointsForVerification: [], promotionChannels: [], reviewMaterials: []
@@ -199,6 +199,7 @@ export default {
                 promotionChannels: MultipleGroupsSelect,
                 fileList: reviewMaterials && reviewMaterials[0].value
             }
+            this.$emit('sendReviewMaterials',reviewMaterials && reviewMaterials[0].value)
         },
         preview(url) {
             this.$emit('preview', url)
@@ -260,9 +261,7 @@ export default {
             })
             strings = array.map(m => { return m.value }).join('、')
             return strings || '--'
-
         }
-
     },
     filters: {
         valueFormat(val) {

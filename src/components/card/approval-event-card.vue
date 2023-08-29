@@ -16,12 +16,13 @@
           }}>{{ item.nodeName }}</i>
           <i v-if="item.taskStatus === '3'" class="tag in-modify">{{ $msg('NodeStatus')[item.taskStatus] }}>{{
             item.nodeName }}</i>
-          <i v-if="item.taskStatus === '5'" class="tag check">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName
+          <i v-if="['5', '6'].includes(item.taskStatus)" class="tag check">{{ $msg('NodeStatus')[item.taskStatus] }}>{{
+            item.nodeName
           }}</i>
           <i v-if="item.taskStatus === '4'" class="end">
             <i class="tag end-sign"> {{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }} </i> </i>
           <!-- 有无意见 -->
-          <i v-if="item.taskStatus === '5' || item.taskStatus === '4'" class="flex">
+          <i v-if="['4', '5', '6'].includes(item.taskStatus)" class="flex">
             <i class="tag has-opinion" v-if="item.substantiveOpinions == 1">
               <i class="iconfont icon-guanzhu2"></i>
               有实质性意见
@@ -84,6 +85,10 @@
         @click="check(item)">
         <span class="iconfont icon icon-tubiao urgent-icon"></span>
         确认</span>
+      <span class="attention check icon-op" v-if="item.taskStatus == 6 && crtSign !== 'approvedCount'"
+        @click="compare(item)">
+        <span class="iconfont icon icon-compare urgent-icon"></span>
+        比对</span>
       <!-- 关注 -->
       <span class="attention no-attention icon-op" v-if="item.followed != 1" @click="concern(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
@@ -123,16 +128,32 @@ export default {
     async toApproval(item) {
       // 判断是领导审批 还是 OCR 审批
       const params = {
-        processInstanceId:item.processInstanceId
+        processInstanceId: item.processInstanceId
       }
       const res = await getTemplatedetail(params)
       if (res.data) {
         const { data } = res.data
         const targetPage = data[data.length - 1].props['targetPage']
-        targetPage == 'LEADER' ? this.toDetail(item) : (this.$router.push({
-          name: "aiApproval",
-          params: { item }
-        }))
+        switch (targetPage) {
+          case 'LEADER':
+            this.toDetail(item)
+            break;
+          case 'CONFIRM':
+            this.toDetail(item)
+            break;
+          case 'CONTRAST':
+            this.$router.push({
+              name: 'compare',
+              params: { item }
+            })
+            break;
+          case 'XIAOBAO':
+            this.$router.push({
+              name: "aiApproval",
+              params: { item }
+            })
+            break;
+        }
       }
     },
     toDetail(item) {
@@ -166,7 +187,7 @@ export default {
           formId: item.recordId,
           taskName: item.taskName,
           processInstanceId: item.processInstanceId,
-          formManagementId:item.formManagementId
+          formManagementId: item.formManagementId
         },
       });
     },
@@ -199,7 +220,7 @@ export default {
           formId: item.recordId,
           taskName: item.taskName,
           processInstanceId: item.processInstanceId,
-          formManagementId:item.formManagementId
+          formManagementId: item.formManagementId
         },
       });
     },
@@ -216,6 +237,12 @@ export default {
         }
       });
     },
+    //比对功能
+    compare(item) {
+      this.$router.push({
+        name: 'compare'
+      })
+    }
   },
 
   filters: {

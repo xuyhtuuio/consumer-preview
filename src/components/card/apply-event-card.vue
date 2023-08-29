@@ -18,13 +18,13 @@
           }}>{{ item.currentActivityName }}</i>
           <i v-if="item.taskStatus === '3'" class="tag in-modify">{{ $msg('NodeStatus')[item.taskStatus] }}>{{
             item.currentActivityName }}</i>
-          <i v-if="item.taskStatus === '5'" class="tag check">{{ $msg('NodeStatus')[item.taskStatus] }}>{{
+          <i v-if="['5', '6'].includes(item.taskStatus)" class="tag check">{{ $msg('NodeStatus')[item.taskStatus] }}>{{
             item.currentActivityName }}</i>
           <i v-if="item.taskStatus === '4'" class="end">
             <i class="tag end-sign">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }} </i>
           </i>
           <!-- 有无意见 -->
-          <i class="flex" v-if="item.taskStatus === '5' || item.taskStatus === '4'">
+          <i class="flex" v-if="['4', '5','6'].includes(item.taskStatus)">
             <i class="tag has-opinion" v-if="item.substantiveOpinions == 1">
               <i class="iconfont icon-guanzhu2"></i>
               有实质性意见

@@ -49,6 +49,7 @@ export default (function () {
     '3': '待修改',
     '4': '已完成',
     '5': '待确认',
+    '6': '待比对'
   }
   return locales
 })()

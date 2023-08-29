@@ -29,7 +29,8 @@
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
           </div> -->
-          <el-button class="back flex" style='border:none;' v-if="!isOCR" :loading="loadings.storageLoading" @click="submit('storage')">
+          <el-button class="back flex" style='border:none;' v-if="!isOCR" :loading="loadings.storageLoading"
+            @click="submit('storage')">
             <span class="flex"> <i class="iconfont icon-baocun"></i>
               <i class="btn">保存</i></span>
           </el-button>
@@ -75,7 +76,8 @@
             </i>
           </span>
         </div>
-        <order-basic-info @preview='previewFile' :personInfo="item.initiator"></order-basic-info>
+        <order-basic-info @preview='previewFile' :personInfo="item.initiator"
+          @sendReviewMaterials="sendReviewMaterials"></order-basic-info>
       </div>
       <div class="right">
         <!-- 消保审查/详情页/审批中预览 -->
@@ -99,10 +101,10 @@
               crtComp = 'approvedOpinionCard';
             }
               ">审查意见书</span>
-            <!-- <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
+            <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
               crtComp = 'uploadFileCard';
             }
-              "><i style="color: #eb5757">*</i> 最终上线材料</span> -->
+              "><i style="color: #eb5757">*</i> 最终上线材料</span>
             <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
               crtComp = 'approvalRecordCard';
             }
@@ -137,7 +139,7 @@
         <div class="right-content">
           <keep-alive exclude="leader-edit-opinion">
             <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus" :coment="coment"
-              @sendOpinionInfo="sendOpinionInfo" :leaderApproveInfo="leaderApproveInfo">
+              @sendOpinionInfo="sendOpinionInfo" :leaderApproveInfo="leaderApproveInfo" :reviewMaterial="reviewMaterials">
               <template slot="head">
                 <div class="approved-opinion-head">
                   <h2>消保审查意见书</h2>
@@ -190,10 +192,9 @@ import approvalRecordCard from "@/components/card/approval-record-card.vue";
 import approvedOpinionCard from "@/components/card/approved-opinion-card.vue";
 import uploadFileCard from "@/components/card/upload-file-card";
 import filePreview from '@/components/filePreview'
-import { leaderEdit } from '@/api/approvalCenter'
+import { leaderEdit, finalMaterial } from '@/api/approvalCenter'
 import { updateAdoptEditedComments, updateEditedComments, getTemplatedetail } from '@/api/applyCenter'
 import moment from 'moment';
-import { set } from 'vue';
 export default {
   name: "order-details",
   components: {
@@ -229,6 +230,7 @@ export default {
       coment: {},
       personInfo: {},
       leaderApproveInfo: {},//TO_NODE TO_BEFORE
+      reviewMaterials: [],//工单上已上传的文件
       peoples: [
         { name: "王明明", code: 1 },
         { name: "王明明", code: 2 },
@@ -269,6 +271,10 @@ export default {
         name: "aiApproval",
         params: { item: this.item }
       });
+    },
+    // 从左侧详情获取到的上传文件详情
+    sendReviewMaterials(val) {
+      this.reviewMaterials = val
     },
     async judgeStatus() {
       const { path } = this.$route
@@ -335,7 +341,7 @@ export default {
       let assignedUser = []
       let disavower = []
       let taskId = this.item.taskId,
-      processInstanceId=this.item.processInstanceId
+        processInstanceId = this.item.processInstanceId
       const params = {
         processInstanceId: this.item.processInstanceId
       }
@@ -346,10 +352,9 @@ export default {
         refuseWay = data[data.length - 1].props['refuseWay']
         mode = data[data.length - 1].props['mode']
         assignedUser = data[data.length - 1].props['assignedUser']?.filter(v => v.type !== 'dept')?.map(v => v.id)
-        if (targetPage !== 'LEADER') {
-         //如果是消保审批
+        if (targetPage == 'XIAOBAO') {
+          //如果是消保审批
           return { targetPage, refuseWay, mode, assignedUser }
-        //如果是消保审批
         }
         //如果是领导审批，走下面的判断
         //驳回人列表处理    发起人
@@ -389,7 +394,7 @@ export default {
         })
         approver = nextApprovers
         assignedType = data[data.length - 1]?.children?.props?.assignedType
-        return { targetPage, refuseWay, disavower, approver, assignedType, mode, assignedUser,taskId,processInstanceId }
+        return { targetPage, refuseWay, disavower, approver, assignedType, mode, assignedUser, taskId, processInstanceId }
       }
     },
     toModify() {
@@ -450,10 +455,6 @@ export default {
     saveEditOpinion() {
       this.loadings.storageLoading = true
       this.$store.commit('setEditOpinionStorage', true)
-      // setTimeout(() => {
-      //   this.$message.success({ message: '已保存当前意见确认内容' })
-      //   this.loadings.storageLoading = false
-      // }, 2000)
       const { editOpinionForm } = this.$store.state.checkApprovedForm
       const { assignedUser } = editOpinionForm
       let params = {
@@ -476,20 +477,20 @@ export default {
       }
       this.loadings.storageLoading = true
       leaderEdit(params).then(res => {
-          const { success, msg } = res.data
-          if (success) {
-            this.loadings.storageLoading = false
-            this.$message.success('审查意见已保存')
-            setTimeout(() => {
-              this.$router.replace({ name: 'approvalcenter' })
-            }, 600)
-          } else {
-            this.$message.error(msg)
-          }
-        }).catch(err => {
+        const { success, msg } = res.data
+        if (success) {
           this.loadings.storageLoading = false
-          this.$message.error('审查意见保存失败')
-        })
+          this.$message.success('审查意见已保存')
+          setTimeout(() => {
+            this.$router.replace({ name: 'approvalcenter' })
+          }, 600)
+        } else {
+          this.$message.error(msg)
+        }
+      }).catch(err => {
+        this.loadings.storageLoading = false
+        this.$message.error('审查意见保存失败')
+      })
 
     },
     sendOpinionInfo(info) {
@@ -500,7 +501,7 @@ export default {
     submit(way) {
       const that = this
       //  待确认的 分有实质性意见和无实质性意见 status:3无/5有
-      const { approvedOpinionRequired, uploadFileRequired, editOpinionRequired, editOpinionForm } = this.$store.state.checkApprovedForm
+      const { approvedOpinionRequired, uploadFileRequired, editOpinionRequired, editOpinionForm, uploadFileRadio } = this.$store.state.checkApprovedForm
       //保存功能
       if (way == 'storage' && [3, 5].includes(this.status)) {
         this.$confirm("是否保存已编辑的意见确认信息？", "", {
@@ -515,7 +516,7 @@ export default {
           })
         return false
       }
-      //状态审批中；编辑意见-保存功能
+      //状态-审批中；编辑意见-保存功能
       if (this.status == 2 && way == 'storage') {
         this.$confirm("是否保存已编辑的意见确认信息？", "", {
           customClass: "confirmBox",
@@ -542,15 +543,15 @@ export default {
           return false
         }
         // 定位上线材料
-        // if (!uploadFileRequired) {
-        //   this.$message({
-        //     type: 'warning',
-        //     customClass: 'el-icon-warning-one',
-        //     message: '当前未上传最终上线材料，请上传材料后提交'
-        //   })
-        //   this.crtComp = 'uploadFileCard'
-        //   return false
-        // }
+        if (uploadFileRadio == 1 && !uploadFileRequired) {
+          this.$message({
+            type: 'warning',
+            customClass: 'el-icon-warning-one',
+            message: '当前未上传最终上线材料，请上传材料后提交'
+          })
+          this.crtComp = 'uploadFileCard'
+          return false
+        }
         // 意见提交
         if (approvedOpinionRequired) {
           if (way == 'update') {
@@ -587,8 +588,6 @@ export default {
                   this.loadings.submitLoading = false
                 });
             }
-            //上线材料提交
-            //保存 给个状态吧
           }
         }
       }
@@ -684,9 +683,9 @@ export default {
         })
       }
     },
-    submitOpinion(opinions, type) {
+    async submitOpinion(opinions, type) {
       const that = this
-      const { approvedOpinionForm, fileUploadForm } = this.$store.state.checkApprovedForm
+      const { approvedOpinionForm, fileUploadForm, uploadFileRadio } = this.$store.state.checkApprovedForm
       const params = approvedOpinionForm.map(v => {
         return {
           adoptOpinions: v.adoptOpinions,
@@ -696,22 +695,23 @@ export default {
           cacheFlag: 0
         }
       })
-      if (!opinions) {
-        //上传文件的逻辑
-      }
-      const user = JSON.parse(window.localStorage.getItem('user_name'))
-      const submission = []
-      const data = {
-        approvalSubmissionDto: {
-          editedCommentsDtoList: [],
-          formId: this.item.recordId
-        },
-        processInstanceId: this.item.processInstanceId,
-        taskId: this.item.taskId,
-        currentUserInfo: {
-          id: user.id,
-          name: user.fullname
-        }
+      let fileSuccess = null
+      //上传文件的逻辑 选中活动正常上线
+      if (!opinions && uploadFileRadio == 1) {
+        const params = fileUploadForm.map(v => {
+          return {
+            fileName: v.fileName,
+            key: v.key,
+            url: v.url,
+            isRelation: true,
+            otherFilename: v.relevantFile.fileName,
+            otherKey: v.relevantFile.key,
+            otherUrl: v.relevantFile.url
+          }
+        })
+        const fileRes = await finalMaterial(params, this.item.processInstanceId, this.item.taskId)
+        const { success } = fileRes.data
+        fileSuccess = success
       }
       updateAdoptEditedComments(params, this.item.taskId).then(res => {
         this.loadings.submitLoading = false

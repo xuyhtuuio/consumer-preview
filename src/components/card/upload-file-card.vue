@@ -1,64 +1,115 @@
 <template>
   <div class="upload-file-card">
+    <p v-if="status !== 4" class="normal-onLine">
+      <span> 请选择活动是否正常上线 <i>*</i></span><br />
+      <el-radio-group v-model="radio">
+        <el-radio :label="1">活动正常上线</el-radio>
+        <el-radio :label="0">活动未开展</el-radio>
+      </el-radio-group>
+    </p>
     <p class="head" v-if="status !== 4">
       请上传最终上线版本，且已审批通过的材料
     </p>
     <el-upload v-if="status !== 4" class="upload-demo" drag action :http-request="uploadBpmn" :file-list="fileList"
       :on-success="handleSuccess" :before-upload="handleBefore" :on-error="handleError" :show-file-list="false">
       <i class="el-icon-upload"></i>
-      <div class="el-upload__text">
+      <div class="el-upload__text" v-if="radio == 1">
         <p>将文件拖到此处，或<em>点击上传</em></p>
-        <p>支持zip/jpg/png/pdf/doc/xls/mp4/ppt/txt/格式的文件</p>
+        <p>支持jpg/png/pdf/doc/xls/mp4/ppt/txt/格式的文件</p>
+      </div>
+      <div class="el-upload__text" v-if="radio == 0">
+        当前不需要上传材料
       </div>
     </el-upload>
     <div :class="{ 'upload-list': true, status4: status == 4 }">
       <div class="item" v-for="(item, index) in fileList" :key="index" @mouseenter="handleMouseEnter(item)"
         @mouseleave="handleMouseLeave(item)">
         <div class="left">{{ `${index + 1}.` }}</div>
-        <div class="center">
-          <g-icon class="left-icon" stylePx="16" :href="fileSuffix[item.type]" />{{ item.name }}
+        <div class="center" style="color: #1D2128;">
+          <file-type :fileName="item.fileName"></file-type>
+          <i>{{ item.fileName | getFileName }}</i>
+          <i style="color: #505968;"> .{{ item.fileName.split('.')[item.fileName.split('.').length - 1] }}</i>
         </div>
         <div class="right">
           <div class="r-item progress" v-if="item.status === -1">上传中...</div>
-          <div class="r-item progress" v-if="item.status === 1 && !item.isClick">
-            上传完成
+          <div class="r-item progress" v-if="item.status === 1">
+            <!-- 在这里匹配是否关联成功 -->
+            <span v-if="item.hasRelevant && !item.isClick" class="flex" style="line-height: 18px;color:#14C9C9">
+              <i class="icon el-icon-circle-check" style="margin-right: 4px; font-size: 18px; color: #14C9C9;"></i>
+              已关联
+            </span>
+            <span v-if="!item.hasRelevant" class="flex" style="line-height: 18px;color: #EB5757;"
+              @click="openRelevant(item)">
+              <i class="icon el-icon-warning-outline" style="margin-right: 4px; font-size: 18px;color:#EB5757;"></i>
+              去关联
+            </span>
+            <span v-if="item.hasRelevant && item.isClick" @click="cancelRelevant(item)">
+              取消关联
+            </span>
           </div>
           <div class="r-item error" v-if="item.status === -2 && !item.isClick">
             上传失败
           </div>
-          <div class="r-item success" v-if="item.status === 1 && item.isClick">
-            <span class="s-item" @click="handleUploadLook(item.url)">预览</span>
+          <!-- <div class="r-item success" v-if="item.status === 1 && item.isClick">
             <span class="s-item" @click="handleUploadDelete(item)" v-if="status !== 4">删除</span>
-            <span class="s-item" @click="handleDownload(item)" v-if="status == 4">下载</span>
-          </div>
-          <div class="r-item error" v-if="item.status === -2 && item.isClick">
+          </div> -->
+          <!-- <div class="r-item error" v-if="item.status === -2 && item.isClick">
             <span class="s-item success" @click="handleUploadDelete(item)">删除</span>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
+    <!-- <el-button @click="showme">哈哈</el-button> -->
     <div v-if="status == 4">
       <p class="downloadAll">下载全部</p>
     </div>
+    <el-dialog title="关联文件" :visible.sync="relevantDocumentDialog" width="624" :before-close="handleClose"
+      custom-class="relevant-dialog">
+      <div>
+        <p class="relevant-filename">请选择与<i style="color: #2D5CF6;">{{ waitRelevantDocument.name }}</i>关联的文件：</p>
+        <ul style="overflow: hidden;padding-top: 16px;">
+          <div style="overflow: auto;max-height: 300px;" class="trs-scroll">
+            <li v-for="(item, index) in reviewMaterials" :key="index">
+              <span>{{ index + 1 }}.
+                <file-type :fileName="item.fileName"></file-type>
+                <i>{{ item.fileName | getFileName }}</i>
+                <i style="color: #505968;"> .{{ item.fileName.split('.')[item.fileName.split('.').length - 1] }}</i>
+              </span>
+              <span>
+                <i style="color: #2D5CF6;" class="pointer" v-if="!item.hasRelevant" @click="relevantItem(item)">关联</i>
+                <i style="color: #86909C;" class="pointer" v-if="item.hasRelevant">已关联</i>
+              </span>
+            </li>
+          </div>
+        </ul>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 import { getFormGroups, deleteFormGroups } from "@/api/front.js";
+import FileType from "@/components/common/file-type";
+import { finalMaterial } from '@/api/approvalCenter'
 export default {
   name: "upload-file-card",
-  components: {},
+  components: { FileType },
   props: {
     status: {
       type: Number,
+      // 3 代表待确认  5 已结束
       default: 0,
+    },
+    reviewMaterial: {
+      type: Array,
+      default: () => [],
     },
   },
   data() {
     return {
       fileList: [],
-      judgment: "zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/",
+      reviewMaterials: this.reviewMaterial,
+      judgment: "jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/",
       fileSuffix: {
-        zip: "#icon-zip",
         pdf: "icon-mianxingtubiao",
         doc: "#icon-mianxingtubiao-2",
         docx: "#icon-mianxingtubiao-2",
@@ -72,20 +123,117 @@ export default {
         jpg: "#icon-picture",
         png: "#icon-picture",
       },
+      radio: 1,
+      relevantDocumentDialog: false,
+      waitRelevantDocument: {} //等待关联的文件
     };
   },
+  watch: {
+    radio(val) {
+      this.$store.commit('setUploadFileRadio', val)
+    }
+  },
+  mounted() {
+    this.reviewMaterials = this.reviewMaterials.map(v => {
+      return {
+        ...v,
+        name: v.fileName,
+        hasRelevant: false,
+        relevantFile: {},
+      }
+    })
+  },
   methods: {
+    handleClose() {
+      this.waitRelevantDocument = {}
+      this.relevantDocumentDialog = false
+    },
+    // 弹窗内取消关联
+    dialogCancelRev(item) {
+      this.fileList.forEach(m => {
+        if (m.key == item.relevantFile.key) {
+          m.hasRelevant = false
+          m.relevantFile = {}
+          m.relevantFileName = ''
+        }
+      })
+      item.hasRelevant = false
+      item.relevantFile = {}
+      item.relevantFileName = ''
+    },
+    //在弹窗内关联某个文件
+    relevantItem(item) {
+      const { key, url, fileName } = this.waitRelevantDocument
+      item.relevantFile = {
+        key, url, fileName
+      }
+      item.hasRelevant = true
+      item.relevantFileName = fileName
+      this.fileList.forEach(m => {
+        if (m.key == this.waitRelevantDocument.key) {
+          m.hasRelevant = true
+          item.relevantFileName = fileName
+          m.relevantFile = {
+            key, url, fileName
+          }
+        }
+      })
+      this.handleClose()
+    },
+    // 上传后去关联
+    openRelevant(item) {
+      this.waitRelevantDocument = item
+      this.relevantDocumentDialog = true
+    },
+    //取消关联
+    cancelRelevant(item) {
+      this.fileList.forEach(m => {
+        if (m.key === item.key) {
+          m.hasRelevant = false
+          m.relevantFileName = ''
+          m.relevantFile = {}
+        }
+      })
+      this.reviewMaterials.forEach(m => {
+        if (m?.relevantFile?.fileName == item.fileName) {
+          m.hasRelevant = false
+          m.relevantFile = {}
+          m.relevantFileName = ''
+        }
+      })
+    },
+    dialogLiEnter(item) {
+      this.dialogCrtLi = item.key
+    },
+    dialogLiLeave(item) {
+      this.dialogCrtLi = ''
+    },
     handleSuccess(data, id) {
+      console.log('handleSuccess', data)
       this.fileList.forEach((item) => {
+        const flag = this.reviewMaterials.some(v => v.fileName == data.fileName)
+        //上传完之后，跟reviewMaterials自动匹配
+        const relevantFile = this.reviewMaterials.filter(v => v.fileName == data.fileName)[0]
         if (item.id === id) {
           item.key = data.key;
           item.url = data.url;
           item.status = 1;
+          item.hasRelevant = flag
+          item.relevantFile = relevantFile
+          item.relevantFileName = flag ? relevantFile.fileName : ''
         }
       });
-      this.$store.commit('setUploadFileRequired',this.fileList.length>0)
+      this.reviewMaterials.forEach(m => {
+        if (m.fileName == data.fileName) {
+          m.hasRelevant = true
+          m.relevantFile = data
+          m.relevantFileName = data.fileName,
+            autoRelevant = true
+        }
+      })
+      this.$store.commit('setUploadFileRequired', this.fileList.length > 0)
       this.$store.commit('setUploadFileForm', this.fileList)
-      console.log(')',this.$store.state.checkApprovedForm.uploadFileRequired)
+      console.log(')', this.$store.state.checkApprovedForm.uploadFileRequired)
     },
     handleDownload() {
       this.$message.success("下载中");
@@ -101,7 +249,6 @@ export default {
     // 上传文件
     uploadBpmn(param) {
       const formData = new FormData();
-      console.log(param);
       formData.append("mf", param.file); // 传入bpmn文件
       getFormGroups(formData)
         .then((res) => {
@@ -110,6 +257,7 @@ export default {
         .catch((err) => {
           param.onError(param.file.uid);
         });
+
     },
     handleUploadLook(url) {
       window.open(url);
@@ -127,7 +275,7 @@ export default {
         this.fileList.splice(idx, 1);
         this.$message({ type: 'success', message: res.data.data });
         //更新store里的状态 form 和 是否上传文件的数量>1
-        this.$store.commit('setUploadFileRequired',this.fileList.length>0)
+        this.$store.commit('setUploadFileRequired', this.fileList.length > 0)
         this.$store.commit('setUploadFileForm', this.fileList)
       });
     },
@@ -136,27 +284,58 @@ export default {
       const type = file.name.replace(/.+\./, "");
       const judgeArr = this.judgment.split("/");
       const judgeRes = judgeArr.includes(type);
+      if (!judgeRes) {
+        this.$message({
+          type: "error",
+          message:
+            "只支持jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/格式的文件！",
+        });
+        return false;
+      }
       this.fileList.push({
-        name: file.name,
+        fileName: file.name,
         id: file.uid,
         status: -1,
         isClick: false,
         type: type,
       });
-      if (!judgeRes) {
-        this.$message({
-          type: "error",
-          message:
-            "只支持zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/格式的文件！",
-        });
-        return false;
-      }
     },
   },
+  filters: {
+    getFileName(val) {
+      return val.replace(/(.*\/)*([^.]+).*/ig, "$2")
+    }
+  }
 };
 </script>
 <style lang="less" scoped>
 .upload-file-card {
+  .normal-onLine {
+    margin-bottom: 16px;
+
+    span {
+
+      color: #000;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 22px;
+
+      /* 157.143% */
+      i {
+        color: #F76560;
+      }
+    }
+
+    .el-radio-group {
+      margin-top: 8px;
+      border-radius: 4px;
+      width: 100%;
+      background: #F7F8FA;
+      padding: 8px 12px;
+    }
+  }
+
   .head {
     color: #1d2128;
     font-size: 12px;
@@ -231,8 +410,11 @@ export default {
         flex: 1;
         display: flex;
         align-items: center;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 22px;
 
-        .left-icon {
+        .icon {
           margin: 0 10px;
         }
       }
@@ -289,9 +471,71 @@ export default {
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
-    /* 157.143% */
     text-decoration-line: underline;
     margin-top: 16px;
+
+  }
+}
+
+/deep/ .relevant-dialog {
+  padding: 36px;
+
+  .el-dialog__header {
+    text-align: center;
+    padding: 0;
+    margin-bottom: 20px;
+
+    .el-dialog__title {
+      color: #1D2128;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 22px;
+    }
+
+    .el-dialog__headerbtn {
+      top: 32px;
+      right: 40px;
+    }
+  }
+
+  .el-dialog__body {
+    padding: 0;
+    max-height: 340px;
+    font-size: 22px;
+
+    .relevant-filename {
+      color: #1D2128;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 22px;
+    }
+
+    ul {
+      li {
+        display: flex;
+        justify-content: space-between;
+        color: #1D2128;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 22px;
+        padding: 8px 12px;
+        margin: 16px 0;
+
+        .file-name {}
+
+        .icon {
+          margin: 0 10px;
+          font-size: 20px;
+        }
+      }
+
+      li:nth-of-type(1) {
+        margin-top: 0;
+      }
+    }
 
   }
 }

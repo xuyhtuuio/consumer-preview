@@ -170,7 +170,8 @@ export default new Vuex.Store({
     designSave: {},
     checkApprovedForm: {
       approvedOpinionRequired: true,  //默认给了采纳所以为true
-      uploadFileRequired: true, //默认已经上传
+      uploadFileRequired: false, //
+      uploadFileRadio: 1, //默认需要上传
       approvedOpinionForm: [],
       fileUploadForm: [],
       opinionStorage: false,
@@ -211,6 +212,9 @@ export default new Vuex.Store({
     setUploadFileRequired(state, val) {
       state.checkApprovedForm.uploadFileRequired = val
     },
+    setUploadFileRadio(state, val) {
+      state.checkApprovedForm.uploadFileRadio = val
+    },
     setEditOpinionStorage(state, val) {
       state.checkApprovedForm.editOpinionStorage = val
     },
@@ -222,15 +226,15 @@ export default new Vuex.Store({
     },
     setCheckApprovedFormFalse(state) {
       state.checkApprovedForm.approvedOpinionRequired = true //默认给了采纳所以为true
-      state.checkApprovedForm.uploadFileRequired = true
+      state.checkApprovedForm.uploadFileRequired = false
       state.checkApprovedForm.approvedOpinionForm = []
       state.checkApprovedForm.fileUploadForm = []
       state.checkApprovedForm.opinionStorage = false
       state.checkApprovedForm.editOpinionStorage = false
       state.checkApprovedForm.editOpinionForm = {}
       state.checkApprovedForm.editOpinionRequired = false
+      state.checkApprovedForm.uploadFileRadio = false
     }
-
   },
   getters: {
   },
