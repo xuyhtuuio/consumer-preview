@@ -39,39 +39,36 @@
                 :show-all-levels="false" @change="changeAgencies"
                 :props="{ checkStrictly: true, label: 'name', value: 'id', children: 'children', }"
                 clearable></el-cascader>
- 
-              <!-- <el-select v-model="search.hasOpinions" placeholder="驳回次数" @change="searchList" clearable>
-                <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
+              <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @change="searchList" clearable>
+                <el-option v-for="(item, index) in $field('adoptionSituations')" :key="index" :label="item.label"
                   :value="item.value"></el-option>
               </el-select>
-              <el-select v-model="search.hasOpinions" placeholder="是否一次通过" @change="searchList" clearable>
-                <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
-              </el-select> -->
-              <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @change="searchList" clearable>
-                <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
-              </el-select>
-              <el-select v-model="search.updateTime2" placeholder="排序" ref="multiSelect" multiple @change="changeSort"
-                :class="search.updateTime2[1] == 'desc'
-                  ? 'arrow-select descArrow'
-                  : 'arrow-select ascArrow'
-                  ">
+              <el-select v-model="search.updateTime2" ref="multiSelect" multiple @change="changeSort" :class="search.updateTime2[1] == 'desc'
+                ? 'arrow-select descArrow'
+                : 'arrow-select ascArrow'
+                ">
                 <el-option-group v-for="group in $field('updateTimeGroup')" :key="group.label">
                   <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-option-group>
               </el-select>
-              <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @change="searchList" clearable>
-                <el-option v-for="(item, index) in $field('adoptionSituations')" :key="index" :label="item.label"
+              <el-select v-model="search.returnSign" placeholder="驳回次数" @change="searchList" clearable>
+                <el-option v-for="(item, index) in $field('isReject')" :key="index" :label="item.label"
                   :value="item.value"></el-option>
               </el-select>
-              <div class="el-select" style="margin-left: 0;">
-              </div>
-              <div class="el-select" style="margin-left: 0;">
-              </div>
-              <div class="el-select" style="margin-left: 0;">
-              </div>
+              <el-select v-model="search.onceAdopt" placeholder="一次通过" @change="searchList" clearable>
+                <el-option v-for="(item, index) in $field('isOncePass')" :key="index" :label="item.label"
+                  :value="item.value"></el-option>
+              </el-select>
+              <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @change="searchList" clearable>
+                <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
+                  :value="item.value"></el-option>
+              </el-select>
+              <div class="el-select"></div>
+              <div class="el-select"></div>
+
+
+
             </div>
             <div class="floor2">
               <div class="floor2-item">
@@ -751,17 +748,14 @@ export default {
         .el-cascader {
           margin-bottom: 12px;
           // margin-right: 16px;
+          // flex: 1;
           width: 20%;
           padding-right: 16px;
         }
 
-        .el-cascader {
-          margin-right: 0;
-        }
-
-        .el-select:last-of-type {
-          margin-left: 16px;
-        }
+        // .el-select:last-of-type {
+        //   padding-right: 16px;
+        // }
 
         /deep/ .el-cascader .el-input .el-icon-arrow-down::before {
           font-family: element-icons !important;
@@ -778,12 +772,18 @@ export default {
           display: flex;
           align-items: center;
 
+          /deep/ .el-input .el-input__suffix .el-input__suffix-inner {
+            display: none !important;
+          }
+
+
           &::before {
+            display: none;
             font-family: element-icons !important;
             content: "\e6e6";
             display: inline-block;
             position: absolute;
-            top: 52%;
+            top: 50%;
             transform: translateY(-50%);
             left: 12px;
             color: #86909c;
@@ -813,7 +813,7 @@ export default {
             content: "\e6eb";
             display: inline-block;
             position: absolute;
-            top: 52%;
+            top: 50%;
             transform: translateY(-50%);
             left: 12px;
             color: #86909c;

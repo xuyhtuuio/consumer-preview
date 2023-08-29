@@ -240,7 +240,10 @@ export default {
     //比对功能
     compare(item) {
       this.$router.push({
-        name: 'compare'
+        name: 'compare',
+        params:{
+          item
+        }
       })
     }
   },

@@ -123,8 +123,6 @@ export default {
           arr.push(obj)
         }
         const arr_handler = arr.reverse()
-        console.log('d',arr_handler)
-
         this.recordList = arr_handler instanceof Array && arr_handler.length ? arr_handler.map(v => {
           const comments = v.optionVOList && v.optionVOList[0].comments
           return {

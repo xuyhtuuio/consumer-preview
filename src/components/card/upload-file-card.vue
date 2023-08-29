@@ -29,8 +29,9 @@
         </div>
       </div>
     </div>
+
     <div :class="{ 'upload-list': true, status4: status == 4 }" v-loading='loading'>
-      <Empty v-if="status == 4 && fileList.length == 0"></Empty>
+      <Empty v-if="status == 4 &&fileList&& fileList.length == 0"></Empty>
       <div class="item" v-for="(item, index) in fileList" :key="index" @mouseenter="handleMouseEnter(item)"
         @mouseleave="handleMouseLeave(item)">
         <div class="left">{{ `${index + 1}.` }}</div>
@@ -74,7 +75,7 @@
         </div>
       </div>
     </div>
-    <div v-if="status == 4 && fileList.length">
+    <div v-if="status == 4 && fileList&&fileList.length">
       <p class="downloadAll">下载全部</p>
     </div>
     <el-dialog title="关联文件" :visible.sync="relevantDocumentDialog" width="624" :before-close="handleClose"
@@ -184,8 +185,9 @@ export default {
         this.loading = false
         const { success, data } = res.data
         if (success) {
-          this.fileList = data
+          this.fileList = data||[]
         }
+
       }).catch(() => {
         this.loading = false
       }).finally(()=>{
@@ -257,7 +259,6 @@ export default {
       this.dialogCrtLi = ''
     },
     handleSuccess(data, id) {
-      console.log('handleSuccess', data)
       this.fileList.forEach((item) => {
         const flag = this.reviewMaterials.some(v => v.fileName == data.fileName)
         //上传完之后，跟reviewMaterials自动匹配
@@ -289,7 +290,6 @@ export default {
       this.fileList.forEach((item) => {
         if (item.id === id) {
           item.status = -2;
-          console.log("handleError", id, item);
         }
       });
     },
