@@ -117,7 +117,7 @@
                 />
               </div>
               <div class="content" v-html="item.showItem"></div>
-              <div v-if="item.showItemCase" class="content" v-html="`案例：${item.showItemCase}`"></div>
+              <!-- <div v-if="item.showItemCase" class="content" v-html="`案例：${item.showItemCase}`"></div> -->
               <div class="info">
                 <span class="info-item"
                   ><g-icon class="left-icon" stylePx="20" href="#icon-yinyong" />已引用：<i
@@ -1136,6 +1136,7 @@ export default {
     }
   }
 }
+
 
 
 
