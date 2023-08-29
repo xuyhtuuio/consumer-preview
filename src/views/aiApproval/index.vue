@@ -736,7 +736,10 @@ export default {
 
 .content-cont {
   position: relative;
-
+  flex: 1;
+  display: flex;
+  gap: 12px;
+  overflow: hidden;
   &-body {
     flex: 1;
     display: flex;
