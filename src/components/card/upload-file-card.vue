@@ -10,18 +10,27 @@
     <p class="head" v-if="status !== 4">
       请上传最终上线版本，且已审批通过的材料
     </p>
-    <el-upload v-if="status !== 4" class="upload-demo" drag action :http-request="uploadBpmn" :file-list="fileList"
-      :on-success="handleSuccess" :before-upload="handleBefore" :on-error="handleError" :show-file-list="false">
+    <el-upload v-if="status !== 4 && radio == 1" class="upload-demo" drag action :http-request="uploadBpmn"
+      :file-list="fileList" :on-success="handleSuccess" :before-upload="handleBefore" :on-error="handleError"
+      :show-file-list="false">
       <i class="el-icon-upload"></i>
-      <div class="el-upload__text" v-if="radio == 1">
+      <div class="el-upload__text">
         <p>将文件拖到此处，或<em>点击上传</em></p>
         <p>支持jpg/png/pdf/doc/xls/mp4/ppt/txt/格式的文件</p>
       </div>
-      <div class="el-upload__text" v-if="radio == 0">
-        当前不需要上传材料
-      </div>
     </el-upload>
-    <div :class="{ 'upload-list': true, status4: status == 4 }">
+    <div class="upload-demo " v-if="radio == 0">
+      <div class="el-upload">
+        <div class="el-upload-dragger">
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">
+            当前不需要上传材料
+          </div>
+        </div>
+      </div>
+    </div>
+    <div :class="{ 'upload-list': true, status4: status == 4 }" v-loading='loading'>
+      <Empty v-if="status == 4 && fileList.length == 0"></Empty>
       <div class="item" v-for="(item, index) in fileList" :key="index" @mouseenter="handleMouseEnter(item)"
         @mouseleave="handleMouseLeave(item)">
         <div class="left">{{ `${index + 1}.` }}</div>
@@ -50,6 +59,12 @@
           <div class="r-item error" v-if="item.status === -2 && !item.isClick">
             上传失败
           </div>
+          <div class="r-item progress" style="color: #2D5CF6;" v-if="item.isClick && status == 4" @click="proview(item)">
+            预览
+          </div>
+          <div class="r-item progress" style="color: #2D5CF6;" v-if="item.isClick && status == 4">
+            下载
+          </div>
           <!-- <div class="r-item success" v-if="item.status === 1 && item.isClick">
             <span class="s-item" @click="handleUploadDelete(item)" v-if="status !== 4">删除</span>
           </div> -->
@@ -59,8 +74,7 @@
         </div>
       </div>
     </div>
-    <!-- <el-button @click="showme">哈哈</el-button> -->
-    <div v-if="status == 4">
+    <div v-if="status == 4 && fileList.length">
       <p class="downloadAll">下载全部</p>
     </div>
     <el-dialog title="关联文件" :visible.sync="relevantDocumentDialog" width="624" :before-close="handleClose"
@@ -89,15 +103,25 @@
 <script>
 import { getFormGroups, deleteFormGroups } from "@/api/front.js";
 import FileType from "@/components/common/file-type";
-import { finalMaterial } from '@/api/approvalCenter'
+import { findFinalMaterial } from '@/api/approvalCenter'
+import Empty from '@/views/common/process/nodes/EmptyNode.vue'
+
 export default {
   name: "upload-file-card",
   components: { FileType },
   props: {
     status: {
       type: Number,
-      // 3 代表待确认  5 已结束
+      // 3 代表待确认  4 已结束
       default: 0,
+    },
+    processInstanceId: {
+      type: String,
+      default: '',
+    },
+    taskId: {
+      type: String,
+      default: '',
     },
     reviewMaterial: {
       type: Array,
@@ -108,6 +132,7 @@ export default {
     return {
       fileList: [],
       reviewMaterials: this.reviewMaterial,
+      loading: false,
       judgment: "jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/",
       fileSuffix: {
         pdf: "icon-mianxingtubiao",
@@ -134,16 +159,39 @@ export default {
     }
   },
   mounted() {
-    this.reviewMaterials = this.reviewMaterials.map(v => {
-      return {
-        ...v,
-        name: v.fileName,
-        hasRelevant: false,
-        relevantFile: {},
-      }
-    })
+    if (this.status == 3) {
+      // 3 待确认，需要上传材料
+      this.reviewMaterials = this.reviewMaterials.map(v => {
+        return {
+          ...v,
+          name: v.fileName,
+          hasRelevant: false,
+          relevantFile: {},
+        }
+      })
+    } else if (this.status == 4) {
+      // 5 已结束，需要查询已上传的材料
+      this.getMaterials()
+    }
   },
   methods: {
+    preview(item){
+      this.$emit('preview', item.url)
+    },
+    getMaterials() {
+      this.loading = true
+      findFinalMaterial(this.processInstanceId, this.taskId).then(res => {
+        this.loading = false
+        const { success, data } = res.data
+        if (success) {
+          this.fileList = data
+        }
+      }).catch(() => {
+        this.loading = false
+      }).finally(()=>{
+        this.loading = false
+      })
+    },
     handleClose() {
       this.waitRelevantDocument = {}
       this.relevantDocumentDialog = false
@@ -233,7 +281,6 @@ export default {
       })
       this.$store.commit('setUploadFileRequired', this.fileList.length > 0)
       this.$store.commit('setUploadFileForm', this.fileList)
-      console.log(')', this.$store.state.checkApprovedForm.uploadFileRequired)
     },
     handleDownload() {
       this.$message.success("下载中");
@@ -448,6 +495,9 @@ export default {
   }
 
   .status4 {
+    margin-top: 0;
+    min-height: 40px;
+
     .item {
       .success {
         visibility: hidden;

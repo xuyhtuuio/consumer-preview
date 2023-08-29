@@ -8,7 +8,7 @@
           ><i class="strong">{{ title }}</i
           >（请优先核对该项目是否包含以下要点）</span
         >
-        <i class="iconfont icon-ocr item"></i>
+        <i class="iconfont icon-a-tubiaoguding item"></i>
       </header>
       <content class="content">
         <div class="content-main" v-for="item in newList" :key="item.id">
@@ -132,8 +132,8 @@ export default {
         this.title = val[0].module;
         
         val.forEach(item => {
+          item.value.length = 0;
           if (item.name === 'SingleGroupsSelect') {
-            item.value.length = 0;
             item.props.options.forEach((propItem, propIndex) => {
               this.$set(propItem, 'value1', '');
             });

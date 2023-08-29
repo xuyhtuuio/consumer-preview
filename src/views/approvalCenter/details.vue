@@ -14,6 +14,7 @@
   <script>
 import orderDetail from "@/components/card/order-detail";
 export default {
+  name:'approval-details',
   components: {
     orderDetail,
   },
