@@ -100,7 +100,9 @@ export default {
       }
     },
   },
-  mounted() { },
+  mounted() { 
+    this.init();
+  },
   methods: {
     saveFile() {
       download({ key: this.approval.id })

@@ -401,7 +401,7 @@
       </div>
     </div>
     <reject-dialog ref="rejectDialog" :formBase="{}"></reject-dialog>
-    <div :class="{ fullScreen: showFullScreen }">
+    <div class="fullScreen-none" :class="{ fullScreen: showFullScreen }">
       <!-- 全屏关闭按钮 -->
       <i
         class="el-icon-circle-close"
@@ -450,12 +450,12 @@ export default {
   },
 
   mounted() {
+    window.addEventListener("resize", this.resize, true);
     this.carouselWidth = Number(
       ((this.$refs.carouselBody.clientWidth - 40) / 6).toFixed(2)
     );
     this.itemBodyWidth = this.$refs.itemBodyRef.clientWidth.toFixed(2);
     this.bodyClientWidth = this.$refs.carouselBody.clientWidth.toFixed(2);
-    window.addEventListener("resize", this.resize, true);
   },
   methods: {
     resize() {
@@ -777,8 +777,11 @@ export default {
   background: #ffffff;
   flex: 1;
 }
-
+.fullScreen-none {
+  display: none;
+}
 .fullScreen {
+  display: block;
   position: fixed;
   z-index: 10;
   width: 100vw;

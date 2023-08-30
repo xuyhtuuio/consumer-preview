@@ -124,14 +124,23 @@ export default {
     mounted() {
         this.init()
     },
-    activated() {
-
+    activated() {},
+    watch: {
+        sidebarParam: {
+            handler(val) {
+                if (val && Object.keys(val)?.length > 2) {
+                    this.getBsicData(val, true)
+                }
+            },
+            immediate: true
+            // deep: true
+        },
     },
     methods: {
         init() {
             const keys = Object.keys(this.$route.params) || Object.keys(this.$route.sidebarParam)
             if (this.sidebarParam && Object.keys(this.sidebarParam)?.length > 2) {
-                this.getBsicData(this.sidebarParam)
+                this.getBsicData(this.sidebarParam, true)
             } else if (keys.length) {
                 this.getOrderDetail()
             }

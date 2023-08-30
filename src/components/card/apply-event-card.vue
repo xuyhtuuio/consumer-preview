@@ -181,11 +181,11 @@ export default {
         processInstanceId: item.process_instance_id
       }
       this.revoked = false
-      canRoved(params).then(res => {
-        // this.revoked = true
-        const {data} = res.data
-        this.revoked= data =='true'
-      })
+      // canRoved(params).then(res => {
+      //   // this.revoked = true
+      //   const {data} = res.data
+      //   this.revoked= data =='true'
+      // })
 
     },
     toDetail(item) {
@@ -204,7 +204,7 @@ export default {
       this.$router.push({
         name: "details",
         params: {
-          formId: item.taskNumber,
+          formId: item.recordId,
           processInstanceId:item.processInstanceId,
           formManagementId: item.form_management_id,
           taskName: item.taskName
@@ -223,7 +223,7 @@ export default {
       this.$router.push({
         name: "details",
         params: {
-          formId: item.taskNumber,
+          formId: item.recordId,
           formManagementId: item.form_management_id,
           taskName: item.taskName
         },

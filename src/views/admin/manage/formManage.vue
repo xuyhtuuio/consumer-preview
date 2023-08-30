@@ -669,10 +669,10 @@ export default {
     line-height: 34px;
     border-radius: 6px;
 
-    span {
-      position: relative;
-      bottom: 5px;
-    }
+    // span {
+    //   position: relative;
+    //   bottom: 5px;
+    // }
   }
 
   .el-button--primary {

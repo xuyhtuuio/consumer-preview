@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import { getEditedCommentsByFormId, } from '@/api/applyCenter'
 import applyFormFilePreview from '@/components/filePreview'
 import applyForm from './apply-form'
 import approvalRecordDetail from './approval-record-detail'
@@ -64,7 +65,7 @@ export default {
           toolSign: 'approved-opinion',
           icon: 'icon-yijianshu',
           sidebarParam: {}, //侧边工具栏激活项 props
-          show: false
+          // show: false
         },
         {
           component: 'aiKnowledgeBase',
@@ -84,6 +85,8 @@ export default {
         }
       }
     });
+    // 判断是否有审查意见
+    // getEditedCommentsByFormId({ formId: this.$route.params.item.taskNumber })
   },
   methods: {
     previewFile(url) {
