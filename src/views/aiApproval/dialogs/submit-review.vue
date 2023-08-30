@@ -14,7 +14,7 @@
             </div>
             <div class="line"></div>
         </div>
-        <div>
+        <div class="main">
             <el-form :model="params" ref="paramsForm" label-width="86px" label-position="left" :rules="rules">
                 <!-- <el-form-item label="请选择">
                     <el-radio-group v-model="params.isPasses">
@@ -22,8 +22,8 @@
                             {{ item.name }}
                         </el-radio>
                     </el-radio-group>
-                </el-form-item>
-                <el-form-item label="产品要点" prop="productEssentials">
+                </el-form-item> -->
+                <!-- <el-form-item label="产品要点" prop="productEssentials">
                     <el-checkbox-group v-model="params.productEssentials">
                         <div class="floor1">
                             <el-checkbox :label="item.value" v-for="item in productEssentialList.slice(0, 2)"
@@ -47,7 +47,9 @@
                     </el-checkbox-group>
                 </el-form-item> -->
 
-                <ExaminePivot ref="refExamine" :titleShow="true" :isWidthDiff="true"></ExaminePivot>
+                <ExaminePivot ref="refExamine" :titleShow="true" :isWidthDiff="true">
+                    <p class="examine-title"><i class="iconfont icon-jinggao1"></i>{{examineInfo}}</p>
+                </ExaminePivot>
             </el-form>
             <p class="title">消保审查意见书</p>
             <div class="submission-content" v-if="submission.length">
@@ -173,7 +175,8 @@ export default {
                 reviewPoints: [],
                 submissionName: 'xxxxx',
             },
-            examineList: []
+            examineList: [],
+            examineInfo: "请选择当前项目是否包含以下要点，不勾选或选择“否”为不包含该要点信息，则会返回至发起人修改并二次会签。"
         }
     },
     watch: {
@@ -275,6 +278,24 @@ export default {
     background: #FFF;
     display: flex;
     flex-direction: column;
+    .main {
+        .examine-title {
+            margin-bottom: 16px;
+            height: 38px;
+            line-height: 38px;
+            padding: 0 8px 0 10px;
+            border-radius: 4px;
+            background: #FFF7E6;
+            color: #FA8C16;
+            .iconfont {
+                position: relative;
+                top: 1px;
+                margin-right: 8px;
+                font-size: 18px;
+            }
+        }
+    }
+    
 
     .el-dialog__header {
         padding: 0;
