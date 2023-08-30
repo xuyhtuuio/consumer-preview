@@ -216,10 +216,7 @@ export default {
       // list: []
     };
   },
-  activated() {
-    this.getDataStatistic();
-    this.searchList()
-  },
+  activated() {},
   async mounted() {
     let dom = document
       .querySelectorAll(".arrow-select")[0]
@@ -235,6 +232,8 @@ export default {
       floor2 ? (floor2.style.paddingRight = 16 + "px") : "";
     });
     this.getApprovalType();
+    this.getDataStatistic();
+    this.searchList()
   },
   watch: {
     "search.form_management_id": {
