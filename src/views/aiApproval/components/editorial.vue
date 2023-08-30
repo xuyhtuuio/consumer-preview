@@ -152,7 +152,7 @@ export default {
   },
   methods: {
     init(val) {
-      const ocrType = ['pdf', 'jpeg', 'jpg', 'png'].includes(val.fileName.split('.')[1])
+      const ocrType = ['pdf', 'jpeg', 'jpg', 'png'].includes(val.fileName.split('.')[val.fileName.split('.').length - 1])
       this.showRecommend = ocrType;
       this.active = ocrType ? 1 : 2;
       this.recommends = val.recommends?.map(item => {

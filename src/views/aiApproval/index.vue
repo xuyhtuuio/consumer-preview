@@ -16,7 +16,7 @@
           <el-button
             type="primary"
             @click="changeOcrView"
-            v-if="specialFileType.includes(approval?.fileName?.split('.')[1])"
+            v-if="specialFileType.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length -  1])"
             ><i class="iconfont icon-ocr"></i>{{ showOcr ? '关闭' : '打开' }}智能审批</el-button
           >
           <el-popover
@@ -55,7 +55,7 @@
             :approval="approval"
             @addWord="addWord"
             @lineRemove="lineRemove"
-            v-if="specialFileType.includes(approval?.fileName?.split('.')[1]) && showOcr"
+            v-if="specialFileType.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length-1]) && showOcr"
             @showLine="showLine"
             :lineWordItem="lineWordItem"
           >
@@ -80,7 +80,7 @@
       </div>
     </div>
     <add-review ref="addReview" @addRecommend="addRecommend"></add-review>
-    <submit-review ref="submitReview" :formId="formId" :formBase="formBase">
+    <submit-review ref="submitReview" :formId="formId" :formBase="formBase" :approvalLetter="approvalLetter">
       
     </submit-review>
     <reject-dialog ref="rejectDialog" :formBase="formBase"></reject-dialog>
@@ -166,13 +166,16 @@ export default {
         height: '0px'
       },
       examineIsShow: false,
+      // 允许提有实质性意见 passAllow 允许提意见以及驳回；passNotAllow不可提意见允许驳回；notPassNotAllow不允许
+      approvalLetter: {
+        permissions: "passAllow",
+        list: []
+      }
     };
   },
-
   created() {
     this.getElHeight();
   },
-
   mounted() {
     if (!this.$route.params.item) {
       this.$router.go(-1);
@@ -185,6 +188,7 @@ export default {
     this.loading = true;
     this.init(item);
     this.formBase = item;
+    // this.getOpinionApprovalLetter();
   },
   methods: {
     reject() {
@@ -197,6 +201,31 @@ export default {
         const mainResult = refContainer - refHeader - 32; // 32 padding值
         this.myContStyle.height = mainResult + 'px';
       });
+    },
+    // 获取工单上一审查意见书
+    getOpinionApprovalLetter() {
+      this.approvalLetter = {
+        permissions: "passNotAllow",
+        list: [
+            {
+                "recordId": 252,
+                "approverId": "1417",
+                "content": "我没意见",
+                "associatedAttachmentsIds": "cpr_1692868861256_未命名.txt",
+                "formId": 1312,
+                "keywordId": "",
+                "substantiveOpinions": 1,
+                "deleted": 0,
+                "createTime": null,
+                "updateTime": "2023-08-24T17:21:33",
+                "sort": 1,
+                "approvalRecordId": 2074259654,
+                "adoptOpinions": null,
+                "notAdoptingReasons": null,
+                "cacheFlag": "0"
+            }
+        ]
+    }
     },
     // 获取工单基本信息
     init() {
@@ -234,7 +263,6 @@ export default {
           if (status === 200) {
             this.files = data.files;
             this.increasedIds = data.increasedIds;
-            this.changeFile(0);
           } else {
             this.$message.error({ offset: 40, title: '提醒', message });
           }
@@ -244,16 +272,18 @@ export default {
           const { data, status, message } = res.data;
           if (status === 200) {
             this.getFiles(data);
-            this.$nextTick(() => {
-              this.$refs.filePreview.init();
-              this.changeFile(0);
-            });
           } else {
             this.$message.error({ offset: 40, title: '提醒', message });
           }
         });
       }
       this.loading = false;
+      if (this.files.length) {
+        this.$nextTick(() => {
+          this.$refs.filePreview.init();
+          this.changeFile(0);
+        });
+      }
     },
     getFiles(data, zipName) {
       data.forEach(file => {
@@ -310,7 +340,7 @@ export default {
       this.activeIndex = i;
       // 更新对应文件的ocr和推荐意见
       const temp = this.files[i];
-      const suffer = ['jpeg', 'jpg', 'png', 'pdf'].includes(temp?.fileName?.split('.')[1]);
+      const suffer = ['jpeg', 'jpg', 'png', 'pdf'].includes(temp?.fileName?.split('.')[temp?.fileName?.split('.').length-1]);
       if (!temp.ocr && !temp.recommends && suffer) {
         temp.ocr = await this.getOcr(temp);
         await getOcrExamineShow({
@@ -321,7 +351,7 @@ export default {
           .then(res => {
             const { data, status } = res.data;
             if (status === 200) {
-              temp.recommends = data.recommends;
+              temp.recommends = data.recommends || [];
             }
           })
           .catch(() => {

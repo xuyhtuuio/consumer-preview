@@ -36,7 +36,7 @@ export default {
   computed: {
     fileType() {
       return val => {
-        return val.split('.')[1]
+        return val.split('.')[val.split('.').length - 1]
       }
     },
   },
