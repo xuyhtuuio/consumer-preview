@@ -17,13 +17,6 @@ const router = new Router({
       path: '/',
       redirect: '/applycenter'
     },
-    // 首页
-    {
-      path: "/index",
-      name: "index",
-      component: () => import("@/views/Index.vue"),
-      meta: { title: 'OA工作流', viewport: viewport }
-    },
     {
       path: '/login',
       name: 'login',
@@ -120,13 +113,6 @@ const router = new Router({
         }
       ]
     },
-    // 工作台
-    {
-      path: "/workspace",
-      name: "workspace",
-      component: () => import("@/views/workspace/WorkSpace.vue"),
-      meta: { title: '工作区', viewport: viewport }
-    },
     {
       path: "/applycenter",
       name: "applycenter",
@@ -162,7 +148,6 @@ const router = new Router({
         }
       ]
     },
-
     {
       path: "/approvalcenter",
       name: "approvalcenter",

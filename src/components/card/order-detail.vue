@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-08-29 17:18:58
+ * @LastEditTime: 2023-08-30 15:57:26
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -90,7 +90,7 @@
           </span>
         </div>
         <order-basic-info @preview='previewFile' :personInfo="item.initiator"
-          @sendReviewMaterials="sendReviewMaterials"></order-basic-info>
+          @sendReviewMaterials="sendReviewMaterials" @sendFilledInByApprover='sendFilledInByApprover'></order-basic-info>
       </div>
       <div class="right">
         <!-- 消保审查/详情页/审批中预览 -->
@@ -152,8 +152,8 @@
         <div class="right-content">
           <keep-alive>
             <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus" :coment="coment"
-              @sendOpinionInfo="sendOpinionInfo" :leaderApproveInfo="leaderApproveInfo" :reviewMaterial="reviewMaterials"
-              :processInstanceId="item.processInstanceId" :taskId="item.taskId" @preview='previewFile'>
+              @sendOpinionInfo="sendOpinionInfo"  :leaderApproveInfo="leaderApproveInfo" :reviewMaterial="reviewMaterials"
+              :processInstanceId="item.processInstanceId" :taskId="item.taskId" @preview='previewFile' :filledInByApprover="filledInByApprover">
               <template slot="head">
                 <div class="approved-opinion-head">
                   <h2>消保审查意见书</h2>
@@ -244,7 +244,8 @@ export default {
       coment: {},
       personInfo: {},
       leaderApproveInfo: {},//TO_NODE TO_BEFORE
-      reviewMaterials: [],//工单上已上传的文件
+      reviewMaterials: [], //工单上已上传的文件
+      filledInByApprover:[], // 审批模块配置项目
       peoples: [
         { name: "王明明", code: 1 },
         { name: "王明明", code: 2 },
@@ -295,6 +296,10 @@ export default {
     // 从左侧详情获取到的上传文件详情
     sendReviewMaterials(val) {
       this.reviewMaterials = val
+    },
+      // 从左侧详情获取到审批模块配置项
+    sendFilledInByApprover(val){
+          this.filledInByApprover=val
     },
     async judgeStatus() {
       const { path } = this.$route

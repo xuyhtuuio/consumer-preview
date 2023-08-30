@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div style="margin-bottom: 20px">
+    <!-- <div style="margin-bottom: 20px">
       <el-radio-group v-model="formId" :disabled="disabledForm" @input="changeFormId" size="small">
         <el-radio-button :label="item.id" v-for="item in formGroup" :key="item.id">{{ item.name }}</el-radio-button>
       </el-radio-group>
-    </div>
+    </div> -->
     <el-table :header-cell-style="{background:'#f5f6f6'}" :data="formPerms" border style="width: 100%">
       <el-table-column prop="title" show-overflow-tooltip label="表单字段">
         <template slot-scope="scope">
