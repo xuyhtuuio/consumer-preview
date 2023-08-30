@@ -1,6 +1,6 @@
 <template>
   <div class="leader-edit-opinion" v-loading="searchLoading">
-    <el-form :model="form" :rules="rules" label-position="left" ref="form">
+    <el-form :model="form" :rules="rules" label-position="left" ref="form" class="basic-form">
       <el-form-item label="请选择" prop="isAccept">
         <el-radio-group v-model="form.isAccept" @change="updateForm">
           <el-radio :label="'1'">通过</el-radio>
@@ -90,14 +90,83 @@
         <el-input type="textarea" placeholder="请输入审查话术内容" v-model="form.content" resize="none"
           @blur="updateForm"></el-input>
       </el-form-item>
+
     </el-form>
+    <!-- 用户自定义模块 -->
+    <template>
+      <el-form hide-required-asterisk label-width="75px" class="my-form">
+        <template v-for="(item, index) in filledInByApprover">
+          <el-form-item :class="formItemCpt(item)" :key="index">
+            <label slot="label">{{ item.title
+            }}<span :style="{ color: 'red', opacity: item.props.required || 0 }">
+                *
+              </span></label>
+            <el-input v-if="item.name === 'TextInput'" :disabled="item.perm === 'R'" v-model.trim="item.value"
+              :placeholder="item.props.placeholder"></el-input>
+
+            <el-select v-else-if="item.name === 'SelectInput' && !item.props.expanding" :disabled="item.perm === 'R'"
+              v-model.trim="item.value" :placeholder="item.props.placeholder">
+              <el-option v-for="(iten, indey) in item.props.options" :key="indey" :label="iten.value"
+                :value="iten.id"></el-option>
+            </el-select>
+
+            <el-radio-group v-else-if="item.name === 'SelectInput' && item.props.expanding" :disabled="item.perm === 'R'"
+              v-model.trim="item.value">
+              <el-radio v-for="(iten, indey) in item.props.options" :key="indey" :label="iten.id">{{ iten.value
+              }}</el-radio>
+            </el-radio-group>
+            <el-checkbox-group v-else-if="item.name === 'MultipleSelect' && item.props.expanding"
+              v-model.trim="item.value" :disabled="item.perm === 'R'">
+              <template v-for="(iten, indey) in item.props.options">
+                <el-checkbox :key="indey" :label="iten.id">{{ iten.value }}</el-checkbox>
+              </template>
+            </el-checkbox-group>
+
+            <div class="groups-select" v-else-if="item.name === 'MultipleGroupsSelect'">
+              <div v-for="iten in item.props.options" :key="iten.id">
+                <p class="group-title">{{ iten.value }}</p>
+                <el-checkbox-group class="group-value" v-model="item.value" :disabled="item.perm === 'R'">
+                  <el-checkbox v-for="(itenItem, indey) in iten.children" :key="indey" :label="itenItem.id">{{
+                    itenItem.value }}
+                  </el-checkbox>
+                </el-checkbox-group>
+              </div>
+            </div>
+            <el-select v-else-if="item.name === 'MultipleSelect' && !item.props.expanding" :disabled="item.perm === 'R'"
+              v-model.trim="item.value" :placeholder="item.props.placeholder" multiple>
+              <el-option v-for="(iten, indey) in item.props.options" :key="indey" :label="iten.value"
+                :value="iten.id"></el-option>
+            </el-select>
+
+            <el-date-picker v-else-if="item.name === 'TimePicker'" :disabled="item.perm === 'R'" type="datetime"
+              :placeholder="item.props.placeholder" :format="item.props.format" v-model.trim="item.value"
+              :picker-options="pickerTime(item.props.gl, item.props.order)" @change="handlePickerChange(item)"
+              style="width: 100%"></el-date-picker>
+
+            <el-input v-else-if="item.name === 'TextareaInput'" :disabled="item.perm === 'R'" type="textarea"
+              v-model.trim="item.value" :placeholder="item.props.placeholder"></el-input>
+
+            <el-cascader v-else-if="item.name === 'Cascader'" v-model="item.value" :options="item.props.childrens"
+              :props="{ label: 'value', value: 'id', checkStrictly: true, multiple: item.props.multiple }" clearable>
+            </el-cascader>
+
+            <div class="warn" v-if="item.isWarning">
+              <warn-info ref="refWarn" :info="judgementWarn(item)"></warn-info>
+            </div>
+          </el-form-item>
+        </template>
+      </el-form>
+    </template>
   </div>
 </template>
 <script>
 import { getEditById } from '@/api/approvalCenter'
 export default {
-
   props: {
+    filledInByApprover: {
+      type: Array,
+      default: () => []
+    },
   },
   data() {
     return {
@@ -115,7 +184,7 @@ export default {
           { required: true, message: "请选择驳回原因", trigger: ["blur"] },
         ],
       },
-      searchLoading:false,
+      searchLoading: false,
       reasons: ['文件预览失败（文件损坏/清晰度过低）', '附件材料与审批项目不匹配', '其他'],
       form: {
         isAccept: "",
@@ -129,9 +198,25 @@ export default {
       externalData: {},// 
     };
   },
+  computed: {
+    formItemCpt() {
+      return item => {
+        if (item.name === 'SelectInput' && !item.props.expanding) {
+          return ['form-item'];
+        } else if (item.name === 'MultipleSelect' && !item.props.expanding) {
+          return ['form-item'];
+        } else if (item.name === 'TimePicker' || item.name === 'Cascader') {
+          return ['form-item'];
+        } else {
+          return [];
+        }
+      };
+    }
+  },
   watch: {},
 
   mounted() {
+    console.log('filledInByApprover', this.filledInByApprover)
   },
   methods: {
     initData(data) {
@@ -149,10 +234,10 @@ export default {
         taskId,
         processInstanceId,
       }
-      this.searchLoading=true
+      this.searchLoading = true
       getEditById(param).then(res => {
         const { data } = res.data
-        this.searchLoading=false
+        this.searchLoading = false
         // 如果 data为空
         if (!data) {
           this.$refs['form'].resetFields()
@@ -168,8 +253,8 @@ export default {
             this.form.reason = reason
           }
         }
-      }).catch(err=>{
-          this.searchLoading=false
+      }).catch(err => {
+        this.searchLoading = false
       })
 
     },
@@ -195,7 +280,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .leader-edit-opinion {
-  /deep/ .el-form {
+  /deep/ .basic-form {
     .el-form-item {
       display: flex;
       flex-direction: column;
@@ -269,6 +354,29 @@ export default {
           }
         }
       }
+    }
+  }
+
+  /deep/ .my-form {
+    .el-form-item {
+      display: flex;
+      align-items: center;
+    }
+
+    .el-form-item__label {
+      line-height: 22px;
+      color: #1d2128;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      text-align: left;
+    }
+
+    .el-form-item__content {
+      flex: 1;
+      margin-left: 0 !important;
     }
   }
 }

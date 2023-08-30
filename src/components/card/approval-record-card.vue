@@ -12,7 +12,7 @@
           <p class="taskname-staff">
             <span class="taskname">{{ activity.name }}</span>
             <span class="staff">
-              <i>{{ activity.nodeUser }}</i>
+              <i>{{ activity.nodeUserName }}</i>
               <i class="post" v-if="activity.orgName">（{{ activity.orgName }}）</i>
               <img src="@/assets/image/ai-approval/record-avatar.svg" alt="" />
             </span>
@@ -44,17 +44,17 @@
           </div> -->
             <div v-for="(item, idx) in activity.optionVOList" :key="idx" class="opinions-item">
               <!-- v-if="activity.targetPage === 'ocr'" -->
-              <!-- <div class="opinion-tag">
-              <span v-if="item.substantiveOpinions == 1" class="guanzhu">
+              <div class="opinion-tag">
+              <span v-if="item.opinion == 1" class="guanzhu">
              
                 <i class="iconfont icon icon-guanzhu"></i>
                 有实质意见
               </span>
-              <span v-if="item.substantiveOpinions == 0" class="guanzhu2">
+              <span v-if="item.opinion == 0" class="guanzhu2">
                 <i class="iconfont icon icon-guanzhu2"></i>
                 无实质意见
               </span>
-            </div> -->
+            </div>
               <p class="opinion-text">{{ idx + 1 }} {{ item.str }}</p>
               <div class="relevant-file">
                 关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.files && item.files[0] }} </i>
@@ -79,6 +79,7 @@
 import moment from 'moment';
 import { instanceInfo } from '@/api/applyCenter'
 import empty from '@/components/common/empty'
+import xx from './xx.json'
 export default {
   components: { empty },
   name: 'approved-record-card',
@@ -106,6 +107,36 @@ export default {
   methods: {
     init() {
       this.loading = true
+      // const res = {data:xx}
+      // console.log('dd',xx)
+      // const { detailVOList } = res.data.data
+      // if (!detailVOList) {
+      //   return this.hasData = false
+      // }
+      // // detailVOList
+      // const keys = Object.keys(detailVOList)
+      // let arr = []
+      // for (let i in keys) {
+      //   let obj = {
+      //     ...detailVOList[keys[i]][0],
+      //     name:detailVOList[keys[i]][0].activityId=='endEventNode'?'已结束':detailVOList[keys[i]][0].name
+      //   }
+      //   arr.push(obj)
+      // }
+      // const arr_handler = arr.sort((a,b)=> {
+      //   return moment(a.createTime)-moment(b.createTime)
+      // })
+      // this.recordList = arr_handler instanceof Array && arr_handler.length ? arr_handler.map(v => {
+      //   const comments = v.optionVOList && v.optionVOList[0].comments
+      //   return {
+      //     ...v,
+      //     optionVOList: JSON.parse(comments),
+      //   }
+      // }) : []
+      // return this.hasData = true
+
+
+
       instanceInfo({
         "processInstanceId": this.$route.params && this.$route.params.processInstanceId || this.sidebarParam && this.sidebarParam.processInstanceId,
       }).then(res => {
@@ -118,11 +149,14 @@ export default {
         let arr = []
         for (let i in keys) {
           let obj = {
-          ...detailVOList[keys[i]][0]
+          ...detailVOList[keys[i]][0],
+           name:detailVOList[keys[i]][0].activityId=='endEventNode'?'已结束':detailVOList[keys[i]][0].name
           }
           arr.push(obj)
         }
-        const arr_handler = arr.reverse()
+      const arr_handler = arr.sort((a,b)=> {
+        return moment(a.createTime)-moment(b.createTime)
+      })
         this.recordList = arr_handler instanceof Array && arr_handler.length ? arr_handler.map(v => {
           const comments = v.optionVOList && v.optionVOList[0].comments
           return {
@@ -139,12 +173,12 @@ export default {
   },
   filters: {
     timeFormat(val) {
-      return val? moment(val).format('MM-DD HH:mm'):'--'
+      return val ? moment(val).format('MM-DD HH:mm') : '--'
     },
     handleTimeFormat(val) {
       let timediff = moment(val.endTime).diff(moment(val.createTime), 'seconds');
       timediff = timediff > 0 ? (timediff / 3600).toFixed(1) : 0
-      return val.endTime? timediff:'--'
+      return val.endTime ? timediff : '--'
     }
   }
 };
@@ -260,8 +294,8 @@ export default {
 
         .opinion-tag {
           position: absolute;
-          top: 0;
-          left: -4px;
+          top: -2px;
+          left: -8px;
           border-radius: 0px 6px 6px 6px;
           color: #fff;
           font-style: normal;

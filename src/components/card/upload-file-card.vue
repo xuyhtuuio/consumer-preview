@@ -31,7 +31,7 @@
     </div>
 
     <div :class="{ 'upload-list': true, status4: status == 4 }" v-loading='loading'>
-      <Empty v-if="status == 4 &&fileList&& fileList.length == 0"></Empty>
+      <Empty v-if="status == 4 && fileList && fileList.length == 0"></Empty>
       <div class="item" v-for="(item, index) in fileList" :key="index" @mouseenter="handleMouseEnter(item)"
         @mouseleave="handleMouseLeave(item)">
         <div class="left">{{ `${index + 1}.` }}</div>
@@ -56,6 +56,9 @@
             <span v-if="item.hasRelevant && item.isClick" @click="cancelRelevant(item)">
               取消关联
             </span>
+            <span v-if="item.isClick" @click="delItem(item)" style="margin-left: 3px;">
+              <i class="icon el-icon-circle-close" style="color: #86909C;font-size: 18px;"></i>
+            </span>
           </div>
           <div class="r-item error" v-if="item.status === -2 && !item.isClick">
             上传失败
@@ -75,7 +78,7 @@
         </div>
       </div>
     </div>
-    <div v-if="status == 4 && fileList&&fileList.length">
+    <div v-if="status == 4 && fileList && fileList.length">
       <p class="downloadAll">下载全部</p>
     </div>
     <el-dialog title="关联文件" :visible.sync="relevantDocumentDialog" width="624" :before-close="handleClose"
@@ -176,7 +179,7 @@ export default {
     }
   },
   methods: {
-    preview(item){
+    preview(item) {
       this.$emit('preview', item.url)
     },
     getMaterials() {
@@ -185,12 +188,12 @@ export default {
         this.loading = false
         const { success, data } = res.data
         if (success) {
-          this.fileList = data||[]
+          this.fileList = data || []
         }
 
       }).catch(() => {
         this.loading = false
-      }).finally(()=>{
+      }).finally(() => {
         this.loading = false
       })
     },
@@ -211,7 +214,19 @@ export default {
       item.relevantFile = {}
       item.relevantFileName = ''
     },
-    //在弹窗内关联某个文件
+    /**
+     * @description: 打开弹窗，准备关联文件
+     * @param {*} item
+     * @return {*}
+     */
+    openRelevant(item) {
+      this.waitRelevantDocument = item
+      this.relevantDocumentDialog = true
+    },
+    /**
+     * @description: 弹窗打开后，去关联刚才点击的文件
+     * @return {*}
+     */
     relevantItem(item) {
       const { key, url, fileName } = this.waitRelevantDocument
       item.relevantFile = {
@@ -230,12 +245,11 @@ export default {
       })
       this.handleClose()
     },
-    // 上传后去关联
-    openRelevant(item) {
-      this.waitRelevantDocument = item
-      this.relevantDocumentDialog = true
-    },
-    //取消关联
+    /**
+     * @description: 已上传文件列表，操作取消关联文件
+     * @param {*} item
+     * @return {*}
+     */
     cancelRelevant(item) {
       this.fileList.forEach(m => {
         if (m.key === item.key) {
@@ -249,6 +263,22 @@ export default {
           m.hasRelevant = false
           m.relevantFile = {}
           m.relevantFileName = ''
+        }
+      })
+    },
+    /**
+     * @description: 对于已上传的文件，删除选中项操作,若已经关联，取消弹窗内的关联文件 this.reviewMaterials
+     * @param {*} item
+     * @return {*}
+     */
+    delItem(item) {
+      const index = this.fileList.findIndex(v => v.key == item.key)
+      this.fileList.splice(index, 1)
+      this.reviewMaterials.forEach(m=>{
+        if(m.relevantFile&&m.relevantFile.key == item.key){
+          m.hasRelevant =false
+          m.relevantFile= {}
+          m.relevantFileName =''
         }
       })
     },
@@ -310,6 +340,7 @@ export default {
       window.open(url);
     },
     handleMouseEnter(item) {
+      console.log('ff',item)
       item.isClick = true;
     },
     handleMouseLeave(item) {
