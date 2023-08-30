@@ -1,35 +1,12 @@
 <template>
   <el-menu router :default-active="$route.path">
     <el-menu-item
-      index="/admin/manage/userManage"
-      :class="{ 'is-active': $route.name === 'UserManage' }"
-      >用户管理</el-menu-item
-    >
-    <el-menu-item
-      index="/admin/manage/rolePermission"
-      :class="{ 'is-active': $route.name === 'RolePermission' }"
-      >角色/权限</el-menu-item
-    >
-    <el-menu-item
-      index="/admin/manage/flowManage"
-      :class="{ 'is-active': $route.name === 'FlowManage' }"
-      >流程管理</el-menu-item
-    >
-    <el-menu-item
-      index="/admin/manage/formManage"
-      :class="{ 'is-active': $route.name === 'FormManage' }"
-      >表单管理</el-menu-item
-    >
-    <el-menu-item
-      index="/admin/manage/labelManage"
-      :class="{ 'is-active': $route.name === 'LabelManage' }"
-      >标签管理</el-menu-item
-    >
-    <el-menu-item
-      index="/admin/manage/opinionManage"
-      :class="{ 'is-active': $route.name === 'OpinionManage' }"
-      >意见管理</el-menu-item
-    >
+      v-for="item in list"
+      :key="item.name"
+      :index="item.path"
+      :class="{ 'is-active': $route.name === item.pathName }">
+      {{ item.name }}
+    </el-menu-item>
   </el-menu>
 </template>
 
@@ -37,6 +14,39 @@
 export default {
   data() {
     return {};
+  },
+  computed: {
+    list() {
+      const { authObject = {} } = this.$store.state
+      const pathNames = [{
+        name: 'FlowManage',
+        path: '/admin/manage/flowManage'
+      },{
+        name: 'UserManage',
+        path: '/admin/manage/userManage'
+      },{
+        name: 'FormManage',
+        path: '/admin/manage/formManage'
+      },{
+        name: 'RolePermission',
+        path: '/admin/manage/rolePermission'
+      },{
+        name: 'LabelManage',
+        path: '/admin/manage/labelManage'
+      },{
+        name: 'OpinionManage',
+        path: '/admin/manage/opinionManage'
+      }]
+      const listArr = authObject.funPerm?.map(item => {
+        const exsit = pathNames.find(p => p.name === item.pathName)
+        if (exsit) {
+          item.path = exsit.path
+          return item;
+        }
+        return;
+      }).filter(e => e)
+      return listArr || []
+    }
   }
 };
 </script>

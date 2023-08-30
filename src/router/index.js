@@ -219,6 +219,10 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
+  const auth = handleAuth(to)
+  if (!auth) {
+    return;
+  }
   if (to.path.split("/").length>1) {
     const data = [{ name: to.path.split("/")[1], title: to.meta.pTitle }, { name: to.path.split("/")[2], title: to.meta.title }]
     store.commit("setBreadcrumbList", data)
@@ -237,6 +241,16 @@ router.beforeEach((to, from, next) => {
   next();
   sessionStorage.setItem('router-path', to.path)
 })
+
+// 权限处理
+function handleAuth(to) {
+  const { authObject } = store.state
+  const auth = authObject.funPerm.find(item => ((item.pathName === to.name) && item.type))
+  if (auth || to.name === 'login') {
+    return true
+  }
+  return false
+}
 
 
 

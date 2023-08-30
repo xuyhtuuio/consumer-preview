@@ -180,6 +180,101 @@ export default new Vuex.Store({
       editOpinionForm: {},
       editOpinionRequired: false
     },
+    authObject: {
+      funPerm: [
+        {
+          code: '1',
+          name: '首页',
+          pathName: 'home',
+          type: 'view'
+        },
+        {
+          code: '1',
+          name: '申请中心',
+          pathName: 'apply-list',
+          type: 'view'
+        },
+        {
+          code: '1',
+          name: '审批中心',
+          pathName: 'approval-list',
+          path: '/manage/labelManage',
+          type: 'view',
+          "child": [
+            {
+              "code": "",
+              "name": "全部任务",
+              "type": "export"
+            }
+          ]
+        },
+        {
+          "code": "",
+          "name": '用户管理',
+          "pathName": 'UserManage',
+          "path": 'userManage',
+          "type": 'edit',
+        },
+        {
+          "code": "",
+          "name": '表单管理',
+          "pathName": 'FormManage',
+          "path": 'formManage',
+          "type": 'edit',
+        },
+        {
+          "code": "",
+          "name": '流程管理',
+          "pathName": 'FlowManage',
+          "path": 'flowManage',
+          "type": 'edit',
+        },
+        {
+          "code": "",
+          "name": '角色/权限管理',
+          "pathName": 'RolePermission',
+          "path": 'rolePermission',
+          "type": 'view',
+        },
+        {
+          "code": "",
+          "name": '标签管理',
+          "pathName": 'LabelManage',
+          "path": 'labelManage',
+          "type": 'view',
+        },
+        {
+          "code": "",
+          "name": '意见管理',
+          "pathName": 'OpinionManage',
+          "path": 'opinionManage',
+          "type": 'view',
+        },
+        {
+          code: "3",
+          name: '后台管理',
+          pathName: '',
+          path: '',
+          type: 'view',
+        },
+        
+        {
+          "code": "",
+          "name": '产品图谱',
+          "pathName": 'productmap',
+          "path": '',
+          "type": 'view',
+        },
+        {
+          "code": "",
+          "name": '统计中心',
+          "pathName": '',
+          "path": '',
+          "type": '',
+        },
+      ],
+      dataPerm: [],
+    }
   },
   mutations: {
     selectedNode(state, val) {

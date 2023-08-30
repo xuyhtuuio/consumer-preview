@@ -62,7 +62,7 @@
         <!-- <template #address="scope">
           <div class="template-class">地址：{{ scope.row.address }}</div>
         </template> -->
-        <template #operate="{ row }">
+        <template #operate="{ row }" v-if="editAuth">
           <el-button type="text" size="small" @click="handleClick(row)">变更角色</el-button>
           <el-button
             type="text"
@@ -211,6 +211,16 @@ export default {
       totalCountInitiated: 0
 
     };
+  },
+  computed: {
+    editAuth() {
+      const { authObject = {} } = this.$store.state
+      const flowManage = authObject.funPerm?.find(item => item.pathName === 'UserManage') || {}
+      if (flowManage.type === 'edit') {
+        return true
+      }
+      return false
+    }
   },
   created() {
     this.initOrganizationData();

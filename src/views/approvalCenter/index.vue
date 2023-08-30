@@ -6,19 +6,21 @@
     </p>
     <div class="approval-center-box">
       <div class="data-statistics">
-        <div v-for="(item, index) in dataStatistics" :key="index" @click="changeStatis(item)" :class="item.value !== crtSign
-          ? 'data-statistics-item'
-          : 'data-statistics-item active-item'
-          ">
-          <div class="icon">
-            <img :src="item.value == crtSign ? item.activeIcon : item.icon"
-              :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
+        <template v-for="(item, index) in dataStatistics">
+          <div v-if="showAllTask(item)" :key="index" @click="changeStatis(item)" :class="item.value !== crtSign
+            ? 'data-statistics-item'
+            : 'data-statistics-item active-item'
+            ">
+            <div class="icon">
+              <img :src="item.value == crtSign ? item.activeIcon : item.icon"
+                :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
+            </div>
+            <div class="name-count">
+              <span class="name">{{ item.name }}</span>
+              <span class="count"><i>{{ item.count }}</i> 个</span>
+            </div>
           </div>
-          <div class="name-count">
-            <span class="name">{{ item.name }}</span>
-            <span class="count"><i>{{ item.count }}</i> 个</span>
-          </div>
-        </div>
+        </template>
       </div>
       <div class="apply-content">
         <div class="filters">
@@ -93,7 +95,7 @@
             </div>
           </div>
           <div class="export-reset">
-            <el-button type="text" @click="exportXlsx" :loading="downloadLoading">导出</el-button>
+            <el-button type="text" v-show="crtSign === 'allTask' && showExport" @click="exportXlsx" :loading="downloadLoading">导出</el-button>
             <el-button type="text" @click="reset">重置</el-button>
           </div>
         </div>
@@ -142,7 +144,7 @@ export default {
           value: "toPending",
           icon: require('@/assets/image/apply-center/wait-review.svg'),
           activeIcon: require('@/assets/image/apply-center/wait-review-active.svg'),
-
+          show: true
         },
         {
           name: "已审批",
@@ -150,21 +152,23 @@ export default {
           value: "approvedCount",
           icon: require('@/assets/image/apply-center/approved.svg'),
           activeIcon: require('@/assets/image/apply-center/approved-active.svg'),
-
+          show: true
         },
         {
           name: "我的关注",
           count: 0,
           value: "applyAll",
           icon: require('@/assets/image/apply-center/my-attention.svg'),
-          activeIcon: require('@/assets/image/apply-center/my-attention-active.svg')
+          activeIcon: require('@/assets/image/apply-center/my-attention-active.svg'),
+          show: true
         },
         {
           name: "全部任务",
           count: 0,
           value: "allTask",
           icon: require('@/assets/image/apply-center/all-attention.svg'),
-          activeIcon: require('@/assets/image/apply-center/all-attention.svg')
+          activeIcon: require('@/assets/image/apply-center/all-attention.svg'),
+          show: false
         },
       ],
       search: {
@@ -188,6 +192,35 @@ export default {
       tipsMsg: "",
       list: [],
     };
+  },
+  computed: {
+    allTask() {
+      const { authObject = {} } = this.$store.state
+      const approvalcenter = authObject.funPerm.find(item => item.pathName === 'approval-list') || {}
+      const isExsit = approvalcenter.child?.find(item => (item.name === '全部任务') && item.type)
+      if (isExsit) {
+        return true
+      }
+      return false
+    },
+    showExport() {
+      const { authObject = {} } = this.$store.state
+      const approvalcenter = authObject.funPerm.find(item => item.pathName === 'approval-list') || {}
+      const isExsit = approvalcenter.child?.find(item => (item.name === '全部任务') && item.type === 'export')
+      if (isExsit) {
+        return true
+      }
+      return false
+    },
+    showAllTask() {
+      const _this = this
+      return (item) => {
+        if (item.value === 'allTask') {
+          return _this.allTask
+        }
+        return item.show
+      }
+    }
   },
   mounted() {
     let dom = document
