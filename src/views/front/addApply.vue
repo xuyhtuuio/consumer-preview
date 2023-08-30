@@ -12,7 +12,7 @@
         :formManagementId="formManagementId"
         @handleTo="handleReviewClick"
       />
-      <div class="cnt-main" v-show="basicInformation.length">
+      <div class="cnt-main" v-loading="isCntLoading">
         <basic-information class="cnt-item" ref="basicInformationRef" :list="basicInformation" />
         <publicity-channels class="cnt-item" ref="publicityChannelsRef" :list="promotionChannels" />
         <reconciliation-point
@@ -94,6 +94,7 @@ export default {
     title: '审查类型',
     cardInfo: '提醒：产品类内容审查，需于在产品上线/宣传前14天进行提交。',
     isLoading: true,
+    isCntLoading: false,
     isGLoading: false,
     submitDialogVisible: false,
     processDialogVisible: false,
@@ -116,7 +117,7 @@ export default {
     currentRowInfo: ''
   }),
   created() {
-    // this.initialData();
+     this.initialData();
   },
   beforeRouteEnter({ name, params: { id, formManagementId } }, from, next) {
     if (name === 'addApply') return next();
@@ -154,21 +155,22 @@ export default {
       next();
     };
   },
-  activated() {
-    this.initialData();
-  },
-  deactivated() {
-    this.formId = '';
-    this.formManagementId = -1;
-    this.clearForm();
-    this.reviewList.length = 0;
-    this.$refs.refReviewMatters.clearData();
-  },
+  // activated() {
+  //   this.initialData();
+  // },
+  // deactivated() {
+  //   this.formId = '';
+  //   this.formManagementId = -1;
+  //   this.clearForm();
+  //   this.reviewList.length = 0;
+  //   this.$refs.refReviewMatters.clearData();
+  // },
   methods: {
     initialData() {
       this.isLoading = true;
       getFormCategoryArray().then(res => {
         this.reviewList = res.data.data;
+        this.isLoading = false
       });
     },
     clearForm() {
@@ -179,7 +181,7 @@ export default {
     },
     // 审查事项类型
     async handleReviewClick(id) {
-      this.isLoading = true;
+       this.isCntLoading = true
       this.clearForm();
       await this.handleAllListprefix(id);
       getApplyForm({
@@ -188,7 +190,7 @@ export default {
         nodeId: 'root',
         formCategoryId: id
       }).then(({ data: { data: res, msg, success } }) => {
-        this.isLoading = false;
+        this.isCntLoading = false;
         this.isGLoading = false;
         if (success) {
           const { basicInformation, promotionChannels, keyPointsForVerification, reviewMaterials } =
@@ -420,6 +422,7 @@ export default {
       border-radius: 10px;
     }
     .cnt-main {
+      min-height: 200px;
       background: rgba(255, 255, 255, 1);
       border-radius: 10px;
     }
