@@ -140,3 +140,12 @@ export function findFinalMaterial(processInstanceId,taskId){
   })
 }
 
+// 获取线上对比数据
+export function dualScreenPreview(param) {
+  return request({
+    url: '/cpr/onlineComparison/dualScreenPreview',
+    method: 'post',
+    contentType:'application/x-www-form-urlencoded',
+    data: param,
+  })
+}

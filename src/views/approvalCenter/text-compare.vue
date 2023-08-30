@@ -4,8 +4,21 @@
     <div class="content">
       <div class="content-header">
         <span class="content-title">
-          <i class="iconfont icon-shenpiyemiantubiao"></i
-          >审查项目名称显审查项目名称显示审查项目名称显示</span
+          <svg
+            class="icon urgent-icon"
+            aria-hidden="true"
+            v-if="formBase.urgent == 1"
+          >
+            <use xlink:href="#icon-shenpiyemiantubiao"></use>
+          </svg>
+          <svg
+            class="icon urgent-icon"
+            aria-hidden="true"
+            v-if="formBase.dismissalMark == 1"
+          >
+            <use xlink:href="#icon-tongyongtubiao2"></use>
+          </svg>
+          {{ formBase.entryName }}</span
         >
         <span class="content-btns">
           <el-button @click="goBack"
@@ -19,10 +32,14 @@
           >
         </span>
       </div>
-      <div class="content-cont">
-        <div class="content-cont-header">
+      <div class="content-cont" v-loading="loading">
+        <div v-show="compareList.length > 0" class="content-cont-header">
           <div class="all-similar">
-            <span class="text">总体文本比对相似度：95%</span>
+            <span class="text"
+              >总体文本比对相似度：{{
+                totalsimilarity ? totalsimilarity : "--"
+              }}</span
+            >
             <span>
               <el-popover
                 placement="bottom"
@@ -32,185 +49,31 @@
               >
                 <div class="show-compare">
                   <div>
-                    <div class="compare-item">
-                      <div class="item-index">1.</div>
+                    <div
+                      class="compare-item"
+                      v-for="(item, index) in compareList"
+                      :key="'compare' + index"
+                    >
+                      <div class="item-index">{{ index + 1 }}.</div>
                       <div class="item-name">
                         <div class="name-item" style="margin-bottom: 10px">
                           <file-type
                             class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
+                            :fileName="item.fileName"
                           ></file-type>
-                          附件附1附件附1附件附件附1附件附1附件附件附1附件附1附件.doc
+                          {{ item.fileName }}
                         </div>
                         <div class="name-item">
                           <file-type
                             class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
+                            :fileName="item.otherFileName"
                           ></file-type>
-                          附件附1附件附1附件附1附件附1附件附1附件.doc
+                          {{ item.otherFileName }}
                         </div>
                       </div>
-                      <div class="similar-level">相似度：83%</div>
-                    </div>
-                    <div class="compare-item">
-                      <div class="item-index">1.</div>
-                      <div class="item-name">
-                        <div class="name-item" style="margin-bottom: 10px">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附件附1附件附1附件附件附1附件附1附件.xls
-                        </div>
-                        <div class="name-item">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附1附件附1附件附1附件.doc
-                        </div>
+                      <div class="similar-level">
+                        相似度：{{ item.similarity ? item.similarity : 0 }}
                       </div>
-                      <div class="similar-level">相似度：83%</div>
-                    </div>
-                    <div class="compare-item">
-                      <div class="item-index">1.</div>
-                      <div class="item-name">
-                        <div class="name-item" style="margin-bottom: 10px">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.xls"
-                          ></file-type>
-                          附件附1附件附1附件附件附1附件附1附件附件附1附件附1附件.xls
-                        </div>
-                        <div class="name-item">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附1附件附1附件附1附件.doc
-                        </div>
-                      </div>
-                      <div class="similar-level">相似度：83%</div>
-                    </div>
-                    <div class="compare-item">
-                      <div class="item-index">1.</div>
-                      <div class="item-name">
-                        <div class="name-item" style="margin-bottom: 10px">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附件附1附件附1附件附件附1附件附1附件.xls
-                        </div>
-                        <div class="name-item">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附1附件附1附件附1附件.doc
-                        </div>
-                      </div>
-                      <div class="similar-level">相似度：83%</div>
-                    </div>
-                    <div class="compare-item">
-                      <div class="item-index">1.</div>
-                      <div class="item-name">
-                        <div class="name-item" style="margin-bottom: 10px">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附件附1附件附1附件附件附1附件附1附件.xls
-                        </div>
-                        <div class="name-item">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附1附件附1附件附1附件.doc
-                        </div>
-                      </div>
-                      <div class="similar-level">相似度：83%</div>
-                    </div>
-                    <div class="compare-item">
-                      <div class="item-index">1.</div>
-                      <div class="item-name">
-                        <div class="name-item" style="margin-bottom: 10px">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附件附1附件附1附件附件附1附件附1附件.xls
-                        </div>
-                        <div class="name-item">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附1附件附1附件附1附件.doc
-                        </div>
-                      </div>
-                      <div class="similar-level">相似度：83%</div>
-                    </div>
-                    <div class="compare-item">
-                      <div class="item-index">1.</div>
-                      <div class="item-name">
-                        <div class="name-item" style="margin-bottom: 10px">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.xls"
-                          ></file-type>
-                          附件附1附件附1附件附件附1附件附1附件附件附1附件附1附件.xls
-                        </div>
-                        <div class="name-item">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附1附件附1附件附1附件.doc
-                        </div>
-                      </div>
-                      <div class="similar-level">相似度：83%</div>
-                    </div>
-                    <div class="compare-item">
-                      <div class="item-index">1.</div>
-                      <div class="item-name">
-                        <div class="name-item" style="margin-bottom: 10px">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附件附1附件附1附件附件附1附件附1附件.xls
-                        </div>
-                        <div class="name-item">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附1附件附1附件附1附件.doc
-                        </div>
-                      </div>
-                      <div class="similar-level">相似度：83%</div>
-                    </div>
-                    <div class="compare-item">
-                      <div class="item-index">1.</div>
-                      <div class="item-name">
-                        <div class="name-item" style="margin-bottom: 10px">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附件附1附件附1附件附件附1附件附1附件.xls
-                        </div>
-                        <div class="name-item">
-                          <file-type
-                            class="left-icon"
-                            fileName="附件附1附件附1附件.doc"
-                          ></file-type>
-                          附件附1附件附1附件附1附件附1附件附1附件.doc
-                        </div>
-                      </div>
-                      <div class="similar-level">相似度：83%</div>
                     </div>
                   </div>
                 </div>
@@ -224,14 +87,14 @@
             </span>
           </div>
           <div class="carousel-div">
-            <div class="btn-prev" :class="{ 'not-allow': canRight }">
+            <div class="btn-prev" :class="{ 'not-allow': !canLeft }">
               <img
                 src="@/assets/image/home-index/prev.png"
                 alt=""
                 @click="moveLeft"
               />
             </div>
-            <div class="btn-next" :class="{ 'not-allow': canLeft }">
+            <div class="btn-next" :class="{ 'not-allow': !canRight }">
               <img
                 src="@/assets/image/home-index/next.png"
                 alt=""
@@ -243,120 +106,25 @@
                 <div
                   class="carousel-item"
                   :style="{ width: carouselWidth + 'px' }"
+                  v-for="(item, index) in compareList"
+                  :key="'compare-carousel' + index"
+                  :class="{ 'active-item': activeIndex === index }"
+                  @click="changeActive(item, index)"
                 >
-                  <file-type
-                    class="left-icon"
-                    fileName="附件附1附件附1附件.doc"
-                  ></file-type>
-                  <div class="item-text">
-                    <div class="text-style color-text">文本相似度：78%</div>
-                    <div class="text-style">
-                      文件名称文件名称文件名称文件名称文件名称文件名称
-                    </div>
+                  <div class="file-img" v-if="item.fileType === 'png'">
+                    <img :src="item.url" alt="" />
                   </div>
-                </div>
-                <div
-                  class="carousel-item"
-                  :style="{ width: carouselWidth + 'px' }"
-                >
                   <file-type
+                    v-else
                     class="left-icon"
-                    fileName="附件附1附件附1附件.doc"
+                    :fileName="item.fileName"
                   ></file-type>
                   <div class="item-text">
-                    <div class="text-style color-text">文本相似度：78%</div>
-                    <div class="text-style">
-                      文件名称文件名称文件名称文件名称文件名称文件名称
+                    <div class="text-style color-text">
+                      文本相似度：{{ item.similarity ? item.similarity : 0 }}
                     </div>
-                  </div>
-                </div>
-                <div
-                  class="carousel-item"
-                  :style="{ width: carouselWidth + 'px' }"
-                >
-                  <file-type
-                    class="left-icon"
-                    fileName="附件附1附件附1附件.doc"
-                  ></file-type>
-                  <div class="item-text">
-                    <div class="text-style color-text">文本相似度：78%</div>
                     <div class="text-style">
-                      文件名称文件名称文件名称文件名称文件名称文件名称
-                    </div>
-                  </div>
-                </div>
-                <div
-                  class="carousel-item"
-                  :style="{ width: carouselWidth + 'px' }"
-                >
-                  <file-type
-                    class="left-icon"
-                    fileName="附件附1附件附1附件.doc"
-                  ></file-type>
-                  <div class="item-text">
-                    <div class="text-style color-text">文本相似度：78%</div>
-                    <div class="text-style">
-                      文件名称文件名称文件名称文件名称文件名称文件名称
-                    </div>
-                  </div>
-                </div>
-                <div
-                  class="carousel-item"
-                  :style="{ width: carouselWidth + 'px' }"
-                >
-                  <file-type
-                    class="left-icon"
-                    fileName="附件附1附件附1附件.doc"
-                  ></file-type>
-                  <div class="item-text">
-                    <div class="text-style color-text">文本相似度：78%</div>
-                    <div class="text-style">
-                      文件名称文件名称文件名称文件名称文件名称文件名称
-                    </div>
-                  </div>
-                </div>
-                <div
-                  class="carousel-item"
-                  :style="{ width: carouselWidth + 'px' }"
-                >
-                  <file-type
-                    class="left-icon"
-                    fileName="附件附1附件附1附件.doc"
-                  ></file-type>
-                  <div class="item-text">
-                    <div class="text-style color-text">文本相似度：78%</div>
-                    <div class="text-style">
-                      文件名称文件名称文件名称文件名称文件名称文件名称
-                    </div>
-                  </div>
-                </div>
-                <div
-                  class="carousel-item"
-                  :style="{ width: carouselWidth + 'px' }"
-                >
-                  <file-type
-                    class="left-icon"
-                    fileName="附件附1附件附1附件.doc"
-                  ></file-type>
-                  <div class="item-text">
-                    <div class="text-style color-text">文本相似度：78%</div>
-                    <div class="text-style">
-                      文件名称文件名称文件名称文件名称文件名称文件名称
-                    </div>
-                  </div>
-                </div>
-                <div
-                  class="carousel-item"
-                  :style="{ width: carouselWidth + 'px' }"
-                >
-                  <file-type
-                    class="left-icon"
-                    fileName="附件附1附件附1附件.doc"
-                  ></file-type>
-                  <div class="item-text">
-                    <div class="text-style color-text">文本相似度：78%</div>
-                    <div class="text-style">
-                      文件名称文件名称文件名称文件名称文件名称文件名称
+                      {{ item.fileName }}
                     </div>
                   </div>
                 </div>
@@ -364,56 +132,72 @@
             </div>
           </div>
         </div>
-        <div class="file-view">
+        <Empty v-if="compareList.length === 0"></Empty>
+        <div class="file-view" v-if="compareList.length > 0">
           <div class="view-left">
             <div class="view-top">
               <div class="top-page">
-                共 <span class="page-weight">3</span> /6
+                共 <span class="page-weight">{{ activeIndex + 1 }}</span> /{{
+                  compareList.length
+                }}
               </div>
               <div class="view-name">初版材料</div>
               <span class="header-btns">
-                <i class="iconfont" @click="saveFile">&#xe62e;</i>
-                <i class="iconfont" @click="fullScreen">&#xe62f;</i>
+                <i class="iconfont" @click="saveFile(1)">&#xe62e;</i>
+                <i class="iconfont" @click="fullScreen(1)">&#xe62f;</i>
               </span>
             </div>
-            <!-- <ImagePreview
-              url="http://192.168.210.51:9090/cpr/cpr_1692588542064_Snipaste_test.png"
-            ></ImagePreview> -->
-            <FilePreview :url="approval.url"></FilePreview>
+            <ImagePreview
+              v-if="activeItem.otherFileType === 'png'"
+              :url="activeItem.otherUrl"
+            ></ImagePreview>
+            <FilePreview v-else :url="activeItem.otherUrl"></FilePreview>
           </div>
           <div class="view-right">
             <div class="view-top">
               <div class="top-page">
-                共 <span class="page-weight">3</span> /6
+                共 <span class="page-weight">{{ activeIndex + 1 }}</span> /{{
+                  compareList.length
+                }}
               </div>
-              <div class="view-name">初版材料</div>
+              <div class="view-name">最终上线版本</div>
               <span class="header-btns">
-                <i class="iconfont" @click="saveFile">&#xe62e;</i>
-                <i class="iconfont" @click="fullScreen">&#xe62f;</i>
+                <i class="iconfont" @click="saveFile(2)">&#xe62e;</i>
+                <i class="iconfont" @click="fullScreen(2)">&#xe62f;</i>
               </span>
             </div>
-            <!-- <ImagePreview
-              url="http://192.168.210.51:9090/cpr/cpr_1692588542064_Snipaste_test.png"
-            ></ImagePreview> -->
-            <FilePreview :url="approval.url"></FilePreview>
+            <ImagePreview
+              v-if="activeItem.fileType === 'png'"
+              :url="activeItem.url"
+            ></ImagePreview>
+            <FilePreview v-else :url="activeItem.url"></FilePreview>
           </div>
         </div>
       </div>
     </div>
-    <reject-dialog ref="rejectDialog" :formBase="{}"></reject-dialog>
+    <reject-dialog ref="rejectDialog" :formBase="formBase"></reject-dialog>
     <div class="fullScreen-none" :class="{ fullScreen: showFullScreen }">
       <!-- 全屏关闭按钮 -->
       <i
         class="el-icon-circle-close"
         v-show="showFullScreen"
-        @click="fullScreen"
+        @click="fullScreen(1)"
       ></i>
       <!-- 图片 -->
-      <!-- <ImagePreview
-        url="http://192.168.210.51:9090/cpr/cpr_1692588542064_Snipaste_test.png"
-      ></ImagePreview> -->
-      <!-- 其他类型文件 -->
-      <FilePreview :url="approval.url"></FilePreview>
+      <div class="perview-div" v-if="fullScreenType === 1">
+        <ImagePreview
+          v-if="activeItem.otherFileType === 'png'"
+          :url="activeItem.otherUrl"
+        ></ImagePreview>
+        <FilePreview v-else :url="activeItem.otherUrl"></FilePreview>
+      </div>
+      <div class="perview-div" v-if="fullScreenType === 2">
+        <ImagePreview
+          v-if="activeItem.fileType === 'png'"
+          :url="activeItem.url"
+        ></ImagePreview>
+        <FilePreview v-else :url="activeItem.url"></FilePreview>
+      </div>
     </div>
   </div>
 </template>
@@ -425,6 +209,8 @@ import FileType from "@/components/common/file-type";
 import ImagePreview from "./image-preview";
 import FilePreview from "@/components/filePreview";
 import { download } from "@/api/aiApproval";
+import { dualScreenPreview } from "@/api/approvalCenter";
+import { getApplyForm } from "@/api/front";
 export default {
   name: "compare",
   components: {
@@ -437,7 +223,7 @@ export default {
   data() {
     return {
       canLeft: false,
-      canRight: true,
+      canRight: false,
       carouselWidth: 0,
       itemBodyWidth: 0,
       bodyClientWidth: 0,
@@ -446,18 +232,54 @@ export default {
       approval: {
         url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
       },
+      compareList: [],
+      formBase: {},
+      totalsimilarity: "",
+      activeIndex: 0,
+      activeItem: {},
+      fullScreenType: 1,
+      loading: true,
     };
   },
-
   mounted() {
+    if (!this.$route.params.item) {
+      this.$router.go(-1);
+      return;
+    }
+    const { item } = this.$route.params;
+    this.formId = item.taskNumber;
+    this.inDraft = item.draftFlag === 1;
+    this.formCategoryId = item.formManagementId;
+    this.init(item);
+    this.formBase = item;
     window.addEventListener("resize", this.resize, true);
     this.carouselWidth = Number(
       ((this.$refs.carouselBody.clientWidth - 40) / 6).toFixed(2)
     );
     this.itemBodyWidth = this.$refs.itemBodyRef.clientWidth.toFixed(2);
     this.bodyClientWidth = this.$refs.carouselBody.clientWidth.toFixed(2);
+    this.getInfo();
   },
   methods: {
+    // 获取工单基本信息
+    init(item) {
+      getApplyForm({
+        formCategoryId: this.formCategoryId,
+        formId: this.formId,
+      }).then((res) => {
+        const { data, status, message } = res.data;
+        if (status === 200) {
+          this.$refs.sidebar.tools[0].sidebarParam = { ...data };
+          // if(data.keyPointsForVerification) {
+          //   this.$refs.refExamine.list = [...data.keyPointsForVerification];
+          // }
+        } else {
+          this.$message.error({ offset: 40, title: "提醒", message });
+        }
+      });
+      // 先获取工单基本信息，，然后判断获取草稿或初始化  文件信息
+      // this.getFileList();
+    },
     resize() {
       this.carouselWidth = Number(
         ((this.$refs.carouselBody.clientWidth - 40) / 6).toFixed(2)
@@ -466,7 +288,7 @@ export default {
       this.bodyClientWidth = this.$refs.carouselBody.clientWidth.toFixed(2);
     },
     moveLeft() {
-      if (this.canLeft) {
+      if (this.canLeft && this.compareList.length > 6) {
         this.scrollX = this.scrollX + this.carouselWidth + 8;
         let element = document.getElementById("itemBody");
         element.style.transform = `translateX(${this.scrollX}px)`;
@@ -479,7 +301,7 @@ export default {
     },
     moveRight() {
       let length = document.querySelectorAll(".carousel-item").length;
-      if (this.canRight) {
+      if (this.canRight && this.compareList.length > 6) {
         this.scrollX = this.scrollX - this.carouselWidth - 8;
         let element = document.getElementById("itemBody");
         element.style.transform = `translateX(${this.scrollX}px)`;
@@ -514,17 +336,141 @@ export default {
         comments: this.comments,
       });
     },
+    // 获取线上对比数据
+    getInfo() {
+      this.loading = true;
+      const param = {
+        formId: this.formId,
+        processInstanceId: this.formBase.processInstanceId,
+      };
+      dualScreenPreview(param)
+        .then((res) => {
+          if (res.data.data) {
+            this.compareList = res.data.data.result;
+            this.totalsimilarity = res.data.data.totalSimilarity;
+            this.activeItem = this.compareList[0];
+            this.loading = false;
+          } else {
+            this.loading = false;
+          }
+        })
+        .catch((err) => {
+          this.loading = false;
+        });
+      // this.compareList = [
+      //   {
+      //     fileName: "上网认证1.pdf",
+      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     otherFileName: "图片22.png",
+      //     otherUrl:
+      //       "http://192.168.210.51:9090/cpr/cpr_1692588542064_Snipaste_test.png",
+      //     fileType: "pdf",
+      //     otherFileType: "png",
+      //     similarity: 1,
+      //   },
+      //   {
+      //     fileName: "图片.png",
+      //     url: "http://192.168.210.51:9090/cpr/cpr_1692588542064_Snipaste_test.png",
+      //     otherFileName: "图片22.png",
+      //     otherUrl:
+      //       "http://192.168.210.51:9090/cpr/cpr_1692588542064_Snipaste_test.png",
+      //     fileType: "png",
+      //     otherFileType: "png",
+      //     similarity: 1,
+      //   },
+      //   {
+      //     fileName: "上网认证1.pdf",
+      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     otherFileName: "上网认证11.pdf",
+      //     otherUrl:
+      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     fileType: "pdf",
+      //     otherFileType: "pdf",
+      //     similarity: 1,
+      //   },
+      //   {
+      //     fileName: "上网认证1.pdf",
+      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     otherFileName: "上网认证11.doc",
+      //     otherUrl:
+      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     fileType: "pdf",
+      //     otherFileType: "pdf",
+      //     similarity: 1,
+      //   },
+      //   {
+      //     fileName: "上网认证2.doc",
+      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     otherFileName: "上网认证22.pdf",
+      //     otherUrl:
+      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     fileType: "pdf",
+      //     otherFileType: "pdf",
+      //     similarity: 1,
+      //   },
+      //   {
+      //     fileName: "上网认证1.pdf",
+      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     otherFileName: "上网认证11.pdf",
+      //     otherUrl:
+      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     fileType: "pdf",
+      //     otherFileType: "pdf",
+      //     similarity: 1,
+      //   },
+      //   {
+      //     fileName: "上网认证1.pdf",
+      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     otherFileName: "上网认证11.doc",
+      //     otherUrl:
+      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     fileType: "pdf",
+      //     otherFileType: "pdf",
+      //     similarity: 1,
+      //   },
+      //   {
+      //     fileName: "上网认证2.doc",
+      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     otherFileName: "上网认证22.pdf",
+      //     otherUrl:
+      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     fileType: "pdf",
+      //     otherFileType: "pdf",
+      //     similarity: 1,
+      //   },
+      //   {
+      //     fileName: "上网认证1.pdf",
+      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     otherFileName: "上网认证11.pdf",
+      //     otherUrl:
+      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+      //     fileType: "pdf",
+      //     otherFileType: "pdf",
+      //     similarity: 1,
+      //   },
+      // ];
+
+      if (this.compareList.length > 6) {
+        this.canRight = true;
+      }
+      // this.totalsimilarity = "100%";
+    },
+    changeActive(item, index) {
+      this.activeItem = item;
+      this.activeIndex = index;
+    },
     // 返回
     goBack(backNow) {
-      this.getComments();
-      if (this.comments.length && backNow !== true) {
-        this.$refs.confirmation.dialogVisible = true;
-      } else {
-        this.$router.go(-1);
-      }
+      this.$router.go(-1);
     },
-    saveFile() {
-      download({ key: this.approval.id })
+    saveFile(type) {
+      let key = "";
+      if (type === 1) {
+        key = this.activeItem.otherKey;
+      } else if (type === 2) {
+        key = this.activeItem.key;
+      }
+      download({ key: key })
         .then((res) => {
           const { data, status } = res.data;
           if (status === 200) {
@@ -538,8 +484,9 @@ export default {
           this.loading = false;
         });
     },
-    fullScreen() {
+    fullScreen(type) {
       this.showFullScreen = !this.showFullScreen;
+      this.fullScreenType = type;
     },
   },
   beforeDestroy() {
@@ -691,16 +638,30 @@ export default {
           padding: 8px;
           flex-shrink: 0;
           .icon {
+            flex-shrink: 0;
             width: 36px;
             height: 36px;
             margin-right: 6px;
+          }
+          .file-img {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            margin-right: 6px;
+            border-radius: 4px;
+            border: 1px solid #306ef5;
+            overflow: hidden;
+            box-shadow: 0px 0px 10px 0px rgba(62, 114, 239, 0.4);
+            img {
+              width: 36px;
+              height: 36px;
+            }
           }
           .item-text {
             .text-style {
               color: #333;
               font-size: 14px;
               font-style: normal;
-              font-weight: 400;
               line-height: 22px;
               overflow: hidden;
               text-overflow: ellipsis;
@@ -711,6 +672,15 @@ export default {
             .color-text {
               color: #eb5757;
             }
+          }
+        }
+        .active-item {
+          border-radius: 6px;
+          border: 1px solid #2d5cf6;
+          background: #f0f6ff;
+          .color-text {
+            color: #eb5757;
+            font-weight: 700;
           }
         }
       }
@@ -815,6 +785,10 @@ export default {
   .el-dialog__body {
     height: 96%;
   }
+}
+.perview-div {
+  width: 100%;
+  height: 100%;
 }
 </style>
 <style lang="less">
