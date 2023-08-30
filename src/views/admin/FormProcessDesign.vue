@@ -33,6 +33,11 @@
         </template>
       </el-result>
     </w-dialog>
+    <secondary-confirmation
+      :option="confirmOption"
+      ref="confirmation"
+      @handleConfirm="handleSubmitLimitTime(confirmOption)"
+    ></secondary-confirmation>
   </el-container>
 </template>
 
@@ -42,12 +47,17 @@ import {saveProcess, publishProcess, getProcessDetail} from '@/api/design'
 import FormBaseSetting from '@/views/admin/layout/FormBaseSetting'
 import ProcessDesign from '@/views/admin/layout/ProcessDesign'
 import FormProSetting from '@/views/admin/layout/FormProSetting'
-
+import secondaryConfirmation from '@/components/common/secondaryConfirmation';
 export default {
   name: "FormProcessDesign",
-  components: {LayoutHeader, FormBaseSetting, ProcessDesign, FormProSetting},
+  components: {LayoutHeader, FormBaseSetting, ProcessDesign, FormProSetting, secondaryConfirmation},
   data() {
     return {
+      confirmOption: {
+        message: '您确定审批流程已配置完毕,并需要将其发布，发布后立即生效，是否继续?',
+        cancelBtn: '取消',
+        confirmBtn: '发布'
+      },
       isNew: true,
       validStep: 0,
       timer: null,
@@ -224,54 +234,39 @@ export default {
     publishProcess() {
       this.validateDesign()
     },
-    doPublish(){
-      this.$confirm('<div><div><i class="el-alert__icon el-icon-warning" style="color: #e6a23c;font-size: 26px;"></i></div>您确定审批流程已配置完毕,并需要将其发布，发布后立即生效，是否继续?</div>', '提示', {
-        confirmButtonText: '发布',
-        cancelButtonText: '取消',
-        dangerouslyUseHTMLString: true,
-        // type: 'warning'
-      }).then(() => {
-        console.log('settings', this.setup.settings)
-        console.log('formItems', this.setup.formItems)
-        console.log('process', this.setup.process)
-        const user = JSON.parse(window.localStorage.getItem('user_name'))
-        let template = {
-          formId: this.setup.formId,
-          formName: this.setup.formName,
-          templateName: this.setup.templateName,
-          templateId: this.setup.templateId,
-          // logo: JSON.stringify(this.setup.logo),
-          settings: JSON.stringify(this.setup.settings),
-          // groupId: this.setup.groupId,
-          formItems: JSON.stringify(this.setup.formItems),
-          process: JSON.stringify(this.setup.process),
-          remark: this.setup.remark,
-          status: '',
-          isRevoke: this.setup.settings.undo,
-          node: this.setup.settings.target,
-          createUserName: user.fullname,
-          createUserId: user.id
-        }
-        // if (this.isNew || this.$isEmpty(this.setup.formId)){
-        publishProcess(template).then(rsp => {
-          this.$message.success("发布成功！可在流程管理列表页查看")
-          // this.setup.processDefinitionI
-          this.validVisible = false
-          this.$router.push({
-            name: 'FlowManage'
-          })
-        }).catch(() => {
-          this.$message.error("发布失败")
+    handleSubmitLimitTime() {
+      const user = JSON.parse(window.localStorage.getItem('user_name'))
+      let template = {
+        formId: this.setup.formId,
+        formName: this.setup.formName,
+        templateName: this.setup.templateName,
+        templateId: this.setup.templateId,
+        // logo: JSON.stringify(this.setup.logo),
+        settings: JSON.stringify(this.setup.settings),
+        // groupId: this.setup.groupId,
+        formItems: JSON.stringify(this.setup.formItems),
+        process: JSON.stringify(this.setup.process),
+        remark: this.setup.remark,
+        status: '',
+        isRevoke: this.setup.settings.undo,
+        node: this.setup.settings.target,
+        createUserName: user.fullname,
+        createUserId: user.id
+      }
+      // if (this.isNew || this.$isEmpty(this.setup.formId)){
+      publishProcess(template).then(rsp => {
+        this.$message.success("发布成功！可在流程管理列表页查看")
+        // this.setup.processDefinitionI
+        this.validVisible = false
+        this.$router.push({
+          name: 'FlowManage'
         })
-        // }else {
-        //   updateFormDetail(template).then(rsp => {
-        //     this.$message.success("更新表单成功")
-        //     // this.$router.push("/formsPanel")
-        //   }).catch(err => {
-        //     this.$message.error(err)
-        //   })
-        // }
+      }).catch(() => {
+        this.$message.error("发布失败")
       })
+    },
+    doPublish(){
+      this.$refs.confirmation.dialogVisible = true;
     }
   }
 }
