@@ -155,6 +155,8 @@ export default {
             getApplyForm({
                 formCategoryId: this.$route.params && this.$route.params.formManagementId || this.sidebarParam && this.sidebarParam.formManagementId,
                 formId: this.$route.params.formId || this.sidebarParam.formId,
+                processTemplateId:this.$route.params.processTemplateId,
+                nodeId:this.$route.params.nodeId,
                 // formCategoryId: 121,
                 // formId: 1257
                 // formManagementId: 121,processInstanceId: "3c186340-3ff6-11ee-bd1a-d4d853dcb3dc"

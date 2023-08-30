@@ -50,7 +50,7 @@
         </span>
       </div>
       <div class="event-infos" v-if="!item.errorInfo">
-        <span class="id">{{ item.taskNumber }}</span>
+        <span class="id">{{ item.orderNo }}</span>
         <span class="sDate date">发起时间：{{ item.create_time || "--" }}</span>
         <span class="sDate date">更新时间：{{ item.update_time || "--" }}</span>
         <span class="sDate date">上线时间：{{ item.productLaunchDate || "--" }}</span>

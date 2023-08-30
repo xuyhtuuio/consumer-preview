@@ -45,7 +45,7 @@
         </span>
       </div>
       <div class="event-infos">
-        <span class="id">{{ item.recordId }}</span>
+        <span class="id">{{ item.orderNo }}</span>
         <span class="sDate date">发起时间：{{ item.createTime | timeFormate }}</span>
         <span class="sDate date">更新时间：{{ item.updateTime | timeFormate }}</span>
         <span class="sDate date">上线时间：{{ item.uptime | timeFormate }}</span>
@@ -167,7 +167,9 @@ export default {
           formId: item.recordId,
           taskName: item.taskName,
           processInstanceId: item.processInstanceId,
-          formManagementId: item.formManagementId
+          formManagementId: item.formManagementId,
+          nodeId:item.nodeId,
+          processTemplateId:item.processTemplateId
         },
       });
     },
@@ -187,7 +189,9 @@ export default {
           formId: item.recordId,
           taskName: item.taskName,
           processInstanceId: item.processInstanceId,
-          formManagementId: item.formManagementId
+          formManagementId: item.formManagementId,
+          nodeId:item.nodeId,
+          processTemplateId:item.processTemplateId
         },
       });
     },
