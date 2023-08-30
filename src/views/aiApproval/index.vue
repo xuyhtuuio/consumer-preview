@@ -20,8 +20,9 @@
             ><i class="iconfont icon-ocr"></i>{{ showOcr ? '关闭' : '打开' }}智能审批</el-button
           >
           <el-popover
+            v-show="examineIsShow"
             popper-class="con-popover"
-            style="margin: 0 10px"
+            style="margin: 0 0 0 10px"
             placement="bottom"
             width="380"
             trigger="click"
@@ -33,7 +34,7 @@
             </el-button>
           </el-popover>
 
-          <el-button type="primary" @click="showSubmit"
+          <el-button type="primary" @click="showSubmit" style="margin-left: 10px"
             ><i class="iconfont icon-tijiao"></i>提交</el-button
           >
         </span>
@@ -163,7 +164,8 @@ export default {
       activeWordType: 0, // 高亮禁用词或敏感词, 1 禁用词,  2 敏感词
       myContStyle: {
         height: '0px'
-      }
+      },
+      examineIsShow: false,
     };
   },
 
@@ -205,8 +207,9 @@ export default {
         const { data, status, message } = res.data;
         if (status === 200) {
           this.$refs.sidebar.tools[0].sidebarParam = { ...data };
-          if(data.keyPointsForVerification) {
-            this.$refs.refExamine.list = [...data.keyPointsForVerification];
+          if(data?.keyPointsForVerification.length) {
+            this.$refs.refExamine.list =  [...data.keyPointsForVerification];
+            this.examineIsShow = true
           }
         } else {
           this.$message.error({ offset: 40, title: '提醒', message });
