@@ -11,7 +11,7 @@
         <span style="position: relative; top: 20px;">></span>
         <el-menu-item index="proSetting" @click="to('proSetting')"><span class="num">3</span> 高级设置</el-menu-item>
       </el-menu>
-      <div class="publish">
+      <div class="publish" v-if="editAuth">
         <el-button size="mini" @click="save"><i class="el-icon-folder-opened"></i>保存</el-button>
         <el-button size="mini" type="primary" :disabled="setup.processDefinitionId" @click="publish"><i class="el-icon-s-promotion"></i>{{ setup.processDefinitionId ? '已发布' : '发布' }}</el-button>
       </div>
@@ -52,6 +52,14 @@ export default {
   computed: {
     setup() {
       return this.$store.state.design
+    },
+    editAuth() {
+      const { authObject = {} } = this.$store.state
+      const flowManage = authObject.funPerm?.find(item => item.pathName === 'FlowManage') || {}
+      if (flowManage.type === 'edit') {
+        return true
+      }
+      return false
     }
   },
   created() {
