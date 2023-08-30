@@ -18,6 +18,7 @@ import FormManage from './formManage'
 import RolePermission from './rolePermission'
 import LabelManage from './labelManage.vue'
 import OpinionManage from "./opinionManage.vue"
+import OpinionManageOne from "./opinionManage-1.0.vue"
 export default {
   name: 'manage',
   components: {
@@ -27,7 +28,8 @@ export default {
     FormManage,
     RolePermission,
     LabelManage,
-    OpinionManage
+    OpinionManage,
+    OpinionManageOne
   },
   data() {
     return {

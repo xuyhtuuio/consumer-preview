@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'diff-examine-pivot': isWidthDiff, 'examine-pivot': true }" ref="refGlobal">
+  <div v-if="newList.length" :class="{ 'diff-examine-pivot': isWidthDiff, 'examine-pivot': true }" ref="refGlobal">
     <slot> </slot>
     <div class="main">
       <header v-if="!titleShow" class="top">

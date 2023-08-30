@@ -2,7 +2,7 @@
   <div class="tableCard">
     <div class="head">
        <div class="left">
-        <g-icon class="right-icon" :wProp="20" :hProp="32" :href="iconHref"/>
+        <g-icon class="right-icon" :wProp="20" :hProp="hProp" :href="iconHref"/>
        <span class="content">{{title}}</span>
        </div>
       <slot name="cardInfo"></slot>
@@ -24,7 +24,11 @@
       title: {
         typeof: String,
         required: true
-      }
+      },
+      hProp: {
+        typeof: Number|String,
+        default: 32
+      },
     },
     data(){
       return {}

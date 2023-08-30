@@ -58,27 +58,63 @@
           </TrsPagination>
         </template>
         <template v-else>
-          <g-table-card title="消保审查" v-loading="cardLoading">
-            <template #cardInfo>
-              <span class="main-info"
-                >共<span class="high"> {{ checkedPermission.length }}</span
-                >/{{ checkedPermissions.length }}</span
-              >
-            </template>
+          <g-table-card title="消保审查" v-loading="cardLoading" :hProp="22">
+            <template #cardInfo> </template>
             <template #content>
               <div class="main-content">
                 <div class="con-top">
-                  功能权限 <span class="normal">{{ checkedPermissions.length }}</span>
+                  功能权限
+                  <div class="con-main">
+                    <div class="con-main-item" v-for="(item, index) in permissionList" :key="index">
+                      <el-checkbox
+                        class="item-left"
+                        v-model="item.type"
+                        @change="handleCheckBoxChange(item)"
+                        >{{ item.title }}</el-checkbox
+                      >
+                      <div class="item-right">
+                        <div
+                          class="item-right-item"
+                          v-for="(childItem, childIndex) in item.children"
+                          :key="childIndex"
+                        >
+                          <p>{{ childItem.title }}</p>
+                          <div>
+                            <el-radio
+                              v-for="(iten, indey) in childItem.props"
+                              :key="indey"
+                              v-model="childItem.type"
+                              :label="iten.label"
+                              @click.native.prevent="handleRadioChange(iten.label, childItem, item)"
+                              >{{ iten.value }}</el-radio
+                            >
+                          </div>
+                        </div>
+                        <div class="item-right-item" style="height: 0"></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <el-checkbox-group v-model="checkedPermission" @change="handleChecked">
-                  <el-checkbox
-                    v-for="check in checkedPermissions"
-                    :label="check.id"
-                    :key="check.id"
-                    @change="isSave = false"
-                    >{{ check.name }}</el-checkbox
-                  >
-                </el-checkbox-group>
+                <div class="con-top">
+                  <div class="title">
+                    <span class="title-item">
+                      数据权限<span style="margin-left: 5px; color: #eb5757">*</span>
+                    </span>
+                    <span class="title-item">
+                      <i></i>
+                      数据权限仅作用于审批中心、后台管理（用户管理、表单管理、流程管理）及统计中心
+                    </span>
+                  </div>
+                  <div class="con-main">
+                    <el-radio
+                      v-for="item in dataRadioList"
+                      :key="item.label"
+                      v-model="dataRadio"
+                      :label="item.label"
+                      >{{ item.value }}</el-radio
+                    >
+                  </div>
+                </div>
               </div>
             </template>
           </g-table-card>
@@ -158,7 +194,105 @@ export default {
       },
       action: 'edit1',
       stopOrRun: {},
-      roleId: ''
+      roleId: '',
+      radio: '',
+      permissionList: [
+        {
+          title: '审批中心',
+          type: false,
+          children: [
+            {
+              title: '全部任务（审批中心）',
+              type: '',
+              props: [
+                { label: 'view', value: '查看' },
+                { label: 'export', value: '查看并导出' }
+              ]
+            }
+          ]
+        },
+        {
+          title: '后台管理',
+          type: false,
+          children: [
+            {
+              title: '用户管理',
+              type: '',
+              props: [
+                { label: 'view', value: '查看' },
+                { label: 'export', value: '查看并编辑' }
+              ]
+            },
+            {
+              title: '表单管理',
+              type: '',
+              props: [
+                { label: 'view', value: '查看' },
+                { label: 'export', value: '查看并编辑' }
+              ]
+            },
+            {
+              title: '流程管理',
+              type: '',
+              props: [
+                { label: 'view', value: '查看' },
+                { label: 'export', value: '查看并编辑' }
+              ]
+            },
+            {
+              title: '角色/权限管理',
+              type: '',
+              props: [
+                { label: 'view', value: '查看' },
+                { label: 'export', value: '查看并编辑' }
+              ]
+            },
+            {
+              title: '标签管理',
+              type: '',
+              props: [
+                { label: 'view', value: '查看' },
+                { label: 'export', value: '查看并编辑' }
+              ]
+            },
+            {
+              title: '意见管理',
+              type: '',
+              props: [
+                { label: 'view', value: '查看' },
+                { label: 'export', value: '查看并编辑' }
+              ]
+            },
+            {
+              title: '法规制度管理',
+              type: '',
+              props: [
+                { label: 'view', value: '查看' },
+                { label: 'export', value: '查看并编辑' }
+              ]
+            },
+            {
+              title: '其他配置',
+              type: '',
+              props: [
+                { label: 'view', value: '查看' },
+                { label: 'export', value: '查看并编辑' }
+              ]
+            }
+          ]
+        },
+        {
+          title: '统计中心',
+          type: ''
+        }
+      ],
+      dataRadio: 'org',
+      dataRadioList: [
+        { value: '全行', label: 'all' },
+        { value: '本行', label: 'own' },
+        { value: '本部门', label: 'org' },
+        { value: '信用卡', label: 'card' }
+      ]
     };
   },
   created() {
@@ -222,23 +356,32 @@ export default {
     },
     async handleSave() {
       if (this.isSave) return;
-      this.cardLoading = true
+      this.cardLoading = true;
       const {
         data: { data: res, success, msg }
       } = await updateRolePermission({
         roleId: this.roleId,
         permissionIdList: this.checkedPermission
       });
-        this.$message.success(msg);
-      
+      this.$message.success(msg);
+
       this.isSave = true;
-      this.cardLoading = false
+      this.cardLoading = false;
     },
     handleChecked() {},
     handleSubmitLimitTime() {},
     handleReturn() {
       this.level = true;
       this.roleId = '';
+    },
+    handleCheckBoxChange(item) {
+      if (!item.type && item?.children?.length) {
+        item.children.forEach(item => (item.type = ''));
+      }
+    },
+    handleRadioChange(value, data, origin) {
+      data.type = value === data.type ? '' : value;
+      origin.type = origin.children.some(item => item.type) && true;
     }
   }
 };
@@ -248,6 +391,7 @@ export default {
 @color1: #1d2128;
 .rolePermission {
   font-size: 14px;
+  color: #1d2128;
   .el-button--text {
     padding: 5px;
   }
@@ -295,18 +439,79 @@ export default {
       }
       .main-content {
         margin-top: 14px;
-        padding: 8px 0;
+        padding: 12px 16px;
         background-color: #f7f8fa;
         border-radius: 8px;
 
         .con-top {
-          padding-left: 18px;
-          font-size: 12px;
           font-weight: 700;
           line-height: 22px;
-          color: #505968;
-          .normal {
-            font-weight: 400;
+          color: #1d2128;
+          .con-main {
+            margin: 12px 0;
+            padding: 0 24px;
+            .con-main-item {
+              display: flex;
+              justify-content: space-between;
+              margin: 0 -24px;
+              padding: 12px 24px;
+              border-top: 1px dotted #e5e6eb;
+
+              &:last-child {
+                border-bottom: 1px dotted #e5e6eb;
+              }
+              .item-left {
+                min-width: 90px;
+                margin-right: 40px;
+                .el-checkbox__input {
+                  .el-checkbox__inner {
+                    width: 20px;
+                    height: 20px;
+                    &::after {
+                      left: 6px;
+                      height: 11px;
+                    }
+                  }
+                }
+                .el-checkbox__label {
+                  color: #1d2128;
+                  font-weight: 700;
+                }
+              }
+              .item-right {
+                flex: 1;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                &-item {
+                  width: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  padding: 0 24px;
+                  &:not(:last-child):nth-child(n + 3) {
+                    padding-top: 16px;
+                  }
+                  &:nth-child(2n) {
+                    border-left: 1px solid #e5e6eb;
+                  }
+                  & > p {
+                    font-weight: normal;
+                  }
+                }
+              }
+            }
+          }
+          .title {
+            line-height: 22px;
+            &-item {
+              margin-right: 8px;
+
+              &:nth-child(2) {
+                font-size: 12px;
+                font-weight: normal;
+              }
+            }
           }
         }
       }
@@ -379,6 +584,11 @@ export default {
     }
     .el-dialog__body {
       padding: 0;
+    }
+  }
+  /deep/.is-checked {
+    .el-radio__label {
+      color: #1d2128;
     }
   }
 }

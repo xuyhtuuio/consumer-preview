@@ -78,6 +78,12 @@ const router = new Router({
           name: "OpinionManage",
           component: () => import("@/views/admin/manage/opinionManage.vue"),
           meta: { title: '意见管理' }
+        },
+        {
+          path: "opinionManage-1.0",
+          name: "OpinionManageOne",
+          component: () => import("@/views/admin/manage/opinionManage-1.0.vue"),
+          meta: { title: '意见管理' }
         }
       ]
     },
