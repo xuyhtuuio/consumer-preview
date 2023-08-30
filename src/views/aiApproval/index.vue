@@ -197,14 +197,17 @@ export default {
       });
     },
     // 获取工单基本信息
-    init(item) {
+    init() {
       getApplyForm({
         formCategoryId: this.formCategoryId,
         formId: this.formId
       }).then(res => {
         const { data, status, message } = res.data;
         if (status === 200) {
-          this.$refs.sidebar.tools[0].sidebarParam = { ...data };
+          this.$refs.sidebar.tools[0].sidebarParam = {
+            ...data,
+            keyPointsForVerification: JSON.parse(JSON.stringify(data.keyPointsForVerification))
+           };
           if(data.keyPointsForVerification) {
             this.$refs.refExamine.list = [...data.keyPointsForVerification];
           }
