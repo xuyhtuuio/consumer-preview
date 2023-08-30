@@ -199,19 +199,23 @@ export default {
       });
     },
     // 获取工单基本信息
-    init(item) {
+    init() {
       getApplyForm({
         formCategoryId: this.formCategoryId,
         formId: this.formId
       }).then(res => {
         const { data, status, message } = res.data;
         if (status === 200) {
-          this.$refs.sidebar.tools[0].sidebarParam = { ...data };
+          this.$refs.sidebar.tools[0].sidebarParam = {
+            ...data,
+            keyPointsForVerification: JSON.parse(JSON.stringify(data.keyPointsForVerification))
+           };
           if(data?.keyPointsForVerification.length) {
             this.$refs.refExamine.list =  [...data.keyPointsForVerification];
             this.examineIsShow = true
-          }
-        } else {
+          } 
+        }
+        else {
           this.$message.error({ offset: 40, title: '提醒', message });
         }
       });
