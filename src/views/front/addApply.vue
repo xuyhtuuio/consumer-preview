@@ -155,16 +155,6 @@ export default {
       next();
     };
   },
-  // activated() {
-  //   this.initialData();
-  // },
-  // deactivated() {
-  //   this.formId = '';
-  //   this.formManagementId = -1;
-  //   this.clearForm();
-  //   this.reviewList.length = 0;
-  //   this.$refs.refReviewMatters.clearData();
-  // },
   methods: {
     initialData() {
       this.isLoading = true;
@@ -174,10 +164,10 @@ export default {
       });
     },
     clearForm() {
-      this.promotionChannels.length = 0;
-      this.basicInformation.length = 0;
-      this.keyPointsForVerification.length = 0;
-      this.reviewMaterials.length = 0;
+      this.promotionChannels = [];
+      this.basicInformation = [];
+      this.keyPointsForVerification = [];
+      this.reviewMaterials = [];
     },
     // 审查事项类型
     async handleReviewClick(id) {
@@ -200,6 +190,7 @@ export default {
           this.keyPointsForVerification = keyPointsForVerification;
           this.reviewMaterials = reviewMaterials;
         } else {
+          this.clearForm()
           // this.$message.error(msg)
         }
       });
@@ -361,7 +352,6 @@ export default {
           this.$message({ type: 'success', message: msg });
           this.rollTo(0);
           this.isGLoading = false;
-          this.handleClear();
           typeof success === 'function' && success();
         });
       }
