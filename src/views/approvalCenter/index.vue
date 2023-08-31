@@ -339,7 +339,6 @@ export default {
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-        // console.log('res')
       }).catch(err => {
         this.downloadLoading = false
       })

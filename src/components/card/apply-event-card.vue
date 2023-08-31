@@ -102,6 +102,12 @@
           确认
         </span>
       </div>
+      <div class="flex" v-if="item.taskStatus == 6">
+        <span class="attention check icon-op" @click="compare(item)">
+          <span class="iconfont icon icon-compare urgent-icon"></span>
+          比对</span>
+      </div>
+
       <div v-if="item.taskStatus == '3'" class="flex" @click="modify(item)">
         <span class="modify icon-op">
           <svg class="icon urgent-icon" aria-hidden="true">
@@ -187,6 +193,19 @@ export default {
       //   this.revoked= data =='true'
       // })
 
+    },
+    /**
+     * @description: 去比对
+     * @return {*}
+     */
+    //
+    compare(item) {
+      this.$router.push({
+        name: 'compare',
+        params: {
+          item
+        }
+      })
     },
     toDetail(item) {
       //草稿去修改页

@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-08-31 16:53:57
+ * @LastEditTime: 2023-08-31 18:23:43
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -36,7 +36,7 @@
           <span class="flex"> <i class="iconfont icon-tijiao"></i>
             <i class="btn">去比对</i></span>
         </el-button>
-        <div v-if="item.taskStatus == 1&&pagePath&&pagePath=='approval'" class="flex">
+        <div v-if="item.taskStatus == 1 && pagePath && pagePath == 'approval'" class="flex">
           <!-- <div class="back flex" @click="transferDialog = true">
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
@@ -219,12 +219,12 @@ export default {
     uploadFileCard,
     filePreview
   },
-props:{
-  pagePath:{
-    type: String,
-    default:''
-  }
-},
+  props: {
+    pagePath: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       loading: false,
@@ -515,8 +515,8 @@ props:{
         msg: editOpinionForm.content,
         userIds: assignedUser,
         processInstanceId: this.item.processInstanceId,
-        formId:editOpinionForm.formId,
-        formItemDataList:editOpinionForm.editOpinionForm
+        formId: editOpinionForm.formId,
+        formItemDataList: editOpinionForm.editOpinionForm
       }
       //通过时候，流程配置中下一节点审批人设置时选择“上一审批人选择”，增加选择审批人选择则框
       if (editOpinionForm.isAccept == '1' && editOpinionForm.assignedType == 'SELF_SELECT') {
@@ -603,8 +603,9 @@ props:{
           })
           return false
         }
+        console.log('required',uploadFileRadio,uploadFileRequired)
         // 最终上线材料模块：选中活动正常上线：radio=1,需要上传材料; 选中活动未开展：radio=0，不需要上传材料
-        if (uploadFileRadio == 1 && !uploadFileRequired) {
+        if (uploadFileRadio==1 && !uploadFileRequired) {
           this.$message({
             type: 'warning',
             customClass: 'el-icon-warning-one',
@@ -776,7 +777,7 @@ props:{
       let fileSuccess = null
       try {
         //上传文件的逻辑 选中活动正常上线
-        if (!opinions && uploadFileRadio == 1) {
+        if (!opinions && uploadFileRadio==1) {
           const params = fileUploadForm.map(v => {
             return {
               fileName: v.fileName,
@@ -795,37 +796,42 @@ props:{
         updateAdoptEditedComments(opinion_submit_params, this.item.taskId).then(res => {
           this.loadings.submitLoading = false
           //有实质意见且采纳所以的有实质意见
-          if (type && type == 1) {
-            this.$confirm("审查意见已确认，请根据审查意见修改提单内容。", "", {
-              customClass: "confirmBox",
-              confirmButtonText: "去修改",
-              cancelButtonText: "知道了",
-              closeOnClickModal: false,
-              distinguishCancelAndClose: true,
-              type: "warning",
-            }).then(() => {
-              that.toModify()
-            }).catch((e) => {
-              switch (e) {
-                case 'close':
-                  that.toModify()
-                  break;
-                case 'cancel':
-                  break;
-              }
-            })
-          } else {
-            this.$confirm("审查意见已确认，可在申请中心查看。", "", {
-              customClass: "confirmBox",
-              cancelButtonText: "知道了",
-              showConfirmButton: false,
-              closeOnClickModal: false,
-              type: "warning",
-            }).then(res => {
-              this.$router.replace('/applycenter')
-            }).catch(err => {
-              this.$router.replace('/applycenter')
-            })
+          const { success } = res.data
+          if (success) {
+            if (type && type == 1) {
+              this.$confirm("审查意见已确认，请根据审查意见修改提单内容。", "", {
+                customClass: "confirmBox",
+                confirmButtonText: "去修改",
+                cancelButtonText: "知道了",
+                closeOnClickModal: false,
+                distinguishCancelAndClose: true,
+                type: "warning",
+              }).then(() => {
+                that.toModify()
+              }).catch((e) => {
+                switch (e) {
+                  case 'close':
+                    that.toModify()
+                    break;
+                  case 'cancel':
+                    break;
+                }
+              })
+            } else {
+              this.$confirm("审查意见已确认，可在申请中心查看。", "", {
+                customClass: "confirmBox",
+                cancelButtonText: "知道了",
+                showConfirmButton: false,
+                closeOnClickModal: false,
+                type: "warning",
+              }).then(res => {
+                this.$router.replace('/applycenter')
+              }).catch(err => {
+                this.$router.replace('/applycenter')
+              })
+            }
+          }else{
+            this.$message.error(res.data.msg)
           }
         }).catch(err => {
           this.loadings.submitLoading = false
