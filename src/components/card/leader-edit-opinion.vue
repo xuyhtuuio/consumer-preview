@@ -88,7 +88,7 @@
       </el-form-item>
       <el-form-item label="审查意见" class="opinion">
         <el-input type="textarea" placeholder="请输入审查话术内容" v-model="form.content" resize="none"
-          @blur="updateForm"></el-input>
+          @change="updateForm"></el-input>
       </el-form-item>
 
     </el-form>
@@ -102,21 +102,20 @@
                 *
               </span></label>
             <el-input v-if="item.name === 'TextInput'" :disabled="item.perm === 'R'" v-model.trim="item.value"
-              :placeholder="item.props.placeholder"></el-input>
-
+              :placeholder="item.props.placeholder" @change="updateForm"></el-input>
             <el-select v-else-if="item.name === 'SelectInput' && !item.props.expanding" :disabled="item.perm === 'R'"
-              v-model.trim="item.value" :placeholder="item.props.placeholder">
+              v-model.trim="item.value" :placeholder="item.props.placeholder" @change="updateForm">
               <el-option v-for="(iten, indey) in item.props.options" :key="indey" :label="iten.value"
                 :value="iten.id"></el-option>
             </el-select>
 
             <el-radio-group v-else-if="item.name === 'SelectInput' && item.props.expanding" :disabled="item.perm === 'R'"
-              v-model.trim="item.value">
+              v-model.trim="item.value" @change="updateForm">
               <el-radio v-for="(iten, indey) in item.props.options" :key="indey" :label="iten.id">{{ iten.value
               }}</el-radio>
             </el-radio-group>
             <el-checkbox-group v-else-if="item.name === 'MultipleSelect' && item.props.expanding"
-              v-model.trim="item.value" :disabled="item.perm === 'R'">
+              v-model.trim="item.value" :disabled="item.perm === 'R'" @change="updateForm">
               <template v-for="(iten, indey) in item.props.options">
                 <el-checkbox :key="indey" :label="iten.id">{{ iten.value }}</el-checkbox>
               </template>
@@ -125,7 +124,7 @@
             <div class="groups-select" v-else-if="item.name === 'MultipleGroupsSelect'">
               <div v-for="iten in item.props.options" :key="iten.id">
                 <p class="group-title">{{ iten.value }}</p>
-                <el-checkbox-group class="group-value" v-model="item.value" :disabled="item.perm === 'R'">
+                <el-checkbox-group class="group-value" v-model="item.value" :disabled="item.perm === 'R'" @change="updateForm">
                   <el-checkbox v-for="(itenItem, indey) in iten.children" :key="indey" :label="itenItem.id">{{
                     itenItem.value }}
                   </el-checkbox>
@@ -133,26 +132,21 @@
               </div>
             </div>
             <el-select v-else-if="item.name === 'MultipleSelect' && !item.props.expanding" :disabled="item.perm === 'R'"
-              v-model.trim="item.value" :placeholder="item.props.placeholder" multiple>
+              v-model.trim="item.value" :placeholder="item.props.placeholder" multiple @change="updateForm">
               <el-option v-for="(iten, indey) in item.props.options" :key="indey" :label="iten.value"
                 :value="iten.id"></el-option>
             </el-select>
 
             <el-date-picker v-else-if="item.name === 'TimePicker'" :disabled="item.perm === 'R'" type="datetime"
               :placeholder="item.props.placeholder" :format="item.props.format" v-model.trim="item.value"
-              :picker-options="pickerTime(item.props.gl, item.props.order)" @change="handlePickerChange(item)"
+              :picker-options="pickerTime(item.props.gl, item.props.order)" @change="updateForm"
               style="width: 100%"></el-date-picker>
 
             <el-input v-else-if="item.name === 'TextareaInput'" :disabled="item.perm === 'R'" type="textarea"
-              v-model.trim="item.value" :placeholder="item.props.placeholder"></el-input>
-
+              v-model.trim="item.value" :placeholder="item.props.placeholder" @change="updateForm"></el-input>
             <el-cascader v-else-if="item.name === 'Cascader'" v-model="item.value" :options="item.props.childrens"
-              :props="{ label: 'value', value: 'id', checkStrictly: true, multiple: item.props.multiple }" clearable>
+              :props="{ label: 'value', value: 'id', checkStrictly: true, multiple: item.props.multiple }" clearable @change="updateForm">
             </el-cascader>
-
-            <div class="warn" v-if="item.isWarning">
-              <warn-info ref="refWarn" :info="judgementWarn(item)"></warn-info>
-            </div>
           </el-form-item>
         </template>
       </el-form>
@@ -258,16 +252,27 @@ export default {
       })
 
     },
-    updateForm(flag) {
+    updateForm() {
+      //动态表单
+      const approver_params=this.filledInByApprover?.map(v=>{
+        return {
+          formItemId: v.id,
+          valueType:v.name,
+          value:v.value
+        }
+      })||[]
       let params = {
         ...this.externalData,
         ...this.form,
+        formId:this.externalData.formId,
         assignedType: this.assignedType,
+        formItemDataList:approver_params
       }
+      // 若审核员选择了驳回
       if (this.form.isAccept == '0') {
         params = {
           ...params,
-          ...this.form.crtDisavower
+          ...this.form.crtDisavower,
         }
       }
       this.$refs["form"].validate((valid) => {
