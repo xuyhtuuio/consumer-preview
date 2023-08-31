@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-08-31 18:23:43
+ * @LastEditTime: 2023-08-31 18:43:13
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -209,6 +209,7 @@ import filePreview from '@/components/filePreview'
 import { leaderEdit, finalMaterial } from '@/api/approvalCenter'
 import { updateAdoptEditedComments, updateEditedComments, getTemplatedetail } from '@/api/applyCenter'
 import moment from 'moment';
+
 export default {
   name: "order-details",
   components: {

@@ -102,7 +102,7 @@
           确认
         </span>
       </div>
-      <div class="flex" v-if="item.taskStatus == 6">
+      <div class="flex" v-if="item.taskStatus == 6&&canCompared">
         <span class="attention check icon-op" @click="compare(item)">
           <span class="iconfont icon icon-compare urgent-icon"></span>
           比对</span>
@@ -159,6 +159,8 @@
 <script>
 import { concernApplication, canRoved } from "@/api/applyCenter";
 import { revoked } from "../../api/applyCenter";
+import { getTemplatedetail } from '@/api/applyCenter'
+
 export default {
 
   props: {
@@ -173,14 +175,33 @@ export default {
       allowConcernClick: true,
       persons: [],
       revoked: false, //是否可以撤销
+      canCompared:false ,// 当前登录用户可以使用对比功能
     };
   },
   mounted() {
     // 判断是否可以撤销
     this.item.taskStatus == '1' ? this.getCanBeRoved(this.item) : ''
+    // 判断当前节点审批人是不是当前用户
+    this.item.taskStatus == '6' ? this.getTemplatedetail(this.item) : ''
 
   },
   methods: {
+    /**
+     * @description: 查询当前节点的审批人是否包含当前登录用户
+     * @return {*}
+     */
+    async getTemplatedetail() {
+      const params = {
+        processInstanceId: this.item.processInstanceId
+      }
+      const res = await getTemplatedetail(params)
+      if (res.data) {
+        const { data } = res.data
+        const assignedUser = data[data.length - 1].props['assignedUser']?.filter(v => v.type !== 'dept')?.map(v => v.id)
+        const user = JSON.parse(window.localStorage.getItem('user_name'))
+        this.canCompared=assignedUser.includes(user.id+'')
+      }
+    },
     getCanBeRoved(item) {
       const params = {
         nodeId: item.nodeId,
