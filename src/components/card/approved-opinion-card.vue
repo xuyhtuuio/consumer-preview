@@ -104,10 +104,7 @@ export default {
   },
 
   mounted() {
-    this.$route.params.formId ? this.getEditedCommentsByFormId() : ''
-  },
-  activated() {
-
+    this.$route.params.formId||this.sidebarParam.formId ? this.getEditedCommentsByFormId() : ''
   },
   methods: {
     // 判断是否更新数据并向state更新
@@ -132,7 +129,7 @@ export default {
     },
     getEditedCommentsByFormId() {
       this.loading = true
-      getEditedCommentsByFormId({ formId: this.$route.params.formId }).then(res => {
+      getEditedCommentsByFormId({ formId: this.$route.params.formId||this.sidebarParam.formId }).then(res => {
         const { data } = res.data
         const keys = Object.keys(data)
         if (data?.constructor !== Object) {

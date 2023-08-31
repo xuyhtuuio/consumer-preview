@@ -97,12 +97,12 @@ export default {
     };
   },
   mounted() {
-
-  },
-  activated() {
     if (this.sidebarParam || this.$route.params) {
       this.init()
     }
+  },
+  activated() {
+ 
   },
   methods: {
     init() {

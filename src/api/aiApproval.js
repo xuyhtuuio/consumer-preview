@@ -73,3 +73,11 @@ export function rollback(param) {
     data: param
   })
 }
+// 获取前面审批人的审批意见，以及当前节点的审批权限
+export function getOpinionApprovalLetter(param) {
+  return request({
+    url: '/cpr/OcrExamine/getOpinionApprovalLetter',
+    method: 'get',
+    params: param
+  })
+}

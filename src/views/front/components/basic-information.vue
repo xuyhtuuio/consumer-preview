@@ -14,7 +14,7 @@
             <el-form-item :class="formItemCpt(item)" :key="index">
               <label slot="label"
                 >{{ item.title
-                }}<span :style="{ color: 'red', opacity: item.props.required || 0 }">
+                }}<span :style="{ color: 'red', opacity: item.props.required ? 1 : 0 }">
                   *
                 </span></label
               >
