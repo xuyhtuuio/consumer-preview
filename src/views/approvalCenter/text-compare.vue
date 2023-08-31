@@ -199,6 +199,11 @@
         <FilePreview v-else :url="activeItem.url"></FilePreview>
       </div>
     </div>
+    <SecondaryConfirmation
+      :option="option"
+      ref="confirmation"
+      @handleConfirm="endTaskSubmit"
+    ></SecondaryConfirmation>
   </div>
 </template>
 
@@ -206,16 +211,18 @@
 import rejectDialog from "./dialogs/reject-dialog";
 import SideBar from "../aiApproval/sidebar/sidebar";
 import FileType from "@/components/common/file-type";
+import SecondaryConfirmation from "@/components/common/secondaryConfirmation";
 import ImagePreview from "./image-preview";
 import FilePreview from "@/components/filePreview";
 import { download } from "@/api/aiApproval";
-import { dualScreenPreview } from "@/api/approvalCenter";
+import { dualScreenPreview, endTask } from "@/api/approvalCenter";
 import { getApplyForm } from "@/api/front";
 export default {
   name: "compare",
   components: {
     rejectDialog,
     FileType,
+    SecondaryConfirmation,
     SideBar,
     ImagePreview,
     FilePreview,
@@ -239,6 +246,11 @@ export default {
       activeItem: {},
       fullScreenType: 1,
       loading: true,
+      option: {
+        message: '确认结束后该申请单结束流转，不可再进行修改',
+        cancelBtn: '取消',
+        confirmBtn: '确认',
+      }
     };
   },
   mounted() {
@@ -319,22 +331,22 @@ export default {
       this.$refs.rejectDialog.init();
     },
     showSubmit() {
-      this.$refs.submitReview.submitReviewDialog = true;
-      this.getComments();
-      this.$refs.submitReview.increasedIds = this.increasedIds;
-      this.$refs.submitReview.submission = JSON.parse(
-        JSON.stringify(
-          this.comments.map((comment) => {
-            comment.opinion = false;
-            return comment;
-          })
-        )
-      );
-      console.log({
-        files: this.files,
-        increasedIds: this.increasedIds,
-        comments: this.comments,
-      });
+      this.$refs.confirmation.dialogVisible = true;
+    },
+    endTaskSubmit() {
+      let data = {
+        taskId: this.formBase.taskId
+      }
+      endTask(data).then(res => {
+        if (res.status == 200) {
+          this.$message.success(res.data.msg);
+          this.goBack();
+        } else {
+          this.$message.success(res.data.msg);
+        }
+      }).catch(err => {
+        this.$message.success('申请单结束流转失败');
+      })
     },
     // 获取线上对比数据
     getInfo() {
