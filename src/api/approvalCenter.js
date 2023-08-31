@@ -149,3 +149,13 @@ export function dualScreenPreview(param) {
     data: param,
   })
 }
+
+// 对比结束接口
+export function endTask(param) {
+  return request({
+    url: '/cpr/workspace/endTask',
+    method: 'post',
+    contentType:'application/x-www-form-urlencoded',
+    data: param,
+  })
+}
