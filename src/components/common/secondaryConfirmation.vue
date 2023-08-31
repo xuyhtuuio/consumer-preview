@@ -4,7 +4,7 @@
     <span>{{ option.message }}</span>
     <span slot="footer" class="dialog-footer">
       <el-button @click="handleClose">{{ option.cancelBtn }}</el-button>
-      <el-button type="primary" @click="handleConfirm">{{ option.confirmBtn }}</el-button>
+      <el-button type="primary" :disabled="isDisabled" @click="handleConfirm">{{ option.confirmBtn }}</el-button>
     </span>
   </el-dialog>
 </template>
@@ -24,6 +24,7 @@ export default {
   },
   data() {
     return {
+      isDisabled: false,
       dialogVisible: false
     }
   },
@@ -34,7 +35,10 @@ export default {
       this.$emit("handleClose", true)
     },
     handleConfirm: debounce(function() {
-      this.dialogVisible = false;
+      // 不需要在这里关闭弹框的确认弹框
+      if (!this.option.noClose) {
+        this.dialogVisible = false;
+      }
       this.$emit("handleConfirm")
     }, 500)
   }

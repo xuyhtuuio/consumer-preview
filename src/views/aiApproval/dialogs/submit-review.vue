@@ -181,6 +181,7 @@ export default {
             const user = JSON.parse(window.localStorage.getItem('user_name'))
             const data = {
                 approvalSubmissionDto: {
+                    OpinionLetterRecordDtoList,
                     editedCommentsDtoList,
                     formId: this.formId
                 },

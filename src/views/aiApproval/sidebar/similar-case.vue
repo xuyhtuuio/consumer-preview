@@ -9,7 +9,7 @@
         <div class="case-box">
             <div class="case-content">
                 <div class="case-item pointer" v-for="(item, index) in caseList" :key="index"
-                    :class="{ 'product-border': item.type === '产品类', 'activity-border': item.type === '活动类', 'customer-border': item.type === '客户类', 'other-border': item.type === '其他', }">
+                    :class="{ 'product-border': item.type === '保险类', 'activity-border': item.type === '活动类', 'customer-border': item.type === '客户类', 'other-border': item.type === '其他', }">
                     <div class="thumbnail-img">
                         <div v-if="item.fileType === 'img'">
                             我是背景图
@@ -39,10 +39,10 @@
                         </div>
                         <div class="desc">
                             <span class="tag">{{ item.tag }}</span>
-                            <span class="tag case-desc">{{ item.desc }}</span>
+                            <span class="tag case-desc" v-for="word in item.desc.split(' ') || []" :key="word">{{ word }}</span>
                         </div>
                     </div>
-                    <div class="case-type cp-class" v-show="item.type == '产品类'">
+                    <div class="case-type cp-class" v-show="item.type == '保险类'">
                         {{ item.type }}
                     </div>
                     <div class="case-type hd-class" v-show="item.type == '活动类'">
@@ -66,53 +66,45 @@ export default {
     data() {
         return {
             caseList: [{
-                name: '涌薪添利尊享68号人民币理财产品',
-                type: '产品类',
+                name: '尊享金生年金保险产品审查',
+                type: '保险类',
                 applyTime: '2023-08-02',
                 organization: '北京分行',
-                tag: '理财产品',
-                desc: '涌薪添利系列',
+                tag: '人身险',
+                desc: '人寿保险 年金保险',
                 fileType: 'pdf'
             },{
-                name: '涌薪增利尊享36号人民币理财产品',
-                type: '产品类',
+                name: '附加健康优享重大疾病保险',
+                type: '保险类',
                 applyTime: '2023-07-28',
                 organization: '长春分行',
-                tag: '理财产品',
-                desc: '涌薪增利系列',
+                tag: '人身险',
+                desc: '健康保险 重疾保险',
                 fileType: 'doc'
             },{
-                name: '聚鑫赢A周周开1号人民币理财产品',
-                type: '产品类',
+                name: '附加住院日额医疗保险产品审查',
+                type: '保险类',
                 applyTime: '2023-07-26',
                 organization: '上海分行',
-                tag: '理财产品',
-                desc: '聚鑫赢系列',
+                tag: '人身险',
+                desc: '健康保险 医疗保险',
                 fileType: 'pdf'
             },{
-                name: '南银理财鑫逸稳一年114期-B份额',
-                type: '产品类',
+                name: '保利盈2.0两全保险产品审查',
+                type: '保险类',
                 applyTime: '2023-07-22',
                 organization: '广州分行',
-                tag: '代销理财产品',
-                desc: '鑫逸稳系列',
+                tag: '人身险',
+                desc: '人寿保险 两全保险',
                 fileType: 'pdf'
             },{
-                name: '兴银理财增盈稳享封闭式44号固收类理财产品',
-                type: '产品类',
+                name: '富德生命如意福两全保险（分红型）',
+                type: '保险类',
                 applyTime: '2023-07-12',
                 organization: '西安分行',
-                tag: '代销理财产品',
-                desc: '增盈稳享系列',
+                tag: '人身险',
+                desc: '人寿保险 两全保险',
                 fileType: 'pdf'
-            },{
-                name: '苏银理财恒源封闭债权42期14月A',
-                type: '产品类',
-                applyTime: '2023-07-11',
-                organization: '深圳分行',
-                tag: '代销理财产品',
-                desc: '恒源系列',
-                fileType: 'doc'
             }
             ]
 

@@ -96,7 +96,12 @@ export default {
       })
       const resData = res.data.data
       if (resData) {
-        const formItems = resData.list.map(item => item.special);
+        const formItems = resData.list.map(item => {
+          return {
+            run: item.run,
+            ...item.special
+          }
+        });
         this.$store.state.design.formItems = formItems
       }
     },

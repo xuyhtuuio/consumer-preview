@@ -1,7 +1,7 @@
 
 <template>
   <div class="apply-order-detail">
-    <order-detail>
+    <order-detail pagePath="approval">
       <template slot="breadcrumb">
         <el-breadcrumb separator="/">
           <el-breadcrumb-item :to="{ path: '/approvalcenter' }">消保审查</el-breadcrumb-item>
