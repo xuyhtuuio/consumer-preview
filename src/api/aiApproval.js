@@ -73,3 +73,11 @@ export function rollback(param) {
     data: param
   })
 }
+// 相似案例列表
+export function getSimilarCases(params) {
+  return request({
+    url: '/cpr/OcrExamine/getSimilarCases',
+    method: 'get',
+    params
+  })
+}

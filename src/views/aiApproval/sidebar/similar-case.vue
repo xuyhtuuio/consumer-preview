@@ -6,7 +6,7 @@
             </svg>
             相似案例
         </p>
-        <div class="case-box">
+        <div class="case-box" v-loading="caseListLoading">
             <div class="case-content">
                 <div class="case-item pointer" v-for="(item, index) in caseList" :key="index"
                     :class="{ 'product-border': item.type === '产品类', 'activity-border': item.type === '活动类', 'customer-border': item.type === '客户类', 'other-border': item.type === '其他', }">
@@ -56,11 +56,15 @@
                     </div>
                 </div>
             </div>
+            <!-- <trs-pagination :total="search.total" @getList="getSimilarCasesData" :pageNow="pageNow"></trs-pagination> -->
         </div>
 
     </div>
 </template>
 <script>
+import {
+    getSimilarCases
+} from '@/api/aiApproval';
 export default {
     name: 'similar-case',
     data() {
@@ -73,7 +77,7 @@ export default {
                 tag: '理财产品',
                 desc: '涌薪添利系列',
                 fileType: 'pdf'
-            },{
+            }, {
                 name: '涌薪增利尊享36号人民币理财产品',
                 type: '产品类',
                 applyTime: '2023-07-28',
@@ -81,7 +85,7 @@ export default {
                 tag: '理财产品',
                 desc: '涌薪增利系列',
                 fileType: 'doc'
-            },{
+            }, {
                 name: '聚鑫赢A周周开1号人民币理财产品',
                 type: '产品类',
                 applyTime: '2023-07-26',
@@ -89,7 +93,7 @@ export default {
                 tag: '理财产品',
                 desc: '聚鑫赢系列',
                 fileType: 'pdf'
-            },{
+            }, {
                 name: '南银理财鑫逸稳一年114期-B份额',
                 type: '产品类',
                 applyTime: '2023-07-22',
@@ -97,7 +101,7 @@ export default {
                 tag: '代销理财产品',
                 desc: '鑫逸稳系列',
                 fileType: 'pdf'
-            },{
+            }, {
                 name: '兴银理财增盈稳享封闭式44号固收类理财产品',
                 type: '产品类',
                 applyTime: '2023-07-12',
@@ -105,7 +109,7 @@ export default {
                 tag: '代销理财产品',
                 desc: '增盈稳享系列',
                 fileType: 'pdf'
-            },{
+            }, {
                 name: '苏银理财恒源封闭债权42期14月A',
                 type: '产品类',
                 applyTime: '2023-07-11',
@@ -114,8 +118,40 @@ export default {
                 desc: '恒源系列',
                 fileType: 'doc'
             }
-            ]
-
+            ],
+            pageNow: 1,
+            pageSize: 10,
+            formCategoryId: '',
+            formId: '',
+            caseListLoading: false,
+            total: 0,
+        }
+    },
+    created() {
+        const { item } = this.$route.params;
+        this.formId = item.taskNumber;
+        this.formCategoryId = item.formManagementId;
+        console.log('item', item);
+        this.getSimilarCasesData(1)
+    },
+    methods: {
+        async getSimilarCasesData(pageNow) {
+            this.pageNow = pageNow
+            const wait_param = {
+                pageNow: 1,
+                pageSize: 10,
+                formCategoryId: 1,
+                formId: 1349
+            }
+            getSimilarCases(wait_param).then(res => {
+                const { data } = res.data;
+                this.caseList = data;
+                this.caseListLoading = false;
+            }).catch(err => {
+                this.caseListLoading = true;
+                this.total = 0
+                this.caseList = []
+            })
         }
     }
 }
@@ -124,8 +160,8 @@ export default {
 <style lang="less" scoped>
 .similar-case {
     width: 600px;
-   height: 100%;
-    overflow:hidden;
+    height: 100%;
+    overflow: hidden;
 
     .poppver-title {
         color: #1D2128;
@@ -198,14 +234,16 @@ export default {
                 width: 160px;
                 height: 100%;
                 margin-right: 8px;
-                .other-icon{
+
+                .other-icon {
                     background: #F7F8FA;
                     width: 100%;
                     height: 100%;
                     text-align: center;
                     line-height: 100px;
                 }
-                .icon{
+
+                .icon {
                     font-size: 40px;
                 }
             }
@@ -342,4 +380,5 @@ export default {
         }
     }
 
-}</style>
+}
+</style>
