@@ -402,6 +402,7 @@ export default {
           errorInfo: v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1 ? '' : v.errorInfo,
           ocr_approval_status: v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1 ? '智能解析中，请您耐心等待...' : v.ocr_approval_status,
           formId: v.taskNumber,
+          recordId:v.taskNumber,
           taskStatus: v.submitted == 0 ? '0' : v.businessStatus,
           initiator: { ...v.sponsorMap, label: v.industryList && v.industryList[1] },
           processInstanceId: v.process_instance_id,
