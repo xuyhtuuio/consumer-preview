@@ -222,7 +222,7 @@ export default {
             }
           }
           &:not(:last-child) {
-            // margin-bottom: 16px;
+            margin-bottom: 16px;
             margin-right: 0;
           }
           .el-checkbox__input {
@@ -318,4 +318,5 @@ export default {
     }
   }
 }
+
 </style>
