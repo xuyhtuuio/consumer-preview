@@ -1,8 +1,10 @@
 <template>
   <div class="addApply" v-loading.body="isGLoading">
     <g-breadcrunm />
-    <div class="tag" v-if="reviewList.length">
-      <add-tag ref="refAddTag" @submit="submit" @save="save" />
+    <div class="tag">
+      <add-tag ref="refAddTag" @submit="submit" @save="save">
+        <div v-if="!reviewList.length"></div>
+      </add-tag>
     </div>
     <div class="content" v-loading="isLoading">
       <review-matters
@@ -13,6 +15,10 @@
         @handleTo="handleReviewClick"
       />
       <div class="cnt-main" v-loading="isCntLoading">
+        <div v-if="!reviewList.length" class="main-no-data">
+          <img src="@/assets/image/noData.png" alt="" />
+          <p>抱歉，您暂无可申请的审查事项</p>
+        </div>
         <basic-information class="cnt-item" ref="basicInformationRef" :list="basicInformation" />
         <publicity-channels class="cnt-item" ref="publicityChannelsRef" :list="promotionChannels" />
         <reconciliation-point
@@ -117,7 +123,7 @@ export default {
     currentRowInfo: ''
   }),
   created() {
-     this.initialData();
+    this.initialData();
   },
   beforeRouteEnter({ name, params: { id, formManagementId } }, from, next) {
     if (name === 'addApply') return next();
@@ -138,6 +144,9 @@ export default {
   },
   beforeRouteLeave({ params: { isNoDialog } }, from, next) {
     const _this = this.$refs['RefSecondaryCon'];
+    if(!this.reviewList.length) {
+      return next()
+    }
     !isNoDialog && (_this.dialogVisible = true);
     isNoDialog && next();
     _this.handleConfirm = () => {
@@ -160,7 +169,7 @@ export default {
       this.isLoading = true;
       getFormCategoryArray().then(res => {
         this.reviewList = res.data.data;
-        this.isLoading = false
+        this.isLoading = false;
       });
     },
     clearForm() {
@@ -171,7 +180,7 @@ export default {
     },
     // 审查事项类型
     async handleReviewClick(id) {
-       this.isCntLoading = true
+      this.isCntLoading = true;
       this.clearForm();
       await this.handleAllListprefix(id);
       getApplyForm({
@@ -190,7 +199,7 @@ export default {
           this.keyPointsForVerification = keyPointsForVerification;
           this.reviewMaterials = reviewMaterials;
         } else {
-          this.clearForm()
+          this.clearForm();
           // this.$message.error(msg)
         }
       });
@@ -214,13 +223,10 @@ export default {
       //     this.currentRowInfo = msg;
       //   }
       // });
-      return Promise.all([
-        externalLogicController({ formId: id }),
-        getProcess({ formId: id })
-      ])
+      return Promise.all([externalLogicController({ formId: id }), getProcess({ formId: id })])
         .then(([res1, res2]) => {
           this.isLoading = false;
-          let flag= true
+          let flag = true;
           const {
             data: { data: result1, msg: msg1, success: success1 }
           } = res1;
@@ -229,7 +235,7 @@ export default {
             this.processDefinitionId = result1.processDefinitionId;
           } else {
             this.templateId = '';
-            flag = false
+            flag = false;
           }
           const {
             data: { data: result2, msg: msg2, success: success2 }
@@ -240,13 +246,13 @@ export default {
             this.currentRow = null;
             this.currentRowInfo = msg2;
           }
-          if(!flag) {
+          if (!flag) {
             // return Promise.reject()
           }
-        }).
-        finally(()=>{
-          this.isLoading = false;
         })
+        .finally(() => {
+          this.isLoading = false;
+        });
     },
     // 提交
     async submit() {
@@ -415,6 +421,21 @@ export default {
       min-height: 200px;
       background: rgba(255, 255, 255, 1);
       border-radius: 10px;
+      .main-no-data {
+        text-align: center;
+        padding-top: 64px;
+        height: 600px;
+        &>img {
+          width: 300px;
+          height: 300px;
+        }
+        p {
+          margin-top: 24px;
+          font-size: 20px;
+          line-height: 28px;
+          color: #86909C;
+        }
+      }
     }
     .btn {
       font-weight: 700;
@@ -477,13 +498,6 @@ export default {
     }
   }
 }
-
-
-
-
-
-
-
 
 
 
