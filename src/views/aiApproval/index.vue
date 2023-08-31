@@ -115,7 +115,8 @@ import {
   getOCRAnalysisResults,
   getOcrExamineShow,
   approvalStorageDraft,
-  getApprovalDraft
+  getApprovalDraft,
+  getOpinionApprovalLetter
 } from '@/api/aiApproval';
 import { getApplyForm } from '@/api/front';
 import { getList } from '@/api/admin-label.js';
@@ -166,9 +167,9 @@ export default {
         height: '0px'
       },
       examineIsShow: false,
-      // 允许提有实质性意见 passAllow 允许提意见以及驳回；passNotAllow不可提意见允许驳回；notPassNotAllow不允许
+      // 允许提有实质性意见 passAllow 允许提意见以及驳回；passNotAllow不可提意见允许驳回；disPassNotAllow不允许
       approvalLetter: {
-        permissions: "passAllow",
+        permissions: "passNotAllow",
         list: []
       }
     };
@@ -188,7 +189,7 @@ export default {
     this.loading = true;
     this.init(item);
     this.formBase = item;
-    // this.getOpinionApprovalLetter();
+    this.getOpinionApprovalLetter();
   },
   methods: {
     reject() {
@@ -203,29 +204,20 @@ export default {
       });
     },
     // 获取工单上一审查意见书
-    getOpinionApprovalLetter() {
-      this.approvalLetter = {
-        permissions: "passNotAllow",
-        list: [
-            {
-                "recordId": 252,
-                "approverId": "1417",
-                "content": "我没意见",
-                "associatedAttachmentsIds": "cpr_1692868861256_未命名.txt",
-                "formId": 1312,
-                "keywordId": "",
-                "substantiveOpinions": 1,
-                "deleted": 0,
-                "createTime": null,
-                "updateTime": "2023-08-24T17:21:33",
-                "sort": 1,
-                "approvalRecordId": 2074259654,
-                "adoptOpinions": null,
-                "notAdoptingReasons": null,
-                "cacheFlag": "0"
-            }
-        ]
-    }
+     getOpinionApprovalLetter() {
+      getOpinionApprovalLetter({
+        nodeId: this.formBase.nodeId,
+        formId: this.formId,
+        templateId: this.formBase.processTemplateId
+      }).then(res => {
+        const { data, status } = res.data;
+        if (status === 200) {
+          const approvalLetter = data.list.forEach(item => {
+            item.str = item.content
+          })
+          this.approvalLetter = approvalLetter
+        }
+      });
     },
     // 获取工单基本信息
     init() {
@@ -311,11 +303,11 @@ export default {
           })
         )
       );
-      console.log({
-        files: this.files,
-        increasedIds: this.increasedIds,
-        comments: this.comments
-      });
+      // console.log({
+      //   files: this.files,
+      //   increasedIds: this.increasedIds,
+      //   comments: this.comments
+      // });
     },
     // 添加关键词
     addWord(word) {
