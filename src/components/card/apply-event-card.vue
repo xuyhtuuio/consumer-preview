@@ -204,7 +204,7 @@ export default {
       this.$router.push({
         name: "details",
         params: {
-          formId: item.recordId,
+          formId: item.taskNumber,
           processInstanceId:item.processInstanceId,
           formManagementId: item.form_management_id,
           taskName: item.taskName
@@ -223,7 +223,7 @@ export default {
       this.$router.push({
         name: "details",
         params: {
-          formId: item.recordId,
+          formId: item.taskNumber,
           formManagementId: item.form_management_id,
           taskName: item.taskName
         },
