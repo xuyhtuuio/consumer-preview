@@ -143,6 +143,7 @@
 </template>
 
 <script>
+import { itemPagingList } from '@/api/manage'
 import orgPicker from '@/components/common/organizationPicker'
 import {ValueType} from '@/views/common/form/ComponentsConfigExport'
 
@@ -173,6 +174,9 @@ export default {
     }
   },
   computed: {
+    setup() {
+      return this.$store.state.design;
+    },
     disabledForm() {
       return this.$route.name === 'FlowManage' || this.$route.meta.pTitle === '申请中心'
     },
@@ -190,7 +194,7 @@ export default {
     },
     conditionList() {
       const conditionItems = this.$store.state.design.formItems.filter(f => {
-        if (f.props.required && this.supportTypes.indexOf(f.valueType) !== -1){
+        if (f.props.required && f.run === 1 && this.supportTypes.indexOf(f.valueType) !== -1){
           return {title: f.title, id: f.id, valueType: f.valueType}
         }
       })
@@ -218,7 +222,30 @@ export default {
       return tempNodes
     }
   },
+  mounted() {
+    this.getFormItems()
+  },
   methods: {
+    async getFormItems() {
+      if (!this.setup.formId) {
+        return;
+      }
+      const res = await itemPagingList({
+        formCategoryId: this.setup.formId,
+        pageNow: 1,
+        pageSize: 1000
+      })
+      const resData = res.data.data
+      if (resData) {
+        const formItems = resData.list.map(item => {
+          return {
+            run: item.run,
+            ...item.special
+          }
+        });
+        this.$store.state.design.formItems = formItems
+      }
+    },
     conditionValType(type){
       switch (type){
         case '=':

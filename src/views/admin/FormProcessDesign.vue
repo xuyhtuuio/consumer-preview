@@ -56,7 +56,8 @@ export default {
       confirmOption: {
         message: '您确定审批流程已配置完毕,并需要将其发布，发布后立即生效，是否继续?',
         cancelBtn: '取消',
-        confirmBtn: '发布'
+        confirmBtn: '发布',
+        noClose: true
       },
       isNew: true,
       validStep: 0,
@@ -235,6 +236,8 @@ export default {
       this.validateDesign()
     },
     handleSubmitLimitTime() {
+      this.$message.info('发布中，请稍等...');
+      this.$refs.confirmation.isDisabled = true;
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       let template = {
         formId: this.setup.formId,
@@ -255,6 +258,8 @@ export default {
       }
       // if (this.isNew || this.$isEmpty(this.setup.formId)){
       publishProcess(template).then(rsp => {
+        this.$refs.confirmation.isDisabled = false;
+        this.$refs.confirmation.dialogVisible = false;
         this.$message.success("发布成功！可在流程管理列表页查看")
         // this.setup.processDefinitionI
         this.validVisible = false
@@ -262,6 +267,7 @@ export default {
           name: 'FlowManage'
         })
       }).catch(() => {
+        this.$refs.confirmation.isDisabled = false;
         this.$message.error("发布失败")
       })
     },
