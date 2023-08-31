@@ -1,7 +1,7 @@
 <template>
   <div class="addApply" v-loading.body="isGLoading">
     <g-breadcrunm />
-    <div class="tag">
+    <div class="tag" v-if="reviewList.length">
       <add-tag ref="refAddTag" @submit="submit" @save="save" />
     </div>
     <div class="content" v-loading="isLoading">
@@ -22,7 +22,7 @@
         />
         <review-material class="cnt-item" ref="reviewMaterialRef" :list="reviewMaterials" />
       </div>
-      <div class="footer" v-if="!isLoading">
+      <div class="footer" v-if="!isLoading && reviewList.length">
         <g-button class="btn" @click="previewFlow">流程总览</g-button>
         <g-button class="btn" @click.native="save">保存草稿</g-button>
         <g-button class="btn" type="primary" @click.native="submit">提交</g-button>
@@ -477,6 +477,8 @@ export default {
     }
   }
 }
+
+
 
 
 
