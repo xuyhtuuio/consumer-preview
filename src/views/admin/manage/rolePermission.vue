@@ -212,13 +212,13 @@ export default {
     };
   },
   created() {
-    this.permissionList = permissionList;
+    this.permissionList = JSON.parse(JSON.stringify(permissionList));
   },
   activated() {
     this.initData();
   },
   deactivated() {
-    this.handleBack()
+    this.handleBack();
   },
   mounted() {},
   methods: {
@@ -246,7 +246,7 @@ export default {
         data: { data: res, success, msg }
       } = await editThePermissionsPage({ roleId });
       if (success) {
-        this.formatDataZero();
+        this.formatDataZero(res);
       } else {
         this.$message.error(msg);
       }
@@ -311,10 +311,10 @@ export default {
       this.level = true;
       this.roleId = '';
       this.action = 'edit1';
-      this.permissionList = permissionList;
+      this.permissionList = JSON.parse(JSON.stringify(permissionList));
     },
-    formatDataZero() {
-      const { funPerms, dataPerm, defaultPerm } = rolePermission;
+    formatDataZero(data) {
+      const { funPerms, dataPerm, defaultPerm } = data;
       this.rolePermission = rolePermission;
       for (const key in this.permissionList) {
         if (Number(key) === 0) {
@@ -622,9 +622,6 @@ export default {
     }
   }
 }
-
-
-
 
 
 
