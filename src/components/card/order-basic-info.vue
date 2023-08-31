@@ -43,7 +43,7 @@
         </div>
     </div>
         <!-- 审查要点 -->
-        <div v-if="orderInfo.reviewPointer && orderInfo.reviewPointer.length > 1">
+        <div v-if="orderInfo.reviewPointer && orderInfo.reviewPointer.length > 0">
             <div class="line"></div>
             <p class="poppver-title">
                 <span>
@@ -54,7 +54,7 @@
             </p>
             <div :class="[
                 'proj-info',
-                orderInfo.reviewPointer && orderInfo.reviewPointer.length > 1
+                orderInfo.reviewPointer && orderInfo.reviewPointer.length > 0
                     ? 'review-pointer'
                     : 'review-pointer1',
             ]">

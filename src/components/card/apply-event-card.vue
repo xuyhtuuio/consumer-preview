@@ -24,7 +24,7 @@
             <i class="tag end-sign">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }} </i>
           </i>
           <!-- 有无意见 -->
-          <i class="flex" v-if="['4', '5','6'].includes(item.taskStatus)">
+          <i class="flex" v-if="['4', '5', '6'].includes(item.taskStatus)">
             <i class="tag has-opinion" v-if="item.substantiveOpinions == 1">
               <i class="iconfont icon-guanzhu2"></i>
               有实质性意见
@@ -82,7 +82,7 @@
       </div>
     </div>
     <div class="right-operation">
-      <div v-if="item.taskStatus == 1 && !item.errorInfo&&revoked" class="flex">
+      <div v-if="item.taskStatus == 1 && !item.errorInfo && revoked" class="flex">
         <span class="modify icon-op" @click="cancel(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-tubiao1"></use>
@@ -166,7 +166,7 @@ export default {
       reminderDialog: false,
       allowConcernClick: true,
       persons: [],
-      revoked:false, //是否可以撤销
+      revoked: false, //是否可以撤销
     };
   },
   mounted() {
@@ -194,6 +194,10 @@ export default {
         this.modify(item)
         return
       }
+      //判断是否解析中
+      if (item.errorInfo || item.ocr_approval_status) {
+        return false
+      }
       window.localStorage.setItem(
         "order-detail",
         JSON.stringify({
@@ -205,7 +209,7 @@ export default {
         name: "details",
         params: {
           formId: item.recordId,
-          processInstanceId:item.processInstanceId,
+          processInstanceId: item.processInstanceId,
           formManagementId: item.form_management_id,
           taskName: item.taskName
         },
