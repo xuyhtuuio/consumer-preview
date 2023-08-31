@@ -123,21 +123,18 @@ export default {
                 { name: '驳回', id: '2' },
             ],
             rules: {
-                productEssentials: [
+               /*  productEssentials: [
                     { required: true, message: '请选择产品要点', trigger: 'change' },
                 ],
                 reviewPoints: [
                     { required: true, message: '请选择审查要点', trigger: 'change' },
-                ],
+                ], */
             },
             submission: [],
             increasedIds: {}, //须在最后提交时移除的
             mousePoint: -1,
             params: {
                 isPasses: '2',
-                productEssentials: [],
-                reviewPoints: [],
-                submissionName: 'xxxxx',
             },
             examineList: [],
             examineInfo: "请选择当前项目是否包含以下要点，不勾选或选择“否”为不包含该要点信息，则会返回至发起人修改并二次会签。"
@@ -147,6 +144,7 @@ export default {
         submitReviewDialog(val) {
             if (val) {
                 this.timeNow = moment().format('YYYY-MM-DD HH:mm:ss');
+                this.submission = (this.approvalLetter.list || []).concat(this.submission || [])
             }
         },
         examineList(val) {
@@ -164,7 +162,18 @@ export default {
         },
         // 提交结果
         submit() {
-            // console.log(this.submission, this.increasedIds)
+            let OpinionLetterRecordDtoList = null;
+            const editedCommentsDtoList = this.submission.filter(item => !item.associatedAttachmentsIds)
+            if (this.approvalLetter.permissions === 'passAllow') {
+                OpinionLetterRecordDtoList = this.submission.map(item => {
+                    return {
+                        ...item,
+                        content: item.str,
+                    }
+                }) || [];
+            }
+            
+            // console.log(editedCommentsDtoList, OpinionLetterRecordDtoList)
             this.submission.forEach(comment => {
                 comment.id = this.increasedIds.strIds.includes(comment.id) ? null : comment.id;
                 comment.words = comment.words.filter(id => !this.increasedIds.words.includes(id))
@@ -172,7 +181,7 @@ export default {
             const user = JSON.parse(window.localStorage.getItem('user_name'))
             const data = {
                 approvalSubmissionDto: {
-                    editedCommentsDtoList: this.submission,
+                    editedCommentsDtoList,
                     formId: this.formId
                 },
                 processInstanceId: this.formBase.processInstanceId,
@@ -192,9 +201,9 @@ export default {
                 }
             })
         },
+        getFinalData() {},
         handleClose() {
             this.$refs.confirmation.dialogVisible = true;
-            // this.submitReviewDialog = false
         },
         mouseenter(item, index) {
             this.mousePoint = index

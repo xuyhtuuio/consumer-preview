@@ -19,6 +19,7 @@
   item.word }}</span>
         </template>
       </p>
+      <Empty v-if="html.length === 0"></Empty>
     </div>
     <div class="isAdd" ref="isAdd" v-if="seletTxt" :style="askIsAddPosition">
       <p>针对该词添加审查意见</p>

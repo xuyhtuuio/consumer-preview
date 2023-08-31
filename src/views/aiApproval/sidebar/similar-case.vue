@@ -466,7 +466,7 @@ export default {
             }
 
             this.caseList1.map((item, index) => {
-                item.approvalTypeOption = item.approvalTypeOption.filter(itemOption => itemOption.id === approvalType)
+                // item.approvalTypeOption = item.approvalTypeOption.filter(itemOption => itemOption.id === approvalType)
                 const lastDotIndex = item.fileName.lastIndexOf('.');
                 console.log('lastDotIndex', lastDotIndex);
                 const imgType = ['jpg', 'jpeg', 'png', 'gif'];

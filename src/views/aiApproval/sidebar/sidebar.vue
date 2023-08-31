@@ -119,6 +119,12 @@ export default {
             processInstanceId: param_item.processInstanceId
           }
           break;
+          case 'approvedOpinion':
+          params = {
+            formId: param_item.taskNumber,
+            processInstanceId: param_item.processInstanceId
+          }
+          break;
       }
       if (Object.keys(item.sidebarParam).length) {
         this.sidebarParam = item.sidebarParam;
