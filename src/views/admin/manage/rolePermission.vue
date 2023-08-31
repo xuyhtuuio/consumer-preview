@@ -6,7 +6,9 @@
           <!-- <g-button type="primary" @click="handleNew">新增</g-button> -->
         </template>
         <template v-else>
-          <span class="title">编辑权限/总行管理员</span>
+          <span class="title"
+            ><i class="top-back" @click="handleReturn">编辑权限</i>/总行管理员</span
+          >
           <div class="btn">
             <g-button class="btn-item" @click="handleReturn">
               <i class="iconfont icon-fanhui1 icon"></i>
@@ -14,7 +16,7 @@
             >
             <g-button class="btn-item" type="primary" @click="handleSave">
               <i class="iconfont icon-baocun icon"></i>
-              {{ isSave ? '已保存' : '保存' }}</g-button
+              保存</g-button
             >
           </div>
         </template>
@@ -66,12 +68,20 @@
                   功能权限
                   <div class="con-main">
                     <div class="con-main-item" v-for="(item, index) in permissionList" :key="index">
-                      <el-checkbox
-                        class="item-left"
-                        v-model="item.type"
-                        @change="handleCheckBoxChange(item)"
-                        >{{ item.title }}</el-checkbox
-                      >
+                      <div class="item-left">
+                        <el-checkbox
+                          v-model="item.type"
+                          true-label="view"
+                          false-label=""
+                          @change="handleCheckBoxChange(item)"
+                          >{{ item.title }}</el-checkbox
+                        >
+                        <p class="warn" v-if="item.isShowWarn">
+                          <g-icon class="right-icon" stylePx="20" href="#icon-a-tubiao1" />
+                          至少选择一个
+                        </p>
+                      </div>
+
                       <div class="item-right">
                         <div
                           class="item-right-item"
@@ -109,7 +119,7 @@
                     <el-radio
                       v-for="item in dataRadioList"
                       :key="item.label"
-                      v-model="dataRadio"
+                      v-model="dataPerm"
                       :label="item.label"
                       >{{ item.value }}</el-radio
                     >
@@ -124,6 +134,7 @@
     <SecondaryConfirmation
       :option="saveOption[action]"
       ref="confirmation"
+      @handleClose="handleClose"
       @handleConfirm="editStatus"
     ></SecondaryConfirmation>
   </div>
@@ -131,32 +142,24 @@
 
 <script>
 import SecondaryConfirmation from '@/components/common/secondaryConfirmation';
+
 import {
   getRoleList,
   deactivateRecoveryRole,
   editThePermissionsPage,
   updateRolePermission
 } from '@/api/admin/role.js';
+import rolePermission from '../data/rolePermission.json';
+import { permissionList } from '../data/rolePermission.js';
 export default {
   name: 'rolePermission',
   components: { SecondaryConfirmation },
   data() {
     return {
       level: true,
-      isSave: false,
       mainLoading: false,
       cardLoading: false,
-      data: [
-        {
-          role: '总行部门管理员',
-          updateTime: '2021-1015 11:00:34'
-        },
-        {
-          role: '总行部门管理员',
-          updateTime: '2021-1015 11:00:341',
-          isStop: true
-        }
-      ],
+      data: [],
       colConfig: [
         {
           label: '角色',
@@ -167,7 +170,6 @@ export default {
           prop: 'updateTime',
           bind: {
             align: 'center'
-            // sortable: 'custom'
           }
         },
         {
@@ -183,124 +185,42 @@ export default {
         pageSize: 10,
         total: 3
       },
-      checkedPermission: [],
-      checkedPermissions: [],
       saveOption: {
         edit1: {
           message: '停用与此角色相关的用户权限将受到影响，确定停用吗？',
           cancelBtn: '取消',
           confirmBtn: '停用'
+        },
+        edit2: {
+          message: '当前权限设置未保存，是否保存？',
+          cancelBtn: '不保存',
+          confirmBtn: '保存'
         }
       },
       action: 'edit1',
       stopOrRun: {},
       roleId: '',
-      radio: '',
-      permissionList: [
-        {
-          title: '审批中心',
-          type: false,
-          children: [
-            {
-              title: '全部任务（审批中心）',
-              type: '',
-              props: [
-                { label: 'view', value: '查看' },
-                { label: 'export', value: '查看并导出' }
-              ]
-            }
-          ]
-        },
-        {
-          title: '后台管理',
-          type: false,
-          children: [
-            {
-              title: '用户管理',
-              type: '',
-              props: [
-                { label: 'view', value: '查看' },
-                { label: 'export', value: '查看并编辑' }
-              ]
-            },
-            {
-              title: '表单管理',
-              type: '',
-              props: [
-                { label: 'view', value: '查看' },
-                { label: 'export', value: '查看并编辑' }
-              ]
-            },
-            {
-              title: '流程管理',
-              type: '',
-              props: [
-                { label: 'view', value: '查看' },
-                { label: 'export', value: '查看并编辑' }
-              ]
-            },
-            {
-              title: '角色/权限管理',
-              type: '',
-              props: [
-                { label: 'view', value: '查看' },
-                { label: 'export', value: '查看并编辑' }
-              ]
-            },
-            {
-              title: '标签管理',
-              type: '',
-              props: [
-                { label: 'view', value: '查看' },
-                { label: 'export', value: '查看并编辑' }
-              ]
-            },
-            {
-              title: '意见管理',
-              type: '',
-              props: [
-                { label: 'view', value: '查看' },
-                { label: 'export', value: '查看并编辑' }
-              ]
-            },
-            {
-              title: '法规制度管理',
-              type: '',
-              props: [
-                { label: 'view', value: '查看' },
-                { label: 'export', value: '查看并编辑' }
-              ]
-            },
-            {
-              title: '其他配置',
-              type: '',
-              props: [
-                { label: 'view', value: '查看' },
-                { label: 'export', value: '查看并编辑' }
-              ]
-            }
-          ]
-        },
-        {
-          title: '统计中心',
-          type: ''
-        }
-      ],
-      dataRadio: 'org',
+      permissionList: [],
+      dataPerm: 'org',
       dataRadioList: [
         { value: '全行', label: 'all' },
         { value: '本行', label: 'own' },
         { value: '本部门', label: 'org' },
         { value: '信用卡', label: 'card' }
-      ]
+      ],
+      rolePermission: []
     };
   },
   created() {
-    this.initData();
+    this.permissionList = permissionList;
   },
   activated() {
     this.initData();
   },
+  deactivated() {
+    this.handleBack()
+  },
+  mounted() {},
   methods: {
     async initData() {
       if (this.mainLoading) return;
@@ -317,18 +237,16 @@ export default {
       }
       this.mainLoading = false;
     },
+    // 编辑
     async handleClick({ roleId }) {
       this.level = false;
-      this.isSave = false;
       this.cardLoading = true;
-      this.checkedPermission.length = 0;
       this.roleId = roleId;
       const {
         data: { data: res, success, msg }
       } = await editThePermissionsPage({ roleId });
       if (success) {
-        this.checkedPermissions = res;
-        res.filter(item => item.status === 1).forEach(({ id }) => this.checkedPermission.push(id));
+        this.formatDataZero();
       } else {
         this.$message.error(msg);
       }
@@ -340,13 +258,26 @@ export default {
       action === 'edit0' && this.editStatus(true);
     },
     editStatus(flag = false) {
+      if (this.action === 'edit2') {
+        return this.handleSave();
+      }
       deactivateRecoveryRole(this.stopOrRun).then(({ data: { data: res, success } }) => {
         if (success) {
           this.initData();
-          flag && this.$message.success('已恢复该角色所有操作权限。');
+          flag &&
+            this.$message({
+              type: 'success',
+              customClass: 'el-icon-success-one',
+              message: '已恢复该角色所有操作权限。'
+            });
           !flag && this.$message.success('停用成功');
         }
       });
+    },
+    handleClose() {
+      if (this.action === 'edit2') {
+        this.handleBack();
+      }
     },
     sortChange() {},
     submitEdit() {},
@@ -355,33 +286,105 @@ export default {
       this.initData();
     },
     async handleSave() {
-      if (this.isSave) return;
+      // 红色警告
+      if (this.permissionList[1].type && !this.permissionList[1].children.some(item => item.type)) {
+        return (this.permissionList[1].isShowWarn = true);
+      }
       this.cardLoading = true;
-      const {
-        data: { data: res, success, msg }
-      } = await updateRolePermission({
-        roleId: this.roleId,
-        permissionIdList: this.checkedPermission
+      this.formatData();
+      console.log(this.rolePermission);
+      // const {
+      //   data: { data: res, success, msg }
+      // } = await updateRolePermission({
+      //   roleId: this.roleId,
+      //   permissionIdList: this.checkedPermission
+      // });
+      this.$message({
+        type: 'success',
+        customClass: 'el-icon-success-one',
+        message: '已成功保存该角色的操作权限'
       });
-      this.$message.success(msg);
-
-      this.isSave = true;
       this.cardLoading = false;
+      this.handleBack();
+    },
+    handleBack() {
+      this.level = true;
+      this.roleId = '';
+      this.action = 'edit1';
+      this.permissionList = permissionList;
+    },
+    formatDataZero() {
+      const { funPerms, dataPerm, defaultPerm } = rolePermission;
+      this.rolePermission = rolePermission;
+      for (const key in this.permissionList) {
+        if (Number(key) === 0) {
+          this.permissionList[key].type = funPerms[key].type;
+          this.permissionList[key].children[0].type = funPerms[key].child[0].type;
+        } else if (Number(key) === 1) {
+          this.permissionList[key].type = funPerms[key].type;
+          const children = this.permissionList[key].children;
+          children.forEach((item, index) => {
+            item.type = funPerms[Number(key) + 1 + Number(index)].type;
+          });
+        } else {
+          this.permissionList[this.permissionList.length - 1].type =
+            funPerms[funPerms.length - 1].type;
+        }
+      }
+      this.dataPerm = Array.isArray(this.dataPerm) ? dataPerm : dataPerm[0];
+    },
+    formatData() {
+      const { funPerms, defaultPerm } = this.rolePermission;
+      this.rolePermission.dataPerm = Array.isArray(this.dataPerm) ? this.dataPerm : [this.dataPerm];
+      for (const key in this.permissionList) {
+        const originVal = this.permissionList[key];
+        if (Number(key) === 0) {
+          if (originVal.type !== funPerms[key].type) {
+            funPerms[key].type = originVal.type;
+            this.permissionList[key].reflect.forEach(reflectItem => {
+              defaultPerm.find(item => item.pathName === reflectItem).type = originVal.type;
+            });
+          }
+          funPerms[key].child[0].type = originVal.children[0].type;
+        } else if (Number(key) === 1) {
+          funPerms[key].type = originVal.type;
+          const children = originVal.children;
+          children.forEach((item, index) => {
+            if (item.title === '流程管理') {
+              if (item.type !== funPerms[Number(key) + 1 + Number(index)].type) {
+                funPerms[Number(key) + 1 + Number(index)].type = item.type;
+                item.reflect.forEach(reflectItem => {
+                  defaultPerm.find(item => item.pathName === reflectItem).type = item.type;
+                });
+              }
+            } else {
+              funPerms[Number(key) + 1 + Number(index)].type = item.type;
+            }
+          });
+        } else if (Number(key) === this.permissionList.length - 1) {
+          console.log(originVal);
+          if (originVal.type !== funPerms[funPerms.length - 1].type) {
+            funPerms[funPerms.length - 1].type = originVal.type;
+          }
+        }
+      }
     },
     handleChecked() {},
     handleSubmitLimitTime() {},
     handleReturn() {
-      this.level = true;
-      this.roleId = '';
+      this.action = 'edit2';
+      this.$refs.confirmation.dialogVisible = true;
     },
     handleCheckBoxChange(item) {
+      item.isShowWarn = false;
       if (!item.type && item?.children?.length) {
         item.children.forEach(item => (item.type = ''));
       }
     },
     handleRadioChange(value, data, origin) {
       data.type = value === data.type ? '' : value;
-      origin.type = origin.children.some(item => item.type) && true;
+      origin.type = origin.children.some(item => item.type) ? 'view' : '';
+      origin.isShowWarn = false;
     }
   }
 };
@@ -390,6 +393,8 @@ export default {
 <style lang="less" scoped>
 @color1: #1d2128;
 .rolePermission {
+  height: 100%;
+  overflow: hidden;
   font-size: 14px;
   color: #1d2128;
   .el-button--text {
@@ -401,6 +406,12 @@ export default {
     margin: 0 -24px;
     padding: 0 24px;
     border-bottom: 1px solid #e5e6eb;
+    .top-back {
+      cursor: pointer;
+      &:hover {
+        font-weight: 700;
+      }
+    }
     .title {
       flex: 1;
     }
@@ -423,8 +434,9 @@ export default {
     }
   }
   .main {
-    padding: 24px 0;
-
+    padding: 24px 0 0;
+    height: calc(100% - 50px);
+    overflow-y: auto;
     /deep/.tableCard {
       padding: 0;
       .content {
@@ -461,8 +473,19 @@ export default {
                 border-bottom: 1px dotted #e5e6eb;
               }
               .item-left {
-                min-width: 90px;
+                min-width: 100px;
                 margin-right: 40px;
+                .warn {
+                  display: flex;
+                  padding-top: 16px;
+                  line-height: 20px;
+                  font-size: 12px;
+                  font-weight: normal;
+                  color: #eb5757;
+                  .right-icon {
+                    margin-right: 6px;
+                  }
+                }
                 .el-checkbox__input {
                   .el-checkbox__inner {
                     width: 20px;
@@ -497,6 +520,13 @@ export default {
                   }
                   & > p {
                     font-weight: normal;
+                  }
+                  .el-radio {
+                    &:focus {
+                      .el-radio__inner {
+                        box-shadow: 0 0 0 0;
+                      }
+                    }
                   }
                 }
               }
@@ -592,4 +622,10 @@ export default {
     }
   }
 }
+
+
+
+
+
+
 </style>

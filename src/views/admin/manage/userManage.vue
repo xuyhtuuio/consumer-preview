@@ -4,7 +4,10 @@
     <div class="top">
       <div class="info">
         <span class="info-title">全部用户</span>
-        <span class="info-desc">共<span class="desc-blue">{{totalCountInitiated}}</span>/{{count}} 个</span>
+        <span class="info-desc"
+          >共<span class="desc-blue">{{ totalCountInitiated }}</span
+          >/{{ count }} 个</span
+        >
       </div>
       <div class="search">
         <el-form class="my-form form" :inline="true" :model="search">
@@ -14,7 +17,7 @@
               popper-class="my-cascader"
               :options="cascaderOptions"
               @change="onSearch"
-              :props="{ label: 'name', value: 'id' }"
+              :props="{ label: 'name', value: 'id', checkStrictly: true }"
               clearable
             ></el-cascader>
           </el-form-item>
@@ -169,6 +172,7 @@ export default {
           label: '更新时间',
           prop: 'updateTime',
           bind: {
+            width:180,
             align: 'center',
             sortable: 'custom'
           }
@@ -195,21 +199,20 @@ export default {
       },
       pageRole: {
         pageNow: 1,
-        pageSize: 10
+        pageSize: 100
       },
       saveOption: {
         edit1: {
           message: '停用该用户将不能登录，确定停用吗？',
           cancelBtn: '取消',
           confirmBtn: '停用'
-        },
+        }
       },
       action: 'edit1',
       stopOrRun: {},
-      sortType:2,
+      sortType: 2,
       count: 0,
       totalCountInitiated: 0
-
     };
   },
   created() {
@@ -235,20 +238,23 @@ export default {
       this.formLoading = true;
       const data = {
         name: this.search.name || '',
-        orgId: this.search.value[this.search.value.length-1] || 0,
+        orgId: this.search.value[this.search.value.length - 1] || 0,
         pageNow: this.page.pageNow,
         pageSize: this.page.pageSize,
         roleId: this.search.roleId || 0,
         sortType: this.sortType
       };
       const {
-        data: { data: {pageData:res,count,totalCountInitiated}, success }
+        data: {
+          data: { pageData: res, count, totalCountInitiated },
+          success
+        }
       } = await getUserList(data);
       if (success) {
         this.data = res.list;
         this.page.total = res.totalCount;
-        this.count = count
-        this.totalCountInitiated = totalCountInitiated
+        this.count = count;
+        this.totalCountInitiated = totalCountInitiated;
       }
       this.formLoading = false;
     },
@@ -264,7 +270,7 @@ export default {
         data: { data: res, success }
       } = await queryRoleList(this.pageRole);
       if (success) {
-        this.roleList = [...res.list]
+        this.roleList = [...res.list];
       }
     },
     getTreeData(data) {
@@ -296,12 +302,12 @@ export default {
     },
 
     sortChange({ column, prop, order }) {
-      if(!order)return
-      this.sortType =order.includes('asc')? 1: 2
-      this.initData()
+      if (!order) return;
+      this.sortType = order.includes('asc') ? 1 : 2;
+      this.initData();
     },
     onSearch() {
-      this.initData()
+      this.initData();
     },
     // 失去焦点重置数据
     handleSelectBlur() {
@@ -315,20 +321,19 @@ export default {
       this.dialog.roleId = row.roleId;
       this.dialog.userId = row.userId;
     },
-    submitEdit(row) {
-    },
+    submitEdit(row) {},
     // 停用
     stopApllay({ userId }, action) {
-      this.stopOrRun = { userId, status: action === 'edit0'? 0 : 1 };
-     action === 'edit1' && (this.$refs.confirmation.dialogVisible = true);
-      action === 'edit0' && this.editStatus(true)
+      this.stopOrRun = { userId, status: action === 'edit0' ? 0 : 1 };
+      action === 'edit1' && (this.$refs.confirmation.dialogVisible = true);
+      action === 'edit0' && this.editStatus(true);
     },
-    editStatus(flag=false) {
+    editStatus(flag = false) {
       deactivateRecoveryUser(this.stopOrRun).then(({ data: { data: res, success } }) => {
         if (success) {
           this.initData();
-          flag && this.$message.success('已恢复该用户所有操作权限。')
-          !flag && this.$message.success('停用成功')
+          flag && this.$message.success('已恢复该用户所有操作权限。');
+          !flag && this.$message.success('停用成功');
         }
       });
     },
@@ -531,5 +536,10 @@ export default {
     }
   }
 }
+
+
+
+
+
 
 </style>

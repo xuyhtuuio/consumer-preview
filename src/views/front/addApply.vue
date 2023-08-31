@@ -1,7 +1,7 @@
 <template>
   <div class="addApply" v-loading.body="isGLoading">
     <g-breadcrunm />
-    <div class="tag">
+    <div class="tag" v-if="reviewList.length">
       <add-tag ref="refAddTag" @submit="submit" @save="save" />
     </div>
     <div class="content" v-loading="isLoading">
@@ -22,7 +22,7 @@
         />
         <review-material class="cnt-item" ref="reviewMaterialRef" :list="reviewMaterials" />
       </div>
-      <div class="footer" v-if="!isLoading">
+      <div class="footer" v-if="!isLoading && reviewList.length">
         <g-button class="btn" @click="previewFlow">流程总览</g-button>
         <g-button class="btn" @click.native="save">保存草稿</g-button>
         <g-button class="btn" type="primary" @click.native="submit">提交</g-button>
@@ -155,16 +155,6 @@ export default {
       next();
     };
   },
-  // activated() {
-  //   this.initialData();
-  // },
-  // deactivated() {
-  //   this.formId = '';
-  //   this.formManagementId = -1;
-  //   this.clearForm();
-  //   this.reviewList.length = 0;
-  //   this.$refs.refReviewMatters.clearData();
-  // },
   methods: {
     initialData() {
       this.isLoading = true;
@@ -174,10 +164,10 @@ export default {
       });
     },
     clearForm() {
-      this.promotionChannels.length = 0;
-      this.basicInformation.length = 0;
-      this.keyPointsForVerification.length = 0;
-      this.reviewMaterials.length = 0;
+      this.promotionChannels = [];
+      this.basicInformation = [];
+      this.keyPointsForVerification = [];
+      this.reviewMaterials = [];
     },
     // 审查事项类型
     async handleReviewClick(id) {
@@ -200,6 +190,7 @@ export default {
           this.keyPointsForVerification = keyPointsForVerification;
           this.reviewMaterials = reviewMaterials;
         } else {
+          this.clearForm()
           // this.$message.error(msg)
         }
       });
@@ -361,7 +352,6 @@ export default {
           this.$message({ type: 'success', message: msg });
           this.rollTo(0);
           this.isGLoading = false;
-          this.handleClear();
           typeof success === 'function' && success();
         });
       }
@@ -487,6 +477,8 @@ export default {
     }
   }
 }
+
+
 
 
 

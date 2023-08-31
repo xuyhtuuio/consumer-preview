@@ -99,13 +99,14 @@
               </el-select>
 
               <el-date-picker
+                popper-class="my-date-picker"
                 v-else-if="item.name === 'TimePicker'"
                 :disabled="item.perm === 'R'"
                 type="datetime"
                 :placeholder="item.props.placeholder"
                 :format="item.props.format"
                 v-model.trim="item.value"
-                :picker-options="pickerTime(item.props.gl, item.props.order)"
+                :picker-options="pickerTime(item.props.gl, item.props.order, item.value)"
                 @change="handlePickerChange(item)"
                 style="width: 100%"
               ></el-date-picker>
@@ -122,8 +123,13 @@
                 v-else-if="item.name === 'Cascader'"
                 v-model="item.value"
                 :options="item.props.childrens"
-                 :props="{label:'value',value:'id',checkStrictly :true,multiple: item.props.multiple }"
-                 clearable
+                :props="{
+                  label: 'value',
+                  value: 'id',
+                  checkStrictly: true,
+                  multiple: item.props.multiple
+                }"
+                clearable
               >
               </el-cascader>
 
@@ -139,7 +145,9 @@
 </template>
 
 <script>
+import moment from 'moment';
 import WarnInfo from './warn-info';
+import { timestampToDateTime } from '@/utils/utils.js';
 function rulesFn(data) {
   switch (data.name) {
     case 'TextInput':
@@ -215,15 +223,38 @@ export default {
     }
   },
   methods: {
-    pickerTime(id, order) {
+    pickerTime(id, order, originVal) {
       if (order == 0) {
-        return this.startTime(id);
+        return this.startTime(id, originVal);
       } else {
-        return this.endTime(id);
+        return this.endTime(id, originVal);
       }
     },
-    startTime(nextId) {
+    startTime(nextId, originVal) {
       const value = this.list.find(item => item.id === nextId).value;
+      let startDateTime = '00:00:00';
+      let endDateTime = '23:59:59';
+      // 关联的下线时间
+      if (value) {
+        if (moment(new Date(value)).format('l') === moment(originVal).format('l')) {
+          startDateTime = '00:00:00';
+          endDateTime = moment(new Date(value)).format('HH:mm:ss');
+        } else if (moment(new Date()).format('l') === moment(originVal).format('l')) {
+          startDateTime = moment(new Date()).format('HH:mm:ss');
+          endDateTime = '23:59:59';
+        } else {
+          startDateTime = '00:00:00';
+          endDateTime = '23:59:59';
+        }
+      } else {
+        if (moment(new Date()).format('l') === moment(originVal).format('l')) {
+          startDateTime = moment(new Date()).format('HH:mm:ss');
+          endDateTime = '23:59:59';
+        } else {
+          startDateTime = '00:00:00';
+          endDateTime = '23:59:59';
+        }
+      }
       return {
         disabledDate: time => {
           // 既不能大于当前日期 也不能小于结束日期
@@ -234,21 +265,42 @@ export default {
           }
           return time.getTime() < new Date() - 8.64e7;
           // - 8.64e7减去了当天，即可选择当天
-        }
+        },
+        selectableRange: startDateTime + '-' + endDateTime
       };
     },
-    endTime(prevId) {
+    endTime(prevId, originVal) {
       const value = this.list.find(item => item.id === prevId).value;
+      let startDateTime = '00:00:00';
+      let endDateTime = '23:59:59';
+      if (value) {
+        if (moment(new Date(value)).format('l') === moment(originVal).format('l')) {
+          startDateTime = moment(new Date(value)).format('HH:mm:ss');
+          endDateTime = '23:59:59';
+        } else {
+          startDateTime = '00:00:00';
+          endDateTime = '23:59:59';
+        }
+      } else {
+        if (moment(new Date()).format('l') === moment(originVal).format('l')) {
+          startDateTime = moment(new Date()).format('HH:mm:ss');
+          endDateTime = '23:59:59';
+        } else {
+          startDateTime = '00:00:00';
+          endDateTime = '23:59:59';
+        }
+      }
       return {
         disabledDate: time => {
           // 既不能大于当前日期 也不能大于开始日期
           if (value) {
-            return time.getTime() < new Date(value).getTime();
+            return time.getTime() < new Date(value).getTime() - 8.64e7;
           }
           return time.getTime() < new Date() - 8.64e7;
           // 如果想实现结束时间可以在开始时间当天内的话 可以减掉86400000秒，相当于一天。
           // return time.getTime() < new Date(this.params.actStartTime).getTime() - 86400000;
-        }
+        },
+        selectableRange: startDateTime + '-' + endDateTime
       };
     },
     handlePickerChange(item) {
@@ -425,13 +477,15 @@ export default {
     }
   }
 }
-
-
-
-
-
-
-
-
-
+</style>
+<style lang="less">
+.my-date-picker {
+  .el-picker-panel__footer {
+    .el-button {
+      &:first-child {
+        display: none;
+      }
+    }
+  }
+}
 </style>
