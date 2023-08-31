@@ -198,7 +198,7 @@ export default {
                 }
                 return
             }
-            const { basicInformation, keyPointsForVerification, reviewMaterials } = data
+            const { basicInformation, keyPointsForVerification, reviewMaterials,filledInByApprover } = data
             //大段文本过滤
             const noTextAreaBeseInfo = basicInformation.filter(v => { return !['TextareaInput', 'MultipleGroupsSelect'].includes(v.name) }) || []
             const textAreaBaseInfo = basicInformation.filter(v => { return ['TextareaInput'].includes(v.name) }) || []
@@ -212,6 +212,8 @@ export default {
                 fileList: reviewMaterials && reviewMaterials[0].value
             }
             this.$emit('sendReviewMaterials',reviewMaterials && reviewMaterials[0].value)
+            this.$emit('sendFilledInByApprover',filledInByApprover)
+            
         },
         preview(url) {
             this.$emit('preview', url)

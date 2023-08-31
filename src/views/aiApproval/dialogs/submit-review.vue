@@ -16,37 +16,13 @@
         </div>
         <div class="main">
             <el-form :model="params" ref="paramsForm" label-width="86px" label-position="left" :rules="rules">
-                <!-- <el-form-item label="请选择">
+                <el-form-item label="是否通过" required v-if="approvalLetter.permissions === 'passNotAllow'">
                     <el-radio-group v-model="params.isPasses">
                         <el-radio :label="item.id" v-for="item in passlist" :key="item.id">
                             {{ item.name }}
                         </el-radio>
                     </el-radio-group>
-                </el-form-item> -->
-                <!-- <el-form-item label="产品要点" prop="productEssentials">
-                    <el-checkbox-group v-model="params.productEssentials">
-                        <div class="floor1">
-                            <el-checkbox :label="item.value" v-for="item in productEssentialList.slice(0, 2)"
-                                :key="item.value" :value="item.value">
-                                {{ item.label }}
-                            </el-checkbox>
-                        </div>
-                        <div class="floor2 reviewPoints">
-                            <el-checkbox :label="item.value" v-for="item in productEssentialList.slice(2, 5)"
-                                :key="item.value" :value="item.value">
-                                {{ item.label }}
-                            </el-checkbox>
-                        </div>
-                    </el-checkbox-group>
                 </el-form-item>
-                <el-form-item label="审查要点" prop="reviewPoints" class="reviewPoints">
-                    <el-checkbox-group v-model="params.reviewPoints">
-                        <el-checkbox :label="item.value" v-for="item in reviewPoints" :key="item.value" :value="item.value">
-                            {{ item.label }}
-                        </el-checkbox>
-                    </el-checkbox-group>
-                </el-form-item> -->
-
                 <ExaminePivot ref="refExamine" :titleShow="true" :isWidthDiff="true">
                     <p class="examine-title"><i class="iconfont icon-jinggao1"></i>{{examineInfo}}</p>
                 </ExaminePivot>
@@ -68,7 +44,7 @@
                         </div>
                         <div class="submission-op">
                             <!-- <i>无实质意见</i> -->
-                            <el-tooltip class="item" content="点击意见标签切换意见类型" placement="bottom">
+                            <el-tooltip class="item" content="点击意见标签切换意见类型" placement="bottom" v-if="approvalLetter.permissions === 'passAllow'">
                                 <span v-if="item.opinion" class="opinion no-opinion" @click="item.opinion = !item.opinion">
                                     <i class="iconfont icon icon-guanzhu2"></i>
                                     有实质意见
@@ -126,6 +102,10 @@ export default {
         formBase: {
             type: Object,
             default: () => ({})
+        },
+        approvalLetter: {
+            type: Object,
+            default: () => ({})
         }
     },
     data() {
@@ -140,23 +120,7 @@ export default {
             submitReviewDialog: false,
             passlist: [
                 { name: '通过', id: '1' },
-                { name: '不通过', id: '2' },
-            ],
-            productEssentialList: [
-                { label: '产品基本信息：起购金额、起购时间、销售渠道、年化利率(含历史)、起息方式、投资方式(存款)', value: 1 },
-                { label: '免责条款', value: 2 },
-                { label: '重要提示(理财有风险、投资需谨慎等）', value: 3 },
-                { label: '信息披露：咨询方式、投诉方式等', value: 4 },
-                { label: '重要提示(理财有风险、投资需谨慎等）', value: 5 },
-            ],
-            reviewPoints: [
-                { label: '承担义务不得低于宣传所承诺的标准', value: 1 },
-                { label: '不得虚假欺诈隐瞒或者误导宣传', value: 2 },
-                { label: '资料真实准确、不得隐瞒限制条件', value: 3 },
-                { label: '无其他违反消保法律法规的营销行为', value: 4 },
-                { label: '不得利用上级审核备案程序误导客户', value: 5 },
-                { label: '不得承诺、夸大效果或收益', value: 6 },
-
+                { name: '驳回', id: '2' },
             ],
             rules: {
                 productEssentials: [
