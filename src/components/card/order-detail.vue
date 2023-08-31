@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-08-31 14:04:12
+ * @LastEditTime: 2023-08-31 16:53:57
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -36,7 +36,7 @@
           <span class="flex"> <i class="iconfont icon-tijiao"></i>
             <i class="btn">去比对</i></span>
         </el-button>
-        <div v-if="item.taskStatus == 1" class="flex">
+        <div v-if="item.taskStatus == 1&&pagePath&&pagePath=='approval'" class="flex">
           <!-- <div class="back flex" @click="transferDialog = true">
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
@@ -219,7 +219,12 @@ export default {
     uploadFileCard,
     filePreview
   },
-
+props:{
+  pagePath:{
+    type: String,
+    default:''
+  }
+},
   data() {
     return {
       loading: false,
@@ -357,14 +362,17 @@ export default {
     },
     // 获取当前的节点的配置信息
     async getTemplatedetail() {
+      //要传递给编辑意见组件的字段 ---start
       let targetPage = ''
       let refuseWay = ''
       let assignedType = ''
       let mode = ''
       let assignedUser = []
       let disavower = []
-      let taskId = this.item.taskId,
-        processInstanceId = this.item.processInstanceId
+      let taskId = this.item.taskId
+      let formId = this.item.recordId
+      let processInstanceId = this.item.processInstanceId
+      //要传递给编辑意见组件的字段 ---end
       const params = {
         processInstanceId: this.item.processInstanceId
       }
@@ -377,7 +385,7 @@ export default {
         assignedUser = data[data.length - 1].props['assignedUser']?.filter(v => v.type !== 'dept')?.map(v => v.id)
         if (targetPage == 'XIAOBAO') {
           //如果是消保审批
-          return { targetPage, refuseWay, mode, assignedUser }
+          return { targetPage, refuseWay, mode, assignedUser, taskId, formId }
         }
         //如果是领导审批，走下面的判断
         //驳回人列表处理    发起人
@@ -417,7 +425,7 @@ export default {
         })
         approver = nextApprovers
         assignedType = data[data.length - 1]?.children?.props?.assignedType
-        return { targetPage, refuseWay, disavower, approver, assignedType, mode, assignedUser, taskId, processInstanceId }
+        return { targetPage, refuseWay, disavower, approver, assignedType, mode, assignedUser, taskId, processInstanceId, formId }
       }
     },
     toModify() {
@@ -506,7 +514,9 @@ export default {
         taskId: this.item.taskId,
         msg: editOpinionForm.content,
         userIds: assignedUser,
-        processInstanceId: this.item.processInstanceId
+        processInstanceId: this.item.processInstanceId,
+        formId:editOpinionForm.formId,
+        formItemDataList:editOpinionForm.editOpinionForm
       }
       //通过时候，流程配置中下一节点审批人设置时选择“上一审批人选择”，增加选择审批人选择则框
       if (editOpinionForm.isAccept == '1' && editOpinionForm.assignedType == 'SELF_SELECT') {
@@ -820,7 +830,7 @@ export default {
         }).catch(err => {
           this.loadings.submitLoading = false
         })
-      } catch(error) {
+      } catch (error) {
         this.loadings.submitLoading = false
       }
     }

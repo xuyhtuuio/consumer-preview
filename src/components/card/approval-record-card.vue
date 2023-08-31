@@ -2,7 +2,7 @@
   <div class="record-detail" v-loading="loading">
     <empty v-if="!hasData"></empty>
     <div v-else>
-      <div v-for="(activity, index) in recordList" :key="index" class="task-item pointer">
+      <div v-for="(activity, index) in recordList" :key="index" class="task-item">
         <div class="left">
           <div class="top-line"></div>
           <img src="@/assets/image/ai-approval/timeline-ellipse.svg" alt="" class="dot" />
@@ -61,7 +61,7 @@
                 <el-popover :placement="bottom - end" popper-class="file-overview-popper" trigger="click"
                   v-if="item.files && item.files.length > 1">
                   <div class="file-list">
-                    <div class="file-list-item pointer ellipsis ellipsis_1 " v-for="(file, idx) in item.files" :key="idx">
+                    <div class="file-list-item  ellipsis ellipsis_1 " v-for="(file, idx) in item.files" :key="idx">
                       {{ file }}
                     </div>
                   </div>
