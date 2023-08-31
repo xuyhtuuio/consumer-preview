@@ -14,8 +14,10 @@
       </div>
     </div>
     <div class="right">
-      <g-button class="btn" @click="save">保存草稿</g-button>
-      <g-button class="btn" type="primary" @click="submit">提交</g-button>
+      <slot>
+        <g-button class="btn" @click="save">保存草稿</g-button>
+        <g-button class="btn" type="primary" @click="submit">提交</g-button>
+      </slot>
     </div>
   </div>
 </template>
@@ -92,11 +94,5 @@ export default {
     }
   }
 }
-
-
-
-
-
-
 
 </style>

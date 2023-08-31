@@ -26,7 +26,6 @@
               :label="iten.id"
               >{{ iten.value }}</el-checkbox
             >
-            <el-checkbox style="width: 0; height: 0; overflow: hidden"></el-checkbox>
           </el-checkbox-group>
           <div v-else-if="item.name === 'SingleGroupsSelect'" class="form-item-1">
             <div class="form-content-item" v-for="(iten, indey) in item.props.options" :key="indey">
@@ -223,7 +222,7 @@ export default {
             }
           }
           &:not(:last-child) {
-            // margin-bottom: 16px;
+            margin-bottom: 16px;
             margin-right: 0;
           }
           .el-checkbox__input {
@@ -272,9 +271,9 @@ export default {
       flex: 1;
       display: flex;
       flex-wrap: wrap;
-      justify-content: space-between;
       .el-checkbox {
         min-width: 300px;
+        margin-bottom: 0 !important;
       }
       .el-checkbox__inner {
         &::after {
@@ -319,4 +318,5 @@ export default {
     }
   }
 }
+
 </style>

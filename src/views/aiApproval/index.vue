@@ -212,10 +212,10 @@ export default {
       }).then(res => {
         const { data, status } = res.data;
         if (status === 200) {
-          const approvalLetter = data.list.forEach(item => {
+          data.list.forEach(item => {
             item.str = item.content
           })
-          this.approvalLetter = approvalLetter
+          this.approvalLetter = data
         }
       });
     },
