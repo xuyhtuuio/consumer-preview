@@ -38,20 +38,38 @@
 export default {
   data() {
     return {
-      list: [
-        // { title: "首页", name: "home", sign: 'home' },
+      activeMenu: 'home',
+      userInfo: {}
+    }
+  },
+  computed: {
+    manageAuth() {
+      const { permissionsPage = {} } = this.$store.state
+      return [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.name === '后台管理' && item.type)
+    },
+    list() {
+      const { permissionsPage = {} } = this.$store.state
+      const navList = [
         { title: "申请中心", name: "apply-list", sign: 'applycenter' },
         { title: "审批中心", name: 'approval-list', sign: 'approvalcenter' },
-        // { title: "人员中心" },
         { title: "产品图谱", name: "productmap", sign: "productmap" },
-      ],
-      activeMenu: 'home',
-      iconList: [
-        // { href: "icon-tongyongtubiao3" },
-        { href: "icon-tongyongtubiao5", name: 'manage' },
-        // { href: "icon-gerenyonghutouxiang2" },
-      ],
-      userInfo: {}
+      ]
+      return navList.map(item => {
+        const exist = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(f => f.pathName === item.name)
+        console.log(exist)
+        if (exist?.type) {
+          return item;
+        }
+        return;
+      }).filter(e => e)
+    },
+    iconList() {
+      if (this.manageAuth) {
+        return [
+          { href: "icon-tongyongtubiao5", name: 'manage' }
+        ]
+      }
+      return []
     }
   },
   watch: {

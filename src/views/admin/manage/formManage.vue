@@ -2,7 +2,7 @@
   <div style="height: 100%">
     <div class="title" v-if="level === 1">
       <span class="title-nav">表单管理</span>
-      <el-button type="primary" @click="addForm" :loading="addLoading">新增</el-button>
+      <el-button type="primary" v-if="editAuth" @click="addForm" :loading="addLoading">新增</el-button>
     </div>
     <div class="title" v-else>
       <div class="title-nav">
@@ -21,12 +21,12 @@
           <span>{{ scope.row.ladingBillTimeLimit ? `上线前${scope.row.ladingBillTimeLimit}天` : '--' }}</span>
         </template>
         <template #operate="scope">
-          <el-button type="text" @click="copyForm(scope.row)">复制</el-button>
+          <el-button type="text" v-if="editAuth" @click="copyForm(scope.row)">复制</el-button>
           <el-button type="text" v-if="scope.row.run === '1'" @click="viewForm(scope.row)">查看</el-button>
-          <el-button type="text" v-if="scope.row.run === '0'" @click="editForm(scope.row)">编辑</el-button>
-          <el-button type="text" v-if="scope.row.run === '0'" @click="editSelfForm(scope.row)">修改时限</el-button>
-          <el-button type="text" v-if="scope.row.run === '1'" class="red" @click="stopApllay(scope.row)">停用</el-button>
-          <el-button type="text" v-else @click="enableApllay(scope.row)">恢复</el-button>
+          <el-button type="text" v-if="editAuth && scope.row.run === '0'" @click="editForm(scope.row)">编辑</el-button>
+          <el-button type="text" v-if="editAuth && scope.row.run === '0'" @click="editSelfForm(scope.row)">修改时限</el-button>
+          <el-button type="text" v-if="editAuth && scope.row.run === '1'" class="red" @click="stopApllay(scope.row)">停用</el-button>
+          <el-button type="text" v-else-if="editAuth" @click="enableApllay(scope.row)">恢复</el-button>
         </template>
       </TrsTable>
       <!-- 表单管理二级表格 -->
@@ -252,7 +252,19 @@ export default {
       isView: false,
     }
   },
+  computed: {
+    editAuth() {
+      const { permissionsPage = {} } = this.$store.state
+      const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.pathName === 'FormManage') || {}
+      if (flowManage.type === 'edit') {
+        return true
+      }
+      return false
+    }
+  },
   created() {
+    this.colConfig[0].edit = this.editAuth
+    this.colConfig1[0].edit = this.editAuth
     this.getItemType()
   },
   methods: {

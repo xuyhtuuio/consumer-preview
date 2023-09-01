@@ -1,5 +1,6 @@
 export const permissionList = [
   {
+    code:'approvalCenter',
     title: '审批中心',
     type: '',
     reflect: ['approval-details', 'aiApproval', 'compare'],
@@ -15,11 +16,13 @@ export const permissionList = [
     ]
   },
   {
+    code:"backManagement",
     title: '后台管理',
     type: '',
     isShowWarn: false,
     children: [
       {
+        code: 'userManagement',
         title: '用户管理',
         type: '',
         props: [
@@ -28,6 +31,16 @@ export const permissionList = [
         ]
       },
       {
+        code: 'rolePermManagement',
+        title: '角色/权限管理',
+        type: '',
+        props: [
+          { label: 'view', value: '查看' },
+          { label: 'edit', value: '查看并编辑' }
+        ]
+      },
+      {
+        code: 'formManagement',
         title: '表单管理',
         type: '',
         props: [
@@ -36,6 +49,7 @@ export const permissionList = [
         ]
       },
       {
+        code: 'flowableManagement',
         title: '流程管理',
         reflect: ['baseSetting', 'processDesign', 'proSetting'],
         type: '',
@@ -45,14 +59,7 @@ export const permissionList = [
         ]
       },
       {
-        title: '角色/权限管理',
-        type: '',
-        props: [
-          { label: 'view', value: '查看' },
-          { label: 'edit', value: '查看并编辑' }
-        ]
-      },
-      {
+        code: 'tagManagement',
         title: '标签管理',
         type: '',
         props: [
@@ -61,6 +68,7 @@ export const permissionList = [
         ]
       },
       {
+        code: 'opinionManagement',
         title: '意见管理',
         type: '',
         props: [
@@ -69,6 +77,7 @@ export const permissionList = [
         ]
       },
       {
+        code: 'statutesManagement',
         title: '法规制度管理',
         type: '',
         props: [
@@ -77,6 +86,7 @@ export const permissionList = [
         ]
       },
       {
+        code: 'otherDisposition',
         title: '其他配置',
         type: '',
         props: [
@@ -87,6 +97,7 @@ export const permissionList = [
     ]
   },
   {
+    code: 'statisticsCenter',
     title: '统计中心',
     type: ''
   }

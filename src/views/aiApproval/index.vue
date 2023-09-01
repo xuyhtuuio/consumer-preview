@@ -80,8 +80,7 @@
       </div>
     </div>
     <add-review ref="addReview" @addRecommend="addRecommend"></add-review>
-    <submit-review ref="submitReview" :formId="formId" :formBase="formBase" :approvalLetter="approvalLetter">
-      
+    <submit-review ref="submitReview" :formId="formId" :formBase="formBase" :approvalLetter="approvalLetter" :applyForm="applyForm">
     </submit-review>
     <reject-dialog ref="rejectDialog" :formBase="formBase"></reject-dialog>
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
@@ -171,7 +170,8 @@ export default {
       approvalLetter: {
         permissions: "passNotAllow",
         list: []
-      }
+      },
+      applyForm: {}
     };
   },
   created() {
@@ -227,6 +227,7 @@ export default {
       }).then(res => {
         const { data, status, message } = res.data;
         if (status === 200) {
+          this.applyForm = data;
           this.$refs.sidebar.tools[0].sidebarParam = {
             ...data,
             keyPointsForVerification: JSON.parse(JSON.stringify(data.keyPointsForVerification))

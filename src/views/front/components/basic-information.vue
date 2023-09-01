@@ -104,7 +104,7 @@
                 :disabled="item.perm === 'R'"
                 type="datetime"
                 :placeholder="item.props.placeholder"
-                :format="item.props.format"
+                value-format="yyyy-MM-dd HH:mm:ss"
                 v-model.trim="item.value"
                 :picker-options="pickerTime(item.props.gl, item.props.order, item.value)"
                 @change="handlePickerChange(item)"
@@ -256,6 +256,7 @@ export default {
         }
       }
       return {
+        selectableRange: `${startDateTime} - ${endDateTime}`,
         disabledDate: time => {
           // 既不能大于当前日期 也不能小于结束日期
           if (value) {
@@ -265,8 +266,7 @@ export default {
           }
           return time.getTime() < new Date() - 8.64e7;
           // - 8.64e7减去了当天，即可选择当天
-        },
-        selectableRange: startDateTime + '-' + endDateTime
+        }
       };
     },
     endTime(prevId, originVal) {
@@ -304,6 +304,12 @@ export default {
       };
     },
     handlePickerChange(item) {
+      if (
+        moment(new Date(item.value)).format('l') === moment(new Date()).format('l') &&
+        moment(item.value).format('HH:mm:ss') === '00:00:00'
+      ) {
+        item.value = new Date();
+      }
       const otherItem = this.list.find(iten => iten.id == item.props.gl);
       const otherVal = new Date(otherItem.value).getTime();
       const itemVal = new Date(item.value).getTime();

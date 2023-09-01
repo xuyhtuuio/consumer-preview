@@ -179,6 +179,11 @@ export default new Vuex.Store({
       editOpinionForm: {},
       editOpinionRequired: false
     },
+    permissionsPage: {  // 页面权限存储
+      defaultPerm: [],
+      funPerms: [],
+      dataPerm: [],
+    }
   },
   mutations: {
     selectedNode(state, val) {

@@ -1,5 +1,5 @@
 <template>
-  <div class="rolePermission">
+  <div :class="['rolePermission', editAuth ? '' : 'noEdit']">
     <template>
       <div class="top">
         <template v-if="level">
@@ -7,14 +7,15 @@
         </template>
         <template v-else>
           <span class="title"
-            ><i class="top-back" @click="handleReturn">编辑权限</i>/总行管理员</span
+            ><i class="top-back" @click="handleReturn">{{ editAuth ? '编辑' : '查看' }}权限</i
+            >/总行管理员</span
           >
           <div class="btn">
             <g-button class="btn-item" @click="handleReturn">
               <i class="iconfont icon-fanhui1 icon"></i>
               返回</g-button
             >
-            <g-button class="btn-item" type="primary" @click="handleSave">
+            <g-button class="btn-item" type="primary" @click="handleSave" v-show="editAuth">
               <i class="iconfont icon-baocun icon"></i>
               保存</g-button
             >
@@ -34,12 +35,15 @@
             :cell-style="{ 'text-align': 'center' }"
           >
             <template #operate="{ row }">
-              <el-button type="text" size="small" @click="handleClick(row)">编辑权限</el-button>
+              <el-button type="text" size="small" @click="handleClick(row)"
+                >{{ editAuth ? '编辑' : '查看' }}权限</el-button
+              >
               <!-- <el-button type="text" size="small" v-if="!scope.row.isStop">恢复</el-button>
               <el-button type="text" class="red" v-else @click="stopApllay(scope.row)"
                 >停用</el-button
               > -->
               <el-button
+                v-show="editAuth"
                 type="text"
                 :class="{ red: row.status !== 0 }"
                 size="small"
@@ -73,6 +77,7 @@
                           v-model="item.type"
                           true-label="view"
                           false-label=""
+                          :disabled="!editAuth"
                           @change="handleCheckBoxChange(item)"
                           >{{ item.title }}</el-checkbox
                         >
@@ -95,6 +100,7 @@
                               :key="indey"
                               v-model="childItem.type"
                               :label="iten.label"
+                              :disabled="!editAuth"
                               @click.native.prevent="handleRadioChange(iten.label, childItem, item)"
                               >{{ iten.value }}</el-radio
                             >
@@ -121,6 +127,7 @@
                       :key="item.label"
                       v-model="dataPerm"
                       :label="item.label"
+                      :disabled="!editAuth"
                       >{{ item.value }}</el-radio
                     >
                   </div>
@@ -211,6 +218,19 @@ export default {
       rolePermission: []
     };
   },
+  computed: {
+    editAuth() {
+      const { permissionsPage = {} } = this.$store.state;
+      const flowManage =
+        [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(
+          item => item.pathName === 'RolePermission'
+        ) || {};
+      if (flowManage.type === 'edit') {
+        return true;
+      }
+      return false;
+    }
+  },
   created() {
     this.permissionList = JSON.parse(JSON.stringify(permissionList));
   },
@@ -247,6 +267,7 @@ export default {
       } = await editThePermissionsPage({ roleId });
       if (success) {
         this.formatDataZero(res);
+        console.log(this.permissionList);
       } else {
         this.$message.error(msg);
       }
@@ -297,7 +318,7 @@ export default {
       //   data: { data: res, success, msg }
       // } = await updateRolePermission({
       //   roleId: this.roleId,
-      //   permissionIdList: this.checkedPermission
+      //   list: {}
       // });
       this.$message({
         type: 'success',
@@ -324,7 +345,7 @@ export default {
           this.permissionList[key].type = funPerms[key].type;
           const children = this.permissionList[key].children;
           children.forEach((item, index) => {
-            item.type = funPerms[Number(key) + 1 + Number(index)].type;
+            item.type = funPerms.find(funItem => funItem.code === item.code).type;
           });
         } else {
           this.permissionList[this.permissionList.length - 1].type =
@@ -350,15 +371,16 @@ export default {
           funPerms[key].type = originVal.type;
           const children = originVal.children;
           children.forEach((item, index) => {
+            const funItem = funPerms.find(funItem => funItem.code === item.code);
             if (item.title === '流程管理') {
-              if (item.type !== funPerms[Number(key) + 1 + Number(index)].type) {
-                funPerms[Number(key) + 1 + Number(index)].type = item.type;
+              if (item.type !== funItem.type) {
+                funItem.type = item.type;
                 item.reflect.forEach(reflectItem => {
                   defaultPerm.find(item => item.pathName === reflectItem).type = item.type;
                 });
               }
             } else {
-              funPerms[Number(key) + 1 + Number(index)].type = item.type;
+              funItem.type = item.type;
             }
           });
         } else if (Number(key) === this.permissionList.length - 1) {
@@ -372,8 +394,12 @@ export default {
     handleChecked() {},
     handleSubmitLimitTime() {},
     handleReturn() {
-      this.action = 'edit2';
-      this.$refs.confirmation.dialogVisible = true;
+      if (this.editAuth) {
+        this.action = 'edit2';
+        this.$refs.confirmation.dialogVisible = true;
+      } else {
+        this.handleBack();
+      }
     },
     handleCheckBoxChange(item) {
       item.isShowWarn = false;
@@ -382,6 +408,7 @@ export default {
       }
     },
     handleRadioChange(value, data, origin) {
+      if (!this.editAuth) return;
       data.type = value === data.type ? '' : value;
       origin.type = origin.children.some(item => item.type) ? 'view' : '';
       origin.isShowWarn = false;
@@ -622,7 +649,9 @@ export default {
     }
   }
 }
-
-
-
+.rolePermission.noEdit {
+  /deep/.el-checkbox__inner {
+    border-color: #dcdfe6;
+  }
+}
 </style>
