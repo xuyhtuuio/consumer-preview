@@ -583,6 +583,7 @@ export default {
      * return {*}
      */
     submit(way) {
+      debugger
       const that = this
       const { approvedOpinionRequired, uploadFileRequired, editOpinionRequired, editOpinionForm, uploadFileRadio } = this.$store.state.checkApprovedForm
       //保存功能  待确认的工单  分有实质性意见和无实质性意见 status:3无 /5有

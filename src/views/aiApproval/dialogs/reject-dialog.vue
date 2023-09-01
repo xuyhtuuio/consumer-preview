@@ -4,7 +4,7 @@
     <el-form label-position="left" label-width="80px" :model="form" :rules="rules">
       <el-form-item label="驳回原因" prop="reason">
         <el-select v-model="form.reason" placeholder="请选择驳回原因" size="medium">
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+          <el-option v-for="item in rejectOption" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
       </el-form-item>
@@ -20,38 +20,26 @@
   </el-dialog>
 </template>
 <script>
-import {
-  rollback
-} from "@/api/aiApproval";
 export default {
   name: 'rejectDialog',
   props: {
     formBase: {
       type: Object,
       default: () => ({})
-    }
+    },
+    rejectOption: {
+      type: Array,
+      default: () => ([])
+    },
   },
   data() {
     return {
       addReviewDialog: false,
       form: {
         reason: '',
-        txt: ''
+        txt: '',
+        nextUser: ''
       },
-      options: [
-        {
-          value: '文件预览失败（文件损坏/清晰度过低）',
-          label: '文件预览失败（文件损坏/清晰度过低）'
-        },
-        {
-          value: '附件材料与审批项目不匹配',
-          label: '附件材料与审批项目不匹配'
-        },
-        {
-          value: '其他',
-          label: '其他'
-        }
-      ],
       rules: {
         reason: [
           { required: true, message: '请选择驳回原因', trigger: 'change' }
@@ -72,28 +60,8 @@ export default {
       this.addReviewDialog = false;
     },
     submit() {
-      const user = JSON.parse(window.localStorage.getItem('user_name'))
-      const data = {
-        comments: `${this.form.reason}${this.form.txt.trim() ? '-' + this.form.txt : ''}`,
-        currentUserInfo: {
-          id: user.id,
-          name: user.fullname
-        },
-        processInstanceId: this.formBase.processInstanceId,
-        rollbackId: this.formBase.rollbackId,
-        signInfo: this.formBase.signInfo,
-        nodeId: this.formBase.nodeId,
-        taskId: this.formBase.taskId,
-        templateId: this.formBase.templateId
-      }
-      rollback(data).then((res) => {
-        const { status, msg } = res.data;
-        if (status === 200) {
-          this.$message.success('操作成功！');
-          this.$router.go(-1)
-        } else {
-          this.$message.error({ offset: 40, message: msg });
-        }
+      this.$emit('submit', {
+        ...this.form
       })
     },
   }
