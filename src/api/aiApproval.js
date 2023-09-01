@@ -73,20 +73,20 @@ export function rollback(param) {
     data: param
   })
 }
-<<<<<<< HEAD
-// 相似案例列表
-export function getSimilarCases(params) {
-  return request({
-    url: '/cpr/OcrExamine/getSimilarCases',
-    method: 'get',
-    params
-=======
 // 获取前面审批人的审批意见，以及当前节点的审批权限
 export function getOpinionApprovalLetter(param) {
   return request({
     url: '/cpr/OcrExamine/getOpinionApprovalLetter',
     method: 'get',
     params: param
->>>>>>> 41f2f2f1d5942dda2f2442ed742c5db7fe28a9eb
+  })
+}
+
+// 相似案例列表
+export function getSimilarCases(params) {
+  return request({
+    url: '/cpr/OcrExamine/getSimilarCases',
+    method: 'get',
+    params
   })
 }

@@ -7,57 +7,8 @@
             相似案例
         </p>
         <div class="case-box" v-loading="caseListLoading">
-            <div class="case-content">
-                <!-- <div class="case-item pointer" v-for="(item, index) in caseList" :key="index"
-                    :class="{ 'product-border': item.type === '产品类', 'activity-border': item.type === '活动类', 'customer-border': item.type === '客户类', 'other-border': item.type === '其他', }">
-                    <div class="thumbnail-img">
-                        <div v-if="item.fileType === 'img'">
-                            我是背景图
-                        </div>
-                        <div v-else class="other-icon">
-                            <svg class="icon" aria-hidden="true" v-if="item.fileType === 'pdf'">
-                                <use xlink:href="#icon-mianxingtubiao"></use>
-                            </svg>
-                            <svg class="icon" aria-hidden="true" v-if="item.fileType === 'doc'">
-                                <use xlink:href="#icon-mianxingtubiao-2"></use>
-                            </svg>
-                            <svg class="icon" aria-hidden="true" v-if="item.fileType === 'xls'">
-                                <use xlink:href="#icon-mianxingtubiao-1"></use>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="case-info">
-                        <div class="name">
-                            {{ item.name }}
-                        </div>
-                        <div class="time">
-                            <span>申请时间：{{ item.createTime  }}</span>
-                            <span>
-                                {{ item.org }}
-                            </span>
-
-                        </div>
-                        <div class="desc">
-                            <span class="tag">{{ item.tag }}</span>
-                            <span class="tag case-desc">{{ item.desc }}</span>
-                        </div>
-                    </div>
-                    <div class="case-type cp-class" v-show="item.type == '产品类'">
-                        {{ item.type }}
-                    </div>
-                    <div class="case-type hd-class" v-show="item.type == '活动类'">
-                        <span>{{ item.type }}</span>
-                    </div>
-                    <div class="case-type kh-class" v-show="item.type == '客户类'">
-                        <span>{{ item.type }}</span>
-                    </div>
-                    <div class="case-type other-class" v-show="item.type == '其他'">
-                        {{ item.type }}
-                    </div>
-                </div> -->
-
-                <div class="case-item pointer" v-for="(item, index) in caseList1" :key="index"
-                    :class="{ 'product-border': item.reviewMattersType === '产品类', 'activity-border': item.reviewMattersType === '活动类', 'customer-border': item.reviewMattersType === '客户类', 'other-border': item.reviewMattersType === '其他', }">
+            <div class="case-content" v-if="caseList.length">
+                <div class="case-item pointer product-border " v-for="(item, index) in caseList" :key="index">
                     <div class="thumbnail-img">
                         <div v-if="item.fileType === 'img'" class="other-icon">
                             <img :src="item.fileUrl" alt="">
@@ -69,7 +20,7 @@
                             <svg class="icon" aria-hidden="true" v-if="item.fileType === 'doc' || item.fileType === 'docx'">
                                 <use xlink:href="#icon-mianxingtubiao-2"></use>
                             </svg>
-                            <svg class="icon" aria-hidden="true" v-if="item.fileType === 'xls'">
+                            <svg class="icon" aria-hidden="true" v-if="item.fileType === 'xls' || item.fileType === 'xlsx'">
                                 <use xlink:href="#icon-mianxingtubiao-1"></use>
                             </svg>
                             <svg class="icon" aria-hidden="true" v-if="item.fileType === 'ppt'">
@@ -84,31 +35,25 @@
                         <div class="time">
                             <span>申请时间：{{ item.createTime }}</span>
                             <span>
+                                <img class="img" src="@/assets/image/ai-approval/orgIcon.png" alt="" />
                                 {{ item.org }}
                             </span>
                         </div>
                         <div class="desc">
-                            <span class="tag">{{ item.tag }}</span>
-                            <span class="tag case-desc">{{ item.desc }}</span>
+                            <span class="tag" v-for="(itemOption, indexOption) in item.approvalTypeOption"
+                                :key="indexOption">{{ itemOption.value }}</span>
+                            <span class="tag case-desc" v-for="(itemOption, indexOption) in item.productTypeOption"
+                                :key="indexOption">{{ itemOption.value }}</span>
                         </div>
                     </div>
-                    <div class="case-type cp-class" v-show="item.reviewMattersType == '产品类'">
-                        {{ item.reviewMattersType }}
-                    </div>
-                    <div class="case-type hd-class" v-show="item.reviewMattersType == '活动类'">
-                        <span>{{ item.reviewMattersType }}</span>
-                    </div>
-                    <div class="case-type kh-class" v-show="item.reviewMattersType == '客户类'">
-                        <span>{{ item.reviewMattersType }}</span>
-                    </div>
-                    <div class="case-type other-class" v-show="item.reviewMattersType == '其他'">
+                    <div class="case-type cp-class">
                         {{ item.reviewMattersType }}
                     </div>
                 </div>
+                <trs-pagination :total="total" @getList="getSimilarCasesData" :pageNow="pageNum"></trs-pagination>
             </div>
-            <!-- <trs-pagination :total="search.total" @getList="getSimilarCasesData" :pageNow="pageNow"></trs-pagination> -->
+            <el-empty v-else description="暂无数据"></el-empty>
         </div>
-
     </div>
 </template>
 <script>
@@ -119,55 +64,7 @@ export default {
     name: 'similar-case',
     data() {
         return {
-            caseList: [{
-                name: '涌薪添利尊享68号人民币理财产品',
-                type: '产品类',
-                applyTime: '2023-08-02',
-                organization: '北京分行',
-                tag: '理财产品',
-                desc: '涌薪添利系列',
-                fileType: 'pdf'
-            }, {
-                name: '涌薪增利尊享36号人民币理财产品',
-                type: '产品类',
-                applyTime: '2023-07-28',
-                organization: '长春分行',
-                tag: '理财产品',
-                desc: '涌薪增利系列',
-                fileType: 'doc'
-            }, {
-                name: '聚鑫赢A周周开1号人民币理财产品',
-                type: '产品类',
-                applyTime: '2023-07-26',
-                organization: '上海分行',
-                tag: '理财产品',
-                desc: '聚鑫赢系列',
-                fileType: 'pdf'
-            }, {
-                name: '南银理财鑫逸稳一年114期-B份额',
-                type: '产品类',
-                applyTime: '2023-07-22',
-                organization: '广州分行',
-                tag: '代销理财产品',
-                desc: '鑫逸稳系列',
-                fileType: 'pdf'
-            }, {
-                name: '兴银理财增盈稳享封闭式44号固收类理财产品',
-                type: '产品类',
-                applyTime: '2023-07-12',
-                organization: '西安分行',
-                tag: '代销理财产品',
-                desc: '增盈稳享系列',
-                fileType: 'img'
-            }, {
-                name: '苏银理财恒源封闭债权42期14月A',
-                type: '产品类',
-                applyTime: '2023-07-11',
-                organization: '深圳分行',
-                tag: '代销理财产品',
-                desc: '恒源系列',
-                fileType: 'doc'
-            }],
+            caseList: [],
             caseList1: [{
                 "id": 1300,
                 "name": "保险审批",
@@ -437,7 +334,7 @@ export default {
                 ],
                 "approvalType": "0",
                 "productType": [
-                    "0"
+                    "0", "1 "
                 ]
             }
             ],
@@ -457,36 +354,35 @@ export default {
     },
     methods: {
         async getSimilarCasesData(pageNum) {
+            this.caseListLoading = true
             this.pageNum = pageNum
             const wait_param = {
                 pageNum: this.pageNum,
                 pageSize: this.pageSize,
                 formCategoryId: this.formCategoryId,
-                formId: this.formId
+                formId: 1349
             }
-
-            this.caseList1.map((item, index) => {
-                // item.approvalTypeOption = item.approvalTypeOption.filter(itemOption => itemOption.id === approvalType)
-                const lastDotIndex = item.fileName.lastIndexOf('.');
-                console.log('lastDotIndex', lastDotIndex);
-                const imgType = ['jpg', 'jpeg', 'png', 'gif'];
-                if (lastDotIndex !== -1) {
-                    const fileType = item.fileName.substring(lastDotIndex + 1);
-                    console.log(fileType); // 输出 "pdf"
-                    if (imgType.includes(fileType)) {
-                        this.$set(item, 'fileType', 'img')
-                    } else {
-                        this.$set(item, 'fileType', fileType)
-                    }
-                } else {
-                    console.log("字符串中没有点（.）");
-                }
-            })
-            console.log('this.caseList1', this.caseList1);
             getSimilarCases(wait_param).then(res => {
                 const { data } = res.data;
-                // this.caseList = data.list;
-
+                this.caseList = data.list;
+                this.caseList.map((item) => {
+                    if (item.approvalTypeOption) {
+                        item.approvalTypeOption = item.approvalTypeOption.filter(itemOption => itemOption.id == item.approvalType)
+                    }
+                    if (item.productTypeOption) {
+                        item.productTypeOption = item.productTypeOption.filter(itemOption => item.productType.includes(String(itemOption.id)))
+                    }
+                    const lastDotIndex = item.fileName.lastIndexOf('.');
+                    const imgType = ['jpg', 'jpeg', 'png', 'gif'];
+                    if (lastDotIndex !== -1) {
+                        const fileType = item.fileName.substring(lastDotIndex + 1);
+                        if (imgType.includes(fileType)) {
+                            this.$set(item, 'fileType', 'img')
+                        } else {
+                            this.$set(item, 'fileType', fileType)
+                        }
+                    }
+                })
                 this.total = data.totalCount;
                 this.caseListLoading = false;
             }).catch(err => {
@@ -520,7 +416,7 @@ export default {
     }
 
     .case-box {
-        height: 97%;
+        height: calc(100% - 40px);
         overflow: hidden;
     }
 
@@ -633,6 +529,11 @@ export default {
                 span {
                     display: flex;
                     align-items: center;
+                    gap: 4px;
+
+                    .img {
+                        width: 20px;
+                    }
                 }
 
                 /* 166.667% */
@@ -643,8 +544,6 @@ export default {
                     height: 12px;
                     background: #E5E6EB;
                     margin: 0 8px;
-
-
                 }
             }
 

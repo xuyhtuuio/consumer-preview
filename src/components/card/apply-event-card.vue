@@ -189,6 +189,7 @@ export default {
 
     },
     toDetail(item) {
+      console.log('dsdsdsd',item);
       //草稿去修改页
       if (item.submitted == 0) {
         this.modify(item)
