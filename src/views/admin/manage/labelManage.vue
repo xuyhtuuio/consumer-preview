@@ -43,7 +43,7 @@
             </el-autocomplete>
           </el-form-item>
 
-          <el-form-item class="form-item">
+          <el-form-item class="form-item" v-show="editAuth">
             <g-button class="g-btn" type="primary" @click="handleClick">
               <i class="iconfont icon-a-tubiaotianjiabiaoqian"></i>
               添加标签</g-button
@@ -80,7 +80,7 @@
           <template #count="{ row }">
             {{ row.count }}
           </template>
-          <template #operate="scope">
+          <template #operate="scope" v-if="editAuth">
             <el-button type="text" size="small" @click="handleClick(scope.row)"> 编辑</el-button>
             <el-button
               type="text"
@@ -224,6 +224,16 @@ export default {
       dialogItem: [],
       orderType: 1
     };
+  },
+  computed: {
+    editAuth() {
+      const { permissionsPage = {} } = this.$store.state
+      const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.pathName === 'LabelManage') || {}
+      if (flowManage.type === 'edit') {
+        return true
+      }
+      return false
+    }
   },
   created() {
     this.getList();

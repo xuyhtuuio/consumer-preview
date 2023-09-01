@@ -5,7 +5,7 @@
         <span>流程管理</span>
         <span class="title-desc">停用流程时请先确认当前流程是否有未结束任务，且当前流程关联表单是否停用。</span>
       </div>
-      <el-button type="primary" @click="addFlow">新增</el-button>
+      <el-button type="primary" @click="addFlow" v-if="editAuth">新增</el-button>
     </div>
     <div  style="height: calc(100% - 63px); overflow-y: auto;">
       <TrsTable v-loading="tableLoading" theme="TRS-table-gray" :data="data" :colConfig="colConfig">
@@ -18,9 +18,9 @@
         </template>
         <template #operate="scope">
           <el-button type="text" @click="previewFlow(scope.row)">预览</el-button>
-          <el-button type="text" v-if="scope.row.status === '已发布'" class="red" @click="stopFlow(scope.row)">停用</el-button>
-          <el-button type="text" v-if="scope.row.status !== '已发布'" @click="editFlow(scope.row)">编辑</el-button>
-          <el-button type="text" v-if="scope.row.status !== '已发布'" class="red" @click="deleteFlow(scope.row)">删除</el-button>
+          <el-button type="text" v-if="scope.row.status === '已发布' && editAuth" class="red" @click="stopFlow(scope.row)">停用</el-button>
+          <el-button type="text" v-if="scope.row.status !== '已发布' && editAuth" @click="editFlow(scope.row)">编辑</el-button>
+          <el-button type="text" v-if="scope.row.status !== '已发布' && editAuth" class="red" @click="deleteFlow(scope.row)">删除</el-button>
         </template>
       </TrsTable>
       <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
@@ -113,6 +113,16 @@ export default {
         },
       ],
       currentRow: {}
+    }
+  },
+  computed: {
+    editAuth() {
+      const { permissionsPage = {} } = this.$store.state
+      const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.pathName === 'FlowManage') || {}
+      if (flowManage.type === 'edit') {
+        return true
+      }
+      return false
     }
   },
   created() {
