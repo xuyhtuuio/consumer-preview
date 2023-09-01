@@ -58,16 +58,15 @@
           v-if="item.currentAssignee && item.currentAssignee.length">
           <div style="max-height: 270px; overflow-y: auto" class="trs-scroll assignee-content">
             <div v-for="(child, index) in item.currentAssignee" :key="index" class="person-item">
-              <span>{{ child.name }}/{{ child.WorkId }}/{{ child.Institution }}/{{
-                child.Dep
-              }}</span>
-              <span class="reminder" @click="reminderItem(child)">{{
+              
+              <span>{{ child.fullname }}/{{ child.id }}/{{ child.Institution }}</span>
+              <!-- <span class="reminder" @click="reminderItem(child)">{{
                 child.hasReminder ? "已催单" : "催一下"
-              }}</span>
+              }}</span> -->
             </div>
           </div>
           <span slot="reference" class="handler pointer">当前处理人：{{
-            (item.currentAssignee && item.currentAssignee[0].name) || "--"
+            (item.currentAssignee && item.currentAssignee[0].fullname) || "--"
           }}
             <i v-if="item.currentAssignee && item.currentAssignee.length > 1">+{{ item.currentAssignee &&
               item.currentAssignee.length - 1 }}</i></span>

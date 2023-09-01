@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-08-31 18:43:13
+ * @LastEditTime: 2023-09-01 18:14:36
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -150,8 +150,8 @@
         </div>
         <div class="right-content">
           <keep-alive>
-            <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus" :coment="coment"
-              @sendOpinionInfo="sendOpinionInfo" :leaderApproveInfo="leaderApproveInfo" :reviewMaterial="reviewMaterials"
+            <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus"
+              @sendOpinionInfo="sendOpinionInfo" :reviewMaterial="reviewMaterials"
               :processInstanceId="item.processInstanceId" :taskId="item.taskId" @preview='previewFile'
               :filledInByApprover="filledInByApprover">
               <template slot="head">
@@ -200,6 +200,7 @@
   </div>
 </template>
 <script>
+import moment from 'moment';
 import orderBasicInfo from "@/components/card/order-basic-info.vue";
 import leaderEditOpinion from "@/components/card/leader-edit-opinion.vue";
 import approvalRecordCard from "@/components/card/approval-record-card.vue";
@@ -208,7 +209,6 @@ import uploadFileCard from "@/components/card/upload-file-card";
 import filePreview from '@/components/filePreview'
 import { leaderEdit, finalMaterial } from '@/api/approvalCenter'
 import { updateAdoptEditedComments, updateEditedComments, getTemplatedetail } from '@/api/applyCenter'
-import moment from 'moment';
 
 export default {
   name: "order-details",
@@ -221,18 +221,17 @@ export default {
     filePreview
   },
   props: {
-    pagePath: {
+    pagePath: {   //用于判断展示申请单详情还是审批单详情    
       type: String,
       default: ''
     }
   },
   data() {
     return {
-      loading: false,
       status: 0,
       crtComp: "",
       transferDialog: false,
-      staff: {
+      staff: {    // 转办功能用的
         keyword: "",
         people: "",
       },
@@ -243,13 +242,10 @@ export default {
       orderBaseInfo: {},
       item: {},
       isOCR: false,
-      loadings: {
+      loadings: {    //点击保存、确认时候的loading状态
         submitLoading: false,
         storageLoading: false,
       },
-      coment: {},
-      personInfo: {},
-      leaderApproveInfo: {},//TO_NODE TO_BEFORE
       reviewMaterials: [], //工单上已上传的文件
       filledInByApprover: [], // 审批模块配置项目
       peoples: [
@@ -283,7 +279,6 @@ export default {
     clearStoreStatus() {
       this.$store.commit('setCheckApprovedFormFalse')
     },
-    startLoading() { this.loading = true },
     /**
      * description: 打开弹窗，预览文件
      * param {*} url
@@ -293,6 +288,10 @@ export default {
       this.previewDialog = true
       this.previewUrl = url
     },
+    /**
+     * @description: 去 OCR 审查页面
+     * @return {*}
+     */
     toApproval() {
       this.$router.push({
         name: "aiApproval",
@@ -310,24 +309,25 @@ export default {
     async judgeStatus() {
       const { path } = this.$route
       const originRouter = path.match(/\/(\S*)\//)[1]
-      // 一般进入详情页：展示返回按钮 及 审批记录详细
+      // 一般进入详情页只：展示返回按钮 及 审批记录详细
       let { item } = JSON.parse(window.localStorage.getItem("order-detail"));
       const info = JSON.parse(window.localStorage.getItem("order-detail"));
       this.info = info
       this.item = item
-      // 草稿
-      if (item.taskStatus == '0') {
+      
+      // 工单状态: 草稿 待比对  taskStatus为6时，右上角增加去比对按钮
+      if (['0', '6'].includes(item.taskStatus)) {
         this.status = 0;
         this.crtComp = "approvalRecordCard";
-        //后期扩展,审批也分好几种类型
       }
       // 工单-审批中状态 主要区分是否OCR审批、部门审批  
       if (item.taskStatus == '1') {
+        // 详情页区分来源：申请列表or审批列表
         if (originRouter == 'applycenter') {
           this.status = 0;
           this.crtComp = "approvalRecordCard";
         } else if (originRouter == 'approvalcenter') {
-          //区分是否OCR审批还是领导审批  先写死targetPage  LEADER XIAOBAO CONFIRM
+          // OCR审批或领导审批 由targetPage确认【 LEADER XIAOBAO 】  注：targetPage：[‘线上比对’ ，taskStatus=6，不在此判断]、[确认 taskStatus=5，也不在此判断]
           const res = await this.getTemplatedetail()
           this.isOCR = res.targetPage !== 'LEADER'
           !this.isOCR ? (this.status = 2, this.crtComp = "leaderEditOpinion") : (
@@ -346,7 +346,7 @@ export default {
       }
       //  工单-待确认状态
       if (item.taskStatus == '5') {
-        // 工单-有实质性意见 status=5 ；无实质性意见：status=3
+        // 工单-有实质性意见 status=5 ；无实质性意见：status=3，有无实质意见的区别在页面上表现为：是否要上传最终上线材料
         this.status = item.hasOpinions == 1 ? 5 : 3
         this.crtComp = "approvedOpinionCard";
       }
@@ -355,11 +355,6 @@ export default {
         this.status = 4;
         this.crtComp = "approvedOpinionCard";
       }
-      // 工单-待对比状态
-      if (item.taskStaus == '6') {
-        this.status = 0;
-        this.crtComp = "approvalRecordCard";
-      }
     },
     // 获取当前的节点的配置信息
     async getTemplatedetail() {
@@ -367,7 +362,6 @@ export default {
       let targetPage = ''
       let refuseWay = ''
       let assignedType = ''
-      let mode = ''
       let assignedUser = []
       let disavower = []
       let taskId = this.item.taskId
@@ -382,14 +376,13 @@ export default {
         const { data } = res.data
         targetPage = data[data.length - 1].props['targetPage']
         refuseWay = data[data.length - 1].props['refuseWay']
-        mode = data[data.length - 1].props['mode']
         assignedUser = data[data.length - 1].props['assignedUser']?.filter(v => v.type !== 'dept')?.map(v => v.id)
         if (targetPage == 'XIAOBAO') {
-          //如果是消保审批
-          return { targetPage, refuseWay, mode, assignedUser, taskId, formId }
+          //如果是ocr审批,页面显示无需太多内容
+          return { targetPage, refuseWay, assignedUser, taskId, formId }
         }
-        //如果是领导审批，走下面的判断
-        //驳回人列表处理    发起人
+        // 如果是领导审批，走下面的判断
+        //1、获取驳回人列表 disavower  1.1 第一个节点是发起人initiator
         const { name, id } = this.item['originator']
         const { institutional } = this.item
         const initiator = {
@@ -400,6 +393,9 @@ export default {
           targetNodeId: 'root'
         }
         disavower.push(initiator)
+        // 1.2 该接口返回当前流程的所有的节点[node_1,node_2,node_3...],
+        //    arr[0]虽然是发起节点，但是发起人信息要从该工单详情里获取，不通过 arr[0]，原因好像是手动加 targetNodeId='root'
+        //    arr[arr.length-1]为当前节点，不能驳回到当前节点，因此要获取 1～arr.length-1之间的节点assignedUser信息
         if (data.length > 2) {
           let othersArray = data.slice(1, data.length - 1)
           let other_disavower = []
@@ -415,7 +411,7 @@ export default {
             disavower = disavower.concat(other_disavower)
           }
         }
-        // 选中通过时的下一级审批人
+        // 2.选中通过时的下一级审批人
         let approver = []
         let nextApprovers = data[data.length - 1]?.children?.props?.assignedUser.filter(v => v.type == 'user') || []
         nextApprovers = nextApprovers?.map(v => {
@@ -426,9 +422,13 @@ export default {
         })
         approver = nextApprovers
         assignedType = data[data.length - 1]?.children?.props?.assignedType
-        return { targetPage, refuseWay, disavower, approver, assignedType, mode, assignedUser, taskId, processInstanceId, formId }
+        return { targetPage, refuseWay, disavower, approver, assignedType, assignedUser, taskId, processInstanceId, formId }
       }
     },
+    /**
+     * @description: 去修改
+     * @return {*}
+     */
     toModify() {
       this.$router.push({
         name: 'editApply',
@@ -455,32 +455,33 @@ export default {
      * return {*}
      */
     goback() {
-      if (this.info) {
-        const that = this
-        // 当前审核模块页面显示为领导审批的或者工单处于待确认的，点击返回的时候，要弹窗提示是否保存当前的操作
-        if ([2, 3].includes(this.status) || this.item.taskStatus == '5') {
-          const { opinionStorage } = this.$store.state.checkApprovedForm
-          if (!opinionStorage || !editOpinionStorage) {
-            this.$confirm("是否保存已编辑的意见确认信息？", "", {
-              customClass: "confirmBox",
-              confirmButtonText: "保存",
-              cancelButtonText: "不保存",
-              type: "warning",
+      const that = this
+      // 当前审核模块页面显示为领导审批的或者工单处于待确认的，点击返回的时候，要弹窗提示是否保存当前的操作
+      if ([2, 3].includes(this.status) || this.item.taskStatus == '5') {
+        const { opinionStorage, editOpinionStorage } = this.$store.state.checkApprovedForm
+        if (!opinionStorage || !editOpinionStorage) {
+          this.$confirm("是否保存已编辑的意见确认信息？", "", {
+            customClass: "confirmBox",
+            confirmButtonText: "保存",
+            cancelButtonText: "不保存",
+            type: "warning",
+          })
+            .then(() => {
+              //  2：编辑意见   3：待确认模块
+              that.status == 2 ? that.saveEditOpinion(true) : that.saveOpinion()
             })
-              .then(() => {
-                //  2：编辑意见   3：待确认模块
-                that.status == 2 ? that.saveEditOpinion() : that.saveOpinion()
-              })
-              .catch(() => {
-                this.$router.go(-1);
-              });
-          }
-        } else {
-          this.$router.go(-1);
+            .catch(() => {
+              this.$router.go(-1);
+            });
         }
+      } else {
+        this.$router.go(-1);
       }
     },
-    //保存意见书功能
+    /**
+     * @description:意见书-保存
+     * @return {*}
+     */
     saveOpinion() {
       const { approvedOpinionForm } = this.$store.state.checkApprovedForm
       const params = approvedOpinionForm.map(v => {
@@ -497,20 +498,18 @@ export default {
       }).catch(() => {
         this.loadings.storageLoading = false
       })
-
     },
 
     /**
-     * description: 保存编辑意见功能
-     * return {*}
+     * @description: 编辑意见-保存、提交
+     * @param {*} isSave  true为保存，false提交
+     * @return {*}
      */
-    saveEditOpinion() {
-      this.loadings.storageLoading = true
-      this.$store.commit('setEditOpinionStorage', true)
+    saveEditOpinion(isSave) {
       const { editOpinionForm } = this.$store.state.checkApprovedForm
       const { assignedUser } = editOpinionForm
       let params = {
-        isSave: true,
+        isSave: isSave, //区分保存还是提交
         success: editOpinionForm.isAccept == '1',
         taskId: this.item.taskId,
         msg: editOpinionForm.content,
@@ -523,29 +522,50 @@ export default {
       if (editOpinionForm.isAccept == '1' && editOpinionForm.assignedType == 'SELF_SELECT') {
         params.targetUser = editOpinionForm.crtApprover
       }
-      //驳回时候，
+      //驳回时候
       if (editOpinionForm.isAccept == '0') {
         params.reason = editOpinionForm.reason
         params.targetNodeId = editOpinionForm.targetNodeId
         params.targetUser = editOpinionForm.id
       }
-      this.loadings.storageLoading = true
-      leaderEdit(params).then(res => {
+      const end_submit = {
+        ...params,
+        comments: params
+      }
+      isSave ? this.loadings.storageLoading = true : this.loadings.submitLoading = true
+      leaderEdit(end_submit).then(res => {
         const { success, msg } = res.data
         if (success) {
-          this.loadings.storageLoading = false
-          this.$message.success('审查意见已保存')
-          setTimeout(() => {
-            this.$router.replace({ name: 'approvalcenter' })
-          }, 600)
+          if (isSave) {
+            // 保存-------start
+            this.loadings.storageLoading = false
+            this.$store.commit('setEditOpinionStorage', true)
+            this.$message.success('审查意见已保存')
+            setTimeout(() => {
+              this.$router.replace({ name: 'approvalcenter' })
+            }, 600)
+            // 保存---------end
+          } else {
+            // 提交-------start
+            this.loadings.submitLoading = false
+            this.$message.success('审查意见已提交')
+            setTimeout(() => {
+              this.$router.replace({ name: 'approvalcenter' })
+            }, 600)
+            // 提交-------end
+          }
         } else {
           this.$message.error(msg)
         }
       }).catch(err => {
-        this.loadings.storageLoading = false
-        this.$message.error('审查意见保存失败')
+        if (isSave) {
+          this.loadings.storageLoading = false
+          this.$message.error('审查意见保存失败')
+        } else {
+          this.loadings.submitLoading = false
+          this.$message.error('审查意见提交失败')
+        }
       })
-
     },
     /**
      * description: 用于审查意见书显示最下面的时间
@@ -558,8 +578,8 @@ export default {
       this.timeNow = time
     },
     /**
-     * description: 合并右上角的保存、提交功能，由 way区分， storage 保存，update：提交
-     * param {*} way
+     * description: 合并右上角的保存、提交功能，
+     * param {*} way  storage 保存，update：提交
      * return {*}
      */
     submit(way) {
@@ -589,7 +609,7 @@ export default {
           type: "warning",
         })
           .then(() => {
-            that.saveEditOpinion()
+            that.saveEditOpinion(true)
           }).catch((e) => {
           })
         return false
@@ -598,16 +618,15 @@ export default {
       // 提交功能   工单待确认状态，为无实质性意见的，需要提交审查意见书和最终上线材料
       if (this.status == 3 && way == 'update') {
         if (!approvedOpinionRequired) {
-          // 审查意见书校验不通过时，要定位第一个未输入项
+          // 1.审查意见书校验不通过时，要定位第一个未输入项
           this.crtComp = 'approvedOpinionCard'
           this.$nextTick(() => {
             this.$refs['child'].checkParam()
           })
           return false
         }
-        console.log('required',uploadFileRadio,uploadFileRequired)
-        // 最终上线材料模块：选中活动正常上线：radio=1,需要上传材料; 选中活动未开展：radio=0，不需要上传材料
-        if (uploadFileRadio==1 && !uploadFileRequired) {
+        // 2. 最终上线材料模块：选中活动正常上线：radio=1,需要上传材料; 选中活动未开展：radio=0，不需要上传材料
+        if (uploadFileRadio == 1 && !uploadFileRequired) {
           this.$message({
             type: 'warning',
             customClass: 'el-icon-warning-one',
@@ -616,43 +635,25 @@ export default {
           this.crtComp = 'uploadFileCard'
           return false
         }
-        // 意见提交
+        // 3.审查意见及上线材料都已提交完毕, 意见提交
         if (approvedOpinionRequired) {
-          if (way == 'update') {
-            // 细分已采纳，存在未采纳
-            const { approvedOpinionForm } = this.$store.state.checkApprovedForm
-            const isAllAccept = approvedOpinionForm.every(v => v.adoptOpinions == 1)
-            if (isAllAccept) {
-              this.$confirm("当前已采纳所有意见，是否继续提交？", "", {
-                customClass: "confirmBox",
-                confirmButtonText: "提交",
-                cancelButtonText: "取消",
-                type: "warning",
-              })
-                .then(() => {
-                  this.loadings.submitLoading = true
-                  that.submitOpinion()
-                })
-                .catch(() => {
-                  this.loadings.submitLoading = false
-                });
-            } else {
-              this.$confirm("当前存在不采纳意见，是否继续提交？", "", {
-                customClass: "confirmBox",
-                confirmButtonText: "提交",
-                cancelButtonText: "取消",
-                closeOnClickModal: false,
-                type: "warning",
-              })
-                .then(() => {
-                  this.loadings.submitLoading = true
-                  that.submitOpinion()
-                })
-                .catch(() => {
-                  this.loadings.submitLoading = false
-                });
-            }
-          }
+          // 细分已采纳，存在未采纳
+          const { approvedOpinionForm } = this.$store.state.checkApprovedForm
+          const isAllAccept = approvedOpinionForm.every(v => v.adoptOpinions == 1)
+          const msg = isAllAccept ? '当前已采纳所有意见，是否继续提交？' : '当前存在不采纳意见，是否继续提交？'
+          this.$confirm(msg, "", {
+            customClass: "confirmBox",
+            confirmButtonText: "提交",
+            cancelButtonText: "取消",
+            type: "warning",
+          })
+            .then(() => {
+              this.loadings.submitLoading = true
+              that.submitOpinion()
+            })
+            .catch(() => {
+              // this.loadings.submitLoading = false
+            });
         }
       }
       // 提交功能  工单待确认状态，为有实质性意见的，需要提交审查意见书
@@ -668,38 +669,22 @@ export default {
         if (approvedOpinionRequired) {
           const { approvedOpinionForm } = this.$store.state.checkApprovedForm
           const isAllAccept = approvedOpinionForm.every(v => v.adoptOpinions == 1)
-          if (isAllAccept) {
-            this.$confirm("当前已采纳所有“实质意见”，是否继续提交？", "", {
-              customClass: "confirmBox",
-              confirmButtonText: "提交",
-              cancelButtonText: "取消",
-              closeOnClickModal: false,
-              type: "warning",
+          const msg = isAllAccept ? '当前已采纳所有“实质意见”，是否继续提交？' : '当前存在未采纳的“实质意见”，提交后将会进一步审核，是否继续提交？'
+          const type = isAllAccept ? 1 : 0
+          this.$confirm(msg, "", {
+            customClass: "confirmBox",
+            confirmButtonText: "提交",
+            cancelButtonText: "取消",
+            closeOnClickModal: false,
+            type: "warning",
+          })
+            .then(() => {
+              this.loadings.submitLoading = true
+              that.submitOpinion(true, type)
             })
-              .then(() => {
-                this.loadings.submitLoading = true
-                that.submitOpinion(true, 1)
-              })
-              .catch(() => {
-                this.loadings.submitLoading = false
-              });
-          } else {
-            this.$confirm("当前存在未采纳的“实质意见”，提交后将会进一步审核，是否继续提交？", "", {
-              customClass: "confirmBox",
-              confirmButtonText: "提交",
-              cancelButtonText: "取消",
-              closeOnClickModal: false,
-              type: "warning",
-            })
-              .then(() => {
-                this.loadings.submitLoading = true
-                that.submitOpinion(true, 0)
-              })
-              .catch(() => {
-                this.loadings.submitLoading = false
-              });
-          }
-
+            .catch(() => {
+              this.loadings.submitLoading = false
+            });
         }
       }
       // 审批中状态之领导审批 提交
@@ -709,47 +694,13 @@ export default {
           this.$message.error('请在编辑意见后提交')
           return false
         }
-        const { assignedUser } = editOpinionForm
-        let params = {
-          success: editOpinionForm.isAccept == '1',
-          taskId: this.item.taskId,
-          processInstanceId: this.item.processInstanceId,
-          msg: editOpinionForm.content,
-          isSave: false,
-          userIds: assignedUser,
-        }
-        //通过时候，流程配置中下一节点审批人设置时选择“上一审批人选择”，增加选择审批人选择则框
-        if (editOpinionForm.isAccept == '1' && editOpinionForm.assignedType == 'SELF_SELECT') {
-          params.targetUser = editOpinionForm.crtApprover
-        }
-        //驳回时候，
-        if (editOpinionForm.isAccept == '0') {
-          params.reason = editOpinionForm.reason
-          params.targetNodeId = editOpinionForm.targetNodeId
-          params.targetUser = editOpinionForm.id
-        }
-        this.loadings.submitLoading = true
-        leaderEdit(params).then(res => {
-          const { success, msg } = res.data
-          if (success) {
-            this.loadings.submitLoading = false
-            this.$message.success('审查意见已提交')
-            setTimeout(() => {
-              this.$router.replace({ name: 'approvalcenter' })
-            }, 600)
-          } else {
-            this.$message.error(msg)
-          }
-        }).catch(err => {
-          this.loadings.submitLoading = false
-          this.$message.error('审查意见提交失败')
-        })
+        this.saveEditOpinion()
       }
     },
     /**
      * description: 审查意见书提交功能
-     * param {*} opinions
-     * param {*} type
+     * param {*} opinions true为有实质性意见，需要上传审查意见书、上线材料； fase为无实质性意见，不需要上传材料
+     * param {*} type :1 已采纳所有意见 0: 存在未采纳
      * return {*}
      */
     async submitOpinion(opinions, type) {
@@ -773,13 +724,11 @@ export default {
           processInstanceId: this.item.processInstanceId,
           taskId: this.item.taskId,
           templateId: this.item.processTemplateId
-
         }
       }
-      let fileSuccess = null
       try {
-        //上传文件的逻辑 选中活动正常上线
-        if (!opinions && uploadFileRadio==1) {
+        //上传文件的逻辑 选中活动正常上线 
+        if (!opinions && uploadFileRadio == 1) {
           const params = fileUploadForm.map(v => {
             return {
               fileName: v.fileName,
@@ -791,9 +740,7 @@ export default {
               otherUrl: v.relevantFile.url
             }
           })
-          const fileRes = await finalMaterial(params, this.item.processInstanceId, this.item.taskId)
-          const { success } = fileRes.data
-          fileSuccess = success
+          await finalMaterial(params, this.item.processInstanceId, this.item.taskId)
         }
         updateAdoptEditedComments(opinion_submit_params, this.item.taskId).then(res => {
           this.loadings.submitLoading = false
@@ -832,7 +779,7 @@ export default {
                 this.$router.replace('/applycenter')
               })
             }
-          }else{
+          } else {
             this.$message.error(res.data.msg)
           }
         }).catch(err => {
@@ -996,7 +943,7 @@ export default {
     .nav {
       padding: 2px 0px;
       padding-bottom: 12px;
-      border-bottom: 1px dashed #e5e6eb;
+      border-bottom: 1px solid #e5e6eb;
       margin-bottom: 16px;
       display: flex;
       font-size: 14px;

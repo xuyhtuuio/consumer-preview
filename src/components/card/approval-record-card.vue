@@ -45,27 +45,26 @@
             <div v-for="(item, idx) in activity.optionVOList" :key="idx" class="opinions-item">
               <!-- v-if="activity.targetPage === 'ocr'" -->
               <div class="opinion-tag">
-              <span v-if="item.opinion == 1" class="guanzhu">
-             
-                <i class="iconfont icon icon-guanzhu"></i>
-                有实质意见
-              </span>
-              <span v-if="item.opinion == 0" class="guanzhu2">
-                <i class="iconfont icon icon-guanzhu2"></i>
-                无实质意见
-              </span>
-            </div>
-              <p class="opinion-text">{{ idx + 1 }} {{ item.str }}</p>
-              <div class="relevant-file">
+                <span v-if="item.opinion == 1" class="guanzhu">
+                  <i class="iconfont icon icon-guanzhu"></i>
+                  有实质意见
+                </span>
+                <span v-if="item.opinion == 0" class="guanzhu2">
+                  <i class="iconfont icon icon-guanzhu2"></i>
+                  无实质意见
+                </span>
+              </div>
+              <p class="opinion-text"><i v-if="activity.optionVOList.length > 1">{{ idx + 1 }}</i> {{ item.str }}</p>
+              <div class="relevant-file" v-if="item.files && item.files.length">
                 关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.files && item.files[0] }} </i>
-                <el-popover :placement="bottom - end" popper-class="file-overview-popper" trigger="click"
+                <el-popover placement="bottom-end" popper-class="file-overview-popper" trigger="click"
                   v-if="item.files && item.files.length > 1">
                   <div class="file-list">
                     <div class="file-list-item  ellipsis ellipsis_1 " v-for="(file, idx) in item.files" :key="idx">
                       {{ file }}
                     </div>
                   </div>
-                  <i slot="reference">+{{ item.files.length - 1 }}</i>
+                  <i slot="reference" class="pointer">+{{ item.files.length - 1 }}</i>
                 </el-popover>
               </div>
             </div>
@@ -79,7 +78,6 @@
 import moment from 'moment';
 import { instanceInfo } from '@/api/applyCenter'
 import empty from '@/components/common/empty'
-import xx from './xx.json'
 export default {
   components: { empty },
   name: 'approved-record-card',
@@ -102,7 +100,7 @@ export default {
     }
   },
   activated() {
- 
+
   },
   methods: {
     init() {
@@ -149,19 +147,30 @@ export default {
         let arr = []
         for (let i in keys) {
           let obj = {
-          ...detailVOList[keys[i]][0],
-           name:detailVOList[keys[i]][0].activityId=='endEventNode'?'已结束':detailVOList[keys[i]][0].name
+            ...detailVOList[keys[i]][0],
+            name: detailVOList[keys[i]][0].activityId == 'endEventNode' ? '已结束' : detailVOList[keys[i]][0].name
           }
           arr.push(obj)
         }
-      const arr_handler = arr.sort((a,b)=> {
-        return moment(a.createTime)-moment(b.createTime)
-      })
+        const arr_handler = arr.sort((a, b) => {
+          return moment(a.createTime) - moment(b.createTime)
+        })
         this.recordList = arr_handler instanceof Array && arr_handler.length ? arr_handler.map(v => {
-          const comments = v.optionVOList && v.optionVOList[0].comments
+          let comments = v.optionVOList && v.optionVOList[0].comments
+          let handlerComents = JSON.parse(comments)
+          // handlerComents = handlerComents?.map(m => {
+          //   return {
+          //     ...m,
+          //     files: m.files?.map(m => {
+          //       let arr = m.split('_')
+          //       arr = arr.slice(2)
+          //       return arr.join('_')
+          //     }) || []
+          //   }
+          // })||[]
           return {
             ...v,
-            optionVOList: JSON.parse(comments),
+            optionVOList: handlerComents,
           }
         }) : []
         return this.hasData = true
@@ -177,7 +186,8 @@ export default {
     },
     handleTimeFormat(val) {
       let timediff = moment(val.endTime).diff(moment(val.createTime), 'seconds');
-      timediff = timediff > 0 ? (timediff / 3600).toFixed(1) : 0
+      let _timediff = timediff > 0 ? (timediff / 3600).toFixed(1) : 0
+      _timediff < 0.1 ? timediff = (timediff / 3600).toFixed(2) : timediff = _timediff
       return val.endTime ? timediff : '--'
     }
   }
@@ -262,10 +272,14 @@ export default {
         justify-content: space-between;
         border-bottom: 1px dashed #e5e6eb;
 
+        span {
+          flex: 1;
+
+        }
+
         .handle-time {
           color: #2d5cf6;
           text-align: center;
-
           font-style: normal;
           font-weight: 400;
           line-height: 18px;

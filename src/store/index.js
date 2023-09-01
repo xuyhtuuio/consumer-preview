@@ -175,7 +175,6 @@ export default new Vuex.Store({
       approvedOpinionForm: [],
       fileUploadForm: [],
       opinionStorage: false,
-
       editOpinionStorage: false,
       editOpinionForm: {},
       editOpinionRequired: false
