@@ -78,7 +78,6 @@
 import moment from 'moment';
 import { instanceInfo } from '@/api/applyCenter'
 import empty from '@/components/common/empty'
-import xx from './xx.json'
 export default {
   components: { empty },
   name: 'approved-record-card',

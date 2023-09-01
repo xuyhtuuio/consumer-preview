@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-01 15:33:38
+ * @LastEditTime: 2023-09-01 17:33:34
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -200,6 +200,7 @@
   </div>
 </template>
 <script>
+import moment from 'moment';
 import orderBasicInfo from "@/components/card/order-basic-info.vue";
 import leaderEditOpinion from "@/components/card/leader-edit-opinion.vue";
 import approvalRecordCard from "@/components/card/approval-record-card.vue";
@@ -208,7 +209,6 @@ import uploadFileCard from "@/components/card/upload-file-card";
 import filePreview from '@/components/filePreview'
 import { leaderEdit, finalMaterial } from '@/api/approvalCenter'
 import { updateAdoptEditedComments, updateEditedComments, getTemplatedetail } from '@/api/applyCenter'
-import moment from 'moment';
 
 export default {
   name: "order-details",
@@ -311,9 +311,11 @@ export default {
       const originRouter = path.match(/\/(\S*)\//)[1]
       // 一般进入详情页只：展示返回按钮 及 审批记录详细
       let { item } = JSON.parse(window.localStorage.getItem("order-detail"));
+      item.taskStatus = 5
       const info = JSON.parse(window.localStorage.getItem("order-detail"));
       this.info = info
       this.item = item
+      
       // 工单状态: 草稿 待比对  taskStatus为6时，右上角增加去比对按钮
       if (['0', '6'].includes(item.taskStatus)) {
         this.status = 0;
@@ -467,7 +469,7 @@ export default {
           })
             .then(() => {
               //  2：编辑意见   3：待确认模块
-              that.status == 2 ? that.saveEditOpinion() : that.saveOpinion()
+              that.status == 2 ? that.saveEditOpinion(true) : that.saveOpinion()
             })
             .catch(() => {
               this.$router.go(-1);
@@ -500,14 +502,15 @@ export default {
     },
 
     /**
-     * description:编辑意见-保存
-     * return {*}
+     * @description: 编辑意见-保存、提交
+     * @param {*} isSave  true为保存，false提交
+     * @return {*}
      */
-    saveEditOpinion() {
+    saveEditOpinion(isSave) {
       const { editOpinionForm } = this.$store.state.checkApprovedForm
       const { assignedUser } = editOpinionForm
       let params = {
-        isSave: true, //区分保存还是提交
+        isSave: isSave, //区分保存还是提交
         success: editOpinionForm.isAccept == '1',
         taskId: this.item.taskId,
         msg: editOpinionForm.content,
@@ -526,25 +529,44 @@ export default {
         params.targetNodeId = editOpinionForm.targetNodeId
         params.targetUser = editOpinionForm.id
       }
-
-      this.loadings.storageLoading = true
-      leaderEdit(params).then(res => {
+      const end_submit = {
+        ...params,
+        comments: params
+      }
+      isSave ? this.loadings.storageLoading = true : this.loadings.submitLoading = true
+      leaderEdit(end_submit).then(res => {
         const { success, msg } = res.data
         if (success) {
-          this.loadings.storageLoading = false
-          this.$store.commit('setEditOpinionStorage', true)
-          this.$message.success('审查意见已保存')
-          setTimeout(() => {
-            this.$router.replace({ name: 'approvalcenter' })
-          }, 600)
+          if (isSave) {
+            // 保存-------start
+            this.loadings.storageLoading = false
+            this.$store.commit('setEditOpinionStorage', true)
+            this.$message.success('审查意见已保存')
+            setTimeout(() => {
+              this.$router.replace({ name: 'approvalcenter' })
+            }, 600)
+            // 保存---------end
+          } else {
+            // 提交-------start
+            this.loadings.submitLoading = false
+            this.$message.success('审查意见已提交')
+            setTimeout(() => {
+              this.$router.replace({ name: 'approvalcenter' })
+            }, 600)
+            // 提交-------end
+          }
         } else {
           this.$message.error(msg)
         }
       }).catch(err => {
-        this.loadings.storageLoading = false
-        this.$message.error('审查意见保存失败')
+        if (isSave) {
+          this.loadings.storageLoading = false
+          this.$message.error('审查意见保存失败')
+        } else {
+          this.loadings.submitLoading = false
+          this.$message.error('审查意见提交失败')
+        }
       })
-
     },
     /**
      * description: 用于审查意见书显示最下面的时间
@@ -587,7 +609,7 @@ export default {
           type: "warning",
         })
           .then(() => {
-            that.saveEditOpinion()
+            that.saveEditOpinion(true)
           }).catch((e) => {
           })
         return false
@@ -672,45 +694,7 @@ export default {
           this.$message.error('请在编辑意见后提交')
           return false
         }
-        const { assignedUser } = editOpinionForm
-        let params = {
-          success: editOpinionForm.isAccept == '1',
-          taskId: this.item.taskId,
-          processInstanceId: this.item.processInstanceId,
-          msg: editOpinionForm.content,
-          isSave: false,
-          userIds: assignedUser,
-        }
-        //通过时候，流程配置中下一节点审批人设置时选择“上一审批人选择”，增加选择审批人选择则框
-        if (editOpinionForm.isAccept == '1' && editOpinionForm.assignedType == 'SELF_SELECT') {
-          params.targetUser = editOpinionForm.crtApprover
-        }
-        //驳回时候，
-        if (editOpinionForm.isAccept == '0') {
-          params.reason = editOpinionForm.reason
-          params.targetNodeId = editOpinionForm.targetNodeId
-          params.targetUser = editOpinionForm.id
-        }
-        const end_submit = {
-          ...params,
-          comments: params
-        }
-        this.loadings.submitLoading = true
-        leaderEdit(end_submit).then(res => {
-          const { success, msg } = res.data
-          if (success) {
-            this.loadings.submitLoading = false
-            this.$message.success('审查意见已提交')
-            setTimeout(() => {
-              this.$router.replace({ name: 'approvalcenter' })
-            }, 600)
-          } else {
-            this.$message.error(msg)
-          }
-        }).catch(err => {
-          this.loadings.submitLoading = false
-          this.$message.error('审查意见提交失败')
-        })
+        this.saveEditOpinion()
       }
     },
     /**
@@ -740,7 +724,6 @@ export default {
           processInstanceId: this.item.processInstanceId,
           taskId: this.item.taskId,
           templateId: this.item.processTemplateId
-
         }
       }
       try {

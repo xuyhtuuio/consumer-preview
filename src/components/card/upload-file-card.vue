@@ -81,6 +81,7 @@
     <div v-if="status == 4 && fileList && fileList.length">
       <p class="downloadAll">下载全部</p>
     </div>
+    <!-- <el-button @click="so">断点</el-button> -->
     <el-dialog title="关联文件" :visible.sync="relevantDocumentDialog" width="624" :before-close="handleClose"
       custom-class="relevant-dialog">
       <div>
@@ -179,6 +180,20 @@ export default {
     }
   },
   methods: {
+    // test(){
+    //   const { approvedOpinionForm, fileUploadForm, uploadFileRadio } = this.$store.state.checkApprovedForm
+    //   const params = fileUploadForm.map(v => {
+    //         return {
+    //           fileName: v.fileName,
+    //           key: v.key,
+    //           url: v.url,
+    //           isRelation: true,
+    //           otherFilename: v.relevantFile.fileName,
+    //           otherKey: v.relevantFile.key,
+    //           otherUrl: v.relevantFile.url
+    //         }
+    //       })
+    // },
     preview(item) {
       this.$emit('preview', item.url)
     },
@@ -213,6 +228,8 @@ export default {
       item.hasRelevant = false
       item.relevantFile = {}
       item.relevantFileName = ''
+      this.$store.commit('setUploadFileRequired', this.fileList.length > 0)
+      this.$store.commit('setUploadFileForm', this.fileList)
     },
     /**
      * @description: 打开弹窗，准备关联文件
@@ -239,11 +256,13 @@ export default {
           m.hasRelevant = true
           item.relevantFileName = fileName
           m.relevantFile = {
-            key, url, fileName
+            key:item.key, url:item.url, fileName:item.fileName
           }
         }
       })
       this.handleClose()
+      this.$store.commit('setUploadFileRequired', this.fileList.length > 0)
+      this.$store.commit('setUploadFileForm', this.fileList)
     },
     /**
      * @description: 已上传文件列表，操作取消关联文件
@@ -265,6 +284,8 @@ export default {
           m.relevantFileName = ''
         }
       })
+      this.$store.commit('setUploadFileRequired', this.fileList.length > 0)
+      this.$store.commit('setUploadFileForm', this.fileList)
     },
     /**
      * @description: 对于已上传的文件，删除选中项操作,若已经关联，取消弹窗内的关联文件 this.reviewMaterials
@@ -281,6 +302,8 @@ export default {
           m.relevantFileName = ''
         }
       })
+      this.$store.commit('setUploadFileRequired', this.fileList.length > 0)
+      this.$store.commit('setUploadFileForm', this.fileList)
     },
     dialogLiEnter(item) {
       this.dialogCrtLi = item.key
@@ -309,7 +332,6 @@ export default {
           m.relevantFileName = data.fileName
         }
       })
-      console.log('fileList', this.fileList.length)
       this.$store.commit('setUploadFileRequired', this.fileList.length > 0)
       this.$store.commit('setUploadFileForm', this.fileList)
     },
@@ -329,7 +351,6 @@ export default {
       formData.append("mf", param.file); // 传入bpmn文件
       getFormGroups(formData).then((res) => {
         const { success } = res.data
-        console.log('res',res)
         if (success) {
           this.handleSuccess(res.data.data, param.file.uid);
         } else {
@@ -341,7 +362,6 @@ export default {
       window.open(url);
     },
     handleMouseEnter(item) {
-      console.log('ff', item)
       item.isClick = true;
     },
     handleMouseLeave(item) {

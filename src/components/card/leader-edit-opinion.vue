@@ -97,8 +97,9 @@
       <el-form hide-required-asterisk label-width="75px" class="my-form">
         <template v-for="(item, index) in filledInByApprover">
           <el-form-item :class="formItemCpt(item)" :key="index">
-            <label slot="label">{{ item.title
-            }}<span :style="{ color: 'red', opacity: item.props.required || 0 }">
+            <label slot="label">
+              <i>{{ item.title}}</i>
+              <span :style="{ color: 'red', opacity: item.props.required || 0 }">
                 *
               </span></label>
             <el-input v-if="item.name === 'TextInput'" :disabled="item.perm === 'R'" v-model.trim="item.value"
