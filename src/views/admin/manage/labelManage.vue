@@ -231,8 +231,10 @@ export default {
       const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.pathName === 'LabelManage') || {}
       if (flowManage.type === 'edit') {
         return true
-      }
+      }else {
+        this.colConfig.pop()
       return false
+      }
     }
   },
   created() {
