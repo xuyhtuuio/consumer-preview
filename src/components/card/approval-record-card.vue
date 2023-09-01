@@ -186,7 +186,8 @@ export default {
     },
     handleTimeFormat(val) {
       let timediff = moment(val.endTime).diff(moment(val.createTime), 'seconds');
-      timediff = timediff > 0 ? (timediff / 3600).toFixed(1) : 0
+      let _timediff = timediff > 0 ? (timediff / 3600).toFixed(1) : 0
+      _timediff < 0.1 ? timediff = (timediff / 3600).toFixed(2) : timediff = _timediff
       return val.endTime ? timediff : '--'
     }
   }
@@ -271,10 +272,14 @@ export default {
         justify-content: space-between;
         border-bottom: 1px dashed #e5e6eb;
 
+        span {
+          flex: 1;
+
+        }
+
         .handle-time {
           color: #2d5cf6;
           text-align: center;
-
           font-style: normal;
           font-weight: 400;
           line-height: 18px;

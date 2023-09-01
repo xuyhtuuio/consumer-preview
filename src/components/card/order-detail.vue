@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-01 17:40:57
+ * @LastEditTime: 2023-09-01 18:14:36
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -942,7 +942,7 @@ export default {
     .nav {
       padding: 2px 0px;
       padding-bottom: 12px;
-      border-bottom: 1px dashed #e5e6eb;
+      border-bottom: 1px solid #e5e6eb;
       margin-bottom: 16px;
       display: flex;
       font-size: 14px;
