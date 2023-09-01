@@ -81,3 +81,13 @@ export function getOpinionApprovalLetter(param) {
     params: param
   })
 }
+
+// 查询某节点的表单项权限（新增回显 和 修改回显）
+export function queryFormItemPermissions(param) {
+  return request({
+    url: '/cpr/workProcessQuery/queryFormItemPermissions',
+    method: 'post',
+    contentType : 'application/x-www-form-urlencoded;charset=utf-8',
+    data: param
+  })
+}
