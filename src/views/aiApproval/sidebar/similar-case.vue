@@ -6,108 +6,144 @@
             </svg>
             相似案例
         </p>
-        <div class="case-box">
-            <div class="case-content">
-                <div class="case-item pointer" v-for="(item, index) in caseList" :key="index"
-                    :class="{ 'product-border': item.type === '保险类', 'activity-border': item.type === '活动类', 'customer-border': item.type === '客户类', 'other-border': item.type === '其他', }">
+        <div class="case-box" v-loading="caseListLoading">
+            <div class="case-content" v-if="caseList.length">
+                <div class="case-item pointer product-border " v-for="(item, index) in caseList" :key="index"
+                    @click="toDetail(item)">
                     <div class="thumbnail-img">
-                        <div v-if="item.fileType === 'img'">
-                            我是背景图
+                        <div v-if="item.fileType === 'img'" class="other-icon">
+                            <img :src="item.fileUrl" alt="">
                         </div>
                         <div v-else class="other-icon">
                             <svg class="icon" aria-hidden="true" v-if="item.fileType === 'pdf'">
                                 <use xlink:href="#icon-mianxingtubiao"></use>
                             </svg>
-                            <svg class="icon" aria-hidden="true" v-if="item.fileType === 'doc'">
+                            <svg class="icon" aria-hidden="true" v-if="item.fileType === 'doc' || item.fileType === 'docx'">
                                 <use xlink:href="#icon-mianxingtubiao-2"></use>
                             </svg>
-                            <svg class="icon" aria-hidden="true" v-if="item.fileType === 'xls'">
+                            <svg class="icon" aria-hidden="true" v-if="item.fileType === 'xls' || item.fileType === 'xlsx'">
                                 <use xlink:href="#icon-mianxingtubiao-1"></use>
+                            </svg>
+                            <svg class="icon" aria-hidden="true" v-if="item.fileType === 'ppt'">
+                                <use xlink:href="#icon-file-ppt"></use>
                             </svg>
                         </div>
                     </div>
                     <div class="case-info">
                         <div class="name">
-                            {{ item.name }}
+                            {{ item.taskName }}
                         </div>
                         <div class="time">
-                            <span>申请时间：{{ item.applyTime }}</span>
+                            <span>申请时间：{{ item.createTime }}</span>
                             <span>
-                                {{ item.organization }}
+                                <img class="img" src="@/assets/image/ai-approval/orgIcon.png" alt="" />
+                                {{ item.org }}
                             </span>
-
                         </div>
                         <div class="desc">
-                            <span class="tag">{{ item.tag }}</span>
-                            <span class="tag case-desc" v-for="word in item.desc.split(' ') || []" :key="word">{{ word }}</span>
+                            <span class="tag" v-for="(itemOption, indexOption) in item.approvalTypeOption"
+                                :key="indexOption">{{ itemOption.value }}</span>
+                            <span class="tag case-desc" v-for="(itemOption, indexOption) in item.productTypeOption"
+                                :key="indexOption">{{ itemOption.value }}</span>
                         </div>
                     </div>
-                    <div class="case-type cp-class" v-show="item.type == '保险类'">
-                        {{ item.type }}
-                    </div>
-                    <div class="case-type hd-class" v-show="item.type == '活动类'">
-                        <span>{{ item.type }}</span>
-                    </div>
-                    <div class="case-type kh-class" v-show="item.type == '客户类'">
-                        <span>{{ item.type }}</span>
-                    </div>
-                    <div class="case-type other-class" v-show="item.type == '其他'">
-                        {{ item.type }}
+                    <div class="case-type cp-class">
+                        {{ item.reviewMattersType }}
                     </div>
                 </div>
+                <trs-pagination :total="total" @getList="getSimilarCasesData" :pageNow="pageNum"></trs-pagination>
             </div>
+            <el-empty v-else description="暂无数据"></el-empty>
         </div>
-
     </div>
 </template>
 <script>
+import {
+    getSimilarCases
+} from '@/api/aiApproval';
 export default {
     name: 'similar-case',
     data() {
         return {
-            caseList: [{
-                name: '尊享金生年金保险产品审查',
-                type: '保险类',
-                applyTime: '2023-08-02',
-                organization: '北京分行',
-                tag: '人身险',
-                desc: '人寿保险 年金保险',
-                fileType: 'pdf'
-            },{
-                name: '附加健康优享重大疾病保险',
-                type: '保险类',
-                applyTime: '2023-07-28',
-                organization: '长春分行',
-                tag: '人身险',
-                desc: '健康保险 重疾保险',
-                fileType: 'doc'
-            },{
-                name: '附加住院日额医疗保险产品审查',
-                type: '保险类',
-                applyTime: '2023-07-26',
-                organization: '上海分行',
-                tag: '人身险',
-                desc: '健康保险 医疗保险',
-                fileType: 'pdf'
-            },{
-                name: '保利盈2.0两全保险产品审查',
-                type: '保险类',
-                applyTime: '2023-07-22',
-                organization: '广州分行',
-                tag: '人身险',
-                desc: '人寿保险 两全保险',
-                fileType: 'pdf'
-            },{
-                name: '富德生命如意福两全保险（分红型）',
-                type: '保险类',
-                applyTime: '2023-07-12',
-                organization: '西安分行',
-                tag: '人身险',
-                desc: '人寿保险 两全保险',
-                fileType: 'pdf'
+            caseList: [],
+            pageNum: 1,
+            pageSize: 10,
+            formCategoryId: '',
+            formId: '',
+            caseListLoading: false,
+            total: 0,
+        }
+    },
+    created() {
+        const { item } = this.$route.params;
+        this.formId = item.taskNumber;
+        this.formCategoryId = item.formManagementId;
+        this.getSimilarCasesData(1)
+    },
+    methods: {
+        toDetail(item) {
+            item.taskStatus = '4';
+            item.taskId = item.processInstanceId;
+            item.initiator = {
+                id: item.userId,
+                label: item.org,
+                name: item.userName,
+                org: item.org,
             }
-            ]
-
+            window.localStorage.setItem(
+                "order-detail",
+                JSON.stringify({
+                    item,
+                    clickPoint: 'taskName',
+                })
+            );
+            this.$router.push({
+                name: "details",
+                params: {
+                    formId: item.recordId,
+                    processInstanceId: item.processInstanceId,
+                    formManagementId: item.formManagementId,
+                    taskName: item.taskName
+                },
+            });
+        },
+        async getSimilarCasesData(pageNum) {
+            this.caseListLoading = true
+            this.pageNum = pageNum
+            const wait_param = {
+                pageNum: this.pageNum,
+                pageSize: this.pageSize,
+                formCategoryId: this.formCategoryId,
+                formId: this.formId,
+            }
+            getSimilarCases(wait_param).then(res => {
+                const { data } = res.data;
+                this.caseList = data.list;
+                this.caseList.map((item) => {
+                    if (item.approvalTypeOption) {
+                        item.approvalTypeOption = item.approvalTypeOption.filter(itemOption => itemOption.id == item.approvalType)
+                    }
+                    if (item.productTypeOption) {
+                        item.productTypeOption = item.productTypeOption.filter(itemOption => item.productType.includes(String(itemOption.id)))
+                    }
+                    const lastDotIndex = item.fileName.lastIndexOf('.');
+                    const imgType = ['jpg', 'jpeg', 'png', 'gif'];
+                    if (lastDotIndex !== -1) {
+                        const fileType = item.fileName.substring(lastDotIndex + 1);
+                        if (imgType.includes(fileType)) {
+                            this.$set(item, 'fileType', 'img')
+                        } else {
+                            this.$set(item, 'fileType', fileType)
+                        }
+                    }
+                })
+                this.total = data.totalCount;
+                this.caseListLoading = false;
+            }).catch(err => {
+                this.caseListLoading = false;
+                this.total = 0
+                this.caseList = []
+            })
         }
     }
 }
@@ -116,8 +152,8 @@ export default {
 <style lang="less" scoped>
 .similar-case {
     width: 600px;
-   height: 100%;
-    overflow:hidden;
+    height: 100%;
+    overflow: hidden;
 
     .poppver-title {
         color: #1D2128;
@@ -134,7 +170,7 @@ export default {
     }
 
     .case-box {
-        height: 97%;
+        height: calc(100% - 40px);
         overflow: hidden;
     }
 
@@ -190,14 +226,20 @@ export default {
                 width: 160px;
                 height: 100%;
                 margin-right: 8px;
-                .other-icon{
+
+                .other-icon {
                     background: #F7F8FA;
                     width: 100%;
                     height: 100%;
                     text-align: center;
                     line-height: 100px;
+
+                    img {
+                        width: 100%;
+                    }
                 }
-                .icon{
+
+                .icon {
                     font-size: 40px;
                 }
             }
@@ -224,6 +266,7 @@ export default {
                 flex-direction: column;
                 justify-content: center;
                 padding: 0 12px 0 0px;
+                flex: 1;
             }
 
             .time {
@@ -240,6 +283,11 @@ export default {
                 span {
                     display: flex;
                     align-items: center;
+                    gap: 4px;
+
+                    .img {
+                        width: 20px;
+                    }
                 }
 
                 /* 166.667% */
@@ -250,8 +298,6 @@ export default {
                     height: 12px;
                     background: #E5E6EB;
                     margin: 0 8px;
-
-
                 }
             }
 
@@ -334,4 +380,5 @@ export default {
         }
     }
 
-}</style>
+}
+</style>
