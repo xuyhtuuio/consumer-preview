@@ -14,7 +14,7 @@
               <i class="iconfont icon-fanhui1 icon"></i>
               返回</g-button
             >
-            <g-button class="btn-item" type="primary" @click="handleSave">
+            <g-button class="btn-item" type="primary" @click="handleSave" v-show="editAuth">
               <i class="iconfont icon-baocun icon"></i>
               保存</g-button
             >
@@ -40,6 +40,7 @@
                 >停用</el-button
               > -->
               <el-button
+                v-show="editAuth"
                 type="text"
                 :class="{ red: row.status !== 0 }"
                 size="small"
@@ -73,6 +74,7 @@
                           v-model="item.type"
                           true-label="view"
                           false-label=""
+                          :disabled="!editAuth"
                           @change="handleCheckBoxChange(item)"
                           >{{ item.title }}</el-checkbox
                         >
@@ -95,6 +97,7 @@
                               :key="indey"
                               v-model="childItem.type"
                               :label="iten.label"
+                              :disabled="!editAuth"
                               @click.native.prevent="handleRadioChange(iten.label, childItem, item)"
                               >{{ iten.value }}</el-radio
                             >
@@ -121,6 +124,7 @@
                       :key="item.label"
                       v-model="dataPerm"
                       :label="item.label"
+                      :disabled="!editAuth"
                       >{{ item.value }}</el-radio
                     >
                   </div>
@@ -210,6 +214,16 @@ export default {
       ],
       rolePermission: []
     };
+  },
+  computed: {
+    editAuth() {
+      const { permissionsPage = {} } = this.$store.state
+      const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.pathName === 'RolePermission') || {}
+      if (flowManage.type === 'edit') {
+        return true
+      }
+      return false
+    }
   },
   created() {
     this.permissionList = JSON.parse(JSON.stringify(permissionList));
