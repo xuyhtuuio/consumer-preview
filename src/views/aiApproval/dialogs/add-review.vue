@@ -22,6 +22,7 @@
     </el-dialog>
 </template>
 <script>
+import { add } from '@/api/admin-label.js';
 export default {
     name: 'addReviewDialog',
     data() {
@@ -45,25 +46,34 @@ export default {
         handleClose() {
             this.addReviewDialog = false;
         },
-        addRecommend() {
+        async addRecommend() {
             if (!this.params.content.trim()) {
                 this.$message.info('请输入审查话术内容')
                 return;
             }
             const newId = Date.parse(new Date()).toString();
-            this.$emit('addRecommend', {
-                word: this.params.keywords,
-                wordType: this.params.type,
-                id: this.params.keywords,
-                totalPage: 1,
-                pageNow: 1,
-                list: [{
-                    str: this.params.content,
-                    id: newId
-                }],
-                selected: newId
-            }, this.params.keywords, newId)
-            this.handleClose();
+            const res = await add({
+                keywordContent: this.params.keywords,
+                type: this.params.type
+            });
+            const { success, msg, data } = res.data;
+            if (success) {
+                this.$emit('addRecommend', {
+                    word: this.params.keywords,
+                    wordType: this.params.type,
+                    id: data,
+                    totalPage: 1,
+                    pageNow: 1,
+                    list: [{
+                        str: this.params.content,
+                        id: newId
+                    }],
+                    selected: newId
+                }, this.params.keywords, newId)
+                this.handleClose();
+            } else {
+                this.$message.error(msg)
+            }
         }
     }
 }

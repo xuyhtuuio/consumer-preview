@@ -85,7 +85,7 @@ export default {
     },
     getSelection(event) {
       const seletTxt = window.getSelection ? window.getSelection().toString() : document.selection.createRange().text;
-      if (!!seletTxt) {
+      if (Boolean(seletTxt)) {
         setTimeout(() => {
           this.seletTxt = seletTxt;
           this.askIsAddPosition = {
