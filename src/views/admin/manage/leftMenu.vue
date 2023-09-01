@@ -17,7 +17,7 @@ export default {
   },
   computed: {
     list() {
-      const { authObject = {} } = this.$store.state
+      const { permissionsPage = {} } = this.$store.state
       const pathNames = [{
         name: 'FlowManage',
         path: '/admin/manage/flowManage'
@@ -37,7 +37,7 @@ export default {
         name: 'OpinionManage',
         path: '/admin/manage/opinionManage'
       }]
-      const listArr = authObject.funPerm?.map(item => {
+      const listArr = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.map(item => {
         const exsit = pathNames.find(p => p.name === item.pathName)
         if (exsit) {
           item.path = exsit.path

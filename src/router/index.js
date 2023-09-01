@@ -244,8 +244,15 @@ router.beforeEach((to, from, next) => {
 
 // 权限处理
 function handleAuth(to) {
-  const { authObject } = store.state
-  const auth = authObject.funPerm.find(item => ((item.pathName === to.name) && item.type))
+  // 本地化持久存储
+  if (!store.state?.permissionsPage?.funPerms?.length) {
+    const permissionsPage = JSON.parse(window.localStorage.getItem('permissionsPage'))
+    if (permissionsPage) {
+      store.state.permissionsPage = permissionsPage
+    }
+  }
+  const { permissionsPage } = store.state
+  const auth = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(item => ((item.pathName === to.name) && item.type))
   if (auth || to.name === 'login') {
     return true
   }

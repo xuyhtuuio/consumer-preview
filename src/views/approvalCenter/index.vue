@@ -195,8 +195,8 @@ export default {
   },
   computed: {
     allTask() {
-      const { authObject = {} } = this.$store.state
-      const approvalcenter = authObject.funPerm.find(item => item.pathName === 'approval-list') || {}
+      const { permissionsPage = {} } = this.$store.state
+      const approvalcenter = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(item => item.pathName === 'approval-list') || {}
       const isExsit = approvalcenter.child?.find(item => (item.name === '全部任务') && item.type)
       if (isExsit) {
         return true
@@ -204,8 +204,8 @@ export default {
       return false
     },
     showExport() {
-      const { authObject = {} } = this.$store.state
-      const approvalcenter = authObject.funPerm.find(item => item.pathName === 'approval-list') || {}
+      const { permissionsPage = {} } = this.$store.state
+      const approvalcenter = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(item => item.pathName === 'approval-list') || {}
       const isExsit = approvalcenter.child?.find(item => (item.name === '全部任务') && item.type === 'export')
       if (isExsit) {
         return true

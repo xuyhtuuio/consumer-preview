@@ -44,18 +44,18 @@ export default {
   },
   computed: {
     manageAuth() {
-      const { authObject = {} } = this.$store.state
-      return authObject.funPerm?.find(item => item.name === '后台管理' && item.type)
+      const { permissionsPage = {} } = this.$store.state
+      return [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.name === '后台管理' && item.type)
     },
     list() {
-      const { authObject = {} } = this.$store.state
+      const { permissionsPage = {} } = this.$store.state
       const navList = [
         { title: "申请中心", name: "apply-list", sign: 'applycenter' },
         { title: "审批中心", name: 'approval-list', sign: 'approvalcenter' },
         { title: "产品图谱", name: "productmap", sign: "productmap" },
       ]
       return navList.map(item => {
-        const exist = authObject.funPerm?.find(f => f.pathName === item.name)
+        const exist = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(f => f.pathName === item.name)
         console.log(exist)
         if (exist?.type) {
           return item;
