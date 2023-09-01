@@ -7,8 +7,8 @@
             相似案例
         </p>
         <div class="case-box" v-loading="caseListLoading">
-            <div class="case-content" v-if="caseList1.length">
-                <div class="case-item pointer product-border " v-for="(item, index) in caseList1" :key="index"
+            <div class="case-content" v-if="caseList.length">
+                <div class="case-item pointer product-border " v-for="(item, index) in caseList" :key="index"
                     @click="toDetail(item)">
                     <div class="thumbnail-img">
                         <div v-if="item.fileType === 'img'" class="other-icon">
@@ -66,57 +66,6 @@ export default {
     data() {
         return {
             caseList: [],
-            caseList1: [{
-                "recordId": 1411,
-                "taskName": "测试",
-                "reviewMattersType": "ocr审批更多审批字段",
-                "formManagementId": 170,
-                "fileName": "新建 DOC 文档.doc",
-                "fileUrl": "http://192.168.210.51:9090/cpr/cpr_1693473517774_新建 DOC 文档.doc",
-                "userId": 1416,
-                "org": "研发组",
-                "createTime": "2023-08-31 17:18:44",
-                "approvalTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "新产品"
-                    },
-                    {
-                        "id": "1",
-                        "value": "产品营销类"
-                    }
-                ],
-                "productTypeOption": null,
-                "approvalType": "0",
-                "productType": null,
-                "processInstanceId": "608a4f9d-47df-11ee-9b31-c6d0bb792efb"
-            },
-            {
-                "recordId": 1409,
-                "taskName": "测试3.000",
-                "reviewMattersType": "ocr审批更多审批字段",
-                "formManagementId": 170,
-                "fileName": "周报-杨凡霆.xlsx",
-                "fileUrl": "http://192.168.210.51:9090/cpr/cpr_1693471941654_周报-杨凡霆.xlsx",
-                "userId": 830,
-                "org": "研发组",
-                "createTime": "2023-08-31 16:52:49",
-                "approvalTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "新产品"
-                    },
-                    {
-                        "id": "1",
-                        "value": "产品营销类"
-                    }
-                ],
-                "productTypeOption": null,
-                "approvalType": "0",
-                "productType": null,
-                "processInstanceId": "b9a5e177-47db-11ee-9252-de2f9d9428ed"
-            }
-            ],
             pageNum: 1,
             pageSize: 10,
             formCategoryId: '',
@@ -135,7 +84,12 @@ export default {
         toDetail(item) {
             item.taskStatus = '4';
             item.taskId = item.processInstanceId;
-            console.log('dsdsds', item);
+            item.initiator = {
+                id: item.userId,
+                label: item.org,
+                name: item.userName,
+                org: item.org,
+            }
             window.localStorage.setItem(
                 "order-detail",
                 JSON.stringify({
