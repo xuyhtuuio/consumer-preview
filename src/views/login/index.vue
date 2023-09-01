@@ -361,6 +361,7 @@
 
 <script>
 import { toCode, fromCode } from '@/utils/utils';
+import { editThePermissionsPage } from '@/api/admin/role'
 import md5 from 'js-md5';
 import moment from 'moment';
 // import Iframes from '@/components/iframe-send-message'
@@ -652,7 +653,7 @@ export default {
                 window.localStorage.setItem('AI_token', res.access_token);
                 const userPermis = await this.getUserRole();
                 window.localStorage.setItem('userPermis', JSON.stringify(userPermis));
-
+                await this.getPermissionsPage()
                 this.$message.success('登录成功');
                 if (this.gohistory && this.gohistory !== '404') {
                   this.$router.go(-1);
@@ -698,6 +699,12 @@ export default {
         return item.clientId === 'teisdata';
       });
       return role;
+    },
+    async getPermissionsPage() {
+      const user = JSON.parse(window.localStorage.getItem('user_name'))
+      const res = await editThePermissionsPage({ roleId: user.id });
+      this.$store.state.permissionsPage = res.data.data || {}
+      window.localStorage.setItem('permissionsPage', JSON.stringify(res.data.data))
     },
     // 判断账号是否过期
     async checkToken() {

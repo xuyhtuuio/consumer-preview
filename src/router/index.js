@@ -204,6 +204,10 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
+  const auth = handleAuth(to)
+  if (!auth) {
+    return;
+  }
   if (to.path.split("/").length>1) {
     const data = [{ name: to.path.split("/")[1], title: to.meta.pTitle }, { name: to.path.split("/")[2], title: to.meta.title }]
     store.commit("setBreadcrumbList", data)
@@ -222,6 +226,23 @@ router.beforeEach((to, from, next) => {
   next();
   sessionStorage.setItem('router-path', to.path)
 })
+
+// 权限处理
+function handleAuth(to) {
+  // 本地化持久存储
+  if (!store.state?.permissionsPage?.funPerms?.length) {
+    const permissionsPage = JSON.parse(window.localStorage.getItem('permissionsPage'))
+    if (permissionsPage) {
+      store.state.permissionsPage = permissionsPage
+    }
+  }
+  const { permissionsPage } = store.state
+  const auth = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(item => ((item.pathName === to.name) && item.type))
+  if (auth || to.name === 'login') {
+    return true
+  }
+  return false
+}
 
 
 

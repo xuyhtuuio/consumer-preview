@@ -128,7 +128,7 @@
                 <span class="info-item">更新时间：{{ timestampToDateTime(item.updateTime) }}</span>
               </div>
             </div>
-            <div class="btns" v-if="pageConfig?.pageType !== 'nonManage'">
+            <div class="btns" v-if="pageConfig?.pageType !== 'nonManage' && editAuth">
               <span v-if="item.isTop !== 0" class="btn btn-yellow" @click="changeIsTop(item)">
                 <i> <g-icon class="left-icon" stylePx="20" href="#icon-zhiding" />取消置顶</i>
               </span>
@@ -277,6 +277,16 @@ export default {
         }
       }
     };
+  },
+  computed: {
+    editAuth() {
+      const { permissionsPage = {} } = this.$store.state
+      const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.pathName === 'OpinionManage') || {}
+      if (flowManage.type === 'edit') {
+        return true
+      }
+      return false
+    }
   },
   created() {
     this.initSearchData();
