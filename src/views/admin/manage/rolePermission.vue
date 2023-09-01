@@ -297,7 +297,7 @@ export default {
       //   data: { data: res, success, msg }
       // } = await updateRolePermission({
       //   roleId: this.roleId,
-      //   permissionIdList: this.checkedPermission
+      //   list: {}
       // });
       this.$message({
         type: 'success',
