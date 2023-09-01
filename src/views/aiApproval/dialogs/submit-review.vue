@@ -184,12 +184,17 @@ export default {
                 comment.id = this.increasedIds.strIds.includes(comment.id) ? null : comment.id;
                 comment.words = comment.words.filter(id => !this.increasedIds.words.includes(id))
             })
+            const keyPointsForVerification = this.$refs.refExamine.list?.map(item => {
+                item.formItemId = item.id;
+                delete item.id;
+                return item;
+            })
             const user = JSON.parse(window.localStorage.getItem('user_name'))
             const data = {
                 approvalSubmissionDto: {
                     opinionLetterRecordDtoList,
                     editedCommentsDtoList,
-                    keyPointsForVerification: [this.$refs.refExamine.list],
+                    keyPointsForVerification,
                     formItemDataList: this.applyForm.filledInByApprover,
                     formId: this.formId
                 },

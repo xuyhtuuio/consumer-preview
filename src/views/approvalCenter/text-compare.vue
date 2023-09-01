@@ -72,7 +72,7 @@
                         </div>
                       </div>
                       <div class="similar-level">
-                        相似度：{{ item.similarity ? item.similarity : 0 }}
+                        相似度：{{ item.similarity ? item.similarity + '%': '--' }}
                       </div>
                     </div>
                   </div>
@@ -87,14 +87,14 @@
             </span>
           </div>
           <div class="carousel-div">
-            <div class="btn-prev" :class="{ 'not-allow': !canLeft }">
+            <div class="btn-prev" v-if="compareList.length > 6" :class="{ 'not-allow': !canLeft }">
               <img
                 src="@/assets/image/home-index/prev.png"
                 alt=""
                 @click="moveLeft"
               />
             </div>
-            <div class="btn-next" :class="{ 'not-allow': !canRight }">
+            <div class="btn-next" v-if="compareList.length > 6" :class="{ 'not-allow': !canRight }">
               <img
                 src="@/assets/image/home-index/next.png"
                 alt=""
@@ -111,7 +111,7 @@
                   :class="{ 'active-item': activeIndex === index }"
                   @click="changeActive(item, index)"
                 >
-                  <div class="file-img" v-if="item.fileType === 'png'">
+                  <div class="file-img" v-if="item.fileType === 'png' || item.fileType === 'jpg'">
                     <img :src="item.url" alt="" />
                   </div>
                   <file-type
@@ -121,7 +121,7 @@
                   ></file-type>
                   <div class="item-text">
                     <div class="text-style color-text">
-                      文本相似度：{{ item.similarity ? item.similarity : 0 }}
+                      文本相似度：{{ item.similarity ? item.similarity + '%' : '--' }}
                     </div>
                     <div class="text-style">
                       {{ item.fileName }}
@@ -148,7 +148,7 @@
               </span>
             </div>
             <ImagePreview
-              v-if="activeItem.otherFileType === 'png'"
+              v-if="activeItem.otherFileType === 'png' || activeItem.otherFileType === 'jpg'"
               :url="activeItem.otherUrl"
             ></ImagePreview>
             <FilePreview v-else :url="activeItem.otherUrl"></FilePreview>
@@ -167,7 +167,7 @@
               </span>
             </div>
             <ImagePreview
-              v-if="activeItem.fileType === 'png'"
+              v-if="activeItem.fileType === 'png' || activeItem.fileType === 'jpg'"
               :url="activeItem.url"
             ></ImagePreview>
             <FilePreview v-else :url="activeItem.url"></FilePreview>
@@ -186,14 +186,14 @@
       <!-- 图片 -->
       <div class="perview-div" v-if="fullScreenType === 1">
         <ImagePreview
-          v-if="activeItem.otherFileType === 'png'"
+          v-if="activeItem.otherFileType === 'png' || activeItem.otherFileType === 'jpg'"
           :url="activeItem.otherUrl"
         ></ImagePreview>
         <FilePreview v-else :url="activeItem.otherUrl"></FilePreview>
       </div>
       <div class="perview-div" v-if="fullScreenType === 2">
         <ImagePreview
-          v-if="activeItem.fileType === 'png'"
+          v-if="activeItem.fileType === 'png' || activeItem.fileType === 'jpg'"
           :url="activeItem.url"
         ></ImagePreview>
         <FilePreview v-else :url="activeItem.url"></FilePreview>
@@ -342,10 +342,10 @@ export default {
           this.$message.success(res.data.msg);
           this.goBack();
         } else {
-          this.$message.success(res.data.msg);
+          this.$message.error(res.data.msg);
         }
       }).catch(err => {
-        this.$message.success('申请单结束流转失败');
+        // this.$message.success('申请单结束流转失败');
       })
     },
     // 获取线上对比数据
@@ -667,6 +667,7 @@ export default {
             img {
               width: 36px;
               height: 36px;
+              object-fit: cover
             }
           }
           .item-text {
