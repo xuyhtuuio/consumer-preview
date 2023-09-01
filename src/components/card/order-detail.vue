@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-08-30 15:57:26
+ * @LastEditTime: 2023-08-31 18:43:13
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -32,12 +32,11 @@
           <span class="flex"> <i class="iconfont icon-tijiao"></i>
             <i class="btn">确认</i></span>
         </el-button>
-        <el-button class="back flex white" type="primary"  @click="compare"
-          v-if="item.taskStatus==6">
+        <el-button class="back flex white" type="primary" @click="compare" v-if="item.taskStatus == 6">
           <span class="flex"> <i class="iconfont icon-tijiao"></i>
             <i class="btn">去比对</i></span>
         </el-button>
-        <div v-if="item.taskStatus == 1" class="flex">
+        <div v-if="item.taskStatus == 1 && pagePath && pagePath == 'approval'" class="flex">
           <!-- <div class="back flex" @click="transferDialog = true">
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
@@ -89,8 +88,8 @@
             </i>
           </span>
         </div>
-        <order-basic-info @preview='previewFile' :personInfo="item.initiator"
-          @sendReviewMaterials="sendReviewMaterials" @sendFilledInByApprover='sendFilledInByApprover'></order-basic-info>
+        <order-basic-info @preview='previewFile' :personInfo="item.initiator" @sendReviewMaterials="sendReviewMaterials"
+          @sendFilledInByApprover='sendFilledInByApprover'></order-basic-info>
       </div>
       <div class="right">
         <!-- 消保审查/详情页/审批中预览 -->
@@ -152,8 +151,9 @@
         <div class="right-content">
           <keep-alive>
             <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus" :coment="coment"
-              @sendOpinionInfo="sendOpinionInfo"  :leaderApproveInfo="leaderApproveInfo" :reviewMaterial="reviewMaterials"
-              :processInstanceId="item.processInstanceId" :taskId="item.taskId" @preview='previewFile' :filledInByApprover="filledInByApprover">
+              @sendOpinionInfo="sendOpinionInfo" :leaderApproveInfo="leaderApproveInfo" :reviewMaterial="reviewMaterials"
+              :processInstanceId="item.processInstanceId" :taskId="item.taskId" @preview='previewFile'
+              :filledInByApprover="filledInByApprover">
               <template slot="head">
                 <div class="approved-opinion-head">
                   <h2>消保审查意见书</h2>
@@ -209,6 +209,7 @@ import filePreview from '@/components/filePreview'
 import { leaderEdit, finalMaterial } from '@/api/approvalCenter'
 import { updateAdoptEditedComments, updateEditedComments, getTemplatedetail } from '@/api/applyCenter'
 import moment from 'moment';
+
 export default {
   name: "order-details",
   components: {
@@ -219,7 +220,12 @@ export default {
     uploadFileCard,
     filePreview
   },
-
+  props: {
+    pagePath: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       loading: false,
@@ -245,7 +251,7 @@ export default {
       personInfo: {},
       leaderApproveInfo: {},//TO_NODE TO_BEFORE
       reviewMaterials: [], //工单上已上传的文件
-      filledInByApprover:[], // 审批模块配置项目
+      filledInByApprover: [], // 审批模块配置项目
       peoples: [
         { name: "王明明", code: 1 },
         { name: "王明明", code: 2 },
@@ -297,9 +303,9 @@ export default {
     sendReviewMaterials(val) {
       this.reviewMaterials = val
     },
-      // 从左侧详情获取到审批模块配置项
-    sendFilledInByApprover(val){
-          this.filledInByApprover=val
+    // 从左侧详情获取到审批模块配置项
+    sendFilledInByApprover(val) {
+      this.filledInByApprover = val
     },
     async judgeStatus() {
       const { path } = this.$route
@@ -357,14 +363,17 @@ export default {
     },
     // 获取当前的节点的配置信息
     async getTemplatedetail() {
+      //要传递给编辑意见组件的字段 ---start
       let targetPage = ''
       let refuseWay = ''
       let assignedType = ''
       let mode = ''
       let assignedUser = []
       let disavower = []
-      let taskId = this.item.taskId,
-        processInstanceId = this.item.processInstanceId
+      let taskId = this.item.taskId
+      let formId = this.item.recordId
+      let processInstanceId = this.item.processInstanceId
+      //要传递给编辑意见组件的字段 ---end
       const params = {
         processInstanceId: this.item.processInstanceId
       }
@@ -377,7 +386,7 @@ export default {
         assignedUser = data[data.length - 1].props['assignedUser']?.filter(v => v.type !== 'dept')?.map(v => v.id)
         if (targetPage == 'XIAOBAO') {
           //如果是消保审批
-          return { targetPage, refuseWay, mode, assignedUser }
+          return { targetPage, refuseWay, mode, assignedUser, taskId, formId }
         }
         //如果是领导审批，走下面的判断
         //驳回人列表处理    发起人
@@ -417,7 +426,7 @@ export default {
         })
         approver = nextApprovers
         assignedType = data[data.length - 1]?.children?.props?.assignedType
-        return { targetPage, refuseWay, disavower, approver, assignedType, mode, assignedUser, taskId, processInstanceId }
+        return { targetPage, refuseWay, disavower, approver, assignedType, mode, assignedUser, taskId, processInstanceId, formId }
       }
     },
     toModify() {
@@ -432,11 +441,11 @@ export default {
     /**
      * description: 待比对状态，去比对页面
      * return {*}
-     */    
-    compare(){
+     */
+    compare() {
       this.$router.push({
         name: 'compare',
-        params:{
+        params: {
           item
         }
       })
@@ -444,7 +453,7 @@ export default {
     /**
      * description: 页面右上角返回功能
      * return {*}
-     */    
+     */
     goback() {
       if (this.info) {
         const that = this
@@ -490,11 +499,11 @@ export default {
       })
 
     },
-  
+
     /**
      * description: 保存编辑意见功能
      * return {*}
-     */    
+     */
     saveEditOpinion() {
       this.loadings.storageLoading = true
       this.$store.commit('setEditOpinionStorage', true)
@@ -506,7 +515,9 @@ export default {
         taskId: this.item.taskId,
         msg: editOpinionForm.content,
         userIds: assignedUser,
-        processInstanceId: this.item.processInstanceId
+        processInstanceId: this.item.processInstanceId,
+        formId: editOpinionForm.formId,
+        formItemDataList: editOpinionForm.editOpinionForm
       }
       //通过时候，流程配置中下一节点审批人设置时选择“上一审批人选择”，增加选择审批人选择则框
       if (editOpinionForm.isAccept == '1' && editOpinionForm.assignedType == 'SELF_SELECT') {
@@ -540,7 +551,7 @@ export default {
      * description: 用于审查意见书显示最下面的时间
      * param {*} info
      * return {*}
-     */    
+     */
     sendOpinionInfo(info) {
       const arr = info[info.length - 1]
       const time = moment(arr.substantiveopinion[arr.substantiveopinion.length - 1].updateTime).format('YYYY-MM-DD HH:mm:ss') || moment('YYYY-MM-DD HH:mm:ss')
@@ -550,7 +561,7 @@ export default {
      * description: 合并右上角的保存、提交功能，由 way区分， storage 保存，update：提交
      * param {*} way
      * return {*}
-     */    
+     */
     submit(way) {
       const that = this
       const { approvedOpinionRequired, uploadFileRequired, editOpinionRequired, editOpinionForm, uploadFileRadio } = this.$store.state.checkApprovedForm
@@ -593,8 +604,9 @@ export default {
           })
           return false
         }
+        console.log('required',uploadFileRadio,uploadFileRequired)
         // 最终上线材料模块：选中活动正常上线：radio=1,需要上传材料; 选中活动未开展：radio=0，不需要上传材料
-        if (uploadFileRadio == 1 && !uploadFileRequired) {
+        if (uploadFileRadio==1 && !uploadFileRequired) {
           this.$message({
             type: 'warning',
             customClass: 'el-icon-warning-one',
@@ -738,11 +750,11 @@ export default {
      * param {*} opinions
      * param {*} type
      * return {*}
-     */    
+     */
     async submitOpinion(opinions, type) {
       const that = this
       const { approvedOpinionForm, fileUploadForm, uploadFileRadio } = this.$store.state.checkApprovedForm
-      const params = approvedOpinionForm.map(v => {
+      const approvedOpinionFormParams = approvedOpinionForm.map(v => {
         return {
           adoptOpinions: v.adoptOpinions,
           notAdoptingReasons: v.notAdoptingReasons,
@@ -751,62 +763,83 @@ export default {
           cacheFlag: 0
         }
       })
-      let fileSuccess = null
-      //上传文件的逻辑 选中活动正常上线
-      if (!opinions && uploadFileRadio == 1) {
-        const params = fileUploadForm.map(v => {
-          return {
-            fileName: v.fileName,
-            key: v.key,
-            url: v.url,
-            isRelation: true,
-            otherFilename: v.relevantFile.fileName,
-            otherKey: v.relevantFile.key,
-            otherUrl: v.relevantFile.url
-          }
-        })
-        const fileRes = await finalMaterial(params, this.item.processInstanceId, this.item.taskId)
-        const { success } = fileRes.data
-        fileSuccess = success
+      const opinion_submit_params = {
+        editedCommentsAdoptDtoList: approvedOpinionFormParams,
+        handleDataDTO: {
+          currentUserInfo: {
+            id: this.item.originator.id
+          },
+          processInstanceId: this.item.processInstanceId,
+          taskId: this.item.taskId,
+          templateId: this.item.processTemplateId
+
+        }
       }
-      updateAdoptEditedComments(params, this.item.taskId).then(res => {
-        this.loadings.submitLoading = false
-        //有实质意见且采纳所以的有实质意见
-        if (type && type == 1) {
-          this.$confirm("审查意见已确认，请根据审查意见修改提单内容。", "", {
-            customClass: "confirmBox",
-            confirmButtonText: "去修改",
-            cancelButtonText: "知道了",
-            closeOnClickModal: false,
-            distinguishCancelAndClose: true,
-            type: "warning",
-          }).then(() => {
-            that.toModify()
-          }).catch((e) => {
-            switch (e) {
-              case 'close':
-                that.toModify()
-                break;
-              case 'cancel':
-                break;
+      let fileSuccess = null
+      try {
+        //上传文件的逻辑 选中活动正常上线
+        if (!opinions && uploadFileRadio==1) {
+          const params = fileUploadForm.map(v => {
+            return {
+              fileName: v.fileName,
+              key: v.key,
+              url: v.url,
+              isRelation: true,
+              otherFilename: v.relevantFile.fileName,
+              otherKey: v.relevantFile.key,
+              otherUrl: v.relevantFile.url
             }
           })
-        } else {
-          this.$confirm("审查意见已确认，可在申请中心查看。", "", {
-            customClass: "confirmBox",
-            cancelButtonText: "知道了",
-            showConfirmButton: false,
-            closeOnClickModal: false,
-            type: "warning",
-          }).then(res => {
-            this.$router.replace('/applycenter')
-          }).catch(err => {
-            this.$router.replace('/applycenter')
-          })
+          const fileRes = await finalMaterial(params, this.item.processInstanceId, this.item.taskId)
+          const { success } = fileRes.data
+          fileSuccess = success
         }
-      }).catch(err => {
+        updateAdoptEditedComments(opinion_submit_params, this.item.taskId).then(res => {
+          this.loadings.submitLoading = false
+          //有实质意见且采纳所以的有实质意见
+          const { success } = res.data
+          if (success) {
+            if (type && type == 1) {
+              this.$confirm("审查意见已确认，请根据审查意见修改提单内容。", "", {
+                customClass: "confirmBox",
+                confirmButtonText: "去修改",
+                cancelButtonText: "知道了",
+                closeOnClickModal: false,
+                distinguishCancelAndClose: true,
+                type: "warning",
+              }).then(() => {
+                that.toModify()
+              }).catch((e) => {
+                switch (e) {
+                  case 'close':
+                    that.toModify()
+                    break;
+                  case 'cancel':
+                    break;
+                }
+              })
+            } else {
+              this.$confirm("审查意见已确认，可在申请中心查看。", "", {
+                customClass: "confirmBox",
+                cancelButtonText: "知道了",
+                showConfirmButton: false,
+                closeOnClickModal: false,
+                type: "warning",
+              }).then(res => {
+                this.$router.replace('/applycenter')
+              }).catch(err => {
+                this.$router.replace('/applycenter')
+              })
+            }
+          }else{
+            this.$message.error(res.data.msg)
+          }
+        }).catch(err => {
+          this.loadings.submitLoading = false
+        })
+      } catch (error) {
         this.loadings.submitLoading = false
-      })
+      }
     }
   },
 

@@ -157,6 +157,7 @@ export default {
       }
     },
     toDetail(item) {
+      console.log('item',item);
       window.localStorage.setItem("order-detail", JSON.stringify({
         item,
         clickPoint: "taskName",

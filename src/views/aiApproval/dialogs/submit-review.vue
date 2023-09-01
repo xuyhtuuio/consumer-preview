@@ -23,6 +23,7 @@
                         </el-radio>
                     </el-radio-group>
                 </el-form-item>
+                <com-form-item v-for="item in applyForm.filledInByApprover" :key="item.id" :item="item"></com-form-item>
                 <ExaminePivot ref="refExamine" :titleShow="true" :isWidthDiff="true">
                     <p class="examine-title"><i class="iconfont icon-jinggao1"></i>{{examineInfo}}</p>
                 </ExaminePivot>
@@ -90,10 +91,11 @@ import moment from 'moment'
 import {
     ocrApprovalSubmission
 } from "@/api/aiApproval";
-import secondaryConfirmation from "@/components/common/secondaryConfirmation"
+import secondaryConfirmation from "@/components/common/secondaryConfirmation";
 import ExaminePivot from '../components/examine-pivot';
+import ComFormItem from '../../../components/common/com-form-item.vue';
 export default {
-    components: { secondaryConfirmation,ExaminePivot },
+    components: { secondaryConfirmation,ExaminePivot, ComFormItem },
     props: {
         formId: {
             type: String,
@@ -106,7 +108,11 @@ export default {
         approvalLetter: {
             type: Object,
             default: () => ({})
-        }
+        },
+        applyForm: {
+            type: Object,
+            default: () => ({})
+        },
     },
     data() {
         return {
@@ -162,10 +168,10 @@ export default {
         },
         // 提交结果
         submit() {
-            let OpinionLetterRecordDtoList = null;
+            let opinionLetterRecordDtoList = null;
             const editedCommentsDtoList = this.submission.filter(item => !item.associatedAttachmentsIds)
             if (this.approvalLetter.permissions === 'passAllow') {
-                OpinionLetterRecordDtoList = this.submission.map(item => {
+                opinionLetterRecordDtoList = this.submission.map(item => {
                     return {
                         ...item,
                         content: item.str,
@@ -173,7 +179,7 @@ export default {
                 }) || [];
             }
             
-            // console.log(editedCommentsDtoList, OpinionLetterRecordDtoList)
+            // console.log(editedCommentsDtoList, opinionLetterRecordDtoList, this.$refs.refExamine.list)
             this.submission.forEach(comment => {
                 comment.id = this.increasedIds.strIds.includes(comment.id) ? null : comment.id;
                 comment.words = comment.words.filter(id => !this.increasedIds.words.includes(id))
@@ -181,7 +187,10 @@ export default {
             const user = JSON.parse(window.localStorage.getItem('user_name'))
             const data = {
                 approvalSubmissionDto: {
+                    opinionLetterRecordDtoList,
                     editedCommentsDtoList,
+                    keyPointsForVerification: [this.$refs.refExamine.list],
+                    formItemDataList: this.applyForm.filledInByApprover,
                     formId: this.formId
                 },
                 processInstanceId: this.formBase.processInstanceId,
@@ -191,6 +200,8 @@ export default {
                     name: user.fullname
                 }
             }
+            // console.log(data)
+            // return
             ocrApprovalSubmission(data).then((res) => {
                 const { status, msg } = res.data;
                 if (status === 200) {

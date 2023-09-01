@@ -31,6 +31,8 @@
                 <span class="value">{{ item | valueFormat }}</span>
             </div>
         </div>
+        <!-- 发布渠道 -->
+        <div v-if="orderInfo.promotionChannels"> 
         <div class="line"></div>
         <div class="channel-info" v-for="(item, index) in orderInfo.promotionChannels" :key="index">
             <div class="item" v-for="(child, idx) in item.props.options" :key="idx">
@@ -39,35 +41,40 @@
             </div>
             <slot name="personal-channel"></slot>
         </div>
-        <div class="line"></div>
-        <p class="poppver-title">
-            <span>
-                <svg class="icon" aria-hidden="true">
-                    <use xlink:href="#icon-a-Rectangle143"></use>
-                </svg>
-                审查要点</span>
-        </p>
-        <div :class="[
-            'proj-info',
-            orderInfo.reviewPointer && orderInfo.reviewPointer.length > 1
-                ? 'review-pointer'
-                : 'review-pointer1',
-        ]">
-            <div class="item" v-for="(item, index) in orderInfo.reviewPointer" :key="index">
-                <span class="label">{{ item.title }}</span>
-                <span class="value" v-if="item.name == 'MultipleSelect'">
-                    <i v-for="(points, index) in formatePoints(item)" :key="index" style="display: block;">
-                        {{ points }}</i>
-                </span>
-                <span class="value" v-if="item.name == 'SingleGroupsSelect'">
-                    <span v-for="(points, index) in formatePoints(item)" :key="index"
-                        style="justify-content: space-between;" class="flex">
-                        <i>-{{ points.point }}</i>
-                        <i>{{ points.isRelative }}</i>
+    </div>
+        <!-- 审查要点 -->
+        <div v-if="orderInfo.reviewPointer && orderInfo.reviewPointer.length > 0">
+            <div class="line"></div>
+            <p class="poppver-title">
+                <span>
+                    <svg class="icon" aria-hidden="true">
+                        <use xlink:href="#icon-a-Rectangle143"></use>
+                    </svg>
+                    审查要点</span>
+            </p>
+            <div :class="[
+                'proj-info',
+                orderInfo.reviewPointer && orderInfo.reviewPointer.length > 0
+                    ? 'review-pointer'
+                    : 'review-pointer1',
+            ]">
+                <div class="item" v-for="(item, index) in orderInfo.reviewPointer" :key="index">
+                    <span class="label">{{ item.title }}</span>
+                    <span class="value" v-if="item.name == 'MultipleSelect'">
+                        <i v-for="(points, index) in formatePoints(item)" :key="index" style="display: block;">
+                            {{ points }}</i>
                     </span>
-                </span>
+                    <span class="value" v-if="item.name == 'SingleGroupsSelect'">
+                        <span v-for="(points, index) in formatePoints(item)" :key="index"
+                            style="justify-content: space-between;" class="flex">
+                            <i>-{{ points.point }}</i>
+                            <i>{{ points.isRelative }}</i>
+                        </span>
+                    </span>
+                </div>
             </div>
         </div>
+        <!-- 审查材料 -->
         <div class="line"></div>
         <p class="poppver-title">
             <span>
@@ -124,7 +131,7 @@ export default {
     mounted() {
         this.init()
     },
-    activated() {},
+    activated() { },
     watch: {
         sidebarParam: {
             handler(val) {
@@ -164,8 +171,8 @@ export default {
             getApplyForm({
                 formCategoryId: this.$route.params && this.$route.params.formManagementId || this.sidebarParam && this.sidebarParam.formManagementId,
                 formId: this.$route.params.formId || this.sidebarParam.formId,
-                processTemplateId:this.$route.params.processTemplateId,
-                nodeId:this.$route.params.nodeId,
+                processTemplateId: this.$route.params.processTemplateId,
+                nodeId: this.$route.params.nodeId,
                 // formCategoryId: 121,
                 // formId: 1257
                 // formManagementId: 121,processInstanceId: "3c186340-3ff6-11ee-bd1a-d4d853dcb3dc"
@@ -198,7 +205,7 @@ export default {
                 }
                 return
             }
-            const { basicInformation, keyPointsForVerification, reviewMaterials,filledInByApprover } = data
+            const { basicInformation, keyPointsForVerification, reviewMaterials, filledInByApprover } = data
             //大段文本过滤
             const noTextAreaBeseInfo = basicInformation.filter(v => { return !['TextareaInput', 'MultipleGroupsSelect'].includes(v.name) }) || []
             const textAreaBaseInfo = basicInformation.filter(v => { return ['TextareaInput'].includes(v.name) }) || []
@@ -211,9 +218,9 @@ export default {
                 promotionChannels: MultipleGroupsSelect,
                 fileList: reviewMaterials && reviewMaterials[0].value
             }
-            this.$emit('sendReviewMaterials',reviewMaterials && reviewMaterials[0].value)
-            this.$emit('sendFilledInByApprover',filledInByApprover)
-            
+            this.$emit('sendReviewMaterials', reviewMaterials && reviewMaterials[0].value)
+            this.$emit('sendFilledInByApprover', filledInByApprover)
+
         },
         preview(url) {
             this.$emit('preview', url)

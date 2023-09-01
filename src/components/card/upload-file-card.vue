@@ -274,11 +274,11 @@ export default {
     delItem(item) {
       const index = this.fileList.findIndex(v => v.key == item.key)
       this.fileList.splice(index, 1)
-      this.reviewMaterials.forEach(m=>{
-        if(m.relevantFile&&m.relevantFile.key == item.key){
-          m.hasRelevant =false
-          m.relevantFile= {}
-          m.relevantFileName =''
+      this.reviewMaterials.forEach(m => {
+        if (m.relevantFile && m.relevantFile.key == item.key) {
+          m.hasRelevant = false
+          m.relevantFile = {}
+          m.relevantFileName = ''
         }
       })
     },
@@ -306,10 +306,10 @@ export default {
         if (m.fileName == data.fileName) {
           m.hasRelevant = true
           m.relevantFile = data
-          m.relevantFileName = data.fileName,
-            autoRelevant = true
+          m.relevantFileName = data.fileName
         }
       })
+      console.log('fileList', this.fileList.length)
       this.$store.commit('setUploadFileRequired', this.fileList.length > 0)
       this.$store.commit('setUploadFileForm', this.fileList)
     },
@@ -327,20 +327,21 @@ export default {
     uploadBpmn(param) {
       const formData = new FormData();
       formData.append("mf", param.file); // 传入bpmn文件
-      getFormGroups(formData)
-        .then((res) => {
+      getFormGroups(formData).then((res) => {
+        const { success } = res.data
+        console.log('res',res)
+        if (success) {
           this.handleSuccess(res.data.data, param.file.uid);
-        })
-        .catch((err) => {
-          param.onError(param.file.uid);
-        });
-
+        } else {
+          this.$message.error(res.data.msg)
+        }
+      })
     },
     handleUploadLook(url) {
       window.open(url);
     },
     handleMouseEnter(item) {
-      console.log('ff',item)
+      console.log('ff', item)
       item.isClick = true;
     },
     handleMouseLeave(item) {

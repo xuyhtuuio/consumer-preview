@@ -7,8 +7,9 @@
             相似案例
         </p>
         <div class="case-box" v-loading="caseListLoading">
-            <div class="case-content" v-if="caseList.length">
-                <div class="case-item pointer product-border " v-for="(item, index) in caseList" :key="index">
+            <div class="case-content" v-if="caseList1.length">
+                <div class="case-item pointer product-border " v-for="(item, index) in caseList1" :key="index"
+                    @click="toDetail(item)">
                     <div class="thumbnail-img">
                         <div v-if="item.fileType === 'img'" class="other-icon">
                             <img :src="item.fileUrl" alt="">
@@ -30,7 +31,7 @@
                     </div>
                     <div class="case-info">
                         <div class="name">
-                            {{ item.name }}
+                            {{ item.taskName }}
                         </div>
                         <div class="time">
                             <span>申请时间：{{ item.createTime }}</span>
@@ -66,116 +67,15 @@ export default {
         return {
             caseList: [],
             caseList1: [{
-                "id": 1300,
-                "name": "保险审批",
-                "reviewMattersType": "产品类旧",
-                "fileName": "1.jpeg",
-                "fileUrl": "http://192.168.210.51:9090/cpr/cpr_1692865382335_1.jpeg",
-                "userId": 813,
-                "org": "研发组",
-                "createTime": "2023-08-24 16:23:35",
-                "approvalTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "新产品"
-                    },
-                    {
-                        "id": "1",
-                        "value": "产品营销类"
-                    }
-                ],
-                "productTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "理财"
-                    },
-                    {
-                        "id": "1",
-                        "value": "基金"
-                    }
-                ],
-                "approvalType": "0",
-                "productType": [
-                    "0"
-                ]
-            },
-            {
-                "id": 1299,
-                "name": "保险宣传",
-                "reviewMattersType": "产品类旧",
-                "fileName": "1.jpeg",
-                "fileUrl": "http://192.168.210.51:9090/cpr/cpr_1692863900824_1.jpeg",
-                "userId": 914,
-                "org": null,
-                "createTime": "2023-08-24 16:03:07",
-                "approvalTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "新产品"
-                    },
-                    {
-                        "id": "1",
-                        "value": "产品营销类"
-                    }
-                ],
-                "productTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "理财"
-                    },
-                    {
-                        "id": "1",
-                        "value": "基金"
-                    }
-                ],
-                "approvalType": "0",
-                "productType": [
-                    "0"
-                ]
-            },
-            {
-                "id": 1295,
-                "name": "svdbjkndfblfm kfm",
-                "reviewMattersType": "产品类旧",
-                "fileName": "屏幕截图 2023-06-05 140504.png",
-                "fileUrl": "http://192.168.210.51:9090/cpr/cpr_1692859132085_屏幕截图 2023-06-05 140504.png",
-                "userId": 813,
-                "org": "研发组",
-                "createTime": "2023-08-24 14:39:01",
-                "approvalTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "新产品"
-                    },
-                    {
-                        "id": "1",
-                        "value": "产品营销类"
-                    }
-                ],
-                "productTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "理财"
-                    },
-                    {
-                        "id": "1",
-                        "value": "基金"
-                    }
-                ],
-                "approvalType": "0",
-                "productType": [
-                    "0"
-                ]
-            },
-            {
-                "id": 1258,
-                "name": "测试16",
-                "reviewMattersType": "产品类旧",
-                "fileName": "认证与上网.pdf",
-                "fileUrl": "http://192.168.210.51:9090/cpr/cpr_1692607777465_认证与上网.pdf",
+                "recordId": 1411,
+                "taskName": "测试",
+                "reviewMattersType": "ocr审批更多审批字段",
+                "formManagementId": 170,
+                "fileName": "新建 DOC 文档.doc",
+                "fileUrl": "http://192.168.210.51:9090/cpr/cpr_1693473517774_新建 DOC 文档.doc",
                 "userId": 1416,
                 "org": "研发组",
-                "createTime": "2023-08-21 16:50:15",
+                "createTime": "2023-08-31 17:18:44",
                 "approvalTypeOption": [
                     {
                         "id": "0",
@@ -186,30 +86,21 @@ export default {
                         "value": "产品营销类"
                     }
                 ],
-                "productTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "理财"
-                    },
-                    {
-                        "id": "1",
-                        "value": "基金"
-                    }
-                ],
+                "productTypeOption": null,
                 "approvalType": "0",
-                "productType": [
-                    "0"
-                ]
+                "productType": null,
+                "processInstanceId": "608a4f9d-47df-11ee-9b31-c6d0bb792efb"
             },
             {
-                "id": 1253,
-                "name": "测试12",
-                "reviewMattersType": "产品类旧",
-                "fileName": "认证与上网.pdf",
-                "fileUrl": "http://192.168.210.51:9090/cpr/cpr_1692595040407_认证与上网.pdf",
-                "userId": 1416,
+                "recordId": 1409,
+                "taskName": "测试3.000",
+                "reviewMattersType": "ocr审批更多审批字段",
+                "formManagementId": 170,
+                "fileName": "周报-杨凡霆.xlsx",
+                "fileUrl": "http://192.168.210.51:9090/cpr/cpr_1693471941654_周报-杨凡霆.xlsx",
+                "userId": 830,
                 "org": "研发组",
-                "createTime": "2023-08-21 13:17:27",
+                "createTime": "2023-08-31 16:52:49",
                 "approvalTypeOption": [
                     {
                         "id": "0",
@@ -220,122 +111,10 @@ export default {
                         "value": "产品营销类"
                     }
                 ],
-                "productTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "理财"
-                    },
-                    {
-                        "id": "1",
-                        "value": "基金"
-                    }
-                ],
+                "productTypeOption": null,
                 "approvalType": "0",
-                "productType": [
-                    "0"
-                ]
-            },
-            {
-                "id": 1201,
-                "name": "测试_zwh",
-                "reviewMattersType": "产品类旧",
-                "fileName": "测试.ppt",
-                "fileUrl": "http://192.168.210.51:9090/cpr/cpr_1692078613010_测试.ppt",
-                "userId": 1416,
-                "org": "研发组",
-                "createTime": "2023-08-15 13:50:19",
-                "approvalTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "新产品"
-                    },
-                    {
-                        "id": "1",
-                        "value": "产品营销类"
-                    }
-                ],
-                "productTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "理财"
-                    },
-                    {
-                        "id": "1",
-                        "value": "基金"
-                    }
-                ],
-                "approvalType": "0",
-                "productType": [
-                    "0"
-                ]
-            },
-            {
-                "id": 1197,
-                "name": "测试7",
-                "reviewMattersType": "产品类旧",
-                "fileName": "认证与上网.docx",
-                "fileUrl": "http://192.168.210.51:9090/cpr/cpr_1692066491409_认证与上网.docx",
-                "userId": 1416,
-                "org": "研发组",
-                "createTime": "2023-08-15 10:28:15",
-                "approvalTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "新产品"
-                    },
-                    {
-                        "id": "1",
-                        "value": "产品营销类"
-                    }
-                ],
-                "productTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "理财"
-                    },
-                    {
-                        "id": "1",
-                        "value": "基金"
-                    }
-                ],
-                "approvalType": "0",
-                "productType": [
-                    "0"
-                ]
-            },
-            {
-                "id": 1148,
-                "name": "半导体产品",
-                "reviewMattersType": "产品类旧",
-                "fileName": "file1.jpg.png",
-                "fileUrl": "http://192.168.210.51:9090/cpr/cpr_1691724631363_file1.jpg.png",
-                "userId": 1133,
-                "org": "研发组",
-                "createTime": "2023-08-11 11:30:42",
-                "approvalTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "新产品"
-                    },
-                    {
-                        "id": "1",
-                        "value": "产品营销类"
-                    }
-                ],
-                "productTypeOption": [
-                    {
-                        "id": "0",
-                        "value": "理财"
-                    },
-                    {
-                        "id": "1",
-                        "value": "基金"
-                    }
-                ],
-                "approvalType": "0",
-                "productType": [
-                    "0", "1 "
-                ]
+                "productType": null,
+                "processInstanceId": "b9a5e177-47db-11ee-9252-de2f9d9428ed"
             }
             ],
             pageNum: 1,
@@ -353,6 +132,27 @@ export default {
         this.getSimilarCasesData(1)
     },
     methods: {
+        toDetail(item) {
+            item.taskStatus = '4';
+            item.taskId = item.processInstanceId;
+            console.log('dsdsds', item);
+            window.localStorage.setItem(
+                "order-detail",
+                JSON.stringify({
+                    item,
+                    clickPoint: 'taskName',
+                })
+            );
+            this.$router.push({
+                name: "details",
+                params: {
+                    formId: item.recordId,
+                    processInstanceId: item.processInstanceId,
+                    formManagementId: item.formManagementId,
+                    taskName: item.taskName
+                },
+            });
+        },
         async getSimilarCasesData(pageNum) {
             this.caseListLoading = true
             this.pageNum = pageNum
@@ -360,7 +160,7 @@ export default {
                 pageNum: this.pageNum,
                 pageSize: this.pageSize,
                 formCategoryId: this.formCategoryId,
-                formId: 1349
+                formId: this.formId,
             }
             getSimilarCases(wait_param).then(res => {
                 const { data } = res.data;

@@ -12,7 +12,7 @@
         <span class="event-name" @click="toDetail(item)">{{
           item.taskName
         }}</span>
-        <span class="event-status" v-if="!item.errorInfo">
+        <span class="event-status" v-if="!item.ocr_approval_status">
           <i v-if="item.taskStatus === '0'" class="tag draft">{{ $msg('NodeStatus')[item.taskStatus] }}</i>
           <i v-if="['1', '2'].includes(item.taskStatus)" class="tag in-approval">{{ $msg('NodeStatus')[item.taskStatus]
           }}>{{ item.currentActivityName }}</i>
@@ -24,7 +24,7 @@
             <i class="tag end-sign">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }} </i>
           </i>
           <!-- 有无意见 -->
-          <i class="flex" v-if="['4', '5','6'].includes(item.taskStatus)">
+          <i class="flex" v-if="['4', '5', '6'].includes(item.taskStatus)">
             <i class="tag has-opinion" v-if="item.substantiveOpinions == 1">
               <i class="iconfont icon-guanzhu2"></i>
               有实质性意见
@@ -82,7 +82,7 @@
       </div>
     </div>
     <div class="right-operation">
-      <div v-if="item.taskStatus == 1 && !item.errorInfo&&revoked" class="flex">
+      <div v-if="item.taskStatus == 1 && !item.errorInfo && revoked" class="flex">
         <span class="modify icon-op" @click="cancel(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-tubiao1"></use>
@@ -102,6 +102,12 @@
           确认
         </span>
       </div>
+      <div class="flex" v-if="item.taskStatus == 6&&canCompared">
+        <span class="attention check icon-op" @click="compare(item)">
+          <span class="iconfont icon icon-compare urgent-icon"></span>
+          比对</span>
+      </div>
+
       <div v-if="item.taskStatus == '3'" class="flex" @click="modify(item)">
         <span class="modify icon-op">
           <svg class="icon urgent-icon" aria-hidden="true">
@@ -153,6 +159,8 @@
 <script>
 import { concernApplication, canRoved } from "@/api/applyCenter";
 import { revoked } from "../../api/applyCenter";
+import { getTemplatedetail } from '@/api/applyCenter'
+
 export default {
 
   props: {
@@ -166,15 +174,34 @@ export default {
       reminderDialog: false,
       allowConcernClick: true,
       persons: [],
-      revoked:false, //是否可以撤销
+      revoked: false, //是否可以撤销
+      canCompared:false ,// 当前登录用户可以使用对比功能
     };
   },
   mounted() {
     // 判断是否可以撤销
     this.item.taskStatus == '1' ? this.getCanBeRoved(this.item) : ''
+    // 判断当前节点审批人是不是当前用户
+    this.item.taskStatus == '6' ? this.getTemplatedetail(this.item) : ''
 
   },
   methods: {
+    /**
+     * @description: 查询当前节点的审批人是否包含当前登录用户
+     * @return {*}
+     */
+    async getTemplatedetail() {
+      const params = {
+        processInstanceId: this.item.processInstanceId
+      }
+      const res = await getTemplatedetail(params)
+      if (res.data) {
+        const { data } = res.data
+        const assignedUser = data[data.length - 1].props['assignedUser']?.filter(v => v.type !== 'dept')?.map(v => v.id)
+        const user = JSON.parse(window.localStorage.getItem('user_name'))
+        this.canCompared=assignedUser.includes(user.id+'')
+      }
+    },
     getCanBeRoved(item) {
       const params = {
         nodeId: item.nodeId,
@@ -188,12 +215,29 @@ export default {
       // })
 
     },
+    /**
+     * @description: 去比对
+     * @return {*}
+     */
+    //
+    compare(item) {
+      this.$router.push({
+        name: 'compare',
+        params: {
+          item
+        }
+      })
+    },
     toDetail(item) {
       console.log('dsdsdsd',item);
       //草稿去修改页
       if (item.submitted == 0) {
         this.modify(item)
         return
+      }
+      //判断是否解析中
+      if (item.errorInfo || item.ocr_approval_status) {
+        return false
       }
       window.localStorage.setItem(
         "order-detail",
@@ -205,8 +249,8 @@ export default {
       this.$router.push({
         name: "details",
         params: {
-          formId: item.recordId,
-          processInstanceId:item.processInstanceId,
+          formId: item.taskNumber,
+          processInstanceId: item.processInstanceId,
           formManagementId: item.form_management_id,
           taskName: item.taskName
         },
@@ -224,7 +268,7 @@ export default {
       this.$router.push({
         name: "details",
         params: {
-          formId: item.recordId,
+          formId: item.taskNumber,
           formManagementId: item.form_management_id,
           taskName: item.taskName
         },

@@ -233,7 +233,7 @@ export default new Vuex.Store({
       state.checkApprovedForm.editOpinionStorage = false
       state.checkApprovedForm.editOpinionForm = {}
       state.checkApprovedForm.editOpinionRequired = false
-      state.checkApprovedForm.uploadFileRadio = false
+      state.checkApprovedForm.uploadFileRadio = 1
     }
   },
   getters: {
