@@ -77,14 +77,21 @@ export default {
     }
   },
   mounted() {
-    document.addEventListener('mouseup', (e) => {
-      const toolsRef = this.$refs['tools']
-      if (toolsRef) {
-        if (!toolsRef.contains(e.target)) {
-          this.showPopper = false;
+      document.addEventListener('mouseup', (e) => {
+        const toolsRef = this.$refs['tools']
+        const popoverRef = document.querySelector('.file-overview-popper')
+        if (toolsRef) {
+          if (this.crtToolComponent != 'approvedOpinion') {
+            if (!toolsRef.contains(e.target)) {
+              this.showPopper = false;
+            }
+          } else {
+            if (!toolsRef.contains(e.target) && popoverRef && !popoverRef.contains(e.target)) {
+              this.showPopper = false;
+            }
+          }
         }
-      }
-    });
+      });
     // 判断是否有审查意见
     // getEditedCommentsByFormId({ formId: this.$route.params.item.taskNumber })
   },
@@ -119,7 +126,7 @@ export default {
             processInstanceId: param_item.processInstanceId
           }
           break;
-          case 'approvedOpinion':
+        case 'approvedOpinion':
           params = {
             formId: param_item.taskNumber,
             processInstanceId: param_item.processInstanceId
@@ -128,7 +135,7 @@ export default {
       }
       if (Object.keys(item.sidebarParam).length) {
         this.sidebarParam = item.sidebarParam;
-      }else if (Object.keys(params).length) {
+      } else if (Object.keys(params).length) {
         this.sidebarParam = params
       }
       this.reference = this.$refs['sideBar-popover-' + item.toolSign][0].$el
@@ -141,6 +148,8 @@ export default {
         })
       })
     },
+  },
+  beforeDestroy() {
   }
 }
 </script>

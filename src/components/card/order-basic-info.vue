@@ -32,16 +32,16 @@
             </div>
         </div>
         <!-- 发布渠道 -->
-        <div v-if="orderInfo.promotionChannels"> 
-        <div class="line"></div>
-        <div class="channel-info" v-for="(item, index) in orderInfo.promotionChannels" :key="index">
-            <div class="item" v-for="(child, idx) in item.props.options" :key="idx">
-                <span class="label">{{ child.value }}</span>
-                <span class="value">{{ multipleSelect(child, item) }}</span>
+        <div v-if="orderInfo.promotionChannels">
+            <div class="line"></div>
+            <div class="channel-info" v-for="(item, index) in orderInfo.promotionChannels" :key="index">
+                <div class="item" v-for="(child, idx) in item.props.options" :key="idx">
+                    <span class="label">{{ child.value }}</span>
+                    <span class="value">{{ multipleSelect(child, item) }}</span>
+                </div>
+                <slot name="personal-channel"></slot>
             </div>
-            <slot name="personal-channel"></slot>
         </div>
-    </div>
         <!-- 审查要点 -->
         <div v-if="orderInfo.reviewPointer && orderInfo.reviewPointer.length > 0">
             <div class="line"></div>
@@ -140,7 +140,6 @@ export default {
                 }
             },
             immediate: true
-            // deep: true
         },
     },
     methods: {
@@ -151,10 +150,12 @@ export default {
             } else if (keys.length) {
                 this.getOrderDetail()
             }
+
         },
-        startLoading(val) {
-            this.$parent.startLoading(true)
-        },
+        /**
+          * @description: 折行，最多 4 个
+          * @return {*}
+        */
         getMapping(list) {
             let len = list.length
             let newList = []
@@ -173,9 +174,6 @@ export default {
                 formId: this.$route.params.formId || this.sidebarParam.formId,
                 processTemplateId: this.$route.params.processTemplateId,
                 nodeId: this.$route.params.nodeId,
-                // formCategoryId: 121,
-                // formId: 1257
-                // formManagementId: 121,processInstanceId: "3c186340-3ff6-11ee-bd1a-d4d853dcb3dc"
             }).then(res => {
                 const { data, status, message } = res.data;
                 if (status === 200) {
@@ -193,9 +191,15 @@ export default {
                     this.loading = false
                 });
         },
+        /**
+         * @description: 格式化数据
+         * @param {*} data 接口或者 props返回的数据
+         * @param {*} flag false：说明拿到的 data为空
+         * @return {*}
+         */
         getBsicData(data, flag) {
             if (!flag) {
-                this.orderInfo = {
+                return this.orderInfo = {
                     baseInfo: [],
                     textAreaBaseInfo: [],
                     newBaseInfo: [],
@@ -203,7 +207,6 @@ export default {
                     promotionChannels: [],
                     fileList: []
                 }
-                return
             }
             const { basicInformation, keyPointsForVerification, reviewMaterials, filledInByApprover } = data
             //大段文本过滤
@@ -234,10 +237,11 @@ export default {
                 return v.key
             })
             const params = {
-                loadList: list
+                ...list
             }
             downloadAllFiles(params).then(res => {
                 const { data } = res.data
+                return
                 for (let i in data) {
                     const link = document.createElement('a');
                     link.href = data[i];
