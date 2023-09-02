@@ -393,6 +393,9 @@ export default {
               this.bodyClientWidth =
                 this.$refs.carouselBody.clientWidth.toFixed(2);
             });
+            if (this.compareList.length > 6) {
+              this.canRight = true;
+            }
           } else {
             this.loading = false;
           }
@@ -400,9 +403,6 @@ export default {
         .catch((err) => {
           this.loading = false;
         });
-      if (this.compareList.length > 6) {
-        this.canRight = true;
-      }
       // this.totalsimilarity = "100%";
     },
     changeActive(item, index) {
