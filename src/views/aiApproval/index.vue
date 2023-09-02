@@ -80,9 +80,9 @@
       </div>
     </div>
     <add-review ref="addReview" @addRecommend="addRecommend"></add-review>
-    <submit-review ref="submitReview" :formId="formId" :formBase="formBase" :approvalLetter="approvalLetter" :applyForm="applyForm">
+    <submit-review ref="submitReview" :formId="formId" :formBase="formBase" :approvalLetter="approvalLetter" :applyFormWithPermissions="applyFormWithPermissions" :userOption="userOption" :rejectOption="rejectOption" @submit="submit">
     </submit-review>
-    <reject-dialog ref="rejectDialog" :formBase="formBase"></reject-dialog>
+    <reject-dialog ref="rejectDialog" :formBase="formBase" :userOption="userOption" :rejectOption="rejectOption" @submit="submit"></reject-dialog>
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <applyFormFilePreview :url="previewfileUrl"></applyFormFilePreview>
     </el-dialog>
@@ -115,10 +115,13 @@ import {
   getOcrExamineShow,
   approvalStorageDraft,
   getApprovalDraft,
-  getOpinionApprovalLetter
+  getOpinionApprovalLetter,
+  queryFormItemPermissions
 } from '@/api/aiApproval';
 import { getApplyForm } from '@/api/front';
-import { getList } from '@/api/admin-label.js';
+import {
+  rollback
+} from "@/api/aiApproval";
 export default {
   name: 'aiApproval',
   components: {
@@ -171,7 +174,40 @@ export default {
         permissions: "passNotAllow",
         list: []
       },
-      applyForm: {}
+      applyForm: {},
+      applyFormWithPermissions: {
+        keyPointsForVerification: [],
+        filledInByApprover: []
+      },
+      formItemPermissions: [],
+      rejectOption: [
+        {
+          value: '文件预览失败（文件损坏/清晰度过低）',
+          label: '文件预览失败（文件损坏/清晰度过低）'
+        },
+        {
+          value: '附件材料与审批项目不匹配',
+          label: '附件材料与审批项目不匹配'
+        },
+        {
+          value: '其他',
+          label: '其他'
+        }
+      ],
+      userOption: [
+        {
+          value: '文件预览失败（文件损坏/清晰度过低）',
+          label: '文件预览失败（文件损坏/清晰度过低）'
+        },
+        {
+          value: '附件材料与审批项目不匹配',
+          label: '附件材料与审批项目不匹配'
+        },
+        {
+          value: '其他',
+          label: '其他'
+        }
+      ],
     };
   },
   created() {
@@ -189,6 +225,7 @@ export default {
     this.loading = true;
     this.init(item);
     this.formBase = item;
+    // 获取前面的审批意见
     this.getOpinionApprovalLetter();
   },
   methods: {
@@ -213,7 +250,8 @@ export default {
         const { data, status } = res.data;
         if (status === 200) {
           data.list.forEach(item => {
-            item.str = item.content
+            item.str = item.content;
+            item.opinion = Boolean(item.substantiveOpinions)
           })
           this.approvalLetter = data
         }
@@ -228,14 +266,11 @@ export default {
         const { data, status, message } = res.data;
         if (status === 200) {
           this.applyForm = data;
+          this.queryFormItemPermissions()
           this.$refs.sidebar.tools[0].sidebarParam = {
             ...data,
             keyPointsForVerification: JSON.parse(JSON.stringify(data.keyPointsForVerification))
            };
-          if(data?.keyPointsForVerification.length) {
-            this.$refs.refExamine.list =  [...data.keyPointsForVerification];
-            this.examineIsShow = true
-          } 
         }
         else {
           this.$message.error({ offset: 40, title: '提醒', message });
@@ -243,6 +278,37 @@ export default {
       });
       // 先获取工单基本信息，，然后判断获取草稿或初始化  文件信息
       this.getFileList();
+    },
+    queryFormItemPermissions() {
+      queryFormItemPermissions({
+        nodeId: this.formBase.nodeId,
+        formCategoryIdsJoin: this.formCategoryId,
+        processTemplateId: this.formBase.processTemplateId
+      }).then(res => {
+        const { data, status } = res.data;
+        const keys = Object.keys(data || {});
+        if (status === 200 && keys.length) {
+          // 权限标识 R为只读 E为可编辑 H为隐藏
+          this.formItemPermissions = data[keys[0]] || [];
+          this.getApplyFormWithPermissions(this.applyForm, this.formItemPermissions)
+        }
+      });
+    },
+    getApplyFormWithPermissions(applyForm, formItemPermissions) {
+      const keyPointsForVerification = [];
+      const filledInByApprover = [];
+      // 权限标识 R为只读 E为可编辑 H为隐藏
+      const permissions = formItemPermissions.filter(item => item.authorityFlag	 === 'E');
+      permissions.forEach(perm => {
+        keyPointsForVerification.push(...applyForm.keyPointsForVerification.filter(item => item.id.toString() === perm.formItemId.toString()));
+        filledInByApprover.push(...applyForm.filledInByApprover.filter(item => item.id.toString() === perm.formItemId.toString()));
+      })
+      this.applyFormWithPermissions = {
+        keyPointsForVerification,
+        filledInByApprover,
+      }
+      this.$refs.refExamine.list = keyPointsForVerification;
+      this.examineIsShow = !!keyPointsForVerification.length
     },
     previewFile(url) {
       this.previewDialog = true;
@@ -638,7 +704,32 @@ export default {
     },
     handleExamine() {
       this.examineShow = !this.examineShow;
-    }
+    },
+    submit({reason, txt}) {
+      const user = JSON.parse(window.localStorage.getItem('user_name'))
+      const data = {
+        comments: `${reason}${txt.trim() ? '-' + txt : ''}`,
+        currentUserInfo: {
+          id: user.id,
+          name: user.fullname
+        },
+        processInstanceId: this.formBase.processInstanceId,
+        rollbackId: this.formBase.rollbackId,
+        signInfo: this.formBase.signInfo,
+        nodeId: this.formBase.nodeId,
+        taskId: this.formBase.taskId,
+        templateId: this.formBase.templateId
+      }
+      rollback(data).then((res) => {
+        const { status, msg } = res.data;
+        if (status === 200) {
+          this.$message.success('操作成功！');
+          this.$router.go(-1)
+        } else {
+          this.$message.error({ offset: 40, message: msg });
+        }
+      })
+    },
   },
   beforeDestroy() {
     this.lineRemove();

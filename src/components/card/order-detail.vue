@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-01 17:40:57
+ * @LastEditTime: 2023-09-01 19:42:27
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -509,7 +509,7 @@ export default {
       const { editOpinionForm } = this.$store.state.checkApprovedForm
       const { assignedUser } = editOpinionForm
       let params = {
-        isSave: isSave, //区分保存还是提交
+        isSave: isSave?isSave:false, //区分保存还是提交
         success: editOpinionForm.isAccept == '1',
         taskId: this.item.taskId,
         msg: editOpinionForm.content,
@@ -583,6 +583,7 @@ export default {
      * return {*}
      */
     submit(way) {
+      debugger
       const that = this
       const { approvedOpinionRequired, uploadFileRequired, editOpinionRequired, editOpinionForm, uploadFileRadio } = this.$store.state.checkApprovedForm
       //保存功能  待确认的工单  分有实质性意见和无实质性意见 status:3无 /5有
@@ -942,7 +943,7 @@ export default {
     .nav {
       padding: 2px 0px;
       padding-bottom: 12px;
-      border-bottom: 1px dashed #e5e6eb;
+      border-bottom: 1px solid #e5e6eb;
       margin-bottom: 16px;
       display: flex;
       font-size: 14px;

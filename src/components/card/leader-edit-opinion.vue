@@ -9,19 +9,21 @@
       </el-form-item>
       <!-- &&refuseWay=='TO_BEFORE' -->
       <el-form-item label="请选择驳回人" prop="crtDisavower" v-if="form.isAccept == '0' && refuseWay == 'TO_BEFORE'">
-        <el-select v-model="form.crtDisavower" placeholder="请选择驳回节点/驳回人" @change="updateForm('disavower')">
+        <el-select v-model="form.crtDisavower" placeholder="请选择驳回节点/驳回人" @change="updateForm('disavower')"
+        popper-class="disavower-popper" :popper-append-to-body="true">
           <el-option v-for="(item, index) in disavower" :key="index"
-            :label="item.name + '/' + item.label + ' 【' + item.nodeName + '】'" :value="item">
-            <span style="
-             width: 33%;
+            :label="item.name + '/' + item.label + ' 【' + item.nodeName + '】'" :value="item" >
+            <div style="display: flex;justify-content: space-between;" >
+              <span class="ellipsis ellipsis_1" style="
+                width: 32%;
                 font-weight: 700;
                 color: #1d2128;
                 font-size: 14px;
                 line-height: 34px;
                 display: inline-block;
               ">{{ item.name }}</span>
-            <span style="
-                 width: 33%;
+            <span class="ellipsis ellipsis_1 " style="
+                width: 32%;
                 color: #505968;
                 font-size: 14px;
                 line-height: 34px;
@@ -30,15 +32,16 @@
               ">{{ item.label }}
 
             </span>
-            <span style="
-                 width: 33%;
+            <span class="ellipsis ellipsis_1 " style="
+                width: 32%;
                 color: #505968;
                 font-size: 14px;
                 line-height: 34px;
                 display: inline-block;
                 font-weight: 400;
               "> · {{ item.nodeName }}
-            </span>
+            </span> </div>
+      
           </el-option>
         </el-select>
       </el-form-item>
@@ -98,7 +101,7 @@
         <template v-for="(item, index) in filledInByApprover">
           <el-form-item :class="formItemCpt(item)" :key="index">
             <label slot="label">
-              <i>{{ item.title}}</i>
+              <i>{{ item.title }}</i>
               <span :style="{ color: 'red', opacity: item.props.required || 0 }">
                 *
               </span></label>
@@ -125,7 +128,8 @@
             <div class="groups-select" v-else-if="item.name === 'MultipleGroupsSelect'">
               <div v-for="iten in item.props.options" :key="iten.id">
                 <p class="group-title">{{ iten.value }}</p>
-                <el-checkbox-group class="group-value" v-model="item.value" :disabled="item.perm === 'R'" @change="updateForm">
+                <el-checkbox-group class="group-value" v-model="item.value" :disabled="item.perm === 'R'"
+                  @change="updateForm">
                   <el-checkbox v-for="(itenItem, indey) in iten.children" :key="indey" :label="itenItem.id">{{
                     itenItem.value }}
                   </el-checkbox>
@@ -146,7 +150,8 @@
             <el-input v-else-if="item.name === 'TextareaInput'" :disabled="item.perm === 'R'" type="textarea"
               v-model.trim="item.value" :placeholder="item.props.placeholder" @change="updateForm"></el-input>
             <el-cascader v-else-if="item.name === 'Cascader'" v-model="item.value" :options="item.props.childrens"
-              :props="{ label: 'value', value: 'id', checkStrictly: true, multiple: item.props.multiple }" clearable @change="updateForm">
+              :props="{ label: 'value', value: 'id', checkStrictly: true, multiple: item.props.multiple }" clearable
+              @change="updateForm">
             </el-cascader>
           </el-form-item>
         </template>
@@ -255,19 +260,19 @@ export default {
     },
     updateForm() {
       //动态表单
-      const approver_params=this.filledInByApprover?.map(v=>{
+      const approver_params = this.filledInByApprover?.map(v => {
         return {
           formItemId: v.id,
-          valueType:v.name,
-          value:v.value
+          valueType: v.name,
+          value: v.value
         }
-      })||[]
+      }) || []
       let params = {
         ...this.externalData,
         ...this.form,
-        formId:this.externalData.formId,
+        formId: this.externalData.formId,
         assignedType: this.assignedType,
-        formItemDataList:approver_params
+        formItemDataList: approver_params
       }
       // 若审核员选择了驳回
       if (this.form.isAccept == '0') {
@@ -286,6 +291,8 @@ export default {
 </script>
 <style lang="less" scoped>
 .leader-edit-opinion {
+  width: 100%;
+
   /deep/ .basic-form {
     .el-form-item {
       display: flex;
@@ -385,6 +392,11 @@ export default {
       margin-left: 0 !important;
     }
   }
+
+}</style>
+<style lang="less">
+.disavower-popper{
+width: 384px !important;
 }
 </style>
 

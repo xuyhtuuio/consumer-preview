@@ -15,15 +15,39 @@
             <div class="line"></div>
         </div>
         <div class="main">
-            <el-form :model="params" ref="paramsForm" label-width="86px" label-position="left" :rules="rules">
-                <el-form-item label="是否通过" required v-if="approvalLetter.permissions === 'passNotAllow'">
+            <el-form :model="params" ref="paramsForm" label-position="left" :rules="rules" :inline="true" class="paramsForm" >
+                <el-form-item required label="是否通过"   label-width="110px" v-if="approvalLetter.permissions === 'passNotAllow'">
                     <el-radio-group v-model="params.isPasses">
                         <el-radio :label="item.id" v-for="item in passlist" :key="item.id">
                             {{ item.name }}
                         </el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <com-form-item v-for="item in applyForm.filledInByApprover" :key="item.id" :item="item"></com-form-item>
+                <!-- <el-form-item required label="请选择审批人"   label-width="110px" prop="nextUser" class="params-nextUser params-nextUser" >
+                    <el-select v-model.trim="params.nextUser" placeholder="需【下一节点名称】审批，请选择审批人">
+                        <el-option v-for="item in userOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </el-form-item> -->
+                <template v-if="approvalLetter.permissions === 'passNotAllow' && !params.isPasses">
+                    <el-form-item required prop="prevUser" class="params-prevUser" label=" ">
+                        <el-select v-model.trim="params.prevUser" placeholder="请选择驳回人">
+                            <el-option v-for="item in userOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item required prop="reason" class="params-reason" label=" ">
+                        <el-select v-model.trim="params.reason" placeholder="请选择驳回原因">
+                            <el-option v-for="item in rejectOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item class="params-txt">
+                        <el-input v-model="params.txt" placeholder="请补充说明具体原因描述"></el-input>
+                    </el-form-item>
+                </template>
+            </el-form>
+            <el-form label-width="110px" label-position="left">
+                <!-- 其他审批人字段 -->
+                <com-form-item v-for="item in applyFormWithPermissions.filledInByApprover" :key="item.id" :item="item"></com-form-item>
+                <!-- 核对要点 -->
                 <ExaminePivot ref="refExamine" :titleShow="true" :isWidthDiff="true">
                     <p class="examine-title"><i class="iconfont icon-jinggao1"></i>{{examineInfo}}</p>
                 </ExaminePivot>
@@ -109,9 +133,17 @@ export default {
             type: Object,
             default: () => ({})
         },
-        applyForm: {
+        applyFormWithPermissions: {
             type: Object,
             default: () => ({})
+        },
+        rejectOption: {
+            type: Array,
+            default: () => ([])
+        },
+        userOption: {
+            type: Array,
+            default: () => ([])
         },
     },
     data() {
@@ -125,10 +157,19 @@ export default {
             showClose: false,
             submitReviewDialog: false,
             passlist: [
-                { name: '通过', id: '1' },
-                { name: '驳回', id: '2' },
+                { name: '通过', id: true },
+                { name: '驳回', id: false },
             ],
             rules: {
+                nextUser: [
+                    { required: true, message: '请选择审批人', trigger: 'change' }
+                ],
+                prevUser: [
+                    { required: true, message: '请选择驳回人', trigger: 'change' }
+                ],
+                reason: [
+                    { required: true, message: '请选择驳回原因', trigger: 'change' }
+                ],
                /*  productEssentials: [
                     { required: true, message: '请选择产品要点', trigger: 'change' },
                 ],
@@ -140,7 +181,11 @@ export default {
             increasedIds: {}, //须在最后提交时移除的
             mousePoint: -1,
             params: {
-                isPasses: '2',
+                isPasses: false,
+                reason: '',
+                txt: '',
+                nextUser: '',
+                prevUser: ''
             },
             examineList: [],
             examineInfo: "请选择当前项目是否包含以下要点，不勾选或选择“否”为不包含该要点信息，则会返回至发起人修改并二次会签。"
@@ -150,7 +195,9 @@ export default {
         submitReviewDialog(val) {
             if (val) {
                 this.timeNow = moment().format('YYYY-MM-DD HH:mm:ss');
-                this.submission = (this.approvalLetter.list || []).concat(this.submission || [])
+                if (this.approvalLetter.permissions === 'passAllow') {
+                    this.submission = (this.approvalLetter.list || []).concat(this.submission || [])
+                }
             }
         },
         examineList(val) {
@@ -168,6 +215,23 @@ export default {
         },
         // 提交结果
         submit() {
+            if (this.approvalLetter.permissions === 'passNotAllow' && !this.params.isPasses) {
+                this.$refs['paramsForm'].validate((valid) => {
+                    if (valid) {
+                        this.$emit('submit', {
+                            ...this.params
+                        })
+                    } else {
+                        return false;
+                    }
+                });
+                return;
+            }
+            const filledInByApproverWithNull = this.applyFormWithPermissions.filledInByApprover.filter(item => item.value.length === 0 && item.props.required)
+            if (filledInByApproverWithNull.length) {
+                this.$message.error('存在必填项未填写，请填写！')
+                return;
+            }
             let opinionLetterRecordDtoList = null;
             const editedCommentsDtoList = this.submission.filter(item => !item.associatedAttachmentsIds)
             if (this.approvalLetter.permissions === 'passAllow') {
@@ -175,18 +239,24 @@ export default {
                     return {
                         ...item,
                         content: item.str,
+                        substantiveOpinions: item.opinion ? 1 : 0
                     }
                 }) || [];
+            } else {
+                editedCommentsDtoList.forEach(item => {
+                    delete item.opinion
+                })
             }
-            
-            // console.log(editedCommentsDtoList, opinionLetterRecordDtoList, this.$refs.refExamine.list)
-            this.submission.forEach(comment => {
+            editedCommentsDtoList.forEach(comment => {
                 comment.id = this.increasedIds.strIds.includes(comment.id) ? null : comment.id;
                 comment.words = comment.words.filter(id => !this.increasedIds.words.includes(id))
             })
             const keyPointsForVerification = this.$refs.refExamine.list?.map(item => {
                 item.formItemId = item.id;
-                delete item.id;
+                return item;
+            })
+            const formItemDataList = this.applyFormWithPermissions.filledInByApprover?.map(item => {
+                item.formItemId = item.id;
                 return item;
             })
             const user = JSON.parse(window.localStorage.getItem('user_name'))
@@ -195,7 +265,7 @@ export default {
                     opinionLetterRecordDtoList,
                     editedCommentsDtoList,
                     keyPointsForVerification,
-                    formItemDataList: this.applyForm.filledInByApprover,
+                    formItemDataList,
                     formId: this.formId
                 },
                 processInstanceId: this.formBase.processInstanceId,
@@ -207,11 +277,13 @@ export default {
             }
             // console.log(data)
             // return
+            this.$message.info('提交中，请稍等！')
             ocrApprovalSubmission(data).then((res) => {
                 const { status, msg } = res.data;
                 if (status === 200) {
-                    this.$message.success({ offset: 40, message: '审查意见已提交,可在审批中心查看' });
                     this.$router.go(-1)
+                    this.$message.success({ offset: 40, message: '审查意见已提交,可在审批中心查看' });
+                    this.submitReviewDialog = false;
                 } else {
                     this.$message.error({ offset: 40, message: msg });
                 }
@@ -520,7 +592,29 @@ export default {
     }
 
 }
-
+.submit-review .paramsForm{
+    display: flex;
+    .params-nextUser, .params-prevUser ,.params-reason,.params-txt{
+        padding: 0;
+        /deep/ .el-form-item__content{
+            padding: 0;
+        }
+        /deep/ .el-input__inner{
+            background: #F7F8FA;
+            border: none;
+            border-radius: 4px;
+        } 
+    }
+    .params-nextUser .el-select{
+        width: 400px;
+    }
+    .params-txt{
+        flex: 1;
+        /deep/ .el-form-item__content{
+            width: 100%;
+        }
+    }
+}
 .nodata {
     text-align: center;
     color: #86909C;
