@@ -123,9 +123,9 @@ export function getEditById(param){
   })
 }
 //上线材料提交
-export function finalMaterial(param,processInstanceId,taskId){
+export function finalMaterial(param,processInstanceId,taskId,formId){
   return request({
-    url: `/cpr/workspace/finalMaterial/${processInstanceId}/${taskId}`,
+    url: `/cpr/workspace/finalMaterial/${processInstanceId}/${taskId}/${formId}`,
     method: 'post',
     contentType: 'application/json',
     data: param,

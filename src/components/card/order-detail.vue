@@ -532,7 +532,7 @@ export default {
         ...params,
         comments: params
       }
-      isSave ? this.loadings.storageLoading = true : this.loadings.submitLoading = true
+      isSave ? this.loadings.storageLoading = true : this.loadings.submitLoading = true;
       leaderEdit(end_submit).then(res => {
         const { success, msg } = res.data
         if (success) {
@@ -583,7 +583,7 @@ export default {
      * return {*}
      */
     submit(way) {
-      debugger
+      // debugger
       const that = this
       const { approvedOpinionRequired, uploadFileRequired, editOpinionRequired, editOpinionForm, uploadFileRadio } = this.$store.state.checkApprovedForm
       //保存功能  待确认的工单  分有实质性意见和无实质性意见 status:3无 /5有
@@ -740,7 +740,8 @@ export default {
               otherUrl: v.relevantFile.url
             }
           })
-          await finalMaterial(params, this.item.processInstanceId, this.item.taskId)
+          console.log(that.item);
+          await finalMaterial(params, this.item.processInstanceId, this.item.taskId, that.item.taskNumber)
         }
         updateAdoptEditedComments(opinion_submit_params, this.item.taskId).then(res => {
           this.loadings.submitLoading = false
