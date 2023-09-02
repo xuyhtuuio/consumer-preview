@@ -72,7 +72,9 @@
                         </div>
                       </div>
                       <div class="similar-level">
-                        相似度：{{ item.similarity ? item.similarity + '%': '--' }}
+                        相似度：{{
+                          item.similarity ? item.similarity + "%" : "--"
+                        }}
                       </div>
                     </div>
                   </div>
@@ -87,14 +89,22 @@
             </span>
           </div>
           <div class="carousel-div">
-            <div class="btn-prev" v-if="compareList.length > 6" :class="{ 'not-allow': !canLeft }">
+            <div
+              class="btn-prev"
+              v-if="compareList.length > 6"
+              :class="{ 'not-allow': !canLeft }"
+            >
               <img
                 src="@/assets/image/home-index/prev.png"
                 alt=""
                 @click="moveLeft"
               />
             </div>
-            <div class="btn-next" v-if="compareList.length > 6" :class="{ 'not-allow': !canRight }">
+            <div
+              class="btn-next"
+              v-if="compareList.length > 6"
+              :class="{ 'not-allow': !canRight }"
+            >
               <img
                 src="@/assets/image/home-index/next.png"
                 alt=""
@@ -107,11 +117,14 @@
                   class="carousel-item"
                   :style="{ width: carouselWidth + 'px' }"
                   v-for="(item, index) in compareList"
-                  :key="'compare-carousel' + index"
+                  :key="'compare-carousel11' + index"
                   :class="{ 'active-item': activeIndex === index }"
                   @click="changeActive(item, index)"
                 >
-                  <div class="file-img" v-if="item.fileType === 'png' || item.fileType === 'jpg'">
+                  <div
+                    class="file-img"
+                    v-if="['jpeg', 'jpg', 'png'].includes(item.fileType)"
+                  >
                     <img :src="item.url" alt="" />
                   </div>
                   <file-type
@@ -121,7 +134,9 @@
                   ></file-type>
                   <div class="item-text">
                     <div class="text-style color-text">
-                      文本相似度：{{ item.similarity ? item.similarity + '%' : '--' }}
+                      文本相似度：{{
+                        item.similarity ? item.similarity + "%" : "--"
+                      }}
                     </div>
                     <div class="text-style">
                       {{ item.fileName }}
@@ -147,10 +162,10 @@
                 <i class="iconfont" @click="fullScreen(1)">&#xe62f;</i>
               </span>
             </div>
-            <ImagePreview
-              v-if="activeItem.otherFileType === 'png' || activeItem.otherFileType === 'jpg'"
+            <ImagePreview1
+              v-if="['jpeg', 'jpg', 'png'].includes(activeItem.otherFileType)"
               :url="activeItem.otherUrl"
-            ></ImagePreview>
+            ></ImagePreview1>
             <FilePreview v-else :url="activeItem.otherUrl"></FilePreview>
           </div>
           <div class="view-right">
@@ -166,10 +181,10 @@
                 <i class="iconfont" @click="fullScreen(2)">&#xe62f;</i>
               </span>
             </div>
-            <ImagePreview
-              v-if="activeItem.fileType === 'png' || activeItem.fileType === 'jpg'"
+            <ImagePreview1
+              v-if="['jpeg', 'jpg', 'png'].includes(activeItem.fileType)"
               :url="activeItem.url"
-            ></ImagePreview>
+            ></ImagePreview1>
             <FilePreview v-else :url="activeItem.url"></FilePreview>
           </div>
         </div>
@@ -181,20 +196,22 @@
       <i
         class="el-icon-circle-close"
         v-show="showFullScreen"
-        @click="fullScreen(1)"
+        @click="fullScreen(fullScreenType)"
       ></i>
       <!-- 图片 -->
       <div class="perview-div" v-if="fullScreenType === 1">
         <ImagePreview
-          v-if="activeItem.otherFileType === 'png' || activeItem.otherFileType === 'jpg'"
+          v-if="['jpeg', 'jpg', 'png'].includes(activeItem.otherFileType)"
           :url="activeItem.otherUrl"
+          ref="imageView1"
         ></ImagePreview>
         <FilePreview v-else :url="activeItem.otherUrl"></FilePreview>
       </div>
       <div class="perview-div" v-if="fullScreenType === 2">
         <ImagePreview
-          v-if="activeItem.fileType === 'png' || activeItem.fileType === 'jpg'"
+          v-if="['jpeg', 'jpg', 'png'].includes(activeItem.fileType)"
           :url="activeItem.url"
+          ref="imageView2"
         ></ImagePreview>
         <FilePreview v-else :url="activeItem.url"></FilePreview>
       </div>
@@ -212,7 +229,9 @@ import rejectDialog from "./dialogs/reject-dialog";
 import SideBar from "../aiApproval/sidebar/sidebar";
 import FileType from "@/components/common/file-type";
 import SecondaryConfirmation from "@/components/common/secondaryConfirmation";
-import ImagePreview from "./image-preview";
+import ImagePreview from "../aiApproval/components/imgae-preview";
+import ImagePreview1 from "./image-preview";
+
 import FilePreview from "@/components/filePreview";
 import { download } from "@/api/aiApproval";
 import { dualScreenPreview, endTask } from "@/api/approvalCenter";
@@ -226,6 +245,7 @@ export default {
     SideBar,
     ImagePreview,
     FilePreview,
+    ImagePreview1,
   },
   data() {
     return {
@@ -247,10 +267,10 @@ export default {
       fullScreenType: 1,
       loading: true,
       option: {
-        message: '确认结束后该申请单结束流转，不可再进行修改',
-        cancelBtn: '取消',
-        confirmBtn: '确认',
-      }
+        message: "确认结束后该申请单结束流转，不可再进行修改",
+        cancelBtn: "取消",
+        confirmBtn: "确认",
+      },
     };
   },
   mounted() {
@@ -335,18 +355,20 @@ export default {
     },
     endTaskSubmit() {
       let data = {
-        taskId: this.formBase.taskId
-      }
-      endTask(data).then(res => {
-        if (res.status == 200) {
-          this.$message.success(res.data.msg);
-          this.goBack();
-        } else {
-          this.$message.error(res.data.msg);
-        }
-      }).catch(err => {
-        // this.$message.success('申请单结束流转失败');
-      })
+        taskId: this.formBase.taskId,
+      };
+      endTask(data)
+        .then((res) => {
+          if (res.status == 200) {
+            this.$message.success(res.data.msg);
+            this.goBack();
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          // this.$message.success('申请单结束流转失败');
+        });
     },
     // 获取线上对比数据
     getInfo() {
@@ -362,6 +384,15 @@ export default {
             this.totalsimilarity = res.data.data.totalSimilarity;
             this.activeItem = this.compareList[0];
             this.loading = false;
+            this.$nextTick(() => {
+              this.carouselWidth = Number(
+                ((this.$refs.carouselBody.clientWidth - 40) / 6).toFixed(2)
+              );
+              this.itemBodyWidth =
+                this.$refs.itemBodyRef.clientWidth.toFixed(2);
+              this.bodyClientWidth =
+                this.$refs.carouselBody.clientWidth.toFixed(2);
+            });
           } else {
             this.loading = false;
           }
@@ -369,99 +400,6 @@ export default {
         .catch((err) => {
           this.loading = false;
         });
-      // this.compareList = [
-      //   {
-      //     fileName: "上网认证1.pdf",
-      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     otherFileName: "图片22.png",
-      //     otherUrl:
-      //       "http://192.168.210.51:9090/cpr/cpr_1692588542064_Snipaste_test.png",
-      //     fileType: "pdf",
-      //     otherFileType: "png",
-      //     similarity: 1,
-      //   },
-      //   {
-      //     fileName: "图片.png",
-      //     url: "http://192.168.210.51:9090/cpr/cpr_1692588542064_Snipaste_test.png",
-      //     otherFileName: "图片22.png",
-      //     otherUrl:
-      //       "http://192.168.210.51:9090/cpr/cpr_1692588542064_Snipaste_test.png",
-      //     fileType: "png",
-      //     otherFileType: "png",
-      //     similarity: 1,
-      //   },
-      //   {
-      //     fileName: "上网认证1.pdf",
-      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     otherFileName: "上网认证11.pdf",
-      //     otherUrl:
-      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     fileType: "pdf",
-      //     otherFileType: "pdf",
-      //     similarity: 1,
-      //   },
-      //   {
-      //     fileName: "上网认证1.pdf",
-      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     otherFileName: "上网认证11.doc",
-      //     otherUrl:
-      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     fileType: "pdf",
-      //     otherFileType: "pdf",
-      //     similarity: 1,
-      //   },
-      //   {
-      //     fileName: "上网认证2.doc",
-      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     otherFileName: "上网认证22.pdf",
-      //     otherUrl:
-      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     fileType: "pdf",
-      //     otherFileType: "pdf",
-      //     similarity: 1,
-      //   },
-      //   {
-      //     fileName: "上网认证1.pdf",
-      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     otherFileName: "上网认证11.pdf",
-      //     otherUrl:
-      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     fileType: "pdf",
-      //     otherFileType: "pdf",
-      //     similarity: 1,
-      //   },
-      //   {
-      //     fileName: "上网认证1.pdf",
-      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     otherFileName: "上网认证11.doc",
-      //     otherUrl:
-      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     fileType: "pdf",
-      //     otherFileType: "pdf",
-      //     similarity: 1,
-      //   },
-      //   {
-      //     fileName: "上网认证2.doc",
-      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     otherFileName: "上网认证22.pdf",
-      //     otherUrl:
-      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     fileType: "pdf",
-      //     otherFileType: "pdf",
-      //     similarity: 1,
-      //   },
-      //   {
-      //     fileName: "上网认证1.pdf",
-      //     url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     otherFileName: "上网认证11.pdf",
-      //     otherUrl:
-      //       "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
-      //     fileType: "pdf",
-      //     otherFileType: "pdf",
-      //     similarity: 1,
-      //   },
-      // ];
-
       if (this.compareList.length > 6) {
         this.canRight = true;
       }
@@ -499,6 +437,15 @@ export default {
     fullScreen(type) {
       this.showFullScreen = !this.showFullScreen;
       this.fullScreenType = type;
+      if (type === 1 && this.$refs.imageView1) {
+        this.$nextTick(() => {
+          this.$refs.imageView1.handleImageLoaded();
+        });
+      } else if (type == 2 && this.$refs.imageView2) {
+        this.$nextTick(() => {
+          this.$refs.imageView2.handleImageLoaded();
+        });
+      }
     },
   },
   beforeDestroy() {
@@ -667,7 +614,7 @@ export default {
             img {
               width: 36px;
               height: 36px;
-              object-fit: cover
+              object-fit: cover;
             }
           }
           .item-text {
@@ -704,6 +651,8 @@ export default {
     display: flex;
     .view-left,
     .view-right {
+      display: flex;
+      flex-direction: column;
       flex: 1;
       flex-shrink: 0;
       border-radius: 10px 10px 0px 0px;
