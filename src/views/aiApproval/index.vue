@@ -80,9 +80,9 @@
       </div>
     </div>
     <add-review ref="addReview" @addRecommend="addRecommend"></add-review>
-    <submit-review ref="submitReview" :formId="formId" :formBase="formBase" :approvalLetter="approvalLetter" :applyFormWithPermissions="applyFormWithPermissions" :userOption="userOption" :rejectOption="rejectOption" @submit="submit">
+    <submit-review ref="submitReview" :formId="formId" :formBase="formBase" :approvalLetter="approvalLetter" :applyFormWithPermissions="applyFormWithPermissions" :nextStepObj="nextStepObj" :rejectOption="rejectOption" @submit="submit">
     </submit-review>
-    <reject-dialog ref="rejectDialog" :formBase="formBase" :userOption="userOption" :rejectOption="rejectOption" @submit="submit"></reject-dialog>
+    <reject-dialog ref="rejectDialog" :formBase="formBase" :nextStepObj="nextStepObj"  :rejectOption="rejectOption" @submit="submit"></reject-dialog>
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <applyFormFilePreview :url="previewfileUrl"></applyFormFilePreview>
     </el-dialog>
@@ -116,7 +116,8 @@ import {
   approvalStorageDraft,
   getApprovalDraft,
   getOpinionApprovalLetter,
-  queryFormItemPermissions
+  queryFormItemPermissions,
+  getNextUserOption
 } from '@/api/aiApproval';
 import { getApplyForm } from '@/api/front';
 import {
@@ -180,21 +181,16 @@ export default {
         filledInByApprover: []
       },
       formItemPermissions: [],
+      nextStepObj: {
+        // 提交： selectObject：1 上一审批选择，nodeSelectUserList
+        // 驳回：  "refuseWay": "TO_BEFORE" ： 调回指定节点  nodeSelectList
+        nextNodeName: '',
+        selectObject: '',
+        nodeSelectUserList: [],
+        refuseWay: '',
+        nodeSelectList: []
+      },
       rejectOption: [
-        {
-          value: '文件预览失败（文件损坏/清晰度过低）',
-          label: '文件预览失败（文件损坏/清晰度过低）'
-        },
-        {
-          value: '附件材料与审批项目不匹配',
-          label: '附件材料与审批项目不匹配'
-        },
-        {
-          value: '其他',
-          label: '其他'
-        }
-      ],
-      userOption: [
         {
           value: '文件预览失败（文件损坏/清晰度过低）',
           label: '文件预览失败（文件损坏/清晰度过低）'
@@ -266,7 +262,8 @@ export default {
         const { data, status, message } = res.data;
         if (status === 200) {
           this.applyForm = data;
-          this.queryFormItemPermissions()
+          this.queryFormItemPermissions();
+          this.getNextUserOption();
           this.$refs.sidebar.tools[0].sidebarParam = {
             ...data,
             keyPointsForVerification: JSON.parse(JSON.stringify(data.keyPointsForVerification))
@@ -278,6 +275,20 @@ export default {
       });
       // 先获取工单基本信息，，然后判断获取草稿或初始化  文件信息
       this.getFileList();
+    },
+    // 获取  下一审批人列表
+    getNextUserOption() {
+      getNextUserOption({
+        nodeId: this.formBase.nodeId,
+        templateId: this.formBase.processTemplateId,
+        bool: 'Y'
+      }).then(res => {
+        const { data, status } = res.data;
+        const keys = Object.keys(data || {});
+        if (status === 200 && keys.length) {
+          this.nextStepObj = data;
+        }
+      });
     },
     queryFormItemPermissions() {
       queryFormItemPermissions({
@@ -705,7 +716,8 @@ export default {
     handleExamine() {
       this.examineShow = !this.examineShow;
     },
-    submit({reason, txt}) {
+    // 驳回方法
+    submit({reason, txt, prevUser}) {
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       const data = {
         comments: `${reason}${txt.trim() ? '-' + txt : ''}`,
@@ -714,7 +726,8 @@ export default {
           name: user.fullname
         },
         processInstanceId: this.formBase.processInstanceId,
-        rollbackId: this.formBase.rollbackId,
+        rollbackId: prevUser,
+        // || this.formBase.rollbackId
         signInfo: this.formBase.signInfo,
         nodeId: this.formBase.nodeId,
         taskId: this.formBase.taskId,

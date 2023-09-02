@@ -9,7 +9,7 @@
                 </span>
                 <div>
                     <el-button @click="handleClose">取消</el-button>
-                    <el-button type="primary" @click="submit"> 提交</el-button>
+                    <el-button type="primary" @click="submit" :disabled="disabled"> 提交</el-button>
                 </div>
             </div>
             <div class="line"></div>
@@ -23,15 +23,15 @@
                         </el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <!-- <el-form-item required label="请选择审批人"   label-width="110px" prop="nextUser" class="params-nextUser params-nextUser" >
-                    <el-select v-model.trim="params.nextUser" placeholder="需【下一节点名称】审批，请选择审批人">
-                        <el-option v-for="item in userOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                <el-form-item v-if="nextStepObj?.selectObject === '1'" style="width: 100%;" required label="请选择审批人"   label-width="110px" prop="nextUser" class="params-nextUser params-nextUser" >
+                    <el-select v-model.trim="params.nextUser" multiple :multiple-limit="1" :placeholder="`需${nextStepObj.nextNodeName}审批，请选择审批人`" filterable>
+                        <el-option v-for="item in nextStepObj?.nodeSelectUserList || []" :key="item.id" :label="item.name" :value="item.id"></el-option>
                     </el-select>
-                </el-form-item> -->
+                </el-form-item>
                 <template v-if="approvalLetter.permissions === 'passNotAllow' && !params.isPasses">
-                    <el-form-item required prop="prevUser" class="params-prevUser" label=" ">
+                    <el-form-item required prop="prevUser" class="params-prevUser" label=" " v-if="nextStepObj?.refuseWay === 'TO_BEFORE'">
                         <el-select v-model.trim="params.prevUser" placeholder="请选择驳回人">
-                            <el-option v-for="item in userOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                            <el-option v-for="item in nextStepObj?.nodeSelectList || []" :key="item.id" :label="item.name" :value="item.id"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item required prop="reason" class="params-reason" label=" ">
@@ -141,13 +141,14 @@ export default {
             type: Array,
             default: () => ([])
         },
-        userOption: {
-            type: Array,
-            default: () => ([])
+        nextStepObj: {
+            type: Object,
+            default: () => ({})
         },
     },
     data() {
         return {
+            disabled: false,
             timeNow: '',
             saveOption: {
                 message: '关闭提交弹窗将不保存已修改内容，确定关闭？',
@@ -181,10 +182,10 @@ export default {
             increasedIds: {}, //须在最后提交时移除的
             mousePoint: -1,
             params: {
-                isPasses: false,
+                isPasses: true,
                 reason: '',
                 txt: '',
-                nextUser: '',
+                nextUser: [],
                 prevUser: ''
             },
             examineList: [],
@@ -215,6 +216,7 @@ export default {
         },
         // 提交结果
         submit() {
+            // 驳回
             if (this.approvalLetter.permissions === 'passNotAllow' && !this.params.isPasses) {
                 this.$refs['paramsForm'].validate((valid) => {
                     if (valid) {
@@ -270,23 +272,41 @@ export default {
                 },
                 processInstanceId: this.formBase.processInstanceId,
                 taskId: this.formBase.taskId,
+                templateId: this.formBase.processTemplateId,
                 currentUserInfo: {
                     id: user.id,
                     name: user.fullname
                 }
             }
-            // console.log(data)
-            // return
+            let formValid = true;
+            if (this.nextStepObj?.selectObject === '1') {
+                this.$refs['paramsForm'].validate((valid) => {
+                    if (valid) {
+                        data.nextNodeId = this.nextStepObj.nextNodeId;
+                        data.nextUserInfo = (this.nextStepObj?.nodeSelectUserList || []).filter(user => this.params.nextUser.includes(user.id) ) 
+                    } else {
+                        formValid = false;
+                        return false;
+                    }
+                });
+            }
+            if (!formValid) {
+                return;
+            }
             this.$message.info('提交中，请稍等！')
+            this.disabled = true;
             ocrApprovalSubmission(data).then((res) => {
+                this.disabled = false;
                 const { status, msg } = res.data;
                 if (status === 200) {
-                    this.$router.go(-1)
                     this.$message.success({ offset: 40, message: '审查意见已提交,可在审批中心查看' });
                     this.submitReviewDialog = false;
+                    this.$router.go(-1)
                 } else {
                     this.$message.error({ offset: 40, message: msg });
                 }
+            }).catch(() => {
+                this.disabled = false;
             })
         },
         getFinalData() {},
@@ -594,6 +614,7 @@ export default {
 }
 .submit-review .paramsForm{
     display: flex;
+    flex-wrap: wrap;
     .params-nextUser, .params-prevUser ,.params-reason,.params-txt{
         padding: 0;
         /deep/ .el-form-item__content{

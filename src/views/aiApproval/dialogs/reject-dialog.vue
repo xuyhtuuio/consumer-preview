@@ -2,6 +2,12 @@
   <el-dialog :visible.sync="addReviewDialog" width="800px" :before-close="handleClose" center custom-class="add-review"
     title="驳回">
     <el-form label-position="left" label-width="80px" :model="form" :rules="rules">
+      <el-form-item label="驳回人" prop="prevUser">
+        <el-select v-model="form.prevUser" placeholder="请选择驳回人" size="medium">
+          <el-option v-for="(item, code) in nextStepObj?.nodeSelectList?.[0] || {}" :key="code" :label="code" :value="item">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="驳回原因" prop="reason">
         <el-select v-model="form.reason" placeholder="请选择驳回原因" size="medium">
           <el-option v-for="item in rejectOption" :key="item.value" :label="item.label" :value="item.value">
@@ -31,6 +37,10 @@ export default {
       type: Array,
       default: () => ([])
     },
+    nextStepObj: {
+      type: Object,
+      default: () => ({})
+    },
   },
   data() {
     return {
@@ -38,9 +48,12 @@ export default {
       form: {
         reason: '',
         txt: '',
-        nextUser: ''
+        prevUser: ''
       },
       rules: {
+        prevUser: [
+          { required: true, message: '请选择驳回人', trigger: 'change' }
+        ],
         reason: [
           { required: true, message: '请选择驳回原因', trigger: 'change' }
         ],
@@ -52,7 +65,7 @@ export default {
   },
   methods: {
     init() {
-      this.form.reason = this.options[0].value;
+      this.form.reason = this.rejectOption[0].value;
       this.form.txt = '';
       this.addReviewDialog = true;
     },

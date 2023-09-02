@@ -101,3 +101,12 @@ export function getSimilarCases(params) {
     params
   })
 }
+
+// 获取下一节点审批人选择返回，和驳回人选择返回
+export function getNextUserOption(params) {
+  return request({
+    url: '/cpr/externalLogicController/ruler',
+    method: 'get',
+    params
+  })
+}
