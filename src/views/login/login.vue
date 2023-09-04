@@ -323,7 +323,7 @@ export default {
         msg: false
       });
       const role = JSON.parse(res.data.user_name).roles.filter((item) => {
-        return item.clientId === 'teisdata'
+        return item.clientId === 'cpr'
       })
       return role;
     },
