@@ -56,13 +56,13 @@ export default {
   watch: {
     list: {
       handler(val) {
-        this.currentId = Number(this.currentId == -1 ? val[0].recordId : this.currentId);
+        this.currentId = Number(this.currentId === -1 ? val[0].recordId : this.currentId);
         this.$emit('handleTo', this.currentId);
       },
       deep: true
     },
     formManagementId(val) {
-      if (val != -1) this.currentId = val;
+      if (Number(val) !== -1) this.currentId = val;
     }
   },
   methods: {

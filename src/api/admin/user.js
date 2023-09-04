@@ -1,5 +1,4 @@
-
-import request from '@/api/request.js'
+import request from '@/api/request'
 // 获取关键词列表
 export function queryUserList() {
   return request({
@@ -29,7 +28,6 @@ export function deactivateRecoveryUser(params) {
     params
   })
 }
-
 
 export function changeUserRoles(params) {
   return request({

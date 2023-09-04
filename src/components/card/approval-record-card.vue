@@ -54,13 +54,17 @@
                   无实质意见
                 </span>
               </div>
-              <p class="opinion-text"><i v-if="activity.optionVOList.length > 1">{{ idx + 1 }}</i> {{ item.str }}</p>
+              <p class="opinion-text">
+                <i v-if="activity.optionVOList.length > 1">{{ idx + 1 }}</i>
+                {{ item.str }}
+              </p>
               <div class="relevant-file" v-if="item.files && item.files.length">
-                关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.files && item.files[0] }} </i>
+                关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.files && item.files[0] }}
+                </i>
                 <el-popover placement="bottom-end" popper-class="file-overview-popper" trigger="click"
                   v-if="item.files && item.files.length > 1">
                   <div class="file-list">
-                    <div class="file-list-item  ellipsis ellipsis_1 " v-for="(file, idx) in item.files" :key="idx">
+                    <div class="file-list-item ellipsis ellipsis_1" v-for="(file, idx) in item.files" :key="idx">
                       {{ file }}
                     </div>
                   </div>
@@ -75,7 +79,7 @@
   </div>
 </template>
 <script>
-import moment from 'moment';
+import moment from 'moment'
 import { instanceInfo } from '@/api/applyCenter'
 import empty from '@/components/common/empty'
 export default {
@@ -91,17 +95,15 @@ export default {
     return {
       hasData: false,
       loading: false,
-      recordList: [],
-    };
+      recordList: []
+    }
   },
   mounted() {
     if (this.sidebarParam || this.$route.params) {
       this.init()
     }
   },
-  activated() {
-
-  },
+  activated() { },
   methods: {
     init() {
       this.loading = true
@@ -133,51 +135,58 @@ export default {
       // }) : []
       // return this.hasData = true
 
-
-
       instanceInfo({
-        "processInstanceId": this.$route.params && this.$route.params.processInstanceId || this.sidebarParam && this.sidebarParam.processInstanceId,
-      }).then(res => {
-        const { detailVOList } = res.data.data
-        if (!detailVOList) {
-          return this.hasData = false
-        }
-        // detailVOList
-        const keys = Object.keys(detailVOList)
-        let arr = []
-        for (let i in keys) {
-          let obj = {
-            ...detailVOList[keys[i]][0],
-            name: detailVOList[keys[i]][0].activityId == 'endEventNode' ? '已结束' : detailVOList[keys[i]][0].name
-          }
-          arr.push(obj)
-        }
-        const arr_handler = arr.sort((a, b) => {
-          return moment(a.createTime) - moment(b.createTime)
-        })
-        this.recordList = arr_handler instanceof Array && arr_handler.length ? arr_handler.map(v => {
-          let comments = v.optionVOList && v.optionVOList[0].comments
-          let handlerComents = JSON.parse(comments)
-          // handlerComents = handlerComents?.map(m => {
-          //   return {
-          //     ...m,
-          //     files: m.files?.map(m => {
-          //       let arr = m.split('_')
-          //       arr = arr.slice(2)
-          //       return arr.join('_')
-          //     }) || []
-          //   }
-          // })||[]
-          return {
-            ...v,
-            optionVOList: handlerComents,
-          }
-        }) : []
-        return this.hasData = true
-
-      }).finally(() => {
-        this.loading = false
+        processInstanceId:
+          (this.$route.params && this.$route.params.processInstanceId) || (this.sidebarParam && this.sidebarParam.processInstanceId)
       })
+        .then((res) => {
+          const { detailVOList } = res.data.data
+          if (!detailVOList) {
+            this.hasData = false
+            return false
+          }
+          // detailVOList
+          const keys = Object.keys(detailVOList)
+          const arr = []
+          for (const i in keys) {
+            const obj = {
+              ...detailVOList[keys[i]][0],
+              name:
+                detailVOList[keys[i]][0].activityId === 'endEventNode'
+                  ? '已结束'
+                  : detailVOList[keys[i]][0].name
+            }
+            arr.push(obj)
+          }
+          // eslint-disable-next-line
+          const arr_handler = arr.sort((a, b) => {
+            return moment(a.createTime) - moment(b.createTime)
+          })
+          // eslint-disable-next-line
+          this.recordList = arr_handler instanceof Array && arr_handler.length ? arr_handler.map((v) => {
+            const comments = v.optionVOList && v.optionVOList[0].comments
+            const handlerComents = JSON.parse(comments)
+            // handlerComents = handlerComents?.map(m => {
+            //   return {
+            //     ...m,
+            //     files: m.files?.map(m => {
+            //       let arr = m.split('_')
+            //       arr = arr.slice(2)
+            //       return arr.join('_')
+            //     }) || []
+            //   }
+            // })||[]
+            return {
+              ...v,
+              optionVOList: handlerComents
+            }
+          })
+            : []
+          this.hasData = true
+        })
+        .finally(() => {
+          this.loading = false
+        })
     }
   },
   filters: {
@@ -185,13 +194,15 @@ export default {
       return val ? moment(val).format('MM-DD HH:mm') : '--'
     },
     handleTimeFormat(val) {
-      let timediff = moment(val.endTime).diff(moment(val.createTime), 'seconds');
-      let _timediff = timediff > 0 ? (timediff / 3600).toFixed(1) : 0
-      _timediff < 0.1 ? timediff = (timediff / 3600).toFixed(2) : timediff = _timediff
+      let timediff = moment(val.endTime).diff(moment(val.createTime), 'seconds')
+      const _timediff = timediff > 0 ? (timediff / 3600).toFixed(1) : 0
+      _timediff < 0.1
+        ? (timediff = (timediff / 3600).toFixed(2))
+        : (timediff = _timediff)
       return val.endTime ? timediff : '--'
     }
   }
-};
+}
 </script>
 <style lang="less" scoped>
 .record-detail {
@@ -274,7 +285,6 @@ export default {
 
         span {
           flex: 1;
-
         }
 
         .handle-time {
@@ -428,7 +438,5 @@ export default {
       line-height: 20px;
       margin-bottom: 8px;
     }
-
   }
-}
-</style>
+}</style>

@@ -111,8 +111,8 @@
 <script>
 import { debounce } from 'lodash';
 import { belongModules } from '@/utils/dict'
-import { getFormGroups } from "@/api/front";
-import secondaryConfirmation from "@/components/common/secondaryConfirmation"
+import { getFormGroups } from '@/api/front';
+import secondaryConfirmation from '@/components/common/secondaryConfirmation'
 import {
   obtainExamineTypeList,
   copyFormCategory,
@@ -164,7 +164,7 @@ export default {
           prop: 'updateTime',
           bind: {
             align: 'center',
-            sortable: "custom"
+            sortable: 'custom'
           }
         },
         {
@@ -270,17 +270,16 @@ export default {
   methods: {
     uploadBpmn(param) {
       const formData = new FormData();
-      formData.append("mf", param.file); // 传入bpmn文件
+      formData.append('mf', param.file); // 传入bpmn文件
       getFormGroups(formData)
         .then((res) => {
           if (res.data.data) {
             this.handleAvatarSuccess(res.data.data, param.file.uid);
           } else {
-            console.log(res.data.data, 123)
             this.$message.error(res.data.msg)
           }
         })
-        .catch((err) => {
+        .catch(() => {
           param.onError(param.file.uid);
         });
     },
@@ -331,7 +330,7 @@ export default {
         }
       }
     },
-    changeSort1(sort) {
+    changeSort1() {
       // let data = {
       //   orderColumn: sort.prop,
       //   orderType: 'asc'
@@ -399,7 +398,7 @@ export default {
       document.querySelector('#icon-uploader').click()
     },
     // 新增表单
-    addForm: debounce(async function() {
+    addForm: debounce(async function () {
       this.addLoading = true;
       const res = await addFormCategory()
       this.addLoading = false;
@@ -424,9 +423,9 @@ export default {
       this.loadingList = false
       const resData = res.data.data
       if (resData) {
-        this.data1 = resData.list.map(item => {
-          item.isView = (this.isView || item.canEdited === 0)
-          return item;
+        this.data1 = resData.list.map(item1 => {
+          item1.isView = (this.isView || item1.canEdited === 0)
+          return item1;
         });
         this.resData1 = JSON.parse(JSON.stringify(resData.list))
         this.page2.total = resData.totalCount
@@ -441,7 +440,7 @@ export default {
       this.editForm(item)
     },
     // 复制表单
-    copyForm: debounce(async function(row) {
+    copyForm: debounce(async function (row) {
       await copyFormCategory(row.recordId)
       this.getObtainExamineTypeList({
         orderColumn: 'updateTime',
@@ -466,13 +465,11 @@ export default {
         })
         this.editForm(this.currentRow)
       }
-      console.log(res?.data)
       if (res?.data?.success) {
         this.$message.success('修改成功!')
       } else {
         if (resData && this.level === 1) {
           const findRow = resData.find(item => item.recordId === row.recordId)
-          console.log(findRow, row)
           if (row.recordId === findRow.recordId && findRow.examineTypesName === row.examineTypesName) {
             return;
           }
@@ -488,7 +485,7 @@ export default {
       this.limitTimeVisible = true
     },
     // 停用
-    stopApllay: debounce(function(row) {
+    stopApllay: debounce(function (row) {
       this.confirmOption = {
         message: '停用此表单可能影响部分申请单，确定停用该表单吗？',
         cancelBtn: '取消',
@@ -498,7 +495,7 @@ export default {
       this.$refs.confirmation.dialogVisible = true;
       this.currentRow = row
     }, 500),
-    enableApllay: debounce(async function(row) {
+    enableApllay: debounce(async function (row) {
       const res = await switchFormCategoryState({
         formCategoryId: row.recordId
       })
@@ -508,7 +505,6 @@ export default {
           message: row.run === '1' ? '停用成功!' : '该表单已恢复，可在提单时查看'
         });
         row.run = row.run === '0' ? '1' : '0'
-        return;
       }
     }, 500),
     async handleStop(option) {
@@ -578,13 +574,13 @@ export default {
       })
       if (res?.data.success) {
         this.$message.success('删除成功!')
-        this.handleCurrentChange(this.data1.length === 1 ? this.page2.pageNow -1: this.page2.pageNow)
+        this.handleCurrentChange(this.data1.length === 1 ? this.page2.pageNow - 1 : this.page2.pageNow)
       } else {
         this.$message.error(res?.data?.msg)
       }
     },
     // 停用表单项
-    changeFormItemState: debounce(async function(item) {
+    changeFormItemState: debounce(async function (item) {
       const res = await switchFormItemState({
         formItemId: item.id
       })
@@ -613,7 +609,7 @@ export default {
       this.level = 1
       this.page = this.page1
     },
-    tableRowClassName({ row, rowIndex }) {
+    tableRowClassName({ row }) {
       if (row.run === '0') {
         return 'disable-row';
       }

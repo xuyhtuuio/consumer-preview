@@ -7,13 +7,18 @@
         <p class="stuff">
           <i class="line"></i>
           <span>
-            {{ item.approveName }} / {{ item.approverOrgName }} <i>共{{ item.substantiveopinion.length }}条</i>
+            {{ item.approveName }} / {{ item.approverOrgName }}
+            <i>共{{ item.substantiveopinion.length }}条</i>
             {{ item.approveTime }}
           </span>
           <i class="line"></i>
         </p>
         <div class="opinions">
-          <div v-for="(child, idx) in item.substantiveopinion" :key="idx" class="opinions-item pointer">
+          <div
+            v-for="(child, idx) in item.substantiveopinion"
+            :key="idx"
+            class="opinions-item pointer"
+          >
             <div class="opinion-tag">
               <span v-if="child.substantiveOpinions == 1" class="guanzhu">
                 <i class="iconfont icon icon-guanzhu"></i>
@@ -25,13 +30,23 @@
               </span>
             </div>
             <p class="opinion-text">{{ idx + 1 }} {{ child.content }}</p>
-            <div class="relevant-file" v-if="child.relevantfile && child.relevantfile.length">
+            <div
+              class="relevant-file"
+              v-if="child.relevantfile && child.relevantfile.length"
+            >
               关联文件：<i class="file-name">{{ child.relevantfile[0] }} </i>
-              <el-popover placement="bottom" popper-class="file-overview-popper" trigger="click"
-                v-if="child.relevantfile && child.relevantfile.length - 1">
+              <el-popover
+                placement="bottom"
+                popper-class="file-overview-popper"
+                trigger="click"
+                v-if="child.relevantfile && child.relevantfile.length - 1"
+              >
                 <div class="file-list">
-                  <div class="file-list-item pointer ellipsis ellipsis_1 " v-for="(file, i) in child.relevantfile"
-                    :key="i">
+                  <div
+                    class="file-list-item pointer ellipsis ellipsis_1"
+                    v-for="(file, i) in child.relevantfile"
+                    :key="i"
+                  >
                     {{ file }}
                   </div>
                 </div>
@@ -39,24 +54,45 @@
               </el-popover>
             </div>
             <!-- 审批的时候选择采纳与否 -->
-            <div class="accept-box" v-if="(status == '3' || status == '5') && taskStatus != 3">
-              <el-radio-group v-model="child.adoptOpinions" @change="changeAccept(child, index, idx)">
+            <div
+              class="accept-box"
+              v-if="(status == '3' || status == '5') && taskStatus != 3"
+            >
+              <el-radio-group
+                v-model="child.adoptOpinions"
+                @change="changeAccept(child, index, idx)"
+              >
                 <el-radio :label="1">采纳</el-radio>
                 <el-radio :label="0">不采纳</el-radio>
               </el-radio-group>
-              <el-form :model="child" :ref="`form_${index}_${idx}`" :class="`form_${index}_${idx}`"
-                :rules="child.adoptOpinions != 1 ? rules : {}" class="desc-form">
+              <el-form
+                :model="child"
+                :ref="`form_${index}_${idx}`"
+                :class="`form_${index}_${idx}`"
+                :rules="child.adoptOpinions != 1 ? rules : {}"
+                class="desc-form"
+              >
                 <el-form-item prop="notAdoptingReasons" label=" " class="flex">
-                  <el-input v-model="child.notAdoptingReasons" class="input-desc" :ref="`input_${index}_${idx}`"
-                    :placeholder="child.adoptOpinions == 1 ? '请填写采纳说明' : '请填写不采纳说明'
-                      " @input="updateState"></el-input>
+                  <el-input
+                    v-model="child.notAdoptingReasons"
+                    class="input-desc"
+                    :ref="`input_${index}_${idx}`"
+                    :placeholder="
+                      child.adoptOpinions == 1
+                        ? '请填写采纳说明'
+                        : '请填写不采纳说明'
+                    "
+                    @input="updateState"
+                  ></el-input>
                 </el-form-item>
               </el-form>
             </div>
             <!-- 正常显示采纳与否 -->
             <div class="isAdopt-box" v-if="status == '4' || taskStatus == 3">
               <span v-if="child.adoptOpinions == 1" class="accept">已采纳</span>
-              <span v-if="child.adoptOpinions == 0" class="no-accept">不采纳</span>
+              <span v-if="child.adoptOpinions == 0" class="no-accept"
+                >不采纳</span
+              >
               <div v-if="child.adoptOpinions == 0" class="desc">
                 {{ child.notAdoptingReasons }}
               </div>
@@ -72,7 +108,7 @@
 import empty from '@/components/common/empty'
 import moment from 'moment'
 
-import { getEditedCommentsByFormId, } from '@/api/applyCenter'
+import { getEditedCommentsByFormId } from '@/api/applyCenter'
 
 export default {
   name: 'approved-opinion-card',
@@ -83,7 +119,7 @@ export default {
     taskStatus: { type: String, default: '0' },
     sidebarParam: {
       type: Object,
-      default: () => { }
+      default: () => {}
     }
   },
   data() {
@@ -92,19 +128,21 @@ export default {
         notAdoptingReasons: [
           {
             required: true,
-            message: "请填写说明",
-            trigger: ["blur", "change"],
-          },
-        ],
+            message: '请填写说明',
+            trigger: ['blur', 'change']
+          }
+        ]
       },
       opinions: [],
       hasData: false,
-      loading: false,
-    };
+      loading: false
+    }
   },
 
   mounted() {
-    this.$route.params.formId||this.sidebarParam.formId ? this.getEditedCommentsByFormId() : ''
+    this.$route.params.formId || this.sidebarParam.formId
+      ? this.getEditedCommentsByFormId()
+      : ''
   },
   methods: {
     // 判断是否更新数据并向state更新
@@ -112,84 +150,102 @@ export default {
       const flag = this.checkParam()
       this.$store.commit('setApprovedOpinionRequired', flag)
       let opinions = Object.values(this.opinions)
-      opinions = opinions.map(v => {
-        return v.substantiveopinion
-      }).flat()
+      opinions = opinions
+        .map((v) => {
+          return v.substantiveopinion
+        })
+        .flat()
       this.$store.commit('setApprovedOpinionForm', opinions)
     },
     // 先获取详情
     changeAccept(child, index, idx) {
-      if (child.adoptOpinions == 1) {
-        const form = `form_${index}_${idx}`;
+      if (child.adoptOpinions === 1) {
+        const form = `form_${index}_${idx}`
         this.$nextTick(() => {
-          this.$refs[form][0].clearValidate();
-        });
+          this.$refs[form][0].clearValidate()
+        })
       }
       this.updateState()
     },
     getEditedCommentsByFormId() {
       this.loading = true
-      getEditedCommentsByFormId({ formId: this.$route.params.formId||this.sidebarParam.formId }).then(res => {
-        const { data } = res.data
-        const keys = Object.keys(data)
-        if (data?.constructor !== Object) {
-          return this.hasData = false
-        }
-        this.hasData = true
-        let opinions = []
-        for (let i in keys) {
-          const obj = {}
-          obj.approveName = keys[i]
-          let _info = data[keys[i]]
-          obj.approverOrgName = _info[0].approverOrgName
-          obj.approveTime = _info[0].updateTime ? moment(_info[0].updateTime).format('YYYY-MM-DD') : ''
-          //根据不同的status展示不同的信息
-          // status:4已经结束   其他的的值表示是可以编辑的表单
-          let _newInfo = []
-          if (this.taskStatus != 4) {
-            _newInfo = _info.map(v => {
-              return {
-                ...v,
-                adoptOpinions: v.cacheFlag === '1' ? Number(v.adoptOpinions) : 1,
-                notAdoptingReasons: v.cacheFlag === '1' ? v.notAdoptingReasons : '',
-                relevantfile: v.associatedAttachmentsIds ? v.associatedAttachmentsIds.split(';') : []
-              }
-            })
-          } else {
-            _newInfo = _info.map(v => {
-              return {
-                ...v,
-                adoptOpinions: v.cacheFlag === '1' ? Number(v.adoptOpinions) : 1,
-                notAdoptingReasons: v.notAdoptingReasons,
-                relevantfile: v.associatedAttachmentsIds ? v.associatedAttachmentsIds.split(';') : []
-              }
-            })
-          }
-          obj.substantiveopinion = _newInfo
-          opinions.push(obj)
-        }
-        this.opinions = opinions
-        const newOpinions = opinions.map(v => {
-          return v.substantiveopinion
-        }).flat()
-        this.$store.commit('setApprovedOpinionForm', newOpinions)
-        this.$emit('sendOpinionInfo', opinions)
-      }).finally(() => {
-        this.loading = false
+      getEditedCommentsByFormId({
+        formId: this.$route.params.formId || this.sidebarParam.formId
       })
+        .then((res) => {
+          const { data } = res.data
+          const keys = Object.keys(data)
+          if (data?.constructor !== Object) {
+            this.hasData = false
+            return false
+          }
+          this.hasData = true
+          const opinions = []
+          for (const i in keys) {
+            const obj = {}
+            obj.approveName = keys[i]
+            const _info = data[keys[i]]
+            obj.approverOrgName = _info[0].approverOrgName
+            obj.approveTime = _info[0].createTime
+              ? moment(_info[0].createTime).format('YYYY-MM-DD')
+              : ''
+            // 根据不同的status展示不同的信息
+            // status:4已经结束   其他的的值表示是可以编辑的表单
+            let _newInfo = []
+            if (this.taskStatus !== 4) {
+              _newInfo = _info.map((v) => {
+                return {
+                  ...v,
+                  adoptOpinions:
+                    v.cacheFlag === '1' ? Number(v.adoptOpinions) : 1,
+                  notAdoptingReasons:
+                    v.cacheFlag === '1' ? v.notAdoptingReasons : '',
+                  relevantfile: v.associatedAttachmentsIds
+                    ? v.associatedAttachmentsIds.split(';')
+                    : []
+                }
+              })
+            } else {
+              _newInfo = _info.map((v) => {
+                return {
+                  ...v,
+                  adoptOpinions:
+                    v.cacheFlag === '1' ? Number(v.adoptOpinions) : 1,
+                  notAdoptingReasons: v.notAdoptingReasons,
+                  relevantfile: v.associatedAttachmentsIds
+                    ? v.associatedAttachmentsIds.split(';')
+                    : []
+                }
+              })
+            }
+            obj.substantiveopinion = _newInfo
+            opinions.push(obj)
+          }
+          this.opinions = opinions
+          const newOpinions = opinions
+            .map((v) => {
+              return v.substantiveopinion
+            })
+            .flat()
+          this.$store.commit('setApprovedOpinionForm', newOpinions)
+          this.$emit('sendOpinionInfo', opinions)
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
 
     checkParam(submit) {
-      const inputArr = [];
+      const inputArr = []
       for (let i = 0; i < this.opinions.length; i++) {
         for (let j = 0; j < this.opinions[i].substantiveopinion.length; j++) {
-          const form = `form_${i}_${j}`;
+          const form = `form_${i}_${j}`
           this.$refs[form][0].validate((valid) => {
             if (!valid) {
-              const ref = `input_${i}_${j}`;
-              inputArr.push(ref);
+              const ref = `input_${i}_${j}`
+              inputArr.push(ref)
             }
-          });
+          })
         }
       }
       if (submit) {
@@ -197,9 +253,9 @@ export default {
       } else {
         return inputArr.length < 1
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 <style lang="less" scoped>
 .approved-opinion-card {
@@ -297,7 +353,7 @@ export default {
         .accept-box {
           margin-top: 8px;
 
-          /deep/ .el-radio .el-radio__input.is-checked+.el-radio__label,
+          /deep/ .el-radio .el-radio__input.is-checked + .el-radio__label,
           /deep/ .el-radio .el-radio__label {
             color: #1d2128;
             font-weight: 400;
@@ -318,7 +374,7 @@ export default {
 
             .el-form-item__error::before {
               font-family: element-icons !important;
-              content: "\e7a3";
+              content: '\e7a3';
               font-size: 20px;
               margin-right: 8px;
             }
@@ -412,5 +468,4 @@ export default {
       margin-bottom: 8px;
     }
   }
-}
-</style>
+}</style>

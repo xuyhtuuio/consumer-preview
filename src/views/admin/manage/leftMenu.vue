@@ -21,19 +21,19 @@ export default {
       const pathNames = [{
         name: 'FlowManage',
         path: '/admin/manage/flowManage'
-      },{
+      }, {
         name: 'UserManage',
         path: '/admin/manage/userManage'
-      },{
+      }, {
         name: 'FormManage',
         path: '/admin/manage/formManage'
-      },{
+      }, {
         name: 'RolePermission',
         path: '/admin/manage/rolePermission'
-      },{
+      }, {
         name: 'LabelManage',
         path: '/admin/manage/labelManage'
-      },{
+      }, {
         name: 'OpinionManage',
         path: '/admin/manage/opinionManage'
       }]
@@ -43,7 +43,6 @@ export default {
           item.path = exsit.path
           return item;
         }
-        return;
       }).filter(e => e)
       return listArr || []
     }
@@ -73,6 +72,5 @@ export default {
     }
   }
 }
-
 
 </style>

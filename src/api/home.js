@@ -1,4 +1,4 @@
-import request from '@/api/request.js';
+import request from '@/api/request';
 export function getList(data) {
   return request({
     url: '/cpr/applicationcenter/applicationList',

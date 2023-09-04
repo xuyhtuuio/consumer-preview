@@ -1,17 +1,13 @@
 import Vue from 'vue'
-import App from './App.vue'
-import router from "./router";
-import store from './store'
-
-import ElementUI from "element-ui";
+import ElementUI from 'element-ui';
 import TrsWebComponents from 'trs-web-components'
-import gloCptsFn from "@/utils/globalCmps"
-import "element-ui/lib/theme-chalk/index.css";
+import gloCptsFn from '@/utils/globalCmps'
+import 'element-ui/lib/theme-chalk/index.css';
 import Empty from '@/components/common/empty'
 import Ellipsis from '@/components/common/Ellipsis'
 import WDialog from '@/components/common/WDialog'
 import $GLOBAL from '@/utils/const';
-import http from '@/api/request.js'; /* eslint-disable */
+import http from '@/api/request'; /* eslint-disable */
 import bus from '@/utils/bus';
 
 import 'trs-web-components/lib/common.less';
@@ -23,6 +19,11 @@ import '@/assets/icon/iconfont.js';
 import '@/assets/css/common.less';
 import '@/assets/css/element.less';
 import '@/mixins'
+
+import App from './App'
+import router from "./router";
+import store from './store'
+
 import onceClick from './utils/click-once';
 Vue.use(ElementUI);
 Vue.use(TrsWebComponents);

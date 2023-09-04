@@ -58,7 +58,7 @@ export default {
     };
   },
   methods: {
-    handleChange(flag) {
+    handleChange() {
       if (this.judgeWarnFlag === true) this.judgeWarnFlag = false;
     },
     judgeWarn() {
@@ -67,7 +67,7 @@ export default {
       } else if (this.list.some(item => item.value.length !== 0)) {
         return [true];
       } else {
-        const offsetTop = this.$refs[`globalRef`].offsetTop;
+        const { offsetTop } = this.$refs['globalRef'];
         this.judgeWarnFlag = true;
         return [false, offsetTop];
       }

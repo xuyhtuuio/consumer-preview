@@ -200,9 +200,9 @@
 </template>
 <script>
 import secondaryConfirmation from '@/components/common/secondaryConfirmation';
-import { getPageList, getSearchList, edit, add, remove } from '@/api/admin-opinion.js';
-import { copyText } from '@/utils/Clipboard.js';
-import { timestampToDateTime } from '@/utils/utils.js';
+import { getPageList, getSearchList, edit, add, remove } from '@/api/admin-opinion';
+import { copyText } from '@/utils/Clipboard';
+import { timestampToDateTime } from '@/utils/utils';
 export default {
   name: 'OpinionManage',
   props: {
@@ -273,18 +273,17 @@ export default {
   },
   directives: {
     scrollLoad: {
-      bind(el, binding, vnode) {
-        var that = this;
-        let wrapDom = el.querySelector('.el-autocomplete-suggestion__wrap');
-        let listDom = el.querySelector(
+      bind(el, binding) {
+        const wrapDom = el.querySelector('.el-autocomplete-suggestion__wrap');
+        const listDom = el.querySelector(
           '.el-autocomplete-suggestion__wrap  .el-autocomplete-suggestion__list'
         );
         wrapDom.addEventListener(
           'scroll',
-          e => {
-            let condition = wrapDom.offsetHeight + wrapDom.scrollTop - listDom.offsetHeight - 20;
-            if (condition == 0 && wrapDom.scrollTop !== 0) {
-              //滚动到底部则执行滚动方法load，binding.value就是v-scrollLoad绑定的值，加()表示执行绑定的方法
+          () => {
+            const condition = wrapDom.offsetHeight + wrapDom.scrollTop - listDom.offsetHeight - 20;
+            if (+condition === 0 && wrapDom.scrollTop !== 0) {
+              // 滚动到底部则执行滚动方法load，binding.value就是v-scrollLoad绑定的值，加()表示执行绑定的方法
               binding.value();
             }
           },
@@ -297,10 +296,12 @@ export default {
     // 初始化数据
     initData() {
       this.isLoading = true;
+      const referSort = this.referSort ? 1 : 2
+      const updateSort = this.updateSort ? 3 : 4
       const pageData = {
         keywordContent: this.search.baseline,
         opinionContent: this.search.review,
-        orderType: this.currentSort ? (this.referSort ? 1 : 2) : this.updateSort ? 3 : 4,
+        orderType: this.currentSort ? referSort : updateSort,
         pageNum: this.page.pageNow,
         pageSize: this.page.pageSize,
         isAll: this.pageConfig.isAll !== undefined ? this.pageConfig.isAll : 1
@@ -329,8 +330,7 @@ export default {
         const arr = res.list;
         this.formatting(arr);
         const keyword = flag ? this.dialogItem.keywordName : this.search.baseline;
-        if (arr && arr.length > 0 && keyword?.length > 0)
-          this.handleTextHigh(arr, { value: ['showItem', keyword] });
+        if (arr && arr.length > 0 && keyword?.length > 0) this.handleTextHigh(arr, { value: ['showItem', keyword] });
 
         if (this.searchDialogIndex === 1) this.searchList.length = 0;
 
@@ -354,10 +354,10 @@ export default {
         originArr.filter(item => {
           item[originValue[0]] = item[originKey];
           const keyword = originValue[1];
-          let reg = new RegExp(keyword, 'gi');
+          const reg = new RegExp(keyword, 'gi');
           const regRes = reg.exec(item[originKey]);
           if (regRes) {
-            let replaceString = `<span style="color:#2D5CF6;">${regRes[0]}</span>`;
+            const replaceString = `<span style="color:#2D5CF6;">${regRes[0]}</span>`;
             item[originValue[0]] = item[originKey].replace(regRes, replaceString);
           }
         });
@@ -373,9 +373,9 @@ export default {
       this.$refs.autocomplete.activated = true;
       this.initSearchData(flag);
     },
-    //根据传进来的状态改变建议输入框的状态（展开|隐藏）
+    // 根据传进来的状态改变建议输入框的状态（展开|隐藏）
     changeStyle(status, className) {
-      let dom = document.querySelectorAll(className);
+      const dom = document.querySelectorAll(className);
       dom[0].style.display = status;
     },
     handleSort(type) {
@@ -391,7 +391,7 @@ export default {
       }
       this.initData();
     },
-    async changeIsTop(item, i) {
+    async changeIsTop(item) {
       this.isLoading = true;
       const isTop = item.isTop === 0 ? 1 : 0;
       const res = await edit({
@@ -456,10 +456,9 @@ export default {
     async editItem({ keywordName, recommendedOpinions }) {
       if (!keywordName || !recommendedOpinions) return this.$message.error('请填写相关信息');
       if (
-        this.searchList.length &&
-        !this.searchList.find(listItem => listItem.value === keywordName)
-      )
-        return this.$message.error('请选择正确的标签名称');
+        this.searchList.length
+        && !this.searchList.find(listItem => listItem.value === keywordName)
+      ) return this.$message.error('请选择正确的标签名称');
       let res;
       if (this.dialogItem?.recordId) {
         res = await edit({

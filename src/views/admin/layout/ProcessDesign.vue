@@ -39,7 +39,7 @@
           <span style="font-size:medium;font-weight:700">
             {{selectedNode.name}}
           </span>
-        </template> 
+        </template>
       </div>
       <div class="node-config-content">
         <node-config/>
@@ -49,13 +49,13 @@
 </template>
 
 <script>
-import ProcessTree from './process/ProcessTree.vue'
+import ProcessTree from './process/ProcessTree'
 import NodeConfig from '../../common/process/config/NodeConfig'
-//import ProcessTree from '@/views/common/process/FormComponentConfig.vue'
+// import ProcessTree from '@/views/common/process/FormComponentConfig.vue'
 
 export default {
-  name: "ProcessDesign",
-  components: {ProcessTree, NodeConfig},
+  name: 'ProcessDesign',
+  components: { ProcessTree, NodeConfig },
   props: {
     from: String
   },
@@ -68,11 +68,11 @@ export default {
       isHover: false
     }
   },
-  computed:{
+  computed: {
     disabledForm() {
       return this.$route.name === 'FlowManage'
     },
-    selectedNode(){
+    selectedNode() {
       return this.$store.state.selectedNode
     },
     nodeMap() {
@@ -91,21 +91,19 @@ export default {
       return tempNodes
     },
   },
-  watch:{
-    selectedNode:{
+  watch: {
+    selectedNode: {
       deep: true,
-      handler(node){
-        console.log("更新")
-        this.$refs["process-tree"].nodeDomUpdate(node)
+      handler(node) {
+        this.$refs['process-tree'].nodeDomUpdate(node)
       }
     }
   },
   methods: {
-    validate(){
-      return this.$refs["process-tree"].validateProcess()
+    validate() {
+      return this.$refs['process-tree'].validateProcess()
     },
-    nodeSelected(node){
-      console.log('配置节点', node)
+    nodeSelected() {
       this.showConfig = true
     },
     closeConfigDrawer() {

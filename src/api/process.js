@@ -1,5 +1,4 @@
-
-import request from '@/api/request.js'
+import request from '@/api/request'
 
 // 通过模板id查看流程信息 会附带流程定义id
 export function getProcessDetail(templateId) {

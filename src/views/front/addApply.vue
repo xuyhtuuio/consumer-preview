@@ -70,13 +70,7 @@
 import SecondaryConfirmation from '@/components/common/secondaryConfirmation';
 import ProcessDesign from '@/views/admin/layout/ProcessDesign';
 
-import AddTag from './components/add-tag.vue';
-import ReviewMatters from './components/review-matters.vue';
-import BasicInformation from './components/basic-information.vue';
-import PublicityChannels from './components/publicity-channels.vue';
-import ReconciliationPoint from './components/reconciliation-point.vue';
-import ReviewMaterial from './components/review-material.vue';
-import { timestampToDateTime } from '@/utils/utils.js';
+import { timestampToDateTime } from '@/utils/utils';
 import {
   getFormCategoryArray,
   getApplyForm,
@@ -84,7 +78,14 @@ import {
   externalLogicController,
   processStart,
   getProcess
-} from '@/api/front.js';
+} from '@/api/front';
+import AddTag from './components/add-tag';
+import ReviewMatters from './components/review-matters';
+import BasicInformation from './components/basic-information';
+import PublicityChannels from './components/publicity-channels';
+import ReconciliationPoint from './components/reconciliation-point';
+import ReviewMaterial from './components/review-material';
+
 export default {
   components: {
     AddTag,
@@ -144,7 +145,7 @@ export default {
   },
   beforeRouteLeave({ params: { isNoDialog } }, from, next) {
     const _this = this.$refs['RefSecondaryCon'];
-    if(!this.reviewList.length) {
+    if (!this.reviewList.length) {
       return next()
     }
     !isNoDialog && (_this.dialogVisible = true);
@@ -188,12 +189,11 @@ export default {
         processTemplateId: this.templateId,
         nodeId: 'root',
         formCategoryId: id
-      }).then(({ data: { data: res, msg, success } }) => {
+      }).then(({ data: { data: res, success } }) => {
         this.isCntLoading = false;
         this.isGLoading = false;
         if (success) {
-          const { basicInformation, promotionChannels, keyPointsForVerification, reviewMaterials } =
-            res;
+          const { basicInformation, promotionChannels, keyPointsForVerification, reviewMaterials } = res;
           this.basicInformation = basicInformation;
           this.promotionChannels = promotionChannels;
           this.keyPointsForVerification = keyPointsForVerification;
@@ -228,7 +228,7 @@ export default {
           this.isLoading = false;
           let flag = true;
           const {
-            data: { data: result1, msg: msg1, success: success1 }
+            data: { data: result1, success: success1 }
           } = res1;
           if (success1) {
             this.templateId = result1.templateId;
@@ -258,19 +258,21 @@ export default {
     async submit() {
       let result0 = true;
       if (!this.$refs['basicInformationRef'].judgeWarn()) {
-        await this.$nextTick(() => {
-          const refs = this.$refs['basicInformationRef'].$refs['refWarn'];
-          result0 = refs?.length ? false : true;
-          if (refs?.length) {
-            let offsetTop = refs[0].$el.offsetParent.offsetTop;
-            refs.forEach(item => {
-              if (item.$el?.offsetParent?.offsetTop < offsetTop) {
-                offsetTop = item.$el?.offsetParent?.offsetTop;
-              }
-            });
-            this.rollTo(offsetTop);
-          }
-        });
+        await new Promise(() => {
+          this.$nextTick(() => {
+            const refs = this.$refs['basicInformationRef'].$refs['refWarn'];
+            result0 = refs?.length === 0 || false
+            if (refs?.length) {
+              let { offsetTop } = refs[0].$el.offsetParent;
+              refs.forEach(item => {
+                if (item.$el?.offsetParent?.offsetTop < offsetTop) {
+                  offsetTop = item.$el?.offsetParent?.offsetTop;
+                }
+              });
+              this.rollTo(offsetTop);
+            }
+          });
+        })
       }
       const [result, offsetTop] = this.$refs['publicityChannelsRef'].judgeWarn();
 
@@ -279,7 +281,15 @@ export default {
       const [result2, offsetTop2] = this.$refs['reviewMaterialRef'].judgeWarn();
       if (!result0 || !result || !result1 || !result2) {
         if (!result0) return;
-        return this.rollTo(offsetTop ? offsetTop : offsetTop1 ? offsetTop1 : offsetTop2);
+        let rollToNum
+        if (offsetTop !== 0) {
+          rollToNum = offsetTop
+        } else if (offsetTop1 !== 0) {
+          rollToNum = offsetTop1
+        } else {
+          rollToNum = offsetTop2
+        }
+        return this.rollTo(rollToNum);
       }
       this.submitTrue();
     },
@@ -294,7 +304,7 @@ export default {
       const list = ['basicInformation', 'promotionChannels', 'keyPointsForVerification'];
       list.forEach(item => {
         this[item].forEach(iten => {
-          if (iten.props.order == 0) {
+          if (Number(iten.props.order) === 0) {
             result.uptime = iten.value ? timestampToDateTime(iten.value) : '';
           }
           formItemDataList.push({
@@ -336,8 +346,8 @@ export default {
           },
           submitDto: result
         })
-          .then(({ data: { success, msg: message } }) => {
-            if (success) {
+          .then(({ data: { success: sus, msg: message } }) => {
+            if (sus) {
               this.submitDialogVisible = false;
               this.$message({ type: 'success', message: '提交成功' });
               this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
@@ -346,7 +356,7 @@ export default {
               this.submitDialogVisible = false;
             }
           })
-          .catch(err => {
+          .catch(() => {
             // this.$message({ type: 'error', message: '提交失败' });
             this.submitDialogVisible = false;
           });
@@ -371,13 +381,12 @@ export default {
     save(success) {
       if (!this.$refs['basicInformationRef'].judgeWarnSave()) {
         this.$nextTick(() => {
-          const offsetTop =
-            this.$refs['basicInformationRef'].$refs['refWarn'][0].$el.offsetParent.offsetTop;
+          const { offsetTop } = this.$refs['basicInformationRef'].$refs['refWarn'][0].$el.offsetParent;
           this.rollTo(offsetTop);
         });
         return false;
       }
-      const [result2, offsetTop2] = this.$refs['reviewMaterialRef'].judgeWarn(false);
+      const [result2] = this.$refs['reviewMaterialRef'].judgeWarn(false);
       if (result2) {
         return this.submitTrue(false, success);
       }
@@ -498,13 +507,4 @@ export default {
     }
   }
 }
-
-
-
-
-
-
-
-
-
 </style>
