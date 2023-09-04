@@ -1,4 +1,4 @@
-import request from '@/api/request.js'
+import request from '@/api/request'
 
 export function getFormCategoryNotAssociated() {
   return request({
@@ -97,7 +97,7 @@ export function groupItemsSort(param) {
 export function updateGroup(param, method) {
   return request({
     url: '/workflow/admin/form/group',
-    method: method,
+    method,
     params: param
   })
 }
@@ -119,7 +119,7 @@ export function updateForm(param) {
   })
 }
 
-export function createForm(param){
+export function createForm(param) {
   return request({
     url: '/workflow/admin/form',
     method: 'post',
@@ -145,6 +145,12 @@ export function updateFormDetail(param) {
 }
 
 export default {
-  getFormGroups, groupItemsSort, createForm, getFormDetail,
-  updateGroup, getGroup, updateForm, updateFormDetail
+  getFormGroups,
+  groupItemsSort,
+  createForm,
+  getFormDetail,
+  updateGroup,
+  getGroup,
+  updateForm,
+  updateFormDetail
 }

@@ -1,4 +1,4 @@
-import request from '@/api/request.js'
+import request from '@/api/request'
 /* 申请中心start */
 // 表单管理-获取审查事项类型列表
 export function getDataStatistics(param) {
@@ -40,7 +40,7 @@ export function censorList(param) {
   })
 }
 
-//关注
+// 关注
 
 export function concernApplication(param) {
   return request({
@@ -61,7 +61,6 @@ export function overrule(param) {
   })
 }
 
-
 // 提单机构
 export function billOfLadingAgenciesList() {
   return request({
@@ -76,7 +75,7 @@ export function workSpaceAgree(param) {
     method: 'post',
     contentType: 'multipart/form-data',
     data: param
-//新的查询列表条件 
+    // 新的查询列表条件
   })
 }
 export function toDoList(param) {
@@ -96,7 +95,7 @@ export function getApprovalListStation(param) {
     contentType: 'application/json'
   })
 }
-export function exportApprovalList(param){
+export function exportApprovalList(param) {
   return request({
     url: '/cpr/censor/exportApprovalList',
     method: 'post',
@@ -104,8 +103,8 @@ export function exportApprovalList(param){
     responseType: 'blob',
   })
 }
-//领导审批通过
-export function leaderEdit(param){
+// 领导审批通过
+export function leaderEdit(param) {
   return request({
     url: '/cpr/workspace/process/edit',
     method: 'post',
@@ -113,8 +112,8 @@ export function leaderEdit(param){
     data: param,
   })
 }
-//领导审批保存后的查询
-export function getEditById(param){
+// 领导审批保存后的查询
+export function getEditById(param) {
   return request({
     url: '/cpr/workspace/process/getEditById',
     method: 'post',
@@ -122,8 +121,8 @@ export function getEditById(param){
     data: param,
   })
 }
-//上线材料提交
-export function finalMaterial(param,processInstanceId,taskId,formId){
+// 上线材料提交
+export function finalMaterial(param, processInstanceId, taskId, formId) {
   return request({
     url: `/cpr/workspace/finalMaterial/${processInstanceId}/${taskId}/${formId}`,
     method: 'post',
@@ -132,8 +131,8 @@ export function finalMaterial(param,processInstanceId,taskId,formId){
   })
 }
 
-//上线材料查询
-export function findFinalMaterial(processInstanceId,taskId){
+// 上线材料查询
+export function findFinalMaterial(processInstanceId, taskId) {
   return request({
     url: `/cpr/workspace/findFinalMaterial/${processInstanceId}/${taskId}`,
     method: 'get',
@@ -145,7 +144,7 @@ export function dualScreenPreview(param) {
   return request({
     url: '/cpr/onlineComparison/dualScreenPreview',
     method: 'post',
-    contentType:'application/x-www-form-urlencoded',
+    contentType: 'application/x-www-form-urlencoded',
     data: param,
   })
 }
@@ -155,7 +154,7 @@ export function endTask(param) {
   return request({
     url: '/cpr/workspace/endTask',
     method: 'post',
-    contentType:'application/x-www-form-urlencoded',
+    contentType: 'application/x-www-form-urlencoded',
     data: param,
   })
 }

@@ -1,4 +1,4 @@
-import request from '@/api/request.js'
+import request from '@/api/request'
 // 获取关键词列表
 export function getList(param) {
   return request({
