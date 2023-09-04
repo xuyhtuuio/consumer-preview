@@ -69,8 +69,6 @@
               <div class="el-select"></div>
               <div class="el-select"></div>
 
-
-
             </div>
             <div class="floor2">
               <div class="floor2-item">
@@ -116,15 +114,18 @@
   </div>
 </template>
 <script>
-import approvalEventCard from "@/components/card/approval-event-card";
+import approvalEventCard from '@/components/card/approval-event-card';
 import {
   getDataStatistics,
   getApprovalType,
   getApprovalStage,
   getApprovalListStation,
   exportApprovalList
-} from "@/api/approvalCenter";
-import { expordFile } from '@/utils/utils'
+} from '@/api/approvalCenter';
+import {
+  delApplication
+} from '@/api/applyCenter'
+// import { expordFile } from '@/utils/utils'
 import { queryUserList } from '@/api/org'
 export default {
   components: {
@@ -133,53 +134,53 @@ export default {
   name: 'approval-center-index',
   data() {
     return {
-      crtSign: "toPending",
+      crtSign: 'toPending',
       pageNow: 1,
       downloadLoading: false,
       // 待审批：pendingApproval 已审批：approvedCount 关注：applyAll 待修改：toModified 全部任务（本分行）：allTasksThis 总行的任务个数：allTasksOffice 驳回单的个数：overrule
       dataStatistics: [
         {
-          name: "待处理",
+          name: '待处理',
           count: 0,
-          value: "toPending",
+          value: 'toPending',
           icon: require('@/assets/image/apply-center/wait-review.svg'),
           activeIcon: require('@/assets/image/apply-center/wait-review-active.svg'),
           show: true
         },
         {
-          name: "已审批",
+          name: '已审批',
           count: 0,
-          value: "approvedCount",
+          value: 'approvedCount',
           icon: require('@/assets/image/apply-center/approved.svg'),
           activeIcon: require('@/assets/image/apply-center/approved-active.svg'),
           show: true
         },
         {
-          name: "我的关注",
+          name: '我的关注',
           count: 0,
-          value: "applyAll",
+          value: 'applyAll',
           icon: require('@/assets/image/apply-center/my-attention.svg'),
           activeIcon: require('@/assets/image/apply-center/my-attention-active.svg'),
           show: true
         },
         {
-          name: "全部任务",
+          name: '全部任务',
           count: 0,
-          value: "allTask",
+          value: 'allTask',
           icon: require('@/assets/image/apply-center/all-attention.svg'),
           activeIcon: require('@/assets/image/apply-center/all-attention.svg'),
           show: false
         },
       ],
       search: {
-        approvalType: "",
-        approvalStage: "",
-        urgent: "",
-        hasOpinions: "",
-        adoptionStatus: "",
-        updateTime: [2, "desc"],
-        updateTime2: [2, "desc"],
-        keywords: "",
+        approvalType: '',
+        approvalStage: '',
+        urgent: '',
+        hasOpinions: '',
+        adoptionStatus: '',
+        updateTime: [2, 'desc'],
+        updateTime2: [2, 'desc'],
+        keywords: '',
         startDate: [],
         productLaunchDate: [],
         total: 0,
@@ -189,7 +190,7 @@ export default {
       agenciesList: [],
       transactionTypes: [],
       approvalPhases: [],
-      tipsMsg: "",
+      tipsMsg: '',
       list: [],
     };
   },
@@ -223,18 +224,17 @@ export default {
     }
   },
   mounted() {
-    let dom = document
-      .querySelectorAll(".arrow-select")[0]
-      .querySelector(".el-select__tags");
+    const dom = document
+      .querySelectorAll('.arrow-select')[0]
+      .querySelector('.el-select__tags');
     this.$nextTick(() => {
-      const text = this.search.updateTime[0] == 1 ? "发起时间" : "更新时间";
+      const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间';
       dom.innerText = text;
     });
     this.userStatus();
     this.getApprovalType();
     this.queryUserList();
     this.searchList();
-
   },
   watch: {
     $route(to, from) {
@@ -249,7 +249,7 @@ export default {
   },
   methods: {
     changeAgencies() {
-      this.$refs["agencies"].dropDownVisible = false;
+      this.$refs['agencies'].dropDownVisible = false;
       this.searchList();
     },
     userStatus() {
@@ -275,9 +275,9 @@ export default {
       };
       getDataStatistics(param).then(res => {
         const { data } = res.data
-        for (let i in data) {
+        for (const i in data) {
           this.dataStatistics.forEach(v => {
-            if (v.value == i) {
+            if (v.value === i) {
               v.count = data[i]
             }
           })
@@ -294,7 +294,7 @@ export default {
       };
       delApplication(param).then((res) => {
         if (res.status === 200) {
-          this.$message.success("删除成功");
+          this.$message.success('删除成功');
           this.getDataStatistic()
           this.getApplicationListAll(1);
         }
@@ -331,21 +331,21 @@ export default {
         productLaunchDateStart: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[0] + ' 00:00:00' : '',
         productLaunchDateEnd: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[1] + ' 00:00:00' : '',
       };
-      let sortType = "";
+      let sortType = '';
       // desc:降序 asc 升序 1 发起时间 2 更新时间
       // 1：创建时间：升序 2：创建时间：降序 3：更新时间：升序 4：更新时间：降序
-      if (this.search.updateTime2[0] == 1) {
-        sortType = this.search.updateTime2[1] == "desc" ? 2 : 1;
-      } else if (this.search.updateTime2[0] == 2) {
-        sortType = this.search.updateTime2[1] == "desc" ? 4 : 3;
+      if (this.search.updateTime2[0] === 1) {
+        sortType = this.search.updateTime2[1] === 'desc' ? 2 : 1;
+      } else if (this.search.updateTime2[0] === 2) {
+        sortType = this.search.updateTime2[1] === 'desc' ? 4 : 3;
       }
       param.sort = sortType;
-      Reflect.deleteProperty(param, "updateTime");
-      Reflect.deleteProperty(param, "updateTime2");
-      Reflect.deleteProperty(param, "total");
-      Reflect.deleteProperty(param, "loading");
-      Reflect.deleteProperty(param, "productLaunchDate");
-      Reflect.deleteProperty(param, "startDate");
+      Reflect.deleteProperty(param, 'updateTime');
+      Reflect.deleteProperty(param, 'updateTime2');
+      Reflect.deleteProperty(param, 'total');
+      Reflect.deleteProperty(param, 'loading');
+      Reflect.deleteProperty(param, 'productLaunchDate');
+      Reflect.deleteProperty(param, 'startDate');
       this.search.loading = true;
       const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
       const taskDTO = {
@@ -356,28 +356,28 @@ export default {
           name: userInfo.fullname
         }
       }
-      const wait_param = {
+      const waitParam = {
         ...param,
         taskDTO
       }
       this.downloadLoading = true
-      exportApprovalList(wait_param).then(res => {
+      exportApprovalList(waitParam).then(res => {
         // expordFile(res)
         this.downloadLoading = false
-        let url = window.URL.createObjectURL(new Blob([res.data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;" }))
-        let link = document.createElement("a")
-        link.style.display = "none"
+        const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;' }))
+        const link = document.createElement('a')
+        link.style.display = 'none'
         link.href = url
         link.setAttribute('download', '消保审核单.xlsx')
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-      }).catch(err => {
+      }).catch(() => {
         this.downloadLoading = false
       })
     },
     getApprovalStage() {
-      let params = {
+      const params = {
         form_management_id: this.search.approvalType,
       };
       getApprovalStage(params).then((res) => {
@@ -400,17 +400,16 @@ export default {
       this.searchList();
     },
     changeStatis(item) {
-      if (item.value == this.crtSign) return;
+      if (item.value === this.crtSign) return;
       this.crtSign = item.value;
       this.searchList();
     },
     changeSort() {
-      const lastKey =
-        this.search.updateTime2[this.search.updateTime2.length - 1];
+      const lastKey = this.search.updateTime2[this.search.updateTime2.length - 1];
       if (this.search.updateTime2.length < 2) {
         this.search.updateTime2 = this.search.updateTime;
       } else {
-        if (!isNaN(lastKey)) {
+        if (!Number.isNaN(lastKey)) {
           this.search.updateTime[0] = lastKey;
         } else {
           this.search.updateTime[1] = lastKey;
@@ -419,11 +418,11 @@ export default {
           this.search.updateTime2 = this.search.updateTime;
         });
       }
-      let dom = document
-        .querySelectorAll(".arrow-select")[0]
-        .querySelector(".el-select__tags");
+      const dom = document
+        .querySelectorAll('.arrow-select')[0]
+        .querySelector('.el-select__tags');
       this.$nextTick(() => {
-        const text = this.search.updateTime[0] == 1 ? "发起时间" : "更新时间";
+        const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间';
         dom.innerText = text;
         setTimeout(() => {
           this.$refs.multiSelect.blur();
@@ -458,7 +457,7 @@ export default {
     getList(pageNow) {
       this.$refs['box'].scrollTo({
         top: 0,
-        behavior: "smooth"
+        behavior: 'smooth'
       })
       let listType = null;
       const typeList = {
@@ -482,21 +481,21 @@ export default {
         productLaunchDateStart: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[0] + ' 00:00:00' : '',
         productLaunchDateEnd: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[1] + ' 23:59:59' : '',
       };
-      let sortType = "";
+      let sortType = '';
       // desc:降序 asc 升序 1 发起时间 2 更新时间
       // 1：创建时间：升序 2：创建时间：降序 3：更新时间：升序 4：更新时间：降序
-      if (this.search.updateTime2[0] == 1) {
-        sortType = this.search.updateTime2[1] == "desc" ? 2 : 1;
-      } else if (this.search.updateTime2[0] == 2) {
-        sortType = this.search.updateTime2[1] == "desc" ? 4 : 3;
+      if (this.search.updateTime2[0] === 1) {
+        sortType = this.search.updateTime2[1] === 'desc' ? 2 : 1;
+      } else if (this.search.updateTime2[0] === 2) {
+        sortType = this.search.updateTime2[1] === 'desc' ? 4 : 3;
       }
       param.sort = sortType;
-      Reflect.deleteProperty(param, "updateTime");
-      Reflect.deleteProperty(param, "updateTime2");
-      Reflect.deleteProperty(param, "total");
-      Reflect.deleteProperty(param, "loading");
-      Reflect.deleteProperty(param, "productLaunchDate");
-      Reflect.deleteProperty(param, "startDate");
+      Reflect.deleteProperty(param, 'updateTime');
+      Reflect.deleteProperty(param, 'updateTime2');
+      Reflect.deleteProperty(param, 'total');
+      Reflect.deleteProperty(param, 'loading');
+      Reflect.deleteProperty(param, 'productLaunchDate');
+      Reflect.deleteProperty(param, 'startDate');
       this.search.loading = true;
       const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
       const taskDTO = {
@@ -507,11 +506,11 @@ export default {
           name: userInfo.fullname
         }
       }
-      const wait_param = {
+      const waitParam = {
         ...param,
         taskDTO
       }
-      getApprovalListStation(wait_param).then(res => {
+      getApprovalListStation(waitParam).then(res => {
         const { data } = res.data;
         this.search.total = data.totalCount;
         const flag = Array.isArray(data.list)
@@ -525,7 +524,7 @@ export default {
           }
         }) : [];
         this.search.loading = false;
-      }).catch(err => {
+      }).catch(() => {
         this.search.loading = false
         this.search.total = 0
         this.list = []
@@ -543,19 +542,21 @@ export default {
         case '待确认':
           status = '3';
           break;
+        default:
+          break;
       }
       return status
     },
     reset() {
       this.search = {
-        approvalType: "",
-        approvalStage: "",
-        urgent: "",
-        hasOpinions: "",
-        adoptionSituation: "",
-        updateTime: [1, "asc"],
-        updateTime2: [1, "asc"],
-        keywords: "",
+        approvalType: '',
+        approvalStage: '',
+        urgent: '',
+        hasOpinions: '',
+        adoptionSituation: '',
+        updateTime: [1, 'asc'],
+        updateTime2: [1, 'asc'],
+        keywords: '',
         startDate: [],
         productLaunchDate: [],
         total: 0,
@@ -808,7 +809,6 @@ export default {
             display: none !important;
           }
 
-
           &::before {
             display: none;
             font-family: element-icons !important;
@@ -887,7 +887,6 @@ export default {
           margin-right: 0;
         }
 
-
         /deep/.el-range-editor {
           position: relative;
 
@@ -935,4 +934,3 @@ export default {
   }
 }
 </style>
-

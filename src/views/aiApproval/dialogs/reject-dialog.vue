@@ -2,7 +2,7 @@
   <el-dialog :visible.sync="addReviewDialog" width="800px" :before-close="handleClose" center custom-class="add-review"
     title="驳回">
     <el-form label-position="left" label-width="80px" :model="form" :rules="rules">
-      <el-form-item label="驳回人" prop="prevUser">
+      <el-form-item label="驳回人" prop="prevUser" v-if="nextStepObj?.refuseWay === 'TO_BEFORE'">
         <el-select v-model="form.prevUser" placeholder="请选择驳回人" size="medium">
           <el-option v-for="(item, code) in nextStepObj?.nodeSelectList?.[0] || {}" :key="code" :label="code" :value="item">
           </el-option>

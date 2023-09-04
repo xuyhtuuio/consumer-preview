@@ -22,7 +22,7 @@
 <script>
 import {
   rollback
-} from "@/api/aiApproval";
+} from '@/api/aiApproval';
 export default {
   name: 'rejectDialog',
   props: {
