@@ -322,7 +322,6 @@ export default {
         list: [{ defaultPerm, funPerms }],
         dataList: [{ dataPerm }]
       });
-      console.log(res, success);
       if (success) {
         this.$message({
           type: 'success',
@@ -330,14 +329,13 @@ export default {
           message: msg || '已成功保存该角色的操作权限'
         });
         this.handleBack();
-        this.cardLoading = false;
       }else {
         this.$message({
           type: 'error',
           message: msg || '保存失败'
         });
       }
-      
+      this.cardLoading = false;
     },
     handleBack() {
       this.level = true;
