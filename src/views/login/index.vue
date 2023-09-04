@@ -702,7 +702,7 @@ export default {
     },
     async getPermissionsPage() {
       const user = JSON.parse(window.localStorage.getItem('user_name'))
-      const res = await editThePermissionsPage({ roleId: user.id });
+      const res = await editThePermissionsPage();
       this.$store.state.permissionsPage = res.data.data || {}
       window.localStorage.setItem('permissionsPage', JSON.stringify(res.data.data))
     },

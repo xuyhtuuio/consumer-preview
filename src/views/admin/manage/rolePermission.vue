@@ -75,8 +75,8 @@
                       <div class="item-left">
                         <el-checkbox
                           v-model="item.type"
-                          true-label="view"
-                          false-label=""
+                          :true-label="item.props.trueLabel"
+                          :false-label="item.props.falseLabel"
                           :disabled="!editAuth"
                           @change="handleCheckBoxChange(item)"
                           >{{ item.title }}</el-checkbox
@@ -314,19 +314,30 @@ export default {
       this.cardLoading = true;
       this.formatData();
       console.log(this.rolePermission);
-      // const {
-      //   data: { data: res, success, msg }
-      // } = await updateRolePermission({
-      //   roleId: this.roleId,
-      //   list: {}
-      // });
-      this.$message({
-        type: 'success',
-        customClass: 'el-icon-success-one',
-        message: '已成功保存该角色的操作权限'
+      const { dataPerm, defaultPerm, funPerms } = this.rolePermission;
+      const {
+        data: { data: res, success, msg }
+      } = await updateRolePermission({
+        roleId: this.roleId,
+        list: [{ defaultPerm, funPerms }],
+        dataList: [{ dataPerm }]
       });
-      this.cardLoading = false;
-      this.handleBack();
+      console.log(res, success);
+      if (success) {
+        this.$message({
+          type: 'success',
+          customClass: 'el-icon-success-one',
+          message: msg || '已成功保存该角色的操作权限'
+        });
+        this.handleBack();
+        this.cardLoading = false;
+      }else {
+        this.$message({
+          type: 'error',
+          message: msg || '保存失败'
+        });
+      }
+      
     },
     handleBack() {
       this.level = true;
@@ -335,8 +346,8 @@ export default {
       this.permissionList = JSON.parse(JSON.stringify(permissionList));
     },
     formatDataZero(data) {
-      const { funPerms, dataPerm, defaultPerm } = data;
-      this.rolePermission = rolePermission;
+      const { funPerms, dataPerm } = data;
+      this.rolePermission = data;
       for (const key in this.permissionList) {
         if (Number(key) === 0) {
           this.permissionList[key].type = funPerms[key].type;
@@ -371,12 +382,13 @@ export default {
           funPerms[key].type = originVal.type;
           const children = originVal.children;
           children.forEach((item, index) => {
-            const funItem = funPerms.find(funItem => funItem.code === item.code);
+            const funItem = funPerms.find(funPermsItem => funPermsItem.code === item.code);
             if (item.title === '流程管理') {
               if (item.type !== funItem.type) {
                 funItem.type = item.type;
                 item.reflect.forEach(reflectItem => {
-                  defaultPerm.find(item => item.pathName === reflectItem).type = item.type;
+                  // defaultPerm.find(item => item.pathName === reflectItem).type = item.type;
+                  defaultPerm.find(item => item.pathName === reflectItem).type = 'edit';
                 });
               }
             } else {
@@ -384,7 +396,6 @@ export default {
             }
           });
         } else if (Number(key) === this.permissionList.length - 1) {
-          console.log(originVal);
           if (originVal.type !== funPerms[funPerms.length - 1].type) {
             funPerms[funPerms.length - 1].type = originVal.type;
           }
@@ -407,10 +418,11 @@ export default {
         item.children.forEach(item => (item.type = ''));
       }
     },
-    handleRadioChange(value, data, origin) {
+    // trueLabel，falseLabel 和permissionList里面的item的props的trueLabel，falseLabel相关
+    handleRadioChange(value, data, origin, trueLabel = 'edit', falseLabel) {
       if (!this.editAuth) return;
       data.type = value === data.type ? '' : value;
-      origin.type = origin.children.some(item => item.type) ? 'view' : '';
+      origin.type = origin.children.some(item => item.type) ? trueLabel : falseLabel;
       origin.isShowWarn = false;
     }
   }
