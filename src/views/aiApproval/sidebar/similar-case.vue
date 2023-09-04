@@ -166,7 +166,6 @@ export default {
 
     .icon {
       font-size: 20px;
-
     }
   }
 
@@ -202,12 +201,10 @@ export default {
 
     .customer-border {
       border: 1px solid #FFF7E6;
-
     }
 
     .other-border {
       border: 1px solid #E6FFFB;
-
     }
 
     .case-item {
@@ -248,7 +245,6 @@ export default {
       .name {
         color: #333;
         max-width: 78%;
-        /* 小字号/正文-加粗 */
         font-family: Microsoft YaHei;
         font-size: 14px;
         font-style: normal;
@@ -258,8 +254,6 @@ export default {
         text-overflow: ellipsis;
         display: inline-block;
         white-space: nowrap;
-
-        /* 157.143% */
       }
 
       .case-info {
@@ -309,13 +303,11 @@ export default {
         .tag {
           color: #2D5CF6;
 
-          /* 次级正文/常规 */
           font-family: Microsoft YaHei;
           font-size: 12px;
           font-style: normal;
           font-weight: 400;
           line-height: 20px;
-          /* 166.667% */
           border-radius: 4px;
           background: #F9FBFF;
           display: inline-block;
@@ -376,10 +368,8 @@ export default {
       .other-class {
         background: #E6FFFB;
         color: #0DA5AA;
-
       }
     }
   }
-
 }
 </style>
