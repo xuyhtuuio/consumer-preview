@@ -9,12 +9,21 @@
         </div>
       </template>
       <template v-slot:content>
-        <el-form hide-required-asterisk label-width="120px" class="ruleForm my-form">
+        <el-form
+          hide-required-asterisk
+          label-width="120px"
+          class="ruleForm my-form"
+        >
           <template v-for="(item, index) in list">
             <el-form-item :class="formItemCpt(item)" :key="index">
               <label slot="label"
                 >{{ item.title
-                }}<span :style="{ color: 'red', opacity: item.props.required ? 1 : 0 }">
+                }}<span
+                  :style="{
+                    color: 'red',
+                    opacity: item.props.required ? 1 : 0
+                  }"
+                >
                   *
                 </span></label
               >
@@ -53,7 +62,9 @@
               </el-radio-group>
 
               <el-checkbox-group
-                v-else-if="item.name === 'MultipleSelect' && item.props.expanding"
+                v-else-if="
+                  item.name === 'MultipleSelect' && item.props.expanding
+                "
                 v-model.trim="item.value"
                 :disabled="item.perm === 'R'"
               >
@@ -62,11 +73,16 @@
                      <el-checkbox :key="indey" @change="checked=>checkRow (checked, item)" :label="iten.id">{{iten.value}}</el-checkbox>
                     <el-input class="checkbox-ipt" v-show="item.value.includes(iten.id)" :key="iten.id" :value="checkBox[item.id]" @input="(val)=>handleInput(val,item,iten.id)" placeholder="请补充具体内容"></el-input>
                   </template> -->
-                  <el-checkbox :key="indey" :label="iten.id">{{ iten.value }}</el-checkbox>
+                  <el-checkbox :key="indey" :label="iten.id">{{
+                    iten.value
+                  }}</el-checkbox>
                 </template>
               </el-checkbox-group>
 
-              <div class="groups-select" v-else-if="item.name === 'MultipleGroupsSelect'">
+              <div
+                class="groups-select"
+                v-else-if="item.name === 'MultipleGroupsSelect'"
+              >
                 <div v-for="iten in item.props.options" :key="iten.id">
                   <p class="group-title">{{ iten.value }}</p>
                   <el-checkbox-group
@@ -84,7 +100,9 @@
                 </div>
               </div>
               <el-select
-                v-else-if="item.name === 'MultipleSelect' && !item.props.expanding"
+                v-else-if="
+                  item.name === 'MultipleSelect' && !item.props.expanding
+                "
                 :disabled="item.perm === 'R'"
                 v-model.trim="item.value"
                 :placeholder="item.props.placeholder"
@@ -116,7 +134,9 @@
                   :placeholder="item.props.placeholder"
                   :value-format="item.props.format"
                   v-model.trim="item.value"
-                  :picker-options="pickerTime(item.props.gl, item.props.order, item.value)"
+                  :picker-options="
+                    pickerTime(item.props.gl, item.props.order, item.value)
+                  "
                   @change="handlePickerChange(item)"
                   style="width: 100%"
                 ></el-date-picker>
@@ -145,7 +165,10 @@
               </el-cascader>
 
               <div class="warn" v-if="item.isWarning">
-                <warn-info ref="refWarn" :info="judgementWarn(item)"></warn-info>
+                <warn-info
+                  ref="refWarn"
+                  :info="judgementWarn(item)"
+                ></warn-info>
               </div>
             </el-form-item>
           </template>
@@ -156,9 +179,8 @@
 </template>
 
 <script>
-import moment from 'moment';
-// import { timestampToDateTime } from '@/utils/utils.js';
-import WarnInfo from './warn-info';
+import moment from 'moment'
+import WarnInfo from './warn-info'
 function rulesFn(data) {
   switch (data.name) {
     case 'TextInput':
@@ -169,7 +191,7 @@ function rulesFn(data) {
           max: data.props.numberOfWords,
           message: `长度在 1 到 ${data.props.numberOfWords} 个字符`
         }
-      ];
+      ]
     case 'TextareaInput':
       return [
         { required: true, message: `请输入${data.title}` },
@@ -178,21 +200,47 @@ function rulesFn(data) {
           max: data.props.numberOfWords,
           message: `长度在 1 到 ${data.props.numberOfWords} 个字符`
         }
-      ];
+      ]
     case 'SelectInput':
-      return [{ required: true, message: `请选择${data.title}`, trigger: 'change' }];
+      return [
+        { required: true, message: `请选择${data.title}`, trigger: 'change' }
+      ]
     case 'MultipleSelect':
       return [
-        { type: 'array', required: true, message: `请至少选择一个${data.title}`, trigger: 'change' }
-      ];
+        {
+          type: 'array',
+          required: true,
+          message: `请至少选择一个${data.title}`,
+          trigger: 'change'
+        }
+      ]
     case 'MultipleGroupsSelect':
       return [
-        { type: 'array', required: true, message: `请至少选择一个${data.title}`, trigger: 'change' }
-      ];
+        {
+          type: 'array',
+          required: true,
+          message: `请至少选择一个${data.title}`,
+          trigger: 'change'
+        }
+      ]
     case 'TimePicker':
-      return [{ type: 'date', required: true, message: '请选择日期', trigger: 'change' }];
+      return [
+        {
+          type: 'date',
+          required: true,
+          message: '请选择日期',
+          trigger: 'change'
+        }
+      ]
     case 'Cascader':
-      return [{ type: 'array', required: true, message: `请选择${data.title}`, trigger: 'change' }];
+      return [
+        {
+          type: 'array',
+          required: true,
+          message: `请选择${data.title}`,
+          trigger: 'change'
+        }
+      ]
     default:
       return []
   }
@@ -213,146 +261,163 @@ export default {
       title: '基本信息',
       cardInfo: '提醒：产品类内容审查，需于在产品上线/宣传前14天进行提交。',
       checkBox: {}
-    };
+    }
   },
   computed: {
     formItemCpt() {
-      return item => {
+      return (item) => {
         if (item.name === 'SelectInput' && !item.props.expanding) {
-          return ['form-item'];
+          return ['form-item']
         } else if (item.name === 'MultipleSelect' && !item.props.expanding) {
-          return ['form-item'];
+          return ['form-item']
         } else if (item.name === 'TimePicker' || item.name === 'Cascader') {
-          return ['form-item'];
+          return ['form-item']
         } else {
-          return [];
+          return []
         }
-      };
+      }
     }
   },
   watch: {
     list() {
-      this.initWarn();
+      this.initWarn()
     }
   },
   methods: {
     pickerTime(id, order, originVal) {
       if (Number(order) === 0) {
-        return this.startTime(id, originVal);
+        return this.startTime(id, originVal)
       } else {
-        return this.endTime(id, originVal);
+        return this.endTime(id, originVal)
       }
     },
     startTime(nextId, originVal) {
-      const { value } = this.list.find(item => item.id === nextId);
-      let startDateTime = '00:00:00';
-      let endDateTime = '23:59:59';
+      const { value } = this.list.find((item) => item.id === nextId)
+      let startDateTime = '00:00:00'
+      let endDateTime = '23:59:59'
       // 关联的下线时间
       if (value) {
-        if (moment(new Date(value)).format('l') === moment(originVal).format('l')) {
-          startDateTime = '00:00:00';
-          endDateTime = moment(new Date(value)).format('HH:mm:ss');
-        } else if (moment(new Date()).format('l') === moment(originVal).format('l')) {
-          startDateTime = moment(new Date()).format('HH:mm:ss');
-          endDateTime = '23:59:59';
+        if (
+          moment(new Date(value)).format('l') === moment(originVal).format('l')
+        ) {
+          startDateTime = '00:00:00'
+          endDateTime = moment(new Date(value)).format('HH:mm:ss')
+        } else if (
+          moment(new Date()).format('l') === moment(originVal).format('l')
+        ) {
+          startDateTime = moment(new Date()).format('HH:mm:ss')
+          endDateTime = '23:59:59'
         } else {
-          startDateTime = '00:00:00';
-          endDateTime = '23:59:59';
+          startDateTime = '00:00:00'
+          endDateTime = '23:59:59'
         }
-      } else if (moment(new Date()).format('l') === moment(originVal).format('l')) {
-        startDateTime = moment(new Date()).format('HH:mm:ss');
-        endDateTime = '23:59:59';
+      } else if (
+        moment(new Date()).format('l') === moment(originVal).format('l')
+      ) {
+        startDateTime = moment(new Date()).format('HH:mm:ss')
+        endDateTime = '23:59:59'
       } else {
-        startDateTime = '00:00:00';
-        endDateTime = '23:59:59';
+        startDateTime = '00:00:00'
+        endDateTime = '23:59:59'
       }
       return {
         selectableRange: `${startDateTime} - ${endDateTime}`,
-        disabledDate: time => {
+        disabledDate: (time) => {
           // 既不能大于当前日期 也不能小于结束日期
           if (value) {
             return (
-              time.getTime() > new Date(value).getTime() || time.getTime() < new Date() - 8.64e7
-            );
+              time.getTime() > new Date(value).getTime()
+              || time.getTime() < new Date() - 8.64e7
+            )
           }
-          return time.getTime() < new Date() - 8.64e7;
+          return time.getTime() < new Date() - 8.64e7
           // - 8.64e7减去了当天，即可选择当天
         }
-      };
+      }
     },
     endTime(prevId, originVal) {
-      const { value } = this.list.find(item => item.id === prevId);
-      let startDateTime = '00:00:00';
-      let endDateTime = '23:59:59';
+      const { value } = this.list.find((item) => item.id === prevId)
+      let startDateTime = '00:00:00'
+      let endDateTime = '23:59:59'
       if (value) {
-        if (moment(new Date(value)).format('l') === moment(originVal).format('l')) {
-          startDateTime = moment(new Date(value)).format('HH:mm:ss');
-          endDateTime = '23:59:59';
+        if (
+          moment(new Date(value)).format('l') === moment(originVal).format('l')
+        ) {
+          startDateTime = moment(new Date(value)).format('HH:mm:ss')
+          endDateTime = '23:59:59'
         } else {
-          startDateTime = '00:00:00';
-          endDateTime = '23:59:59';
+          startDateTime = '00:00:00'
+          endDateTime = '23:59:59'
         }
-      } else if (moment(new Date()).format('l') === moment(originVal).format('l')) {
-        startDateTime = moment(new Date()).format('HH:mm:ss');
-        endDateTime = '23:59:59';
+      } else if (
+        moment(new Date()).format('l') === moment(originVal).format('l')
+      ) {
+        startDateTime = moment(new Date()).format('HH:mm:ss')
+        endDateTime = '23:59:59'
       } else {
-        startDateTime = '00:00:00';
-        endDateTime = '23:59:59';
+        startDateTime = '00:00:00'
+        endDateTime = '23:59:59'
       }
       return {
-        disabledDate: time => {
+        disabledDate: (time) => {
           // 既不能大于当前日期 也不能大于开始日期
           if (value) {
-            return time.getTime() < new Date(value).getTime() - 8.64e7;
+            return time.getTime() < new Date(value).getTime() - 8.64e7
           }
-          return time.getTime() < new Date() - 8.64e7;
+          return time.getTime() < new Date() - 8.64e7
           // 如果想实现结束时间可以在开始时间当天内的话 可以减掉86400000秒，相当于一天。
           // return time.getTime() < new Date(this.params.actStartTime).getTime() - 86400000;
         },
         selectableRange: startDateTime + '-' + endDateTime
-      };
+      }
     },
     handlePickerChange(item) {
       if (
-        moment(new Date(item.value)).format('l') === moment(new Date()).format('l')
+        moment(new Date(item.value)).format('l')
+          === moment(new Date()).format('l')
         && moment(item.value).format('HH:mm:ss') === '00:00:00'
       ) {
-        item.value = new Date();
+        item.value = new Date()
       }
-      const otherItem = this.list.find(iten => Number(iten.id) === Number(item.props.gl));
-      const otherVal = new Date(otherItem.value).getTime();
-      const itemVal = new Date(item.value).getTime();
+      const otherItem = this.list.find((iten) => Number(iten.id) === Number(item.props.gl))
+      const otherVal = new Date(otherItem.value).getTime()
+      const itemVal = new Date(item.value).getTime()
       if (Number(item.props.order) === 0 && otherVal && itemVal > otherVal) {
-        item.value = '';
+        item.value = ''
       } else if (Number(item.props.order) === 1 && otherVal && itemVal < otherVal) {
-        item.value = '';
+        item.value = ''
       }
     },
     handleInput(val, item) {
       // this.checkBox[item.id]= val
-      this.$set(this.checkBox, item.id, val);
+      this.$set(this.checkBox, item.id, val)
     },
 
     // 判断警告出现
     judgementWarn(item) {
-      let flag;
+      let flag
       if (item.valueType === 'Date') {
-        flag = item.value == null ? '' : String(item.value);
+        flag = item.value == null ? '' : String(item.value)
       } else {
-        flag = item.value;
+        flag = item.value
       }
       if (item.props.required) {
         if (!flag.length && typeof item.value !== 'number') {
-          return item.warnInfo[0].message;
-        } else if (item.props.numberOfWords && item.value.length > item.props.numberOfWords) {
-          item.isWarning = true;
-          return item.warnInfo[1].message;
+          return item.warnInfo[0].message
+        } else if (
+          item.props.numberOfWords
+          && item.value.length > item.props.numberOfWords
+        ) {
+          item.isWarning = true
+          return item.warnInfo[1].message
         } else {
           item.isWarning = false
         }
       } else if (item.props.numberOfWords && item.value.length) {
-        if (item.value.length > item.props.numberOfWords) return item.warnInfo[0].message;
-        item.isWarning = false;
+        if (item.value.length > item.props.numberOfWords) {
+          return item.warnInfo[0].message
+        }
+        item.isWarning = false
       } else {
         item.isWarning = false
       }
@@ -360,55 +425,57 @@ export default {
     judgeWarn() {
       const result = this.list.every((item) => {
         if (item.props.required) {
-          if (item.value == null) return false;
-          else if (item.props.numberOfWords && item.value.length !== 0) { return item.value.length < item.props.numberOfWords; } else return item.value.length !== 0;
+          if (item.value == null) return false
+          else if (item.props.numberOfWords && item.value.length !== 0) {
+            return item.value.length < item.props.numberOfWords
+          } else return item.value.length !== 0
         } else if (item.props.numberOfWords && item.value.length !== 0) {
-          return false;
+          return false
         } else {
-          return true;
+          return true
         }
-      });
+      })
       if (!result) {
-        this.list.forEach(item => {
+        this.list.forEach((item) => {
           if (item.props.required || item.props.numberOfWords) {
-            item.isWarning = true;
+            item.isWarning = true
           }
-        });
+        })
       }
-      return result;
+      return result
     },
     judgeWarnSave() {
-      this.list.forEach(item => { item.isWarning = false });
+      this.list.forEach((item) => { item.isWarning = false })
       if (
         this.list[0].value.length === 0
         || this.list[0].value.length > this.list[0].props.numberOfWords
       ) {
-        this.list[0].isWarning = true;
-        return false;
+        this.list[0].isWarning = true
+        return false
       } else {
-        return true;
+        return true
       }
     },
     initWarn() {
-      this.list.forEach(item => {
+      this.list.forEach((item) => {
         if (item.props.required) {
-          this.$set(item, 'isWarning', false);
-          this.$set(item, 'warnInfo', rulesFn(item));
+          this.$set(item, 'isWarning', false)
+          this.$set(item, 'warnInfo', rulesFn(item))
         } else if (item.props.numberOfWords) {
-          this.$set(item, 'isWarning', false);
-          this.$set(item, 'warnInfo', [rulesFn(item)[1]]);
+          this.$set(item, 'isWarning', false)
+          this.$set(item, 'warnInfo', [rulesFn(item)[1]])
         }
-      });
+      })
     },
 
     // 其他输入框
     checkRow(check, item) {
       if (!check) {
-        this.checkBox[item.id] = '';
+        this.checkBox[item.id] = ''
       }
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>
