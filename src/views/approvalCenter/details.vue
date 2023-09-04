@@ -1,4 +1,3 @@
-
 <template>
   <div class="apply-order-detail">
     <order-detail pagePath="approval">
@@ -11,15 +10,15 @@
     </order-detail>
   </div>
 </template>
-  <script>
-import orderDetail from "@/components/card/order-detail";
+<script>
+import orderDetail from '@/components/card/order-detail';
 export default {
-  name:'approval-details',
+  name: 'approval-details',
   components: {
     orderDetail,
   },
   watch: {
-    '$route'(val) {
+    $route(val) {
       if (val.name !== 'approval-details') {
         window.sessionStorage.removeItem('order-detail')
       }
