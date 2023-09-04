@@ -1,6 +1,5 @@
 <template>
   <div class="apply-center" v-cloak>
-
     <p class="welcoming">欢迎来到消保管控平台！</p>
     <p class="tips" v-if="tipsMsg">
       <i class="iconfont icon-xiaoxi-tongzhi"></i>{{ tipsMsg }}
@@ -8,12 +7,12 @@
     <div class="apply-center-box">
       <div class="data-statistics">
         <div v-for="(item, index) in dataStatistics" :key="index" @click="changeStatis(item)" :class="item.value !== crtSign
-          ? 'data-statistics-item'
-          : 'data-statistics-item active-item'
+            ? 'data-statistics-item'
+            : 'data-statistics-item active-item'
           ">
           <div class="icon">
             <img :src="item.value == crtSign ? item.activeIcon : item.icon" alt=""
-              :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
+              :class="item.value == crtSign ? 'active-icon' : 'default-icon'" />
           </div>
           <div class="name-count">
             <span class="name">{{ item.name }}</span>
@@ -29,7 +28,6 @@
         <div class="filters">
           <div class="filters-content">
             <div class="floor1">
-
               <!-- <div class="floor1-item"> -->
               <el-select popper-class="transaction-select" v-model="search.form_management_id" placeholder="事项类型"
                 @change="changeArrrovalType" clearable @clear="searchList">
@@ -56,14 +54,14 @@
                 <el-option v-for="(item, index) in $field('adoptionSituations')" :key="index" :label="item.label"
                   :value="item.value"></el-option>
               </el-select>
-              <el-select v-model="search.adoptionStatus" placeholder="是否一次通过" @change="searchList" clearable>
-                <el-option v-for="(item, index) in $field('adoptionSituations')" :key="index" :label="item.label"
+              <el-select v-model="search.isOneTimePassed" placeholder="是否一次通过" @change="searchList" clearable>
+                <el-option v-for="(item, index) in $field('isOncePass')" :key="index" :label="item.label"
                   :value="item.value"></el-option>
               </el-select>
               <el-select v-model="search.updateTime2" ref="multiSelect" placeholder="排序" multiple @change="changeSort"
                 :class="search.updateTime2[1] == 'desc'
-                  ? 'arrow-select descArrow'
-                  : 'arrow-select ascArrow'
+                    ? 'arrow-select descArrow'
+                    : 'arrow-select ascArrow'
                   ">
                 <el-option-group v-for="group in $field('updateTimeGroup')" :key="group.label">
                   <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value">
@@ -125,134 +123,127 @@ import {
   toBeConfirmed,
   revoked,
   toReviseList,
-  Approval,
-  canRoved
-} from "@/api/applyCenter";
-import applyEventCard from "@/components/card/apply-event-card";
+  Approval
+} from '@/api/applyCenter'
+import applyEventCard from '@/components/card/apply-event-card'
 export default {
   name: 'apply-center-index',
   components: {
-    applyEventCard,
+    applyEventCard
   },
   data() {
     return {
       imageSize: 292,
       tipsMsg: null,
-      crtSign: "applyAll",
+      crtSign: 'applyAll',
       crtId: 0,
       dataStatistics: [
         {
-          name: "全部申请", // (1：我的关注 2：已撤销 3：草稿箱 4:待修改 5：待确认 6：审批中)
+          name: '全部申请', // (1：我的关注 2：已撤销 3：草稿箱 4:待修改 5：待确认 6：审批中)
           count: 0,
-          value: "applyAll",
+          value: 'applyAll',
           id: 0,
           icon: require('@/assets/image/apply-center/all-attention.svg'),
           activeIcon: require('@/assets/image/apply-center/all-attention.svg')
-
         },
         {
-          name: "我的关注",
+          name: '我的关注',
           count: 0,
-          value: "myConcern",
+          value: 'myConcern',
           id: 1,
           icon: require('@/assets/image/apply-center/my-attention.svg'),
           activeIcon: require('@/assets/image/apply-center/my-attention-active.svg')
-
         },
         {
-          name: "待修改",
+          name: '待修改',
           count: 0,
-          value: "toModified",
+          value: 'toModified',
           id: 4,
           icon: require('@/assets/image/apply-center/wait-modify.svg'),
           activeIcon: require('@/assets/image/apply-center/wait-modify-active.svg')
-
         },
         {
-          name: "待确认",
+          name: '待确认',
           count: 0,
-          value: "toConfirmed",
+          value: 'toConfirmed',
           id: 5,
           icon: require('@/assets/image/apply-center/wait-check.svg'),
-          activeIcon: require('@/assets/image/apply-center/wait-check-active.svg'),
+          activeIcon: require('@/assets/image/apply-center/wait-check-active.svg')
         },
         {
-          name: "审批中",
+          name: '审批中',
           count: 0,
-          value: "Approval",
+          value: 'Approval',
           id: 6,
           icon: require('@/assets/image/apply-center/in-approval.svg'),
           activeIcon: require('@/assets/image/apply-center/in-approval-active.svg')
-
         },
         {
-          name: "草稿箱",
+          name: '草稿箱',
           count: 0,
-          value: "draftBin",
+          value: 'draftBin',
           id: 3,
           icon: require('@/assets/image/apply-center/draft-box.svg'),
-          activeIcon: require('@/assets/image/apply-center/draft-box-active.svg'),
-        },
+          activeIcon: require('@/assets/image/apply-center/draft-box-active.svg')
+        }
       ],
       search: {
-        form_management_id: "",
-        approvalStage: "",
-        urgent: "",
-        hasOpinions: "",
-        adoptionStatus: "",
-        updateTime: [2, "desc"],
-        updateTime2: [2, "desc"],
-        keywords: "",
+        form_management_id: '',
+        approvalStage: '',
+        urgent: '',
+        hasOpinions: '',
+        adoptionStatus: '',
+        updateTime: [2, 'desc'],
+        updateTime2: [2, 'desc'],
+        keywords: '',
+        isOneTimePassed: '',
         productLaunchDate: [],
         total: 0,
         loading: false,
-        startDate: [],
-
+        startDate: []
       },
       transactionTypes: [],
       approvalPhases: [],
 
-      list: [],
+      list: []
       // list: []
-    };
+    }
   },
   activated() { },
   async mounted() {
-    let dom = document
-      .querySelectorAll(".arrow-select")[0]
-      .querySelector(".el-select__tags");
+    const dom = document
+      .querySelectorAll('.arrow-select')[0]
+      .querySelector('.el-select__tags')
     this.$nextTick(() => {
-      const text = this.search.updateTime[0] == 1 ? "发起时间" : "更新时间";
-      dom.innerText = text;
-    });
-    let floor2 = document.querySelectorAll(".apply-center .floor2")[0];
-    floor2 ? (floor2.style.paddingRight = 16 + "px") : "";
-    window.addEventListener("resize", () => {
-      let floor2 = document.querySelectorAll(".apply-center .floor2")[0];
-      floor2 ? (floor2.style.paddingRight = 16 + "px") : "";
-    });
-    this.getApprovalType();
-    this.getDataStatistic();
+      const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间'
+      dom.innerText = text
+    })
+    const floor2 = document.querySelectorAll('.apply-center .floor2')[0]
+    floor2 ? (floor2.style.paddingRight = 16 + 'px') : ''
+    window.addEventListener('resize', () => {
+      const floor3 = document.querySelectorAll('.apply-center .floor2')[0]
+      floor3 ? (floor3.style.paddingRight = 16 + 'px') : ''
+    })
+    this.getApprovalType()
+    this.getDataStatistic()
     this.searchList()
   },
   watch: {
-    "search.form_management_id": {
+    'search.form_management_id': {
       handler(val) {
-        if (val == "") {
-          this.approvalPhases = [];
+        if (!val) {
+          this.approvalPhases = []
         }
       },
       immediate: true,
-      deep: true,
-    },
+      deep: true
+    }
   },
-  created() {
-
-  },
+  created() { },
   methods: {
     to(path) {
       if (path !== this.$route.path) {
-        this.$router.push(path);
+        this.$router.push(path)
       }
     },
     changeArrrovalType() {
@@ -262,53 +253,55 @@ export default {
       //   this.search.approvalStage = "";
       //   this.approvalPhases = [];
       // }
-      this.searchList();
+      this.searchList()
     },
     getApprovalType() {
       getApprovalType().then((res) => {
         this.transactionTypes = res.data.data.map((v) => {
           return {
             label: v.examineTypesName,
-            value: v.recordId,
-          };
-        });
-      });
+            value: v.recordId
+          }
+        })
+      })
     },
     getApprovalStage() {
-      let params = {
-        approvalPhases: this.search.form_management_id,
-      };
+      const params = {
+        approvalPhases: this.search.form_management_id
+      }
       getApprovalStage(params).then((res) => {
         const { data } = res.data
-        this.approvalPhases = data ? data.map((v, index) => {
-          return {
-            label: v,
-            value: v,
-          };
-        }) : []
-      });
+        this.approvalPhases = data
+          ? data.map((v) => {
+            return {
+              label: v,
+              value: v
+            }
+          })
+          : []
+      })
     },
     getDataStatistic() {
       const userinfo = JSON.parse(window.localStorage.getItem('user_name'))
       const param = {
         pageNow: 1,
         pageSize: 10,
-        approvalType: "",
-        approvalStage: "",
-        urgent: "",
-        hasOpinions: "",
-        adoptionStatus: "",
+        approvalType: '',
+        approvalStage: '',
+        urgent: '',
+        hasOpinions: '',
+        adoptionStatus: '',
         currentActivityName: this.search.approvalStage,
         sortType: 1,
         id: userinfo.id,
         // id: '25',
-        name: userinfo.fullname,
-      };
-      getsTheNumberOfHeaders(param).then(res => {
+        name: userinfo.fullname
+      }
+      getsTheNumberOfHeaders(param).then((res) => {
         const data = res.data.data[0]
-        for (let key in data) {
-          this.dataStatistics.forEach(m => {
-            if (m.value == key) {
+        for (const key in data) {
+          this.dataStatistics.forEach((m) => {
+            if (m.value === key) {
               m.count = data[key]
             }
           })
@@ -317,35 +310,35 @@ export default {
       })
     },
     changeSort() {
-      const lastKey =
-        this.search.updateTime2[this.search.updateTime2.length - 1];
+      const lastKey = this.search.updateTime2[this.search.updateTime2.length - 1]
       if (this.search.updateTime2.length < 2) {
-        this.search.updateTime2 = this.search.updateTime;
+        this.search.updateTime2 = this.search.updateTime
       } else {
+        // eslint-disable-next-line
         if (!isNaN(lastKey)) {
-          this.search.updateTime[0] = lastKey;
+          this.search.updateTime[0] = lastKey
         } else {
-          this.search.updateTime[1] = lastKey;
+          this.search.updateTime[1] = lastKey
         }
         this.$nextTick(() => {
-          this.search.updateTime2 = this.search.updateTime;
-        });
+          this.search.updateTime2 = this.search.updateTime
+        })
       }
-      let dom = document
-        .querySelectorAll(".arrow-select")[0]
-        .querySelector(".el-select__tags");
+      const dom = document
+        .querySelectorAll('.arrow-select')[0]
+        .querySelector('.el-select__tags')
       this.$nextTick(() => {
-        const text = this.search.updateTime[0] == 1 ? "发起时间" : "更新时间";
-        dom.innerText = text;
+        const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间'
+        dom.innerText = text
         setTimeout(() => {
-          this.$refs.multiSelect.blur();
-        }, 50);
+          this.$refs.multiSelect.blur()
+        }, 50)
 
-        this.searchList();
-      });
+        this.searchList()
+      })
     },
     async getApplicationListAll(pageNow) {
-      //在此时分流  调不同的接口
+      // 在此时分流  调不同的接口
       this.pageNow = pageNow
       const userinfo = JSON.parse(window.localStorage.getItem('user_name'))
       // 关于排序
@@ -356,65 +349,96 @@ export default {
         currentActivityName: this.search.approvalStage,
         id: userinfo.id,
         name: userinfo.fullname,
-        startDate: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate.map((v, index) => { return v + (index > 0 ? ' 23:59:59' : ' 00:00:00') }).join('TO') : '',
-        productLaunchDate: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate.map((v, index) => { return v + (index > 0 ? ' 23:59:59' : ' 00:00:00') }).join('TO') : ''
-      };
-      let sortType = "";
+        startDate:
+          this.search.startDate && this.search.startDate.length > 0
+            ? this.search.startDate
+              .map((v, index) => {
+                return v + (index > 0 ? ' 23:59:59' : ' 00:00:00')
+              })
+              .join('TO')
+            : '',
+        productLaunchDate:
+          this.search.productLaunchDate && this.search.productLaunchDate.length > 0
+            ? this.search.productLaunchDate
+              .map((v, index) => {
+                return v + (index > 0 ? ' 23:59:59' : ' 00:00:00')
+              })
+              .join('TO')
+            : ''
+      }
+      let sortType = ''
       // desc:降序 asc 升序 1 发起时间 2 更新时间
       // 1：创建时间：升序 2：创建时间：降序 3：更新时间：升序 4：更新时间：降序
-      if (this.search.updateTime2[0] == 1) {
-        sortType = this.search.updateTime2[1] == "desc" ? 2 : 1;
-      } else if (this.search.updateTime2[0] == 2) {
-        sortType = this.search.updateTime2[1] == "desc" ? 4 : 3;
+      if (this.search.updateTime2[0] === 1) {
+        sortType = this.search.updateTime2[1] === 'desc' ? 2 : 1
+      } else if (this.search.updateTime2[0] === 2) {
+        sortType = this.search.updateTime2[1] === 'desc' ? 4 : 3
       }
-      param.sortType = sortType;
-      Reflect.deleteProperty(param, "updateTime");
-      Reflect.deleteProperty(param, "updateTime2");
-      Reflect.deleteProperty(param, "total");
-      Reflect.deleteProperty(param, "loading");
-      this.search.loading = true;
+      param.sortType = sortType
+      Reflect.deleteProperty(param, 'updateTime')
+      Reflect.deleteProperty(param, 'updateTime2')
+      Reflect.deleteProperty(param, 'total')
+      Reflect.deleteProperty(param, 'loading')
+      this.search.loading = true
       let res = {}
+      // eslint-disable-next-line
       switch (this.crtSign) {
         case 'applyAll':
           res = await getApplicationList(param)
-          break;
+          break
         case 'myConcern':
           res = await concernedList(param)
-          break;
+          break
         case 'toModified':
           res = await toReviseList(param)
-          break;
+          break
         case 'toConfirmed':
           res = await toBeConfirmed(param)
-          break;
+          break
         case 'Approval':
           res = await Approval(param)
-          break;
+          break
         case 'draftBin':
           res = await revoked(param)
-          break;
+          break
       }
-      const { data } = res.data;
-      this.search.total = data.totalCount;
-      this.list = data.list && data.list.length ? data.list.map((v) => {
-        return {
-          ...v,
-          errorInfo: v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1 ? '' : v.errorInfo,
-          ocr_approval_status: v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1 ? '智能解析中，请您耐心等待...' : v.ocr_approval_status,
-          formId: v.taskNumber,
-          recordId:v.taskNumber,
-          taskStatus: v.submitted == 0 ? '0' : v.businessStatus,
-          initiator: { ...v.sponsorMap, label: v.industryList && v.industryList[1] },
-          processInstanceId: v.process_instance_id,
-          currentAssignee: v.currentAssignee && v.currentAssignee.length ? v.currentAssignee.map(m => {
+      const { data } = res.data
+      this.search.total = data.totalCount
+      // eslint-disable-next-line
+      this.list =
+        data.list && data.list.length
+          ? data.list.map((v) => {
             return {
-              ...m,
-              hasReminder: false
+              ...v,
+              errorInfo:
+                v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1
+                  ? ''
+                  : v.errorInfo,
+              ocr_approval_status:
+                v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1
+                  ? '智能解析中，请您耐心等待...'
+                  : v.ocr_approval_status,
+              formId: v.taskNumber,
+              recordId: v.taskNumber,
+              taskStatus: v.submitted === 0 ? '0' : v.businessStatus,
+              initiator: {
+                ...v.sponsorMap,
+                label: v.industryList && v.industryList[1]
+              },
+              processInstanceId: v.process_instance_id,
+              currentAssignee:
+                v.currentAssignee && v.currentAssignee.length
+                  ? v.currentAssignee.map((m) => {
+                    return {
+                      ...m,
+                      hasReminder: false
+                    }
+                  })
+                  : []
             }
-          }) : []
-        }
-      }) : []
-      this.search.loading = false;
+          })
+          : []
+      this.search.loading = false
     },
     concern() {
       this.getDataStatistic()
@@ -422,16 +446,15 @@ export default {
     },
     del(id) {
       const param = {
-        recordId: id,
-      };
+        recordId: id
+      }
       delApplication(param).then((res) => {
         if (res.status === 200) {
-          this.$message.success("删除成功");
+          this.$message.success('删除成功')
           this.getDataStatistic()
-          this.getApplicationListAll(1);
-
+          this.getApplicationListAll(1)
         }
-      });
+      })
     },
     quash(item) {
       const param = {
@@ -441,11 +464,11 @@ export default {
       }
       quashApplication(param).then((res) => {
         if (res.status === 200) {
-          this.$message.success("撤销成功");
+          this.$message.success('撤销成功')
           this.getDataStatistic()
-          this.getApplicationListAll(1);
+          this.getApplicationListAll(1)
         }
-      });
+      })
     },
     userStatus(counts) {
       const modifyCount = counts['toModified']
@@ -455,53 +478,56 @@ export default {
       const applyAllCount = counts['applyAll']
       const finished = ApprovalCount - modifyCount - toConfirmedCount - draftBinCount - applyAllCount
       if (modifyCount > 0 && modifyCount <= 5) {
-        return this.tipsMsg = `您有${modifyCount}笔申请单待修改哦，请尽快修改。`
+        // eslint-disable-next-line
+        return (this.tipsMsg = `您有${modifyCount}笔申请单待修改哦，请尽快修改。`)
       }
       if (toConfirmedCount <= 5 && toConfirmedCount > 0) {
-        return this.tipsMsg = `您有${toConfirmedCount}笔申请单待确认哦，请尽快确认。`
+        // eslint-disable-next-line
+        return (this.tipsMsg = `您有${toConfirmedCount}笔申请单待确认哦，请尽快确认。`)
       }
       if (ApprovalCount > 0) {
-        return this.tipsMsg = `您的申请单正在处理哦，请耐心等待。`
+        // eslint-disable-next-line
+        return (this.tipsMsg = `您的申请单正在处理哦，请耐心等待。`)
       }
-      if (finished == 0) {
-        return this.tipsMsg = `您今日还没有提起新的申请，快去操作吧！`
+      if (finished === 0) {
+        // eslint-disable-next-line
+        return (this.tipsMsg = `您今日还没有提起新的申请，快去操作吧！`)
       }
     },
     changeStatis(item) {
-      if (item.value == this.crtSign) return;
-      this.crtSign = item.value;
-      this.crtId = item.id;
-      this.getApplicationListAll(1);
+      if (item.value === this.crtSign) return
+      this.crtSign = item.value
+      this.crtId = item.id
+      this.getApplicationListAll(1)
     },
     searchList() {
-      this.getApplicationListAll(1);
+      this.getApplicationListAll(1)
     },
     reset() {
       this.search = {
-        form_management_id: "",
-        approvalStage: "",
-        urgent: "",
-        hasOpinions: "",
-        adoptionSituation: "",
-        updateTime: [1, "asc"],
-        updateTime2: [1, "asc"],
-        keywords: "",
+        form_management_id: '',
+        approvalStage: '',
+        urgent: '',
+        hasOpinions: '',
+        adoptionSituation: '',
+        updateTime: [1, 'asc'],
+        updateTime2: [1, 'asc'],
+        keywords: '',
         startDate: [],
         productLaunchDate: [],
         total: 0,
-        loading: false,
-      };
-      this.approvalPhases = [];
-      this.searchList();
-    },
+        loading: false
+      }
+      this.approvalPhases = []
+      this.searchList()
+    }
   },
   beforeRouteEnter(to, from, next) {
     next(() => {
       localStorage.removeItem('order-detail')
     })
-  },
-
-};
+  }
+}
 </script>
 <style lang="less" scoped>
 [v-cloak] {
@@ -545,7 +571,7 @@ export default {
 
   .apply-center-box {
     border-radius: 10px;
-    background: #FFF;
+    background: #fff;
     padding: 24px;
   }
 
@@ -646,8 +672,6 @@ export default {
       }
     }
 
-
-
     .new-apply {
       width: 120px !important;
 
@@ -671,7 +695,6 @@ export default {
       font-weight: 700;
       line-height: 22px;
       /* 157.143% */
-
     }
 
     .new-apply:hover {
@@ -680,9 +703,8 @@ export default {
           rgba(97, 160, 255, 0.07) 100%);
 
       img {
-
         transform: scale(1.2);
-        transition: all .2s ease;
+        transition: all 0.2s ease;
         margin-bottom: 8px;
       }
     }
@@ -734,7 +756,7 @@ export default {
 
         /deep/ .el-select .el-input .el-icon-arrow-up::before {
           font-family: element-icons !important;
-          content: "\e78f";
+          content: '\e78f';
         }
 
         .descArrow,
@@ -744,7 +766,7 @@ export default {
 
           &::before {
             font-family: element-icons !important;
-            content: "\e6e6";
+            content: '\e6e6';
             display: inline-block;
             position: absolute;
             top: 50%;
@@ -774,7 +796,7 @@ export default {
         .descArrow {
           &::before {
             font-family: element-icons !important;
-            content: "\e6eb";
+            content: '\e6eb';
             display: inline-block;
             position: absolute;
             top: 50%;
@@ -820,18 +842,14 @@ export default {
           }
 
           span {
-            color: #86909C;
+            color: #86909c;
             font-size: 14px;
             font-weight: 400;
             line-height: 22px;
             word-break: keep-all;
             margin-right: 8px;
-
           }
-
         }
-
-
 
         .floor2-item:last-of-type {
           margin-right: 0;
@@ -850,7 +868,7 @@ export default {
 
           .el-icon-time::before {
             font-family: element-icons !important;
-            content: "\e78e";
+            content: '\e78e';
           }
 
           .el-input__suffix {
@@ -883,8 +901,6 @@ export default {
       }
     }
   }
-
-
 }
 </style>
 <style lang="less">
@@ -892,4 +908,3 @@ export default {
   max-width: 200px !important;
 }
 </style>
-

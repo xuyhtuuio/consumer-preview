@@ -3,24 +3,41 @@
     <div class="event-info">
       <div class="event-name-status">
         <!-- 加急 -->
-        <svg class="icon urgent-icon" aria-hidden="true" v-if="item.urgent == 1">
+        <svg
+          class="icon urgent-icon"
+          aria-hidden="true"
+          v-if="item.urgent == 1"
+        >
           <use xlink:href="#icon-shenpiyemiantubiao"></use>
         </svg>
-        <svg class="icon urgent-icon" aria-hidden="true" v-if="item.dismissalMark == 1">
+        <svg
+          class="icon urgent-icon"
+          aria-hidden="true"
+          v-if="item.dismissalMark == 1"
+        >
           <use xlink:href="#icon-tongyongtubiao2"></use>
         </svg>
-        <span class="event-name pointer" @click="toDetail(item)">{{ item.entryName }}</span>
+        <span class="event-name pointer" @click="toDetail(item)">{{
+          item.entryName
+        }}</span>
         <span class="event-status">
-          <i v-if="item.taskStatus === '0'" class="tag draft">{{ $msg('NodeStatus')[item.taskStatus] }}</i>
-          <i v-if="['1', '2'].includes(item.taskStatus)" class="tag in-approval">{{ $msg('NodeStatus')[item.taskStatus]
-          }}>{{ item.nodeName }}</i>
-          <i v-if="item.taskStatus === '3'" class="tag in-modify">{{ $msg('NodeStatus')[item.taskStatus] }}>{{
-            item.nodeName }}</i>
-          <i v-if="['5', '6'].includes(item.taskStatus)" class="tag check">{{ $msg('NodeStatus')[item.taskStatus] }}>{{
-            item.nodeName
+          <i v-if="item.taskStatus === '0'" class="tag draft">{{
+            $msg('NodeStatus')[item.taskStatus]
           }}</i>
+          <i v-if="['1', '2'].includes(item.taskStatus)" class="tag in-approval"
+            >{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i
+          >
+          <i v-if="item.taskStatus === '3'" class="tag in-modify"
+            >{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i
+          >
+          <i v-if="['5', '6'].includes(item.taskStatus)" class="tag check"
+            >{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i
+          >
           <i v-if="item.taskStatus === '4'" class="end">
-            <i class="tag end-sign"> {{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }} </i> </i>
+            <i class="tag end-sign">
+              {{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}
+            </i>
+          </i>
           <!-- 有无意见 -->
           <i v-if="['4', '5', '6'].includes(item.taskStatus)" class="flex">
             <i class="tag has-opinion" v-if="item.substantiveOpinions == 1">
@@ -31,11 +48,17 @@
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
-            <i class="tag check" v-if="item.adoptionStatus == 0 && item.taskStatus != '5'">
+            <i
+              class="tag check"
+              v-if="item.adoptionStatus == 0 && item.taskStatus != '5'"
+            >
               <i class="iconfont icon-guanzhu2"></i>
               不采纳
             </i>
-            <i class="tag adoption" v-if="item.adoptionStatus == 1 && item.taskStatus != '5'">
+            <i
+              class="tag adoption"
+              v-if="item.adoptionStatus == 1 && item.taskStatus != '5'"
+            >
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tubiao"></use>
               </svg>
@@ -46,20 +69,35 @@
       </div>
       <div class="event-infos">
         <span class="id">{{ item.orderNo }}</span>
-        <span class="sDate date">发起时间：{{ item.createTime | timeFormate }}</span>
-        <span class="sDate date">更新时间：{{ item.updateTime | timeFormate }}</span>
-        <span class="sDate date">上线时间：{{ item.uptime | timeFormate }}</span>
-        <span class="handler date">发起人：{{ item.originator && item.originator.name }}</span>
-        <span class="handler" v-if="item.institutional && item.institutional[1]">
+        <span class="sDate date"
+          >发起时间：{{ item.createTime | timeFormate }}</span
+        >
+        <span class="sDate date"
+          >更新时间：{{ item.updateTime | timeFormate }}</span
+        >
+        <span class="sDate date"
+          >上线时间：{{ item.uptime | timeFormate }}</span
+        >
+        <span class="handler date"
+          >发起人：{{ item.originator && item.originator.name }}</span
+        >
+        <span
+          class="handler"
+          v-if="item.institutional && item.institutional[1]"
+        >
           <i class="iconfont icon-dept"></i>
-          {{ item.institutional && item.institutional[1] }}</span>
+          {{ item.institutional && item.institutional[1] }}</span
+        >
       </div>
     </div>
     <!-- 任务状态（0:草稿 1：审查中 2：待修改 3：待确认 4：已完成 -->
     <div class="right-operation">
       <!-- 待审核状态显示审查 -->
-      <span class="attention icon-op" v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'"
-        @click="toApproval(item)">
+      <span
+        class="attention icon-op"
+        v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'"
+        @click="toApproval(item)"
+      >
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-tubiao3"></use>
         </svg>
@@ -81,48 +119,65 @@
       </span> -->
 
       <!-- 待确认状态的工单 需要该审批人确认的工单-->
-      <span class="attention check icon-op" v-if="item.taskStatus == 5 && crtSign !== 'approvedCount'"
-        @click="check(item)">
+      <span
+        class="attention check icon-op"
+        v-if="item.taskStatus == 5 && crtSign !== 'approvedCount'"
+        @click="check(item)"
+      >
         <span class="iconfont icon icon-tubiao urgent-icon"></span>
-        确认</span>
-      <span class="attention check icon-op" v-if="item.taskStatus == 6 && crtSign !== 'approvedCount'"
-        @click="compare(item)">
+        确认</span
+      >
+      <span
+        class="attention check icon-op"
+        v-if="item.taskStatus == 6 && crtSign !== 'approvedCount'"
+        @click="compare(item)"
+      >
         <span class="iconfont icon icon-compare urgent-icon"></span>
-        比对</span>
+        比对</span
+      >
       <!-- 关注 -->
-      <span class="attention no-attention icon-op" v-if="item.followed != 1" @click="concern(item)">
+      <span
+        class="attention no-attention icon-op"
+        v-if="item.followed != 1"
+        @click="concern(item)"
+      >
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-tubiao-1"></use>
         </svg>
-        关注</span>
-      <span class="attention has-attention icon-op" v-if="item.followed == 1" @click="concern(item)">
+        关注</span
+      >
+      <span
+        class="attention has-attention icon-op"
+        v-if="item.followed == 1"
+        @click="concern(item)"
+      >
         <svg class="icon urgent-icon" aria-hidden="true">
-          <use xlink:href="#icon-guanzhu-1"></use>
-        </svg>已关注</span>
+          <use xlink:href="#icon-guanzhu-1"></use></svg>已关注</span
+      >
     </div>
   </div>
 </template>
 <script>
-import { concernApplication } from "@/api/approvalCenter";
+import { concernApplication } from '@/api/approvalCenter'
 import { getTemplatedetail } from '@/api/applyCenter'
 
 import moment from 'moment'
 export default {
-  name: "applyEventCard",
+  name: 'applyEventCard',
   props: {
     item: {
       type: Object,
-      default: () => { },
+      default: () => {}
     },
     crtSign: {
       type: String,
-      default: '',
+      default: ''
     }
   },
   data() {
     return {
-      allowConcernClick: true,
-    };
+      allowConcernClick: true
+    }
   },
   methods: {
     async toApproval(item) {
@@ -133,120 +188,127 @@ export default {
       const res = await getTemplatedetail(params)
       if (res.data) {
         const { data } = res.data
-        const targetPage = data[data.length - 1].props['targetPage']
+        const { targetPage } = data[data.length - 1]?.props
+        // eslint-disable-next-line
         switch (targetPage) {
           case 'LEADER':
             this.toDetail(item)
-            break;
+            break
           case 'CONFIRM':
             this.toDetail(item)
-            break;
+            break
           case 'CONTRAST':
             this.$router.push({
               name: 'compare',
               params: { item }
             })
-            break;
+            break
           case 'XIAOBAO':
             this.$router.push({
-              name: "aiApproval",
+              name: 'aiApproval',
               params: { item }
             })
-            break;
+            break
         }
       }
     },
     toDetail(item) {
-      console.log('item',item);
-      window.localStorage.setItem("order-detail", JSON.stringify({
-        item,
-        clickPoint: "taskName",
-      }));
+      window.localStorage.setItem(
+        'order-detail',
+        JSON.stringify({
+          item,
+          clickPoint: 'taskName'
+        })
+      )
       this.$router.push({
-        name: "approval-details",
+        name: 'approval-details',
         params: {
           formId: item.recordId,
           taskName: item.taskName,
           processInstanceId: item.processInstanceId,
           formManagementId: item.formManagementId,
-          nodeId:item.nodeId,
-          processTemplateId:item.processTemplateId
-        },
-      });
+          nodeId: item.nodeId,
+          processTemplateId: item.processTemplateId
+        }
+      })
     },
     check(item) {
       window.localStorage.setItem(
-        "order-detail",
+        'order-detail',
         JSON.stringify({
-          item: item,
-          pageFrom: "apply",
-          op: "check",
+          item,
+          pageFrom: 'apply',
+          op: 'check',
           check: item.comments
         })
-      );
+      )
       this.$router.push({
-        name: "approval-details",
+        name: 'approval-details',
         params: {
           formId: item.recordId,
           taskName: item.taskName,
           processInstanceId: item.processInstanceId,
           formManagementId: item.formManagementId,
-          nodeId:item.nodeId,
-          processTemplateId:item.processTemplateId
-        },
-      });
+          nodeId: item.nodeId,
+          processTemplateId: item.processTemplateId
+        }
+      })
     },
     // 超级管理员的删除功能
     del(item) {
-      return this.$message.info("此功能暂未开放");
-      this.$confirm("确定删除该工单吗？", "", {
-        customClass: "confirmBox",
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
+      return this.$message.info('此功能暂未开放')
+      // eslint-disable-next-line
+      this.$confirm('确定删除该工单吗？', '', {
+        customClass: 'confirmBox',
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
+        type: 'warning'
       })
         .then(() => {
-          this.$emit("del", item.taskNumber);
+          this.$emit('del', item.taskNumber)
         })
         .catch(() => {
           this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
-        });
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
     modify(item) {
-      window.localStorage.setItem("order-detail", JSON.stringify({
-        item,
-      }));
+      window.localStorage.setItem(
+        'order-detail',
+        JSON.stringify({
+          item
+        })
+      )
       this.$router.push({
-        name: "approval-details",
+        name: 'approval-details',
         params: {
           formId: item.recordId,
           taskName: item.taskName,
           processInstanceId: item.processInstanceId,
           formManagementId: item.formManagementId
-        },
-      });
+        }
+      })
     },
     concern(item) {
       const param = {
         recordId: item.taskNumber,
         type: 2
-      };
+      }
       concernApplication(param).then((res) => {
-        if (res.status == 200) {
-          item.followed = item.followed == 1 ? 0 : 1;
-          this.$message.success(res.data.msg);
+        if (res.status === 200) {
+          item.followed = item.followed === 1 ? 0 : 1
+          this.$message.success(res.data.msg)
           this.$emit('concern')
         }
-      });
+      })
     },
-    //比对功能
+    // 比对功能
     compare(item) {
       this.$router.push({
         name: 'compare',
-        params:{
+        params: {
           item
         }
       })
@@ -258,7 +320,7 @@ export default {
       return val ? moment(val).format('YYYY-MM-DD HH:mm:ss') : '--'
     }
   }
-};
+}
 </script>
 <style lang="less" scoped>
 .approval-event-card {
@@ -398,7 +460,7 @@ export default {
       }
 
       .date:after {
-        content: "";
+        content: '';
         display: inline-block;
         width: 1px;
         height: 10px;
@@ -512,7 +574,7 @@ export default {
     }
 
     .del {
-      color: #F76560;
+      color: #f76560;
     }
 
     .del:hover {
@@ -534,5 +596,4 @@ export default {
   .event-name {
     color: #2d5cf6;
   }
-}
-</style>
+}</style>
