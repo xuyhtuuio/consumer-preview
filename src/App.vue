@@ -12,7 +12,7 @@
 
 <script>
 //import layout from './components/layout'
-import NavMenu from "@/components/common/navMenu"
+import NavMenu from "@/components/common/navMenu";
 export default {
   components: { NavMenu},
   data() {
