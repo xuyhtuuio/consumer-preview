@@ -110,3 +110,13 @@ export function getNextUserOption(params) {
     params
   })
 }
+
+// 更新下一节点审批人配置
+export function updateRuleCode(param) {
+  return request({
+    url: '/cpr/workspace/updateRuleCode',
+    method: 'post',
+    // contentType : 'application/x-www-form-urlencoded;charset=utf-8',
+    data: param
+  })
+}
