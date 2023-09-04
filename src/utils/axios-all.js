@@ -4,7 +4,6 @@ import router from '@/router';
 
 // 并发请求封装
 export default function axiosAll(options) {
-
   const arr = [];
   const keys = [];
   for (const key in options) {

@@ -1,5 +1,7 @@
 public/*
 bable.config.js
 .eslintrc.js
+src/assets/*
+src/utils/base64.min.js
 src/lib/crypto/crypto-js.js
 src/views/login/login.less
