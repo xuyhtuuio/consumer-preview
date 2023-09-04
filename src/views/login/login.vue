@@ -58,7 +58,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import {
   toCode,
   fromCode
@@ -214,7 +213,6 @@ export default {
       }
       // this.ruleForm.codeImg = res.data.image;
       this.verCode = res.data.data.image;
-      console.log(res)
       this.login_form.verKey = res.data.data.key;
     },
     // 密码显示与隐藏
