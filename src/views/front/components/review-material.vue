@@ -65,9 +65,10 @@
 </template>
 
 <script>
-import WarnInfo from './warn-info.vue';
-import { getFormGroups, deleteFormGroups } from '@/api/front.js';
 import FileType from '@/components/common/file-type';
+import { getFormGroups, deleteFormGroups } from '@/api/front';
+import WarnInfo from './warn-info';
+
 // 核对要点
 export default {
   components: {
@@ -117,18 +118,17 @@ export default {
   watch: {
     list(newVal) {
       if (newVal.length) {
-         this.judgeWarnFlag = false
+        this.judgeWarnFlag = false
         this.fileList = newVal[0].value;
-        this.fileList.length &&
-          this.fileList.forEach(item => {
-            item.status = 1;
-            item.name = item.fileName;
-            item.type = item.fileName.replace(/.+\./, '');
-            this.$set(item, 'isClick', false);
-          });
+        this.fileList.length && this.fileList.forEach(item => {
+          item.status = 1;
+          item.name = item.fileName;
+          item.type = item.fileName.replace(/.+\./, '');
+          this.$set(item, 'isClick', false);
+        });
       }
     },
-    'fileList.length'(val) {
+    'fileList.length': function () {
       if (this.judgeWarnFlag) this.judgeWarnFlag = false;
     }
   },
@@ -143,7 +143,7 @@ export default {
       });
       this.judgeWarnFlag = false;
     },
-    handleError(id, file, fileList) {
+    handleError(id) {
       this.fileList.forEach(item => {
         if (item.id === id) {
           item.status = -2;
@@ -175,7 +175,7 @@ export default {
         id: file.uid,
         status: -1,
         isClick: false,
-        type: type
+        type
       });
     },
     // 上传文件
@@ -192,12 +192,12 @@ export default {
             this.handleError(param.file.uid);
           }
         })
-        .catch(err => {
+        .catch(() => {
           this.handleError(param.file.uid);
         });
     },
     handleUploadLook(url) {
-      let routeUrl = this.$router.resolve({
+      const routeUrl = this.$router.resolve({
         name: 'showReview',
         query: {
           url
@@ -205,7 +205,7 @@ export default {
       });
       window.open(routeUrl.href, '_blank');
     },
-    //删除图片
+    // 删除图片
     handleUploadDelete(item, flag = true) {
       if (flag) {
         deleteFormGroups({ key: item.key }).then(res => {
@@ -213,10 +213,10 @@ export default {
           this.fileList.splice(idx, 1);
           this.$message({ type: 'success', message: res.data.data });
         });
-      }else {
+      } else {
         const idx = this.fileList.findIndex(iten => iten.key === item.key);
-          this.fileList.splice(idx, 1);
-          this.$message({ type: 'success', message: '删除成功'});
+        this.fileList.splice(idx, 1);
+        this.$message({ type: 'success', message: '删除成功' });
       }
     },
     handleMouseEnter(item) {
@@ -227,7 +227,7 @@ export default {
     },
 
     judgeWarn(flag = true) {
-      const offsetTop = this.$refs['globalRef'].offsetTop;
+      const { offsetTop } = this.$refs['globalRef'];
       if (this.fileList.some(item => item.status === -2)) {
         this.warnInfoMessage(this.info.err);
         flag && (this.judgeWarnFlag = true);

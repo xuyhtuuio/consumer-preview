@@ -157,8 +157,8 @@
 
 <script>
 import moment from 'moment';
+// import { timestampToDateTime } from '@/utils/utils.js';
 import WarnInfo from './warn-info';
-import { timestampToDateTime } from '@/utils/utils.js';
 function rulesFn(data) {
   switch (data.name) {
     case 'TextInput':
@@ -193,6 +193,8 @@ function rulesFn(data) {
       return [{ type: 'date', required: true, message: '请选择日期', trigger: 'change' }];
     case 'Cascader':
       return [{ type: 'array', required: true, message: `请选择${data.title}`, trigger: 'change' }];
+    default:
+      return []
   }
 }
 export default {
@@ -235,14 +237,14 @@ export default {
   },
   methods: {
     pickerTime(id, order, originVal) {
-      if (order == 0) {
+      if (Number(order) === 0) {
         return this.startTime(id, originVal);
       } else {
         return this.endTime(id, originVal);
       }
     },
     startTime(nextId, originVal) {
-      const value = this.list.find(item => item.id === nextId).value;
+      const { value } = this.list.find(item => item.id === nextId);
       let startDateTime = '00:00:00';
       let endDateTime = '23:59:59';
       // 关联的下线时间
@@ -257,14 +259,12 @@ export default {
           startDateTime = '00:00:00';
           endDateTime = '23:59:59';
         }
+      } else if (moment(new Date()).format('l') === moment(originVal).format('l')) {
+        startDateTime = moment(new Date()).format('HH:mm:ss');
+        endDateTime = '23:59:59';
       } else {
-        if (moment(new Date()).format('l') === moment(originVal).format('l')) {
-          startDateTime = moment(new Date()).format('HH:mm:ss');
-          endDateTime = '23:59:59';
-        } else {
-          startDateTime = '00:00:00';
-          endDateTime = '23:59:59';
-        }
+        startDateTime = '00:00:00';
+        endDateTime = '23:59:59';
       }
       return {
         selectableRange: `${startDateTime} - ${endDateTime}`,
@@ -281,7 +281,7 @@ export default {
       };
     },
     endTime(prevId, originVal) {
-      const value = this.list.find(item => item.id === prevId).value;
+      const { value } = this.list.find(item => item.id === prevId);
       let startDateTime = '00:00:00';
       let endDateTime = '23:59:59';
       if (value) {
@@ -292,14 +292,12 @@ export default {
           startDateTime = '00:00:00';
           endDateTime = '23:59:59';
         }
+      } else if (moment(new Date()).format('l') === moment(originVal).format('l')) {
+        startDateTime = moment(new Date()).format('HH:mm:ss');
+        endDateTime = '23:59:59';
       } else {
-        if (moment(new Date()).format('l') === moment(originVal).format('l')) {
-          startDateTime = moment(new Date()).format('HH:mm:ss');
-          endDateTime = '23:59:59';
-        } else {
-          startDateTime = '00:00:00';
-          endDateTime = '23:59:59';
-        }
+        startDateTime = '00:00:00';
+        endDateTime = '23:59:59';
       }
       return {
         disabledDate: time => {
@@ -316,21 +314,21 @@ export default {
     },
     handlePickerChange(item) {
       if (
-        moment(new Date(item.value)).format('l') === moment(new Date()).format('l') &&
-        moment(item.value).format('HH:mm:ss') === '00:00:00'
+        moment(new Date(item.value)).format('l') === moment(new Date()).format('l')
+        && moment(item.value).format('HH:mm:ss') === '00:00:00'
       ) {
         item.value = new Date();
       }
-      const otherItem = this.list.find(iten => iten.id == item.props.gl);
+      const otherItem = this.list.find(iten => Number(iten.id) === Number(item.props.gl));
       const otherVal = new Date(otherItem.value).getTime();
       const itemVal = new Date(item.value).getTime();
-      if (item.props.order == 0 && otherVal && itemVal > otherVal) {
+      if (Number(item.props.order) === 0 && otherVal && itemVal > otherVal) {
         item.value = '';
-      } else if (item.props.order == 1 && otherVal && itemVal < otherVal) {
+      } else if (Number(item.props.order) === 1 && otherVal && itemVal < otherVal) {
         item.value = '';
       }
     },
-    handleInput(val, item, id) {
+    handleInput(val, item) {
       // this.checkBox[item.id]= val
       this.$set(this.checkBox, item.id, val);
     },
@@ -338,7 +336,7 @@ export default {
     // 判断警告出现
     judgementWarn(item) {
       let flag;
-      if (item.valueType == 'Date') {
+      if (item.valueType === 'Date') {
         flag = item.value == null ? '' : String(item.value);
       } else {
         flag = item.value;
@@ -350,22 +348,20 @@ export default {
           item.isWarning = true;
           return item.warnInfo[1].message;
         } else {
-          return (item.isWarning = false);
+          item.isWarning = false
         }
       } else if (item.props.numberOfWords && item.value.length) {
         if (item.value.length > item.props.numberOfWords) return item.warnInfo[0].message;
         item.isWarning = false;
       } else {
-        return (item.isWarning = false);
+        item.isWarning = false
       }
     },
     judgeWarn() {
-      const result = this.list.every((item, index) => {
+      const result = this.list.every((item) => {
         if (item.props.required) {
           if (item.value == null) return false;
-          else if (item.props.numberOfWords && item.value.length !== 0)
-            return item.value.length < item.props.numberOfWords;
-          else return item.value.length !== 0;
+          else if (item.props.numberOfWords && item.value.length !== 0) { return item.value.length < item.props.numberOfWords; } else return item.value.length !== 0;
         } else if (item.props.numberOfWords && item.value.length !== 0) {
           return false;
         } else {
@@ -382,10 +378,10 @@ export default {
       return result;
     },
     judgeWarnSave() {
-      this.list.forEach(item => (item.isWarning = false));
+      this.list.forEach(item => { item.isWarning = false });
       if (
-        this.list[0].value.length === 0 ||
-        this.list[0].value.length > this.list[0].props.numberOfWords
+        this.list[0].value.length === 0
+        || this.list[0].value.length > this.list[0].props.numberOfWords
       ) {
         this.list[0].isWarning = true;
         return false;
@@ -395,7 +391,7 @@ export default {
     },
     initWarn() {
       this.list.forEach(item => {
-        if (item.props.required == true) {
+        if (item.props.required) {
           this.$set(item, 'isWarning', false);
           this.$set(item, 'warnInfo', rulesFn(item));
         } else if (item.props.numberOfWords) {
