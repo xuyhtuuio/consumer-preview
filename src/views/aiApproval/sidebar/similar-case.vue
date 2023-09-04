@@ -155,7 +155,6 @@ export default {
   width: 600px;
   height: 100%;
   overflow: hidden;
-
   .poppver-title {
     color: #1D2128;
     font-size: 16px;

@@ -89,16 +89,14 @@ export default {
       handler(val) {
         this.judgeWarnFlag = false
         // this.handleCheckAll(val)
-        val.length &&
-          val.forEach(item => {
-            if(item.name=== "SingleGroupsSelect") {
-              item.props.options.forEach((propItem,propIndex) => {
-                this.$set(propItem, 'value1','')
-                propItem.value1 = item.value[propIndex] || ''
-              })
-            }
-          })
-        
+        val.length && val.forEach(item => {
+          if (item.name === 'SingleGroupsSelect') {
+            item.props.options.forEach((propItem, propIndex) => {
+              this.$set(propItem, 'value1', '')
+              propItem.value1 = item.value[propIndex] || ''
+            })
+          }
+        })
       },
     }
   },
@@ -113,13 +111,13 @@ export default {
     },
     handleCheckAll(val) {
       let len = 0;
-        let valLen = 0;
-        val.forEach(listItem => {
-          len += listItem.value.length;
-          valLen += listItem.props.options.length;
-        });
-        this.checkAll = len === valLen ? true : false;
-        this.checkAll && (this.judgeWarnFlag = false);
+      let valLen = 0;
+      val.forEach(listItem => {
+        len += listItem.value.length;
+        valLen += listItem.props.options.length;
+      });
+      this.checkAll = len === valLen || false;
+      this.checkAll && (this.judgeWarnFlag = false);
     },
     // 全选
     // handleCheckAllChange(val) {
@@ -136,7 +134,7 @@ export default {
         this.judgeWarnFlag = false;
       }
     },
-    handleRadioChange(val,idx,originArr) {
+    handleRadioChange(val, idx, originArr) {
       originArr[idx] = val
     },
     judgeWarn() {
@@ -153,7 +151,7 @@ export default {
       } else if (this.list.every(item => Object.keys(item.value).length === item.props.options.length)) {
         return [true];
       } else {
-        const offsetTop = this.$refs[`globalRef`].offsetTop;
+        const { offsetTop } = this.$refs['globalRef'];
         this.judgeWarnFlag = true;
         return [false, offsetTop];
       }
@@ -218,7 +216,7 @@ export default {
         }
         .content-item {
           display: flex;
-          
+
           /deep/.el-radio {
             flex: 1;
             line-height: 22px;
@@ -228,46 +226,4 @@ export default {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </style>
