@@ -75,7 +75,7 @@
             }}</span>
           </template>
           <template #updateTime="{row:{updateTime}}">
-              {{updateTime | handleTime}} 
+              {{updateTime | handleTime}}
           </template>
           <template #count="{ row }">
             {{ row.count }}
@@ -154,7 +154,7 @@
   </div>
 </template>
 <script>
-import { getList, edit, add } from '@/api/admin-label.js';
+import { getList, edit, add } from '@/api/admin-label';
 import secondaryConfirmation from '@/components/common/secondaryConfirmation';
 export default {
   name: 'labelManage',
@@ -231,9 +231,8 @@ export default {
       const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.pathName === 'LabelManage') || {}
       if (flowManage.type === 'edit') {
         return true
-      }else {
-        this.colConfig.pop()
-      return false
+      } else {
+        return false
       }
     }
   },
@@ -242,7 +241,7 @@ export default {
   },
   filters: {
     handleTime(val) {
-      return val.replace('T',' ')
+      return val.replace('T', ' ')
     }
   },
   methods: {
@@ -282,7 +281,7 @@ export default {
       this.loading = false;
     },
     sortChange({ column, prop, order }) {
-      if(!order) return
+      if (!order) return
       const orderType = !!column?.order?.startsWith('asc');
       let result = 1
       switch (prop) {
@@ -290,7 +289,9 @@ export default {
           result = orderType ? 4 : 3;
           break;
         case 'updateTime':
-          result= orderType ? 2 : 1;
+          result = orderType ? 2 : 1;
+          break;
+        default:
       }
       this.orderType = result
       this.getList(1)
@@ -313,7 +314,7 @@ export default {
     },
     // 编辑标签
     async editKeyWord() {
-      const recordId = this.dialogItem.recordId;
+      const { recordId } = this.dialogItem;
       // const index = this.dialogItem.index;
       const { keywordContent, type } = this.dialogItem;
       let res;
@@ -725,19 +726,5 @@ export default {
     line-height: 28px;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 </style>

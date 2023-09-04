@@ -68,15 +68,15 @@
 </template>
 
 <script>
-import draggable from "vuedraggable";
+import draggable from 'vuedraggable';
 import {
   getFormGroups, groupItemsSort,
-  getFormDetail, updateGroup, updateForm
+  updateGroup, updateForm
 } from '@/api/design'
 
 export default {
-  name: "FormsPanel",
-  components: {draggable},
+  name: 'FormsPanel',
+  components: { draggable },
   data() {
     return {
       moveSelect: '',
@@ -92,17 +92,12 @@ export default {
     getGroups() {
       getFormGroups().then(rsp => {
         this.groups = rsp.data
-        this.groups.forEach(group => {
-          group.items.forEach(item => {
-            item.logo = item.logo
-          })
-        })
-      }).catch(err => this.$message.error('获取分组异常'))
+      }).catch(() => this.$message.error('获取分组异常'))
     },
     newProcess(groupId) {
-      this.$store.commit("setTemplate", this.getTemplateData());
-      this.$store.commit("setIsEdit", false);
-      this.$router.push("/admin/design/baseSetting?groupId=" + groupId);
+      this.$store.commit('setTemplate', this.getTemplateData());
+      this.$store.commit('setIsEdit', false);
+      this.$router.push('/admin/design/baseSetting?groupId=' + groupId);
     },
     groupSort() {
       this.groupsSort = false
@@ -121,8 +116,8 @@ export default {
         inputPattern: /^[\u4E00-\u9FA5A-Za-z0-9\\-]{1,30}$/,
         inputErrorMessage: '分组名不能为空且长度小于30',
         inputPlaceholder: '请输入分组名'
-      }).then(({value}) => {
-        updateGroup({name: value}, 'post').then(rsp => {
+      }).then(({ value }) => {
+        updateGroup({ name: value }, 'post').then(rsp => {
           this.$message.success(rsp.data)
           this.getGroups()
         }).catch(err => this.$message.error(err.response.data))
@@ -134,7 +129,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        updateGroup({id: group.id}, 'delete').then(rsp => {
+        updateGroup({ id: group.id }, 'delete').then(rsp => {
           this.$message.success(rsp.data)
           this.getGroups()
         }).catch(err => this.$message.error(err.response.data))
@@ -148,27 +143,27 @@ export default {
         inputErrorMessage: '分组名不能为空且长度小于30',
         inputPlaceholder: '请输入分组名',
         inputValue: group.name
-      }).then(({value}) => {
-        updateGroup({id: group.id, name: value}, 'put').then(rsp => {
+      }).then(({ value }) => {
+        updateGroup({ id: group.id, name: value }, 'put').then(rsp => {
           this.$message.success(rsp.data)
           this.getGroups()
         }).catch(err => this.$message.error(err.response.data))
       })
     },
     updateForm(item, type) {
-      updateForm({templateId: item.id, type: type}).then(rsp => {
+      updateForm({ templateId: item.id, type }).then(rsp => {
         this.$message.success(rsp.data)
         this.getGroups()
       }).catch(err => this.$message.error(err.response.data))
     },
-    getTemplateData(data, group){
+    getTemplateData(data) {
       return data
     },
-    editFrom(item, group) {
-      this.$router.push("/admin/design/baseSetting?code=" + item.formId);
+    editFrom(item) {
+      this.$router.push('/admin/design/baseSetting?code=' + item.formId);
     },
     stopFrom(item) {
-      let tip = item.isStop ? ' 启用后将会进入 “其他” 分组，是否继续？' : ' 停用后将会被转移到 “已停用” 分组，您可以再次启用或者删除它，是否继续?';
+      const tip = item.isStop ? ' 启用后将会进入 “其他” 分组，是否继续？' : ' 停用后将会被转移到 “已停用” 分组，您可以再次启用或者删除它，是否继续?';
       this.$confirm(item.name + tip, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -187,11 +182,11 @@ export default {
           this.updateForm(item, 'delete');
         })
       } else {
-        if (this.moveSelect === null || this.moveSelect === ''){
+        if (this.moveSelect === null || this.moveSelect === '') {
           this.$message.error('请选择分组')
           return;
         }
-        updateForm({templateId: item.id, type: 'move', groupId: this.moveSelect}).then(rsp => {
+        updateForm({ templateId: item.id, type: 'move', groupId: this.moveSelect }).then(rsp => {
           this.$message.success(rsp.data)
           this.getGroups()
           this.moveSelect = null

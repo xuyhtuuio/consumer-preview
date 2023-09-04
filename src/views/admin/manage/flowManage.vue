@@ -35,9 +35,9 @@
 </template>
 <script>
 import { getProcessList } from '@/api/manage'
-import { deleteProcess, publishProcess, getProcessDetailByTemplateId, stopProcess } from '@/api/design'
+import { deleteProcess, getProcessDetailByTemplateId, stopProcess } from '@/api/design'
 import ProcessDesign from '@/views/admin/layout/ProcessDesign'
-import secondaryConfirmation from "@/components/common/secondaryConfirmation"
+import secondaryConfirmation from '@/components/common/secondaryConfirmation'
 export default {
   name: 'flowManage',
   components: {
@@ -145,7 +145,7 @@ export default {
       this.tableLoading = false
     },
     addFlow() {
-      this.$store.commit("setIsPreview", false);
+      this.$store.commit('setIsPreview', false);
       this.$store.commit('loadForm', {})
       this.$router.push({
         name: 'design'
@@ -164,13 +164,13 @@ export default {
       design.formItems = JSON.parse(design.formItems)
       design.process = JSON.parse(design.process)
       this.$store.commit('loadForm', design)
-      this.$store.commit("setIsPreview", true);
+      this.$store.commit('setIsPreview', true);
       this.$nextTick(() => {
         this.flowVisible = true
       })
     },
     editFlow(row) {
-      this.$store.commit("setIsPreview", false);
+      this.$store.commit('setIsPreview', false);
       this.$store.state.design = {
         ...row
       }
@@ -200,7 +200,7 @@ export default {
       this.currentRow = row
       this.processDetailRes = await getProcessDetailByTemplateId(row.templateId)
       if (!this.processDetailRes.data?.data?.processDefinitionId) {
-        this.$message.error("流程id不存在！")
+        this.$message.error('流程id不存在！')
         return false;
       }
       // check 接口

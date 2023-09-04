@@ -15,7 +15,7 @@
               <i slot="suffix" class="el-icon-search" @click="onSearch"></i>
             </el-input>
           </el-form-item>
-          <!-- 
+          <!--
           <el-form-item class="form-item">
             <el-autocomplete
               class="onlyInput"
@@ -219,9 +219,9 @@
 </template>
 <script>
 import secondaryConfirmation from '@/components/common/secondaryConfirmation';
-import { getPageList, getSearchList, edit, add, remove } from '@/api/admin-opinion.js';
-import { copyText } from '@/utils/Clipboard.js';
-import { timestampToDateTime } from '@/utils/utils.js';
+import { getPageList, getSearchList, edit, add } from '@/api/admin-opinion';
+import { copyText } from '@/utils/Clipboard';
+import { timestampToDateTime } from '@/utils/utils';
 export default {
   name: 'OpinionManage',
   props: {
@@ -302,18 +302,17 @@ export default {
   },
   directives: {
     scrollLoad: {
-      bind(el, binding, vnode) {
-        var that = this;
-        let wrapDom = el.querySelector('.el-autocomplete-suggestion__wrap');
-        let listDom = el.querySelector(
+      bind(el, binding) {
+        const wrapDom = el.querySelector('.el-autocomplete-suggestion__wrap');
+        const listDom = el.querySelector(
           '.el-autocomplete-suggestion__wrap  .el-autocomplete-suggestion__list'
         );
         wrapDom.addEventListener(
           'scroll',
-          e => {
-            let condition = wrapDom.offsetHeight + wrapDom.scrollTop - listDom.offsetHeight - 20;
-            if (condition == 0 && wrapDom.scrollTop !== 0) {
-              //滚动到底部则执行滚动方法load，binding.value就是v-scrollLoad绑定的值，加()表示执行绑定的方法
+          () => {
+            const condition = wrapDom.offsetHeight + wrapDom.scrollTop - listDom.offsetHeight - 20;
+            if (+condition === 0 && wrapDom.scrollTop !== 0) {
+              // 滚动到底部则执行滚动方法load，binding.value就是v-scrollLoad绑定的值，加()表示执行绑定的方法
               binding.value();
             }
           },
@@ -326,19 +325,21 @@ export default {
     // 初始化数据
     initData(pageNow) {
       this.isLoading = true;
+      const referSort = this.referSort ? 1 : 2
+      const updateSort = this.updateSort ? 3 : 4
       const pageData = {
         keywordContent: this.search.baseline,
         opinionContent: this.search.review,
-        orderType: this.currentSort ? (this.referSort ? 1 : 2) : this.updateSort ? 3 : 4,
+        orderType: this.currentSort ? referSort : updateSort,
         pageNum: pageNow || this.page.pageNow,
         pageSize: this.page.pageSize,
         isAll: this.pageConfig.isAll !== undefined ? this.pageConfig.isAll : 1
       };
-      getPageList(pageData,'/cpr/opinion/listZhongAn').then(({ totalCount, list }) => {
+      getPageList(pageData, '/cpr/opinion/listZhongAn').then(({ totalCount, list }) => {
         this.page.total = totalCount;
-         this.isLoading = false;
-        list.forEach((item, index) => {
-          item.equityListOther = ([item.productType, item.businessProcess]).filter(item=>Boolean(item));
+        this.isLoading = false;
+        list.forEach((item) => {
+          item.equityListOther = ([item.productType, item.businessProcess]).filter(item1 => Boolean(item1));
         });
         this.data = list;
         this.handleTextHigh(this.data, {
@@ -348,10 +349,9 @@ export default {
           recommendedOpinions: ['showItem', this.search.review],
           cases: ['showItemCase', this.search.review]
         });
-        
       });
       this.scrollTop()
-       
+
       this.searchList.length = 0;
     },
     // 初始化搜索数据
@@ -365,8 +365,7 @@ export default {
         const arr = res.list;
         this.formatting(arr);
         const keyword = flag ? this.dialogItem.keywordName : this.search.baseline;
-        if (arr && arr.length > 0 && keyword?.length > 0)
-          this.handleTextHigh(arr, { value: ['showItem', keyword] });
+        if (arr && arr.length > 0 && keyword?.length > 0) this.handleTextHigh(arr, { value: ['showItem', keyword] });
 
         if (this.searchDialogIndex === 1) this.searchList.length = 0;
 
@@ -391,10 +390,10 @@ export default {
         originArr.filter(item => {
           item[originValue[0]] = item[originKey];
           const keyword = originValue[1];
-          let reg = new RegExp(keyword, 'gi');
+          const reg = new RegExp(keyword, 'gi');
           const regRes = reg.exec(item[originKey]);
           if (regRes && regRes[0]) {
-            let replaceString = `<span style="color:#2D5CF6;">${regRes[0]}</span>`;
+            const replaceString = `<span style="color:#2D5CF6;">${regRes[0]}</span>`;
             item[originValue[0]] = item[originKey].replace(regRes, replaceString);
           }
         });
@@ -410,9 +409,9 @@ export default {
       this.$refs.autocomplete.activated = true;
       this.initSearchData(flag);
     },
-    //根据传进来的状态改变建议输入框的状态（展开|隐藏）
+    // 根据传进来的状态改变建议输入框的状态（展开|隐藏）
     changeStyle(status, className) {
-      let dom = document.querySelectorAll(className);
+      const dom = document.querySelectorAll(className);
       dom[0].style.display = status;
     },
     handleSort(type) {
@@ -428,47 +427,29 @@ export default {
       }
       this.initData();
     },
-    async changeIsTop(item, i) {
-      // this.isLoading = true;
-      // const that = this
-      // setTimeout(() => {
-      //   this.$message.success('操作成功!');
-      //   item.isTop = item.isTop !==0? 0:1;
-      //    that.isLoading=false
-      // },500);
-      return;
-      this.isLoading = true;
-      const isTop = item.isTop === 0 ? 1 : 0;
-      const res = await edit({
-        ...item,
-        isTop
-      });
-      if (res.success) {
-        this.$message.success('操作成功!');
-        this.initData();
-      } else {
-        this.$message.error(res.msg);
-      }
+    changeIsTop() {
+      // return;
     },
     handleLabelType(id) {
       this.dialogItem.keywordType = id;
     },
-    handleClick(row) {
-      return;
-      this.titleDialog = row ? '编辑意见' : '新建意见';
-      this.dialogItem = row ? { ...row, keywordId: row.keywordType } : {};
-      this.limitTimeVisible = true;
-      this.initSearchData(true);
+    handleClick() {
+      // return;
+      // this.titleDialog = row ? '编辑意见' : '新建意见';
+      // this.dialogItem = row ? { ...row, keywordId: row.keywordType } : {};
+      // this.limitTimeVisible = true;
+      // this.initSearchData(true);
     },
     // submitEdit(row) {
     //   console.log(row);
     // },
     // 停用
-    stopApllay(item, action) {
-      return;
-      this.dialogItem = item;
-      this.action = action;
-      this.$refs.confirmation.dialogVisible = true;
+    stopApllay() {
+      // item, action
+      // return;
+      // this.dialogItem = item;
+      // this.action = action;
+      // this.$refs.confirmation.dialogVisible = true;
     },
     handleCurrentChange(val) {
       this.page.pageNow = val;
@@ -476,38 +457,37 @@ export default {
     },
     // 停用 或启用 意见， 或删除意见
     async editStatus() {
-      return;
-      let res;
-      if (this.action === 'remove') {
-        res = await remove({
-          ...this.dialogItem
-        });
-      } else if (this.action.indexOf('edit') !== -1) {
-        const status = this.dialogItem.status === 0 ? 1 : 0;
-        res = await edit({
-          ...this.dialogItem,
-          status
-        });
-      }
-      if (res.success) {
-        this.$message.success('操作成功!');
-        this.handleCurrentChange(
-          this.action === 'remove' && this.data.length === 1
-            ? this.page.pageNow - 1
-            : this.page.pageNow
-        );
-      } else {
-        this.$message.error(res.msg);
-      }
+      // return;
+      // let res;
+      // if (this.action === 'remove') {
+      //   res = await remove({
+      //     ...this.dialogItem
+      //   });
+      // } else if (this.action.indexOf('edit') !== -1) {
+      //   const status = this.dialogItem.status === 0 ? 1 : 0;
+      //   res = await edit({
+      //     ...this.dialogItem,
+      //     status
+      //   });
+      // }
+      // if (res.success) {
+      //   this.$message.success('操作成功!');
+      //   this.handleCurrentChange(
+      //     this.action === 'remove' && this.data.length === 1
+      //       ? this.page.pageNow - 1
+      //       : this.page.pageNow
+      //   );
+      // } else {
+      //   this.$message.error(res.msg);
+      // }
     },
     // 编辑意见 或新增
     async editItem({ keywordName, recommendedOpinions }) {
       if (!keywordName || !recommendedOpinions) return this.$message.error('请填写相关信息');
       if (
-        this.searchList.length &&
-        !this.searchList.find(listItem => listItem.value === keywordName)
-      )
-        return this.$message.error('请选择正确的标签名称');
+        this.searchList.length
+        && !this.searchList.find(listItem => listItem.value === keywordName)
+      ) return this.$message.error('请选择正确的标签名称');
       let res;
       if (this.dialogItem?.recordId) {
         res = await edit({
@@ -553,8 +533,8 @@ export default {
       );
     },
     // 滚动到顶部
-    scrollTop(){
-     this.$refs.refMainBody.scrollTop=0
+    scrollTop() {
+      this.$refs.refMainBody.scrollTop = 0
     }
   }
 };
@@ -1146,8 +1126,5 @@ export default {
     }
   }
 }
-
-
-
 
 </style>

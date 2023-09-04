@@ -1,8 +1,7 @@
 <template>
   <div>
     <div class="header">
-      <el-menu :default-active="value" active-text-color="#165DFF" class="el-menu-demo" mode="horizontal"
-               @select="handleSelect">
+      <el-menu :default-active="value" active-text-color="#165DFF" class="el-menu-demo" mode="horizontal">
         <el-menu-item index="baseSetting" @click="to('baseSetting')"><span class="num">1</span> 基础设置</el-menu-item>
         <span style="position: relative; top: 20px;">></span>
         <!-- <el-menu-item index="/admin/design/formSetting" @click="to('/admin/design/formSetting')">④ 表单设计</el-menu-item> -->
@@ -27,13 +26,13 @@
 </template>
 
 <script>
-import secondaryConfirmation from "@/components/common/secondaryConfirmation"
+import secondaryConfirmation from '@/components/common/secondaryConfirmation'
 export default {
-  name: "LayoutHeader",
+  name: 'LayoutHeader',
   components: {
     secondaryConfirmation
   },
-  props:{
+  props: {
     value: {
       type: String,
       default: 'baseSetting'
@@ -67,7 +66,7 @@ export default {
   },
   mounted() {
     if (document.body.offsetWidth <= 970) {
-      this.$msgbox.alert("本设计器未适配中小屏幕，建议您在PC电脑端浏览器进行操作")
+      this.$msgbox.alert('本设计器未适配中小屏幕，建议您在PC电脑端浏览器进行操作')
     }
     this.listener()
   },
@@ -102,21 +101,18 @@ export default {
         this.$emit('changeRoute', name)
       }
     },
-    handleSelect(key, keyPath) {
-      // console.log(key, keyPath);
-    },
     listener() {
       window.onunload = this.closeBefore()
       window.onbeforeunload = this.closeBefore()
-      //window.on('beforeunload',this.closeBefore())
+      // window.on('beforeunload',this.closeBefore())
     },
     closeBefore() {
-      //alert("您将要离开本页")
+      // alert("您将要离开本页")
       return false
     },
     check() {
       if (this.$store.state.isEdit === null) {
-        //this.$router.push("/workPanel");
+        // this.$router.push("/workPanel");
       }
     }
   }

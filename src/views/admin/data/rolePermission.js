@@ -1,6 +1,6 @@
 export const permissionList = [
   {
-    code:'approvalCenter',
+    code: 'approvalCenter',
     title: '审批中心',
     type: '',
     reflect: ['approval-details', 'aiApproval', 'compare'],
@@ -16,7 +16,7 @@ export const permissionList = [
     ]
   },
   {
-    code:"backManagement",
+    code: 'backManagement',
     title: '后台管理',
     type: '',
     isShowWarn: false,
