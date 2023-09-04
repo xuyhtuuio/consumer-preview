@@ -22,7 +22,7 @@ export default {
     }
   },
   mounted() {
-    let beforeUrl = sessionStorage.getItem('router-path')
+     let beforeUrl = sessionStorage.getItem('router-path')
     if (beforeUrl === undefined || beforeUrl === '') {
       //this.$router.push("/workPanel")
     } else {

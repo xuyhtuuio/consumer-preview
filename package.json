@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "commit": "git-cz",
     "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve",
     "start": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "prepare": "husky install",
+    "lint": "lint-staged",
+    "fix": "eslint src/views/**/**/*.*  --fix"
   },
   "dependencies": {
     "@antv/g6": "^4.8.21",
