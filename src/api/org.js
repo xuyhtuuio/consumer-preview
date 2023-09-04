@@ -1,4 +1,4 @@
-import request from '@/api/request.js'
+import request from '@/api/request'
 
 // 查询人员，角色，部门列表
 export function queryUserList(param) {

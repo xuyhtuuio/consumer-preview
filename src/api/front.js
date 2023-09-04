@@ -1,5 +1,4 @@
-import request from '@/api/request.js'
-
+import request from '@/api/request'
 
 // 上传图片
 export function getFormGroups(formData) {
@@ -7,10 +6,9 @@ export function getFormGroups(formData) {
     url: '/cpr/file/upload',
     method: 'post',
     data: formData,
-    headers: {'Content-Type': 'multipart/form-data'}
+    headers: { 'Content-Type': 'multipart/form-data' }
   })
 }
-
 
 // 删除图片
 export function deleteFormGroups(params) {
@@ -53,7 +51,7 @@ export function saveDraft(data) {
     data
   })
 }
-//查询工单详情
+// 查询工单详情
 export function workOrderTaskInfo(params) {
   return request({
     url: '/cpr/applicationForm/workOrderTaskInfo',
@@ -61,7 +59,7 @@ export function workOrderTaskInfo(params) {
     params
   })
 }
-//查询工单详情
+// 查询工单详情
 export function externalLogicController(params) {
   return request({
     url: '/cpr/externalLogicController',
@@ -77,11 +75,11 @@ export function processStart(data) {
     data
   })
 }
-//获取当前登录用户信息
-export function getCurrentUserInfo(){
+// 获取当前登录用户信息
+export function getCurrentUserInfo() {
   return request({
-    url:'/cpr/user/getCurrentUser',
-    method:'get'
+    url: '/cpr/user/getCurrentUser',
+    method: 'get'
   })
 }
 // 单个流程
@@ -89,7 +87,7 @@ export function getProcess(params) {
   return request({
     url: '/cpr/admin/form/list',
     method: 'get',
-    params:{
+    params: {
       ...params,
       pageNow: 1,
       pageSize: 10

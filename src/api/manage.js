@@ -1,4 +1,4 @@
-import request from '@/api/request.js'
+import request from '@/api/request'
 
 /* 表单管理start */
 // 表单管理-获取审查事项类型列表
@@ -17,7 +17,7 @@ export function addFormCategory(param) {
     params: param
   })
 }
-// 修改表单类别的 名称 
+// 修改表单类别的 名称
 export function modifyNameFormCategory(param) {
   return request({
     url: '/cpr/FormManagement/modifyNameFormCategory',
@@ -88,7 +88,7 @@ export function modifyOrder(param) {
   return request({
     url: '/cpr/FormManagement/modifyOrder',
     method: 'post',
-    contentType : 'application/x-www-form-urlencoded;charset=utf-8',
+    contentType: 'application/x-www-form-urlencoded;charset=utf-8',
     data: param
   })
 }
@@ -109,7 +109,6 @@ export function switchFormItemState(param) {
   })
 }
 /* 表单管理end */
-
 
 /* 流程管理start */
 // 流程列表

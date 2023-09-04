@@ -11,8 +11,8 @@ export default new Vuex.Store({
     selectedNode: {},
     design: {},
     tempDesign: {
-      formId: "",
-      formName: "",
+      formId: '',
+      formName: '',
       // logo:{
       //   icon:"el-icon-eleme",
       //   background:"#1e90ff"
@@ -24,8 +24,8 @@ export default new Vuex.Store({
         // admin:[],
         // sign: false,
         notify: {
-          types: ["APP"],
-          title: "消息通知标题"
+          types: ['APP'],
+          title: '消息通知标题'
         }
       },
       formItems: [],
@@ -153,25 +153,25 @@ export default new Vuex.Store({
       //   }
       //  }],
       process: {
-        id: "root",
+        id: 'root',
         parentId: null,
-        type: "ROOT",
-        name: "申请人",
-        desc: "任何人",
+        type: 'ROOT',
+        name: '申请人',
+        desc: '任何人',
         props: {
           assignedUser: [],
           formPerms: []
         },
         children: {}
       },
-      remark: "",
+      remark: '',
 
     },
     designSave: {},
     checkApprovedForm: {
-      approvedOpinionRequired: true,  //默认给了采纳所以为true
+      approvedOpinionRequired: true, // 默认给了采纳所以为true
       uploadFileRequired: false, //
-      uploadFileRadio: 1, //默认需要上传
+      uploadFileRadio: 1, // 默认需要上传
       approvedOpinionForm: [],
       fileUploadForm: [],
       opinionStorage: false,
@@ -179,7 +179,7 @@ export default new Vuex.Store({
       editOpinionForm: {},
       editOpinionRequired: false
     },
-    permissionsPage: {  // 页面权限存储
+    permissionsPage: { // 页面权限存储
       defaultPerm: [],
       funPerms: [],
       dataPerm: [],
@@ -229,7 +229,7 @@ export default new Vuex.Store({
       state.checkApprovedForm.editOpinionRequired = val
     },
     setCheckApprovedFormFalse(state) {
-      state.checkApprovedForm.approvedOpinionRequired = true //默认给了采纳所以为true
+      state.checkApprovedForm.approvedOpinionRequired = true // 默认给了采纳所以为true
       state.checkApprovedForm.uploadFileRequired = false
       state.checkApprovedForm.approvedOpinionForm = []
       state.checkApprovedForm.fileUploadForm = []

@@ -1,4 +1,4 @@
-import request from '@/api/request.js'
+import request from '@/api/request'
 /* 申请中心start */
 // 表单管理-获取审查事项类型列表
 export function getDataStatistics(param) {
@@ -58,7 +58,7 @@ export function concernedList(param) {
   })
 }
 
-//待确认
+// 待确认
 export function toBeConfirmed(param) {
   return request({
     url: '/cpr/applicationcenter/toBeConfirmed',
@@ -66,7 +66,7 @@ export function toBeConfirmed(param) {
     data: param
   })
 }
-//待修改
+// 待修改
 export function toReviseList(param) {
   return request({
     url: '/cpr/applicationcenter/toReviseList',
@@ -83,7 +83,7 @@ export function revoked(param) {
     data: param
   })
 }
-//审批中
+// 审批中
 export function Approval(param) {
   return request({
     url: '/cpr/applicationcenter/approval',
@@ -98,17 +98,17 @@ export function delApplication(param) {
   return request({
     url: '/cpr/applicationcenter/del',
     method: 'post',
-    contentType:'application/x-www-form-urlencoded',
+    contentType: 'application/x-www-form-urlencoded',
     data: param
   })
 }
-//关注
+// 关注
 
 export function concernApplication(param) {
   return request({
     url: '/cpr/censor/follow',
     method: 'post',
-    contentType:'application/x-www-form-urlencoded',
+    contentType: 'application/x-www-form-urlencoded',
     data: param
   })
 }
@@ -121,7 +121,7 @@ export function instanceInfo(param) {
     data: param
   })
 }
-//下载
+// 下载
 
 export function downloadAllFiles(param) {
   return request({
@@ -132,41 +132,41 @@ export function downloadAllFiles(param) {
   })
 }
 // 用id获取意见详情
-export function getEditedCommentsByFormId(param){
+export function getEditedCommentsByFormId(param) {
   return request({
     url: '/cpr/approvalrecord/getOpinionLetterByFormId',
-    contentType:'application/x-www-form-urlencoded',
+    contentType: 'application/x-www-form-urlencoded',
     method: 'post',
     data: param
   })
 }
-//审查意见书 保存
-export function insertApprovalRecordAndEditedComments(param){
+// 审查意见书 保存
+export function insertApprovalRecordAndEditedComments(param) {
   return request({
     url: '/cpr/approvalrecord/insertApprovalRecordAndEditedComments',
     method: 'post',
     data: param
   })
-} 
-//审查意见书 提交
-export function updateAdoptEditedComments(param,id){
+}
+// 审查意见书 提交
+export function updateAdoptEditedComments(param, id) {
   return request({
     url: `/cpr/approvalrecord/opinionConfirmation?taskId=${id}`,
     method: 'post',
     data: param
   })
-} 
+}
 // 保存审查意见书
-export function updateEditedComments(param){
+export function updateEditedComments(param) {
   return request({
     url: '/cpr/approvalrecord/temporaryOpinions',
     method: 'post',
-    contentType:'application/json',
+    contentType: 'application/json',
     data: param
   })
-} 
+}
 
-export function quashApplication(param){
+export function quashApplication(param) {
   return request({
     url: '/cpr/workspace/revoke',
     method: 'post',
@@ -174,25 +174,21 @@ export function quashApplication(param){
   })
 }
 
-export function  canRoved(param){
+export function canRoved(param) {
   return request({
     url: '/cpr/externalLogicController/rove',
     method: 'GET',
-    contentType:'application/x-www-form-urlencoded',
+    contentType: 'application/x-www-form-urlencoded',
     params: param
   })
 }
 
-
-
 // 获取当前process-id对应的流程配置信息
-export function  getTemplatedetail(param){
+export function getTemplatedetail(param) {
   return request({
     url: '/cpr/workspace/process/templateDetail',
     method: 'post',
-    contentType:'application/x-www-form-urlencoded',
+    contentType: 'application/x-www-form-urlencoded',
     data: param
   })
 }
-
-
