@@ -75,8 +75,8 @@
                       <div class="item-left">
                         <el-checkbox
                           v-model="item.type"
-                          true-label="view"
-                          false-label=""
+                          :true-label="item.props.trueLabel"
+                          :false-label="item.props.falseLabel"
                           :disabled="!editAuth"
                           @change="handleCheckBoxChange(item)"
                           >{{ item.title }}</el-checkbox
@@ -149,13 +149,12 @@
 
 <script>
 import SecondaryConfirmation from '@/components/common/secondaryConfirmation';
-
 import {
   getRoleList,
   deactivateRecoveryRole,
-  editThePermissionsPage
+  editThePermissionsPage,
+  updateRolePermission
 } from '@/api/admin/role';
-import rolePermission from '../data/rolePermission.json';
 import { permissionList } from '../data/rolePermission';
 export default {
   name: 'rolePermission',
@@ -307,23 +306,32 @@ export default {
       // 红色警告
       if (this.permissionList[1].type && !this.permissionList[1].children.some(item => item.type)) {
         this.permissionList[1].isShowWarn = true
-        return;
+        return
       }
       this.cardLoading = true;
       this.formatData();
-      // const {
-      //   data: { data: res, success, msg }
-      // } = await updateRolePermission({
-      //   roleId: this.roleId,
-      //   list: {}
-      // });
-      this.$message({
-        type: 'success',
-        customClass: 'el-icon-success-one',
-        message: '已成功保存该角色的操作权限'
+      const { dataPerm, defaultPerm, funPerms } = this.rolePermission;
+      const {
+        data: { success, msg }
+      } = await updateRolePermission({
+        roleId: this.roleId,
+        list: [{ defaultPerm, funPerms }],
+        dataList: [{ dataPerm }]
       });
+      if (success) {
+        this.$message({
+          type: 'success',
+          customClass: 'el-icon-success-one',
+          message: msg || '已成功保存该角色的操作权限'
+        });
+        this.handleBack();
+      } else {
+        this.$message({
+          type: 'error',
+          message: msg || '保存失败'
+        });
+      }
       this.cardLoading = false;
-      this.handleBack();
     },
     handleBack() {
       this.level = true;
@@ -333,7 +341,7 @@ export default {
     },
     formatDataZero(data) {
       const { funPerms, dataPerm } = data;
-      this.rolePermission = rolePermission;
+      this.rolePermission = data;
       for (const key in this.permissionList) {
         if (Number(key) === 0) {
           this.permissionList[key].type = funPerms[key].type;
@@ -367,12 +375,13 @@ export default {
           funPerms[key].type = originVal.type;
           const { children } = originVal;
           children.forEach((item) => {
-            const funItem = funPerms.find(funItem1 => funItem1.code === item.code);
+            const funItem = funPerms.find(funPermsItem => funPermsItem.code === item.code);
             if (item.title === '流程管理') {
               if (item.type !== funItem.type) {
                 funItem.type = item.type;
                 item.reflect.forEach(reflectItem => {
-                  defaultPerm.find(item1 => item1.pathName === reflectItem).type = item.type;
+                  // defaultPerm.find(item => item.pathName === reflectItem).type = item.type;
+                  defaultPerm.find(defaultItem => defaultItem.pathName === reflectItem).type = 'edit';
                 });
               }
             } else {
@@ -399,15 +408,14 @@ export default {
     handleCheckBoxChange(item) {
       item.isShowWarn = false;
       if (!item.type && item?.children?.length) {
-        item.children.forEach(item1 => {
-          item1.type = ''
-        });
+        item.children.forEach(childItem => { childItem.type = '' });
       }
     },
-    handleRadioChange(value, data, origin) {
+    // trueLabel，falseLabel 和permissionList里面的item的props的trueLabel，falseLabel相关
+    handleRadioChange(value, data, origin, trueLabel = 'edit', falseLabel) {
       if (!this.editAuth) return;
       data.type = value === data.type ? '' : value;
-      origin.type = origin.children.some(item => item.type) ? 'view' : '';
+      origin.type = origin.children.some(item => item.type) ? trueLabel : falseLabel;
       origin.isShowWarn = false;
     }
   }

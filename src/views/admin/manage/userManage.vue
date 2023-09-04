@@ -51,7 +51,7 @@
         </el-form>
       </div>
     </div>
-    <div class="main" v-loading="formLoading">
+    <div class="main" v-loading.body="formLoading">
       <TrsTable
         theme="TRS-table-gray"
         :data="data"

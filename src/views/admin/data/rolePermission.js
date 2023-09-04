@@ -3,6 +3,7 @@ export const permissionList = [
     code: 'approvalCenter',
     title: '审批中心',
     type: '',
+    props: { trueLabel: 'edit', falseLabel: '' },
     reflect: ['approval-details', 'aiApproval', 'compare'],
     children: [
       {
@@ -10,15 +11,16 @@ export const permissionList = [
         type: '',
         props: [
           { label: 'view', value: '查看' },
-          { label: 'export', value: '查看并导出' }
-        ]
-      }
-    ]
+          { label: 'export', value: '查看并导出' },
+        ],
+      },
+    ],
   },
   {
     code: 'backManagement',
     title: '后台管理',
     type: '',
+    props: { trueLabel: 'edit', falseLabel: '' },
     isShowWarn: false,
     children: [
       {
@@ -27,8 +29,8 @@ export const permissionList = [
         type: '',
         props: [
           { label: 'view', value: '查看' },
-          { label: 'edit', value: '查看并编辑' }
-        ]
+          { label: 'edit', value: '查看并编辑' },
+        ],
       },
       {
         code: 'rolePermManagement',
@@ -36,8 +38,8 @@ export const permissionList = [
         type: '',
         props: [
           { label: 'view', value: '查看' },
-          { label: 'edit', value: '查看并编辑' }
-        ]
+          { label: 'edit', value: '查看并编辑' },
+        ],
       },
       {
         code: 'formManagement',
@@ -45,8 +47,8 @@ export const permissionList = [
         type: '',
         props: [
           { label: 'view', value: '查看' },
-          { label: 'edit', value: '查看并编辑' }
-        ]
+          { label: 'edit', value: '查看并编辑' },
+        ],
       },
       {
         code: 'flowableManagement',
@@ -55,8 +57,8 @@ export const permissionList = [
         type: '',
         props: [
           { label: 'view', value: '查看' },
-          { label: 'edit', value: '查看并编辑' }
-        ]
+          { label: 'edit', value: '查看并编辑' },
+        ],
       },
       {
         code: 'tagManagement',
@@ -64,8 +66,8 @@ export const permissionList = [
         type: '',
         props: [
           { label: 'view', value: '查看' },
-          { label: 'edit', value: '查看并编辑' }
-        ]
+          { label: 'edit', value: '查看并编辑' },
+        ],
       },
       {
         code: 'opinionManagement',
@@ -73,8 +75,8 @@ export const permissionList = [
         type: '',
         props: [
           { label: 'view', value: '查看' },
-          { label: 'edit', value: '查看并编辑' }
-        ]
+          { label: 'edit', value: '查看并编辑' },
+        ],
       },
       {
         code: 'statutesManagement',
@@ -82,8 +84,8 @@ export const permissionList = [
         type: '',
         props: [
           { label: 'view', value: '查看' },
-          { label: 'edit', value: '查看并编辑' }
-        ]
+          { label: 'edit', value: '查看并编辑' },
+        ],
       },
       {
         code: 'otherDisposition',
@@ -91,14 +93,15 @@ export const permissionList = [
         type: '',
         props: [
           { label: 'view', value: '查看' },
-          { label: 'edit', value: '查看并编辑' }
-        ]
-      }
-    ]
+          { label: 'edit', value: '查看并编辑' },
+        ],
+      },
+    ],
   },
   {
     code: 'statisticsCenter',
     title: '统计中心',
-    type: ''
-  }
-]
+    type: '',
+    props: { trueLabel: 'edit', falseLabel: '' },
+  },
+];
