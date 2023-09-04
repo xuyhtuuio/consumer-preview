@@ -98,18 +98,29 @@
                 ></el-option>
               </el-select>
 
-              <el-date-picker
-                popper-class="my-date-picker"
-                v-else-if="item.name === 'TimePicker'"
-                :disabled="item.perm === 'R'"
-                type="datetime"
-                :placeholder="item.props.placeholder"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                v-model.trim="item.value"
-                :picker-options="pickerTime(item.props.gl, item.props.order, item.value)"
-                @change="handlePickerChange(item)"
-                style="width: 100%"
-              ></el-date-picker>
+              <template v-else-if="item.name === 'TimePicker'">
+                <el-date-picker
+                  v-if="item.title !== '上线时间' && item.title !== '下线时间'"
+                  :disabled="item.perm === 'R'"
+                  type="datetime"
+                  :placeholder="item.props.placeholder"
+                  :value-format="item.props.format"
+                  v-model.trim="item.value"
+                  style="width: 100%"
+                ></el-date-picker>
+                <el-date-picker
+                  popper-class="my-date-picker"
+                  v-else
+                  :disabled="item.perm === 'R'"
+                  type="datetime"
+                  :placeholder="item.props.placeholder"
+                  :value-format="item.props.format"
+                  v-model.trim="item.value"
+                  :picker-options="pickerTime(item.props.gl, item.props.order, item.value)"
+                  @change="handlePickerChange(item)"
+                  style="width: 100%"
+                ></el-date-picker>
+              </template>
 
               <el-input
                 v-else-if="item.name === 'TextareaInput'"
@@ -322,7 +333,6 @@ export default {
     handleInput(val, item, id) {
       // this.checkBox[item.id]= val
       this.$set(this.checkBox, item.id, val);
-      // item.value
     },
 
     // 判断警告出现
