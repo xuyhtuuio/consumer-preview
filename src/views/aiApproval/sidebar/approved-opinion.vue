@@ -14,20 +14,19 @@
 <script>
 import approvedOpinionCard from '@/components/card/approved-opinion-card'
 export default {
-    name: 'ocr-approved-opinion',
-    props: {
-        sidebarParam: {
-            type: Object,
-            default: () => { }
-        }
-    },
-    components:{approvedOpinionCard},
-    data() {
-        return {
-        
-        }
+  name: 'ocr-approved-opinion',
+  props: {
+    sidebarParam: {
+      type: Object,
+      default: () => { }
+    }
+  },
+  components: { approvedOpinionCard },
+  data() {
+    return {
 
     }
+  }
 
 }
 </script>
@@ -57,9 +56,8 @@ export default {
     .opinion-content {
    flex: 1;
         overflow: auto;
-  
-    }
 
+    }
 
 }
 </style>

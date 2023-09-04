@@ -22,60 +22,60 @@
     </el-dialog>
 </template>
 <script>
-import { add } from '@/api/admin-label.js';
+import { add } from '@/api/admin-label';
 export default {
-    name: 'addReviewDialog',
-    data() {
-        return {
-            addReviewDialog: false,
-            showClose: false,
-            params: {
-                keywords: '',
-                type: '',
-                content: ''
-            }
-        }
-    },
-    methods: {
-        init(word) {
-            this.addReviewDialog = true;
-            this.params.keywords = word;
-            this.params.type = 1
-            this.params.content = ''
-        },
-        handleClose() {
-            this.addReviewDialog = false;
-        },
-        async addRecommend() {
-            if (!this.params.content.trim()) {
-                this.$message.info('请输入审查话术内容')
-                return;
-            }
-            const newId = Date.parse(new Date()).toString();
-            const res = await add({
-                keywordContent: this.params.keywords,
-                type: this.params.type
-            });
-            const { success, msg, data } = res.data;
-            if (success) {
-                this.$emit('addRecommend', {
-                    word: this.params.keywords,
-                    wordType: this.params.type,
-                    id: data,
-                    totalPage: 1,
-                    pageNow: 1,
-                    list: [{
-                        str: this.params.content,
-                        id: newId
-                    }],
-                    selected: newId
-                }, this.params.keywords, newId)
-                this.handleClose();
-            } else {
-                this.$message.error(msg)
-            }
-        }
+  name: 'addReviewDialog',
+  data() {
+    return {
+      addReviewDialog: false,
+      showClose: false,
+      params: {
+        keywords: '',
+        type: '',
+        content: ''
+      }
     }
+  },
+  methods: {
+    init(word) {
+      this.addReviewDialog = true;
+      this.params.keywords = word;
+      this.params.type = 1
+      this.params.content = ''
+    },
+    handleClose() {
+      this.addReviewDialog = false;
+    },
+    async addRecommend() {
+      if (!this.params.content.trim()) {
+        this.$message.info('请输入审查话术内容')
+        return;
+      }
+      const newId = Date.parse(new Date()).toString();
+      const res = await add({
+        keywordContent: this.params.keywords,
+        type: this.params.type
+      });
+      const { success, msg, data } = res.data;
+      if (success) {
+        this.$emit('addRecommend', {
+          word: this.params.keywords,
+          wordType: this.params.type,
+          id: data,
+          totalPage: 1,
+          pageNow: 1,
+          list: [{
+            str: this.params.content,
+            id: newId
+          }],
+          selected: newId
+        }, this.params.keywords, newId)
+        this.handleClose();
+      } else {
+        this.$message.error(msg)
+      }
+    }
+  }
 }
 </script>
 <style lang="less" scoped>
@@ -117,7 +117,6 @@ export default {
         border-radius: 4px;
         background: #F7F8FA;
         margin-right: 10px;
-
 
     }
 

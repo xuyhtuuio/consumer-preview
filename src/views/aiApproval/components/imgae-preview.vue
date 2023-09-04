@@ -15,10 +15,10 @@ const paramsInit = Object.freeze({
   currentX: 0,
   currentY: 0,
   flag: false,
-  border_left: 0,
-  border_right: 0,
-  border_top: 0,
-  border_bottom: 0,
+  borderLeft: 0,
+  borderRight: 0,
+  borderTop: 0,
+  borderBottom: 0,
   moved: false
 })
 export default {
@@ -53,8 +53,8 @@ export default {
     url() {
       this.loaded = false;
       const target = this.$refs.imgDom
-      target.style.left = "0px";
-      target.style.top = "0px";
+      target.style.left = '0px';
+      target.style.top = '0px';
     }
   },
   mounted() {
@@ -89,7 +89,7 @@ export default {
     handleImageLoaded() {
       this.$refs.imgDom.style.left = '0px'
       this.$refs.imgDom.style.top = '0px'
-      this.params = JSON.parse(JSON.stringify(paramsInit)),
+      this.params = JSON.parse(JSON.stringify(paramsInit))
       this.loaded = true;
       this.naturalWidth = this.$refs.imgDom.naturalWidth;
       this.naturalHeight = this.$refs.imgDom.naturalHeight;
@@ -105,44 +105,44 @@ export default {
     },
     // 计算出允许拖拽的最大偏移量
     getMaxPosition() {
-      const params = this.params;
+      const { params } = this;
       if (this.$refs.imgDom.clientHeight <= 0) {
         return;
       }
       // 左右边距
-      let border_left = ((params.zoomVal - 1) * this.$refs.imgDom.clientWidth) / 2;;
-      let border_right = this.$refs.contentDom.clientWidth - this.$refs.imgDom.clientWidth - border_left;
-      let topArr = [border_left, border_right];
-      this.params.border_left = Math.max.apply(null, topArr)
-      this.params.border_right = Math.min.apply(null, topArr)
+      const borderLeft = ((params.zoomVal - 1) * this.$refs.imgDom.clientWidth) / 2;
+      const borderRight = this.$refs.contentDom.clientWidth - this.$refs.imgDom.clientWidth - borderLeft;
+      let topArr = [borderLeft, borderRight];
+      this.params.borderLeft = Math.max.apply(null, topArr)
+      this.params.borderRight = Math.min.apply(null, topArr)
       // 上下边距
-      let border_top = ((this.params.zoomVal - 1) * this.$refs.imgDom.clientHeight) / 2;
-      let border_bottom = this.$refs.contentDom.clientHeight - this.$refs.imgDom.clientHeight - border_top;
-      topArr = [border_top, border_bottom];
-      this.params.border_top = Math.max.apply(null, topArr)
-      this.params.border_bottom = Math.min.apply(null, topArr)
+      const borderTop = ((this.params.zoomVal - 1) * this.$refs.imgDom.clientHeight) / 2;
+      const borderBottom = this.$refs.contentDom.clientHeight - this.$refs.imgDom.clientHeight - borderTop;
+      topArr = [borderTop, borderBottom];
+      this.params.borderTop = Math.max.apply(null, topArr)
+      this.params.borderBottom = Math.min.apply(null, topArr)
     },
     // 初始化图片中心
     initCenter() {
-      let params = this.params;
-      let target = this.$refs.imgDom;
-      if (params.border_left !== params.border_right) {
+      const { params } = this;
+      const target = this.$refs.imgDom;
+      if (params.borderLeft !== params.borderRight) {
         // 调整左右位置
-        target.style.left = (params.border_left / 2) + "px";
+        target.style.left = (params.borderLeft / 2) + 'px';
       }
-      if (params.border_top !== params.border_bottom) {
-        //调整上下位置
-        target.style.top = (params.border_top / 2) + "px";
+      if (params.borderTop !== params.borderBottom) {
+        // 调整上下位置
+        target.style.top = (params.borderTop / 2) + 'px';
       }
-      if (this.getCss(target, "left") !== "auto") {
-        this.params.left = this.getCss(target, "left");
+      if (this.getCss(target, 'left') !== 'auto') {
+        this.params.left = this.getCss(target, 'left');
       }
-      if (this.getCss(target, "top") !== "auto") {
-        this.params.top = this.getCss(target, "top");
+      if (this.getCss(target, 'top') !== 'auto') {
+        this.params.top = this.getCss(target, 'top');
       }
-      target.style.transform = "scale(1)";
+      target.style.transform = 'scale(1)';
     },
-    //获取相关CSS属性
+    // 获取相关CSS属性
     getCss(o, key) {
       return o.currentStyle
         ? o.currentStyle[key]
@@ -151,29 +151,38 @@ export default {
     // 滚轮缩放事件
     handleWheel(event) {
       this.getMaxPosition()
-      let params = this.params;
+      const { params } = this;
       this.params.zoomVal += -event.deltaY / 1200;
       if (params.zoomVal >= 0.2) {
-        this.$refs.imgDom.style.transform = "scale(" + params.zoomVal + ")";
+        this.$refs.imgDom.style.transform = 'scale(' + params.zoomVal + ')';
       } else {
         params.zoomVal = 0.2;
-        this.$refs.imgDom.style.transform = "scale(" + params.zoomVal + ")";
+        this.$refs.imgDom.style.transform = 'scale(' + params.zoomVal + ')';
       }
       this.getMaxPosition();
-      let target = this.$refs.imgDom;
-      let left = parseInt(this.getCss(target, "left"), 10);
-      let top = parseInt(this.getCss(target, "top"), 10);
-
-      left = left > params.border_left ? params.border_left : left < (params.border_right) ? params.border_right : left;
-      top = top > params.border_top ? params.border_top : top < params.border_bottom ? params.border_bottom : top;
-      target.style.left = left + "px";
-      target.style.top = top + "px";
-
-      if (this.getCss(target, "left") !== "auto") {
-        this.params.left = this.getCss(target, "left");
+      const target = this.$refs.imgDom;
+      let left = parseInt(this.getCss(target, 'left'), 10);
+      let top = parseInt(this.getCss(target, 'top'), 10);
+      if (left > params.borderLeft) {
+        left = params.borderLeft
+      } else if (left < params.borderRight) {
+        left = params.borderRight
       }
-      if (this.getCss(target, "top") !== "auto") {
-        this.params.top = this.getCss(target, "top");
+
+      if (top > params.borderTop) {
+        top = params.borderTop
+      } else if (top < params.borderBottom) {
+        top = params.borderBottom
+      }
+
+      target.style.left = left + 'px';
+      target.style.top = top + 'px';
+
+      if (this.getCss(target, 'left') !== 'auto') {
+        this.params.left = this.getCss(target, 'left');
+      }
+      if (this.getCss(target, 'top') !== 'auto') {
+        this.params.top = this.getCss(target, 'top');
       }
       this.linePosition()
       // this.changeHightPos()
@@ -183,37 +192,37 @@ export default {
     startDrag() {
       const bar = this.$refs.contentDom
       const target = this.$refs.imgDom
-      let params = this.params;
-      if (this.getCss(target, "left") !== "auto") {
-        this.params.left = this.getCss(target, "left");
+      const { params } = this;
+      if (this.getCss(target, 'left') !== 'auto') {
+        this.params.left = this.getCss(target, 'left');
       }
-      if (this.getCss(target, "top") !== "auto") {
-        this.params.top = this.getCss(target, "top");
+      if (this.getCss(target, 'top') !== 'auto') {
+        this.params.top = this.getCss(target, 'top');
       }
-      //o是移动对象
+      // o是移动对象
       bar.onmousedown = event => {
         this.getMaxPosition()
         this.params.flag = true;
         if (!event) {
           event = window.event;
-          //防止IE文字选中
+          // 防止IE文字选中
           bar.onselectstart = () => {
             return false;
           };
         }
-        var e = event;
+        const e = event;
         this.params.currentX = e.clientX;
         this.params.currentY = e.clientY;
       };
 
-      document.onmouseup = (event) => {
+      document.onmouseup = () => {
         if (this.params.flag) {
           this.params.flag = false;
-          if (this.getCss(target, "left") !== "auto") {
-            this.params.left = this.getCss(target, "left");
+          if (this.getCss(target, 'left') !== 'auto') {
+            this.params.left = this.getCss(target, 'left');
           }
-          if (this.getCss(target, "top") !== "auto") {
-            this.params.top = this.getCss(target, "top");
+          if (this.getCss(target, 'top') !== 'auto') {
+            this.params.top = this.getCss(target, 'top');
           }
           this.linePosition()
         }
@@ -228,8 +237,8 @@ export default {
         //   let left = parseInt(params.left, 10) + disX;
         //   let top = parseInt(params.top, 10) + disY;
 
-        //   left = left > params.border_left ? params.border_left : left < (params.border_right) ? params.border_right : left;
-        //   top = top > params.border_top ? params.border_top : top < params.border_bottom ? params.border_bottom : top;
+        //   left = left > params.borderLeft ? params.borderLeft : left < (params.borderRight) ? params.borderRight : left;
+        //   top = top > params.borderTop ? params.borderTop : top < params.borderBottom ? params.borderBottom : top;
         //   target.style.left = left + "px";
         //   target.style.top = top + "px";
         //   this.params.moved = false;
@@ -245,17 +254,17 @@ export default {
       };
 
       document.onmousemove = event => {
-        var e = event ? event : window.event;
+        const e = event || window.event;
         if (params.flag) {
-          var nowX = e.clientX,
-            nowY = e.clientY;
-          var disX = nowX - params.currentX,
-            disY = nowY - params.currentY;
-          let left = parseInt(params.left, 10) + disX;
-          let top = parseInt(params.top, 10) + disY;
+          const nowX = e.clientX;
+          const nowY = e.clientY;
+          const disX = nowX - params.currentX;
+          const disY = nowY - params.currentY;
+          const left = parseInt(params.left, 10) + disX;
+          const top = parseInt(params.top, 10) + disY;
 
-          target.style.left = left + "px";
-          target.style.top = top + "px";
+          target.style.left = left + 'px';
+          target.style.top = top + 'px';
           // this.changeHightPos()
           this.params.moved = true;
 

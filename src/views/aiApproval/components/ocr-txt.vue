@@ -74,8 +74,8 @@ export default {
       this.seletTxt = '';
     },
     hideAdd(e) {
-      var e = e || window.event;
-      var elem = e.target;
+      e = e || window.event;
+      const elem = e.target;
       if (this.$refs?.isAdd && !this.$refs.isAdd.contains(elem) && this.seletTxt) {
         this.seletTxt = '';
       }
@@ -85,7 +85,7 @@ export default {
     },
     getSelection(event) {
       const seletTxt = window.getSelection ? window.getSelection().toString() : document.selection.createRange().text;
-      if (Boolean(seletTxt)) {
+      if (seletTxt) {
         setTimeout(() => {
           this.seletTxt = seletTxt;
           this.askIsAddPosition = {
@@ -116,7 +116,7 @@ export default {
             const temp = [];
             for (let index = 0; index < newOcr.length; index++) {
               if (typeof newOcr[index] === 'string' && newOcr[index].includes(word)) {
-                let a = newOcr[index].split(word)
+                const a = newOcr[index].split(word)
                 a.splice(1, 0, {
                   word,
                   wordType,
@@ -166,7 +166,8 @@ export default {
     getTextInfoList(textNodes) {
       let length = 0
       const textList = textNodes.map(node => {
-        let startIdx = length, endIdx = length + node.wholeText.length
+        const startIdx = length; const
+          endIdx = length + node.wholeText.length
         length = endIdx
         return {
           text: node.wholeText,
@@ -178,9 +179,9 @@ export default {
     },
     getMatchList(content, keyword) {
       if (!this.regExp) {
-        // eslint-disable-next-line 
+        // eslint-disable-next-line
         const characters = [...'\\[](){}?.+*^$:|'].reduce((r, c) => (r[c] = true, r), {})
-        keyword = keyword.split('').map(s => characters[s] ? `\\${s}` : s).join('[\\s\\n]*')
+        keyword = keyword.split('').map(s => (characters[s] ? `\\${s}` : s)).join('[\\s\\n]*')
       }
       const reg = new RegExp(keyword, 'gmi')
       const matchList = []
@@ -195,7 +196,8 @@ export default {
       // 对于每一个匹配结果，可能分散在多个标签中，找出这些标签，截取匹配片段并用font标签替换出
       for (let i = matchList.length - 1; i >= 0; i--) {
         const match = matchList[i]
-        const matchStart = match.index, matchEnd = matchStart + match[0].length // 匹配结果在拼接字符串中的起止索引
+        const matchStart = match.index; const
+          matchEnd = matchStart + match[0].length // 匹配结果在拼接字符串中的起止索引
         // 遍历文本信息列表，查找匹配的文本节点
         for (let textIdx = 0; textIdx < textList.length; textIdx++) {
           const { text, startIdx, endIdx } = textList[textIdx] // 文本内容、文本在拼接串中开始、结束索引

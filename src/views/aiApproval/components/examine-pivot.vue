@@ -118,7 +118,6 @@ export default {
             }
           ]
         },
-        value: ['1-1', '2-2', '3-3']
       }
     };
   },
@@ -129,11 +128,11 @@ export default {
     list(val) {
       if (val.length && !this.isWidthDiff) {
         this.title = val[0].module;
-        
+
         val.forEach(item => {
           item.value.length = 0;
           if (item.name === 'SingleGroupsSelect') {
-            item.props.options.forEach((propItem, propIndex) => {
+            item.props.options.forEach((propItem) => {
               this.$set(propItem, 'value1', '');
             });
           }

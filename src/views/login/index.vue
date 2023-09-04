@@ -599,8 +599,7 @@ export default {
     next() {
       if (this.activeName === '手机号') {
         this.$message.success('当前只能用账号密码登录');
-        return;
-        this.$refs['form'].validate(async valid => {
+        /*  this.$refs['form'].validate(async valid => {
           if (valid) {
             if (!this.checked) {
               this.checkAgreement = true;
@@ -625,7 +624,7 @@ export default {
               ];
             }
           }
-        });
+        }); */
       } else if (this.activeName === '账号密码') {
         this.$refs['form'].validate(async valid => {
           if (valid) {
@@ -667,7 +666,6 @@ export default {
                 // this.checkToken()
               }
             } catch (err) {
-              console.log(err);
               if (err.data.error_description === '用户帐号已过期') {
                 _this.expirydialog = true;
                 return;
@@ -701,8 +699,8 @@ export default {
       return role;
     },
     async getPermissionsPage() {
-      const user = JSON.parse(window.localStorage.getItem('user_name'))
-      const res = await editThePermissionsPage({ roleId: user.id });
+      // const user = JSON.parse(window.localStorage.getItem('user_name'))
+      const res = await editThePermissionsPage();
       this.$store.state.permissionsPage = res.data.data || {}
       window.localStorage.setItem('permissionsPage', JSON.stringify(res.data.data))
     },
@@ -743,9 +741,9 @@ export default {
             name: 'homePage'
           });
         } else if (
-          routeFrom &&
-          routeFrom !== 'trs' &&
-          this.platlistBack.indexOf(routeFrom) === -1
+          routeFrom
+          && routeFrom !== 'trs'
+          && this.platlistBack.indexOf(routeFrom) === -1
         ) {
           // 没有对应权限，需申请
           this.platlist.push(routeFrom);
