@@ -12658,7 +12658,7 @@ trim-canvas@^0.1.2:
   resolved "https://registry.yarnpkg.com/trim-canvas/-/trim-canvas-0.1.2.tgz#620457f5fecf564b521d35c5fcd4da58304d6e45"
   integrity sha512-nd4Ga3iLFV94mdhW9JFMLpQbHUyCQuhFOD71PEAt1NjtMD5wbZctzhX8c3agHNybMR5zXD1XTGoIEWk995E6pQ==
 
-trs-web-components@^0.1.5:
+trs-web-components@^0.1.6:
   version "0.1.5"
   resolved "https://registry.npmmirror.com/trs-web-components/-/trs-web-components-0.1.5.tgz#09b38ae69b6dd4d01d34b3009ff2f05f444d8d87"
   integrity sha512-NBwIuRNuERPnhDyCqxxXamj/owryb0BZAICwyk+/o5gZyyJxlsfdFg4XJ12d2Utsefj3rfati+71pyXpaq9dgw==
