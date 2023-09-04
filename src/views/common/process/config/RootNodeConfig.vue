@@ -37,12 +37,12 @@
 <script>
 import orgPicker from '@/components/common/organizationPicker'
 export default {
-  name: "RootConfig",
-  components: {orgPicker},
-  props:{
-    config:{
+  name: 'RootConfig',
+  components: { orgPicker },
+  props: {
+    config: {
       type: Object,
-      default: ()=>{
+      default: () => {
         return {}
       }
     },
@@ -65,7 +65,7 @@ export default {
       }
     }
   },
-  computed:{
+  computed: {
     disabledForm() {
       return this.$route.name === 'FlowManage' || this.$route.meta.pTitle === '申请中心'
     },
@@ -90,7 +90,7 @@ export default {
     }
   },
   methods: {
-    closeSelect(){
+    closeSelect() {
       this.showOrgSelect = false
     },
     selectOrg() {
@@ -100,7 +100,7 @@ export default {
       this.showOrgSelect = false
       this.config.assignedUser = []
       // this.select = []
-      for (let key in select) {
+      for (const key in select) {
         select[key].forEach(val => this.select.push({
           ...val,
           label: val.label
@@ -117,7 +117,7 @@ export default {
       })
       this.config.assignedUser = assignedUser
     },
-    removeOrgItem(index){
+    removeOrgItem(index) {
       if (this.disabledForm) {
         return;
       }

@@ -26,12 +26,12 @@
 <script>
 import orgPicker from '@/components/common/organizationPicker'
 export default {
-  name: "CcNodeConfig",
-  components: {orgPicker},
-  props:{
-    config:{
+  name: 'CcNodeConfig',
+  components: { orgPicker },
+  props: {
+    config: {
       type: Object,
-      default: ()=>{
+      default: () => {
         return {}
       }
     },
@@ -55,7 +55,7 @@ export default {
       }
     }
   },
-  computed:{
+  computed: {
     disabledForm() {
       return this.$route.name === 'FlowManage' || this.$route.meta.pTitle === '申请中心'
     },
@@ -74,7 +74,7 @@ export default {
   methods: {
     // 展开收起
     handleCollapse(e, isCollapse) {
-      const height = e.target.parentNode.getBoundingClientRect().height
+      const { height } = e.target.parentNode.getBoundingClientRect()
       if (height > 150) {
         e.target.parentNode.style.height = '150px'
         this[isCollapse] = false
@@ -87,7 +87,7 @@ export default {
       this.$nextTick(() => {
         const dom = document.querySelector(selector)
         if (!dom) return;
-        const height = dom.getBoundingClientRect().height
+        const { height } = dom.getBoundingClientRect()
         if (height < 151) {
           dom.style.height = 'auto'
           this[showType] = false
@@ -97,7 +97,7 @@ export default {
         }
       })
     },
-    closeSelect(){
+    closeSelect() {
       this.showOrgSelect = false
     },
     selectOrg() {
@@ -106,7 +106,7 @@ export default {
     selected(select) {
       this.showOrgSelect = false
       this.select = []
-      for (let key in select) {
+      for (const key in select) {
         select[key].forEach(val => this.select.push({
           ...val,
           label: val.label
@@ -114,7 +114,7 @@ export default {
       }
       this.initCollapse('.tag-action', 'showCollapse')
     },
-    removeOrgItem(index){
+    removeOrgItem(index) {
       this.select.splice(index, 1)
     }
   }

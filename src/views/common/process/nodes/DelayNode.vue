@@ -8,57 +8,55 @@
 import Node from './Node'
 
 export default {
-  name: "DelayNode",
-  props:{
-    config:{
+  name: 'DelayNode',
+  props: {
+    config: {
       type: Object,
       default: () => {
         return {}
       }
     }
   },
-  components: {Node},
+  components: { Node },
   data() {
     return {
       showError: false,
       errorInfo: '',
     }
   },
-  computed:{
-    content(){
-      if (this.config.props.type === 'FIXED'){
+  computed: {
+    content() {
+      if (this.config.props.type === 'FIXED') {
         return `等待 ${this.config.props.time} ${this.getName(this.config.props.unit)}`
-      }else if(this.config.props.type === 'AUTO'){
+      } else if (this.config.props.type === 'AUTO') {
         return `至当天 ${this.config.props.dateTime}`
-      }else {
+      } else {
         return null
       }
     }
   },
   methods: {
-    //校验数据配置的合法性
-    validate(){
+    // 校验数据配置的合法性
+    validate() {
       this.showError = false
       try {
-        if (this.config.type === "AUTO") {
-          if ((this.config.datetime || "") === ""){
+        if (this.config.type === 'AUTO') {
+          if ((this.config.datetime || '') === '') {
             this.showError = true
-            this.errorInfo = "请选择时间点"
+            this.errorInfo = '请选择时间点'
           }
-        } else {
-          if (this.config.time <= 0) {
-            this.showError = true
-            this.errorInfo = "请设置延时时长"
-          }
+        } else if (this.config.time <= 0) {
+          this.showError = true
+          this.errorInfo = '请设置延时时长'
         }
       } catch (e) {
         this.showError = true
-        this.errorInfo = "配置出现问题"
+        this.errorInfo = '配置出现问题'
       }
       return !this.showError
     },
-    getName(unit){
-      switch (unit){
+    getName(unit) {
+      switch (unit) {
         case 'D': return '天';
         case 'H': return '小时';
         case 'M': return '分钟';

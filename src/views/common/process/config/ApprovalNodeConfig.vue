@@ -212,10 +212,10 @@
           <div style="color:#409EEF; font-size: small">默认提醒当前审批人</div>
           <el-switch inactive-text="循环" active-text="一次" v-model="nodeProps.timeLimit.handler.notify.once"></el-switch>
           <span style="margin-left: 20px" v-if="!nodeProps.timeLimit.handler.notify.once">
-							每隔
-							<el-input-number :min="0" :max="10000" :step="1" size="mini" v-model="nodeProps.timeLimit.handler.notify.hour"/>
-							小时提醒一次
-						</span>
+            每隔
+            <el-input-number :min="0" :max="10000" :step="1" size="mini" v-model="nodeProps.timeLimit.handler.notify.hour"/>
+            小时提醒一次
+          </span>
         </div>
       </el-form-item>
     </el-form>
@@ -226,8 +226,8 @@
 import orgPicker from '@/components/common/organizationPicker'
 
 export default {
-  name: "ApprovalNodeConfig",
-  components: {orgPicker},
+  name: 'ApprovalNodeConfig',
+  components: { orgPicker },
   props: {
     config: {
       type: Object,
@@ -249,9 +249,9 @@ export default {
       showOrgSelect1: false,
       approvalTypes: [
         // {name: '指定人员', type: 'ASSIGN_USER'},
-        {name: '上一审批人选择', type: 'SELF_SELECT'},
-        {name: '指定部门/人员/角色', type: 'DEPT_USER_ROLE'},
-        {name: '节点审批人', type: 'SELECT_NODE'},
+        { name: '上一审批人选择', type: 'SELF_SELECT' },
+        { name: '指定部门/人员/角色', type: 'DEPT_USER_ROLE' },
+        { name: '节点审批人', type: 'SELECT_NODE' },
         // {name: '连续多级主管', type: 'LEADER_TOP'},
         // {name: '主管', type: 'LEADER'},
         // {name: '角色', type: 'ROLE'},
@@ -311,26 +311,26 @@ export default {
       })
       return tempNodes
     },
-    forms(){
+    forms() {
       return this.$store.state.design.formItems.map(f => {
-        if (f.type === 'USER'){
+        if (f.type === 'USER') {
           return f;
         }
       })
     },
     showMode() {
       switch (this.nodeProps.assignedType) {
-        case "ASSIGN_USER":
+        case 'ASSIGN_USER':
           return this.nodeProps.assignedUser.length > 0;
-        case "SELF_SELECT":
+        case 'SELF_SELECT':
           return this.nodeProps.selfSelect.multiple;
-        case "LEADER_TOP":
+        case 'LEADER_TOP':
           return this.nodeProps.formUser !== '';
-        case "FORM_USER":
+        case 'FORM_USER':
           return true;
-        case "DEPT_USER_ROLE":
+        case 'DEPT_USER_ROLE':
           return this.nodeProps.assignedUser.length > 1;
-        case "ROLE":
+        case 'ROLE':
           return true;
         default:
           return false;
@@ -339,14 +339,14 @@ export default {
   },
   mounted() {
     // setTimeout(() => {
-      this.initCollapse('.tag-action', 'showCollapse')
-      this.initCollapse('.tag-action1', 'showCollapse1')
+    this.initCollapse('.tag-action', 'showCollapse')
+    this.initCollapse('.tag-action1', 'showCollapse1')
     // }, 500);
   },
   methods: {
     // 展开收起
     handleCollapse(e, isCollapse) {
-      const height = e.target.parentNode.getBoundingClientRect().height
+      const { height } = e.target.parentNode.getBoundingClientRect()
       if (height > 150) {
         e.target.parentNode.style.height = '150px'
         this[isCollapse] = false
@@ -359,7 +359,7 @@ export default {
       this.$nextTick(() => {
         const dom = document.querySelector(selector)
         if (!dom) return;
-        const height = dom.getBoundingClientRect().height
+        const { height } = dom.getBoundingClientRect()
         if (height < 151) {
           dom.style.height = 'auto'
           this[showType] = false
@@ -393,7 +393,7 @@ export default {
       this.showOrgSelect = false
       // this.select = []
       this.config.assignedUser = []
-      for (let key in select) {
+      for (const key in select) {
         select[key].forEach(val => this.select.push({
           ...val,
           label: val.label,
@@ -405,7 +405,7 @@ export default {
     selected1(select) {
       this.showOrgSelect1 = false
       this.config.changeHandleUser = []
-      for (let key in select) {
+      for (const key in select) {
         select[key].forEach(val => this.select1.push({
           ...val,
           label: val.label,

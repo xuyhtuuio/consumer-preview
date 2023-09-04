@@ -8,12 +8,12 @@
 
 <script>
 export default {
-  name: "NumberInput",
+  name: 'NumberInput',
   components: {},
-  props:{
-    value:{
+  props: {
+    value: {
       type: Object,
-      default: ()=>{
+      default: () => {
         return {}
       }
     }

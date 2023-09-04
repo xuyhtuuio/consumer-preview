@@ -1,19 +1,19 @@
-//混入组件数据
-export default{
-  props:{
+// 混入组件数据
+export default {
+  props: {
     value: {
       default: undefined
     },
-    mode:{
+    mode: {
       type: String,
       default: 'DESIGN'
     },
-    required:{
+    required: {
       type: Boolean,
       default: false
     },
   },
-  data(){
+  data() {
     return {}
   },
   computed: {
@@ -22,7 +22,7 @@ export default{
         return this.value;
       },
       set(val) {
-        this.$emit("input", val);
+        this.$emit('input', val);
       }
     }
   },

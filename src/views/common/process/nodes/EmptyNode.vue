@@ -6,8 +6,8 @@
 import Node from './Node'
 
 export default {
-  name: "EmptyNode",
-  components: {Node},
+  name: 'EmptyNode',
+  components: { Node },
   data() {
     return {}
   },
