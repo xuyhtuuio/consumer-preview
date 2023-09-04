@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import store from "@/store/index"
+import request from '@/api/request.js'
 Vue.use(Router);
 
 const viewport = {
@@ -206,6 +207,7 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   const auth = handleAuth(to)
   if (!auth) {
+    getUserRole()
     return;
   }
   if (to.path.split("/").length>1) {
@@ -242,6 +244,30 @@ function handleAuth(to) {
     return true
   }
   return false
+}
+
+async function getUserRole() {
+  const token = window.localStorage.getItem('AI_token')
+  if (!token) {
+    router.push({ name: 'login' })
+    return false
+  }
+  const res = await request({
+    method: 'post',
+    url: '/cpr/oauth/check_token',
+    contentType: 'application/x-www-form-urlencoded',
+    data: {
+      token
+    },
+    msg: false
+  });
+  const role = JSON.parse(res.data.user_name).roles?.find((item) => {
+    return item.clientId === 'cpr'
+  })
+  if (!role) {
+    router.push({ name: 'login' })
+  }
+  return role;
 }
 
 

@@ -91,7 +91,7 @@
           options: [],
           expanding: false,
           isMultiple: false,
-          dateFormat: ''
+          dateFormat: 'yyyy-MM-dd HH:mm:ss'
         },
         rules: {
           title: [
@@ -441,7 +441,7 @@
             name,
             module,
             value: '',
-            valueType: 'String',
+            valueType: 'Date',
             props: {
               required,
               placeholder,

@@ -146,6 +146,7 @@ export default {
     },
     addFlow() {
       this.$store.commit("setIsPreview", false);
+      this.$store.commit('loadForm', {})
       this.$router.push({
         name: 'design'
       })

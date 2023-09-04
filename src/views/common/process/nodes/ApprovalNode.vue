@@ -83,6 +83,11 @@ export default {
             this.errorInfo = '未配置驳回到指定节点'
             this.showError = true
           }
+          if (this.config.props.targetPage === 'XIAOBAO' && !this.config.props.cpAuthority) {
+            err.push(`${this.config.name} 未配置消保审批权限`)
+            this.errorInfo = '未配置消保审批权限'
+            this.showError = true
+          }
           this[`validate_${this.config.props.assignedType}`](err)
         } else {
           // 二次会签
