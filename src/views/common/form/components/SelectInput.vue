@@ -16,18 +16,18 @@ import componentMinxins from '../ComponentMinxins'
 
 export default {
   mixins: [componentMinxins],
-  name: "SelectInput",
+  name: 'SelectInput',
   components: {},
-  props:{
-    placeholder:{
+  props: {
+    placeholder: {
       type: String,
       default: '请选择选项'
     },
-    multiple:{
+    multiple: {
       type: Boolean,
       default: false
     },
-    options:{
+    options: {
       type: Array,
       default: () => {
         return []

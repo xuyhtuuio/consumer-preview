@@ -14,23 +14,23 @@ import componentMinxins from '../ComponentMinxins'
 
 export default {
   mixins: [componentMinxins],
-  name: "DateTimeRange",
+  name: 'DateTimeRange',
   components: {},
-  props:{
-    format:{
+  props: {
+    format: {
       type: String,
       default: 'yyyy-MM-dd HH:mm'
     },
-    placeholder:{
+    placeholder: {
       type: Array,
-      default: ()=>{
+      default: () => {
         return ['开始时间', '结束时间']
       }
     }
   },
-  computed:{
-    type(){
-      switch (this.format){
+  computed: {
+    type() {
+      switch (this.format) {
         case 'yyyy-MM-dd': return 'daterange';
         case 'yyyy-MM-dd HH:mm': return 'datetimerange';
         default: return 'daterange';

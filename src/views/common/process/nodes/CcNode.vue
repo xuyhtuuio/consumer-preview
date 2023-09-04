@@ -8,16 +8,16 @@
 import Node from './Node'
 
 export default {
-  name: "CcNode",
-  props:{
-    config:{
+  name: 'CcNode',
+  props: {
+    config: {
       type: Object,
       default: () => {
         return {}
       }
     }
   },
-  components: {Node},
+  components: { Node },
   data() {
     return {
       showError: false,
@@ -25,7 +25,7 @@ export default {
       content: ''
     }
   },
-  computed:{
+  computed: {
     assignedUser() {
       return this.$store.state.selectedNode?.props?.assignedUser
     },
@@ -50,7 +50,7 @@ export default {
       handler() {
         this.content = (this.config.props.assignedUser || []).map(item => item.label).join('、') || ''
         if (this.$store.state.selectedNode.id !== this.config.id || this.config.name === '二次会签') {
-          return;
+          // console
         }
       },
       immediate: true,
@@ -58,12 +58,12 @@ export default {
     }
   },
   methods: {
-    //校验数据配置的合法性
-    validate(err){
+    // 校验数据配置的合法性
+    validate(err) {
       this.showError = false
-      if(this.config.props.assignedUser && this.config.props.assignedUser.length > 0){
+      if (this.config.props.assignedUser && this.config.props.assignedUser.length > 0) {
         this.showError = false
-      }else {
+      } else {
         this.showError = true
         err.push(`${this.config.name} 未指定需要抄送的人员`)
         this.errorInfo = '请选择需要抄送的人员'

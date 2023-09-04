@@ -14,10 +14,10 @@ import componentMinxins from '../ComponentMinxins'
 
 export default {
   mixins: [componentMinxins],
-  name: "TextareaInput",
+  name: 'TextareaInput',
   components: {},
-  props:{
-    placeholder:{
+  props: {
+    placeholder: {
       type: String,
       default: '请输入内容'
     }
@@ -28,7 +28,7 @@ export default {
         return this.value;
       },
       set(val) {
-        this.$emit("input", val);
+        this.$emit('input', val);
       }
     }
   },

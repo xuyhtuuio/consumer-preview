@@ -13,7 +13,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="readOnly" label="只读" width="80">
-        <template slot="header" slot-scope="scope">
+        <template slot="header">
           <el-radio label="R" :disabled="disabledForm" v-model="permSelect" @change="allSelect('R')">只读</el-radio>
         </template>
         <template slot-scope="scope">
@@ -21,7 +21,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="editable" label="可编辑" width="90">
-        <template slot="header" slot-scope="scope">
+        <template slot="header">
           <el-radio label="E" :disabled="disabledForm" v-model="permSelect" @change="allSelect('E')">可编辑</el-radio>
         </template>
         <template slot-scope="scope">
@@ -29,7 +29,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="hide" label="隐藏" width="80">
-        <template slot="header" slot-scope="scope">
+        <template slot="header">
           <el-radio label="H" :disabled="disabledForm" v-model="permSelect" @change="allSelect('H')">隐藏</el-radio>
         </template>
         <template slot-scope="scope">
@@ -41,16 +41,15 @@
 </template>
 
 <script>
-import { getFormTemplateById } from '@/api/design'
 export default {
-  name: "FormAuthorityConfig",
+  name: 'FormAuthorityConfig',
   components: {},
   data() {
     return {
-      tableData:[],
-      isIndeterminate:false,
+      tableData: [],
+      isIndeterminate: false,
       permSelect: '',
-      checkStatus:{
+      checkStatus: {
         readOnly: true,
         editable: false,
         hide: false
@@ -64,31 +63,33 @@ export default {
     this.formId = this.formGroup[0]?.id
     this.formPermsLoad()
   },
-  computed:{
+  computed: {
     disabledForm() {
       return this.$route.name === 'FlowManage' || this.$route.meta.pTitle === '申请中心'
     },
-    formData(){
+    formData() {
       return this.$store.state.design.formItems
     },
-    formPerms(){
+    formPerms() {
       return this.$store.state.selectedNode.props.formPerms
     }
   },
   methods: {
-    allSelect(type){
-      this.formPerms.forEach(f => f.perm = type)
+    allSelect(type) {
+      this.formPerms.forEach(f => {
+        f.perm = type
+      })
       this.$nextTick(() => {
         this.permSelect = type
       })
     },
-    formPermsLoad(){
-      let perms = this.$store.state.selectedNode.props.formPerms
+    formPermsLoad() {
+      const perms = this.$store.state.selectedNode.props.formPerms
       const { id, name } = this.formGroup.find(item => item.id === this.formId) || {}
       this.formData.forEach(form => {
         let isLoad = false
-        for (let i in perms) {
-          if (perms[i].id === form.id){
+        for (const i in perms) {
+          if (perms[i].id === form.id) {
             perms[i].title = form.title
             perms[i].module = form.module
             perms[i].formCategoryId = id
@@ -97,10 +98,10 @@ export default {
             break;
           }
         }
-        if (!isLoad){
+        if (!isLoad) {
           const isRoot = this.$store.state.selectedNode.type === 'ROOT'
           const secondCheck = this.$store.state.selectedNode.type === 'APPROVAL-TWO'
-          let perm = (isRoot || secondCheck) ? 'E':'R'
+          let perm = (isRoot || secondCheck) ? 'E' : 'R'
           if (form.module === '审批人填写') {
             perm = 'H'
           }
@@ -115,16 +116,16 @@ export default {
         }
       })
     },
-    handleCheckAllChange(){
+    handleCheckAllChange() {
 
     },
     changeFormId() {
     }
   },
-  watch:{
-    formPerms:{
+  watch: {
+    formPerms: {
       deep: true,
-      handler(){
+      handler() {
         const set = new Set(this.formPerms.map(f => f.perm))
         this.permSelect = set.size === 1 ? this.formPerms[0].perm : ''
       }

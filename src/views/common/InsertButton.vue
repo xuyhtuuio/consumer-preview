@@ -39,40 +39,40 @@
 
 <script>
 export default {
-  name: "InsertButton",
+  name: 'InsertButton',
   components: {},
   data() {
     return {}
   },
-  computed:{
-    selectedNode(){
-      this.$store.state.selectedNode
+  computed: {
+    selectedNode() {
+      return this.$store.state.selectedNode
     },
     disabledForm() {
       return this.$route.name === 'FlowManage' || this.$route.meta.pTitle === '申请中心'
     }
   },
   methods: {
-    addApprovalNode(){
-      this.$emit('insertNode', "APPROVAL")
+    addApprovalNode() {
+      this.$emit('insertNode', 'APPROVAL')
     },
     addApprovalTwoNode() {
-      this.$emit('insertNode', "APPROVAL-TWO")
+      this.$emit('insertNode', 'APPROVAL-TWO')
     },
-    addCcNode(){
-      this.$emit('insertNode', "CC")
+    addCcNode() {
+      this.$emit('insertNode', 'CC')
     },
-    addDelayNode(){
-      this.$emit('insertNode', "DELAY")
+    addDelayNode() {
+      this.$emit('insertNode', 'DELAY')
     },
-    addConditionsNode(){
-      this.$emit('insertNode', "CONDITIONS")
+    addConditionsNode() {
+      this.$emit('insertNode', 'CONDITIONS')
     },
-    addConcurrentsNode(){
-      this.$emit('insertNode', "CONCURRENTS")
+    addConcurrentsNode() {
+      this.$emit('insertNode', 'CONCURRENTS')
     },
-    addTriggerNode(){
-      this.$emit('insertNode', "TRIGGER")
+    addTriggerNode() {
+      this.$emit('insertNode', 'TRIGGER')
     }
   }
 }

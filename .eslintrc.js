@@ -49,6 +49,7 @@ module.exports = {
     'vue/max-attributes-per-line': 0,
     'vue/attributes-order': 0,
     'vue/html-self-closing': 0,
+    'vue/no-mutating-props': 0,
     'max-len': 0,
     'max-classes-per-file': 0,
     'comma-dangle': 0,

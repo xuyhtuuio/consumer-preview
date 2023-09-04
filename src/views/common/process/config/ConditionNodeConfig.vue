@@ -44,12 +44,12 @@
 </template>
 
 <script>
-import draggable from "vuedraggable";
-import GroupItem from "./ConditionGroupItemConfig"
+import draggable from 'vuedraggable';
+import GroupItem from './ConditionGroupItemConfig'
 
 export default {
-  name: "ConditionNodeConfig",
-  components: {draggable, GroupItem},
+  name: 'ConditionNodeConfig',
+  components: { draggable, GroupItem },
   props: {
     config: {
       type: Object,
@@ -71,10 +71,9 @@ export default {
     nowNodeLeave() {
       return this.prioritySortList.indexOf(this.selectedNode)
     },
-    //条件节点
+    // 条件节点
     prioritySortList() {
-      let node = this.$store.state.nodeMap.get(this.selectedNode.parentId)
-      console.log(this.selectedNode.id, node)
+      const node = this.$store.state.nodeMap.get(this.selectedNode.parentId)
       if (node) {
         return node.branchs || []
       }
@@ -103,9 +102,9 @@ export default {
     },
     addConditionGroup() {
       this.config.groups.push({
-        cids:[],
-        groupType: "OR",
-        conditions:[]
+        cids: [],
+        groupType: 'OR',
+        conditions: []
       })
     },
     closeSelect() {
@@ -117,7 +116,7 @@ export default {
     selected(select) {
       this.showOrgSelect = false
       this.users.length = 0
-      for (let key in select) {
+      for (const key in select) {
         select[key].forEach(val => this.users.push({
           ...val,
           label: val.label

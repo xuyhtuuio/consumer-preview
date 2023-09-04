@@ -8,12 +8,12 @@
 
 <script>
 export default {
-  name: "TextareaInput",
+  name: 'TextareaInput',
   components: {},
-  props:{
-    value:{
+  props: {
+    value: {
       type: Object,
-      default: ()=>{
+      default: () => {
         return {}
       }
     }

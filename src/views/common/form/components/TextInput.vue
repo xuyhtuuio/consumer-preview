@@ -14,7 +14,7 @@ import componentMinxins from '../ComponentMinxins'
 
 export default {
   mixins: [componentMinxins],
-  name: "TextInput",
+  name: 'TextInput',
   components: {},
   props: {
     placeholder: {

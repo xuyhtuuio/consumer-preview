@@ -14,19 +14,19 @@
 </template>
 
 <script>
-import TextInput from './config/TextInputConfig.vue'
-import NumberInput from './config/NumberInputConfig.vue'
-import TextareaInput from './config/TextareaInputConfig.vue'
-import SelectInput from './config/SelectInputConfig.vue'
-import DateTime from './config/DateTimeConfig.vue'
-import DateTimeRange from './config/DateTimeRangeConfig.vue'
-import ImageUpload from './config/ImageUploadConfig.vue'
-import FileUpload from './config/FileUploadConfig.vue'
-import Description from './config/DescriptionConfig.vue'
-import MoneyInput from './config/MoneyInputConfig.vue'
+import TextInput from './config/TextInputConfig'
+import NumberInput from './config/NumberInputConfig'
+import TextareaInput from './config/TextareaInputConfig'
+import SelectInput from './config/SelectInputConfig'
+import DateTime from './config/DateTimeConfig'
+import DateTimeRange from './config/DateTimeRangeConfig'
+import ImageUpload from './config/ImageUploadConfig'
+import FileUpload from './config/FileUploadConfig'
+import Description from './config/DescriptionConfig'
+import MoneyInput from './config/MoneyInputConfig'
 
 export default {
-  name: "FormComponentConfig",
+  name: 'FormComponentConfig',
   components: {
     TextInput,
     NumberInput,
@@ -39,14 +39,14 @@ export default {
     Description,
     MoneyInput
   },
-  props:{
-    formSelected:{
+  props: {
+    formSelected: {
       type: Number,
       default: 0
     }
   },
-  computed:{
-    form(){
+  computed: {
+    form() {
       return this.$store.state.design.formItems[this.formSelected]
     }
   },

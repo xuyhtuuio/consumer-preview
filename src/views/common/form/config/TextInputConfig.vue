@@ -6,12 +6,12 @@
 
 <script>
 export default {
-  name: "TextInput",
+  name: 'TextInput',
   components: {},
-  props:{
-    value:{
+  props: {
+    value: {
       type: Object,
-      default: ()=>{
+      default: () => {
         return {}
       }
     }
