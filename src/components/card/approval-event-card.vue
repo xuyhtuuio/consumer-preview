@@ -95,7 +95,7 @@
       <!-- 待审核状态显示审查 -->
       <span
         class="attention icon-op"
-        v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'"
+        v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'&&hasAuth"
         @click="toApproval(item)"
       >
         <svg class="icon urgent-icon" aria-hidden="true">
@@ -121,7 +121,7 @@
       <!-- 待确认状态的工单 需要该审批人确认的工单-->
       <span
         class="attention check icon-op"
-        v-if="item.taskStatus == 5 && crtSign !== 'approvedCount'"
+        v-if="item.taskStatus == 5 && crtSign !== 'approvedCount'&&hasAuth"
         @click="check(item)"
       >
         <span class="iconfont icon icon-tubiao urgent-icon"></span>
@@ -129,7 +129,7 @@
       >
       <span
         class="attention check icon-op"
-        v-if="item.taskStatus == 6 && crtSign !== 'approvedCount'"
+        v-if="item.taskStatus == 6 && crtSign !== 'approvedCount'&&hasAuth"
         @click="compare(item)"
       >
         <span class="iconfont icon icon-compare urgent-icon"></span>
@@ -152,8 +152,7 @@
         @click="concern(item)"
       >
         <svg class="icon urgent-icon" aria-hidden="true">
-          <use xlink:href="#icon-guanzhu-1"></use></svg>已关注</span
-      >
+          <use xlink:href="#icon-guanzhu-1"></use></svg>已关注</span>
     </div>
   </div>
 </template>
@@ -176,8 +175,17 @@ export default {
   },
   data() {
     return {
-      allowConcernClick: true
+      hasAuth: false
     }
+  },
+  mounted() {
+    let { currentProcessor } = this.item
+    currentProcessor = currentProcessor?.map((v) => {
+      return Object.keys(v)[0]
+    })
+    const { id } = JSON.parse(window.localStorage.getItem('user_name'))
+    this.hasAuth = currentProcessor.includes(id + '')
+    this.item.hasAuth = currentProcessor.includes(id + '')
   },
   methods: {
     async toApproval(item) {
@@ -596,4 +604,5 @@ export default {
   .event-name {
     color: #2d5cf6;
   }
-}</style>
+}
+</style>
