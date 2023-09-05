@@ -6,7 +6,7 @@
         <component :is="(selectNode.type||'').toLowerCase()" :nodeName="nodeName" :config="selectNode.props"/>
       </el-tab-pane>
       <el-tab-pane label="表单权限设置" name="permissions">
-        <form-authority-config/>
+        <form-authority-config :nodeName="nodeName"/>
       </el-tab-pane>
     </el-tabs>
     <component :is="(selectNode.type||'').toLowerCase()" v-else :nodeName="nodeName"  :config="selectNode.props"/>
