@@ -201,6 +201,12 @@ const router = new Router({
       component: () => import("@/views/product-map/index"),
       meta: { title: '产品图谱', viewport: viewport },
     },
+    {
+      path: "/404",
+      name: "404",
+      component: () => import("@/views/404"),
+      meta: { title: '404', viewport: viewport },
+    },
   ]
 })
 
@@ -240,7 +246,7 @@ function handleAuth(to) {
   }
   const { permissionsPage } = store.state
   const auth = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(item => ((item.pathName === to.name) && item.type))
-  if (auth || to.name === 'login') {
+  if (auth || to.name === 'login' || to.name === '404') {
     return true
   }
   return false
@@ -252,22 +258,28 @@ async function getUserRole() {
     router.push({ name: 'login' })
     return false
   }
-  const res = await request({
-    method: 'post',
-    url: '/cpr/oauth/check_token',
-    contentType: 'application/x-www-form-urlencoded',
-    data: {
-      token
-    },
-    msg: false
-  });
-  const role = JSON.parse(res.data.user_name).roles?.find((item) => {
-    return item.clientId === 'cpr'
-  })
-  if (!role) {
-    router.push({ name: 'login' })
+  try {
+    const res = await request({
+      method: 'post',
+      url: '/cpr/oauth/check_token',
+      contentType: 'application/x-www-form-urlencoded',
+      data: {
+        token
+      },
+      msg: false
+    });
+    const role = JSON.parse(res.data.user_name).roles?.find((item) => {
+      return item.clientId === 'cpr'
+    })
+    if (!role) {
+      router.push({ name: 'login' })
+    } else {
+      router.push({ name: '404' })
+    }
+    return role;
+  } catch {
+    router.push({ name: '404' })
   }
-  return role;
 }
 
 
