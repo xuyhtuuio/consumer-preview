@@ -322,13 +322,13 @@ export default {
           type: 'success',
           message: msg || '已成功保存该角色的操作权限'
         });
-        this.handleBack();
       } else {
         this.$message({
           type: 'error',
           message: msg || '保存失败'
         });
       }
+      this.handleBack();
       this.cardLoading = false;
     },
     handleBack() {

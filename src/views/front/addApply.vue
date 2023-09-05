@@ -328,7 +328,8 @@ export default {
       });
       formItemDataList.push(reviewMaterialsData);
       result.formItemDataList = formItemDataList;
-
+      console.log(result)
+      // return ;
       if (flag) {
         if (this.submitDialogVisible) return;
         this.submitDialogVisible = true;
