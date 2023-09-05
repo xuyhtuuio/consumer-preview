@@ -201,10 +201,10 @@ const router = new Router({
       meta: { title: '产品图谱', viewport },
     },
     {
-      path: "/404",
-      name: "404",
-      component: () => import("@/views/404"),
-      meta: { title: '404', viewport: viewport },
+      path: '/404',
+      name: '404',
+      component: () => import('@/views/404'),
+      meta: { title: '404', viewport }
     },
   ]
 })
@@ -242,11 +242,9 @@ function handleAuth(to) {
     if (permissionsPage) {
       store.state.permissionsPage = permissionsPage
     }
-    console.log(store.state.permissionsPage)
   }
   const { permissionsPage } = store.state
   const auth = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(item => ((item.pathName === to.name) && item.type))
-  console.log(to.name, [...permissionsPage.funPerms, ...permissionsPage.defaultPerm])
   if (auth || to.name === 'login' || to.name === '404') {
     return true
   }

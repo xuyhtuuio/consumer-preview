@@ -50,22 +50,22 @@ export default {
     list() {
       const { permissionsPage = {} } = this.$store.state
       const navList = [
-        { title: "申请中心", name: "apply-list", sign: 'applycenter' },
-        { title: "审批中心", name: 'approval-list', sign: 'approvalcenter' },
-        { title: "产品图谱", name: "productmap", sign: "productmap" },
+        { title: '申请中心', name: 'apply-list', sign: 'applycenter' },
+        { title: '审批中心', name: 'approval-list', sign: 'approvalcenter' },
+        { title: '产品图谱', name: 'productmap', sign: 'productmap' },
       ]
       return navList.map(item => {
         const exist = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(f => f.pathName === item.name)
         if (exist?.type) {
           return item;
         }
-        return;
+        return false;
       }).filter(e => e)
     },
     iconList() {
       if (this.manageAuth) {
         return [
-          { href: "icon-tongyongtubiao5", name: 'manage' }
+          { href: 'icon-tongyongtubiao5', name: 'manage' }
         ]
       }
       return []
@@ -73,7 +73,7 @@ export default {
   },
   watch: {
     $route: {
-      handler: function (val) {
+      handler(val) {
         this.routeActived(val)
       },
       // 深度观察监听
@@ -137,7 +137,7 @@ export default {
     },
     toManagePage(item) {
       const { funPerms } = this.$store.state.permissionsPage
-      const rout = funPerms.filter(item => item.path?.indexOf('/admin/') !== -1 && item.pathName !== 'manage').find(i => i.type)
+      const rout = funPerms.filter(item1 => item1.path?.indexOf('/admin/') !== -1 && item1.pathName !== 'manage').find(i => i.type)
       if (item.name && rout) {
         this.$router.push({
           name: rout.pathName
@@ -213,8 +213,6 @@ export default {
       position: absolute;
       left: 0;
       bottom: -14px;
-
-
     }
   }
 
