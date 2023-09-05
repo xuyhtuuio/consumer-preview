@@ -489,7 +489,7 @@ export default {
       };
       dualScreenPreview(param)
         .then((res) => {
-          if (res.data.data && Array.isArray(res.data.data)) {
+          if (res?.data?.data?.result && Array.isArray(res.data.data.result)) {
             this.compareList = res.data.data.result;
             this.totalsimilarity = res.data.data.totalSimilarity;
             const item = this.compareList[0]
