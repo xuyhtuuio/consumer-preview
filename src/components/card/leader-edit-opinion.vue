@@ -29,7 +29,7 @@
             v-for="(item, index) in disavower"
             :key="index"
             :label="item.name + '/' + item.label + ' 【' + item.nodeName + '】'"
-            :value="item.id"
+            :value="item"
           >
             <div class="flex">
               <div class="item ellipsis ellipsis_1">{{ item.name }}</div>
