@@ -118,12 +118,7 @@ import {
   getApprovalStage,
   getApplicationList,
   delApplication,
-  quashApplication,
-  concernedList,
-  toBeConfirmed,
-  revoked,
-  toReviseList,
-  Approval
+  quashApplication
 } from '@/api/applyCenter'
 import applyEventCard from '@/components/card/apply-event-card'
 export default {
@@ -384,24 +379,24 @@ export default {
       // eslint-disable-next-line
       switch (this.crtSign) {
         case 'applyAll':
-          res = await getApplicationList(param)
           break
         case 'myConcern':
-          res = await concernedList(param)
+          param.isAttention = 1
           break
         case 'toModified':
-          res = await toReviseList(param)
+          param.queryStatus = '3'
           break
         case 'toConfirmed':
-          res = await toBeConfirmed(param)
+          param.queryStatus = '5'
           break
         case 'Approval':
-          res = await Approval(param)
+          param.queryStatus = '1'
           break
         case 'draftBin':
-          res = await revoked(param)
+          param.queryStatus = '0'
           break
       }
+      res = await getApplicationList(param)
       const { data } = res.data
       this.search.total = data.totalCount
       // eslint-disable-next-line

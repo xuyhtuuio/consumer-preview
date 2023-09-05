@@ -221,13 +221,14 @@
       :nextStepObj="nextStepObj"
       ref="confirmation"
       @handleConfirm="endTaskSubmit"
+      :disabled="disabled"
     ></SecondaryConfirmation>
   </div>
 </template>
 
 <script>
-import { download, getNextUserOption, rollback } from '@/api/aiApproval';
-import { dualScreenPreview, endTask } from '@/api/approvalCenter';
+import { download, getNextUserOption, rollback, updateRuleCode, ocrApprovalSubmission } from '@/api/aiApproval';
+import { dualScreenPreview } from '@/api/approvalCenter';
 import { getApplyForm } from '@/api/front';
 import FileType from '@/components/common/file-type';
 import FilePreview from '@/components/filePreview';
@@ -275,7 +276,9 @@ export default {
         message: '提交后该申请单进入下一审批阶段，不可再进行修改',
         cancelBtn: '取消',
         confirmBtn: '确认',
+        noClose: true
       },
+      disabled: false,
       nextStepObj: {
         // 提交： selectObject：1 上一审批选择，nodeSelectUserList
         // 驳回：  "refuseWay": "TO_BEFORE" ： 调回指定节点  nodeSelectList
@@ -326,7 +329,8 @@ export default {
       getNextUserOption({
         nodeId: this.formBase.nodeId,
         templateId: this.formBase.processTemplateId,
-        bool: 'Y'
+        processInstanceId: this.formBase.processInstanceId
+        // bool: 'Y'
       }).then(res => {
         const { data, status } = res.data;
         const keys = Object.keys(data || {});
@@ -422,22 +426,59 @@ export default {
     showSubmit() {
       this.$refs.confirmation.dialogVisible = true;
     },
-    endTaskSubmit() {
+    async endTaskSubmit(val) {
+      const user = JSON.parse(window.localStorage.getItem('user_name'))
       const data = {
+        approvalSubmissionDto: {
+          editedCommentsDtoList: [],
+          formId: this.formId
+        },
+        processInstanceId: this.formBase.processInstanceId,
         taskId: this.formBase.taskId,
-      };
-      endTask(data)
-        .then((res) => {
-          if (res.status === 200) {
-            this.$message.success(res.data.msg);
-            this.goBack();
-          } else {
-            this.$message.error(res.data.msg);
-          }
+        templateId: this.formBase.processTemplateId,
+        currentUserInfo: {
+          id: user.id,
+          name: user.fullname
+        }
+      }
+      this.$message.info('提交中，请稍等！')
+      this.disabled = true;
+      let updateRuleRes = {
+        data: {
+          status: 200,
+          msg: '',
+        }
+      }
+      if (this.nextStepObj?.selectObject === '1') {
+        data.nextNodeId = this.nextStepObj.nextNodeId;
+        data.nextUserInfo = (this.nextStepObj?.nodeSelectUserList || []).filter(item => val.includes(item.id))
+        updateRuleRes = await updateRuleCode({
+          nextNodeId: data.nextNodeId,
+          nextUserInfo: data.nextUserInfo,
+          templateId: this.formBase.processTemplateId,
+        }).catch(() => {
+          updateRuleRes.data.status = 400;
+          this.disabled = false;
         })
-        .catch(() => {
-          // this.$message.success('申请单结束流转失败');
-        });
+      }
+      const { status: ruleStatus, msg: ruleMsg } = updateRuleRes.data;
+      if (ruleStatus === 200) {
+        ocrApprovalSubmission(data).then((res) => {
+          this.disabled = false;
+          const { status, msg } = res.data;
+          if (status === 200) {
+            this.$message.success({ offset: 40, message: '审查意见已提交,可在审批中心查看' });
+            this.submitReviewDialog = false;
+            this.$router.go(-1)
+          } else {
+            this.$message.error({ offset: 40, message: msg });
+          }
+        }).catch(() => {
+          this.disabled = false;
+        })
+      } else {
+        ruleMsg && this.$message.error({ offset: 40, message: ruleMsg });
+      }
     },
     // 获取线上对比数据
     getInfo() {
@@ -448,7 +489,7 @@ export default {
       };
       dualScreenPreview(param)
         .then((res) => {
-          if (res.data.data) {
+          if (res.data.data && Array.isArray(res.data.data)) {
             this.compareList = res.data.data.result;
             this.totalsimilarity = res.data.data.totalSimilarity;
             const item = this.compareList[0]
