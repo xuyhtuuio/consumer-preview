@@ -31,20 +31,14 @@
             :placeholder="`需${nextStepObj.nextNodeName}审批，请选择审批人`"
             filterable
           >
-            <el-option
-              v-for="(item, code) in nextStepObj?.nodeSelectList?.[0] || {}"
-              :key="code"
-              :label="code"
-              :value="item"
-            >
-            </el-option>
+            <el-option v-for="item in nextStepObj?.nodeSelectUserList || []" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button @click="handleClose">{{ option.cancelBtn }}</el-button>
-      <el-button type="primary" :disabled="isDisabled" @click="handleConfirm">{{
+      <el-button type="primary" :disabled="disabled" @click="handleConfirm">{{
         option.confirmBtn
       }}</el-button>
     </span>
@@ -67,6 +61,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    disabled: {
+      type: Boolean,
+      default: () => false
+    }
   },
   data() {
     return {
@@ -97,7 +95,15 @@ export default {
       if (!this.option.noClose) {
         this.dialogVisible = false;
       }
-      this.$emit('handleConfirm');
+      if (this.$refs['paramsForm']) {
+        this.$refs['paramsForm'].validate((valid) => {
+          if (valid) {
+            this.$emit('handleConfirm', this.params.nextUser)
+          } else {
+            return false
+          }
+        })
+      }
     }, 500),
   },
 };
