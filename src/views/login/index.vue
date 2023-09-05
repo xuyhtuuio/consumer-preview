@@ -701,10 +701,13 @@ export default {
       return role;
     },
     async getPermissionsPage() {
-      const user = JSON.parse(window.localStorage.getItem('user_name'))
+      // const user = JSON.parse(window.localStorage.getItem('user_name'))
       const res = await editThePermissionsPage();
-      this.$store.state.permissionsPage = res.data.data || {}
-      window.localStorage.setItem('permissionsPage', JSON.stringify(res.data.data))
+      const data = res.data.data || {}
+      data.funPerms = data.funPerms.filter(item => item.type)
+      data.defaultPerm = data.defaultPerm.filter(item => item.type)
+      this.$store.state.permissionsPage = data
+      window.localStorage.setItem('permissionsPage', JSON.stringify(data))
     },
     // 判断账号是否过期
     async checkToken() {

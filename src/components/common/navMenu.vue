@@ -56,7 +56,6 @@ export default {
       ]
       return navList.map(item => {
         const exist = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(f => f.pathName === item.name)
-        console.log(exist)
         if (exist?.type) {
           return item;
         }
@@ -137,9 +136,11 @@ export default {
       })
     },
     toManagePage(item) {
-      if (item.name) {
+      const { funPerms } = this.$store.state.permissionsPage
+      const rout = funPerms.filter(item => item.path?.indexOf('/admin/') !== -1 && item.pathName !== 'manage').find(i => i.type)
+      if (item.name && rout) {
         this.$router.push({
-          name: item.name
+          name: rout.pathName
         })
       }
     }

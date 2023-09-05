@@ -243,9 +243,11 @@ function handleAuth(to) {
     if (permissionsPage) {
       store.state.permissionsPage = permissionsPage
     }
+    console.log(store.state.permissionsPage)
   }
   const { permissionsPage } = store.state
   const auth = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(item => ((item.pathName === to.name) && item.type))
+  console.log(to.name, [...permissionsPage.funPerms, ...permissionsPage.defaultPerm])
   if (auth || to.name === 'login' || to.name === '404') {
     return true
   }
@@ -268,9 +270,7 @@ async function getUserRole() {
       },
       msg: false
     });
-    const role = JSON.parse(res.data.user_name).roles?.find((item) => {
-      return item.clientId === 'cpr'
-    })
+    const role = (res.data.client_id === 'cpr')
     if (!role) {
       router.push({ name: 'login' })
     } else {

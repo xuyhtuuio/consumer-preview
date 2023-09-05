@@ -38,7 +38,7 @@ export default {
         path: '/admin/manage/opinionManage'
       }]
       const listArr = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.map(item => {
-        const exsit = pathNames.find(p => p.name === item.pathName)
+        const exsit = pathNames.find(p => (p.name === item.pathName && item.type))
         if (exsit) {
           item.path = exsit.path
           return item;
