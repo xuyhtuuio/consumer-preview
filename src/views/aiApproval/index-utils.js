@@ -39,6 +39,8 @@ export default {
             item.opinion = Boolean(item.substantiveOpinions)
           })
           this.approvalLetter = data
+          this.$refs.sidebar.tools[3].show = (data.permissions === 'passAllow' && data.list.length !== 0)
+          this.$forceUpdate()
         }
       });
     },

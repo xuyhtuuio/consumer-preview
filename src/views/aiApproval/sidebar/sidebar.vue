@@ -97,7 +97,7 @@ export default {
           component: 'approvedOpinion',
           toolSign: 'approved-opinion',
           icon: 'icon-yijianshu',
-          sidebarParam: {} // 侧边工具栏激活项 props
+          sidebarParam: {}, // 侧边工具栏激活项 props
           // show: false
         },
         {
