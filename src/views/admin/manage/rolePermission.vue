@@ -284,7 +284,6 @@ export default {
           flag
             && this.$message({
               type: 'success',
-              customClass: 'el-icon-success-one',
               message: '已恢复该角色所有操作权限。'
             });
           !flag && this.$message.success('停用成功');
@@ -321,7 +320,6 @@ export default {
       if (success) {
         this.$message({
           type: 'success',
-          customClass: 'el-icon-success-one',
           message: msg || '已成功保存该角色的操作权限'
         });
         this.handleBack();
@@ -338,6 +336,7 @@ export default {
       this.roleId = '';
       this.action = 'edit1';
       this.permissionList = JSON.parse(JSON.stringify(permissionList));
+      this.initData()
     },
     formatDataZero(data) {
       const { funPerms, dataPerm } = data;
@@ -426,7 +425,6 @@ export default {
 @color1: #1d2128;
 .rolePermission {
   height: 100%;
-  overflow: hidden;
   font-size: 14px;
   color: #1d2128;
   .el-button--text {
