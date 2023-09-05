@@ -226,11 +226,6 @@ export default {
       }
     }
   },
-  created() {
-    this.initOrganizationData();
-    this.initRoleData();
-    this.initData();
-  },
   activated() {
     this.initOrganizationData();
     this.initRoleData();
@@ -362,7 +357,6 @@ export default {
 @color1: #1d2128;
 .user {
   height: 100%;
-  overflow: hidden;
   .top {
     font-size: 14px;
     margin: 0 -24px;

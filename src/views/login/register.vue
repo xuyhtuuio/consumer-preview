@@ -182,46 +182,46 @@ export default {
   methods: {
     // 系统内部手机号验证码
     getCodeMible() {
-      return this.$message.success("目前没有注册")
-      if (!this.registerForm.phone) {
-        return this.$message.error('请输入手机号')
-      }
-      if (this.CodeMibleTime > 0 && this.CodeMibleTime < 60) {
-        return;
-      }
-      clearInterval(this.CodeMibleTimer);
-      this.CodeMibleTime = 60;
+      return this.$message.success('目前没有注册')
+      // if (!this.registerForm.phone) {
+      //   return this.$message.error('请输入手机号')
+      // }
+      // if (this.CodeMibleTime > 0 && this.CodeMibleTime < 60) {
+      //   return;
+      // }
+      // clearInterval(this.CodeMibleTimer);
+      // this.CodeMibleTime = 60;
 
-      this.$http({
-        method: 'post',
-        contentType: 'application/x-www-form-urlencoded',
-        url: this.$GLOBAL.uaa + 'registerValidCodeSms',
-        data: {
-          phone: this.registerForm.phone
-        }
-      }).then((res) => {
-        if (res.success) {
-          this.CodeMibleTimer = setInterval(() => {
-            if (this.CodeMibleTime <= 0) {
-              this.CodeMibleTxt = '点击重新发送';
-            } else {
-              this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
-              this.CodeMibleTime--;
-            }
-          }, 1000);
-        }
-      }).catch(res => {
-        if (['验证码还在有效期，请勿重复操作'].includes(res.data.msg)) {
-          this.CodeMibleTimer = setInterval(() => {
-            if (this.CodeMibleTime <= 0) {
-              this.CodeMibleTxt = '点击重新发送';
-            } else {
-              this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
-              this.CodeMibleTime--;
-            }
-          }, 1000);
-        }
-      })
+      // this.$http({
+      //   method: 'post',
+      //   contentType: 'application/x-www-form-urlencoded',
+      //   url: this.$GLOBAL.uaa + 'registerValidCodeSms',
+      //   data: {
+      //     phone: this.registerForm.phone
+      //   }
+      // }).then((res) => {
+      //   if (res.success) {
+      //     this.CodeMibleTimer = setInterval(() => {
+      //       if (this.CodeMibleTime <= 0) {
+      //         this.CodeMibleTxt = '点击重新发送';
+      //       } else {
+      //         this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
+      //         this.CodeMibleTime--;
+      //       }
+      //     }, 1000);
+      //   }
+      // }).catch(res => {
+      //   if (['验证码还在有效期，请勿重复操作'].includes(res.data.msg)) {
+      //     this.CodeMibleTimer = setInterval(() => {
+      //       if (this.CodeMibleTime <= 0) {
+      //         this.CodeMibleTxt = '点击重新发送';
+      //       } else {
+      //         this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
+      //         this.CodeMibleTime--;
+      //       }
+      //     }, 1000);
+      //   }
+      // })
     },
     register() {
       if (!this.checkAgreement) {
@@ -237,33 +237,33 @@ export default {
     },
     // 新用户注册
     registerUser() {
-        return this.$message.success("目前没有注册")
-      this.$refs.registerForm.validate(async (valid) => {
-        if (valid) {
-          const data = {
-            custname: this.registerForm.entname,
-            mobile: this.registerForm.phone,
-            mail: this.registerForm.email,
-            position: this.registerForm.post,
-            description: this.registerForm.des,
-            // platform: this.registerForm.platform.join(),
-            fullname: this.registerForm.user,
-            smsCode: this.registerForm.code,
-          };
-          const res = await this.$http({
-            method: 'post',
-            url: this.$GLOBAL.uaa + 'user/requestTry',
-            data
-          })
-          if (res.success) {
-            this.$parent.registerSuccessdialog = true
-            this.$parent.downtimer()
-            // this.$emit('tologin', true)
-            this.$refs['registerForm'].clearValidate()
-            this.$refs['registerForm'].resetFields()
-          }
-        }
-      });
+      return this.$message.success('目前没有注册')
+      // this.$refs.registerForm.validate(async (valid) => {
+      //   if (valid) {
+      //     const data = {
+      //       custname: this.registerForm.entname,
+      //       mobile: this.registerForm.phone,
+      //       mail: this.registerForm.email,
+      //       position: this.registerForm.post,
+      //       description: this.registerForm.des,
+      //       // platform: this.registerForm.platform.join(),
+      //       fullname: this.registerForm.user,
+      //       smsCode: this.registerForm.code,
+      //     };
+      //     const res = await this.$http({
+      //       method: 'post',
+      //       url: this.$GLOBAL.uaa + 'user/requestTry',
+      //       data
+      //     })
+      //     if (res.success) {
+      //       this.$parent.registerSuccessdialog = true
+      //       this.$parent.downtimer()
+      //       // this.$emit('tologin', true)
+      //       this.$refs['registerForm'].clearValidate()
+      //       this.$refs['registerForm'].resetFields()
+      //     }
+      //   }
+      // });
     },
     toPrivacypolicy() {
       const page2 = this.$router.resolve({ name: 'privacy-policy' })
@@ -527,8 +527,4 @@ export default {
     }
   }
 }
-
-
-
-
 </style>

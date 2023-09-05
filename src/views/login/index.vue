@@ -710,8 +710,7 @@ export default {
       if (window.localStorage.getItem('AI_token') == null && !this.sendMessage.uni__teis_Token) {
         return;
       }
-      this.sendMessage.uni__teis_Token &&
-        localStorage.setItem('AI_token', this.sendMessage.uni__teis_Token);
+      this.sendMessage.uni__teis_Token && localStorage.setItem('AI_token', this.sendMessage.uni__teis_Token);
       this.platlistBack = [];
       this.platlist = [];
       const res = await this.$http({
@@ -753,11 +752,7 @@ export default {
           this.expirydialog = true;
           // this.expirytime = expiryTime || moment().format('YYYY-MM-DD HH:mm:ss')
         } else if (
-          routeFrom &&
-          !this.platDialog &&
-          !this.expirydialog &&
-          routeFrom &&
-          routeFrom !== 'trs'
+          routeFrom && !this.platDialog && !this.expirydialog && routeFrom && routeFrom !== 'trs'
         ) {
           // 未到期 & 有权限
           const plat = this.iframeSrc.filter(item => item.value === routeFrom);
@@ -765,8 +760,8 @@ export default {
           if (plat.length) {
             window.opener = null;
             window.open(
-              plat[0][this.iframeType].replace(plat[0].route, '') +
-                `?id=${md5.hex(window.localStorage.getItem('AI_token'))}`,
+              plat[0][this.iframeType].replace(plat[0].route, '') + `?id=
+              ${md5.hex(window.localStorage.getItem('AI_token'))}`,
               '_self'
             );
           } else {
@@ -797,162 +792,162 @@ export default {
     // 系统内部手机号验证码
     async getCodeMible() {
       return this.$message.success('当前只能用账号密码登录');
-      if (this.crtOp === 'forget-pwd') {
-        if (!this.changePwdform.phone) {
-          return this.$message.error('请输入手机号');
-        }
-      }
-      if (this.crtOp === 'inputPhone') {
-        if (this.CodeMibleTime > 0 && this.CodeMibleTime < 60) {
-          this.regainShow = true;
-          this.crtOp = 'inputSms';
-          // 获取短信验证码
-          this.captchas = [
-            { num: '' },
-            { num: '' },
-            { num: '' },
-            { num: '' },
-            { num: '' },
-            { num: '' }
-          ];
-          return;
-        }
-      }
+      // if (this.crtOp === 'forget-pwd') {
+      //   if (!this.changePwdform.phone) {
+      //     return this.$message.error('请输入手机号');
+      //   }
+      // }
+      // if (this.crtOp === 'inputPhone') {
+      //   if (this.CodeMibleTime > 0 && this.CodeMibleTime < 60) {
+      //     this.regainShow = true;
+      //     this.crtOp = 'inputSms';
+      //     // 获取短信验证码
+      //     this.captchas = [
+      //       { num: '' },
+      //       { num: '' },
+      //       { num: '' },
+      //       { num: '' },
+      //       { num: '' },
+      //       { num: '' }
+      //     ];
+      //     return;
+      //   }
+      // }
 
-      clearInterval(this.CodeMibleTimer);
-      const data = {
-        phone: this.crtOp === 'forget-pwd' ? this.changePwdform.phone : this.form.phone
-      };
-      let res;
-      try {
-        res = await this.$http({
-          method: 'post',
-          contentType: 'application/x-www-form-urlencoded',
-          url: this.$GLOBAL.uaa + 'validCodeSms',
-          data
-        });
-        if (res.success) {
-          this.regainShow = true;
-          this.CodeMibleTime = 60;
-          if (this.crtOp === 'inputPhone') {
-            this.crtOp = 'inputSms';
-            this.activeInput = 0;
-            // 获取短信验证码
-            this.captchas = [
-              { num: '' },
-              { num: '' },
-              { num: '' },
-              { num: '' },
-              { num: '' },
-              { num: '' }
-            ];
-          }
+      // clearInterval(this.CodeMibleTimer);
+      // const data = {
+      //   phone: this.crtOp === 'forget-pwd' ? this.changePwdform.phone : this.form.phone
+      // };
+      // let res;
+      // try {
+      //   res = await this.$http({
+      //     method: 'post',
+      //     contentType: 'application/x-www-form-urlencoded',
+      //     url: this.$GLOBAL.uaa + 'validCodeSms',
+      //     data
+      //   });
+      //   if (res.success) {
+      //     this.regainShow = true;
+      //     this.CodeMibleTime = 60;
+      //     if (this.crtOp === 'inputPhone') {
+      //       this.crtOp = 'inputSms';
+      //       this.activeInput = 0;
+      //       // 获取短信验证码
+      //       this.captchas = [
+      //         { num: '' },
+      //         { num: '' },
+      //         { num: '' },
+      //         { num: '' },
+      //         { num: '' },
+      //         { num: '' }
+      //       ];
+      //     }
 
-          this.CodeMibleTimer = setInterval(() => {
-            // eslint-disable-next-line
-            if (this.CodeMibleTime <= 0) {
-              // this.CodeMibleTime=60
-              clearInterval(this.CodeMibleTimer);
-              if (this.crtOp === 'forget-pwd') {
-                this.CodeMibleTxt = '点击发送验证码';
-              }
-              this.regainShow = false;
-            } else {
-              this.CodeMibleTime--;
-              this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
-            }
-          }, 1000);
-        } else if (this.crtOp === 'forget-pwd') {
-          this.CodeMibleTxt = '点击发送验证码';
-          this.regainShow = true;
-          this.CodeMibleTime = 60;
-          // this.crtOp = 'inputSms';
-          // this.activeInput = 0;
-          // 获取短信验证码
-          // this.captchas = [
-          //   { num: '' },
-          //   { num: '' },
-          //   { num: '' },
-          //   { num: '' },
-          //   { num: '' },
-          //   { num: '' },
-          // ]
-        } else if (['验证码有效，请勿频繁发送'].includes(res.msg)) {
-          this.regainShow = true;
-          this.CodeMibleTime = 60;
-          if (this.crtOp === 'inputPhone') {
-            this.crtOp = 'inputSms';
-            this.activeInput = 0;
-            // 获取短信验证码
-            this.captchas = [
-              { num: '' },
-              { num: '' },
-              { num: '' },
-              { num: '' },
-              { num: '' },
-              { num: '' }
-            ];
-          }
-          this.CodeMibleTimer = setInterval(() => {
-            // eslint-disable-next-line
-            if (this.CodeMibleTime <= 0) {
-              this.regainShow = false;
-              clearInterval(this.CodeMibleTimer);
-              if (this.crtOp === 'forget-pwd') {
-                this.CodeMibleTxt = '点击发送验证码';
-              }
-            } else {
-              this.CodeMibleTime--;
-              this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
-            }
-          }, 1000);
-        } else if (['超出单日可使用上限'].includes(res.msg)) {
-          this.regainShow = true;
-          this.CodeMibleTime = 60;
-          if (this.crtOp === 'inputPhone') {
-            this.crtOp = 'inputSms';
-            this.activeInput = 0;
-            // 获取短信验证码
-            this.captchas = [
-              { num: '' },
-              { num: '' },
-              { num: '' },
-              { num: '' },
-              { num: '' },
-              { num: '' }
-            ];
-          }
-          this.CodeMibleTimer = setInterval(() => {
-            // eslint-disable-next-line
-            if (this.CodeMibleTime <= 0) {
-              this.regainShow = false;
-              clearInterval(this.CodeMibleTimer);
-              if (this.crtOp === 'forget-pwd') {
-                this.CodeMibleTxt = '点击发送验证码';
-              }
-            } else {
-              this.CodeMibleTime--;
-              this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
-            }
-          }, 1000);
-        }
-      } catch {
-        if (['验证码有效，请勿频繁发送'].includes(res.msg)) {
-          this.CodeMibleTimer = setInterval(() => {
-            // eslint-disable-next-line
-            if (this.CodeMibleTime <= 0) {
-              this.regainShow = false;
-              clearInterval(this.CodeMibleTimer);
-              if (this.crtOp === 'forget-pwd') {
-                this.CodeMibleTxt = '点击发送验证码';
-              }
-            } else {
-              this.CodeMibleTime--;
-              this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
-            }
-          }, 1000);
-        }
-      }
+      //     this.CodeMibleTimer = setInterval(() => {
+      //       // eslint-disable-next-line
+      //       if (this.CodeMibleTime <= 0) {
+      //         // this.CodeMibleTime=60
+      //         clearInterval(this.CodeMibleTimer);
+      //         if (this.crtOp === 'forget-pwd') {
+      //           this.CodeMibleTxt = '点击发送验证码';
+      //         }
+      //         this.regainShow = false;
+      //       } else {
+      //         this.CodeMibleTime--;
+      //         this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
+      //       }
+      //     }, 1000);
+      //   } else if (this.crtOp === 'forget-pwd') {
+      //     this.CodeMibleTxt = '点击发送验证码';
+      //     this.regainShow = true;
+      //     this.CodeMibleTime = 60;
+      //     // this.crtOp = 'inputSms';
+      //     // this.activeInput = 0;
+      //     // 获取短信验证码
+      //     // this.captchas = [
+      //     //   { num: '' },
+      //     //   { num: '' },
+      //     //   { num: '' },
+      //     //   { num: '' },
+      //     //   { num: '' },
+      //     //   { num: '' },
+      //     // ]
+      //   } else if (['验证码有效，请勿频繁发送'].includes(res.msg)) {
+      //     this.regainShow = true;
+      //     this.CodeMibleTime = 60;
+      //     if (this.crtOp === 'inputPhone') {
+      //       this.crtOp = 'inputSms';
+      //       this.activeInput = 0;
+      //       // 获取短信验证码
+      //       this.captchas = [
+      //         { num: '' },
+      //         { num: '' },
+      //         { num: '' },
+      //         { num: '' },
+      //         { num: '' },
+      //         { num: '' }
+      //       ];
+      //     }
+      //     this.CodeMibleTimer = setInterval(() => {
+      //       // eslint-disable-next-line
+      //       if (this.CodeMibleTime <= 0) {
+      //         this.regainShow = false;
+      //         clearInterval(this.CodeMibleTimer);
+      //         if (this.crtOp === 'forget-pwd') {
+      //           this.CodeMibleTxt = '点击发送验证码';
+      //         }
+      //       } else {
+      //         this.CodeMibleTime--;
+      //         this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
+      //       }
+      //     }, 1000);
+      //   } else if (['超出单日可使用上限'].includes(res.msg)) {
+      //     this.regainShow = true;
+      //     this.CodeMibleTime = 60;
+      //     if (this.crtOp === 'inputPhone') {
+      //       this.crtOp = 'inputSms';
+      //       this.activeInput = 0;
+      //       // 获取短信验证码
+      //       this.captchas = [
+      //         { num: '' },
+      //         { num: '' },
+      //         { num: '' },
+      //         { num: '' },
+      //         { num: '' },
+      //         { num: '' }
+      //       ];
+      //     }
+      //     this.CodeMibleTimer = setInterval(() => {
+      //       // eslint-disable-next-line
+      //       if (this.CodeMibleTime <= 0) {
+      //         this.regainShow = false;
+      //         clearInterval(this.CodeMibleTimer);
+      //         if (this.crtOp === 'forget-pwd') {
+      //           this.CodeMibleTxt = '点击发送验证码';
+      //         }
+      //       } else {
+      //         this.CodeMibleTime--;
+      //         this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
+      //       }
+      //     }, 1000);
+      //   }
+      // } catch {
+      //   if (['验证码有效，请勿频繁发送'].includes(res.msg)) {
+      //     this.CodeMibleTimer = setInterval(() => {
+      //       // eslint-disable-next-line
+      //       if (this.CodeMibleTime <= 0) {
+      //         this.regainShow = false;
+      //         clearInterval(this.CodeMibleTimer);
+      //         if (this.crtOp === 'forget-pwd') {
+      //           this.CodeMibleTxt = '点击发送验证码';
+      //         }
+      //       } else {
+      //         this.CodeMibleTime--;
+      //         this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
+      //       }
+      //     }, 1000);
+      //   }
+      // }
     },
     smsBack() {
       this.activeName = '手机号';
@@ -967,28 +962,28 @@ export default {
     // 忘记密码提交
     submit() {
       this.$message.success('当前只能用账号密码登录');
-      this.$refs['changePwdform'].validate(async valid => {
-        return;
-        if (valid) {
-          const data = {
-            code: this.changePwdform.code,
-            password: this.changePwdform.newPwd,
-            phone: this.changePwdform.phone,
-            mobile: this.changePwdform.phone
-          };
-          const res = await this.$http({
-            method: 'post',
-            url: this.$GLOBAL.uaa + 'user/update',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            data
-          });
-          if (res.success) {
-            this.$message.success('密码修改成功');
-            this.pwdBack();
-          }
-        }
+      this.$refs['changePwdform'].validate(async () => {
+        // return
+        // if (valid) {
+        //   const data = {
+        //     code: this.changePwdform.code,
+        //     password: this.changePwdform.newPwd,
+        //     phone: this.changePwdform.phone,
+        //     mobile: this.changePwdform.phone
+        //   };
+        //   const res = await this.$http({
+        //     method: 'post',
+        //     url: this.$GLOBAL.uaa + 'user/update',
+        //     headers: {
+        //       'Content-Type': 'application/json'
+        //     },
+        //     data
+        //   });
+        //   if (res.success) {
+        //     this.$message.success('密码修改成功');
+        //     this.pwdBack();
+        //   }
+        // }
       });
     },
     login() {
@@ -1025,8 +1020,8 @@ export default {
         }
       } catch (err) {
         if (
-          err.data.error_description ===
-          '账号已到期\n可输入您的诉求并申请延期，提交后需管理员审核！'
+          err.data.error_description
+          === '账号已到期\n可输入您的诉求并申请延期，提交后需管理员审核！'
         ) {
           _this.expirydialog = true;
           return;
@@ -1240,9 +1235,9 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(vm => {
       if (
-        from &&
-        !['login', 'loginAuto', 'microLogin'].includes(from.name) &&
-        from.fullPath !== '/'
+        from
+        && !['login', 'loginAuto', 'microLogin'].includes(from.name)
+        && from.fullPath !== '/'
       ) {
         vm.gohistory = from.name || true;
       }
