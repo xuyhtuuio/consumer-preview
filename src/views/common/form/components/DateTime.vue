@@ -14,21 +14,21 @@ import componentMinxins from '../ComponentMinxins'
 
 export default {
   mixins: [componentMinxins],
-  name: "DateTime",
+  name: 'DateTime',
   components: {},
-  props:{
-    format:{
+  props: {
+    format: {
       type: String,
       default: 'yyyy-MM-dd HH:mm'
     },
-    placeholder:{
+    placeholder: {
       type: String,
       default: '请选择日期时间'
     }
   },
-  computed:{
-    type(){
-      switch (this.format){
+  computed: {
+    type() {
+      switch (this.format) {
         case 'yyyy': return 'year';
         case 'yyyy-MM': return 'month';
         case 'yyyy-MM-dd': return 'date';

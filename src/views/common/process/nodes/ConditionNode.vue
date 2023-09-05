@@ -44,25 +44,24 @@
 </template>
 
 <script>
-import InsertButton from '@/views/common/InsertButton.vue'
-
+import InsertButton from '@/views/common/InsertButton'
 export default {
-  name: "ConditionNode",
-  components: {InsertButton},
-  props:{
-    config:{
+  name: 'ConditionNode',
+  components: { InsertButton },
+  props: {
+    config: {
       type: Object,
       default: () => {
         return {}
       }
     },
-    //索引位置
-    level:{
+    // 索引位置
+    level: {
       type: Number,
       default: 1
     },
-    //条件数
-    size:{
+    // 条件数
+    size: {
       type: Number,
       default: 0
     }
@@ -70,7 +69,7 @@ export default {
   data() {
     return {
       placeholder: '请设置条件',
-      errorInfo:'',
+      errorInfo: '',
       showError: false,
       content: ''
     }
@@ -95,8 +94,8 @@ export default {
     })
   },
   methods: {
-    //校验数据配置的合法性
-    validate(err){
+    // 校验数据配置的合法性
+    validate(err) {
       const map = {
         0: 'A',
         1: 'B',
@@ -127,7 +126,7 @@ export default {
     },
     setContent() {
       this.content = ''
-      this.config.props.groups.forEach((g, i) => {
+      this.config.props.groups.forEach((g) => {
         g.conditions.forEach(c => {
           if (c.value.length > 0) {
             this.content = '已设置'

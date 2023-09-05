@@ -7,17 +7,27 @@
     <div class="approval-center-box">
       <div class="data-statistics">
         <template v-for="(item, index) in dataStatistics">
-          <div v-if="showAllTask(item)" :key="index" @click="changeStatis(item)" :class="item.value !== crtSign
-            ? 'data-statistics-item'
-            : 'data-statistics-item active-item'
-            ">
+          <div
+            v-if="showAllTask(item)"
+            :key="index"
+            @click="changeStatis(item)"
+            :class="
+              item.value !== crtSign
+                ? 'data-statistics-item'
+                : 'data-statistics-item active-item'
+            "
+          >
             <div class="icon">
-              <img :src="item.value == crtSign ? item.activeIcon : item.icon"
-                :class="item.value == crtSign ? 'active-icon' : 'default-icon'">
+              <img
+                :src="item.value == crtSign ? item.activeIcon : item.icon"
+                :class="item.value == crtSign ? 'active-icon' : 'default-icon'"
+              />
             </div>
             <div class="name-count">
               <span class="name">{{ item.name }}</span>
-              <span class="count"><i>{{ item.count }}</i> 个</span>
+              <span class="count"
+                ><i>{{ item.count }}</i> 个</span
+              >
             </div>
           </div>
         </template>
@@ -26,178 +36,299 @@
         <div class="filters">
           <div class="filters-content">
             <div class="floor1">
-              <el-select v-model="search.approvalType" placeholder="审批事项类型" @change="changeArrrovalType" clearable>
-                <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
+              <el-select
+                v-model="search.approvalType"
+                placeholder="审批事项类型"
+                @change="changeArrrovalType"
+                clearable
+              >
+                <el-option
+                  v-for="(item, index) in transactionTypes"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
               </el-select>
               <!-- <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable>
                 <el-option v-for="(item, index) in approvalPhases" :key="index" :label="item.label"
                   :value="item.value"></el-option></el-select> -->
-              <el-select v-model="search.urgent" placeholder="是否加急" @change="searchList" clearable>
-                <el-option v-for="(item, index) in $field('isUrgent')" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
+              <el-select
+                v-model="search.urgent"
+                placeholder="是否加急"
+                @change="searchList"
+                clearable
+              >
+                <el-option
+                  v-for="(item, index) in $field('isUrgent')"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
               </el-select>
-              <el-cascader :options="agenciesList" placeholder="提单机构" ref="agencies" v-model="search.orgIds"
-                :show-all-levels="false" @change="changeAgencies"
-                :props="{ checkStrictly: true, label: 'name', value: 'id', children: 'children', }"
-                clearable></el-cascader>
-              <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @change="searchList" clearable>
-                <el-option v-for="(item, index) in $field('adoptionSituations')" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
+              <el-cascader
+                :options="agenciesList"
+                placeholder="提单机构"
+                ref="agencies"
+                v-model="search.orgIds"
+                :show-all-levels="false"
+                @change="changeAgencies"
+                :props="{
+                  checkStrictly: true,
+                  label: 'name',
+                  value: 'id',
+                  children: 'children'
+                }"
+                clearable
+              ></el-cascader>
+              <el-select
+                v-model="search.adoptionStatus"
+                placeholder="采纳情况"
+                @change="searchList"
+                clearable
+              >
+                <el-option
+                  v-for="(item, index) in $field('adoptionSituations')"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
               </el-select>
-              <el-select v-model="search.updateTime2" ref="multiSelect" multiple @change="changeSort" :class="search.updateTime2[1] == 'desc'
-                ? 'arrow-select descArrow'
-                : 'arrow-select ascArrow'
-                ">
-                <el-option-group v-for="group in $field('updateTimeGroup')" :key="group.label">
-                  <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value">
+              <el-select
+                v-model="search.updateTime2"
+                ref="multiSelect"
+                multiple
+                @change="changeSort"
+                :class="
+                  search.updateTime2[1] == 'desc'
+                    ? 'arrow-select descArrow'
+                    : 'arrow-select ascArrow'
+                "
+              >
+                <el-option-group
+                  v-for="group in $field('updateTimeGroup')"
+                  :key="group.label"
+                >
+                  <el-option
+                    v-for="item in group.options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
                   </el-option>
                 </el-option-group>
               </el-select>
-              <el-select v-model="search.returnSign" placeholder="驳回次数" @change="searchList" clearable>
-                <el-option v-for="(item, index) in $field('isReject')" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
+              <el-select
+                v-model="search.returnSign"
+                placeholder="驳回次数"
+                @change="searchList"
+                clearable
+              >
+                <el-option
+                  v-for="(item, index) in $field('isReject')"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
               </el-select>
-              <el-select v-model="search.onceAdopt" placeholder="一次通过" @change="searchList" clearable>
-                <el-option v-for="(item, index) in $field('isOncePass')" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
+              <el-select
+                v-model="search.onceAdopt"
+                placeholder="一次通过"
+                @change="searchList"
+                clearable
+              >
+                <el-option
+                  v-for="(item, index) in $field('isOncePass')"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
               </el-select>
-              <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @change="searchList" clearable>
-                <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
+              <el-select
+                v-model="search.hasOpinions"
+                placeholder="有/无实质意见"
+                @change="searchList"
+                clearable
+              >
+                <el-option
+                  v-for="(item, index) in $field('isOpinions')"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
               </el-select>
               <div class="el-select"></div>
               <div class="el-select"></div>
-
-
-
             </div>
             <div class="floor2">
               <div class="floor2-item">
-                <el-input v-model="search.keywords" placeholder="请输入任务名称/发起人关键词查询" clearable @clear="searchList"
-                  @keyup.enter.native="searchList">
-                  <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
+                <el-input
+                  v-model="search.keywords"
+                  placeholder="请输入任务名称/发起人关键词查询"
+                  clearable
+                  @clear="searchList"
+                  @keyup.enter.native="searchList"
+                >
+                  <i
+                    slot="suffix"
+                    class="el-input__icon el-icon-search pointer"
+                    @click="searchList"
+                  ></i>
                 </el-input>
               </div>
               <div class="floor2-item">
                 <span>发起时间</span>
-                <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
-                  value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间">
+                <el-date-picker
+                  v-model="search.startDate"
+                  type="daterange"
+                  @clear="searchList"
+                  @change="searchList"
+                  value-format="yyyy-MM-dd"
+                  range-separator="至"
+                  start-placeholder="开始时间"
+                  end-placeholder="结束时间"
+                >
                 </el-date-picker>
               </div>
               <div class="floor2-item">
                 <span>上线时间</span>
-                <el-date-picker v-model="search.productLaunchDate" value-format="yyyy-MM-dd" clearable type="daterange"
-                  range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" @clear="searchList"
-                  @change="searchList">
+                <el-date-picker
+                  v-model="search.productLaunchDate"
+                  value-format="yyyy-MM-dd"
+                  clearable
+                  type="daterange"
+                  range-separator="至"
+                  start-placeholder="开始时间"
+                  end-placeholder="结束时间"
+                  @clear="searchList"
+                  @change="searchList"
+                >
                 </el-date-picker>
               </div>
             </div>
           </div>
           <div class="export-reset">
-            <el-button type="text" v-show="crtSign === 'allTask' && showExport" @click="exportXlsx" :loading="downloadLoading">导出</el-button>
+            <el-button
+              type="text"
+              v-show="crtSign === 'allTask' && showExport"
+              @click="exportXlsx"
+              :loading="downloadLoading"
+              >导出</el-button
+            >
             <el-button type="text" @click="reset">重置</el-button>
           </div>
         </div>
         <div class="list" v-loading="search.loading">
           <div v-if="list.length">
             <div v-for="(item, index) in list" :key="index">
-              <approvalEventCard :item="item" @concern="concern" :crtSign="crtSign" @del="del"></approvalEventCard>
+              <approvalEventCard
+                :item="item"
+                @concern="concern"
+                :crtSign="crtSign"
+                @del="del"
+              ></approvalEventCard>
             </div>
-            <trs-pagination :total="search.total" @getList='getList' :pageNow="pageNow"></trs-pagination>
+            <trs-pagination
+              :total="search.total"
+              @getList="getList"
+              :pageNow="pageNow"
+            ></trs-pagination>
           </div>
           <div v-loading="search.loading" v-else>
             <Empty></Empty>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 </template>
 <script>
-import approvalEventCard from "@/components/card/approval-event-card";
+import approvalEventCard from '@/components/card/approval-event-card'
 import {
   getDataStatistics,
   getApprovalType,
   getApprovalStage,
   getApprovalListStation,
   exportApprovalList
-} from "@/api/approvalCenter";
-import { expordFile } from '@/utils/utils'
+} from '@/api/approvalCenter'
 import { queryUserList } from '@/api/org'
 export default {
   components: {
-    approvalEventCard,
+    approvalEventCard
   },
   name: 'approval-center-index',
   data() {
     return {
-      crtSign: "toPending",
+      crtSign: 'toPending',
       pageNow: 1,
       downloadLoading: false,
       // 待审批：pendingApproval 已审批：approvedCount 关注：applyAll 待修改：toModified 全部任务（本分行）：allTasksThis 总行的任务个数：allTasksOffice 驳回单的个数：overrule
       dataStatistics: [
         {
-          name: "待处理",
+          name: '待处理',
           count: 0,
-          value: "toPending",
+          value: 'toPending',
           icon: require('@/assets/image/apply-center/wait-review.svg'),
           activeIcon: require('@/assets/image/apply-center/wait-review-active.svg'),
           show: true
         },
         {
-          name: "已审批",
+          name: '已审批',
           count: 0,
-          value: "approvedCount",
+          value: 'approvedCount',
           icon: require('@/assets/image/apply-center/approved.svg'),
           activeIcon: require('@/assets/image/apply-center/approved-active.svg'),
           show: true
         },
         {
-          name: "我的关注",
+          name: '我的关注',
           count: 0,
-          value: "applyAll",
+          value: 'applyAll',
           icon: require('@/assets/image/apply-center/my-attention.svg'),
           activeIcon: require('@/assets/image/apply-center/my-attention-active.svg'),
           show: true
         },
         {
-          name: "全部任务",
+          name: '全部任务',
           count: 0,
-          value: "allTask",
+          value: 'allTask',
           icon: require('@/assets/image/apply-center/all-attention.svg'),
           activeIcon: require('@/assets/image/apply-center/all-attention.svg'),
           show: false
-        },
+        }
       ],
       search: {
-        approvalType: "",
-        approvalStage: "",
-        urgent: "",
-        hasOpinions: "",
-        adoptionStatus: "",
-        updateTime: [2, "desc"],
-        updateTime2: [2, "desc"],
-        keywords: "",
+        approvalType: '',
+        approvalStage: '',
+        urgent: '',
+        hasOpinions: '',
+        adoptionStatus: '',
+        updateTime: [2, 'desc'],
+        updateTime2: [2, 'desc'],
+        keywords: '',
         startDate: [],
         productLaunchDate: [],
         total: 0,
         loading: false,
-        orgIds: [],
+        orgIds: []
       },
       agenciesList: [],
       transactionTypes: [],
       approvalPhases: [],
-      tipsMsg: "",
-      list: [],
-    };
+      tipsMsg: '',
+      list: []
+    }
   },
   computed: {
     allTask() {
       const { permissionsPage = {} } = this.$store.state
-      const approvalcenter = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(item => item.pathName === 'approval-list') || {}
-      const isExsit = approvalcenter.child?.find(item => (item.name === '全部任务') && item.type)
+      // eslint-disable-next-line
+      const approvalcenter =
+        [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(
+          (item) => item.pathName === 'approval-list'
+        ) || {}
+      const isExsit = approvalcenter.child?.find(
+        (item) => item.name === '全部任务' && item.type
+      )
       if (isExsit) {
         return true
       }
@@ -205,8 +336,14 @@ export default {
     },
     showExport() {
       const { permissionsPage = {} } = this.$store.state
-      const approvalcenter = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(item => item.pathName === 'approval-list') || {}
-      const isExsit = approvalcenter.child?.find(item => (item.name === '全部任务') && item.type === 'export')
+      // eslint-disable-next-line
+      const approvalcenter =
+        [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(
+          (item) => item.pathName === 'approval-list'
+        ) || {}
+      const isExsit = approvalcenter.child?.find(
+        (item) => item.name === '全部任务' && item.type === 'export'
+      )
       if (isExsit) {
         return true
       }
@@ -223,34 +360,33 @@ export default {
     }
   },
   mounted() {
-    let dom = document
-      .querySelectorAll(".arrow-select")[0]
-      .querySelector(".el-select__tags");
+    const dom = document
+      .querySelectorAll('.arrow-select')[0]
+      .querySelector('.el-select__tags')
     this.$nextTick(() => {
-      const text = this.search.updateTime[0] == 1 ? "发起时间" : "更新时间";
-      dom.innerText = text;
-    });
-    this.userStatus();
-    this.getApprovalType();
-    this.queryUserList();
-    this.searchList();
-
+      const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间'
+      dom.innerText = text
+    })
+    this.userStatus()
+    this.getApprovalType()
+    this.queryUserList()
+    this.searchList()
   },
   watch: {
     $route(to, from) {
       // 从审批页来, 刷新当前页码的数据且  跳转到审批页面
       if (from.name === 'aiApproval' && to.name === 'approval-list') {
-        this.getList(this.pageNow);
+        this.getList(this.pageNow)
       }
     }
   },
   created() {
-    this.getDataStatistic();
+    this.getDataStatistic()
   },
   methods: {
     changeAgencies() {
-      this.$refs["agencies"].dropDownVisible = false;
-      this.searchList();
+      this.$refs['agencies'].dropDownVisible = false
+      this.searchList()
     },
     userStatus() {
       // getUserStatus()
@@ -272,12 +408,12 @@ export default {
             name: userInfo.fullname
           }
         }
-      };
-      getDataStatistics(param).then(res => {
+      }
+      getDataStatistics(param).then((res) => {
         const { data } = res.data
-        for (let i in data) {
-          this.dataStatistics.forEach(v => {
-            if (v.value == i) {
+        for (const i in data) {
+          this.dataStatistics.forEach((v) => {
+            if (v.value === i) {
               v.count = data[i]
             }
           })
@@ -286,37 +422,37 @@ export default {
     },
     concern() {
       this.getDataStatistic()
-      this.searchList();
+      this.searchList()
     },
-    del(id) {
-      const param = {
-        recordId: id,
-      };
-      delApplication(param).then((res) => {
-        if (res.status === 200) {
-          this.$message.success("删除成功");
-          this.getDataStatistic()
-          this.getApplicationListAll(1);
-        }
-      });
+    del() {
+      // const param = {
+      //   recordId: id
+      // }
+      // delApplication(param).then((res) => {
+      //   if (res.status === 200) {
+      //     this.$message.success('删除成功')
+      //     this.getDataStatistic()
+      //     this.getApplicationListAll(1)
+      //   }
+      // })
     },
     getApprovalType() {
       getApprovalType().then((res) => {
         this.transactionTypes = res.data.data.map((v) => {
           return {
             label: v.examineTypesName,
-            value: v.recordId,
-          };
-        });
-      });
+            value: v.recordId
+          }
+        })
+      })
     },
     exportXlsx() {
-      let listType = null;
+      let listType = null
       const typeList = {
         toPending: '1',
         approvedCount: '2',
         applyAll: '3',
-        allTask: '4',
+        allTask: '4'
       }
       listType = typeList[this.crtSign]
       const param = {
@@ -326,27 +462,44 @@ export default {
         listType,
         nodeid: this.search.approvalStage,
         orgIds: this.search.orgIds.length ? this.search.orgIds : null,
-        createTimeStart: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[0] + ' 00:00:00' : '',
-        createTimeEnd: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[1] + ' 00:00:00' : '',
-        productLaunchDateStart: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[0] + ' 00:00:00' : '',
-        productLaunchDateEnd: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[1] + ' 00:00:00' : '',
-      };
-      let sortType = "";
+        createTimeStart:
+          this.search.startDate && this.search.startDate.length > 0
+            ? this.search.startDate[0] + ' 00:00:00'
+            : '',
+        createTimeEnd:
+          this.search.startDate && this.search.startDate.length > 0
+            ? this.search.startDate[1] + ' 00:00:00'
+            : '',
+
+        productLaunchDateStart:
+          // eslint-disable-next-line
+          this.search.productLaunchDate &&
+          this.search.productLaunchDate.length > 0
+            ? this.search.productLaunchDate[0] + ' 00:00:00'
+            : '',
+        productLaunchDateEnd:
+          // eslint-disable-next-line
+          this.search.productLaunchDate &&
+          this.search.productLaunchDate.length > 0
+            ? this.search.productLaunchDate[1] + ' 00:00:00'
+            : ''
+      }
+      let sortType = ''
       // desc:降序 asc 升序 1 发起时间 2 更新时间
       // 1：创建时间：升序 2：创建时间：降序 3：更新时间：升序 4：更新时间：降序
-      if (this.search.updateTime2[0] == 1) {
-        sortType = this.search.updateTime2[1] == "desc" ? 2 : 1;
-      } else if (this.search.updateTime2[0] == 2) {
-        sortType = this.search.updateTime2[1] == "desc" ? 4 : 3;
+      if (this.search.updateTime2[0] === 1) {
+        sortType = this.search.updateTime2[1] === 'desc' ? 2 : 1
+      } else if (this.search.updateTime2[0] === 2) {
+        sortType = this.search.updateTime2[1] === 'desc' ? 4 : 3
       }
-      param.sort = sortType;
-      Reflect.deleteProperty(param, "updateTime");
-      Reflect.deleteProperty(param, "updateTime2");
-      Reflect.deleteProperty(param, "total");
-      Reflect.deleteProperty(param, "loading");
-      Reflect.deleteProperty(param, "productLaunchDate");
-      Reflect.deleteProperty(param, "startDate");
-      this.search.loading = true;
+      param.sort = sortType
+      Reflect.deleteProperty(param, 'updateTime')
+      Reflect.deleteProperty(param, 'updateTime2')
+      Reflect.deleteProperty(param, 'total')
+      Reflect.deleteProperty(param, 'loading')
+      Reflect.deleteProperty(param, 'productLaunchDate')
+      Reflect.deleteProperty(param, 'startDate')
+      this.search.loading = true
       const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
       const taskDTO = {
         pageNo: 0,
@@ -356,39 +509,48 @@ export default {
           name: userInfo.fullname
         }
       }
+      // eslint-disable-next-line
       const wait_param = {
         ...param,
         taskDTO
       }
       this.downloadLoading = true
-      exportApprovalList(wait_param).then(res => {
-        // expordFile(res)
-        this.downloadLoading = false
-        let url = window.URL.createObjectURL(new Blob([res.data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;" }))
-        let link = document.createElement("a")
-        link.style.display = "none"
-        link.href = url
-        link.setAttribute('download', '消保审核单.xlsx')
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-      }).catch(err => {
-        this.downloadLoading = false
-      })
+      exportApprovalList(wait_param)
+        .then((res) => {
+          // expordFile(res)
+          this.downloadLoading = false
+          const url = window.URL.createObjectURL(
+            new Blob([res.data], {
+              type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;'
+            })
+          )
+          const link = document.createElement('a')
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', '消保审核单.xlsx')
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        })
+        .catch(() => {
+          this.downloadLoading = false
+        })
     },
     getApprovalStage() {
-      let params = {
-        form_management_id: this.search.approvalType,
-      };
+      const params = {
+        form_management_id: this.search.approvalType
+      }
       getApprovalStage(params).then((res) => {
         const { data } = res.data
-        this.approvalPhases = data ? data.map((v) => {
-          return {
-            label: v,
-            value: v,
-          };
-        }) : []
-      });
+        this.approvalPhases = data
+          ? data.map((v) => {
+            return {
+              label: v,
+              value: v
+            }
+          })
+          : []
+      })
     },
     changeArrrovalType() {
       // if (this.search.approvalType || this.search.approvalType == 0) {
@@ -397,39 +559,41 @@ export default {
       //   this.search.approvalStage = "";
       //   this.approvalPhases = [];
       // }
-      this.searchList();
+      this.searchList()
     },
     changeStatis(item) {
-      if (item.value == this.crtSign) return;
-      this.crtSign = item.value;
-      this.searchList();
+      if (item.value === this.crtSign) return
+      this.crtSign = item.value
+      this.searchList()
     },
     changeSort() {
+      // eslint-disable-next-line
       const lastKey =
-        this.search.updateTime2[this.search.updateTime2.length - 1];
+        this.search.updateTime2[this.search.updateTime2.length - 1]
       if (this.search.updateTime2.length < 2) {
-        this.search.updateTime2 = this.search.updateTime;
+        this.search.updateTime2 = this.search.updateTime
       } else {
+        // eslint-disable-next-line
         if (!isNaN(lastKey)) {
-          this.search.updateTime[0] = lastKey;
+          this.search.updateTime[0] = lastKey
         } else {
-          this.search.updateTime[1] = lastKey;
+          this.search.updateTime[1] = lastKey
         }
         this.$nextTick(() => {
-          this.search.updateTime2 = this.search.updateTime;
-        });
+          this.search.updateTime2 = this.search.updateTime
+        })
       }
-      let dom = document
-        .querySelectorAll(".arrow-select")[0]
-        .querySelector(".el-select__tags");
+      const dom = document
+        .querySelectorAll('.arrow-select')[0]
+        .querySelector('.el-select__tags')
       this.$nextTick(() => {
-        const text = this.search.updateTime[0] == 1 ? "发起时间" : "更新时间";
-        dom.innerText = text;
+        const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间'
+        dom.innerText = text
         setTimeout(() => {
-          this.$refs.multiSelect.blur();
-        }, 50);
-        this.searchList();
-      });
+          this.$refs.multiSelect.blur()
+        }, 50)
+        this.searchList()
+      })
     },
     resize() {
       // let floor2 = document.querySelectorAll(".approval-center  .floor2")[0];
@@ -438,37 +602,37 @@ export default {
       //   : "";
     },
     searchList() {
-      this.getList(1);
+      this.getList(1)
     },
     queryUserList() {
       queryUserList().then((res) => {
         const { root } = res.data.data
         if (root) {
-          this.agenciesList = root.children.map(item => {
+          this.agenciesList = root.children.map((item) => {
             return {
               ...item,
               children: null,
               id: item.id,
-              name: item.name,
+              name: item.name
             }
           })
         }
-      });
+      })
     },
     getList(pageNow) {
       this.$refs['box'].scrollTo({
         top: 0,
-        behavior: "smooth"
+        behavior: 'smooth'
       })
-      let listType = null;
+      let listType = null
       const typeList = {
         toPending: '1',
         approvedCount: '2',
         applyAll: '3',
-        allTask: '4',
+        allTask: '4'
       }
       listType = typeList[this.crtSign]
-      this.pageNow = pageNow;
+      this.pageNow = pageNow
       const param = {
         pageNow,
         pageSize: 10,
@@ -477,27 +641,39 @@ export default {
         formManagementId: this.search.approvalType,
         nodeid: this.search.approvalStage,
         orgIds: this.search.orgIds.length ? this.search.orgIds : null,
-        createTimeStart: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[0] + ' 00:00:00' : '',
-        createTimeEnd: this.search.startDate && this.search.startDate.length > 0 ? this.search.startDate[1] + ' 23:59:59' : '',
-        productLaunchDateStart: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[0] + ' 00:00:00' : '',
-        productLaunchDateEnd: this.search.productLaunchDate && this.search.productLaunchDate.length > 0 ? this.search.productLaunchDate[1] + ' 23:59:59' : '',
-      };
-      let sortType = "";
+        createTimeStart:
+          this.search.startDate && this.search.startDate.length > 0
+            ? this.search.startDate[0] + ' 00:00:00'
+            : '',
+        createTimeEnd:
+          this.search.startDate && this.search.startDate.length > 0
+            ? this.search.startDate[1] + ' 23:59:59'
+            : '',
+        productLaunchDateStart:
+          this.search.productLaunchDate && this.search.productLaunchDate.length > 0
+            ? this.search.productLaunchDate[0] + ' 00:00:00'
+            : '',
+        productLaunchDateEnd:
+          this.search.productLaunchDate && this.search.productLaunchDate.length > 0
+            ? this.search.productLaunchDate[1] + ' 23:59:59'
+            : ''
+      }
+      let sortType = ''
       // desc:降序 asc 升序 1 发起时间 2 更新时间
       // 1：创建时间：升序 2：创建时间：降序 3：更新时间：升序 4：更新时间：降序
-      if (this.search.updateTime2[0] == 1) {
-        sortType = this.search.updateTime2[1] == "desc" ? 2 : 1;
-      } else if (this.search.updateTime2[0] == 2) {
-        sortType = this.search.updateTime2[1] == "desc" ? 4 : 3;
+      if (this.search.updateTime2[0] === 1) {
+        sortType = this.search.updateTime2[1] === 'desc' ? 2 : 1
+      } else if (this.search.updateTime2[0] === 2) {
+        sortType = this.search.updateTime2[1] === 'desc' ? 4 : 3
       }
-      param.sort = sortType;
-      Reflect.deleteProperty(param, "updateTime");
-      Reflect.deleteProperty(param, "updateTime2");
-      Reflect.deleteProperty(param, "total");
-      Reflect.deleteProperty(param, "loading");
-      Reflect.deleteProperty(param, "productLaunchDate");
-      Reflect.deleteProperty(param, "startDate");
-      this.search.loading = true;
+      param.sort = sortType
+      Reflect.deleteProperty(param, 'updateTime')
+      Reflect.deleteProperty(param, 'updateTime2')
+      Reflect.deleteProperty(param, 'total')
+      Reflect.deleteProperty(param, 'loading')
+      Reflect.deleteProperty(param, 'productLaunchDate')
+      Reflect.deleteProperty(param, 'startDate')
+      this.search.loading = true
       const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
       const taskDTO = {
         pageNo: 0,
@@ -507,71 +683,82 @@ export default {
           name: userInfo.fullname
         }
       }
+      // eslint-disable-next-line
       const wait_param = {
         ...param,
         taskDTO
       }
-      getApprovalListStation(wait_param).then(res => {
-        const { data } = res.data;
-        this.search.total = data.totalCount;
-        const flag = Array.isArray(data.list)
-        this.list = flag && data.list.length > 0 ? data.list.map(v => {
-          return {
-            ...v,
-            taskNumber: v.recordId + '',
-            taskName: v.entryName,
-            initiator: { ...v.originator, label: v.institutional && v.institutional[1] },
-            taskStatus: v.nodeStatus
-          }
-        }) : [];
-        this.search.loading = false;
-      }).catch(err => {
-        this.search.loading = false
-        this.search.total = 0
-        this.list = []
-      })
+      getApprovalListStation(wait_param)
+        .then((res) => {
+          const { data } = res.data
+          this.search.total = data.totalCount
+          const flag = Array.isArray(data.list)
+          this.list = flag && data.list.length > 0
+            ? data.list.map((v) => {
+              return {
+                ...v,
+                taskNumber: v.recordId + '',
+                taskName: v.entryName,
+                initiator: {
+                  ...v.originator,
+                  label: v.institutional && v.institutional[1]
+                },
+                taskStatus: v.nodeStatus
+              }
+            })
+            : []
+          this.search.loading = false
+        })
+        .catch(() => {
+          this.search.loading = false
+          this.search.total = 0
+          this.list = []
+        })
     },
     taskStatusSwitch(val) {
       let status = ''
+      // eslint-disable-next-line
       switch (val) {
         case '待修改':
-          status = '2';
-          break;
+          status = '2'
+          break
         case '审查中':
-          status = '1';
-          break;
+          status = '1'
+          break
         case '待确认':
           status = '3';
+          break;
+        default:
           break;
       }
       return status
     },
     reset() {
       this.search = {
-        approvalType: "",
-        approvalStage: "",
-        urgent: "",
-        hasOpinions: "",
-        adoptionSituation: "",
-        updateTime: [1, "asc"],
-        updateTime2: [1, "asc"],
-        keywords: "",
+        approvalType: '',
+        approvalStage: '',
+        urgent: '',
+        hasOpinions: '',
+        adoptionSituation: '',
+        updateTime: [1, 'asc'],
+        updateTime2: [1, 'asc'],
+        keywords: '',
         startDate: [],
         productLaunchDate: [],
         total: 0,
         loading: false,
-        orgIds: [],
-      };
-      this.approvalPhases = [];
-      this.searchList();
-    },
+        orgIds: []
+      }
+      this.approvalPhases = []
+      this.searchList()
+    }
   },
   beforeRouteEnter(to, from, next) {
     next(() => {
       localStorage.removeItem('order-detail')
     })
-  },
-};
+  }
+}
 </script>
 <style lang="less" scoped>
 .approval-center {
@@ -689,7 +876,6 @@ export default {
 
     .active-item {
       .icon {
-
         .active-icon,
         .default-icon {
           position: absolute;
@@ -732,14 +918,15 @@ export default {
       font-weight: 700;
       line-height: 22px;
       /* 157.143% */
-      background: linear-gradient(90deg,
+      background: linear-gradient(
+        90deg,
         rgba(123, 97, 255, 0.15) 0%,
-        rgba(97, 160, 255, 0.15) 100%);
+        rgba(97, 160, 255, 0.15) 100%
+      );
     }
   }
 
   .apply-content {
-
     margin-top: 16px;
   }
 
@@ -749,7 +936,6 @@ export default {
     justify-content: space-between;
 
     .filters-content {
-
       display: flex;
       flex-direction: column;
       flex: 1;
@@ -770,7 +956,6 @@ export default {
       }
 
       .floor1 {
-
         // padding-right: 16px;
         display: flex;
         justify-content: space-between;
@@ -791,12 +976,12 @@ export default {
 
         /deep/ .el-cascader .el-input .el-icon-arrow-down::before {
           font-family: element-icons !important;
-          content: "\e790";
+          content: '\e790';
         }
 
         /deep/ .el-select .el-input .el-icon-arrow-up::before {
           font-family: element-icons !important;
-          content: "\e78f";
+          content: '\e78f';
         }
 
         .descArrow,
@@ -808,11 +993,10 @@ export default {
             display: none !important;
           }
 
-
           &::before {
             display: none;
             font-family: element-icons !important;
-            content: "\e6e6";
+            content: '\e6e6';
             display: inline-block;
             position: absolute;
             top: 50%;
@@ -842,7 +1026,7 @@ export default {
         .descArrow {
           &::before {
             font-family: element-icons !important;
-            content: "\e6eb";
+            content: '\e6eb';
             display: inline-block;
             position: absolute;
             top: 50%;
@@ -872,21 +1056,18 @@ export default {
           }
 
           span {
-            color: #86909C;
+            color: #86909c;
             font-size: 14px;
             font-weight: 400;
             line-height: 22px;
             word-break: keep-all;
             margin-right: 8px;
-
           }
-
         }
 
         .floor2-item:last-of-type {
           margin-right: 0;
         }
-
 
         /deep/.el-range-editor {
           position: relative;
@@ -901,7 +1082,7 @@ export default {
 
           .el-icon-time::before {
             font-family: element-icons !important;
-            content: "\e78e";
+            content: '\e78e';
           }
 
           .el-input__suffix {
@@ -933,6 +1114,4 @@ export default {
       }
     }
   }
-}
-</style>
-
+}</style>

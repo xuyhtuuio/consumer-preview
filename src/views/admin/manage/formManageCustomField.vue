@@ -60,403 +60,402 @@
   </div>
 </template>
 <script>
-  import { debounce } from 'lodash';
-  import { belongModules } from '@/utils/dict'
-  import { addFormField, editItem } from '@/api/manage'
-  import CascaderField from './cascaderField'
-  import SelectField from './selectField'
-  import SelectGroupField from './selectGroupField'
-  import { getTreeId } from '@/utils/utils'
-  export default {
-    components: {
-      CascaderField,
-      SelectField,
-      SelectGroupField
-    },
-    props: {
-      drawerTitle: String,
-      feildTypes: Array,
-      isView: Boolean
-    },
-    data() {
-      return {
-        ruleForm: {
-          title: '',
-          module: '',
-          required: false,
-          placeholder: '',
-          name: '',
-          exclusiveRowOrNot: false,
-          numberOfWords: null,
-          options: [],
-          expanding: false,
-          isMultiple: false,
-          dateFormat: 'yyyy-MM-dd HH:mm:ss'
-        },
-        rules: {
-          title: [
-            { required: true, message: '请输入字段名称', trigger: 'blur' },
-            { min: 2, max: 6, message: '长度在 2 到 6 个字符', trigger: 'blur' }
-          ],
-          module: [
-            { required: true, message: '请选择所属模块', trigger: 'change' }
-          ],
-          name: [
-            { required: true, message: '请选择字段类型', trigger: 'change' }
-          ],
-          dateFormat: [
-            { required: true, message: '请选择时间格式', trigger: 'change' }
-          ]
-        },
-        belongModules,
-        cascaderOptions: [
-          {
-            id: getTreeId('cascader'),
-            value: '',
-            children: []
-          }
+import { debounce } from 'lodash';
+import { belongModules } from '@/utils/dict'
+import { addFormField, editItem } from '@/api/manage'
+import { getTreeId } from '@/utils/utils'
+import CascaderField from './cascaderField'
+import SelectField from './selectField'
+import SelectGroupField from './selectGroupField'
+export default {
+  components: {
+    CascaderField,
+    SelectField,
+    SelectGroupField
+  },
+  props: {
+    drawerTitle: String,
+    feildTypes: Array,
+    isView: Boolean
+  },
+  data() {
+    return {
+      ruleForm: {
+        title: '',
+        module: '',
+        required: false,
+        placeholder: '',
+        name: '',
+        exclusiveRowOrNot: false,
+        numberOfWords: null,
+        options: [],
+        expanding: false,
+        isMultiple: false,
+        dateFormat: 'yyyy-MM-dd HH:mm:ss'
+      },
+      rules: {
+        title: [
+          { required: true, message: '请输入字段名称', trigger: 'blur' },
+          { min: 2, max: 6, message: '长度在 2 到 6 个字符', trigger: 'blur' }
         ],
-        selectOptions: [{
-          id: getTreeId('select'),
-          value: ''
-        }],
-        selectGroupOptions: [{
-          id: getTreeId('selectGroup'),
-          value: '组1',
-          showInput: false,
-          children: [{
-            id: getTreeId('selectGroup'),
-            value: ''
-          }]
-        }],
-        currentRow: {},
-        parentForm: {}
-      };
-    },
-    computed: {
-      viewDisable() {
-        return this.isView || this.currentRow.isView
+        module: [
+          { required: true, message: '请选择所属模块', trigger: 'change' }
+        ],
+        name: [
+          { required: true, message: '请选择字段类型', trigger: 'change' }
+        ],
+        dateFormat: [
+          { required: true, message: '请选择时间格式', trigger: 'change' }
+        ]
       },
-      titleDisable() {
-        const arr = ['宣传渠道', '项目名称', '上线时间', '下线时间']
-        return arr.includes(this.ruleForm.title)
-      },
-      nameDisable() {
-        return this.titleDisable
-      },
-      nameOptionDisable() {
-        return (name) => {
-          const arr = ['MultipleSelect', 'SingleGroupsSelect']
-          const jude1 = !arr.includes(name) && this.ruleForm.module === '核对要点'
-          const jude2 = (this.ruleForm.module !== '核对要点') && name === 'SingleGroupsSelect'
-          return jude1 || jude2
-          
+      belongModules,
+      cascaderOptions: [
+        {
+          id: getTreeId('cascader'),
+          value: '',
+          children: []
         }
-      },
-      isSingleGroupsSelect() {
-        return this.ruleForm.name === 'SingleGroupsSelect'
-      },
-      isMultipleGroupsSelect() {
-        return this.ruleForm.name === 'MultipleGroupsSelect'
-      },
-      moudleDisable() {
-        return this.isMultipleGroupsSelect || this.titleDisable
-      },
-      expandingDisable() {
-        return this.isMultipleGroupsSelect || this.isSingleGroupsSelect || this.ruleForm.module === '核对要点'
-      },
-      showExpanding() {
-        const arr = ['SelectInput', 'MultipleSelect', 'MultipleGroupsSelect', 'SingleGroupsSelect']
-        return arr.includes(this.ruleForm.name)
-      },
-      isRequired() {
-        return (this.titleDisable || this.expandingDisable) && this.ruleForm.title !== '下线时间'
+      ],
+      selectOptions: [{
+        id: getTreeId('select'),
+        value: ''
+      }],
+      selectGroupOptions: [{
+        id: getTreeId('selectGroup'),
+        value: '组1',
+        showInput: false,
+        children: [{
+          id: getTreeId('selectGroup'),
+          value: ''
+        }]
+      }],
+      currentRow: {},
+      parentForm: {}
+    };
+  },
+  computed: {
+    viewDisable() {
+      return this.isView || this.currentRow.isView
+    },
+    titleDisable() {
+      const arr = ['宣传渠道', '项目名称', '上线时间', '下线时间']
+      return arr.includes(this.ruleForm.title)
+    },
+    nameDisable() {
+      return this.titleDisable
+    },
+    nameOptionDisable() {
+      return (name) => {
+        const arr = ['MultipleSelect', 'SingleGroupsSelect']
+        const jude1 = !arr.includes(name) && this.ruleForm.module === '核对要点'
+        const jude2 = (this.ruleForm.module !== '核对要点') && name === 'SingleGroupsSelect'
+        return jude1 || jude2
       }
     },
-    methods: {
-      resetOptions() {
-        this.selectOptions = this.$options.data().selectOptions
-        this.selectGroupOptions = this.$options.data().selectGroupOptions
-        this.cascaderOptions = this.$options.data().cascaderOptions
-      },
-      setOptions(name, options) {
-        if (name === 'MultipleGroupsSelect' || name === 'SingleGroupsSelect' ) {
-          this.selectGroupOptions = options
-        } else if (name === 'Cascader') {
-          this.cascaderOptions = options
-        } else {
-          this.selectOptions = options
+    isSingleGroupsSelect() {
+      return this.ruleForm.name === 'SingleGroupsSelect'
+    },
+    isMultipleGroupsSelect() {
+      return this.ruleForm.name === 'MultipleGroupsSelect'
+    },
+    moudleDisable() {
+      return this.isMultipleGroupsSelect || this.titleDisable
+    },
+    expandingDisable() {
+      return this.isMultipleGroupsSelect || this.isSingleGroupsSelect || this.ruleForm.module === '核对要点'
+    },
+    showExpanding() {
+      const arr = ['SelectInput', 'MultipleSelect', 'MultipleGroupsSelect', 'SingleGroupsSelect']
+      return arr.includes(this.ruleForm.name)
+    },
+    isRequired() {
+      return (this.titleDisable || this.expandingDisable) && this.ruleForm.title !== '下线时间'
+    }
+  },
+  methods: {
+    resetOptions() {
+      this.selectOptions = this.$options.data().selectOptions
+      this.selectGroupOptions = this.$options.data().selectGroupOptions
+      this.cascaderOptions = this.$options.data().cascaderOptions
+    },
+    setOptions(name, options) {
+      if (name === 'MultipleGroupsSelect' || name === 'SingleGroupsSelect') {
+        this.selectGroupOptions = options
+      } else if (name === 'Cascader') {
+        this.cascaderOptions = options
+      } else {
+        this.selectOptions = options
+      }
+    },
+    initForm(form, row) {
+      this.parentForm = form;
+      if (row) {
+        this.currentRow = JSON.parse(JSON.stringify(row))
+        this.$set(this.ruleForm, 'title', this.currentRow.title)
+        this.$set(this.ruleForm, 'module', this.currentRow.module)
+        this.$set(this.ruleForm, 'name', this.currentRow.special.name)
+        this.$set(this.ruleForm, 'required', Boolean(this.currentRow.special.props.required))
+        this.$set(this.ruleForm, 'isMultiple', Boolean(this.currentRow.special.props.multiple))
+        this.$set(this.ruleForm, 'expanding', Boolean(this.currentRow.special.props.expanding))
+        this.$set(this.ruleForm, 'placeholder', this.currentRow.special.props.placeholder)
+        this.$set(this.ruleForm, 'numberOfWords', this.currentRow.special.props.numberOfWords)
+        this.$set(this.ruleForm, 'exclusiveRowOrNot', this.currentRow.special.props.exclusiveRowOrNot)
+        if (this.currentRow.special.name && this.currentRow.special.props.options) {
+          this.setOptions(this.currentRow.special.name, this.currentRow.special.props.options)
         }
-      },
-      initForm(form, row) {
-        this.parentForm = form;
-        if (row) {
-          this.currentRow = JSON.parse(JSON.stringify(row))
-          this.$set(this.ruleForm, 'title', this.currentRow.title)
-          this.$set(this.ruleForm, 'module', this.currentRow.module)
-          this.$set(this.ruleForm, 'name', this.currentRow.special.name)
-          this.$set(this.ruleForm, 'required', Boolean(this.currentRow.special.props.required))
-          this.$set(this.ruleForm, 'isMultiple', Boolean(this.currentRow.special.props.multiple))
-          this.$set(this.ruleForm, 'expanding', Boolean(this.currentRow.special.props.expanding))
-          this.$set(this.ruleForm, 'placeholder', this.currentRow.special.props.placeholder)
-          this.$set(this.ruleForm, 'numberOfWords', this.currentRow.special.props.numberOfWords)
-          this.$set(this.ruleForm, 'exclusiveRowOrNot', this.currentRow.special.props.exclusiveRowOrNot)
-          if (this.currentRow.special.name && this.currentRow.special.props.options) {
-            this.setOptions(this.currentRow.special.name, this.currentRow.special.props.options)
-          }
-        } else {
-          this.currentRow = {}
-          this.ruleForm = this.$options.data().ruleForm
-        }
-        this.$nextTick(() => {
-          this.$refs['ruleForm'].clearValidate()
-        })
-      },
-      changeModule(val) {
-        if (val === '核对要点') {
-          this.$set(this.ruleForm, 'name', 'MultipleSelect')
-          this.$set(this.ruleForm, 'expanding', true)
-          this.$set(this.ruleForm, 'required', true)
-        } else {
-          this.$set(this.ruleForm, 'name', '')
-        }
-        this.$refs['ruleForm'].clearValidate() 
-      },
-      changeFiledType(val) {
-        if (val === 'MultipleGroupsSelect') {
-          this.$set(this.ruleForm, 'title', '宣传渠道')
-          this.$set(this.ruleForm, 'module', '基本信息')
-          this.$set(this.ruleForm, 'expanding', true)
-          this.$set(this.ruleForm, 'required', true)
-        } else if (val === 'SingleGroupsSelect') {
-          this.$set(this.ruleForm, 'module', '核对要点')
-          this.$set(this.ruleForm, 'expanding', true)
-          this.$set(this.ruleForm, 'required', true)
-        } else {
-          this.$set(this.ruleForm, 'expanding', false)
-        }
-        if (this.ruleForm.module === '核对要点' && this.ruleForm.name === 'MultipleSelect') {
-          this.$set(this.ruleForm, 'expanding', true)
-          this.$set(this.ruleForm, 'required', true)
-        }
-        this.$refs['ruleForm'].clearValidate() 
-      },
-      addSelectOptions() {
-        this.selectOptions.push({
-          id: getTreeId('select'),
-          value: ''
-        })
-      },
-      addSelectGroupOptions() {
-        this.selectGroupOptions.push({
+      } else {
+        this.currentRow = {}
+        this.ruleForm = this.$options.data().ruleForm
+      }
+      this.$nextTick(() => {
+        this.$refs['ruleForm'].clearValidate()
+      })
+    },
+    changeModule(val) {
+      if (val === '核对要点') {
+        this.$set(this.ruleForm, 'name', 'MultipleSelect')
+        this.$set(this.ruleForm, 'expanding', true)
+        this.$set(this.ruleForm, 'required', true)
+      } else {
+        this.$set(this.ruleForm, 'name', '')
+      }
+      this.$refs['ruleForm'].clearValidate()
+    },
+    changeFiledType(val) {
+      if (val === 'MultipleGroupsSelect') {
+        this.$set(this.ruleForm, 'title', '宣传渠道')
+        this.$set(this.ruleForm, 'module', '基本信息')
+        this.$set(this.ruleForm, 'expanding', true)
+        this.$set(this.ruleForm, 'required', true)
+      } else if (val === 'SingleGroupsSelect') {
+        this.$set(this.ruleForm, 'module', '核对要点')
+        this.$set(this.ruleForm, 'expanding', true)
+        this.$set(this.ruleForm, 'required', true)
+      } else {
+        this.$set(this.ruleForm, 'expanding', false)
+      }
+      if (this.ruleForm.module === '核对要点' && this.ruleForm.name === 'MultipleSelect') {
+        this.$set(this.ruleForm, 'expanding', true)
+        this.$set(this.ruleForm, 'required', true)
+      }
+      this.$refs['ruleForm'].clearValidate()
+    },
+    addSelectOptions() {
+      this.selectOptions.push({
+        id: getTreeId('select'),
+        value: ''
+      })
+    },
+    addSelectGroupOptions() {
+      this.selectGroupOptions.push({
+        id: getTreeId('selectGroup'),
+        value: '组' + (this.selectGroupOptions.length + 1),
+        showInput: false,
+        isHover: false,
+        children: [{
           id: getTreeId('selectGroup'),
-          value: '组' + (this.selectGroupOptions.length + 1),
-          showInput: false,
-          isHover: false,
-          children: [{
-            id: getTreeId('selectGroup'),
-            value: ''
-          }]
-        })
-      },
-      submitForm: debounce(async function(formName) {
-        this.$refs[formName].validate(async (valid) => {
-          if (valid) {
-            const data = this.handleForm()
-            data.sort = this.currentRow?.sort
-            const form = {
-              type: data.name,
-              formCategoryId: this.parentForm.recordId,
-              formItemId: this.currentRow?.id,
-              sort: this.currentRow?.sort,
-              data: {
-                ...data
-              }
+          value: ''
+        }]
+      })
+    },
+    submitForm: debounce(async function (formName) {
+      this.$refs[formName].validate(async (valid) => {
+        if (valid) {
+          const data = this.handleForm()
+          data.sort = this.currentRow?.sort
+          const form = {
+            type: data.name,
+            formCategoryId: this.parentForm.recordId,
+            formItemId: this.currentRow?.id,
+            sort: this.currentRow?.sort,
+            data: {
+              ...data
             }
-            if (this.checkOptionValue(data.name)) {
-              this.$message.error('请完善选项设置')
-              return false;
-            }
-            // 没有id是新增
-            let res;
-            if (!this.currentRow?.id) {
-              // 新增字段
-              res = await addFormField(form)
-            } else {
-              // 编辑字段
-              res = await editItem(form)
-            }
-            if (res?.data?.success) {
-              this.resetOptions()
-              this.$emit('refreshItemList')
-            } else {
-              this.$message.error(res.data?.msg)
-            }
-          } else {
-            // console.log('error submit!!');
+          }
+          if (this.checkOptionValue(data.name)) {
+            this.$message.error('请完善选项设置')
             return false;
           }
-        });
-      }, 500),
-      checkOptionValue(type) {
-        let isNullValue = false;
-        switch (type) {
-          case 'SelectInput':
-          case 'MultipleSelect':
-          chenck(this.selectOptions)
-            break;
-          case 'Cascader':
-          chenck(this.cascaderOptions)
-            break;
-        }
-        return isNullValue;
-        function chenck(arr) {
-          const nullValue = arr.filter(option => option.value.trim() === '');
-          if (nullValue.length) {
-            isNullValue = true;
+          // 没有id是新增
+          let res;
+          if (!this.currentRow?.id) {
+            // 新增字段
+            res = await addFormField(form)
+          } else {
+            // 编辑字段
+            res = await editItem(form)
           }
-          arr?.children?.length && chenck(arr?.children?.length)
+          if (res?.data?.success) {
+            this.resetOptions()
+            this.$emit('refreshItemList')
+          } else {
+            this.$message.error(res.data?.msg)
+          }
+        } else {
+          // console.log('error submit!!');
+          return false;
         }
-      },
-      resetForm(formName) {
-        this.resetOptions()
-        this.$refs[formName].resetFields();
-        this.$emit('close')
-      },
-      handleForm() {
-        const {
+      });
+    }, 500),
+    checkOptionValue(type) {
+      let isNullValue = false;
+      switch (type) {
+        case 'SelectInput':
+        case 'MultipleSelect':
+          chenck(this.selectOptions)
+          break;
+        case 'Cascader':
+          chenck(this.cascaderOptions)
+          break;
+        default:
+      }
+      return isNullValue;
+      function chenck(arr) {
+        const nullValue = arr.filter(option => option.value.trim() === '');
+        if (nullValue.length) {
+          isNullValue = true;
+        }
+        arr?.children?.length && chenck(arr?.children?.length)
+      }
+    },
+    resetForm(formName) {
+      this.resetOptions()
+      this.$refs[formName].resetFields();
+      this.$emit('close')
+    },
+    handleForm() {
+      const {
+        title,
+        name,
+        module,
+        required,
+        placeholder,
+        numberOfWords,
+        exclusiveRowOrNot,
+        expanding,
+        isMultiple,
+        dateFormat
+      } = this.ruleForm
+      const form = {
+        TextInput: {
+          id: this.getId(),
           title,
           name,
           module,
-          required,
-          placeholder,
-          numberOfWords,
-          exclusiveRowOrNot,
-          expanding,
-          options,
-          isMultiple,
-          dateFormat
-        } = this.ruleForm
-        let form = {
-          TextInput: {
-            id: this.getId(),
-            title,
-            name,
-            module,
-            value: '',
-            valueType: 'String',
-            props: {
-              required,
-              placeholder,
-              numberOfWords,
-              exclusiveRowOrNot
-            }
-          },
-          TextareaInput: {
-            id: this.getId(),
-            title,
-            name,
-            module,
-            value: '',
-            valueType: 'String',
-            props: {
-              required,
-              placeholder,
-              numberOfWords
-            }
-          },
-          SelectInput: {
-            id: this.getId(),
-            title,
-            name,
-            module,
-            value: '',
-            valueType: 'String',
-            props: {
-              required,
-              placeholder,
-              expanding,
-              options: this.selectOptions
-            }
-          },
-          MultipleSelect: {
-            id: this.getId(),
-            title,
-            name,
-            module,
-            value: [],
-            valueType: 'Array',
-            props: {
-              required,
-              placeholder,
-              expanding,
-              options: this.selectOptions
-            }
-          },
-          MultipleGroupsSelect: {
-            id: this.getId(),
-            title,
-            name,
-            module,
-            value: [],
-            valueType: 'Array',
-            props: {
-              required,
-              placeholder,
-              expanding,
-              options: this.selectGroupOptions
-            }
-          },
-          SingleGroupsSelect: {
-            id: this.getId(),
-            title,
-            name,
-            module,
-            value: [],
-            valueType: 'Array',
-            props: {
-              required,
-              placeholder,
-              expanding,
-              options: this.selectGroupOptions
-            }
-          },
-          Cascader: {
-            id: this.getId(),
-            title,
-            name,
-            module,
-            value: [],
-            valueType: 'Tree',
-            props: {
-              required,
-              placeholder,
-              multiple: isMultiple,
-              options: this.cascaderOptions
-            }
-          },
-          TimePicker: {
-            id: this.getId(),
-            title,
-            name,
-            module,
-            value: '',
-            valueType: 'Date',
-            props: {
-              required,
-              placeholder,
-              format: dateFormat,
-            }
+          value: '',
+          valueType: 'String',
+          props: {
+            required,
+            placeholder,
+            numberOfWords,
+            exclusiveRowOrNot
+          }
+        },
+        TextareaInput: {
+          id: this.getId(),
+          title,
+          name,
+          module,
+          value: '',
+          valueType: 'String',
+          props: {
+            required,
+            placeholder,
+            numberOfWords
+          }
+        },
+        SelectInput: {
+          id: this.getId(),
+          title,
+          name,
+          module,
+          value: '',
+          valueType: 'String',
+          props: {
+            required,
+            placeholder,
+            expanding,
+            options: this.selectOptions
+          }
+        },
+        MultipleSelect: {
+          id: this.getId(),
+          title,
+          name,
+          module,
+          value: [],
+          valueType: 'Array',
+          props: {
+            required,
+            placeholder,
+            expanding,
+            options: this.selectOptions
+          }
+        },
+        MultipleGroupsSelect: {
+          id: this.getId(),
+          title,
+          name,
+          module,
+          value: [],
+          valueType: 'Array',
+          props: {
+            required,
+            placeholder,
+            expanding,
+            options: this.selectGroupOptions
+          }
+        },
+        SingleGroupsSelect: {
+          id: this.getId(),
+          title,
+          name,
+          module,
+          value: [],
+          valueType: 'Array',
+          props: {
+            required,
+            placeholder,
+            expanding,
+            options: this.selectGroupOptions
+          }
+        },
+        Cascader: {
+          id: this.getId(),
+          title,
+          name,
+          module,
+          value: [],
+          valueType: 'Tree',
+          props: {
+            required,
+            placeholder,
+            multiple: isMultiple,
+            options: this.cascaderOptions
+          }
+        },
+        TimePicker: {
+          id: this.getId(),
+          title,
+          name,
+          module,
+          value: '',
+          valueType: 'Date',
+          props: {
+            required,
+            placeholder,
+            format: dateFormat,
           }
         }
-        return form[this.ruleForm.name]
-      },
-      getId() {
-        // return this.currentRow?.id;
+      }
+      return form[this.ruleForm.name]
+    },
+    getId() {
+      // return this.currentRow?.id;
       return this.currentRow?.id || 'field' + (Math.floor(Math.random() * (99999 - 10000)) + 10000).toString() + new Date().getTime().toString().substring(5);
-      },
-    }
+    },
   }
+}
 </script>
 <style lang="less" scoped>
 /deep/.el-input__inner {

@@ -1,22 +1,33 @@
-import TextInput from './components/TextInput.vue'
-import NumberInput from './components/NumberInput.vue'
-import TextareaInput from './components/TextareaInput.vue'
-import SelectInput from './components/SelectInput.vue'
-import DateTime from './components/DateTime.vue'
-import DateTimeRange from './components/DateTimeRange.vue'
+import TextInput from './components/TextInput'
+import NumberInput from './components/NumberInput'
+import TextareaInput from './components/TextareaInput'
+import SelectInput from './components/SelectInput'
+import DateTime from './components/DateTime'
+import DateTimeRange from './components/DateTimeRange'
 
-import Description from './components/Description.vue'
-import ImageUpload from './components/ImageUpload.vue'
-import FileUpload from './components/FileUpload.vue'
-import Location from './components/Location.vue'
-import MoneyInput from './components/MoneyInput.vue'
-import OrgPicker from './components/OrgPicker.vue'
-import SignPanel from './components/SignPannel.vue'
+import Description from './components/Description'
+import ImageUpload from './components/ImageUpload'
+import FileUpload from './components/FileUpload'
+import Location from './components/Location'
+import MoneyInput from './components/MoneyInput'
+import OrgPicker from './components/OrgPicker'
+import SignPanel from './components/SignPannel'
 
 export default {
-  //基础组件
-  TextInput, NumberInput, TextareaInput, SelectInput, DateTime, DateTimeRange,
-  //高级组件
-  Description, FileUpload, ImageUpload, MoneyInput, Location, SignPanel, OrgPicker
+  // 基础组件
+  TextInput,
+  NumberInput,
+  TextareaInput,
+  SelectInput,
+  DateTime,
+  DateTimeRange,
+  // 高级组件
+  Description,
+  FileUpload,
+  ImageUpload,
+  MoneyInput,
+  Location,
+  SignPanel,
+  OrgPicker
 
 }

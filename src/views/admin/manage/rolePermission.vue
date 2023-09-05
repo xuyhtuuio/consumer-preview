@@ -149,15 +149,13 @@
 
 <script>
 import SecondaryConfirmation from '@/components/common/secondaryConfirmation';
-
 import {
   getRoleList,
   deactivateRecoveryRole,
   editThePermissionsPage,
   updateRolePermission
-} from '@/api/admin/role.js';
-import rolePermission from '../data/rolePermission.json';
-import { permissionList } from '../data/rolePermission.js';
+} from '@/api/admin/role';
+import { permissionList } from '../data/rolePermission';
 export default {
   name: 'rolePermission',
   components: { SecondaryConfirmation },
@@ -221,10 +219,9 @@ export default {
   computed: {
     editAuth() {
       const { permissionsPage = {} } = this.$store.state;
-      const flowManage =
-        [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(
-          item => item.pathName === 'RolePermission'
-        ) || {};
+      const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(
+        item => item.pathName === 'RolePermission'
+      ) || {};
       if (flowManage.type === 'edit') {
         return true;
       }
@@ -267,7 +264,6 @@ export default {
       } = await editThePermissionsPage({ roleId });
       if (success) {
         this.formatDataZero(res);
-        console.log(this.permissionList);
       } else {
         this.$message.error(msg);
       }
@@ -282,13 +278,12 @@ export default {
       if (this.action === 'edit2') {
         return this.handleSave();
       }
-      deactivateRecoveryRole(this.stopOrRun).then(({ data: { data: res, success } }) => {
+      deactivateRecoveryRole(this.stopOrRun).then(({ data: { success } }) => {
         if (success) {
           this.initData();
-          flag &&
-            this.$message({
+          flag
+            && this.$message({
               type: 'success',
-              customClass: 'el-icon-success-one',
               message: '已恢复该角色所有操作权限。'
             });
           !flag && this.$message.success('停用成功');
@@ -309,14 +304,14 @@ export default {
     async handleSave() {
       // 红色警告
       if (this.permissionList[1].type && !this.permissionList[1].children.some(item => item.type)) {
-        return (this.permissionList[1].isShowWarn = true);
+        this.permissionList[1].isShowWarn = true
+        return
       }
       this.cardLoading = true;
       this.formatData();
-      console.log(this.rolePermission);
       const { dataPerm, defaultPerm, funPerms } = this.rolePermission;
       const {
-        data: { data: res, success, msg }
+        data: { success, msg }
       } = await updateRolePermission({
         roleId: this.roleId,
         list: [{ defaultPerm, funPerms }],
@@ -325,11 +320,10 @@ export default {
       if (success) {
         this.$message({
           type: 'success',
-          customClass: 'el-icon-success-one',
           message: msg || '已成功保存该角色的操作权限'
         });
         this.handleBack();
-      }else {
+      } else {
         this.$message({
           type: 'error',
           message: msg || '保存失败'
@@ -342,6 +336,7 @@ export default {
       this.roleId = '';
       this.action = 'edit1';
       this.permissionList = JSON.parse(JSON.stringify(permissionList));
+      this.initData()
     },
     formatDataZero(data) {
       const { funPerms, dataPerm } = data;
@@ -352,13 +347,12 @@ export default {
           this.permissionList[key].children[0].type = funPerms[key].child[0].type;
         } else if (Number(key) === 1) {
           this.permissionList[key].type = funPerms[key].type;
-          const children = this.permissionList[key].children;
-          children.forEach((item, index) => {
+          const { children } = this.permissionList[key];
+          children.forEach((item) => {
             item.type = funPerms.find(funItem => funItem.code === item.code).type;
           });
         } else {
-          this.permissionList[this.permissionList.length - 1].type =
-            funPerms[funPerms.length - 1].type;
+          this.permissionList[this.permissionList.length - 1].type = funPerms[funPerms.length - 1].type;
         }
       }
       this.dataPerm = Array.isArray(this.dataPerm) ? dataPerm : dataPerm[0];
@@ -378,15 +372,15 @@ export default {
           funPerms[key].child[0].type = originVal.children[0].type;
         } else if (Number(key) === 1) {
           funPerms[key].type = originVal.type;
-          const children = originVal.children;
-          children.forEach((item, index) => {
+          const { children } = originVal;
+          children.forEach((item) => {
             const funItem = funPerms.find(funPermsItem => funPermsItem.code === item.code);
             if (item.title === '流程管理') {
               if (item.type !== funItem.type) {
                 funItem.type = item.type;
                 item.reflect.forEach(reflectItem => {
                   // defaultPerm.find(item => item.pathName === reflectItem).type = item.type;
-                  defaultPerm.find(item => item.pathName === reflectItem).type = 'edit';
+                  defaultPerm.find(defaultItem => defaultItem.pathName === reflectItem).type = 'edit';
                 });
               }
             } else {
@@ -413,7 +407,7 @@ export default {
     handleCheckBoxChange(item) {
       item.isShowWarn = false;
       if (!item.type && item?.children?.length) {
-        item.children.forEach(item => (item.type = ''));
+        item.children.forEach(childItem => { childItem.type = '' });
       }
     },
     // trueLabel，falseLabel 和permissionList里面的item的props的trueLabel，falseLabel相关
@@ -431,7 +425,6 @@ export default {
 @color1: #1d2128;
 .rolePermission {
   height: 100%;
-  overflow: hidden;
   font-size: 14px;
   color: #1d2128;
   .el-button--text {

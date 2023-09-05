@@ -8,10 +8,10 @@
 import Node from './Node'
 
 export default {
-  name: "ApprovalNode",
-  components: {Node},
-  props:{
-    config:{
+  name: 'ApprovalNode',
+  components: { Node },
+  props: {
+    config: {
       type: Object,
       default: () => {
         return {}
@@ -25,7 +25,7 @@ export default {
       content: ''
     }
   },
-  computed:{
+  computed: {
     nodeMap() {
       return this.$store.state.nodeMap
     },
@@ -67,12 +67,11 @@ export default {
     }
   },
   methods: {
-    //校验数据配置的合法性
-    validate(err){
+    // 校验数据配置的合法性
+    validate(err) {
       try {
         this.showError = false
         if (this.config.type === 'APPROVAL') {
-          console.log(this.config, this.config.props.assignedType)
           if (!this.config.props.targetPage) {
             err.push(`${this.config.name} 目标页面未配置`)
             this.errorInfo = '目标页面未配置'
@@ -91,8 +90,9 @@ export default {
           this[`validate_${this.config.props.assignedType}`](err)
         } else {
           // 二次会签
+          // eslint-disable-next-line
           if (!this.config.props.target) {
-            this.errorInfo = `请指定二次会签人员`
+            this.errorInfo = '请指定二次会签人员'
             err.push(`${this.config.name} 未指定二次会签人员`)
             this.showError = true
           } else {
@@ -105,9 +105,9 @@ export default {
       }
     },
     // 上一个审批人选中
-    validate_SELF_SELECT(err){
+    validate_SELF_SELECT(err) {
       const msg = '审批'
-      if(this.config.props.assignedUser.length === 0) {
+      if (this.config.props.assignedUser.length === 0) {
         this.errorInfo = `请指定${msg}人员`
         err.push(`${this.config.name} 未指定${msg}人员`)
         this.showError = true
@@ -118,41 +118,38 @@ export default {
       this.validate_SELF_SELECT(err)
     },
     validate_SELECT_NODE(err) {
-      if(!this.config.props.target) {
+      if (!this.config.props.target) {
         this.errorInfo = '请指定节点审批人'
         err.push(`${this.config.name} 未指定节点审批人`)
         this.showError = true
       }
     },
-    validate_LEADER_TOP(){
+    validate_LEADER_TOP() {
       return true;
     },
-    validate_LEADER(){
+    validate_LEADER() {
       return true;
     },
-    validate_ROLE(){
+    validate_SELF() {
       return true;
     },
-    validate_SELF(){
+    validate_REFUSE() {
       return true;
     },
-    validate_REFUSE(){
-      return true;
-    },
-    validate_ROLE(err){
-      if (this.config.props.role.length <= 0){
+    validate_ROLE(err) {
+      if (this.config.props.role.length <= 0) {
         this.errorInfo = '请指定负责审批的系统角色'
         err.push(`${this.config.name} 未指定审批角色`)
         return false
       }
       return true;
     },
-    validate_FORM_USER(err){
-     if (this.config.props.formUser === ''){
-       this.errorInfo = '请指定表单中的人员组件'
-       err.push(`${this.config.name} 审批人为表单中人员，但未指定`)
-       return false
-     }
+    validate_FORM_USER(err) {
+      if (this.config.props.formUser === '') {
+        this.errorInfo = '请指定表单中的人员组件'
+        err.push(`${this.config.name} 审批人为表单中人员，但未指定`)
+        return false
+      }
       return true;
     },
   }

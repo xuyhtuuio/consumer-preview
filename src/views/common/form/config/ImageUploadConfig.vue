@@ -1,10 +1,10 @@
 <template>
-
+  <div></div>
 </template>
 
 <script>
 export default {
-  name: "UploadImage",
+  name: 'UploadImage',
   components: {},
   data() {
     return {}

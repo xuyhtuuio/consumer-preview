@@ -17,14 +17,12 @@
 </template>
 
 <script>
-import orgPicker from '@/components/common/organizationPicker'
 export default {
-  name: "CcNodeConfig",
-  components: {orgPicker},
-  props:{
-    config:{
+  name: 'CcNodeConfig',
+  props: {
+    config: {
       type: Object,
-      default: ()=>{
+      default: () => {
         return {}
       }
     },
@@ -46,7 +44,7 @@ export default {
       }
     }
   },
-  computed:{
+  computed: {
     disabledForm() {
       return this.$route.name === 'FlowManage' || this.$route.meta.pTitle === '申请中心'
     },
@@ -83,7 +81,7 @@ export default {
     },
   },
   methods: {
-    closeSelect(){
+    closeSelect() {
       this.showOrgSelect = false
     },
     selectOrg() {
@@ -93,7 +91,7 @@ export default {
       this.showOrgSelect = false
       // this.select = []
       this.config.assignedUser = []
-      for (let key in select) {
+      for (const key in select) {
         select[key].forEach(val => this.select.push({
           ...val,
           label: val.label,
@@ -101,7 +99,7 @@ export default {
         }))
       }
     },
-    removeOrgItem(index){
+    removeOrgItem(index) {
       this.select.splice(index, 1)
     }
   }

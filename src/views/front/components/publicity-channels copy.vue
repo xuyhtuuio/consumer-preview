@@ -1,5 +1,5 @@
 <template>
-  <div class="publicity-channels"> 
+  <div class="publicity-channels">
     <g-table-card :title="title">
       <template v-slot:cardInfo>{{cardInfo}}</template>
       <template v-slot:content>
@@ -17,27 +17,25 @@
 </template>
 
 <script>
-  export default {
-    props: {
-      list: {
-        typeof: Array,
-        default: ()=> ([])
-      }
-    },
-    data(){
-      return {
-        title: "宣传渠道",
-        cardInfo: "*",
-        ruleForm: {
-        }
+export default {
+  props: {
+    list: {
+      typeof: Array,
+      default: () => ([])
+    }
+  },
+  data() {
+    return {
+      title: '宣传渠道',
+      cardInfo: '*',
+      ruleForm: {
       }
     }
   }
+}
 </script>
 
 <style lang="less" scoped>
-
-
 .publicity-channels {
     .cardInfo {
       padding: 0 8px;

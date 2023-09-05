@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "commit": "git-cz",
     "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve",
     "start": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "prepare": "husky install",
+    "lint": "lint-staged",
+    "fix": "eslint src/views/**/**/*.*  --fix"
   },
   "dependencies": {
     "@antv/g6": "^4.8.21",
@@ -37,7 +41,7 @@
     "sortablejs": "^1.14.0",
     "swiper": "5.4.5",
     "trim-canvas": "^0.1.2",
-    "trs-web-components": "^0.1.5",
+    "trs-web-components": "^0.1.6",
     "v-viewer": "^1.6.4",
     "validator": "^13.7.0",
     "viewerjs": "^1.11.1",
@@ -89,6 +93,16 @@
     "vue-template-babel-compiler": "^1.0.6-0",
     "vue-template-compiler": "^2.6.11"
   },
+  "lint-staged": {
+    "*.{css, less}": [
+      "git add"
+    ],
+    "*.{js, vue, jsx}": [
+      "eslint",
+      "git add"
+    ]
+  },
+  "main": "index.js",
   "engines": {
     "node": ">= 6.0.0",
     "npm": ">= 3.0.0"

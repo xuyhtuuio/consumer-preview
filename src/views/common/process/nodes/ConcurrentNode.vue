@@ -34,24 +34,23 @@
 </template>
 
 <script>
-import InsertButton from '@/views/common/InsertButton.vue'
-
+import InsertButton from '@/views/common/InsertButton'
 export default {
-  name: "ConcurrentNode",
-  components: {InsertButton},
-  props:{
-    config:{
+  name: 'ConcurrentNode',
+  components: { InsertButton },
+  props: {
+    config: {
       type: Object,
       default: () => {
         return {}
       }
     },
-    level:{
+    level: {
       type: Number,
       default: 1
     },
-    //条件数
-    size:{
+    // 条件数
+    size: {
       type: Number,
       default: 0
     }

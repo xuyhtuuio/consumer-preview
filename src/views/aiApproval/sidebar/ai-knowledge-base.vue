@@ -10,19 +10,19 @@
     </div>
 </template>
 <script>
-import opinionManage from "../../admin/manage/opinionManage.vue";
+import opinionManage from '../../admin/manage/opinionManage';
 export default {
-    name: "aiknowledge-base",
-    components: { opinionManage },
-    data() {
-        return {
-            pageConfig: {
-                pageType: 'nonManage',
-                isAll: 0,
-                pageSize: 5
-            }
-        }
+  name: 'aiknowledge-base',
+  components: { opinionManage },
+  data() {
+    return {
+      pageConfig: {
+        pageType: 'nonManage',
+        isAll: 0,
+        pageSize: 5
+      }
     }
+  }
 };
 </script>
 <style lang="less" scoped>

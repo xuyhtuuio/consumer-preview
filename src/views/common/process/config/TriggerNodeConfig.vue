@@ -108,31 +108,31 @@
 </template>
 
 <script>
-//import { codemirror } from 'vue-codemirror'
+// import { codemirror } from 'vue-codemirror'
 // 引入主题 可以从 codemirror/theme/ 下引入多个
-//import 'codemirror/theme/idea.css'
+// import 'codemirror/theme/idea.css'
 // 引入语言模式 可以从 codemirror/mode/ 下引入多个
-//import "codemirror/mode/javascript/javascript.js"
+// import "codemirror/mode/javascript/javascript.js"
 
 export default {
-  name: "TriggerNodeConfig",
-  components: {/*codemirror*/},
-  props:{
-    config:{
+  name: 'TriggerNodeConfig',
+  components: {/* codemirror */},
+  props: {
+    config: {
       type: Object,
-      default: ()=>{
+      default: () => {
         return {}
       }
     }
   },
-  computed:{
-    forms(){
+  computed: {
+    forms() {
       return this.$store.state.design.formItems || []
     }
   },
   data() {
     return {
-      cmOptions:{
+      cmOptions: {
         tabSize: 4, // tab
         indentUnit: 4,
         styleActiveLine: true, // 高亮选中行
@@ -140,9 +140,9 @@ export default {
         styleSelectedText: true,
         line: true,
         foldGutter: true, // 块槽
-        gutters: ['CodeMirror-linenumbers', "lock", "warn"],
+        gutters: ['CodeMirror-linenumbers', 'lock', 'warn'],
         highlightSelectionMatches: { showToken: /w/, annotateScrollbar: true }, // 可以启用该选项来突出显示当前选中的内容的所有实例
-        mode:'javascript',
+        mode: 'javascript',
         // hint.js options
         hintOptions: {
           // 当匹配只有一项的时候是否自动补全
@@ -155,27 +155,27 @@ export default {
         // scrollbarStyle:null,
         // readOnly:true,  //是否只读
         theme: 'material', // 主题 material
-        extraKeys: { 'Ctrl': 'autocomplete' }, // 可以用于为编辑器指定额外的键绑定，以及keyMap定义的键绑定
-        lastLineBefore:0
+        extraKeys: { Ctrl: 'autocomplete' }, // 可以用于为编辑器指定额外的键绑定，以及keyMap定义的键绑定
+        lastLineBefore: 0
       }
     }
   },
   methods: {
-    addItem(items){
+    addItem(items) {
       if (items.length > 0 && (items[items.length - 1].name.trim() === ''
-          || items[items.length - 1].value.trim() === '')){
-        this.$message.warning("请完善之前项后在添加")
+          || items[items.length - 1].value.trim() === '')) {
+        this.$message.warning('请完善之前项后在添加')
         return;
       }
-      items.push({name: '', value: '', isField: true})
+      items.push({ name: '', value: '', isField: true })
     },
-    delItem(items, index){
+    delItem(items, index) {
       items.splice(index, 1)
     },
-    onCmCodeChange(){
+    onCmCodeChange() {
 
     },
-    onCmReady(){
+    onCmReady() {
 
     }
   }

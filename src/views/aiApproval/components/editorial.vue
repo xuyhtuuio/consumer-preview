@@ -87,10 +87,10 @@
 </template>
 
 <script>
-import addFileSource from '../dialogs/add-file-source'
 import {
   RecommendedListLoadMore
-} from "@/api/aiApproval";
+} from '@/api/aiApproval';
+import addFileSource from '../dialogs/add-file-source'
 export default {
   name: 'editorial',
   components: { addFileSource },
@@ -131,7 +131,7 @@ export default {
       recommends: [], // 推荐意见,便于快捷修改,切换后会同步至 对应文件相关信息
       collection: [], // 最后的编辑及意见,需反向修改 对应选中的 意见
       input: '',
-      editItem: {}, //当前编辑关联的的文件
+      editItem: {}, // 当前编辑关联的的文件
       newInput: '',
       newFiles: [],
       newFocus: false,
@@ -219,7 +219,7 @@ export default {
       this.editItem = item || {};
     },
     changeSelect(a, i, isedit) {
-      const id = this.recommends[a].list[i].id;
+      const { id } = this.recommends[a].list[i];
       if (this.recommends[a].selected === id && !isedit) {
         this.recommends[a].selected = null;
       } else {
@@ -242,7 +242,7 @@ export default {
               this.recommends[a].pageNow = pageNow;
               this.recommends[a].list.push(...data.list)
             } else {
-              this.$message.error({ offset: 40, title: "提醒", message });
+              this.$message.error({ offset: 40, title: '提醒', message });
             }
           });
       }

@@ -11,10 +11,10 @@ import componentMinxins from '../ComponentMinxins'
 
 export default {
   mixins: [componentMinxins],
-  name: "Description",
+  name: 'Description',
   components: {},
   props: {
-    color:{
+    color: {
       type: String,
       default: '#868686'
     },

@@ -53,12 +53,12 @@
 <script>
 import 'swiper/css/swiper.css'
 import Swiper from 'swiper'
-import imgaePreview from './imgae-preview'
-import fileType from '@/components/common/file-type.vue';
+import fileType from '@/components/common/file-type';
 import filePreview from '@/components/filePreview'
 import {
   download
-} from "@/api/aiApproval";
+} from '@/api/aiApproval';
+import imgaePreview from './imgae-preview'
 export default {
   components: { imgaePreview, fileType, filePreview },
   name: 'file-preview',
@@ -100,7 +100,7 @@ export default {
       }
     },
   },
-  mounted() { 
+  mounted() {
     // this.init();
   },
   methods: {
@@ -128,7 +128,7 @@ export default {
         // },
         slidesPerView: 'auto',
         on: {
-          resize: function () {
+          resize() {
             this.update();
           },
         },

@@ -14,10 +14,10 @@ import componentMinxins from '../ComponentMinxins'
 
 export default {
   mixins: [componentMinxins],
-  name: "NumberInput",
+  name: 'NumberInput',
   components: {},
-  props:{
-    placeholder:{
+  props: {
+    placeholder: {
       type: String,
       default: '请输入数值'
     }

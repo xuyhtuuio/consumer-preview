@@ -8,34 +8,34 @@
 import Node from './Node'
 
 export default {
-  name: "TriggerNode",
-  props:{
-    config:{
+  name: 'TriggerNode',
+  props: {
+    config: {
       type: Object,
       default: () => {
         return {}
       }
     }
   },
-  components: {Node},
+  components: { Node },
   data() {
     return {
       showError: false,
       errorInfo: '',
     }
   },
-  computed:{
-    content(){
-      this.config
+  computed: {
+    content() {
+      return this.config
     }
   },
   methods: {
-    //校验数据配置的合法性
-    validate(){
+    // 校验数据配置的合法性
+    validate() {
       this.showError = false
-      if(this.config.assignedUser && this.config.assignedUser.length > 0){
+      if (this.config.assignedUser && this.config.assignedUser.length > 0) {
         this.showError = false
-      }else {
+      } else {
         this.showError = true
         this.errorInfo = '请设置触发器详情'
       }

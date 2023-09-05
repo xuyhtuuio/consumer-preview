@@ -28,7 +28,7 @@
             ><i class="iconfont icon-tuihui1"></i>退回/驳回</el-button
           >
           <el-button type="primary" @click="showSubmit"
-            ><i class="iconfont icon-tijiao"></i>结束任务</el-button
+            ><i class="iconfont icon-tijiao"></i>提交</el-button
           >
         </span>
       </div>
@@ -190,7 +190,7 @@
         </div>
       </div>
     </div>
-    <reject-dialog ref="rejectDialog" :formBase="formBase"></reject-dialog>
+    <reject-dialog ref="rejectDialog" :formBase="formBase" :nextStepObj="nextStepObj" :rejectOption="rejectOption" @submit="submit"></reject-dialog>
     <div class="fullScreen-none" :class="{ fullScreen: showFullScreen }">
       <!-- 全屏关闭按钮 -->
       <i
@@ -217,7 +217,8 @@
       </div>
     </div>
     <SecondaryConfirmation
-      :option="option"
+      :option="nextStepObj?.selectObject === '1' ? optionOther : option"
+      :nextStepObj="nextStepObj"
       ref="confirmation"
       @handleConfirm="endTaskSubmit"
     ></SecondaryConfirmation>
@@ -225,19 +226,18 @@
 </template>
 
 <script>
-import rejectDialog from "./dialogs/reject-dialog";
-import SideBar from "../aiApproval/sidebar/sidebar";
-import FileType from "@/components/common/file-type";
-import SecondaryConfirmation from "@/components/common/secondaryConfirmation";
-import ImagePreview from "../aiApproval/components/imgae-preview";
-import ImagePreview1 from "./image-preview";
-
-import FilePreview from "@/components/filePreview";
-import { download } from "@/api/aiApproval";
-import { dualScreenPreview, endTask } from "@/api/approvalCenter";
-import { getApplyForm } from "@/api/front";
+import { download, getNextUserOption, rollback } from '@/api/aiApproval';
+import { dualScreenPreview, endTask } from '@/api/approvalCenter';
+import { getApplyForm } from '@/api/front';
+import FileType from '@/components/common/file-type';
+import FilePreview from '@/components/filePreview';
+import SideBar from '../aiApproval/sidebar/sidebar';
+import rejectDialog from '../aiApproval/dialogs/reject-dialog';
+import SecondaryConfirmation from './dialogs/submit-dialog';
+import ImagePreview from '../aiApproval/components/imgae-preview';
+import ImagePreview1 from './image-preview';
 export default {
-  name: "compare",
+  name: 'compare',
   components: {
     rejectDialog,
     FileType,
@@ -257,20 +257,48 @@ export default {
       scrollX: 0,
       showFullScreen: false,
       approval: {
-        url: "http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf",
+        url: 'http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf',
       },
       compareList: [],
       formBase: {},
-      totalsimilarity: "",
+      totalsimilarity: '',
       activeIndex: 0,
       activeItem: {},
       fullScreenType: 1,
       loading: true,
       option: {
-        message: "确认结束后该申请单结束流转，不可再进行修改",
-        cancelBtn: "取消",
-        confirmBtn: "确认",
+        message: '确认结束后该申请单结束流转，不可再进行修改',
+        cancelBtn: '取消',
+        confirmBtn: '确认',
       },
+      optionOther: {
+        message: '提交后该申请单进入下一审批阶段，不可再进行修改',
+        cancelBtn: '取消',
+        confirmBtn: '确认',
+      },
+      nextStepObj: {
+        // 提交： selectObject：1 上一审批选择，nodeSelectUserList
+        // 驳回：  "refuseWay": "TO_BEFORE" ： 调回指定节点  nodeSelectList
+        nextNodeName: '',
+        selectObject: '',
+        nodeSelectUserList: [],
+        refuseWay: '',
+        nodeSelectList: []
+      },
+      rejectOption: [
+        {
+          value: '文件预览失败（文件损坏/清晰度过低）',
+          label: '文件预览失败（文件损坏/清晰度过低）'
+        },
+        {
+          value: '附件材料与审批项目不匹配',
+          label: '附件材料与审批项目不匹配'
+        },
+        {
+          value: '其他',
+          label: '其他'
+        }
+      ],
     };
   },
   mounted() {
@@ -284,7 +312,7 @@ export default {
     this.formCategoryId = item.formManagementId;
     this.init(item);
     this.formBase = item;
-    window.addEventListener("resize", this.resize, true);
+    window.addEventListener('resize', this.resize, true);
     this.carouselWidth = Number(
       ((this.$refs.carouselBody.clientWidth - 40) / 6).toFixed(2)
     );
@@ -293,24 +321,38 @@ export default {
     this.getInfo();
   },
   methods: {
-    // 获取工单基本信息
-    init(item) {
-      getApplyForm({
-        formCategoryId: this.formCategoryId,
-        formId: this.formId,
-      }).then((res) => {
-        const { data, status, message } = res.data;
-        if (status === 200) {
-          this.$refs.sidebar.tools[0].sidebarParam = { ...data };
-          // if(data.keyPointsForVerification) {
-          //   this.$refs.refExamine.list = [...data.keyPointsForVerification];
-          // }
-        } else {
-          this.$message.error({ offset: 40, title: "提醒", message });
+    // 获取  下一审批人列表
+    getNextUserOption() {
+      getNextUserOption({
+        nodeId: this.formBase.nodeId,
+        templateId: this.formBase.processTemplateId,
+        bool: 'Y'
+      }).then(res => {
+        const { data, status } = res.data;
+        const keys = Object.keys(data || {});
+        if (status === 200 && keys.length) {
+          this.nextStepObj = data;
         }
       });
-      // 先获取工单基本信息，，然后判断获取草稿或初始化  文件信息
-      // this.getFileList();
+    },
+    // 获取工单基本信息
+    init() {
+      getApplyForm({
+        formCategoryId: this.formCategoryId,
+        formId: this.formId
+      }).then(res => {
+        const { data, status, message } = res.data;
+        if (status === 200) {
+          this.applyForm = data;
+          this.getNextUserOption();
+          this.$refs.sidebar.tools[0].sidebarParam = {
+            ...data,
+            keyPointsForVerification: JSON.parse(JSON.stringify(data.keyPointsForVerification))
+          };
+        } else {
+          this.$message.error({ offset: 40, title: '提醒', message });
+        }
+      });
     },
     resize() {
       this.carouselWidth = Number(
@@ -322,9 +364,9 @@ export default {
     moveLeft() {
       if (this.canLeft && this.compareList.length > 6) {
         this.scrollX = this.scrollX + this.carouselWidth + 8;
-        let element = document.getElementById("itemBody");
+        const element = document.getElementById('itemBody');
         element.style.transform = `translateX(${this.scrollX}px)`;
-        element.style.transition = "all 0.5s";
+        element.style.transition = 'all 0.5s';
         if (this.scrollX >= 0) {
           this.canLeft = false;
           this.canRight = true;
@@ -332,15 +374,15 @@ export default {
       }
     },
     moveRight() {
-      let length = document.querySelectorAll(".carousel-item").length;
+      const { length } = document.querySelectorAll('.carousel-item');
       if (this.canRight && this.compareList.length > 6) {
         this.scrollX = this.scrollX - this.carouselWidth - 8;
-        let element = document.getElementById("itemBody");
+        const element = document.getElementById('itemBody');
         element.style.transform = `translateX(${this.scrollX}px)`;
-        element.style.transition = "all 0.5s";
+        element.style.transition = 'all 0.5s';
         if (
-          this.scrollX <=
-          this.bodyClientWidth - (this.carouselWidth + 8) * length + 8
+          this.scrollX
+          <= this.bodyClientWidth - (this.carouselWidth + 8) * length + 8
         ) {
           this.canLeft = true;
           this.canRight = false;
@@ -350,23 +392,50 @@ export default {
     reject() {
       this.$refs.rejectDialog.init();
     },
+    // 驳回方法
+    submit({ reason, txt, prevUser }) {
+      const user = JSON.parse(window.localStorage.getItem('user_name'))
+      const data = {
+        comments: `${reason}${txt.trim() ? '-' + txt : ''}`,
+        currentUserInfo: {
+          id: user.id,
+          name: user.fullname
+        },
+        processInstanceId: this.formBase.processInstanceId,
+        rollbackId: prevUser,
+        // || this.formBase.rollbackId
+        signInfo: this.formBase.signInfo,
+        nodeId: this.formBase.nodeId,
+        taskId: this.formBase.taskId,
+        templateId: this.formBase.templateId
+      }
+      rollback(data).then((res) => {
+        const { status, msg } = res.data;
+        if (status === 200) {
+          this.$message.success('操作成功！');
+          this.$router.go(-1)
+        } else {
+          this.$message.error({ offset: 40, message: msg });
+        }
+      })
+    },
     showSubmit() {
       this.$refs.confirmation.dialogVisible = true;
     },
     endTaskSubmit() {
-      let data = {
+      const data = {
         taskId: this.formBase.taskId,
       };
       endTask(data)
         .then((res) => {
-          if (res.status == 200) {
+          if (res.status === 200) {
             this.$message.success(res.data.msg);
             this.goBack();
           } else {
             this.$message.error(res.data.msg);
           }
         })
-        .catch((err) => {
+        .catch(() => {
           // this.$message.success('申请单结束流转失败');
         });
     },
@@ -382,16 +451,15 @@ export default {
           if (res.data.data) {
             this.compareList = res.data.data.result;
             this.totalsimilarity = res.data.data.totalSimilarity;
-            this.activeItem = this.compareList[0];
+            const item = this.compareList[0]
+            this.activeItem = item;
             this.loading = false;
             this.$nextTick(() => {
               this.carouselWidth = Number(
                 ((this.$refs.carouselBody.clientWidth - 40) / 6).toFixed(2)
               );
-              this.itemBodyWidth =
-                this.$refs.itemBodyRef.clientWidth.toFixed(2);
-              this.bodyClientWidth =
-                this.$refs.carouselBody.clientWidth.toFixed(2);
+              this.itemBodyWidth = this.$refs.itemBodyRef.clientWidth.toFixed(2);
+              this.bodyClientWidth = this.$refs.carouselBody.clientWidth.toFixed(2);
             });
             if (this.compareList.length > 6) {
               this.canRight = true;
@@ -400,7 +468,7 @@ export default {
             this.loading = false;
           }
         })
-        .catch((err) => {
+        .catch(() => {
           this.loading = false;
         });
       // this.totalsimilarity = "100%";
@@ -410,17 +478,17 @@ export default {
       this.activeIndex = index;
     },
     // 返回
-    goBack(backNow) {
+    goBack() {
       this.$router.go(-1);
     },
     saveFile(type) {
-      let key = "";
+      let key = '';
       if (type === 1) {
         key = this.activeItem.otherKey;
       } else if (type === 2) {
         key = this.activeItem.key;
       }
-      download({ key: key })
+      download({ key })
         .then((res) => {
           const { data, status } = res.data;
           if (status === 200) {
@@ -441,7 +509,7 @@ export default {
         this.$nextTick(() => {
           this.$refs.imageView1.handleImageLoaded();
         });
-      } else if (type == 2 && this.$refs.imageView2) {
+      } else if (type === 2 && this.$refs.imageView2) {
         this.$nextTick(() => {
           this.$refs.imageView2.handleImageLoaded();
         });
@@ -449,7 +517,7 @@ export default {
     },
   },
   beforeDestroy() {
-    window.removeEventListener("resize", this.resize, true);
+    window.removeEventListener('resize', this.resize, true);
   },
 };
 </script>

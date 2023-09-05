@@ -9,8 +9,8 @@
         >
         <span class="content-btns">
           <el-button @click="goBack"><i class="iconfont icon-fanhui1"></i>返回</el-button>
-          <el-button type="tuihui" @click="reject"
-            ><i class="iconfont icon-tuihui1"></i>退回/驳回</el-button
+          <el-button type="tuihui" @click="reject" v-if="approvalLetter.permissions !== 'disPassNotAllow'">
+            <i class="iconfont icon-tuihui1"></i>退回/驳回</el-button
           >
           <el-button @click="save"><i class="iconfont icon-baocun"></i>保存</el-button>
           <el-button
@@ -108,7 +108,7 @@ import submitReview from './dialogs/submit-review';
 import rejectDialog from './dialogs/reject-dialog';
 import ExaminePivot from './components/examine-pivot';
 
-import utils from './index'
+import utils from './index-utils'
 export default {
   name: 'aiApproval',
   mixins: [utils],
@@ -145,7 +145,7 @@ export default {
       },
       showOcr: true,
       formId: '',
-      inDraft: false, //判断当前单子是否有 已存的审批意见
+      inDraft: false, // 判断当前单子是否有 已存的审批意见
       formCategoryId: '',
       saveOption: {
         message: '是否保存本审查项目的审查意见？',
@@ -159,7 +159,7 @@ export default {
       examineIsShow: false,
       // 允许提有实质性意见 passAllow 允许提意见以及驳回；passNotAllow不可提意见允许驳回；disPassNotAllow不允许
       approvalLetter: {
-        permissions: "passNotAllow",
+        permissions: 'passNotAllow',
         list: []
       },
       applyForm: {},
@@ -268,9 +268,6 @@ export default {
     }
   }
 
-  .el-popver {
-  }
-
   .el-button--tuihui {
     background: #ffffff;
     color: #eb5757;
@@ -315,12 +312,6 @@ export default {
   }
 }
 
-
-
-
-
-
-
 </style>
 <style lang="less">
 .sidebar-popper {
@@ -350,11 +341,5 @@ svg.leader-line {
     // height: 100%;
   }
 }
-
-
-
-
-
-
 
 </style>

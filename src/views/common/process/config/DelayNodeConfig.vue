@@ -26,12 +26,12 @@
 
 <script>
 export default {
-  name: "DelayNodeConfig",
+  name: 'DelayNodeConfig',
   components: {},
-  props:{
-    config:{
+  props: {
+    config: {
       type: Object,
-      default: ()=>{
+      default: () => {
         return {}
       }
     }

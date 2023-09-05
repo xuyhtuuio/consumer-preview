@@ -60,7 +60,7 @@
                       <!--<i class="el-icon-copy-document" @click="copy"></i>-->
                         <i class="el-icon-close" @click="del(id)"></i>
                       </div>
-                      <form-design-render :config="cp"/>
+                      <!-- <form-design-render :config="cp"/> -->
                     </div>
                   </div>
                 </draggable>
@@ -86,7 +86,7 @@
     <el-dialog title="表单预览" :visible.sync="viewFormVisible">
       <el-form label-width="150px">
         <el-form-item :label="item.title" v-for="(item, index) in forms" :key="item.name + index">
-          <form-design-render mode="PC" :config="item"/>
+          <!-- <form-design-render mode="PC" :config="item"/> -->
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -94,14 +94,14 @@
 </template>
 
 <script>
-import draggable from "vuedraggable";
-import FormDesignRender from '@/views/admin/layout/form/FormDesignRender'
+import draggable from 'vuedraggable';
 import FormComponentConfig from '@/views/common/form/FormComponentConfig'
 import components from '@/views/common/form/ComponentsConfigExport'
+// import FormDesignRender from '@/views/admin/layout/form/FormDesignRender'
 
 export default {
-  name: "FormDesign",
-  components: {draggable, FormComponentConfig, FormDesignRender},
+  name: 'FormDesign',
+  components: { draggable, FormComponentConfig },
   data() {
     return {
       libSelect: 0,
@@ -120,7 +120,7 @@ export default {
   },
   methods: {
     copy(node, index) {
-      this.form.splice(index + 1, 0, Object.assign({}, node))
+      this.form.splice(index + 1, 0, { ...node })
     },
     getId() {
       return 'field' + (Math.floor(Math.random() * (99999 - 10000)) + 10000).toString()
@@ -133,7 +133,7 @@ export default {
       obj.id = this.getId()
       return JSON.parse(JSON.stringify(obj));
     },
-    viewForms(){
+    viewForms() {
       this.viewFormVisible = true
     }
   }

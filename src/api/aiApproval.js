@@ -1,4 +1,4 @@
-import request from '@/api/request.js'
+import request from '@/api/request'
 // 获取申请单所有的文件列表
 export function getUploadedFilesList(param) {
   return request({
@@ -44,7 +44,7 @@ export function download(param) {
   return request({
     url: '/cpr/file/download',
     method: 'post',
-    contentType : 'application/x-www-form-urlencoded;charset=utf-8',
+    contentType: 'application/x-www-form-urlencoded;charset=utf-8',
     data: param
   })
 }
@@ -87,11 +87,10 @@ export function queryFormItemPermissions(param) {
   return request({
     url: '/cpr/workProcessQuery/queryFormItemPermissions',
     method: 'post',
-    contentType : 'application/x-www-form-urlencoded;charset=utf-8',
+    contentType: 'application/x-www-form-urlencoded;charset=utf-8',
     data: param
   })
 }
-
 
 // 相似案例列表
 export function getSimilarCases(params) {

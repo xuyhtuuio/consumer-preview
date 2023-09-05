@@ -8,10 +8,10 @@
 import Node from './Node'
 
 export default {
-  name: "RootNode",
-  components: {Node},
-  props:{
-    config:{
+  name: 'RootNode',
+  components: { Node },
+  props: {
+    config: {
       type: Object,
       default: () => {
         return {}
@@ -22,8 +22,8 @@ export default {
     return {
     }
   },
-  computed:{
-    content(){
+  computed: {
+    content() {
       return this.config.props.assignedUser.map(item => item.label).join('、') || ''
     }
   },

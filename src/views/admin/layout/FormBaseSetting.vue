@@ -60,8 +60,8 @@ import orgPicker from '@/components/common/organizationPicker'
 import { itemPagingList } from '@/api/manage'
 import { getFormCategoryNotAssociated } from '@/api/design'
 export default {
-  name: "FormBaseSetting",
-  components: {orgPicker},
+  name: 'FormBaseSetting',
+  components: { orgPicker },
   data() {
     return {
       nowUserSelect: null,
@@ -84,7 +84,7 @@ export default {
       return this.$store.state.design;
     }
   },
-  mounted(){
+  mounted() {
     this.getObtainExamineTypeList()
   },
   methods: {
@@ -126,28 +126,27 @@ export default {
     },
     closeSelect() {
       this.showUserSelect = false
-      //this.nowUserSelect = null
+      // this.nowUserSelect = null
     },
-    selected(select) {
+    selected() {
       this.showUserSelect = false
       // this.$set(this.setup.settings, this.nowUserSelect, select)
-      //this.setup[this.nowUserSelect] = select
+      // this.setup[this.nowUserSelect] = select
     },
     selectUser(key) {
       // this.select = this.setup.settings[key]
       this.nowUserSelect = key
       this.showUserSelect = true
     },
-    validate(){
+    validate() {
       this.$refs.baseSetting.validate()
-      let err = []
-      if ((!this.setup.templateName) || (this.setup.templateName?.length < 2) || (this.setup.templateName?.length > 10)){
+      const err = []
+      if ((!this.setup.templateName) || (this.setup.templateName?.length < 2) || (this.setup.templateName?.length > 10)) {
         err.push('流程名称未设置或长度不对')
       }
-      if (!this.$isNotEmpty(this.setup.formId) || !this.setup.formId){
+      if (!this.$isNotEmpty(this.setup.formId) || !this.setup.formId) {
         err.push('关联表单未设置')
       }
-      console.log(this.setup)
       return err
     }
   }
@@ -191,8 +190,6 @@ export default {
   width: 1.3em;
   height: 1.3em;
 }
-
-
 
 .base-setup {
   overflow: auto;

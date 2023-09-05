@@ -42,15 +42,15 @@
 </template>
 
 <script>
-import LayoutHeader from './LayoutHeader'
-import {saveProcess, publishProcess, getProcessDetail} from '@/api/design'
+import { saveProcess, publishProcess, getProcessDetail } from '@/api/design'
 import FormBaseSetting from '@/views/admin/layout/FormBaseSetting'
 import ProcessDesign from '@/views/admin/layout/ProcessDesign'
 import FormProSetting from '@/views/admin/layout/FormProSetting'
 import secondaryConfirmation from '@/components/common/secondaryConfirmation';
+import LayoutHeader from './LayoutHeader'
 export default {
-  name: "FormProcessDesign",
-  components: {LayoutHeader, FormBaseSetting, ProcessDesign, FormProSetting, secondaryConfirmation},
+  name: 'FormProcessDesign',
+  components: { LayoutHeader, FormBaseSetting, ProcessDesign, FormProSetting, secondaryConfirmation },
   data() {
     return {
       confirmOption: {
@@ -66,20 +66,20 @@ export default {
       validVisible: false,
       validResult: {},
       validOptions: [
-        {title: '基础信息', description: '', icon: '', status: ''},
+        { title: '基础信息', description: '', icon: '', status: '' },
         // {title: '审批表单', description: '', icon: '', status: ''},
-        {title: '审批流程', description: '', icon: '', status: ''},
-        {title: '扩展设置', description: '', icon: '', status: ''}
+        { title: '审批流程', description: '', icon: '', status: '' },
+        { title: '扩展设置', description: '', icon: '', status: '' }
       ],
       validComponents: ['baseSetting', 'processDesign', 'proSetting'],
     }
   },
-  computed:{
-    setup(){
+  computed: {
+    setup() {
       return this.$store.state.design
     },
-    errTitle(){
-      if (this.validResult.finished && !this.validResult.success){
+    errTitle() {
+      if (this.validResult.finished && !this.validResult.success) {
         return this.validResult.title + ` (${this.validResult.errs.length}项错误) 😥`
       }
       return this.validResult.title
@@ -96,10 +96,10 @@ export default {
   },
   created() {
     this.showValiding()
-    let formId = this.$route.query.code
-    //判断传参，决定是新建还是加载原始数据
-    
-    if (!this.$isEmpty(formId)){
+    const formId = this.$route.query.code
+    // 判断传参，决定是新建还是加载原始数据
+
+    if (!this.$isEmpty(formId)) {
       this.isNew = false
       this.loadFormInfo(formId)
     } else {
@@ -111,8 +111,8 @@ export default {
   beforeDestroy() {
     this.stopTimer()
   },
-  methods:{
-    async loadFormInfo(formId){
+  methods: {
+    async loadFormInfo(formId) {
       const res = await getProcessDetail(formId)
       const design = res.data.data
       design.formId = +design.formId || ''
@@ -122,7 +122,7 @@ export default {
       this.$store.commit('loadForm', design)
       this.$store.state.designSave = JSON.stringify(design)
     },
-    loadInitFrom(){
+    loadInitFrom() {
       this.$store.commit('loadForm', {
         ...this.$store.state.tempDesign
       })
@@ -197,14 +197,14 @@ export default {
       }
     },
     async saveProcess(callback) {
-      if ((!this.$refs['baseSetting'].setup.templateName) ||  (this.$refs['baseSetting'].setup.templateName?.length < 2) || (this.$refs['baseSetting'].setup.templateName?.length > 10)) {
+      if ((!this.$refs['baseSetting'].setup.templateName) || (this.$refs['baseSetting'].setup.templateName?.length < 2) || (this.$refs['baseSetting'].setup.templateName?.length > 10)) {
         this.$message.warning('流程名称未设置或长度不对')
         return false;
       }
 
       const user = JSON.parse(window.localStorage.getItem('user_name'))
-      console.log('this.setup.process', this.setup.process)
-      let template = {
+      // console.log('this.setup.process', this.setup.process)
+      const template = {
         formId: this.setup.formId,
         formName: this.setup.formName,
         templateName: this.setup.templateName,
@@ -239,7 +239,7 @@ export default {
       this.$message.info('发布中，请稍等...');
       this.$refs.confirmation.isDisabled = true;
       const user = JSON.parse(window.localStorage.getItem('user_name'))
-      let template = {
+      const template = {
         formId: this.setup.formId,
         formName: this.setup.formName,
         templateName: this.setup.templateName,
@@ -257,10 +257,10 @@ export default {
         createUserId: user.id
       }
       // if (this.isNew || this.$isEmpty(this.setup.formId)){
-      publishProcess(template).then(rsp => {
+      publishProcess(template).then(() => {
         this.$refs.confirmation.isDisabled = false;
         this.$refs.confirmation.dialogVisible = false;
-        this.$message.success("发布成功！可在流程管理列表页查看")
+        this.$message.success('发布成功！可在流程管理列表页查看')
         // this.setup.processDefinitionI
         this.validVisible = false
         this.$router.push({
@@ -268,10 +268,10 @@ export default {
         })
       }).catch(() => {
         this.$refs.confirmation.isDisabled = false;
-        this.$message.error("发布失败")
+        this.$message.error('发布失败')
       })
     },
-    doPublish(){
+    doPublish() {
       this.$refs.confirmation.dialogVisible = true;
     }
   }

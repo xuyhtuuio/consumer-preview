@@ -22,15 +22,15 @@
 </template>
 
 <script>
-import draggable from "vuedraggable";
+import draggable from 'vuedraggable';
 
 export default {
-  name: "SelectInputConfig",
-  components: {draggable},
-  props:{
-    value:{
+  name: 'SelectInputConfig',
+  components: { draggable },
+  props: {
+    value: {
       type: Object,
-      default: ()=>{
+      default: () => {
         return {}
       }
     }

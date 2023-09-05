@@ -1,4 +1,3 @@
-
 <template>
   <div class="user">
     <div class="top">
@@ -128,7 +127,7 @@ import {
   getUserList,
   deactivateRecoveryUser,
   changeUserRoles
-} from '@/api/admin/user.js';
+} from '@/api/admin/user';
 export default {
   name: 'UserManage',
   components: { SecondaryConfirmation },
@@ -172,7 +171,7 @@ export default {
           label: '更新时间',
           prop: 'updateTime',
           bind: {
-            width:180,
+            width: 180,
             align: 'center',
             sortable: 'custom'
           }
@@ -221,29 +220,16 @@ export default {
       const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.pathName === 'UserManage') || {}
       if (flowManage.type === 'edit') {
         return true
-      }else {
-        this.colConfig.pop()
+      } else {
+        // this.colConfig.pop()
         return false
       }
     }
-  },
-  created() {
-    this.initOrganizationData();
-    this.initRoleData();
-    this.initData();
   },
   activated() {
     this.initOrganizationData();
     this.initRoleData();
     this.initData();
-  },
-  mounted() {
-    // 监听滚动事件
-    // 暂时没用
-    this.$refs.refSelect.$refs.scrollbar.$refs.wrap.addEventListener(
-      'scroll',
-      _.throttle(this.scolling, 300, { leading: true, trailing: true })
-    );
   },
   methods: {
     async initData() {
@@ -286,7 +272,7 @@ export default {
       }
     },
     getTreeData(data) {
-      for (var i = 0; i < data.length; i++) {
+      for (let i = 0; i < data.length; i++) {
         if (data[i].children.length < 1) {
           // children若为空数组，则将children设为undefined
           data[i].children = undefined;
@@ -298,10 +284,10 @@ export default {
       return data;
     },
     scolling() {
-      let e = this.$refs.refSelect.$refs.scrollbar.$refs.wrap;
+      const e = this.$refs.refSelect.$refs.scrollbar.$refs.wrap;
       if (this.noMore) return;
       // 到底时触发 loadMore
-      let loadMore = e.scrollHeight - e.scrollTop <= e.clientHeight;
+      const loadMore = e.scrollHeight - e.scrollTop <= e.clientHeight;
       if (loadMore) {
         // this.loadMore();
       }
@@ -313,7 +299,7 @@ export default {
       this.initRoleData();
     },
 
-    sortChange({ column, prop, order }) {
+    sortChange({ order }) {
       if (!order) return;
       this.sortType = order.includes('asc') ? 1 : 2;
       this.initData();
@@ -333,7 +319,7 @@ export default {
       this.dialog.roleId = row.roleId;
       this.dialog.userId = row.userId;
     },
-    submitEdit(row) {},
+    submitEdit() {},
     // 停用
     stopApllay({ userId }, action) {
       this.stopOrRun = { userId, status: action === 'edit0' ? 0 : 1 };
@@ -341,7 +327,7 @@ export default {
       action === 'edit0' && this.editStatus(true);
     },
     editStatus(flag = false) {
-      deactivateRecoveryUser(this.stopOrRun).then(({ data: { data: res, success } }) => {
+      deactivateRecoveryUser(this.stopOrRun).then(({ data: { success } }) => {
         if (success) {
           this.initData();
           flag && this.$message.success('已恢复该用户所有操作权限。');
@@ -354,7 +340,7 @@ export default {
       this.initData();
     },
     handleSubmitLimitTime() {
-      changeUserRoles(this.dialog).then(({ data: { data: res, msg, success } }) => {
+      changeUserRoles(this.dialog).then(({ data: { msg, success } }) => {
         if (success) {
           this.$message.success(msg);
         } else {
@@ -371,7 +357,6 @@ export default {
 @color1: #1d2128;
 .user {
   height: 100%;
-  overflow: hidden;
   .top {
     font-size: 14px;
     margin: 0 -24px;
@@ -548,10 +533,5 @@ export default {
     }
   }
 }
-
-
-
-
-
 
 </style>

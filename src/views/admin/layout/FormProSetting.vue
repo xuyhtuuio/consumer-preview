@@ -22,7 +22,7 @@
 
 <script>
 export default {
-  name: "FormProSetting",
+  name: 'FormProSetting',
   data() {
     return {
       showSelect: false,
@@ -44,7 +44,7 @@ export default {
     // }
   },
   methods: {
-    validate(){
+    validate() {
       if (this.setup.undo && !this.setup.target) {
         return ['请选择指定节点']
       }

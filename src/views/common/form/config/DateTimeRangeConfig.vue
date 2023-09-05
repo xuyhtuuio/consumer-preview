@@ -17,7 +17,7 @@
 
 <script>
 export default {
-  name: "DateTimeRangeConfig",
+  name: 'DateTimeRangeConfig',
   components: {},
   props: {
     value: {

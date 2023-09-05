@@ -13,29 +13,29 @@
 <script >
 import orderBasicInfo from '@/components/card/order-basic-info'
 export default {
-    name:'apply-form',
-    props: {
-        sidebarParam: {
-            type: Object,
-            default: () => { }
-        },
-        personInfo: {
-            type: Object,
-            default: () => { }
-        }
+  name: 'apply-form',
+  props: {
+    sidebarParam: {
+      type: Object,
+      default: () => { }
     },
-    components: {
-        orderBasicInfo
-    },
-    data() {
-        return {
-        }
-    },
-    methods:{
-        preview(url){
-            this.$emit('previewFile', url)
-        }
+    personInfo: {
+      type: Object,
+      default: () => { }
     }
+  },
+  components: {
+    orderBasicInfo
+  },
+  data() {
+    return {
+    }
+  },
+  methods: {
+    preview(url) {
+      this.$emit('previewFile', url)
+    }
+  }
 }
 
 </script>
@@ -61,10 +61,7 @@ export default {
             font-size: 16px;
         }
 
-
-
     }
-
 
 }
 </style>

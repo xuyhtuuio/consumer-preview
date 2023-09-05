@@ -9,7 +9,7 @@ export const ValueType = {
   cascader: 'Tree',
   dateRange: 'DateRange'
 }
-//导出所有组件及配置
+// 导出所有组件及配置
 export default [
   {
     title: '单行文本输入',
@@ -53,7 +53,7 @@ export default [
     props: {
       required: false,
       enablePrint: true,
-      options:['选项1', '选项2']
+      options: ['选项1', '选项2']
     }
   },
   {
@@ -65,7 +65,7 @@ export default [
     props: {
       required: false,
       enablePrint: true,
-      options:['选项1', '选项2']
+      options: ['选项1', '选项2']
     }
   },
   {
@@ -88,7 +88,7 @@ export default [
     props: {
       required: false,
       enablePrint: true,
-      placeholder:['开始时间','结束时间'],
+      placeholder: ['开始时间', '结束时间'],
       format: 'yyyy-MM-dd HH:mm'
     }
   },

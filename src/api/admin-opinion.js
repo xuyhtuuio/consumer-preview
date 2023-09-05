@@ -1,7 +1,6 @@
-import qs from 'qs';
-import request from '@/api/request.js';
+import request from '@/api/request';
 // 获取列表
-export function getPageList(params,url="/cpr/opinion/list") {
+export function getPageList(params, url = '/cpr/opinion/list') {
   return request({
     url,
     method: 'get',
@@ -44,7 +43,7 @@ export function remove(param) {
   return request({
     url: '/cpr/opinion/remove',
     method: 'post',
-    contentType : 'application/x-www-form-urlencoded;charset=utf-8',
+    contentType: 'application/x-www-form-urlencoded;charset=utf-8',
     data: param
   }).then(({ data: res }) => {
     return res;

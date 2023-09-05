@@ -129,266 +129,265 @@
 <script>
 import moment from 'moment'
 import {
-    updateRuleCode,
-    ocrApprovalSubmission
-} from "@/api/aiApproval";
-import secondaryConfirmation from "@/components/common/secondaryConfirmation";
+  updateRuleCode,
+  ocrApprovalSubmission
+} from '@/api/aiApproval';
+import secondaryConfirmation from '@/components/common/secondaryConfirmation';
 import ExaminePivot from '../components/examine-pivot';
-import ComFormItem from '../../../components/common/com-form-item.vue';
+import ComFormItem from '../../../components/common/com-form-item';
 export default {
-    components: { secondaryConfirmation, ExaminePivot, ComFormItem },
-    props: {
-        formId: {
-            type: String,
-            default: ''
-        },
-        formBase: {
-            type: Object,
-            default: () => ({})
-        },
-        approvalLetter: {
-            type: Object,
-            default: () => ({})
-        },
-        applyFormWithPermissions: {
-            type: Object,
-            default: () => ({})
-        },
-        rejectOption: {
-            type: Array,
-            default: () => ([])
-        },
-        nextStepObj: {
-            type: Object,
-            default: () => ({})
-        },
+  components: { secondaryConfirmation, ExaminePivot, ComFormItem },
+  props: {
+    formId: {
+      type: String,
+      default: ''
     },
-    data() {
-        return {
-            disabled: false,
-            timeNow: '',
-            saveOption: {
-                message: '关闭提交弹窗将不保存已修改内容，确定关闭？',
-                cancelBtn: '取消',
-                confirmBtn: '关闭',
-            },
-            showClose: false,
-            submitReviewDialog: false,
-            passlist: [
-                { name: '通过', id: true },
-                { name: '驳回', id: false },
-            ],
-            rules: {
-                nextUser: [
-                    { required: true, message: '请选择审批人', trigger: 'change' }
-                ],
-                prevUser: [
-                    { required: true, message: '请选择驳回人', trigger: 'change' }
-                ],
-                reason: [
-                    { required: true, message: '请选择驳回原因', trigger: 'change' }
-                ],
-                /*  productEssentials: [
+    formBase: {
+      type: Object,
+      default: () => ({})
+    },
+    approvalLetter: {
+      type: Object,
+      default: () => ({})
+    },
+    applyFormWithPermissions: {
+      type: Object,
+      default: () => ({})
+    },
+    rejectOption: {
+      type: Array,
+      default: () => ([])
+    },
+    nextStepObj: {
+      type: Object,
+      default: () => ({})
+    },
+  },
+  data() {
+    return {
+      disabled: false,
+      timeNow: '',
+      saveOption: {
+        message: '关闭提交弹窗将不保存已修改内容，确定关闭？',
+        cancelBtn: '取消',
+        confirmBtn: '关闭',
+      },
+      showClose: false,
+      submitReviewDialog: false,
+      passlist: [
+        { name: '通过', id: true },
+        { name: '驳回', id: false },
+      ],
+      rules: {
+        nextUser: [
+          { required: true, message: '请选择审批人', trigger: 'change' }
+        ],
+        prevUser: [
+          { required: true, message: '请选择驳回人', trigger: 'change' }
+        ],
+        reason: [
+          { required: true, message: '请选择驳回原因', trigger: 'change' }
+        ],
+        /*  productEssentials: [
                      { required: true, message: '请选择产品要点', trigger: 'change' },
                  ],
                  reviewPoints: [
                      { required: true, message: '请选择审查要点', trigger: 'change' },
                  ], */
-            },
-            submission: [],
-            increasedIds: {}, //须在最后提交时移除的
-            mousePoint: -1,
-            params: {
-                isPasses: true,
-                reason: '',
-                txt: '',
-                nextUser: [],
-                prevUser: ''
-            },
-            examineList: [],
-            examineInfo: "请选择当前项目是否包含以下要点，不勾选或选择“否”为不包含该要点信息，则会返回至发起人修改并二次会签。"
-        }
-    },
-    watch: {
-        submitReviewDialog(val) {
-            if (val) {
-                this.timeNow = moment().format('YYYY-MM-DD HH:mm:ss');
-                this.params.isPasses = true;
-                if (this.approvalLetter.permissions === 'passAllow') {
-                    this.submission = (this.approvalLetter.list || []).concat(this.submission || [])
-                }
-            }
-        },
-        examineList(val) {
-            this.$nextTick(() => {
-                this.$refs.refExamine.list = val
-            })
-        }
-    },
-    methods: {
-        showEdit_collection(i) {
-            this.$set(this.submission[i], 'showEdit', true);
-            this.$nextTick(() => {
-                this.$refs[`input_${i}`][0].focus()
-            })
-        },
-        // 提交结果
-        async submit() {
-            // 驳回
-            if (this.approvalLetter.permissions === 'passNotAllow' && !this.params.isPasses) {
-                this.$refs['paramsForm'].validate((valid) => {
-                    if (valid) {
-                        this.$emit('submit', {
-                            ...this.params
-                        })
-                    } else {
-                        return false;
-                    }
-                });
-                return;
-            }
-            const filledInByApproverWithNull = this.applyFormWithPermissions.filledInByApprover.filter(item => item.value.length === 0 && item.props.required)
-            if (filledInByApproverWithNull.length) {
-                this.$message.error('存在必填项未填写，请填写！')
-                return;
-            }
-            let opinionLetterRecordDtoList = null;
-            const editedCommentsDtoList = this.submission.filter(item => !item.associatedAttachmentsIds)
-            if (this.approvalLetter.permissions === 'passAllow') {
-                opinionLetterRecordDtoList = this.submission.map(item => {
-                    return {
-                        ...item,
-                        content: item.str,
-                        substantiveOpinions: item.opinion ? 1 : 0
-                    }
-                }) || [];
-            } else {
-                editedCommentsDtoList.forEach(item => {
-                    delete item.opinion
-                })
-            }
-            editedCommentsDtoList.forEach(comment => {
-                comment.id = this.increasedIds.strIds.includes(comment.id) ? null : comment.id;
-                comment.words = comment.words.filter(id => !this.increasedIds.words.includes(id))
-            })
-            const keyPointsForVerification = this.$refs.refExamine.list?.map(item => {
-                item.formItemId = item.id;
-                return item;
-            })
-            const formItemDataList = this.applyFormWithPermissions.filledInByApprover?.map(item => {
-                item.formItemId = item.id;
-                return item;
-            })
-            const user = JSON.parse(window.localStorage.getItem('user_name'))
-            const data = {
-                approvalSubmissionDto: {
-                    opinionLetterRecordDtoList,
-                    editedCommentsDtoList,
-                    keyPointsForVerification,
-                    formItemDataList,
-                    formId: this.formId
-                },
-                processInstanceId: this.formBase.processInstanceId,
-                taskId: this.formBase.taskId,
-                templateId: this.formBase.processTemplateId,
-                currentUserInfo: {
-                    id: user.id,
-                    name: user.fullname
-                }
-            }
-            let formValid = true;
-            if (this.nextStepObj?.selectObject === '1') {
-                this.$refs['paramsForm'].validate((valid) => {
-                    if (valid) {
-                        data.nextNodeId = this.nextStepObj.nextNodeId;
-                        data.nextUserInfo = (this.nextStepObj?.nodeSelectUserList || []).filter(user => this.params.nextUser.includes(user.id))
-                    } else {
-                        formValid = false;
-                        return false;
-                    }
-                });
-            }
-            if (!formValid) {
-                return;
-            }
-            this.postData(data)
-        },
-        async postData(data) {
-            this.$message.info('提交中，请稍等！')
-            this.disabled = true;
-            let updateRuleRes = {
-                data: {
-                    status: 200,
-                    msg: '',
-                }
-            }
-            if (this.nextStepObj?.selectObject === '1') {
-                updateRuleRes = await updateRuleCode({
-                    nextNodeId: data.nextNodeId,
-                    nextUserInfo: data.nextUserInfo,
-                    templateId: data.templateId
-                }).catch(() => {
-                    updateRuleRes.data.status = 400;
-                    this.disabled = false;
-                })
-            }
-            const { status: ruleStatus, msg: ruleMsg } = updateRuleRes.data;
-            if (ruleStatus === 200) {
-                ocrApprovalSubmission(data).then((res) => {
-                    this.disabled = false;
-                    const { status, msg } = res.data;
-                    if (status === 200) {
-                        this.$message.success({ offset: 40, message: '审查意见已提交,可在审批中心查看' });
-                        this.submitReviewDialog = false;
-                        this.$router.go(-1)
-                    } else {
-                        this.$message.error({ offset: 40, message: msg });
-                    }
-                }).catch(() => {
-                    this.disabled = false;
-                })
-            } else {
-                ruleMsg && this.$message.error({ offset: 40, message: ruleMsg });
-            }
-        },
-        handleClose() {
-            this.$refs.confirmation.dialogVisible = true;
-        },
-        mouseenter(item, index) {
-            this.mousePoint = index
-        },
-        mouseleave() {
-            this.mousePoint = -1
-        },
-        moveTop(index) {
-            const copyCrtValue = this.submission[index]
-            const copyUpValue = this.submission[index - 1]
-            this.$set(this.submission, index, copyUpValue)
-            this.$set(this.submission, index - 1, copyCrtValue)
-        },
-        moveDown(index) {
-            const copyCrtValue = this.submission[index]
-            const copyNextValue = this.submission[index + 1]
-            this.$set(this.submission, index, copyNextValue)
-            this.$set(this.submission, index + 1, copyCrtValue)
-        },
-        del(item, index) {
-            this.$confirm('确定删除该条意见吗？', '', {
-                customClass: 'confirmBox',
-                confirmButtonText: '删除',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                this.submission.splice(index, 1)
-            }).catch(() => {
-                this.$message({
-                    type: 'info',
-                    message: '已取消删除'
-                });
-            });
-
-        }
+      },
+      submission: [],
+      increasedIds: {}, // 须在最后提交时移除的
+      mousePoint: -1,
+      params: {
+        isPasses: true,
+        reason: '',
+        txt: '',
+        nextUser: [],
+        prevUser: ''
+      },
+      examineList: [],
+      examineInfo: '请选择当前项目是否包含以下要点，不勾选或选择“否”为不包含该要点信息，则会返回至发起人修改并二次会签。'
     }
+  },
+  watch: {
+    submitReviewDialog(val) {
+      if (val) {
+        this.timeNow = moment().format('YYYY-MM-DD HH:mm:ss');
+        this.params.isPasses = true;
+        if (this.approvalLetter.permissions === 'passAllow') {
+          this.submission = (this.approvalLetter.list || []).concat(this.submission || [])
+        }
+      }
+    },
+    examineList(val) {
+      this.$nextTick(() => {
+        this.$refs.refExamine.list = val
+      })
+    }
+  },
+  methods: {
+    showEdit_collection(i) {
+      this.$set(this.submission[i], 'showEdit', true);
+      this.$nextTick(() => {
+        this.$refs[`input_${i}`][0].focus()
+      })
+    },
+    // 提交结果
+    async submit() {
+      // 驳回
+      if (this.approvalLetter.permissions === 'passNotAllow' && !this.params.isPasses) {
+        this.$refs['paramsForm'].validate((valid) => {
+          if (valid) {
+            this.$emit('submit', {
+              ...this.params
+            })
+          } else {
+            return false;
+          }
+        });
+        return;
+      }
+      const filledInByApproverWithNull = this.applyFormWithPermissions.filledInByApprover.filter(item => item.value.length === 0 && item.props.required)
+      if (filledInByApproverWithNull.length) {
+        this.$message.error('存在必填项未填写，请填写！')
+        return;
+      }
+      let opinionLetterRecordDtoList = null;
+      const editedCommentsDtoList = this.submission.filter(item => !item.associatedAttachmentsIds)
+      if (this.approvalLetter.permissions === 'passAllow') {
+        opinionLetterRecordDtoList = this.submission.map(item => {
+          return {
+            ...item,
+            content: item.str,
+            substantiveOpinions: item.opinion ? 1 : 0
+          }
+        }) || [];
+      } else {
+        editedCommentsDtoList.forEach(item => {
+          delete item.opinion
+        })
+      }
+      editedCommentsDtoList.forEach(comment => {
+        comment.id = this.increasedIds.strIds.includes(comment.id) ? null : comment.id;
+        comment.words = comment.words.filter(id => !this.increasedIds.words.includes(id))
+      })
+      const keyPointsForVerification = this.$refs.refExamine.list?.map(item => {
+        item.formItemId = item.id;
+        return item;
+      })
+      const formItemDataList = this.applyFormWithPermissions.filledInByApprover?.map(item => {
+        item.formItemId = item.id;
+        return item;
+      })
+      const user = JSON.parse(window.localStorage.getItem('user_name'))
+      const data = {
+        approvalSubmissionDto: {
+          opinionLetterRecordDtoList,
+          editedCommentsDtoList,
+          keyPointsForVerification,
+          formItemDataList,
+          formId: this.formId
+        },
+        processInstanceId: this.formBase.processInstanceId,
+        taskId: this.formBase.taskId,
+        templateId: this.formBase.processTemplateId,
+        currentUserInfo: {
+          id: user.id,
+          name: user.fullname
+        }
+      }
+      let formValid = true;
+      if (this.nextStepObj?.selectObject === '1') {
+        this.$refs['paramsForm'].validate((valid) => {
+          if (valid) {
+            data.nextNodeId = this.nextStepObj.nextNodeId;
+            data.nextUserInfo = (this.nextStepObj?.nodeSelectUserList || []).filter(item => this.params.nextUser.includes(item.id))
+          } else {
+            formValid = false;
+            return false;
+          }
+        });
+      }
+      if (!formValid) {
+        return;
+      }
+      this.postData(data)
+    },
+    async postData(data) {
+      this.$message.info('提交中，请稍等！')
+      this.disabled = true;
+      let updateRuleRes = {
+        data: {
+          status: 200,
+          msg: '',
+        }
+      }
+      if (this.nextStepObj?.selectObject === '1') {
+        updateRuleRes = await updateRuleCode({
+          nextNodeId: data.nextNodeId,
+          nextUserInfo: data.nextUserInfo,
+          templateId: data.templateId
+        }).catch(() => {
+          updateRuleRes.data.status = 400;
+          this.disabled = false;
+        })
+      }
+      const { status: ruleStatus, msg: ruleMsg } = updateRuleRes.data;
+      if (ruleStatus === 200) {
+        ocrApprovalSubmission(data).then((res) => {
+          this.disabled = false;
+          const { status, msg } = res.data;
+          if (status === 200) {
+            this.$message.success({ offset: 40, message: '审查意见已提交,可在审批中心查看' });
+            this.submitReviewDialog = false;
+            this.$router.go(-1)
+          } else {
+            this.$message.error({ offset: 40, message: msg });
+          }
+        }).catch(() => {
+          this.disabled = false;
+        })
+      } else {
+        ruleMsg && this.$message.error({ offset: 40, message: ruleMsg });
+      }
+    },
+    handleClose() {
+      this.$refs.confirmation.dialogVisible = true;
+    },
+    mouseenter(item, index) {
+      this.mousePoint = index
+    },
+    mouseleave() {
+      this.mousePoint = -1
+    },
+    moveTop(index) {
+      const copyCrtValue = this.submission[index]
+      const copyUpValue = this.submission[index - 1]
+      this.$set(this.submission, index, copyUpValue)
+      this.$set(this.submission, index - 1, copyCrtValue)
+    },
+    moveDown(index) {
+      const copyCrtValue = this.submission[index]
+      const copyNextValue = this.submission[index + 1]
+      this.$set(this.submission, index, copyNextValue)
+      this.$set(this.submission, index + 1, copyCrtValue)
+    },
+    del(item, index) {
+      this.$confirm('确定删除该条意见吗？', '', {
+        customClass: 'confirmBox',
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.submission.splice(index, 1)
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    }
+  }
 }
 </script>
 <style lang="less" scoped>
@@ -419,7 +418,6 @@ export default {
             }
         }
     }
-
 
     .el-dialog__header {
         padding: 0;
@@ -526,7 +524,6 @@ export default {
             height: 18px;
         }
 
-
         .title {
             color: #1D2128;
             text-align: center;
@@ -607,7 +604,6 @@ export default {
                     flex: 1;
                     justify-content: space-evenly;
 
-
                     .opinion {
                         padding: 2px 4px;
                         border-radius: 0px 6px 6px 6px;
@@ -629,7 +625,6 @@ export default {
                     .no-opinion {
                         border-radius: 0px 6px 6px 6px;
                         background: linear-gradient(90deg, #E85167 0%, #FF8193 100%);
-
 
                     }
 
@@ -701,20 +696,6 @@ export default {
         font-weight: 400;
         line-height: 28px;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 </style>

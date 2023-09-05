@@ -11,24 +11,14 @@
 </template>
 
 <script>
-//import layout from './components/layout'
-import NavMenu from "@/components/common/navMenu"
+import NavMenu from '@/components/common/navMenu';
 export default {
-  components: { NavMenu},
+  components: { NavMenu },
   data() {
     return {
-      noPaddingRoute:['aiApproval','approval-aiApproval', 'compare'],
+      noPaddingRoute: ['aiApproval', 'approval-aiApproval', 'compare'],
       noBodyScroll: ['baseSetting', 'processDesign', 'proSetting']
     }
-  },
-  mounted() {
-    let beforeUrl = sessionStorage.getItem('router-path')
-    if (beforeUrl === undefined || beforeUrl === '') {
-      //this.$router.push("/workPanel")
-    } else {
-      //this.$router.push(beforeUrl)
-    }
-
   },
   methods: {}
 }
@@ -83,10 +73,5 @@ ul {
 .item-desc {
   font-size: small;
   color: #5e5e5e;
-
-
-
-
-
-
-}</style>
+}
+</style>

@@ -7,12 +7,10 @@ import {
   getApprovalDraft,
   getOpinionApprovalLetter,
   queryFormItemPermissions,
-  getNextUserOption
+  getNextUserOption,
+  rollback
 } from '@/api/aiApproval';
 import { getApplyForm } from '@/api/front';
-import {
-  rollback
-} from "@/api/aiApproval";
 
 export default {
   methods: {
@@ -28,7 +26,7 @@ export default {
       });
     },
     // 获取工单上一审查意见书
-     getOpinionApprovalLetter() {
+    getOpinionApprovalLetter() {
       getOpinionApprovalLetter({
         nodeId: this.formBase.nodeId,
         formId: this.formId,
@@ -41,6 +39,8 @@ export default {
             item.opinion = Boolean(item.substantiveOpinions)
           })
           this.approvalLetter = data
+          this.$refs.sidebar.tools[3].show = (data.permissions === 'passAllow' && data.list.length !== 0)
+          this.$forceUpdate()
         }
       });
     },
@@ -58,9 +58,8 @@ export default {
           this.$refs.sidebar.tools[0].sidebarParam = {
             ...data,
             keyPointsForVerification: JSON.parse(JSON.stringify(data.keyPointsForVerification))
-           };
-        }
-        else {
+          };
+        } else {
           this.$message.error({ offset: 40, title: '提醒', message });
         }
       });
@@ -101,7 +100,7 @@ export default {
       const keyPointsForVerification = [];
       const filledInByApprover = [];
       // 权限标识 R为只读 E为可编辑 H为隐藏
-      const permissions = formItemPermissions.filter(item => item.authorityFlag	 === 'E');
+      const permissions = formItemPermissions.filter(item => item?.authorityFlag === 'E');
       permissions.forEach(perm => {
         keyPointsForVerification.push(...applyForm.keyPointsForVerification.filter(item => item.id.toString() === perm.formItemId.toString()));
         filledInByApprover.push(...applyForm.filledInByApprover.filter(item => item.id.toString() === perm.formItemId.toString()));
@@ -202,7 +201,7 @@ export default {
       this.activeIndex = i;
       // 更新对应文件的ocr和推荐意见
       const temp = this.files[i];
-      const suffer = ['jpeg', 'jpg', 'png', 'pdf'].includes(temp?.fileName?.split('.')[temp?.fileName?.split('.').length-1]);
+      const suffer = ['jpeg', 'jpg', 'png', 'pdf'].includes(temp?.fileName?.split('.')[temp?.fileName?.split('.').length - 1]);
       if (!temp.ocr && !temp.recommends && suffer) {
         temp.ocr = await this.getOcr(temp);
         await getOcrExamineShow({
@@ -224,13 +223,13 @@ export default {
       this.fileloading = false;
     },
     async getOcr(temp) {
-      let ocr = [];
+      const ocr = [];
       await getOCRAnalysisResults({
         fileId: temp.id
       }).then(res => {
         const { data, status } = res.data;
         if (status === 200) {
-          for (let key in data.results) {
+          for (const key in data.results) {
             ocr.push(...data.results[key]);
           }
         }
@@ -331,9 +330,9 @@ export default {
               words: [recommend.id]
             });
           }
-        }),
-          // 未关联word的 意见
-          file?.comments && arr.push(...file?.comments);
+        })
+        // 未关联word的 意见
+        file?.comments && arr.push(...file?.comments);
       });
       // 去重
       const setArr = [];
@@ -353,7 +352,7 @@ export default {
     },
     // 编辑意见后,同步更新  文件的推荐意见状态
     upDateComments(type, item, newVal) {
-      let filterFiles = this.files.filter(file => item.files.includes(file.id));
+      const filterFiles = this.files.filter(file => item.files.includes(file.id));
       switch (type) {
         // 新增意见,至少找到一个 关联文件,将新增意见插入即可
         case 'add':
@@ -365,11 +364,12 @@ export default {
         // 修改类型为修改意见字符串,找到意见关联的所有文件,  如果意见存在关联 关键词,修改对应词,对应意见的str,  如果 comments下包含,则修改 该意见
         case 'editStr':
         // 删除意见,找到意见关联的所有文件, 如果意见存在关联 关键词,则取消关键词 选择 的 意见,如果 comments下包含,则移除 该意见
+        // eslint-disable-next-line
         case 'remove':
           filterFiles.map(file => {
             const matchWord = file?.recommends?.filter(word => item.words.includes(word.id));
-            matchWord &&
-              matchWord.forEach(word => {
+            matchWord
+              && matchWord.forEach(word => {
                 if (type === 'remove') {
                   word.selected = null;
                 } else if (type === 'editStr') {
@@ -377,8 +377,8 @@ export default {
                   recommend[0].str = newVal;
                 }
               });
-            file?.comments &&
-              file?.comments.map((comment, i) => {
+            file?.comments
+              && file?.comments.map((comment, i) => {
                 if (item.str === comment.str) {
                   if (type === 'remove') {
                     file.comments.splice(i, 1);
@@ -407,21 +407,20 @@ export default {
           const removeIds = item.files.filter(id => !newVal.includes(id));
           removeIds.map(id => {
             const removeFile = this.files.filter(file => file.id === id)?.[0];
-            const matchWord =
-              removeFile?.recommends?.filter(word => item.words.includes(word.id)) || [];
+            const matchWord = removeFile?.recommends?.filter(word => item.words.includes(word.id)) || [];
             if (matchWord.length) {
               matchWord.forEach(word => {
                 word.selected = null;
               });
             } else {
-              removeFile?.comments &&
-                removeFile?.comments.map((comment, i) => {
+              removeFile?.comments
+                && removeFile?.comments.map((comment, i) => {
                   if (item.str === comment.str) {
                     if (!filterFiles[0]?.comments) {
                       filterFiles[0].comments = [];
                     }
-                    filterFiles?.[0]?.comments &&
-                      filterFiles[0].comments.push({
+                    filterFiles?.[0]?.comments
+                      && filterFiles[0].comments.push({
                         ...item,
                         files: newVal
                       });
@@ -430,9 +429,9 @@ export default {
                 });
             }
             // 更新已存在的意见里的 ids
-            const existIds = item.files.filter(id => newVal.includes(id));
-            existIds.map(id => {
-              const addFile = this.files.filter(file => file.id === id)?.[0];
+            const existIds = item.files.filter(val => newVal.includes(val));
+            existIds.map(val => {
+              const addFile = this.files.filter(file => file.id === val)?.[0];
               const matchComments = addFile?.comments?.filter(comment => comment.str === item.str);
               if (matchComments) {
                 matchComments.forEach(comment => {
@@ -485,7 +484,7 @@ export default {
           comments: {}
         }
       }).then(res => {
-        const { data, status, message } = res.data;
+        const { status, message } = res.data;
         if (status === 200) {
           // 返回审批列表
           this.$router.push({
@@ -509,7 +508,7 @@ export default {
       this.examineShow = !this.examineShow;
     },
     // 驳回方法
-    submit({reason, txt, prevUser}) {
+    submit({ reason, txt, prevUser }) {
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       const data = {
         comments: `${reason}${txt.trim() ? '-' + txt : ''}`,

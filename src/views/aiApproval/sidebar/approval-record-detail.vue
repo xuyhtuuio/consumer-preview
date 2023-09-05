@@ -12,24 +12,24 @@
     </div>
 </template>
 <script>
-import approvalRecordCard from '@/components/card/approval-record-card.vue'
+import approvalRecordCard from '@/components/card/approval-record-card'
 export default {
-    name:'approval-record-detail',
-    props: {
-        sidebarParam: {
-            type: Object,
-            default: () => { }
-        }
-    },
-    components: {
-        approvalRecordCard
-    },
-    data() {
-        return {
-        }
-    },
-    mounted(){
-    },
+  name: 'approval-record-detail',
+  props: {
+    sidebarParam: {
+      type: Object,
+      default: () => { }
+    }
+  },
+  components: {
+    approvalRecordCard
+  },
+  data() {
+    return {
+    }
+  },
+  mounted() {
+  },
 }
 </script>
 <style lang="less" scoped>
@@ -57,8 +57,6 @@ export default {
         height: 96%;
         overflow-y: auto;
     }
-
-
 
 }
 </style>

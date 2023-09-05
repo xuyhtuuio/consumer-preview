@@ -11,12 +11,12 @@
 
 <script>
 export default {
-  name: "Description",
+  name: 'Description',
   components: {},
-  props:{
-    value:{
+  props: {
+    value: {
       type: Object,
-      default: ()=>{
+      default: () => {
         return {}
       }
     }

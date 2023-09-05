@@ -14,17 +14,17 @@
 </template>
 
 <script>
-import Approval from './ApprovalNodeConfig.vue'
-import Condition from './ConditionNodeConfig.vue'
-import Delay from './DelayNodeConfig.vue'
-import Cc from './CcNodeConfig.vue'
-import ApprovalTwo from './ApprovalTwoNodeConfig.vue'
-import Trigger from './TriggerNodeConfig.vue'
-import FormAuthorityConfig from './FormAuthorityConfig.vue'
-import Root from './RootNodeConfig.vue'
+import Approval from './ApprovalNodeConfig'
+import Condition from './ConditionNodeConfig'
+import Delay from './DelayNodeConfig'
+import Cc from './CcNodeConfig'
+import ApprovalTwo from './ApprovalTwoNodeConfig'
+import Trigger from './TriggerNodeConfig'
+import FormAuthorityConfig from './FormAuthorityConfig'
+import Root from './RootNodeConfig'
 
 export default {
-  name: "NodeConfig",
+  name: 'NodeConfig',
   components: {
     Approval,
     ApprovalTwo,
@@ -52,7 +52,6 @@ export default {
       return this.selectNode.name;
     },
     name() {
-      console.log(this.selectNode)
       switch (this.selectNode.type) {
         case 'ROOT':
           return '设置' + this.selectNode.name;

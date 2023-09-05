@@ -32,56 +32,55 @@
 </template>
 
 <script>
-import InsertButton from '@/views/common/InsertButton.vue'
-
+import InsertButton from '@/views/common/InsertButton'
 export default {
-  name: "Node",
-  components: {InsertButton},
-  props:{
-    //是否为根节点
+  name: 'Node',
+  components: { InsertButton },
+  props: {
+    // 是否为根节点
     isRoot: {
       type: Boolean,
       default: false
     },
-    //是否显示节点体
+    // 是否显示节点体
     show: {
       type: Boolean,
       default: true
     },
-    //节点内容区域文字
+    // 节点内容区域文字
     content: {
       type: String,
-      default: ""
+      default: ''
     },
-    title:{
+    title: {
       type: String,
-      default: "标题"
+      default: '标题'
     },
-    placeholder:{
+    placeholder: {
       type: String,
-      default: "请设置"
+      default: '请设置'
     },
-    //节点体左侧图标
+    // 节点体左侧图标
     leftIcon: {
       type: String,
       default: undefined
     },
-    //头部图标
-    headerIcon:{
+    // 头部图标
+    headerIcon: {
       type: String,
       default: ''
     },
-    //头部背景色
-    headerBgc:{
+    // 头部背景色
+    headerBgc: {
       type: String,
       default: '#576a95'
     },
-    //是否显示错误状态
-    showError:{
+    // 是否显示错误状态
+    showError: {
       type: Boolean,
       default: false
     },
-    errorInfo:{
+    errorInfo: {
       type: String,
       default: '无信息'
     },

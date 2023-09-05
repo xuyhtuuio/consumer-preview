@@ -145,31 +145,32 @@
 <script>
 import { itemPagingList } from '@/api/manage'
 import orgPicker from '@/components/common/organizationPicker'
-import {ValueType} from '@/views/common/form/ComponentsConfigExport'
+import { ValueType } from '@/views/common/form/ComponentsConfigExport'
 
 export default {
-  name: "ConditionGroupItemConfig",
-  components: {orgPicker},
+  name: 'ConditionGroupItemConfig',
+  components: { orgPicker },
   data() {
     return {
       ValueType,
       users: [],
       orgType: 'user',
       showOrgSelect: false,
-      //groupConditions: [],
+      // groupConditions: [],
       groupNames: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
-      supportTypes:[ValueType.number, ValueType.string, ValueType.array, ValueType.cascader,, ValueType.dept, ValueType.user], // ValueType.date
-      explains:[
-        {label: '等于', value:'='},
-        {label: '大于', value:'>'},
-        {label: '大于等于', value:'>='},
-        {label: '小于', value:'<'},
-        {label: '小于等于', value:'<='},
-        {label: '包含在', value:'IN'},
-        {label: 'x < 值 < x', value:'B'},
-        {label: 'x ≤ 值 < x', value:'AB'},
-        {label: 'x < 值 ≤ x', value:'BA'},
-        {label: 'x ≤ 值 ≤ x', value:'ABA'},
+      // eslint-disable-next-line
+      supportTypes: [ValueType.number, ValueType.string, ValueType.array, ValueType.cascader,, ValueType.dept, ValueType.user],
+      explains: [
+        { label: '等于', value: '=' },
+        { label: '大于', value: '>' },
+        { label: '大于等于', value: '>=' },
+        { label: '小于', value: '<' },
+        { label: '小于等于', value: '<=' },
+        { label: '包含在', value: 'IN' },
+        { label: 'x < 值 < x', value: 'B' },
+        { label: 'x ≤ 值 < x', value: 'AB' },
+        { label: 'x < 值 ≤ x', value: 'BA' },
+        { label: 'x ≤ 值 ≤ x', value: 'ABA' },
       ]
     }
   },
@@ -194,15 +195,15 @@ export default {
     },
     conditionList() {
       const conditionItems = this.$store.state.design.formItems.filter(f => {
-        if (f.props.required && f.run === 1 && this.supportTypes.indexOf(f.valueType) !== -1){
-          return {title: f.title, id: f.id, valueType: f.valueType}
+        if (f.props.required && f.run === 1 && this.supportTypes.indexOf(f.valueType) !== -1) {
+          return { title: f.title, id: f.id, valueType: f.valueType }
         }
       })
-      if (conditionItems.length === 0 || conditionItems[0].id !== 'root'){
+      if (conditionItems.length === 0 || conditionItems[0].id !== 'root') {
         // this.nodes.forEach((n) => {
         //   conditionItems.unshift({id: n.id, title: n.name, valueType: 'User'})
         // })
-        conditionItems.unshift({id: this.nodes[0].id, title: this.nodes[0].name, valueType: 'User'})
+        conditionItems.unshift({ id: this.nodes[0].id, title: this.nodes[0].name, valueType: 'User' })
       }
       return conditionItems
     },
@@ -246,8 +247,8 @@ export default {
         this.$store.state.design.formItems = formItems
       }
     },
-    conditionValType(type){
-      switch (type){
+    conditionValType(type) {
+      switch (type) {
         case '=':
         case '>':
         case '>=':
@@ -268,7 +269,7 @@ export default {
     selected(select) {
       this.showOrgSelect = false
       this.users.length = 0
-      for (let key in select) {
+      for (const key in select) {
         select[key].forEach(val => this.users.push({
           ...val,
           label: val.label
@@ -289,19 +290,19 @@ export default {
       cids.splice(index, 1)
     },
     conditionChange(index, group) {
-      //判断新增的
+      // 判断新增的
       group.cids.forEach(cid => {
-        if (0 > group.conditions.findIndex(cd => cd.id === cid)){
-          //新增条件
-          let condition = {...this.conditionList[index]}
+        if (group.conditions.findIndex(cd => cd.id === cid) < 0) {
+          // 新增条件
+          const condition = { ...this.conditionList[index] }
           condition.compare = '';
           condition.value = []
           group.conditions.push(condition)
         }
       })
       for (const i in group.conditions) {
-        //去除没有选中的
-        if (group.cids.indexOf(group.conditions[i].id) < 0){
+        // 去除没有选中的
+        if (group.cids.indexOf(group.conditions[i].id) < 0) {
           group.conditions.splice(i, 1)
         }
       }
