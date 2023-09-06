@@ -53,7 +53,7 @@
         </div>
         <trs-pagination :total="total" @getList="getSimilarCasesData" :pageNow="pageNum"></trs-pagination>
       </div>
-      <el-empty v-else description="暂无数据"></el-empty>
+      <Empty v-else></Empty>
     </div>
   </div>
 </template>
@@ -61,6 +61,7 @@
 import {
   getSimilarCases
 } from '@/api/aiApproval';
+
 export default {
   name: 'similar-case',
   data() {
