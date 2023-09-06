@@ -498,7 +498,9 @@ export default {
     },
     judgeWarn() {
       const result = this.list.every((item) => {
-        if (item.props.required) {
+        if (item.title === '下线时间' && item.props.required && !item.value && item.props.placeholder === '永久' && item.props.isRoyalty && item.lastProps) {
+          return true
+        } else if (item.props.required) {
           if (item.value == null) return false
           else if (item.props.numberOfWords && item.value.length !== 0) {
             return item.value.length < item.props.numberOfWords
@@ -533,10 +535,22 @@ export default {
       }
     },
     initWarn() {
+      console.log(this.list)
       this.list.forEach((item) => {
         if (item.props.required) {
           this.$set(item, 'isWarning', false)
           this.$set(item, 'warnInfo', rulesFn(item))
+          if (item.title === '下线时间' && item.value === '永久') {
+            this.$nextTick(() => {
+              this.$refs.refDatePicker1[0].$el.classList.add('my-class' + item.props.order)
+            })
+            if (!item.lastProps) {
+              item.lastProps = JSON.parse(JSON.stringify(item.props))
+            }
+            item.value === ''
+            item.props.placeholder = '永久'
+            item.props.isRoyalty = true
+          }
         } else if (item.props.numberOfWords) {
           this.$set(item, 'isWarning', false)
           this.$set(item, 'warnInfo', [rulesFn(item)[1]])

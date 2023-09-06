@@ -307,6 +307,9 @@ export default {
           if (Number(iten.props.order) === 0) {
             result.uptime = iten.value ? timestampToDateTime(iten.value) : '';
           }
+          if (Number(iten.props.order) === 1 && iten.props.placeholder === '永久' && iten.props.isRoyalty && iten.lastProps) {
+            iten.value = iten.props.placeholder
+          }
           formItemDataList.push({
             formItemId: iten.id,
             value: iten.value,
@@ -328,8 +331,6 @@ export default {
       });
       formItemDataList.push(reviewMaterialsData);
       result.formItemDataList = formItemDataList;
-      console.log(result)
-      // return ;
       if (flag) {
         if (this.submitDialogVisible) return;
         this.submitDialogVisible = true;
