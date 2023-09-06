@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  name: "WDialog",
+  name: 'WDialog',
   install(Vue) {
     Vue.component('WDialog', this)
   },
@@ -50,7 +50,7 @@ export default {
       type: String,
       default: '确 定'
     },
-    border:{
+    border: {
       type: Boolean,
       default: true
     }
@@ -61,7 +61,7 @@ export default {
         return this.value;
       },
       set(val) {
-        this.$emit("input", val);
+        this.$emit('input', val);
       }
     }
   },

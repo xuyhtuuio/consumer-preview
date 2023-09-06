@@ -32,14 +32,14 @@ export default {
   methods: {
     handleClose() {
       this.dialogVisible = false;
-      this.$emit("handleClose", true)
+      this.$emit('handleClose', true)
     },
-    handleConfirm: debounce(function() {
+    handleConfirm: debounce(function () {
       // 不需要在这里关闭弹框的确认弹框
       if (!this.option.noClose) {
         this.dialogVisible = false;
       }
-      this.$emit("handleConfirm")
+      this.$emit('handleConfirm')
     }, 500)
   }
 }
@@ -49,7 +49,7 @@ export default {
 .el-dialog__wrapper {
   /deep/ .el-dialog__header{
     padding: 0;
-  } 
+  }
   /deep/ .el-dialog__body {
     text-align: center;
     font-size: 14px;
@@ -94,4 +94,5 @@ export default {
       border: none;
     }
   }
-}</style>
+}
+</style>

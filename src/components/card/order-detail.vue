@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-04 17:43:04
+ * @LastEditTime: 2023-09-05 15:30:44
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -473,6 +473,20 @@ export default {
       const info = JSON.parse(window.localStorage.getItem('order-detail'))
       this.info = info
       this.item = item
+      // 抄送功能，能看不能做其他操作
+      if (this.pagePath === 'approval') {
+        let { currentProcessor } = this.item
+        currentProcessor = currentProcessor?.map((v) => {
+          return Object.keys(v)[0]
+        })
+        const { id } = JSON.parse(window.localStorage.getItem('user_name'))
+        const hasAuth = currentProcessor.includes(id + '')
+        if (!hasAuth) {
+          this.status = 0
+          this.crtComp = 'approvalRecordCard'
+          return
+        }
+      }
 
       // 工单状态: 草稿 待比对  taskStatus为6时，右上角增加去比对按钮
       if (['0', '6'].includes(item.taskStatus)) {
@@ -635,7 +649,9 @@ export default {
           })
             .then(() => {
               //  2：编辑意见   3：待确认模块
-              that.status === 2 ? that.saveEditOpinion(true) : that.saveOpinion()
+              that.status === 2
+                ? that.saveEditOpinion(true)
+                : that.saveOpinion()
             })
             .catch(() => {
               this.$router.go(-1)
@@ -678,7 +694,9 @@ export default {
       const { editOpinionForm } = this.$store.state.checkApprovedForm
       const { assignedUser } = editOpinionForm
       // eslint-disable-next-line
-      const params = { isSave: isSave ? isSave : false, // 区分保存还是提交
+      const params = {
+        // eslint-disable-next-line
+        isSave: isSave ? isSave : false, // 区分保存还是提交
         success: editOpinionForm.isAccept === '1',
         taskId: this.item.taskId,
         msg: editOpinionForm.content,
@@ -731,6 +749,7 @@ export default {
               // 提交-------end
             }
           } else {
+            this.loadings.submitLoading = false
             this.$message.error(msg)
           }
         })
@@ -762,11 +781,7 @@ export default {
     submit(way) {
       // debugger
       const that = this
-      const {
-        approvedOpinionRequired,
-        uploadFileRequired,
-        uploadFileRadio
-      } = this.$store.state.checkApprovedForm
+      const { approvedOpinionRequired, uploadFileRequired, uploadFileRadio } = this.$store.state.checkApprovedForm
       // 保存功能  待确认的工单  分有实质性意见和无实质性意见 status:3无 /5有
       if (way === 'storage' && [3, 5].includes(this.status)) {
         this.$confirm('是否保存已编辑的意见确认信息？', '', {
@@ -1305,4 +1320,5 @@ export default {
   .el-dialog__body {
     height: 76vh;
   }
-}</style>
+}
+</style>

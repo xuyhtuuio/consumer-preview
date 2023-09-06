@@ -14,26 +14,26 @@
 </template>
 
 <script>
-  export default {
-    name: "gTableCard",
-    props: {
-      iconHref: {
-        typeof: String,
-        default: "#icon-a-Rectangle143"
-      },
-      title: {
-        typeof: String,
-        required: true
-      },
-      hProp: {
-        typeof: Number|String,
-        default: 32
-      },
+export default {
+  name: 'gTableCard',
+  props: {
+    iconHref: {
+      typeof: String,
+      default: '#icon-a-Rectangle143'
     },
-    data(){
-      return {}
-    }
+    title: {
+      typeof: String,
+      required: true
+    },
+    hProp: {
+      typeof: Number | String,
+      default: 32
+    },
+  },
+  data() {
+    return {}
   }
+}
 </script>
 
 <style lang="less" scoped>
@@ -50,7 +50,6 @@
     font-size: 14px;
     font-weight: 700;
     }
-    
 
     .content {
       margin-right:  8px;

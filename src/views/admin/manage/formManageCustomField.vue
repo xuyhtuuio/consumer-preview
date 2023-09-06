@@ -130,7 +130,8 @@ export default {
         }]
       }],
       currentRow: {},
-      parentForm: {}
+      parentForm: {},
+      special: {}
     };
   },
   computed: {
@@ -191,6 +192,7 @@ export default {
       this.parentForm = form;
       if (row) {
         this.currentRow = JSON.parse(JSON.stringify(row))
+        this.special = JSON.parse(JSON.stringify(row?.special || {}))
         this.$set(this.ruleForm, 'title', this.currentRow.title)
         this.$set(this.ruleForm, 'module', this.currentRow.module)
         this.$set(this.ruleForm, 'name', this.currentRow.special.name)
@@ -263,13 +265,18 @@ export default {
         if (valid) {
           const data = this.handleForm()
           data.sort = this.currentRow?.sort
+          if (this.special?.props?.gl && this.special?.props?.order) {
+            data.props.gl = this.special?.props?.gl
+            data.props.order = this.special?.props?.order
+          }
+
           const form = {
             type: data.name,
             formCategoryId: this.parentForm.recordId,
             formItemId: this.currentRow?.id,
             sort: this.currentRow?.sort,
             data: {
-              ...data
+              ...data,
             }
           }
           if (this.checkOptionValue(data.name)) {

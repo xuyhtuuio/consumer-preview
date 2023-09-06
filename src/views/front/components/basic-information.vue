@@ -126,20 +126,26 @@
                   v-model.trim="item.value"
                   style="width: 100%"
                 ></el-date-picker>
-                <el-date-picker
-                  popper-class="my-date-picker"
-                  v-else
-                  :disabled="item.perm === 'R'"
-                  type="datetime"
-                  :placeholder="item.props.placeholder"
-                  :value-format="item.props.format"
-                  v-model.trim="item.value"
-                  :picker-options="
-                    pickerTime(item.props.gl, item.props.order, item.value)
-                  "
-                  @change="handlePickerChange(item)"
-                  style="width: 100%"
-                ></el-date-picker>
+                <div v-else @click="handlePickerClick(item.props.order, item)" @mousemove="handlePickerMouse(item,'enter','refDatePicker'+item.props.order)" @mouseout="handlePickerMouse(item,'out','refDatePicker'+item.props.order)">
+                  <el-date-picker
+                    :popper-class="
+                      Number(item.props.order) === 1
+                        ? 'my-date-picker-1 my-date-picker'
+                        : 'my-date-picker'
+                    "
+                    :ref="'refDatePicker'+item.props.order"
+                    :disabled="item.perm === 'R'"
+                    type="datetime"
+                    :value-format="item.props.format"
+                    :placeholder="item.props.placeholder"
+                    v-model.trim="item.value"
+                    :picker-options="
+                      pickerTime(item.props.gl, item.props.order, item.value)
+                    "
+                    @change="handlePickerChange(item)"
+                    style="width: 100%"
+                  ></el-date-picker>
+                </div>
               </template>
 
               <el-input
@@ -255,12 +261,17 @@ export default {
       default: () => []
     }
   },
+  created() {
+    this.$nextTick(() => {})
+  },
   data() {
     return {
       flag: 9999,
       title: '基本信息',
       cardInfo: '提醒：产品类内容审查，需于在产品上线/宣传前14天进行提交。',
-      checkBox: {}
+      checkBox: {},
+      isAddPickerFoot: false,
+      lastProps: {}
     }
   },
   computed: {
@@ -371,7 +382,33 @@ export default {
         selectableRange: startDateTime + '-' + endDateTime
       }
     },
+    handlePickerClick(order, item) {
+      if (Number(order) !== 1 || this.isAddPickerFoot) return
+      this.$nextTick(() => {
+        const footerEls = document.querySelector('.my-date-picker-1').children[1]
+        const btnEl = document.createElement('button')
+        btnEl.className = footerEls.children[footerEls.children.length - 1].className
+        btnEl.classList.add('my-royalty')
+        btnEl.textContent = '永久'
+        footerEls.insertBefore(btnEl, footerEls.children[footerEls.children.length - 1])
+        document.querySelector('.my-royalty').addEventListener('click', () => {
+          this.$refs.refDatePicker1[0].$el.classList.add('my-class' + order)
+          this.$refs.refDatePicker1[0].handleClose()
+          if (!item.lastProps) {
+            item.lastProps = JSON.parse(JSON.stringify(item.props))
+          }
+          item.value = ''
+          item.props.placeholder = '永久'
+          item.props.isRoyalty = true
+        })
+        this.isAddPickerFoot = true
+      })
+    },
     handlePickerChange(item) {
+      if (item.value) { item.props.isRoyalty = false }
+      if (!item.value && item.lastProps && !item.props.isRoyalty) {
+        item.props.placeholder = item.lastProps.placeholder || ''
+      }
       if (
         moment(new Date(item.value)).format('l')
           === moment(new Date()).format('l')
@@ -379,18 +416,44 @@ export default {
       ) {
         item.value = new Date()
       }
-      const otherItem = this.list.find((iten) => Number(iten.id) === Number(item.props.gl))
+      const otherItem = this.list.find(
+        (iten) => Number(iten.id) === Number(item.props.gl)
+      )
       const otherVal = new Date(otherItem.value).getTime()
       const itemVal = new Date(item.value).getTime()
       if (Number(item.props.order) === 0 && otherVal && itemVal > otherVal) {
         item.value = ''
-      } else if (Number(item.props.order) === 1 && otherVal && itemVal < otherVal) {
+      } else if (
+        Number(item.props.order) === 1
+        && otherVal
+        && itemVal < otherVal
+      ) {
         item.value = ''
       }
     },
     handleInput(val, item) {
       // this.checkBox[item.id]= val
       this.$set(this.checkBox, item.id, val)
+    },
+    handlePickerMouse(item, action, refEl) {
+      const order = Number(item.props.order)
+      if (order === 0) return
+      if (order === 0 || !item.props.isRoyalty) return
+      const els = this.$refs[refEl][0].$el
+      const closeIconEl = els.children[els.children.length - 1].children[0]
+      const closeIconElChild = els.children[els.children.length - 1].children[0].children[0]
+      if (action === 'enter') {
+        closeIconElChild.classList.add('el-icon-circle-close')
+        closeIconEl.addEventListener('click', () => {
+          if (!item.props.placeholder) return
+          item.props.placeholder = item.lastProps.placeholder || ''
+          document.querySelector('.my-date-picker-1').style.display = 'none'
+          item.props.isRoyalty = false
+          closeIconElChild.classList.remove('el-icon-circle-close')
+        }, false)
+      } else {
+        closeIconElChild.classList.remove('el-icon-circle-close')
+      }
     },
 
     // 判断警告出现
@@ -400,6 +463,9 @@ export default {
         flag = item.value == null ? '' : String(item.value)
       } else {
         flag = item.value
+      }
+      if (item.title === '下线时间' && item.props.isRoyalty) {
+        flag = '永久'
       }
       if (item.props.required) {
         if (!flag.length && typeof item.value !== 'number') {
@@ -424,7 +490,9 @@ export default {
     },
     judgeWarn() {
       const result = this.list.every((item) => {
-        if (item.props.required) {
+        if (item.title === '下线时间' && item.props.required && !item.value && item.props.placeholder === '永久' && item.props.isRoyalty && item.lastProps) {
+          return true
+        } else if (item.props.required) {
           if (item.value == null) return false
           else if (item.props.numberOfWords && item.value.length !== 0) {
             return item.value.length < item.props.numberOfWords
@@ -445,7 +513,9 @@ export default {
       return result
     },
     judgeWarnSave() {
-      this.list.forEach((item) => { item.isWarning = false })
+      this.list.forEach((item) => {
+        item.isWarning = false
+      })
       if (
         this.list[0].value.length === 0
         || this.list[0].value.length > this.list[0].props.numberOfWords
@@ -461,6 +531,17 @@ export default {
         if (item.props.required) {
           this.$set(item, 'isWarning', false)
           this.$set(item, 'warnInfo', rulesFn(item))
+          if (item.title === '下线时间' && item.value === '永久') {
+            this.$nextTick(() => {
+              this.$refs.refDatePicker1[0].$el.classList.add('my-class' + item.props.order)
+            })
+            if (!item.lastProps) {
+              item.lastProps = JSON.parse(JSON.stringify(item.props))
+            }
+            item.value === ''
+            item.props.placeholder = '永久'
+            item.props.isRoyalty = true
+          }
         } else if (item.props.numberOfWords) {
           this.$set(item, 'isWarning', false)
           this.$set(item, 'warnInfo', [rulesFn(item)[1]])
@@ -553,6 +634,14 @@ export default {
 
     .el-input__suffix {
       right: 20px;
+    }
+  }
+}
+
+.my-class1 {
+  /deep/.el-input__inner {
+    &::-webkit-input-placeholder{
+      color: #606266;
     }
   }
 }

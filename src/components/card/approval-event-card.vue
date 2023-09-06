@@ -95,7 +95,7 @@
       <!-- 待审核状态显示审查 -->
       <span
         class="attention icon-op"
-        v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'"
+        v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'&&hasAuth"
         @click="toApproval(item)"
       >
         <svg class="icon urgent-icon" aria-hidden="true">
@@ -121,7 +121,7 @@
       <!-- 待确认状态的工单 需要该审批人确认的工单-->
       <span
         class="attention check icon-op"
-        v-if="item.taskStatus == 5 && crtSign !== 'approvedCount'"
+        v-if="item.taskStatus == 5 && crtSign !== 'approvedCount'&&hasAuth"
         @click="check(item)"
       >
         <span class="iconfont icon icon-tubiao urgent-icon"></span>
@@ -129,7 +129,7 @@
       >
       <span
         class="attention check icon-op"
-        v-if="item.taskStatus == 6 && crtSign !== 'approvedCount'"
+        v-if="item.taskStatus == 6 && crtSign !== 'approvedCount'&&hasAuth"
         @click="compare(item)"
       >
         <span class="iconfont icon icon-compare urgent-icon"></span>
@@ -152,15 +152,12 @@
         @click="concern(item)"
       >
         <svg class="icon urgent-icon" aria-hidden="true">
-          <use xlink:href="#icon-guanzhu-1"></use></svg>已关注</span
-      >
+          <use xlink:href="#icon-guanzhu-1"></use></svg>已关注</span>
     </div>
   </div>
 </template>
 <script>
 import { concernApplication } from '@/api/approvalCenter'
-import { getTemplatedetail } from '@/api/applyCenter'
-
 import moment from 'moment'
 export default {
   name: 'applyEventCard',
@@ -176,40 +173,42 @@ export default {
   },
   data() {
     return {
-      allowConcernClick: true
+      hasAuth: false
     }
+  },
+  mounted() {
+    let { currentProcessor } = this.item
+    currentProcessor = currentProcessor?.map((v) => {
+      return Object.keys(v)[0]
+    })
+    const { id } = JSON.parse(window.localStorage.getItem('user_name'))
+    this.hasAuth = currentProcessor.includes(id + '')
+    this.item.hasAuth = currentProcessor.includes(id + '')
   },
   methods: {
     async toApproval(item) {
       // 判断是领导审批 还是 OCR 审批
-      const params = {
-        processInstanceId: item.processInstanceId
-      }
-      const res = await getTemplatedetail(params)
-      if (res.data) {
-        const { data } = res.data
-        const { targetPage } = data[data.length - 1]?.props
-        // eslint-disable-next-line
+      const { targetPage } = item
+      // eslint-disable-next-line
         switch (targetPage) {
-          case 'LEADER':
-            this.toDetail(item)
-            break
-          case 'CONFIRM':
-            this.toDetail(item)
-            break
-          case 'CONTRAST':
-            this.$router.push({
-              name: 'compare',
-              params: { item }
-            })
-            break
-          case 'XIAOBAO':
-            this.$router.push({
-              name: 'aiApproval',
-              params: { item }
-            })
-            break
-        }
+        case 'LEADER':
+          this.toDetail(item)
+          break
+        case 'CONFIRM':
+          this.toDetail(item)
+          break
+        case 'CONTRAST':
+          this.$router.push({
+            name: 'compare',
+            params: { item }
+          })
+          break
+        case 'XIAOBAO':
+          this.$router.push({
+            name: 'aiApproval',
+            params: { item }
+          })
+          break
       }
     },
     toDetail(item) {
@@ -596,4 +595,5 @@ export default {
   .event-name {
     color: #2d5cf6;
   }
-}</style>
+}
+</style>
