@@ -2,13 +2,13 @@
   <div>
     <div class="header">
       <el-menu :default-active="value" active-text-color="#165DFF" class="el-menu-demo" mode="horizontal">
-        <el-menu-item index="baseSetting" @click="to('baseSetting')"><span class="num">1</span> 基础设置</el-menu-item>
+        <el-menu-item index="baseSetting" @click="to('baseSetting')"><span class="num">1</span> 基础信息</el-menu-item>
         <span style="position: relative; top: 20px;">></span>
         <!-- <el-menu-item index="/admin/design/formSetting" @click="to('/admin/design/formSetting')">④ 表单设计</el-menu-item> -->
-        <el-menu-item index="processDesign" @click="to('processDesign')"><span class="num">2</span> 流程设计
+        <el-menu-item index="processDesign" @click="to('processDesign')"><span class="num">2</span> 审批流程
         </el-menu-item>
         <span style="position: relative; top: 20px;">></span>
-        <el-menu-item index="proSetting" @click="to('proSetting')"><span class="num">3</span> 高级设置</el-menu-item>
+        <el-menu-item index="proSetting" @click="to('proSetting')"><span class="num">3</span> 扩展设置</el-menu-item>
       </el-menu>
       <div class="publish" v-if="editAuth">
         <el-button size="mini" @click="save"><i class="el-icon-folder-opened"></i>保存</el-button>
