@@ -107,7 +107,7 @@ export default {
   props: {
     item: {
       typeof: Object,
-      default: ()=> {}
+      default: () => {}
     }
   },
 };
