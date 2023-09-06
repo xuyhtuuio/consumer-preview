@@ -17,7 +17,7 @@
           <el-radio label="R" :disabled="disabledForm" v-model="permSelect" @change="allSelect('R')">只读</el-radio>
         </template>
         <template slot-scope="scope">
-          <el-radio :disabled="disabledForm" v-model="scope.row.perm" label="R" :name="scope.row.id"></el-radio>
+          <el-radio :disabled="disabledForm || fieldCheck(scope.row)" v-model="scope.row.perm" label="R" :name="scope.row.id"></el-radio>
         </template>
       </el-table-column>
       <el-table-column prop="editable" label="可编辑" width="90">
@@ -25,7 +25,7 @@
           <el-radio label="E" :disabled="disabledForm" v-model="permSelect" @change="allSelect('E')">可编辑</el-radio>
         </template>
         <template slot-scope="scope">
-          <el-radio v-model="scope.row.perm" :disabled="disabledForm" label="E" :name="scope.row.id"></el-radio>
+          <el-radio v-model="scope.row.perm" :disabled="disabledForm || fieldCheck(scope.row)" label="E" :name="scope.row.id"></el-radio>
         </template>
       </el-table-column>
       <el-table-column prop="hide" label="隐藏" width="80">
@@ -33,7 +33,7 @@
           <el-radio label="H" :disabled="disabledForm" v-model="permSelect" @change="allSelect('H')">隐藏</el-radio>
         </template>
         <template slot-scope="scope">
-          <el-radio v-model="scope.row.perm" :disabled="disabledForm" label="H"  :name="scope.row.id"></el-radio>
+          <el-radio v-model="scope.row.perm" :disabled="disabledForm || fieldCheck(scope.row)" label="H"  :name="scope.row.id"></el-radio>
         </template>
       </el-table-column>
     </el-table>
@@ -43,7 +43,9 @@
 <script>
 export default {
   name: 'FormAuthorityConfig',
-  components: {},
+  props: {
+    nodeName: String,
+  },
   data() {
     return {
       tableData: [],
@@ -66,6 +68,13 @@ export default {
   computed: {
     disabledForm() {
       return this.$route.name === 'FlowManage' || this.$route.meta.pTitle === '申请中心'
+    },
+    fieldCheck() {
+      return (row) => {
+        const jude1 = this.nodeName === '申请人' && row.module === '审批人填写'
+        const jude2 = this.nodeName !== '申请人' && row.module === '审批人填写' && (row.title === '有无实质意见' || row.title === '意见采纳结果')
+        return jude1 || jude2
+      }
     },
     formData() {
       return this.$store.state.design.formItems

@@ -7,6 +7,7 @@
         <span class="header-btns">
           <i class="iconfont" @click="saveFile">&#xe62e;</i>
           <i class="iconfont" @click="fullScreen">&#xe62f;</i>
+          <i class="iconfont" @click="imgEditorShow">&#xe65b;</i>
         </span>
       </p>
       <div class="file-header-swiper">
@@ -47,20 +48,24 @@
       <!-- 其他类型文件 -->
       <filePreview v-else :url="approval.url"></filePreview>
     </div>
+    <el-dialog class="imgEditor" title="图片编辑" width="1200px" :visible.sync="imgEditorDialogVisible">
+      <imgEditor :url="approval.url" @saveImg="upDateImg"></imgEditor>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import 'swiper/css/swiper.css'
 import Swiper from 'swiper'
-import fileType from '@/components/common/file-type';
+import fileType from '@/components/common/file-type'
 import filePreview from '@/components/filePreview'
 import {
   download
 } from '@/api/aiApproval';
+import imgEditor from './image-editor'
 import imgaePreview from './imgae-preview'
 export default {
-  components: { imgaePreview, fileType, filePreview },
+  components: { imgaePreview, fileType, filePreview, imgEditor },
   name: 'file-preview',
   props: {
     approval: {
@@ -82,6 +87,7 @@ export default {
   },
   data() {
     return {
+      imgEditorDialogVisible: false,
       swiper: null,
       showFullScreen: false,
     }
@@ -104,6 +110,13 @@ export default {
     // this.init();
   },
   methods: {
+    upDateImg(img) {
+      this.approval.url = img
+      this.imgEditorDialogVisible = false
+    },
+    imgEditorShow() {
+      this.imgEditorDialogVisible = true
+    },
     saveFile() {
       download({ key: this.approval.id })
         .then((res) => {
@@ -384,6 +397,11 @@ export default {
   iframe {
     width: calc(100% - 80px);
     margin-left: 40px;
+  }
+}
+.imgEditor{
+  /deep/ .el-dialog__body{
+    height: 72vh;
   }
 }
 </style>
