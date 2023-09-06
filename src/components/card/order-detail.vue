@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-06 17:37:03
+ * @LastEditTime: 2023-09-06 18:40:43
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -519,7 +519,7 @@ export default {
       //  工单-待确认状态
       if (item.taskStatus === '5') {
         // 工单-有实质性意见 status=5 ；无实质性意见：status=3，有无实质意见的区别在页面上表现为：是否要上传最终上线材料
-        this.status = item.hasOpinions === 1 ? 3 : 5
+        this.status = item.substantiveOpinions === 1 ? 5 : 3
         this.crtComp = 'approvedOpinionCard'
       }
       // 工单-已结束状态  页面回显: 返回按钮、审批记录详细、审查意见书、最终上线材
@@ -897,6 +897,7 @@ export default {
         // 判断。
         this.$refs['child'].updateForm()
         const { editOpinionRequired } = this.$store.state.checkApprovedForm
+
         if (!editOpinionRequired) {
           this.crtComp = 'leaderEditOpinion'
           this.$message.error('请在编辑意见后提交')

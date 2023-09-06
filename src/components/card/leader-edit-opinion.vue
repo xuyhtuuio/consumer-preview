@@ -549,16 +549,18 @@ export default {
           ...this.form.crtDisavower
         }
       }
-      this.$nextTick(() => {
-        this.judgeWarnSave()
-      })
+      // this.$nextTick(() => {
+      //   this.judgeWarnSave()
+      // })
+      const customFlag = this.judgeWarnSave()
       this.$refs['form'].validate((valid) => {
-        this.$store.commit('setEditOpinionRequired', valid)
+        this.$store.commit('setEditOpinionRequired', valid && customFlag)
         this.$store.commit('setEditOpinionForm', params)
       })
     },
     judgeWarnSave() {
-      for (const i in this.filledInByApprover) {
+      // eslint-disable-next-line
+        for(let i in this.filledInByApprover) {
         const { props } = this.filledInByApprover[i]
         if (
           (this.filledInByApprover[i].value.length === 0 || this.filledInByApprover[i].value.length > this.filledInByApprover[i].props.numberOfWords) && props.required
@@ -566,6 +568,10 @@ export default {
           this.filledInByApprover[i].isWarning = true
         }
       }
+      const flag = this.filledInByApprover.some(m => {
+        return m.isWarning
+      })
+      return flag
     },
     // 判断警告出现
     judgementWarn(item) {
