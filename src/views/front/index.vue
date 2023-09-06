@@ -1,8 +1,5 @@
 <template>
   <div class="front">
-    <!-- <transition name="router-fade" mode="out-in">
-			  <router-view v-if="!$route.meta.keepAlive" class="view-box "/>
-		  </transition> -->
     <div class="front-header"></div>
     <div class="front-body">
       <div class="index-show">
@@ -206,8 +203,8 @@
 </template>
 
 <script>
-import OpinionManage from "../admin/manage/opinionManage";
-import { getList, getNum } from "../../api/home";
+import OpinionManage from '../admin/manage/opinionManage';
+import { getList, getNum } from '../../api/home';
 export default {
   components: {
     OpinionManage,
@@ -215,19 +212,19 @@ export default {
   data() {
     return {
       pageConfig: {
-        pageType: "nonManage",
+        pageType: 'nonManage',
         isAll: 0,
         pageSize: 5,
       },
       canLeft: false,
       canRight: true,
       linkAdress: {
-        0: "",
-        1: "http://192.168.210.58:31808/index.html",
-        2: "http://103.37.44.13:18855/",
-        3: "http://192.168.210.57:30648/labelExtractionForDCU.html",
-        4: "http://192.168.210.57:31588/aigc-static/intelligent-assistant",
-        5: "http://192.168.210.57:31846/supervisory-control/index",
+        0: '',
+        1: 'http://192.168.210.58:31808/index.html',
+        2: 'http://103.37.44.13:18855/',
+        3: 'http://192.168.210.57:30648/labelExtractionForDCU.html',
+        4: 'http://192.168.210.57:31588/aigc-static/intelligent-assistant',
+        5: 'http://192.168.210.57:31846/supervisory-control/index',
       },
       applyList: [],
       applyLoading: false,
@@ -237,63 +234,63 @@ export default {
     };
   },
   created() {
-    this.userInfo = JSON.parse(localStorage.getItem("user_name"));
+    this.userInfo = JSON.parse(localStorage.getItem('user_name'));
     this.getListApi();
     this.getNumApi();
   },
   methods: {
-    handleItem(item) {
-      console.log(item);
+    handleItem() {
+      // console.log(item);
     },
     showMore() {
-      this.$router.push("/applycenter/apply-list");
+      this.$router.push('/applycenter/apply-list');
     },
     moveLeft() {
       if (this.canLeft) {
-        let element = document.getElementById("itemBody");
-        element.style.transform = "translateX(0px)";
-        element.style.transition = "all 0.5s";
+        const element = document.getElementById('itemBody');
+        element.style.transform = 'translateX(0px)';
+        element.style.transition = 'all 0.5s';
         this.canLeft = false;
         this.canRight = true;
       }
     },
     moveRight() {
       if (this.canRight) {
-        let element = document.getElementById("itemBody");
-        element.style.transform = "translateX(-243px)";
-        element.style.transition = "all 0.5s";
+        const element = document.getElementById('itemBody');
+        element.style.transform = 'translateX(-243px)';
+        element.style.transition = 'all 0.5s';
         this.canLeft = true;
         this.canRight = false;
       }
     },
     linkJump(type) {
       if (type === 0) {
-        this.$router.push("/applycenter/apply-list");
+        this.$router.push('/applycenter/apply-list');
       } else {
-        window.open(this.linkAdress[type], "_blank");
+        window.open(this.linkAdress[type], '_blank');
       }
     },
     getListApi() {
       this.applyLoading = true;
-      let that = this;
-      let data = {
-        adoptionStatus: "",
-        approvalStage: "",
-        approvalType: "",
-        create_time: "",
-        currentActivityName: "",
+      const that = this;
+      const data = {
+        adoptionStatus: '',
+        approvalStage: '',
+        approvalType: '',
+        create_time: '',
+        currentActivityName: '',
         hasOpinions: 0,
         id: that.userInfo.id,
-        keywords: "",
-        label: "",
-        launchDate: "",
+        keywords: '',
+        label: '',
+        launchDate: '',
         name: that.userInfo.fullname,
         pageNow: 1,
         pageSize: 5,
-        roleRange: "",
+        roleRange: '',
         selected: true,
-        sex: "",
-        type: "",
+        sex: '',
+        type: '',
         urgent: 0,
         sortType: 1,
         form_management_id: 1,
@@ -305,63 +302,61 @@ export default {
             this.applyData = res.data.data;
           }
           this.applyLoading = false;
-        })
-        .catch((res) => {
+        }).catch(() => {
           this.applyLoading = false;
         });
     },
     getNumApi() {
       this.applyLoading = true;
-      let that = this;
-      let data = {
-        adoptionStatus: "",
-        approvalStage: "",
-        approvalType: "",
-        currentActivityName: "",
-        hasOpinions: "",
+      const that = this;
+      const data = {
+        adoptionStatus: '',
+        approvalStage: '',
+        approvalType: '',
+        currentActivityName: '',
+        hasOpinions: '',
         id: that.userInfo.id,
         name: that.userInfo.fullname,
         pageNow: 1,
         pageSize: 10,
-        urgent: "",
+        urgent: '',
         sortType: 1,
       };
       getNum(data)
         .then((res) => {
-          this.numData = res.data.data[0];
-        })
-        .catch((res) => {});
+          this.numData = res.data.data?.[0];
+        }).catch(() => {});
     },
     estimateClass(type) {
       if (type) {
-        if (type === "5") {
-          return "deep-green";
-        } else if (type === "3") {
-          return "red";
-        } else if (type === "4") {
-          return "green";
+        if (type === '5') {
+          return 'deep-green';
+        } else if (type === '3') {
+          return 'red';
+        } else if (type === '4') {
+          return 'green';
         } else {
-          return "orange";
+          return 'orange';
         }
       }
     },
     getNodeStatus(value) {
-      let nodeName = "";
+      let nodeName = '';
       switch (value) {
-        case "1":
-          nodeName = "审批中";
+        case '1':
+          nodeName = '审批中';
           break;
-        case "2":
-          nodeName = "撤销";
+        case '2':
+          nodeName = '撤销';
           break;
-        case "3":
-          nodeName = "待修改";
+        case '3':
+          nodeName = '待修改';
           break;
-        case "4":
-          nodeName = "已结束";
+        case '4':
+          nodeName = '已结束';
           break;
-        case "5":
-          nodeName = "待确认";
+        case '5':
+          nodeName = '待确认';
           break;
         default:
       }
