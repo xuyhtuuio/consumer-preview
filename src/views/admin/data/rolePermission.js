@@ -104,4 +104,10 @@ export const permissionList = [
     type: '',
     props: { trueLabel: 'edit', falseLabel: '' },
   },
+  {
+    code: 'peopleCenter',
+    title: '人员中心',
+    type: '',
+    props: { trueLabel: 'edit', falseLabel: '' },
+  }
 ];
