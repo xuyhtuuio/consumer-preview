@@ -9,6 +9,7 @@ import WDialog from '@/components/common/WDialog'
 import $GLOBAL from '@/utils/const';
 import http from '@/api/request'; /* eslint-disable */
 import bus from '@/utils/bus';
+import * as echarts from 'echarts'
 
 import 'trs-web-components/lib/common.less';
 import 'trs-web-components/lib/element.less';
@@ -35,7 +36,7 @@ Vue.use(onceClick);
 Vue.use(bus);
 Vue.prototype.$GLOBAL = $GLOBAL; // 全局常量
 Vue.prototype.$http = http; // 请求库
-
+Vue.prototype.$echarts = echarts
 
 
 Vue.config.productionTip = false

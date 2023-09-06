@@ -405,7 +405,6 @@ export default {
       })
     },
     handlePickerChange(item) {
-      console.log(item)
       if (item.value) { item.props.isRoyalty = false }
       if (!item.value && item.lastProps && !item.props.isRoyalty) {
         item.props.placeholder = item.lastProps.placeholder || ''
@@ -489,16 +488,11 @@ export default {
         item.isWarning = false
       }
     },
-    keyboardInput(dom, value) {
-      const evt = document.createEvent('HTMLEvents')
-      evt.initEvent('input', true, true)
-      dom.value = value
-      console.log(dom, dom.value)
-      dom.dispatchEvent(evt)
-    },
     judgeWarn() {
       const result = this.list.every((item) => {
-        if (item.props.required) {
+        if (item.title === '下线时间' && item.props.required && !item.value && item.props.placeholder === '永久' && item.props.isRoyalty && item.lastProps) {
+          return true
+        } else if (item.props.required) {
           if (item.value == null) return false
           else if (item.props.numberOfWords && item.value.length !== 0) {
             return item.value.length < item.props.numberOfWords
@@ -537,6 +531,17 @@ export default {
         if (item.props.required) {
           this.$set(item, 'isWarning', false)
           this.$set(item, 'warnInfo', rulesFn(item))
+          if (item.title === '下线时间' && item.value === '永久') {
+            this.$nextTick(() => {
+              this.$refs.refDatePicker1[0].$el.classList.add('my-class' + item.props.order)
+            })
+            if (!item.lastProps) {
+              item.lastProps = JSON.parse(JSON.stringify(item.props))
+            }
+            item.value === ''
+            item.props.placeholder = '永久'
+            item.props.isRoyalty = true
+          }
         } else if (item.props.numberOfWords) {
           this.$set(item, 'isWarning', false)
           this.$set(item, 'warnInfo', [rulesFn(item)[1]])

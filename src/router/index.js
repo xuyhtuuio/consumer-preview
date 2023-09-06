@@ -201,6 +201,12 @@ const router = new Router({
       meta: { title: '产品图谱', viewport },
     },
     {
+      path: '/person-center',
+      name: 'personCenter',
+      component: () => import('@/views/personCenter/index'),
+      meta: { title: '人员中心', viewport },
+    },
+    {
       path: '/404',
       name: '404',
       component: () => import('@/views/404'),
