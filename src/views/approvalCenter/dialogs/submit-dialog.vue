@@ -103,6 +103,8 @@ export default {
             return false
           }
         })
+      } else {
+        this.$emit('handleConfirm', this.params.nextUser)
       }
     }, 500),
   },
