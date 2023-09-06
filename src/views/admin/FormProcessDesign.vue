@@ -124,7 +124,7 @@ export default {
     },
     loadInitFrom() {
       this.$store.commit('loadForm', {
-        ...this.$store.state.tempDesign
+        ...JSON.parse(JSON.stringify(this.$store.state.tempDesign))
       })
       this.$store.state.designSave = JSON.stringify(this.$store.state.tempDesign)
     },
