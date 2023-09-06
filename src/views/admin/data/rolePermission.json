@@ -117,14 +117,14 @@
     },
     {
       "code": "",
-      "name": "工作流设计-流程设计",
+      "name": "工作流设计-审批流程",
       "pathName": "processDesign",
       "path": "processDesign",
       "type": "view"
     },
     {
       "code": "",
-      "name": "工作流设计-高级配置",
+      "name": "工作流设计-扩展配置",
       "pathName": "proSetting",
       "path": "proSetting",
       "type": "view"
