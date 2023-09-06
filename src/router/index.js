@@ -180,9 +180,14 @@ const router = new Router({
       ]
     },
     {
+      path: '/statistical-center',
+      name: 'statistical-center',
+      component: () => import('@/views/statistical-center/index'),
+      meta: { title: '统计中心', viewport },
+    },
+    {
       path: '/front',
       name: 'front',
-      redirect: '/home',
       component: () => import('@/views/front/index'),
       meta: { title: '消保管控平台', viewport },
       children: [
