@@ -36,7 +36,7 @@
                  <span style="margin-left: 10px">
                    <span v-if="condition.compare === '='">
                     <el-select v-if="condition.name === 'SelectInput'" style="width: 260px;" filterable allow-create size="small" v-model="condition.value" placeholder="输入可能包含的值">
-                      <el-option v-for="item in selectOptions(condition.id)" :label="item.value" :value="item.value" :key="item.id"></el-option>
+                      <el-option v-for="item in selectOptions(condition.id)" :label="item.value" :value="item.id" :key="item.id"></el-option>
                     </el-select>
                      <el-input v-else style="width: 260px;" placeholder="输入比较值" size="small" v-model="condition.value[0]"/>
                    </span>
@@ -54,13 +54,13 @@
                  <span style="margin-left: 10px">
                    <span v-if="condition.compare === '='">
                     <el-select style="width: 260px;" filterable allow-create size="small" v-model="condition.value[0]" placeholder="输入可能包含的值">
-                      <el-option v-for="item in selectOptions(condition.id)" :label="item.value" :value="item.value" :key="item.id"></el-option>
+                      <el-option v-for="item in selectOptions(condition.id)" :label="item.value" :value="item.id" :key="item.id"></el-option>
                     </el-select>
                      <!-- <el-input style="width: 260px;" placeholder="输入比较值" size="small" v-model="condition.value[0]"/> -->
                    </span>
                    <span v-else>
                     <el-select style="width: 260px;" multiple collapse-tags filterable allow-create size="small" v-model="condition.value" placeholder="输入可能包含的值">
-                      <el-option v-for="item in selectOptions(condition.id)" :label="item.value" :value="item.value" :key="item.id"></el-option>
+                      <el-option v-for="item in selectOptions(condition.id)" :label="item.value" :value="item.id" :key="item.id"></el-option>
                     </el-select>
                    </span>
                  </span>

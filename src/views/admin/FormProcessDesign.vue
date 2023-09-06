@@ -124,7 +124,7 @@ export default {
     },
     loadInitFrom() {
       this.$store.commit('loadForm', {
-        ...this.$store.state.tempDesign
+        ...JSON.parse(JSON.stringify(this.$store.state.tempDesign))
       })
       this.$store.state.designSave = JSON.stringify(this.$store.state.tempDesign)
     },
@@ -227,9 +227,6 @@ export default {
         this.$message.success('已保存当前内容至草稿箱')
         this.$store.state.designSave = JSON.stringify(this.$store.state.design)
         callback && callback();
-        // this.$router.push({
-        //   name: 'FlowManage'
-        // })
       }
     },
     publishProcess() {

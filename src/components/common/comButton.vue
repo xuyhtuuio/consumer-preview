@@ -9,19 +9,19 @@
 </template>
 
 <script>
-  export default {
-    name: "gButton",
-    props : {
-      type: {
-        typeof: String,
-        default: "normal"
-      },
-      size: {
-        typeof: String,
-        default: "normal"
-      }
+export default {
+  name: 'gButton',
+  props: {
+    type: {
+      typeof: String,
+      default: 'normal'
     },
-  }
+    size: {
+      typeof: String,
+      default: 'normal'
+    }
+  },
+}
 </script>
 
 <style lang="less" scoped>
@@ -57,6 +57,5 @@
       }
     }
 }
-
 
 </style>

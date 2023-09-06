@@ -8,23 +8,23 @@
 </template>
 
 <script>
-//超出指定行数自动隐藏文字
+// 超出指定行数自动隐藏文字
 export default {
-  name: "Ellipsis",
-  install(Vue){
+  name: 'Ellipsis',
+  install(Vue) {
     Vue.component('ellipsis', this)
   },
   components: {},
-  props:{
+  props: {
     row: {
       type: Number,
       default: 1
     },
-    hoverTip:{
+    hoverTip: {
       type: Boolean,
       default: false
     },
-    content:{
+    content: {
       type: String,
       default: ''
     }

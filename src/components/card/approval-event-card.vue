@@ -158,8 +158,6 @@
 </template>
 <script>
 import { concernApplication } from '@/api/approvalCenter'
-import { getTemplatedetail } from '@/api/applyCenter'
-
 import moment from 'moment'
 export default {
   name: 'applyEventCard',
@@ -190,34 +188,27 @@ export default {
   methods: {
     async toApproval(item) {
       // 判断是领导审批 还是 OCR 审批
-      const params = {
-        processInstanceId: item.processInstanceId
-      }
-      const res = await getTemplatedetail(params)
-      if (res.data) {
-        const { data } = res.data
-        const { targetPage } = data[data.length - 1]?.props
-        // eslint-disable-next-line
+      const { targetPage } = item
+      // eslint-disable-next-line
         switch (targetPage) {
-          case 'LEADER':
-            this.toDetail(item)
-            break
-          case 'CONFIRM':
-            this.toDetail(item)
-            break
-          case 'CONTRAST':
-            this.$router.push({
-              name: 'compare',
-              params: { item }
-            })
-            break
-          case 'XIAOBAO':
-            this.$router.push({
-              name: 'aiApproval',
-              params: { item }
-            })
-            break
-        }
+        case 'LEADER':
+          this.toDetail(item)
+          break
+        case 'CONFIRM':
+          this.toDetail(item)
+          break
+        case 'CONTRAST':
+          this.$router.push({
+            name: 'compare',
+            params: { item }
+          })
+          break
+        case 'XIAOBAO':
+          this.$router.push({
+            name: 'aiApproval',
+            params: { item }
+          })
+          break
       }
     },
     toDetail(item) {
