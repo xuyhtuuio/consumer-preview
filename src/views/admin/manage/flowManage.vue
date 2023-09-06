@@ -192,9 +192,13 @@ export default {
         }
         return;
       }
-      await stopProcess(this.processDetailRes.data.data.processDefinitionId, this.currentRow.templateId)
-      this.getProcessList()
-      this.$message.success('停用成功')
+      const res = await stopProcess(this.processDetailRes.data.data.processDefinitionId, this.currentRow.templateId)
+      if (res.data.status === 200) {
+        this.getProcessList()
+        this.$message.success('停用成功')
+      } else {
+        this.$message.error(res.data.msg || '停用失败')
+      }
     },
     async stopFlow(row) {
       this.currentRow = row
