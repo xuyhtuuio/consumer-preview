@@ -8,7 +8,7 @@
         <template v-else>
           <span class="title"
             ><i class="top-back" @click="handleReturn">{{ editAuth ? '编辑' : '查看' }}权限</i
-            >/总行管理员</span
+            >/{{roleName}}</span
           >
           <div class="btn">
             <g-button class="btn-item" @click="handleReturn">
@@ -205,6 +205,7 @@ export default {
       action: 'edit1',
       stopOrRun: {},
       roleId: '',
+      roleName: '',
       permissionList: [],
       dataPerm: 'org',
       dataRadioList: [
@@ -255,10 +256,11 @@ export default {
       this.mainLoading = false;
     },
     // 编辑
-    async handleClick({ roleId }) {
+    async handleClick({ roleId, roleName }) {
       this.level = false;
       this.cardLoading = true;
       this.roleId = roleId;
+      this.roleName = roleName;
       const {
         data: { data: res, success, msg }
       } = await editThePermissionsPage({ roleId });
@@ -352,7 +354,11 @@ export default {
             item.type = funPerms.find(funItem => funItem.code === item.code).type;
           });
         } else {
-          this.permissionList[this.permissionList.length - 1].type = funPerms[funPerms.length - 1].type;
+          const item = this.permissionList[key]
+          const funPermsItem = funPerms.find(funItem => funItem.code === item.code)
+          if (funPermsItem) {
+            item.type = funPermsItem.type
+          }
         }
       }
       this.dataPerm = Array.isArray(this.dataPerm) ? dataPerm : dataPerm[0];
@@ -387,10 +393,9 @@ export default {
               funItem.type = item.type;
             }
           });
-        } else if (Number(key) === this.permissionList.length - 1) {
-          if (originVal.type !== funPerms[funPerms.length - 1].type) {
-            funPerms[funPerms.length - 1].type = originVal.type;
-          }
+        } else {
+          const funItem = funPerms.find(funPermsItem => funPermsItem.code === originVal.code)
+          funItem.type = originVal.type
         }
       }
     },
