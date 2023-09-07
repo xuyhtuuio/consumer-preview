@@ -28,7 +28,19 @@ export default {
       contributionData: {
         xData: ['＜100', '100(含)-200', '200(含)-300', '300(含)-400', '400(含)-500'],
         yData: [800, 1200, 390, 200, 1500],
-      }
+      },
+      acceptanceData: {
+        xData: ['＜20%', '20(含)-40%', '40(含)-60%', '60(含)-80%', '80(含)-100%'],
+        yData: [800, 1200, 390, 200, 1500],
+        rate: ['10%', '20%', '30%', '10%', '40%'],
+      },
+      processingData: [
+        { value: 200, name: '产品类', rate: '20%' },
+        { value: 400, name: '活动类', rate: '40%' },
+        { value: 300, name: '客户类', rate: '30%' },
+        { value: 100, name: '其他', rate: '10%' },
+      ],
+      colorListTimes: ['#5773F9', '#249EFF', '#21CCFF', '#81E2FF'],
     }
   },
   mounted() {
@@ -39,6 +51,7 @@ export default {
     this.$nextTick(() => {
       this.initPassingEcharts(this.contributionData)
       this.initAcceptanceEcharts(this.contributionData)
+      this.initProcessingEcharts(this.processingData)
     })
   },
   methods: {
@@ -174,6 +187,44 @@ export default {
       };
       this.initChart('acceptance', option)
     },
+    // 平均处理时长分布
+    initProcessingEcharts() {
+      const option = {
+        color: this.colorListTimes,
+        tooltip: {
+          trigger: 'item',
+          backgroundColor: 'rgba(255,255,255,0.8)',
+          formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        grid: {
+          left: '0',
+          right: '0',
+          bottom: '14%',
+          containLabel: true
+        },
+        series: [
+          {
+            name: '平均处理时长',
+            type: 'pie',
+            radius: [10, 80],
+            center: ['50%', '50%'],
+            roseType: 'radius',
+            itemStyle: {
+              borderRadius: 5
+            },
+            label: {
+              show: false
+            },
+            emphasis: {
+              label: {
+                show: true
+              }
+            },
+            data: this.processingData
+          }]
+      };
+      this.initChart('processing', option)
+    },
     initChart(ref, option) {
       const chart = this.$refs[ref];
       let myChart;
@@ -239,5 +290,99 @@ export default {
       }
     }
   }
+}
+</style>
+<style lang="less">
+.num-table {
+
+  .el-table th.el-table__cell>.cell {
+    font-size: 12px;
+    font-weight: 400;
+    padding: 0 5px !important;
+    color: #000;
+  }
+}
+
+.charts-tooltip-p {
+  text-align: left;
+  min-width: 80px;
+  color: '#505968';
+  line-height: 18px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+
+  &.fontw {
+    font-weight: 700;
+  }
+
+  &.black {
+    color: #333;
+  }
+
+  span {
+    margin-right: 10px;
+  }
+
+  .charts_span {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: #2D5CF6;
+    border: 2px solid #FFFFFF;
+    box-sizing: border-box;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+
+  .charts_num {
+    margin-left: 6px;
+  }
+
+  // transform: scale(0.83);
+  &.charts-tooltip-p {
+    margin-top: 6px;
+  }
+
+  .charts-tooltip-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+  }
+
+  .serieName {
+    display: inline-block;
+    width: fit-content;
+    padding-right: 15px;
+  }
+
+  .bold {
+    font-weight: bold;
+    color: '#1D2128';
+    display: inline-block;
+    width: fit-content;
+    padding-left: 15px;
+  }
+}
+
+.charts-tooltip-box {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 300px;
+
+  .w50 {
+    width: 49%;
+  }
+}
+
+.charts-tooltip-box-s {
+  width: 220px;
+}
+
+.el-picker-panel__footer {
+  display: none;
 }
 </style>
