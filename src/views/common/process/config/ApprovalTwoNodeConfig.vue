@@ -10,7 +10,7 @@
     </p>
     <p style="color: #86909C;font-size: 12px;margin:20px 0 0 6px;">注：二次会签时，仅支持指定之前某一节点对应的审批人（包含发起人），仅选择审批节点即可</p>
     <span style="display: inline-block;font-size:14px;margin: 24px 10px 0 0;">指定节点 </span>
-    <el-select :disabled="disabledForm" v-model="nodeProps.target" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
+    <el-select :disabled="disabledForm" v-model="nodeProps.countersignTarget" placeholder="请选择指定节点" size="medium" class="is-dark input" style="width: 250px;">
       <el-option v-for="(op, index) in nodes" :key="index" :label="op.name" :value="op.id"></el-option>
     </el-select>
   </div>

@@ -49,7 +49,9 @@ export default {
     assignedUser: {
       handler(val) {
         this.content = (this.config.props.assignedUser || val || []).map(item => item.label).join('、') || ''
-        if (this.config.name === '二次会签' || this.config.props.assignedType === 'SELECT_NODE') {
+        if (this.config.name === '二次会签') {
+          this.content = this.nodes.find(n => (n.id === this.config.props.countersignTarget))?.name
+        } else if (this.config.props.assignedType === 'SELECT_NODE') {
           this.content = this.nodes.find(n => (n.id === this.config.props.target))?.name
         }
       },
@@ -58,7 +60,9 @@ export default {
     },
     config: {
       handler() {
-        if (this.config.name === '二次会签' || this.config.props.assignedType === 'SELECT_NODE') {
+        if (this.config.name === '二次会签') {
+          this.content = this.nodes.find(n => (n.id === this.config.props.countersignTarget))?.name
+        } else if (this.config.props.assignedType === 'SELECT_NODE') {
           this.content = this.nodes.find(n => (n.id === this.config.props.target))?.name
         }
       },
@@ -91,7 +95,7 @@ export default {
         } else {
           // 二次会签
           // eslint-disable-next-line
-          if (!this.config.props.target) {
+          if (!this.config.props.countersignTarget) {
             this.errorInfo = '请指定二次会签人员'
             err.push(`${this.config.name} 未指定二次会签人员`)
             this.showError = true
