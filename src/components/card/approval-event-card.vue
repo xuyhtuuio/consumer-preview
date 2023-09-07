@@ -50,14 +50,14 @@
             </i>
             <i
               class="tag check"
-              v-if="item.adoptionStatus == 0 && item.taskStatus != '5'"
+              v-if="item.adoptSign == 0 && item.taskStatus != '5'"
             >
               <i class="iconfont icon-guanzhu2"></i>
               不采纳
             </i>
             <i
               class="tag adoption"
-              v-if="item.adoptionStatus == 1 && item.taskStatus != '5'"
+              v-if="item.adoptSign == 1 && item.taskStatus != '5'"
             >
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tubiao"></use>

@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-06 18:40:43
+ * @LastEditTime: 2023-09-07 13:37:11
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -573,13 +573,13 @@ export default {
           // eslint-disable-next-line
           let other_disavower = []
           for (let i = 0; i < othersArray.length; i++) {
-            const arr = othersArray[i].props.assignedUser.map((m) => {
+            const arr = othersArray[i].props?.assignedUser?.map((m) => {
               return {
                 ...m,
                 nodeName: othersArray[i].name,
                 targetNodeId: othersArray[i].id
               }
-            })
+            }) || []
             other_disavower.push(...arr)
             disavower = disavower.concat(other_disavower)
           }
