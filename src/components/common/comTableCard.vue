@@ -1,10 +1,18 @@
 <template>
   <div class="tableCard">
     <div class="head">
-       <div class="left">
-        <g-icon class="right-icon" :wProp="20" :hProp="hProp" :href="iconHref"/>
-       <span class="content">{{title}}</span>
-       </div>
+      <div class="left">
+        <g-icon
+          class="right-icon"
+          :wProp="20"
+          :hProp="hProp"
+          :href="iconHref"
+        />
+        <span class="content">{{ title }}</span>
+      </div>
+      <div class="right">
+        <slot name="head-right"></slot>
+      </div>
       <slot name="cardInfo"></slot>
     </div>
     <div class="content">
@@ -28,7 +36,7 @@ export default {
     hProp: {
       typeof: Number | String,
       default: 32
-    },
+    }
   },
   data() {
     return {}
@@ -44,15 +52,16 @@ export default {
   .head {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     .left {
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    font-weight: 700;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 700;
     }
 
     .content {
-      margin-right:  8px;
+      margin-right: 8px;
     }
   }
 }
