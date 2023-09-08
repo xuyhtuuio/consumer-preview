@@ -85,6 +85,7 @@
         <span class="sDate date"
           >上线时间：{{ item.productLaunchDate || '--' }}</span
         >
+        <span v-if="item.taskStatus!=='4'">
         <el-popover
           placement="bottom"
           trigger="click"
@@ -101,9 +102,9 @@
               class="person-item"
             >
               <span
-                >{{ child.fullname }}/{{ child.id }}/{{
+                >{{ child.fullname }}/{{ child.id }}<i v-show="child.Institution">/{{
                   child.Institution
-                }}</span
+                }}</i></span
               >
               <!-- <span class="reminder" @click="reminderItem(child)">{{
                 child.hasReminder ? "已催单" : "催一下"
@@ -120,6 +121,7 @@
           >
         </el-popover>
         <span class="handler" v-else>当前处理人：--</span>
+      </span>
       </div>
       <div class="event-infos error" v-else>
         <svg class="icon urgent-icon" aria-hidden="true">
@@ -575,6 +577,9 @@ export default {
         height: 10px;
         background: #e5e6eb;
         margin: 0 12px;
+      }
+      .date:last-of-type::after{
+        display: none;
       }
 
       .sDate {

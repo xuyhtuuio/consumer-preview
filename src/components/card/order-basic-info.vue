@@ -374,9 +374,8 @@ export default {
         return strings || '--'
       }
       if (val.name === 'TimePicker') {
-        return val.value
-          ? moment(val.value).format('YYYY-MM-DD HH:mm:ss')
-          : '--'
+        if (!val.value) return '--'
+        return val.value.length < 8 ? val.value : moment(val.value).format('YYYY-MM-DD HH:mm:ss')
       }
       if (val.name === 'MultipleSelect') {
         const { options } = val.props

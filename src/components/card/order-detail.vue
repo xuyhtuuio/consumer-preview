@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-05 15:30:44
+ * @LastEditTime: 2023-09-08 10:06:31
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -425,6 +425,7 @@ export default {
       this.$router.replace({
         name: url
       })
+      return
     }
     this.clearStoreStatus()
     this.judgeStatus()
@@ -457,14 +458,24 @@ export default {
         params: { item: this.item }
       })
     },
-    // 从左侧详情获取到的上传文件详情
+    /**
+     * @description: 从左侧详情接口拿到-该申请单-的已上传文件，用于上线最终材料关联
+     * @return {*}
+     */
     sendReviewMaterials(val) {
       this.reviewMaterials = val
     },
-    // 从左侧详情获取到审批模块配置项
+    /**
+     * @description: 从左侧详情获取到的有关领导审批自定义字段
+     * @return {*}
+     */
     sendFilledInByApprover(val) {
       this.filledInByApprover = val
     },
+    /**
+     * @description: 刚进入详情页，对单子的状态进行判断，用于页面展示不同的要素
+     * @return {*}
+     */
     async judgeStatus() {
       const { path } = this.$route
       const originRouter = path.match(/\/(\S*)\//)[1]
@@ -519,7 +530,7 @@ export default {
       //  工单-待确认状态
       if (item.taskStatus === '5') {
         // 工单-有实质性意见 status=5 ；无实质性意见：status=3，有无实质意见的区别在页面上表现为：是否要上传最终上线材料
-        this.status = item.hasOpinions === 1 ? 5 : 3
+        this.status = item.substantiveOpinions === 1 ? 5 : 3
         this.crtComp = 'approvedOpinionCard'
       }
       // 工单-已结束状态  页面回显: 返回按钮、审批记录详细、审查意见书、最终上线材
@@ -528,7 +539,10 @@ export default {
         this.crtComp = 'approvedOpinionCard'
       }
     },
-    // 获取当前的节点的配置信息
+    /**
+     * @description: 获取申请单的所有节点信息，从root根节点一直到下一节点
+     * @return {*}
+     */
     async getTemplatedetail() {
       // 要传递给编辑意见组件的字段 ---start
       let targetPage = ''
@@ -573,13 +587,13 @@ export default {
           // eslint-disable-next-line
           let other_disavower = []
           for (let i = 0; i < othersArray.length; i++) {
-            const arr = othersArray[i].props.assignedUser.map((m) => {
+            const arr = othersArray[i].props?.assignedUser?.map((m) => {
               return {
                 ...m,
                 nodeName: othersArray[i].name,
                 targetNodeId: othersArray[i].id
               }
-            })
+            }) || []
             other_disavower.push(...arr)
             disavower = disavower.concat(other_disavower)
           }
@@ -928,7 +942,7 @@ export default {
         editedCommentsAdoptDtoList: approvedOpinionFormParams,
         handleDataDTO: {
           currentUserInfo: {
-            id: this.item.originator.id
+            id: this.item.initiator.id
           },
           processInstanceId: this.item.processInstanceId,
           taskId: this.item.taskId,

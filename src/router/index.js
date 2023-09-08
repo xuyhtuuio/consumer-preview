@@ -92,7 +92,7 @@ const router = new Router({
           path: 'baseSetting',
           name: 'baseSetting',
           component: () => import('@/views/admin/layout/FormBaseSetting'),
-          meta: { title: '基础设置' }
+          meta: { title: '基础信息' }
         },
         // {
         //   path: "formSetting",
@@ -104,12 +104,12 @@ const router = new Router({
           path: 'processDesign',
           name: 'processDesign',
           component: () => import('@/views/admin/layout/ProcessDesign'),
-          meta: { title: '流程设计' }
+          meta: { title: '审批流程' }
         }, {
           path: 'proSetting',
           name: 'proSetting',
           component: () => import('@/views/admin/layout/FormProSetting'),
-          meta: { title: '高级设置' }
+          meta: { title: '扩展设置' }
         }
       ]
     },
@@ -180,9 +180,14 @@ const router = new Router({
       ]
     },
     {
+      path: '/statistical-center',
+      name: 'statistical-center',
+      component: () => import('@/views/statistical-center/index'),
+      meta: { title: '统计中心', viewport },
+    },
+    {
       path: '/front',
       name: 'front',
-      redirect: '/home',
       component: () => import('@/views/front/index'),
       meta: { title: '消保管控平台', viewport },
       children: [

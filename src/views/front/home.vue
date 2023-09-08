@@ -1,7 +1,5 @@
 <template>
   <div>
-    home
-    <button @click="handle">点击1</button>
   </div>
 </template>
 
