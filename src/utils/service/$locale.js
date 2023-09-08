@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-04 16:47:01
+ * @LastEditTime: 2023-09-08 17:05:48
  * @FilePath: /consumer-preview/src/utils/service/$locale.js
  * @Description:
  */
@@ -63,20 +63,13 @@ export default (function () {
     },
   ]
   messages['NodeStatus'] = {
-    // eslint-disable-next-line
-    '0': '草稿',
-    // eslint-disable-next-line
-    '1': '审批中',
-    // eslint-disable-next-line
-    '2': '撤销',
-    // eslint-disable-next-line
-    '3': '待修改',
-    // eslint-disable-next-line
-    '4': '已完成',
-    // eslint-disable-next-line
-    '5': '待确认',
-    // eslint-disable-next-line
-    '6': '待比对'
+    0: '草稿',
+    1: '审批中',
+    2: '撤销',
+    3: '待修改',
+    4: '已完成',
+    5: '待确认',
+    6: '待比对'
   }
   return locales
   // eslint-disable-next-line

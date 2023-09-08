@@ -255,11 +255,16 @@ export default {
       canCompared: false // 当前登录用户可以使用对比功能
     }
   },
-  mounted() {
-    // 判断是否可以撤销
-    this.item.taskStatus === '1' ? this.getCanBeRoved(this.item) : ''
-    // 判断当前节点审批人是不是当前用户
-    this.item.taskStatus === '6' ? this.getTemplatedetail(this.item) : ''
+  watch: {
+    item: {
+      handler(val) {
+        // 判断是否可以撤销
+        val.taskStatus === '1' ? this.getCanBeRoved(val) : ''
+        // 判断当前节点审批人是不是当前用户
+        val.taskStatus === '6' ? this.getTemplatedetail(val) : ''
+      },
+      immediate: true
+    }
   },
   methods: {
     /**

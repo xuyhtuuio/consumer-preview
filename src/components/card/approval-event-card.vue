@@ -176,15 +176,21 @@ export default {
       hasAuth: false
     }
   },
-  mounted() {
-    let { currentProcessor } = this.item
-    currentProcessor = currentProcessor?.map((v) => {
-      return Object.keys(v)[0]
-    })
-    const { id } = JSON.parse(window.localStorage.getItem('user_name'))
-    this.hasAuth = currentProcessor.includes(id + '')
-    this.item.hasAuth = currentProcessor.includes(id + '')
+  watch: {
+    item: {
+      handler(val) {
+        let { currentProcessor } = val
+        currentProcessor = currentProcessor?.map((v) => {
+          return Object.keys(v)[0]
+        })
+        const { id } = JSON.parse(window.localStorage.getItem('user_name'))
+        this.hasAuth = currentProcessor.includes(id + '')
+        this.item.hasAuth = currentProcessor.includes(id + '')
+      },
+      immediate: true
+    }
   },
+  mounted() {},
   methods: {
     async toApproval(item) {
       // 判断是领导审批 还是 OCR 审批
