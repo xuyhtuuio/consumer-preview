@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-07 13:37:11
+ * @LastEditTime: 2023-09-08 10:06:31
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -425,6 +425,7 @@ export default {
       this.$router.replace({
         name: url
       })
+      return
     }
     this.clearStoreStatus()
     this.judgeStatus()
@@ -457,14 +458,24 @@ export default {
         params: { item: this.item }
       })
     },
-    // 从左侧详情获取到的上传文件详情
+    /**
+     * @description: 从左侧详情接口拿到-该申请单-的已上传文件，用于上线最终材料关联
+     * @return {*}
+     */
     sendReviewMaterials(val) {
       this.reviewMaterials = val
     },
-    // 从左侧详情获取到审批模块配置项
+    /**
+     * @description: 从左侧详情获取到的有关领导审批自定义字段
+     * @return {*}
+     */
     sendFilledInByApprover(val) {
       this.filledInByApprover = val
     },
+    /**
+     * @description: 刚进入详情页，对单子的状态进行判断，用于页面展示不同的要素
+     * @return {*}
+     */
     async judgeStatus() {
       const { path } = this.$route
       const originRouter = path.match(/\/(\S*)\//)[1]
@@ -528,7 +539,10 @@ export default {
         this.crtComp = 'approvedOpinionCard'
       }
     },
-    // 获取当前的节点的配置信息
+    /**
+     * @description: 获取申请单的所有节点信息，从root根节点一直到下一节点
+     * @return {*}
+     */
     async getTemplatedetail() {
       // 要传递给编辑意见组件的字段 ---start
       let targetPage = ''
@@ -897,7 +911,6 @@ export default {
         // 判断。
         this.$refs['child'].updateForm()
         const { editOpinionRequired } = this.$store.state.checkApprovedForm
-
         if (!editOpinionRequired) {
           this.crtComp = 'leaderEditOpinion'
           this.$message.error('请在编辑意见后提交')

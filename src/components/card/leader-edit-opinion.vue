@@ -552,6 +552,7 @@ export default {
       // this.$nextTick(() => {
       //   this.judgeWarnSave()
       // })
+
       const customFlag = this.judgeWarnSave()
       this.$refs['form'].validate((valid) => {
         this.$store.commit('setEditOpinionRequired', valid && customFlag)
@@ -568,7 +569,8 @@ export default {
           this.filledInByApprover[i].isWarning = true
         }
       }
-      const flag = this.filledInByApprover.some(m => {
+      let flag = true
+      flag = !this.filledInByApprover.some(m => {
         return m.isWarning
       })
       return flag
