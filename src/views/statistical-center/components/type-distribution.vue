@@ -22,45 +22,10 @@
             v-show="isToggleNext"
             @click="handleReturn"
           >
-            返回上一级 >
+            返回上一级
           </div>
           <div class="content-main">
             <div class="echarts-box" ref="my-echarts"></div>
-            <div class="echarts-lengd">
-              <template v-if="!isToggleNext">
-                <div
-                  class="lengd-com"
-                  v-for="(item, index) in timesData"
-                  :key="index"
-                >
-                  <div
-                    class="lengd-point"
-                    :style="{ 'background-color': colorListTimes[index] }"
-                  ></div>
-                  <span>{{ item.name }}</span>
-                  <span class="black">{{ item.value }}项</span>
-                  <span class="black">{{ item.rate }}</span>
-                </div>
-              </template>
-              <template v-else>
-                <div>
-                  {{ isToggleNextData.name }}
-                </div>
-                <div
-                  class="lengd-com"
-                  v-for="(item, index) in timesDataTwo"
-                  :key="index"
-                >
-                  <div
-                    class="lengd-point"
-                    :style="{ 'background-color': colorListTimes[index] }"
-                  ></div>
-                  <span>{{ item.name }}</span>
-                  <span class="black">{{ item.value }}项</span>
-                  <span class="black">{{ item.rate }}</span>
-                </div>
-              </template>
-            </div>
           </div>
         </div>
       </template>
@@ -83,15 +48,15 @@ export default {
       colorListTimes: ['#5773F9', '#249EFF', '#21CCFF', '#81E2FF'],
       colorListTimesTwo: ['#65CFE4', '#FADC6D', '#CF84CD'],
       timesData: [
-        { value: 200, name: '产品类', rate: '20%' },
-        { value: 400, name: '活动类', rate: '40%' },
-        { value: 300, name: '客户类', rate: '30%' },
-        { value: 100, name: '其他', rate: '10%' }
+        { value: 200, name: '产品类' },
+        { value: 400, name: '活动类' },
+        { value: 300, name: '客户类' },
+        { value: 100, name: '其他' }
       ],
       timesDataTwo: [
-        { value: 400, name: '有实质意见', rate: '40%' },
-        { value: 300, name: '非实质意见', rate: '30%' },
-        { value: 100, name: '活动未开展', rate: '10%' }
+        { value: 400, name: '有实质意见' },
+        { value: 300, name: '非实质意见' },
+        { value: 100, name: '活动未开展' }
       ],
       isToggleNext: false,
       isToggleNextData: null
@@ -102,6 +67,9 @@ export default {
   },
   methods: {
     initMyEcharts(timesData, colorListTimes) {
+      const all = timesData.reduce((item, next) => {
+        return item + next.value
+      }, 0)
       const option = {
         color: colorListTimes,
         // tooltip: {
@@ -109,18 +77,37 @@ export default {
         //   backgroundColor: 'rgba(255,255,255,0.8)',
         //   formatter: '{a} <br/>{b} : {c} ({d}%)'
         // },
-        grid: {
-          left: '0',
-          right: '0',
-          bottom: '14%',
-          containLabel: true
+        legend: {
+          orient: 'vertical',
+          right: 100,
+          y: 'center',
+          // 设置图例形状
+          icon: 'circle',
+          itemWidth: 8,
+          itemHeight: 8,
+          itemGap: 15,
+          textStyle: {
+            fontSize: 12,
+            rich: {
+              a: {
+                fontWeight: 700
+              },
+              b: {
+                lintHeight: '28px'
+              }
+            }
+          },
+          formatter(name) {
+            const { value } = timesData.find((item) => item.name === name)
+            const rate = (value / all) * 100
+            return `{b|${name}} {a| ${value}项 ${rate}%}`
+          }
         },
         series: [
           {
-            name: '',
             type: 'pie',
             radius: [10, 80],
-            center: ['50%', '50%'],
+            center: ['20%', '50%'],
             roseType: 'radius',
             itemStyle: {
               borderRadius: 5
@@ -184,6 +171,9 @@ export default {
   padding: 24px;
   /deep/.tableCard {
     padding: 0;
+    .head {
+      justify-content: space-between;
+    }
   }
   .btns {
     font-size: 12px;
@@ -208,43 +198,22 @@ export default {
     }
   }
   .content {
-    margin-top: 24px;
+    position: relative;
+    padding-top: 22px;
+    width: 100%;
     padding-left: 20px;
     &-title {
+      position: absolute;
+      top: 0px;
       margin-left: 20px;
       line-height: 22px;
       color: @color-4;
       cursor: pointer;
     }
     &-main {
-      display: flex;
-      align-items: center;
+      height: 100%;
       .echarts-box {
-        width: 200px;
-        height: 180px;
-        margin-right: 60px;
-      }
-      .echarts-lengd {
-        font-size: 12px;
-        .lengd-com {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          color: #1d2128;
-          margin-top: 4px;
-          height: 24px;
-          &:last-of-type {
-            border-bottom: none;
-          }
-          .black {
-            font-weight: 700;
-          }
-          .lengd-point {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-          }
-        }
+        height: 100%;
       }
     }
   }

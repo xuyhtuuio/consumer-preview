@@ -21,6 +21,7 @@
     "dayjs": "^1.11.9",
     "default-passive-events": "^2.0.0",
     "echarts": "^5.2.2",
+    "echarts-wordcloud": "^2.1.0",
     "element-ui": "2.15.6",
     "html2canvas": "^1.4.1",
     "insert-css": "^2.0.0",

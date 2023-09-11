@@ -347,10 +347,6 @@ export default {
       if (flag) {
         if (this.submitDialogVisible) return;
         this.submitDialogVisible = true;
-        // submit(result).then(res => {
-        //   this.$message({ type: 'success', message: res.data.data });
-        //   this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
-        // });
         const { userId: id, fullname: name } = this.$refs['refAddTag'];
         const user = JSON.parse(window.localStorage.getItem('user_name'))
         let res = {};
@@ -358,7 +354,7 @@ export default {
           submitDto: result,
           ocessInstanceId: this.formBasicInfo.processInstanceId,
           taskId: this.formBasicInfo.taskId,
-          templateId: this.formBasicInfo.processTemplateId,
+          templateId: this.templateId,
           currentUserInfo: {
             id: user.id,
             name: user.fullname
@@ -369,7 +365,7 @@ export default {
             this.submitDialogVisible = false;
           });
         } else {
-          res = processStart({
+          res = await processStart({
             templateId: this.templateId,
             processDefinitionId: this.processDefinitionId,
             startUserInfo: {

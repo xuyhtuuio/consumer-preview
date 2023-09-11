@@ -74,10 +74,15 @@ export default {
           // y: 'center',
           // 设置图例形状
           icon: 'circle',
-          // itemWidth: 16, // 设置宽度
-          // itemHeight: 24, // 设置高度
+          itemWidth: 8,
+          itemHeight: 8,
           textStyle: {
-            fontSize: 12
+            fontSize: 12,
+            rich: {
+              a: {
+                fontWeight: 700
+              }
+            },
           },
           formatter(name) {
             const { value } = data.find((item) => item.name === name)
@@ -85,10 +90,8 @@ export default {
               return item + next.value
             }, 0)
             const rate = (value / all) * 100
-
-            const v = name + ' ' + value + '项 ' + rate + '%'
-            return v
-          }
+            return `${name} {a| ${value}项 ${rate}%}`
+          },
         },
         series: [
           {

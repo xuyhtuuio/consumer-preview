@@ -129,7 +129,7 @@ export default {
           {
             name: '',
             type: 'bar',
-            barWidth: '22%',
+            barWidth: '16',
             data,
             color: '#2D5CF6',
             itemStyle: {

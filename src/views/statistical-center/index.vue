@@ -29,13 +29,14 @@
           class="common"
           style="width: 60%"
         ></SensitiveProhibited>
-        <SensitiveProhibited class="common"></SensitiveProhibited>
+        <HighWord  class="common" style="flex:1"></HighWord>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import HighWord from './components/high-word'
 import SensitiveProhibited from './components/sensitive-prohibited'
 import TurnDown from './components/turn-down'
 import SystemConnection from './components/system-connection'
@@ -47,6 +48,7 @@ import MissionTrends from './components/mission-trends'
 import TypeDistribution from './components/type-distribution'
 export default {
   components: {
+    HighWord,
     SensitiveProhibited,
     TurnDown,
     SystemConnection,
