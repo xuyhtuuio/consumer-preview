@@ -83,10 +83,10 @@
         >
         <span
           class="handler"
-          v-if="item.institutional && item.institutional[1]"
+          v-if="item.institutional && item.institutional[item.institutional.length-1]"
         >
           <i class="iconfont icon-dept"></i>
-          {{ item.institutional && item.institutional[1] }}</span
+          {{ item.institutional && item.institutional[item.institutional.length-1] }}</span
         >
       </div>
     </div>
