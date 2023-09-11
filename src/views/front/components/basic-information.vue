@@ -312,24 +312,25 @@ export default {
       let endDateTime = '23:59:59'
       // 关联的下线时间
       if (value) {
+        console.log(123, value, originVal)
         if (
-          dayjs(new Date(value)).format('l') === dayjs(originVal).format('l')
+          this.handleDate(value) === this.handleDate(originVal)
         ) {
           startDateTime = '00:00:00'
-          endDateTime = dayjs(new Date(value)).format('HH:mm:ss')
+          endDateTime = this.handleDate(value, 'HH:mm:ss')
         } else if (
-          dayjs(new Date()).format('l') === dayjs(originVal).format('l')
+          this.handleDate() === this.handleDate(originVal)
         ) {
-          startDateTime = dayjs(new Date()).format('HH:mm:ss')
+          startDateTime = this.handleDate(new Date(), 'HH:mm:ss')
           endDateTime = '23:59:59'
         } else {
           startDateTime = '00:00:00'
           endDateTime = '23:59:59'
         }
       } else if (
-        dayjs(new Date()).format('l') === dayjs(originVal).format('l')
+        this.handleDate() === this.handleDate(originVal)
       ) {
-        startDateTime = dayjs(new Date()).format('HH:mm:ss')
+        startDateTime = this.handleDate(new Date(), 'HH:mm:ss')
         endDateTime = '23:59:59'
       } else {
         startDateTime = '00:00:00'
@@ -356,18 +357,18 @@ export default {
       let endDateTime = '23:59:59'
       if (value) {
         if (
-          dayjs(new Date(value)).format('l') === dayjs(originVal).format('l')
+          this.handleDate(value) === this.handleDate(originVal)
         ) {
-          startDateTime = dayjs(new Date(value)).format('HH:mm:ss')
+          startDateTime = this.handleDate(value, 'HH:mm:ss')
           endDateTime = '23:59:59'
         } else {
           startDateTime = '00:00:00'
           endDateTime = '23:59:59'
         }
       } else if (
-        dayjs(new Date()).format('l') === dayjs(originVal).format('l')
+        this.handleDate() === this.handleDate(originVal)
       ) {
-        startDateTime = dayjs(new Date()).format('HH:mm:ss')
+        startDateTime = this.handleDate(new Date(), 'HH:mm:ss')
         endDateTime = '23:59:59'
       } else {
         startDateTime = '00:00:00'
@@ -377,7 +378,7 @@ export default {
         disabledDate: (time) => {
           // 既不能大于当前日期 也不能大于开始日期
           if (value) {
-            return time.getTime() < new Date(value).getTime() - 8.64e7
+            return this.handleDate(value, 'HH:mm:ss') === '00:00:00' ? time.getTime() < new Date(value).getTime() : time.getTime() < new Date(value).getTime() - 8.64e7
           }
           return time.getTime() < new Date() - 8.64e7
           // 如果想实现结束时间可以在开始时间当天内的话 可以减掉86400000秒，相当于一天。
@@ -414,9 +415,9 @@ export default {
         item.props.placeholder = item.lastProps.placeholder || ''
       }
       if (
-        dayjs(new Date(item.value)).format('l')
-          === dayjs(new Date()).format('l')
-        && dayjs(item.value).format('HH:mm:ss') === '00:00:00'
+        this.handleDate(item.value)
+          === this.handleDate()
+        && this.handleDate(item.value, 'HH:mm:ss')
       ) {
         item.value = new Date()
       }
@@ -558,6 +559,10 @@ export default {
       if (!check) {
         this.checkBox[item.id] = ''
       }
+    },
+    // 判断时间
+    handleDate(date = new Date(), formatText = 'YYYY-MM-DD') {
+      return dayjs(date).format(formatText)
     }
   }
 }
