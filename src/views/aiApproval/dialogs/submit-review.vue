@@ -253,7 +253,7 @@ export default {
         return;
       }
       let opinionLetterRecordDtoList = null;
-      const editedCommentsDtoList = this.submission.filter(item => !item.associatedAttachmentsIds)
+      const editedCommentsDtoList = this.submission.filter(item => item.associatedAttachmentsIds !== undefined)
       if (this.approvalLetter.permissions === 'passAllow') {
         opinionLetterRecordDtoList = this.submission.map(item => {
           return {
