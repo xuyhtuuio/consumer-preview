@@ -4,7 +4,7 @@
     <div class="view-content">
       <transition name="router-fade" mode="out-in">
         <keep-alive>
-          <components :is="$route.name"></components>
+          <router-view></router-view>
         </keep-alive>
       </transition>
     </div>
@@ -12,24 +12,10 @@
 </template>
 <script>
 import LeftMenu from './leftMenu'
-import UserManage from './userManage'
-import FlowManage from './flowManage'
-import FormManage from './formManage'
-import RolePermission from './rolePermission'
-import LabelManage from './labelManage'
-import OpinionManage from './opinionManage'
-import OpinionManageOne from './opinionManage-1.0'
 export default {
   name: 'manage',
   components: {
     LeftMenu,
-    UserManage,
-    FlowManage,
-    FormManage,
-    RolePermission,
-    LabelManage,
-    OpinionManage,
-    OpinionManageOne
   },
   data() {
     return {
