@@ -59,7 +59,7 @@
         @sort-change="sortChange"
         @submitEdit="submitEdit"
         :header-cell-style="{ 'text-align': 'center' }"
-        :cell-style="{ 'text-align': 'center' }"
+        :cell-style="{ 'text-align': 'left' }"
       >
         <!-- <template #address="scope">
           <div class="template-class">地址：{{ scope.row.address }}</div>
