@@ -79,13 +79,13 @@
         </span>
       </div>
       <div class="event-infos" v-if="!item.errorInfo">
-        <span class="id">{{ item.orderNo }}</span>
+        <span class="id" v-if="item.orderNo">{{ item.orderNo }}</span>
         <span class="sDate date">发起时间：{{ item.create_time || '--' }}</span>
         <span class="sDate date">更新时间：{{ item.update_time || '--' }}</span>
         <span class="sDate date"
           >上线时间：{{ item.productLaunchDate || '--' }}</span
         >
-        <span v-if="item.taskStatus!=='4'">
+        <span v-if="item.taskStatus!=='4' && item.submitted !== 0">
         <el-popover
           placement="bottom"
           trigger="click"
@@ -111,8 +111,8 @@
               }}</span> -->
             </div>
           </div>
-          <span slot="reference" class="handler pointer"
-            >当前处理人：{{
+          <span slot="reference" class="handler pointer">
+            当前处理人：{{
               (item.currentAssignee && item.currentAssignee[0].fullname) || '--'
             }}
             <i v-if="item.currentAssignee && item.currentAssignee.length > 1"
@@ -255,11 +255,16 @@ export default {
       canCompared: false // 当前登录用户可以使用对比功能
     }
   },
-  mounted() {
-    // 判断是否可以撤销
-    this.item.taskStatus === '1' ? this.getCanBeRoved(this.item) : ''
-    // 判断当前节点审批人是不是当前用户
-    this.item.taskStatus === '6' ? this.getTemplatedetail(this.item) : ''
+  watch: {
+    item: {
+      handler(val) {
+        // 判断是否可以撤销
+        val.taskStatus === '1' ? this.getCanBeRoved(val) : ''
+        // 判断当前节点审批人是不是当前用户
+        val.taskStatus === '6' ? this.getTemplatedetail(val) : ''
+      },
+      immediate: true
+    }
   },
   methods: {
     /**

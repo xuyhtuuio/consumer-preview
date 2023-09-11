@@ -158,7 +158,8 @@
 </template>
 <script>
 import { concernApplication } from '@/api/approvalCenter'
-import moment from 'moment'
+// eslint-disable-next-line
+import dayjs from 'dayjs'
 export default {
   name: 'applyEventCard',
   props: {
@@ -176,15 +177,21 @@ export default {
       hasAuth: false
     }
   },
-  mounted() {
-    let { currentProcessor } = this.item
-    currentProcessor = currentProcessor?.map((v) => {
-      return Object.keys(v)[0]
-    })
-    const { id } = JSON.parse(window.localStorage.getItem('user_name'))
-    this.hasAuth = currentProcessor.includes(id + '')
-    this.item.hasAuth = currentProcessor.includes(id + '')
+  watch: {
+    item: {
+      handler(val) {
+        let { currentProcessor } = val
+        currentProcessor = currentProcessor?.map((v) => {
+          return Object.keys(v)[0]
+        })
+        const { id } = JSON.parse(window.localStorage.getItem('user_name'))
+        this.hasAuth = currentProcessor.includes(id + '')
+        this.item.hasAuth = currentProcessor.includes(id + '')
+      },
+      immediate: true
+    }
   },
+  mounted() {},
   methods: {
     async toApproval(item) {
       // 判断是领导审批 还是 OCR 审批
@@ -316,7 +323,7 @@ export default {
 
   filters: {
     timeFormate(val) {
-      return val ? moment(val).format('YYYY-MM-DD HH:mm:ss') : '--'
+      return val ? dayjs(val).format('YYYY-MM-DD HH:mm:ss') : '--'
     }
   }
 }

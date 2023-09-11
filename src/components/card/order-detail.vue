@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-08 10:06:31
+ * @LastEditTime: 2023-09-11 10:23:03
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -352,7 +352,8 @@
   </div>
 </template>
 <script>
-import moment from 'moment'
+// eslint-disable-next-line
+import * as dayjs from 'dayjs'
 import orderBasicInfo from '@/components/card/order-basic-info'
 import leaderEditOpinion from '@/components/card/leader-edit-opinion'
 import approvalRecordCard from '@/components/card/approval-record-card'
@@ -784,7 +785,7 @@ export default {
      */
     sendOpinionInfo(info) {
       const arr = info[info.length - 1]
-      const time = moment(arr.substantiveopinion[arr.substantiveopinion.length - 1].updateTime).format('YYYY-MM-DD HH:mm:ss') || moment('YYYY-MM-DD HH:mm:ss')
+      const time = dayjs(arr.substantiveopinion[arr.substantiveopinion.length - 1].updateTime).format('YYYY-MM-DD HH:mm:ss') || dayjs('YYYY-MM-DD HH:mm:ss')
       this.timeNow = time
     },
     /**
@@ -793,7 +794,6 @@ export default {
      * return {*}
      */
     submit(way) {
-      // debugger
       const that = this
       const { approvedOpinionRequired, uploadFileRequired, uploadFileRadio } = this.$store.state.checkApprovedForm
       // 保存功能  待确认的工单  分有实质性意见和无实质性意见 status:3无 /5有

@@ -127,7 +127,8 @@
     </el-dialog>
 </template>
 <script>
-import moment from 'moment'
+// eslint-disable-next-line
+import * as dayjs from 'dayjs'
 import {
   updateRuleCode,
   ocrApprovalSubmission
@@ -212,7 +213,7 @@ export default {
   watch: {
     submitReviewDialog(val) {
       if (val) {
-        this.timeNow = moment().format('YYYY-MM-DD HH:mm:ss');
+        this.timeNow = dayjs().format('YYYY-MM-DD HH:mm:ss');
         this.params.isPasses = true;
         if (this.approvalLetter.permissions === 'passAllow') {
           this.submission = (this.approvalLetter.list || []).concat(this.submission || [])
@@ -253,7 +254,7 @@ export default {
         return;
       }
       let opinionLetterRecordDtoList = null;
-      const editedCommentsDtoList = this.submission.filter(item => !item.associatedAttachmentsIds)
+      const editedCommentsDtoList = this.submission.filter(item => item.associatedAttachmentsIds !== undefined)
       if (this.approvalLetter.permissions === 'passAllow') {
         opinionLetterRecordDtoList = this.submission.map(item => {
           return {
