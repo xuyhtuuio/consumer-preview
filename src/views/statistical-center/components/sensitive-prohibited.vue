@@ -118,8 +118,11 @@ export default {
     width: 100%;
     .content-item {
       line-height: 22px;
-      padding: 8px 8px 16px;
+      padding:16px;
       border-bottom: 1px dotted @color-3;
+      &:first-child {
+        padding-top: 0;
+      }
       .cnt-title {
         font-weight: 700;
       }
