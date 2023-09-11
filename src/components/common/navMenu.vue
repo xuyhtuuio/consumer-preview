@@ -54,7 +54,7 @@ export default {
         { title: '审批中心', name: 'approval-list', sign: 'approvalcenter' },
         { title: '产品图谱', name: 'productmap', sign: 'productmap' },
         // { title: '统计中心', name: 'statistical-center', sign: 'statistical-center' },
-        // { title: '人员中心', name: 'personCenter', sign: 'personcenter' },
+        { title: '人员中心', name: 'personCenter', sign: 'personcenter' },
       ]
       return navList.map(item => {
         const exist = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(f => f.pathName === item.name)

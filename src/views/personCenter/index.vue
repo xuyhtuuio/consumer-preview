@@ -93,7 +93,8 @@
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs14 fw">{{ scope.row.gxz }}</p>
-                  <img class="icon pointer w16" src="../../assets/image/person-center/tc1.png" alt="">
+                  <img @click="rejectDialogShow('月度贡献值变化情况', scope.row)" class="icon pointer w16"
+                    src="../../assets/image/person-center/tc1.png" alt="">
                 </div>
               </template>
             </el-table-column>
@@ -101,8 +102,8 @@
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.scs }}</p>
-                  <p class="gray fs12 pt6 flex-box ">项<img class="icon pointer  w16"
-                      src="../../assets/image/person-center/tc2.png" alt=""></p>
+                  <p class="gray fs12 pt6 flex-box ">项<img @click="rejectDialogShow('审批概览', scope.row)"
+                      class="icon pointer  w16" src="../../assets/image/person-center/tc2.png" alt=""></p>
                 </div>
               </template>
             </el-table-column>
@@ -255,13 +256,83 @@
         </div>
       </div>
     </div>
+    <el-dialog :visible.sync="rejectDialog" :before-close="rejectDialogClose" width="1000px" center
+      custom-class="transfer-dialog">
+      <span slot="title">{{ rejectDialogTit }}</span>
+      <div class="dialog-cont">
+        <div class="cont-approve" v-if="rejectDialogTit === '审批概览'">
+          <div class="user">
+            <div class="user-info">
+              <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
+              <span class="nickname">
+                谭新宇
+              </span>
+              <span>总行 | 财富平台部 | 财富客群团队</span>
+            </div>
+            <slot name="apply-modify"></slot>
+          </div>
+          <div class="filters">
+            <div class="filters-content">
+              <div class="floor1">
+                <el-select v-model="search.approvalType" placeholder="审批事项类型" @change="searchList" clearable>
+                  <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
+                    :value="item.value"></el-option>
+                </el-select>
+                <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @change="searchList" clearable>
+                  <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
+                    :value="item.value"></el-option>
+                </el-select>
+                <el-select v-model="search.onceAdopt" placeholder="一次通过" @change="searchList" clearable>
+                  <el-option v-for="(item, index) in $field('isOncePass')" :key="index" :label="item.label"
+                    :value="item.value"></el-option>
+                </el-select>
+              </div>
+              <div class="floor2">
+                <div class="floor2-item">
+                  <el-input v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
+                    @keyup.enter.native="searchList">
+                    <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
+                  </el-input>
+                </div>
+                <div class="floor2-item floor2-itemW">
+                  <span>提单时间</span>
+                  <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
+                    value-format="yyyy-MM-dd" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间">
+                  </el-date-picker>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="list trs-scroll" v-loading="search.loading" ref="box">
+            <div v-if="list.length">
+              <div v-for="(item, index) in list" :key="index">
+                <approvalEventCard :item="item" :crtSign="crtSign"></approvalEventCard>
+              </div>
+              <trs-pagination :total="search.total" @getList="getList" :pageNow="pageNow"></trs-pagination>
+            </div>
+            <div v-loading="search.loading" v-else>
+              <Empty></Empty>
+            </div>
+          </div>
+        </div>
+        <div class="cont-echart" v-if="rejectDialogTit === '月度贡献值变化情况'">
+          <div class="stackBar-echarts" id="passing-echarts"></div>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
+import {
+  getApprovalType,
+  getApprovalListStation,
+} from '@/api/approvalCenter'
+import approvalEventCard from './components/approval-event-card'
 import barEcharts from './components/bar-echarts'
 export default {
   components: {
-    barEcharts
+    barEcharts,
+    approvalEventCard
   },
   name: 'person-center-index',
   data() {
@@ -478,6 +549,28 @@ export default {
         seriesItemStyle: ['rgba(255,221,100,0.6)', 'rgba(255,153,0,0.6)'],
         emphasisItemStyle: ['#FFDD64', '#FF9900'],
       },
+      rejectDialog: false,
+      rejectDialogTit: '',
+      passingData: {
+        xData: ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01'],
+        yData: [10, 12, 30, 20, 15],
+      },
+      search: {
+        approvalType: '',
+        approvalStage: '',
+        urgent: '',
+        hasOpinions: '',
+        adoptionStatus: '',
+        keywords: '',
+        startDate: [],
+        productLaunchDate: [],
+        total: 0,
+        loading: false,
+        orgIds: []
+      },
+      transactionTypes: [],
+      crtSign: 'allTask',
+      list: []
     }
   },
   mounted() {
@@ -488,18 +581,36 @@ export default {
     this.billChange()
   },
   methods: {
+    rejectDialogClose() {
+      this.rejectDialog = false
+      this.rejectDialogTit = ''
+    },
     billChange() {
       if (this.billValue === '审批人员') {
         this.$nextTick(() => {
-          this.initPassingEcharts(this.contributionData)
+          this.initContribuEcharts(this.contributionData)
           this.initProcessingEcharts(this.processingData)
         })
+      }
+    },
+    // eslint-disable-next-line no-unused-vars
+    rejectDialogShow(rejectDialogTit, rowData) {
+      this.rejectDialogTit = rejectDialogTit;
+      this.rejectDialog = true
+      if (this.rejectDialogTit === '月度贡献值变化情况') {
+        this.$nextTick(() => {
+          this.initPassingEcharts(this.passingData);
+        })
+      }
+      if (this.rejectDialogTit === '审批概览') {
+        this.getApprovalType()
+        this.getList(1)
       }
     },
     approvalList() {
     },
     // 贡献值分布
-    initPassingEcharts(industryDataVal) {
+    initContribuEcharts(industryDataVal) {
       const option = {
         tooltip: {
           backgroundColor: 'rgba(255,255,255,0.8)',
@@ -627,6 +738,107 @@ export default {
       };
       this.initChart('processing', option)
     },
+    // 月度贡献值变化情况
+    initPassingEcharts(industryDataVal) {
+      const option = {
+        tooltip: {
+          backgroundColor: 'rgba(255,255,255,0.8)',
+          trigger: 'axis',
+          formatter: (serie) => {
+            const name = serie[0].axisValueLabel
+            let params = '<p class="charts-tooltip-p fontw black">贡献值</p>'
+            params += `<p class="charts-tooltip-p black"><span style="margin-right:12px">${name}</span><span>贡献值${serie[0].data}</span></p>`
+            return params
+          },
+        },
+        grid: {
+          left: '0',
+          right: '0',
+          bottom: '8%',
+          containLabel: true
+        },
+        yAxis: {
+          type: 'value',
+          name: '分',
+          minInterval: 1,
+        },
+        xAxis: {
+          type: 'category',
+          data: industryDataVal.xData,
+        },
+        dataZoom: [
+          {
+            start: 0,
+            end: 100,
+            bottom: '2%',
+            height: 8,
+            backgroundColor: '#F9F9FB',
+            borderColor: '#fff',
+            fillerColor: '#E5F9FF',
+            moveHandleSize: 0,
+            handleSize: '180%',
+            handleIcon: 'image://data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAABCcAAAQnAEmzTo0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAIuSURBVHgBtVXBTttAEH2zDiZRixRoT1UrkgP3Vj311H5ApVb9gbZfAHwByReQP2i/oCpSP4CeekLlzgEjEHAJRAKU4MReZpI42qzXlmOJJ1nyjj1vdmZn3hJycKx1vTrCptb4wE+DTY3ppx4RDuMR9oaE380aBVkc5DJe9HVDe/ghxCgCws8wQtsVSNmGy1Bvxgr/C5MLNL757HM+0Fu5AS6GeifS6PBrHYujrgm7wmEaZyWSnU/JUwhj4OQeuIkm62dL/FSAp547Emlsv6hSZxZAai5lsXcuxP9ugaO+m2ijBrx94gzUY983cibjEjH5jk1+y7v9dZVNLpBvf64n/1qoL3OTjDOY7v7YJs9wdEIy+LIG+FbLhD5WFdf9s+1wcFecPNmQlNJGZYAtpSr4ZP+cV5YsiI+cmQnPw3vF/f7aNHZHKI3gfn4t0y9Vmzvc7hCl4ShrQ+GRoXjMA9Ow4qE01iopU0+Rmg+wXkVpPF+aX7N0HKoowl/T6PNsb5QIIj6piY6xR6L5fohr0x5qnuLuYoP2cTUdgNu2qZpEcnnsmx8kC5fDIuRyR4gW5YqdZHAgYjdwk0tZ3q2kJQKG2M3k+owvC85k10UkgWQAkxmRTltfdhKPwQO2/dKU6wSnfd1SE2UtjThG+1WNWsk6dSdPM0nJdwH0eOftZOeZAQRyJlyVFs/IVxQA9/v+MMJ316VPeY7jQCLnrLg0EcUkq4BJA80zNKqiI52YxfEArMjodcM5n8kAAAAASUVORK5CYII=',
+          },
+          {
+            type: 'inside',
+            start: 5,
+            end: 95,
+          }
+        ],
+        series: [
+          {
+            barWidth: '16px',
+            name: '贡献值',
+            type: 'bar',
+            label: {
+              show: false
+            },
+            itemStyle: {
+              normal: {
+                borderRadius: [8, 8, 0, 0],
+                color: {
+                  type: 'linear',
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [
+                    {
+                      offset: 0, color: industryDataVal.seriesItemStyle ? industryDataVal.seriesItemStyle[0] : 'rgba(33,204,255,0.6)' // 100% 处的颜色
+                    },
+                    {
+                      offset: 1, color: industryDataVal.seriesItemStyle ? industryDataVal.seriesItemStyle[1] : 'rgba(33,204,255,0.6)' // 0% 处的颜色
+                    }
+                  ],
+                },
+              },
+            },
+            emphasis: {
+              itemStyle: {
+                borderRadius: [8, 8, 0, 0],
+                color: {
+                  type: 'linear',
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [
+                    {
+                      offset: 0, color: industryDataVal.emphasisItemStyle ? industryDataVal.emphasisItemStyle[0] : '#21CCFF' // 100% 处的颜色
+                    },
+                    {
+                      offset: 1, color: industryDataVal.emphasisItemStyle ? industryDataVal.emphasisItemStyle[1] : '#2D5CF6' // 0% 处的颜色
+                    }
+                  ],
+                },
+              },
+            },
+            data: industryDataVal.yData,
+          },
+        ]
+      };
+      this.initChart('passing-echarts', option)
+    },
     initChart(ref, option) {
       const chart = document.getElementById(ref);
       let myChart;
@@ -642,6 +854,83 @@ export default {
           myChart.resize();
         });
       });
+    },
+    searchList() { },
+    getApprovalType() {
+      getApprovalType().then((res) => {
+        this.transactionTypes = res.data.data.map((v) => {
+          return {
+            label: v.examineTypesName,
+            value: v.recordId
+          }
+        })
+      })
+    },
+    getList(pageNow) {
+      const listType = '4'
+      this.pageNow = pageNow
+      const param = {
+        pageNow,
+        pageSize: 10,
+        ...this.search,
+        listType,
+        formManagementId: this.search.approvalType,
+        nodeid: this.search.approvalStage,
+        orgIds: this.search.orgIds.length ? this.search.orgIds : null,
+        createTimeStart:
+          this.search.startDate && this.search.startDate.length > 0
+            ? this.search.startDate[0] + ' 00:00:00'
+            : '',
+        createTimeEnd:
+          this.search.startDate && this.search.startDate.length > 0
+            ? this.search.startDate[1] + ' 23:59:59'
+            : '',
+      }
+      Reflect.deleteProperty(param, 'total')
+      Reflect.deleteProperty(param, 'loading')
+      Reflect.deleteProperty(param, 'productLaunchDate')
+      Reflect.deleteProperty(param, 'startDate')
+      this.search.loading = true
+      const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
+      const taskDTO = {
+        pageNo: 0,
+        pageSize: 10,
+        currentUserInfo: {
+          id: userInfo.id,
+          name: userInfo.fullname
+        }
+      }
+      // eslint-disable-next-line
+      const wait_param = {
+        ...param,
+        taskDTO
+      }
+      getApprovalListStation(wait_param)
+        .then((res) => {
+          const { data } = res.data
+          this.search.total = data.totalCount
+          const flag = Array.isArray(data.list)
+          this.list = flag && data.list.length > 0
+            ? data.list.map((v) => {
+              return {
+                ...v,
+                taskNumber: v.recordId + '',
+                taskName: v.entryName,
+                initiator: {
+                  ...v.originator,
+                  label: v.institutional && v.institutional[1]
+                },
+                taskStatus: v.nodeStatus
+              }
+            })
+            : []
+          this.search.loading = false
+        })
+        .catch(() => {
+          this.search.loading = false
+          this.search.total = 0
+          this.list = []
+        })
     },
   },
 }
@@ -910,19 +1199,352 @@ export default {
       }
     }
   }
+
+  /deep/ .transfer-dialog {
+    border-radius: 10px;
+    background: #fff;
+    padding: 40px 60px;
+    /* 阴影/大 */
+    box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.1);
+
+    .el-dialog__header {
+      padding: 0;
+      color: var(--gray-gray-9, #1d2128);
+      text-align: center;
+
+      /* 二级标题/加粗 */
+      font-family: Microsoft YaHei;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 24px;
+
+      /* 150% */
+      .el-dialog__headerbtn {
+        right: 60px;
+        top: 40px;
+        font-size: 20px;
+        color: #505968;
+      }
+    }
+
+    .el-dialog__body {
+      padding: 0;
+    }
+
+    .dialog-cont {
+      margin-top: 24px;
+
+      .cont-approve {
+        .user {
+          margin-bottom: 16px;
+          display: flex;
+          align-items: center;
+          width: fit-content;
+
+          .user-info {
+            flex: 1;
+            padding-right: 12px;
+            border-radius: 20px;
+            background: #f7f8fa;
+            display: flex;
+            align-items: center;
+
+            .avatar {
+              width: 32px;
+              height: 32px;
+              background: #80a6ff;
+              text-align: center;
+              line-height: 32px;
+              border-radius: 20px;
+              margin-right: 8px;
+              font-weight: 700;
+              color: #fff;
+              font-size: 14px;
+            }
+
+            img {
+              width: 32px;
+              height: 32px;
+              margin-right: 8px;
+            }
+
+            color: #505968;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 32px;
+
+            .nickname {
+              color: #1d2128;
+              font-weight: 700;
+              line-height: 32px;
+              margin-right: 16px;
+            }
+          }
+        }
+
+        .filters {
+          display: flex;
+          padding-right: 16px;
+          justify-content: space-between;
+
+          .filters-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+
+            /deep/ .el-input__inner,
+            /deep/ .el-range-input {
+              border-radius: 4px;
+              border: none;
+              background: #f7f8fa;
+              color: #1d2128;
+              font-size: 14px;
+              font-weight: 400;
+              line-height: 22px;
+
+              .el-range-separator {
+                padding: 0;
+              }
+            }
+
+            .floor1 {
+              // padding-right: 16px;
+              display: flex;
+              justify-content: space-between;
+              flex-wrap: wrap;
+
+              .el-select,
+              .el-cascader {
+                margin-bottom: 12px;
+                width: 32%;
+              }
+
+              /deep/ .el-cascader .el-input .el-icon-arrow-down::before {
+                font-family: element-icons !important;
+                content: '\e790';
+              }
+
+              /deep/ .el-select .el-input .el-icon-arrow-up::before {
+                font-family: element-icons !important;
+                content: '\e78f';
+              }
+            }
+
+            .floor2 {
+              width: 100%;
+              display: flex;
+              padding-right: 16px;
+
+              .floor2-item {
+                width: 33%;
+                margin-right: 16px;
+                display: flex;
+                align-items: center;
+
+                .el-input,
+                .el-date-editor {
+                  width: 100%;
+                }
+
+                span {
+                  color: #86909c;
+                  font-size: 14px;
+                  font-weight: 400;
+                  line-height: 22px;
+                  word-break: keep-all;
+                  margin-right: 8px;
+                }
+              }
+
+              .floor2-itemW {
+                width: 40%;
+              }
+
+              .floor2-item:last-of-type {
+                margin-right: 0;
+              }
+
+              /deep/.el-range-editor {
+                position: relative;
+
+                .el-icon-date,
+                .el-icon-time {
+                  position: absolute;
+                  right: 8px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                }
+
+                .el-icon-time::before {
+                  font-family: element-icons !important;
+                  content: '\e78e';
+                }
+
+                .el-input__suffix {
+                  right: 20px;
+                }
+              }
+            }
+          }
+
+          .export-reset {
+            border-left: 1px dashed #e5e6eb;
+            padding-left: 16px;
+            display: flex;
+            flex-direction: column;
+
+            .el-button {
+              height: 38px;
+              padding: 6px 0px;
+              width: 84px;
+              border-radius: 6px;
+              border: 1px solid #a8c5ff;
+              background: #f0f6ff;
+              margin-left: 0;
+              margin-bottom: 12px;
+            }
+
+            .el-button:last-of-type {
+              margin-bottom: 0;
+            }
+          }
+        }
+        .list{
+          padding-right: 16px;
+          height: 390px;
+          overflow-y: auto;
+        }
+      }
+
+      .el-input__inner,
+      .el-range-input {
+        border-radius: 4px;
+        border: none;
+        background: #f7f8fa;
+        color: #1d2128;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 22px;
+
+        .el-range-separator {
+          padding: 0;
+        }
+      }
+
+      .el-range-editor .el-icon-date {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      .cont-screen {
+        width: 100%;
+        display: flex;
+        padding-right: 16px;
+
+        .screen-item {
+          margin-right: 16px;
+          display: flex;
+          align-items: center;
+
+          .el-input,
+          .el-date-editor {
+            width: 100%;
+          }
+
+          .el-cascader .el-input .el-icon-arrow-down::before {
+            font-family: element-icons !important;
+            content: "\e790";
+          }
+
+          .el-select .el-input .el-icon-arrow-up::before {
+            font-family: element-icons !important;
+            content: "\e78f";
+          }
+
+          .el-range-editor .el-icon-date {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+          }
+
+          .item-tit {
+            color: #1D2128;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 22px;
+            word-break: keep-all;
+            margin-right: 8px;
+          }
+
+          span {
+            color: #86909C;
+          }
+        }
+
+        .screen-item1 {
+          width: 208px;
+
+          .hintIcon {
+            width: 20px;
+            margin-left: 4px;
+          }
+        }
+
+        .screen-item2 {
+          width: 208px;
+
+          .el-select {
+            width: 100%;
+          }
+        }
+
+        .screen-item3 {
+          width: 416px;
+        }
+
+        .screen-item:last-of-type {
+          margin-right: 0;
+        }
+
+        /deep/.el-range-editor {
+          position: relative;
+
+          .el-icon-date,
+          .el-icon-time {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+          }
+
+          .el-icon-time::before {
+            font-family: element-icons !important;
+            content: "\e78e";
+          }
+
+          .el-input__suffix {
+            right: 20px;
+          }
+        }
+      }
+
+      .cont-echart {
+        margin-top: 24px;
+        height: 454px;
+
+        .stackBar-echarts {
+          height: 454px;
+        }
+      }
+    }
+  }
 }
 </style>
 <style lang="less">
-.num-table {
-
-  .el-table th.el-table__cell>.cell {
-    font-size: 12px;
-    font-weight: 400;
-    padding: 0 5px !important;
-    color: #000;
-  }
-}
-
 .charts-tooltip-p {
   text-align: left;
   min-width: 80px;
