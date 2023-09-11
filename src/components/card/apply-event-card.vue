@@ -120,7 +120,7 @@
             ></span
           >
         </el-popover>
-        <span class="handler">当前处理人：--</span>
+        <span class="handler" v-else>当前处理人：--</span>
       </span>
       </div>
       <div class="event-infos error" v-else>
@@ -371,6 +371,7 @@ export default {
       this.$router.push({
         name: 'editApply',
         params: {
+          ...item,
           id: item.taskNumber,
           formManagementId: item.form_management_id
         }

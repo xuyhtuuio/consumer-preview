@@ -98,7 +98,7 @@ export default {
           toolSign: 'approved-opinion',
           icon: 'icon-yijianshu',
           sidebarParam: {}, // 侧边工具栏激活项 props
-          // show: false
+          show: true
         },
         {
           component: 'aiKnowledgeBase',

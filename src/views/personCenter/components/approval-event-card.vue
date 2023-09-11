@@ -3,18 +3,10 @@
     <div class="event-info">
       <div class="event-name-status">
         <!-- 加急 -->
-        <svg
-          class="icon urgent-icon"
-          aria-hidden="true"
-          v-if="item.urgent == 1"
-        >
+        <svg class="icon urgent-icon" aria-hidden="true" v-if="item.urgent == 1">
           <use xlink:href="#icon-shenpiyemiantubiao"></use>
         </svg>
-        <svg
-          class="icon urgent-icon"
-          aria-hidden="true"
-          v-if="item.dismissalMark == 1"
-        >
+        <svg class="icon urgent-icon" aria-hidden="true" v-if="item.dismissalMark == 1">
           <use xlink:href="#icon-tongyongtubiao2"></use>
         </svg>
         <span class="event-name pointer" @click="toDetail(item)">{{
@@ -24,15 +16,12 @@
           <i v-if="item.taskStatus === '0'" class="tag draft">{{
             $msg('NodeStatus')[item.taskStatus]
           }}</i>
-          <i v-if="['1', '2'].includes(item.taskStatus)" class="tag in-approval"
-            >{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i
-          >
-          <i v-if="item.taskStatus === '3'" class="tag in-modify"
-            >{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i
-          >
-          <i v-if="['5', '6'].includes(item.taskStatus)" class="tag check"
-            >{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i
-          >
+          <i v-if="['1', '2'].includes(item.taskStatus)" class="tag in-approval">{{ $msg('NodeStatus')[item.taskStatus]
+          }}>{{ item.nodeName }}</i>
+          <i v-if="item.taskStatus === '3'" class="tag in-modify">{{ $msg('NodeStatus')[item.taskStatus] }}>{{
+            item.nodeName }}</i>
+          <i v-if="['5', '6'].includes(item.taskStatus)" class="tag check">{{ $msg('NodeStatus')[item.taskStatus] }}>{{
+            item.nodeName }}</i>
           <i v-if="item.taskStatus === '4'" class="end">
             <i class="tag end-sign">
               {{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}
@@ -48,17 +37,11 @@
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
-            <i
-              class="tag check"
-              v-if="item.adoptSign == 0 && item.taskStatus != '5'"
-            >
+            <i class="tag check" v-if="item.adoptSign == 0 && item.taskStatus != '5'">
               <i class="iconfont icon-guanzhu2"></i>
               不采纳
             </i>
-            <i
-              class="tag adoption"
-              v-if="item.adoptSign == 1 && item.taskStatus != '5'"
-            >
+            <i class="tag adoption" v-if="item.adoptSign == 1 && item.taskStatus != '5'">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tubiao"></use>
               </svg>
@@ -69,103 +52,26 @@
       </div>
       <div class="event-infos">
         <span class="id">{{ item.orderNo }}</span>
-        <span class="sDate date"
-          >发起时间：{{ item.createTime | timeFormate }}</span
-        >
-        <span class="sDate date"
-          >更新时间：{{ item.updateTime | timeFormate }}</span
-        >
-        <span class="sDate date"
-          >上线时间：{{ item.uptime | timeFormate }}</span
-        >
-        <span class="handler date"
-          >发起人：{{ item.originator && item.originator.name }}</span
-        >
-        <span
-          class="handler"
-          v-if="item.institutional && item.institutional[1]"
-        >
+        <span class="sDate date">发起时间：{{ item.createTime | timeFormate }}</span>
+        <span class="sDate date">更新时间：{{ item.updateTime | timeFormate }}</span>
+        <span class="sDate date">上线时间：{{ item.uptime | timeFormate }}</span>
+        <span class="handler date">发起人：{{ item.originator && item.originator.name }}</span>
+        <span class="handler" v-if="item.institutional && item.institutional[1]">
           <i class="iconfont icon-dept"></i>
-          {{ item.institutional && item.institutional[1] }}</span
-        >
+          {{ item.institutional && item.institutional[1] }}</span>
       </div>
-    </div>
-    <!-- 任务状态（0:草稿 1：审查中 2：待修改 3：待确认 4：已完成 -->
-    <div class="right-operation">
-      <!-- 待审核状态显示审查 -->
-      <span
-        class="attention icon-op"
-        v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'&&hasAuth"
-        @click="toApproval(item)"
-      >
-        <svg class="icon urgent-icon" aria-hidden="true">
-          <use xlink:href="#icon-tubiao3"></use>
-        </svg>
-        审查
-      </span>
-      <!-- 超级管理员的删除功能 -->
-      <!-- <span class="attention icon-op del" v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'" @click="del(item)">
-        <svg class="icon urgent-icon" aria-hidden="true">
-          <use xlink:href="#icon-xianxingtubiao-1"></use>
-        </svg>
-        删除
-      </span> -->
-      <!-- 待修改状态的工单 需要该审批人修改的工单显示修改-->
-      <!-- <span class="modify icon-op" v-if="item.taskStatus == 3" @click="modify(item)">
-        <svg class="icon urgent-icon" aria-hidden="true">
-          <use xlink:href="#icon-xianxingtubiao"></use>
-        </svg>
-        修改
-      </span> -->
-
-      <!-- 待确认状态的工单 需要该审批人确认的工单-->
-      <span
-        class="attention check icon-op"
-        v-if="item.taskStatus == 5 && crtSign !== 'approvedCount'&&hasAuth"
-        @click="check(item)"
-      >
-        <span class="iconfont icon icon-tubiao urgent-icon"></span>
-        确认</span
-      >
-      <span
-        class="attention check icon-op"
-        v-if="item.taskStatus == 6 && crtSign !== 'approvedCount'&&hasAuth"
-        @click="compare(item)"
-      >
-        <span class="iconfont icon icon-compare urgent-icon"></span>
-        比对</span
-      >
-      <!-- 关注 -->
-      <span
-        class="attention no-attention icon-op"
-        v-if="item.followed != 1"
-        @click="concern(item)"
-      >
-        <svg class="icon urgent-icon" aria-hidden="true">
-          <use xlink:href="#icon-tubiao-1"></use>
-        </svg>
-        关注</span
-      >
-      <span
-        class="attention has-attention icon-op"
-        v-if="item.followed == 1"
-        @click="concern(item)"
-      >
-        <svg class="icon urgent-icon" aria-hidden="true">
-          <use xlink:href="#icon-guanzhu-1"></use></svg>已关注</span>
     </div>
   </div>
 </template>
 <script>
 import { concernApplication } from '@/api/approvalCenter'
-// eslint-disable-next-line
-import dayjs from 'dayjs'
+import moment from 'moment'
 export default {
   name: 'applyEventCard',
   props: {
     item: {
       type: Object,
-      default: () => {}
+      default: () => { }
     },
     crtSign: {
       type: String,
@@ -177,27 +83,23 @@ export default {
       hasAuth: false
     }
   },
-  watch: {
-    item: {
-      handler(val) {
-        let { currentProcessor } = val
-        currentProcessor = currentProcessor?.map((v) => {
-          return Object.keys(v)[0]
-        })
-        const { id } = JSON.parse(window.localStorage.getItem('user_name'))
-        this.hasAuth = currentProcessor.includes(id + '')
-        this.item.hasAuth = currentProcessor.includes(id + '')
-      },
-      immediate: true
+  mounted() {
+    let { currentProcessor } = this.item
+    if (currentProcessor) {
+      currentProcessor = currentProcessor?.map((v) => {
+        return Object.keys(v)[0]
+      })
+      const { id } = JSON.parse(window.localStorage.getItem('user_name'))
+      this.hasAuth = currentProcessor.includes(id + '')
+      this.item.hasAuth = currentProcessor.includes(id + '')
     }
   },
-  mounted() {},
   methods: {
     async toApproval(item) {
       // 判断是领导审批 还是 OCR 审批
       const { targetPage } = item
       // eslint-disable-next-line
-        switch (targetPage) {
+      switch (targetPage) {
         case 'LEADER':
           this.toDetail(item)
           break
@@ -323,7 +225,7 @@ export default {
 
   filters: {
     timeFormate(val) {
-      return val ? dayjs(val).format('YYYY-MM-DD HH:mm:ss') : '--'
+      return val ? moment(val).format('YYYY-MM-DD') : '--'
     }
   }
 }
@@ -335,15 +237,12 @@ export default {
   border-radius: 8px;
   border: 1px solid #f2f3f5;
   background: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   cursor: default;
   width: 100%;
 
   .event-info {
     // flex: 1;
-    width: calc(100% - 250px);
+    width: 100%;
 
     .event-name-status {
       margin-bottom: 17px;
@@ -373,7 +272,6 @@ export default {
 
     .event-status {
       display: flex;
-
       .tag {
         margin-left: 12px;
         display: inline-block;
@@ -455,6 +353,11 @@ export default {
     }
 
     .event-infos {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
       .id {
         color: #2d5cf6;
         font-size: 14px;
@@ -496,102 +399,6 @@ export default {
           color: #2d5cf6;
         }
       }
-    }
-  }
-
-  .right-operation {
-    width: 250px;
-    display: flex;
-    justify-content: flex-end;
-
-    .icon {
-      width: 20px !important;
-      height: 20px !important;
-      margin-right: 2px;
-    }
-
-    .icon-op {
-      display: flex;
-      text-align: center;
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 22px;
-      // width: 76px;
-      text-align: center;
-      justify-content: center;
-      padding: 4px 8px 4px 4px;
-      margin-right: 16px;
-      cursor: pointer;
-    }
-
-    .icon-op:last-of-type {
-      margin-right: 0;
-    }
-
-    .attention {
-      padding: 4px 8px 4px 4px;
-      display: flex;
-      color: #2d5cf6;
-
-      /* 157.143% */
-    }
-
-    .check {
-      border-radius: 4px;
-      color: #14c9c9;
-
-      .icon {
-        font-size: 20px;
-      }
-    }
-
-    .attention:hover {
-      border-radius: 2px;
-      background: #e7f0ff;
-      padding: 4px 8px 4px 4px;
-    }
-
-    .check:hover {
-      border-radius: 2px;
-      background: #e6fffb;
-    }
-
-    .no-attention {
-      color: #2d5cf6;
-    }
-
-    .has-attention {
-      color: #1d2128;
-    }
-
-    .modify {
-      color: #ffa940;
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 22px;
-    }
-
-    .modify:hover {
-      border-radius: 2px;
-      background: #fff7e6;
-      padding: 4px 8px 4px 4px;
-    }
-
-    .del {
-      color: #f76560;
-    }
-
-    .del:hover {
-      border-radius: 2px;
-      background: #fff1f0;
-      padding: 4px 8px 4px 4px;
-    }
-
-    .no-attention,
-    .del {
-      margin-right: 16px !important;
     }
   }
 }

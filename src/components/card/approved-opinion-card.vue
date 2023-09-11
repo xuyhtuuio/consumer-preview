@@ -105,11 +105,10 @@
   </div>
 </template>
 <script>
+// eslint-disable-next-line
+import * as dayjs from 'dayjs'
 import empty from '@/components/common/empty'
-import moment from 'moment'
-
 import { getEditedCommentsByFormId } from '@/api/applyCenter'
-
 export default {
   name: 'approved-opinion-card',
   components: { empty },
@@ -187,7 +186,7 @@ export default {
             const _info = data[keys[i]]
             obj.approverOrgName = _info[0].approverOrgName
             obj.approveTime = _info[0].createTime
-              ? moment(_info[0].createTime).format('YYYY-MM-DD')
+              ? dayjs(_info[0].createTime).format('YYYY-MM-DD')
               : ''
             // 根据不同的status展示不同的信息
             // status:4已经结束   其他的的值表示是可以编辑的表单

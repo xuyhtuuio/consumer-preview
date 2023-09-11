@@ -79,7 +79,8 @@
   </div>
 </template>
 <script>
-import moment from 'moment'
+// eslint-disable-next-line
+import * as dayjs from 'dayjs'
 import { instanceInfo } from '@/api/applyCenter'
 import empty from '@/components/common/empty'
 export default {
@@ -124,7 +125,7 @@ export default {
       //   arr.push(obj)
       // }
       // const arr_handler = arr.sort((a,b)=> {
-      //   return moment(a.createTime)-moment(b.createTime)
+      //   return dayjs(a.createTime)-dayjs(b.createTime)
       // })
       // this.recordList = arr_handler instanceof Array && arr_handler.length ? arr_handler.map(v => {
       //   const comments = v.optionVOList && v.optionVOList[0].comments
@@ -160,7 +161,7 @@ export default {
           }
           // eslint-disable-next-line
           const arr_handler = arr.sort((a, b) => {
-            return moment(a.createTime) - moment(b.createTime)
+            return dayjs(a.createTime) - dayjs(b.createTime)
           })
           // eslint-disable-next-line
           this.recordList = arr_handler instanceof Array && arr_handler.length ? arr_handler.map((v) => {
@@ -191,10 +192,10 @@ export default {
   },
   filters: {
     timeFormat(val) {
-      return val ? moment(val).format('MM-DD HH:mm') : '--'
+      return val ? dayjs(val).format('MM-DD HH:mm') : '--'
     },
     handleTimeFormat(val) {
-      let timediff = moment(val.endTime).diff(moment(val.createTime), 'seconds')
+      let timediff = dayjs(val.endTime).diff(dayjs(val.createTime), 'second')
       const _timediff = timediff > 0 ? (timediff / 3600).toFixed(1) : 0
       _timediff < 0.1
         ? (timediff = (timediff / 3600).toFixed(2))

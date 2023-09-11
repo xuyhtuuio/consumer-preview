@@ -185,7 +185,8 @@
 </template>
 
 <script>
-import moment from 'moment'
+// eslint-disable-next-line
+import * as dayjs from 'dayjs'
 import WarnInfo from './warn-info'
 function rulesFn(data) {
   switch (data.name) {
@@ -303,29 +304,32 @@ export default {
       }
     },
     startTime(nextId, originVal) {
+      if (!nextId) {
+        return;
+      }
       const { value } = this.list.find((item) => item.id === nextId)
       let startDateTime = '00:00:00'
       let endDateTime = '23:59:59'
       // 关联的下线时间
       if (value) {
         if (
-          moment(new Date(value)).format('l') === moment(originVal).format('l')
+          dayjs(new Date(value)).format('l') === dayjs(originVal).format('l')
         ) {
           startDateTime = '00:00:00'
-          endDateTime = moment(new Date(value)).format('HH:mm:ss')
+          endDateTime = dayjs(new Date(value)).format('HH:mm:ss')
         } else if (
-          moment(new Date()).format('l') === moment(originVal).format('l')
+          dayjs(new Date()).format('l') === dayjs(originVal).format('l')
         ) {
-          startDateTime = moment(new Date()).format('HH:mm:ss')
+          startDateTime = dayjs(new Date()).format('HH:mm:ss')
           endDateTime = '23:59:59'
         } else {
           startDateTime = '00:00:00'
           endDateTime = '23:59:59'
         }
       } else if (
-        moment(new Date()).format('l') === moment(originVal).format('l')
+        dayjs(new Date()).format('l') === dayjs(originVal).format('l')
       ) {
-        startDateTime = moment(new Date()).format('HH:mm:ss')
+        startDateTime = dayjs(new Date()).format('HH:mm:ss')
         endDateTime = '23:59:59'
       } else {
         startDateTime = '00:00:00'
@@ -352,18 +356,18 @@ export default {
       let endDateTime = '23:59:59'
       if (value) {
         if (
-          moment(new Date(value)).format('l') === moment(originVal).format('l')
+          dayjs(new Date(value)).format('l') === dayjs(originVal).format('l')
         ) {
-          startDateTime = moment(new Date(value)).format('HH:mm:ss')
+          startDateTime = dayjs(new Date(value)).format('HH:mm:ss')
           endDateTime = '23:59:59'
         } else {
           startDateTime = '00:00:00'
           endDateTime = '23:59:59'
         }
       } else if (
-        moment(new Date()).format('l') === moment(originVal).format('l')
+        dayjs(new Date()).format('l') === dayjs(originVal).format('l')
       ) {
-        startDateTime = moment(new Date()).format('HH:mm:ss')
+        startDateTime = dayjs(new Date()).format('HH:mm:ss')
         endDateTime = '23:59:59'
       } else {
         startDateTime = '00:00:00'
@@ -410,9 +414,9 @@ export default {
         item.props.placeholder = item.lastProps.placeholder || ''
       }
       if (
-        moment(new Date(item.value)).format('l')
-          === moment(new Date()).format('l')
-        && moment(item.value).format('HH:mm:ss') === '00:00:00'
+        dayjs(new Date(item.value)).format('l')
+          === dayjs(new Date()).format('l')
+        && dayjs(item.value).format('HH:mm:ss') === '00:00:00'
       ) {
         item.value = new Date()
       }
@@ -561,6 +565,11 @@ export default {
 
 <style lang="less" scoped>
 .basic-information {
+  .tableCard{
+    /deep/ .head{
+      justify-content: flex-start;
+    }
+  }
   .cardInfo {
     display: flex;
     align-items: center;

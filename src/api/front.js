@@ -62,7 +62,7 @@ export function workOrderTaskInfo(params) {
 // 查询工单详情
 export function externalLogicController(params) {
   return request({
-    url: '/cpr/externalLogicController',
+    url: '/cpr/externalLogicController/getProcessDefinitionId',
     method: 'post',
     params
   })
