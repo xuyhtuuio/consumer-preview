@@ -16,12 +16,22 @@
           <div class="com-tit">选择机构
             <img src="../../assets/image/person-center/down.png" class="down" alt="">
           </div>
+          <el-cascader class="my-hidden" v-model="cascader" :options="organOptions" :props="{ checkStrictly: true }"
+            @change="handleOrganChange" @visible-change="handleOrganChange"></el-cascader>
           <el-tooltip class="item" effect="dark" content="选择机构提示文字" placement="top">
             <img src="@/assets/image/person-center/hintIcon.png" alt="" class="hintIcon">
           </el-tooltip>
         </div>
-        <div class="scrren-com">提单时间
-          <img src="../../assets/image/person-center/down.png" class="down" alt="">
+        <div class="scrren-com">
+          <el-popover placement="bottom-start" trigger="click" @show="handlePopoverShow" @hide="handlePopoverHide" :width="400">
+            <el-date-picker ref="my-date-picker" v-model="datePicker" type="monthrange" align="right" range-separator="至"
+              start-placeholder="开始月份" end-placeholder="结束月份" :picker-options="pickerOptions">
+            </el-date-picker>
+            <div slot="reference">
+              提单时间
+              <img src="../../assets/image/person-center/down.png" class="down" alt="" />
+            </div>
+          </el-popover>
         </div>
         <div class="scrren-btn">
           <img src="@/assets/image/person-center/reset.png" alt="" class="btnIcon">
@@ -208,7 +218,8 @@
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.tds }}</p>
                   <p class="gray fs12 pt6 flex-box ">项<img class="icon pointer  w16"
-                      src="../../assets/image/person-center/tc2.png" alt=""></p>
+                      @click="rejectDialogShow('申请概览', scope.row)" src="../../assets/image/person-center/tc2.png" alt="">
+                  </p>
                 </div>
               </template>
             </el-table-column>
@@ -245,7 +256,8 @@
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.bhqk }}</p>
                   <p class="gray fs12 pt6 flex-box">/{{ scope.row.bhqkRate }}<img class="icon pointer  w16"
-                      src="../../assets/image/person-center/tc1.png" alt=""></p>
+                      @click="rejectDialogShow('驳回情况', scope.row)" src="../../assets/image/person-center/tc1.png" alt="">
+                  </p>
                 </div>
               </template>
             </el-table-column>
@@ -256,11 +268,11 @@
         </div>
       </div>
     </div>
-    <el-dialog :visible.sync="rejectDialog" :before-close="rejectDialogClose" width="1000px" center
-      custom-class="transfer-dialog">
+    <el-dialog :visible.sync="rejectDialog" :before-close="rejectDialogClose"
+      :width="rejectDialogTit === '驳回情况' ? '800px' : '1000px'" center custom-class="transfer-dialog">
       <span slot="title">{{ rejectDialogTit }}</span>
       <div class="dialog-cont">
-        <div class="cont-approve" v-if="rejectDialogTit === '审批概览'">
+        <div class="cont-approve" v-if="rejectDialogTit === '审批概览' || rejectDialogTit === '申请概览'">
           <div class="user">
             <div class="user-info">
               <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
@@ -318,6 +330,49 @@
         <div class="cont-echart" v-if="rejectDialogTit === '月度贡献值变化情况'">
           <div class="stackBar-echarts" id="passing-echarts"></div>
         </div>
+        <div class="cont-reject" v-if="rejectDialogTit === '驳回情况'">
+          <div class="reject-tab">
+            <template v-for="(item, index) in tabList">
+              <div :class="['tab-name', currentTabListIndex === index && 'active']" :key="'total' + item.id"
+                @click="handleTabToggle(index)">
+                {{ item.name }}
+              </div>
+              <span v-if="index !== 1" class="line" :key="index"></span>
+            </template>
+          </div>
+          <div class="filters">
+            <div class="filters-content">
+              <div class="floor2">
+                <div class="floor2-item">
+                  <el-select v-model="search.approvalType" placeholder="审批事项类型" @change="searchList" clearable>
+                    <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
+                      :value="item.value"></el-option>
+                  </el-select>
+                </div>
+                <div class="floor2-item floor2-itemW">
+                  <span>提单时间</span>
+                  <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
+                    value-format="yyyy-MM-dd" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间">
+                  </el-date-picker>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="reject-echart">
+            <div class="echart-com" v-show="currentTabListIndex === 0">
+              <div class="com-echart" id="reason-echart"></div>
+              <div class="legend">
+                <div class="legend-item" v-for="(item, index) in reasonData.xData" :key="'legend' + index">
+                  <span class="legend-icon" :style="{ backgroundColor: reasonData.color[index] }"></span>
+                  <span>{{ item }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="echart-com" v-show="currentTabListIndex === 1">
+              <div class="com-echart com-echart-rate" id="reasonRate-echart"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </el-dialog>
   </div>
@@ -339,6 +394,304 @@ export default {
     return {
       total: 5,
       pageNow: 1,
+      cascader: '',
+      organOptions: [
+        {
+          value: 'zhinan',
+          label: '指南',
+          children: [
+            {
+              value: 'shejiyuanze',
+              label: '设计原则',
+              children: [
+                {
+                  value: 'yizhi',
+                  label: '一致'
+                },
+                {
+                  value: 'fankui',
+                  label: '反馈'
+                },
+                {
+                  value: 'xiaolv',
+                  label: '效率'
+                },
+                {
+                  value: 'kekong',
+                  label: '可控'
+                }
+              ]
+            },
+            {
+              value: 'daohang',
+              label: '导航',
+              children: [
+                {
+                  value: 'cexiangdaohang',
+                  label: '侧向导航'
+                },
+                {
+                  value: 'dingbudaohang',
+                  label: '顶部导航'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          value: 'zujian',
+          label: '组件',
+          children: [
+            {
+              value: 'basic',
+              label: 'Basic',
+              children: [
+                {
+                  value: 'layout',
+                  label: 'Layout 布局'
+                },
+                {
+                  value: 'color',
+                  label: 'Color 色彩'
+                },
+                {
+                  value: 'typography',
+                  label: 'Typography 字体'
+                },
+                {
+                  value: 'icon',
+                  label: 'Icon 图标'
+                },
+                {
+                  value: 'button',
+                  label: 'Button 按钮'
+                }
+              ]
+            },
+            {
+              value: 'form',
+              label: 'Form',
+              children: [
+                {
+                  value: 'radio',
+                  label: 'Radio 单选框'
+                },
+                {
+                  value: 'checkbox',
+                  label: 'Checkbox 多选框'
+                },
+                {
+                  value: 'input',
+                  label: 'Input 输入框'
+                },
+                {
+                  value: 'input-number',
+                  label: 'InputNumber 计数器'
+                },
+                {
+                  value: 'select',
+                  label: 'Select 选择器'
+                },
+                {
+                  value: 'cascader',
+                  label: 'Cascader 级联选择器'
+                },
+                {
+                  value: 'switch',
+                  label: 'Switch 开关'
+                },
+                {
+                  value: 'slider',
+                  label: 'Slider 滑块'
+                },
+                {
+                  value: 'time-picker',
+                  label: 'TimePicker 时间选择器'
+                },
+                {
+                  value: 'date-picker',
+                  label: 'DatePicker 日期选择器'
+                },
+                {
+                  value: 'datetime-picker',
+                  label: 'DateTimePicker 日期时间选择器'
+                },
+                {
+                  value: 'upload',
+                  label: 'Upload 上传'
+                },
+                {
+                  value: 'rate',
+                  label: 'Rate 评分'
+                },
+                {
+                  value: 'form',
+                  label: 'Form 表单'
+                }
+              ]
+            },
+            {
+              value: 'data',
+              label: 'Data',
+              children: [
+                {
+                  value: 'table',
+                  label: 'Table 表格'
+                },
+                {
+                  value: 'tag',
+                  label: 'Tag 标签'
+                },
+                {
+                  value: 'progress',
+                  label: 'Progress 进度条'
+                },
+                {
+                  value: 'tree',
+                  label: 'Tree 树形控件'
+                },
+                {
+                  value: 'pagination',
+                  label: 'Pagination 分页'
+                },
+                {
+                  value: 'badge',
+                  label: 'Badge 标记'
+                }
+              ]
+            },
+            {
+              value: 'notice',
+              label: 'Notice',
+              children: [
+                {
+                  value: 'alert',
+                  label: 'Alert 警告'
+                },
+                {
+                  value: 'loading',
+                  label: 'Loading 加载'
+                },
+                {
+                  value: 'message',
+                  label: 'Message 消息提示'
+                },
+                {
+                  value: 'message-box',
+                  label: 'MessageBox 弹框'
+                },
+                {
+                  value: 'notification',
+                  label: 'Notification 通知'
+                }
+              ]
+            },
+            {
+              value: 'navigation',
+              label: 'Navigation',
+              children: [
+                {
+                  value: 'menu',
+                  label: 'NavMenu 导航菜单'
+                },
+                {
+                  value: 'tabs',
+                  label: 'Tabs 标签页'
+                },
+                {
+                  value: 'breadcrumb',
+                  label: 'Breadcrumb 面包屑'
+                },
+                {
+                  value: 'dropdown',
+                  label: 'Dropdown 下拉菜单'
+                },
+                {
+                  value: 'steps',
+                  label: 'Steps 步骤条'
+                }
+              ]
+            },
+            {
+              value: 'others',
+              label: 'Others',
+              children: [
+                {
+                  value: 'dialog',
+                  label: 'Dialog 对话框'
+                },
+                {
+                  value: 'tooltip',
+                  label: 'Tooltip 文字提示'
+                },
+                {
+                  value: 'popover',
+                  label: 'Popover 弹出框'
+                },
+                {
+                  value: 'card',
+                  label: 'Card 卡片'
+                },
+                {
+                  value: 'carousel',
+                  label: 'Carousel 走马灯'
+                },
+                {
+                  value: 'collapse',
+                  label: 'Collapse 折叠面板'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          value: 'ziyuan',
+          label: '资源',
+          children: [
+            {
+              value: 'axure',
+              label: 'Axure Components'
+            },
+            {
+              value: 'sketch',
+              label: 'Sketch Templates'
+            },
+            {
+              value: 'jiaohu',
+              label: '组件交互文档'
+            }
+          ]
+        }
+      ],
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: '本月',
+            onClick(picker) {
+              picker.$emit('pick', [new Date(), new Date()])
+            }
+          },
+          {
+            text: '上月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setMonth(start.getMonth() - 1)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '近一年',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setMonth(start.getMonth() - 12)
+              picker.$emit('pick', [start, end])
+            }
+          }
+        ]
+      },
+      datePicker: '',
       contributionData: {
         xData: ['＜100', '100(含)-200', '200(含)-300', '300(含)-400', '400(含)-500'],
         yData: [800, 1200, 390, 200, 1500],
@@ -570,7 +923,50 @@ export default {
       },
       transactionTypes: [],
       crtSign: 'allTask',
-      list: []
+      list: [],
+      tabList: [
+        { id: 1, name: '驳回原因分布' },
+        { id: 2, name: '驳回率' }
+      ],
+      currentTabListIndex: 0,
+      reasonData: {
+        xData: [
+          '文件预览失败（文件损坏/清晰度过低）',
+          '附件材料与审批项目不匹配',
+          '其他',
+        ],
+        yData: [10, 12, 30],
+        color: [
+          '#249EFF',
+          '#65CFE4',
+          '#74E4BD',
+        ],
+        yDataHint: [
+          {
+            cp: 210,
+            hd: 230,
+            kh: 220,
+            qt: 240,
+          },
+          {
+            cp: 210,
+            hd: 230,
+            kh: 220,
+            qt: 240,
+          },
+          {
+            cp: 210,
+            hd: 230,
+            kh: 220,
+            qt: 240,
+          }
+        ],
+      },
+      rejectionRateData: {
+        name: '驳回率',
+        xData: ['2022-11', '2022-12', '2023-01', '2023-02', '2023-03'],
+        yData: [800, 1200, 390, 200, 1500],
+      },
     }
   },
   mounted() {
@@ -602,9 +998,14 @@ export default {
           this.initPassingEcharts(this.passingData);
         })
       }
-      if (this.rejectDialogTit === '审批概览') {
+      if (this.rejectDialogTit === '审批概览' || this.rejectDialogTit === '申请概览') {
         this.getApprovalType()
         this.getList(1)
+      }
+      if (this.rejectDialogTit === '驳回情况') {
+        this.$nextTick(() => {
+          this.initReasonEcharts(this.reasonData);
+        })
       }
     },
     approvalList() {
@@ -932,6 +1333,185 @@ export default {
           this.list = []
         })
     },
+
+    // 驳回原因分布
+    initReasonEcharts({ color: colorBy, yData, xData }) {
+      const yData1 = JSON.parse(JSON.stringify(yData))
+      const xData1 = JSON.parse(JSON.stringify(xData))
+      const color = JSON.parse(JSON.stringify(colorBy)).reverse()
+      const option = {
+        tooltip: {
+          backgroundColor: 'rgba(255,255,255,0.8)',
+          borderColor: 'rgba(255,255,255,0.8)',
+          formatter(params) {
+            // console.log(params)
+            const p = `
+            <div style="padding: 6px;display:flex;gap:8px;flex-direction:column;font-size:12px">
+            <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">驳回原因</div>
+            <div>
+              <div style="display:flex;align-items:center;gap:12px;color:#1D2128;">
+                <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;background-color: ${params.color};"></span>
+                <span>${params.name}</span>
+                <span>${params.data}项</span>
+              </div>
+              <div style="display:flex;gap:12px;">
+                <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;"></span>
+                <div style="flex:1;display:flex;justify-content: space-between;">
+                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
+                    <span>产品类</span>
+                    <span>230项</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
+                    <span>活动类</span>
+                    <span>23项</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;">
+                <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;"></span>
+                <div style="flex:1;display:flex;justify-content: space-between">
+                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
+                    <span>产品类</span>
+                    <span>230项</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
+                    <span>活动类</span>
+                    <span>23项</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
+            `
+            return p
+          }
+        },
+        grid: {
+          top: '0',
+          left: '0',
+          right: '10',
+          bottom: '10',
+          containLabel: true
+        },
+        xAxis: {},
+        yAxis: {
+          type: 'category',
+          data: xData1,
+          axisLabel: {
+            formatter(value) {
+              let str = '';
+              const num = 9; // 每行显示字数
+              const valLength = value.length; // 该项x轴字数
+              const rowNum = Math.ceil(valLength / num); // 行数
+              if (rowNum > 1) {
+                for (let i = 0; i < rowNum; i++) {
+                  let temp = '';
+                  const start = i * num;
+                  const end = start + num;
+
+                  temp = value.substring(start, end) + '\n';
+                  str += temp;
+                }
+                return str;
+              } else {
+                return value;
+              }
+            }
+          }
+        },
+        series: {
+          barWidth: '16px',
+          name: xData1.reverse()[0],
+          type: 'bar',
+          itemStyle: {
+            color: (params) => {
+              return color[params.dataIndex]
+            }
+          },
+          data: yData1.reverse()
+        }
+      }
+      this.initChart('reason-echart', option)
+    },
+    handleTabToggle(index) {
+      if (this.currentTabListIndex !== index) {
+        this.currentTabListIndex = index
+        if (index === 0) {
+          this.initReasonEcharts(this.reasonData)
+        }
+        if (index === 1) {
+          this.initRejectionRateEcharts(this.rejectionRateData)
+        }
+      }
+    },
+    initRejectionRateEcharts(industryDataVal) {
+      const option = {
+        tooltip: {
+          backgroundColor: 'rgba(255,255,255,0.8)',
+          trigger: 'axis',
+          formatter: (serie) => {
+            const name = serie[0].axisValueLabel
+            const params = `<p class="charts-tooltip-p fontw black">${name}</p><p class="charts-tooltip-p fontw black"><span class="serieName"><span class="charts-tooltip-dot" style="background: #21CCFF;"></span>驳回率</span><span><span class="blue">${serie[0].data}</span>%</span></p>`
+            return params
+          },
+        },
+        grid: {
+          left: '0',
+          right: '0',
+          top: '12%',
+          bottom: '12%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          data: industryDataVal.xData
+        },
+        yAxis: {
+          type: 'value',
+          name: '%',
+        },
+        series: [
+          {
+            data: industryDataVal.yData,
+            type: 'line',
+            areaStyle: { normal: {} },
+            itemStyle: {
+              normal: {
+                color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  {
+                    offset: 0,
+                    color: 'rgba(0,194,255, 0.05)' // 0% 处的颜色
+                  },
+                  {
+                    offset: 1,
+                    color: '#fff' // 100% 处的颜色
+                  }
+                ]), // 背景渐变色
+                lineStyle: {
+                  // 系列级个性化折线样式
+                  color: '#21CCFF'
+                }
+              }
+            },
+            smooth: true
+          }
+        ]
+      };
+      this.initChart('reasonRate-echart', option)
+    },
+    handleOrganChange(item) {
+      if (!item && this.cascader.length) {
+        this.handleSearchBlur()
+      }
+    },
+    handlePopoverShow() {
+      this.$refs['my-date-picker'].handleFocus()
+    },
+    handlePopoverHide() {
+      if (this.datePicker) {
+        this.handleSearchBlur()
+      }
+    },
   },
 }
 </script>
@@ -990,6 +1570,11 @@ export default {
 
         &.active {
           color: #2D5CF6;
+        }
+
+        .my-hidden {
+          position: absolute;
+          opacity: 0;
         }
 
         .el-select {
@@ -1235,6 +1820,134 @@ export default {
     .dialog-cont {
       margin-top: 24px;
 
+      .filters {
+        display: flex;
+        padding-right: 16px;
+        justify-content: space-between;
+
+        .filters-content {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+
+          /deep/ .el-input__inner,
+          /deep/ .el-range-input {
+            border-radius: 4px;
+            border: none;
+            background: #f7f8fa;
+            color: #1d2128;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 22px;
+
+            .el-range-separator {
+              padding: 0;
+            }
+          }
+
+          .floor1 {
+            // padding-right: 16px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+
+            .el-select,
+            .el-cascader {
+              margin-bottom: 12px;
+              width: 32%;
+            }
+
+            /deep/ .el-cascader .el-input .el-icon-arrow-down::before {
+              font-family: element-icons !important;
+              content: '\e790';
+            }
+
+            /deep/ .el-select .el-input .el-icon-arrow-up::before {
+              font-family: element-icons !important;
+              content: '\e78f';
+            }
+          }
+
+          .floor2 {
+            width: 100%;
+            display: flex;
+            padding-right: 16px;
+
+            .floor2-item {
+              width: 33%;
+              margin-right: 16px;
+              display: flex;
+              align-items: center;
+
+              .el-input,
+              .el-date-editor {
+                width: 100%;
+              }
+
+              span {
+                color: #86909c;
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 22px;
+                word-break: keep-all;
+                margin-right: 8px;
+              }
+            }
+
+            .floor2-itemW {
+              width: 40%;
+            }
+
+            .floor2-item:last-of-type {
+              margin-right: 0;
+            }
+
+            /deep/.el-range-editor {
+              position: relative;
+
+              .el-icon-date,
+              .el-icon-time {
+                position: absolute;
+                right: 8px;
+                top: 50%;
+                transform: translateY(-50%);
+              }
+
+              .el-icon-time::before {
+                font-family: element-icons !important;
+                content: '\e78e';
+              }
+
+              .el-input__suffix {
+                right: 20px;
+              }
+            }
+          }
+        }
+
+        .export-reset {
+          border-left: 1px dashed #e5e6eb;
+          padding-left: 16px;
+          display: flex;
+          flex-direction: column;
+
+          .el-button {
+            height: 38px;
+            padding: 6px 0px;
+            width: 84px;
+            border-radius: 6px;
+            border: 1px solid #a8c5ff;
+            background: #f0f6ff;
+            margin-left: 0;
+            margin-bottom: 12px;
+          }
+
+          .el-button:last-of-type {
+            margin-bottom: 0;
+          }
+        }
+      }
+
       .cont-approve {
         .user {
           margin-bottom: 16px;
@@ -1283,134 +1996,7 @@ export default {
           }
         }
 
-        .filters {
-          display: flex;
-          padding-right: 16px;
-          justify-content: space-between;
-
-          .filters-content {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-
-            /deep/ .el-input__inner,
-            /deep/ .el-range-input {
-              border-radius: 4px;
-              border: none;
-              background: #f7f8fa;
-              color: #1d2128;
-              font-size: 14px;
-              font-weight: 400;
-              line-height: 22px;
-
-              .el-range-separator {
-                padding: 0;
-              }
-            }
-
-            .floor1 {
-              // padding-right: 16px;
-              display: flex;
-              justify-content: space-between;
-              flex-wrap: wrap;
-
-              .el-select,
-              .el-cascader {
-                margin-bottom: 12px;
-                width: 32%;
-              }
-
-              /deep/ .el-cascader .el-input .el-icon-arrow-down::before {
-                font-family: element-icons !important;
-                content: '\e790';
-              }
-
-              /deep/ .el-select .el-input .el-icon-arrow-up::before {
-                font-family: element-icons !important;
-                content: '\e78f';
-              }
-            }
-
-            .floor2 {
-              width: 100%;
-              display: flex;
-              padding-right: 16px;
-
-              .floor2-item {
-                width: 33%;
-                margin-right: 16px;
-                display: flex;
-                align-items: center;
-
-                .el-input,
-                .el-date-editor {
-                  width: 100%;
-                }
-
-                span {
-                  color: #86909c;
-                  font-size: 14px;
-                  font-weight: 400;
-                  line-height: 22px;
-                  word-break: keep-all;
-                  margin-right: 8px;
-                }
-              }
-
-              .floor2-itemW {
-                width: 40%;
-              }
-
-              .floor2-item:last-of-type {
-                margin-right: 0;
-              }
-
-              /deep/.el-range-editor {
-                position: relative;
-
-                .el-icon-date,
-                .el-icon-time {
-                  position: absolute;
-                  right: 8px;
-                  top: 50%;
-                  transform: translateY(-50%);
-                }
-
-                .el-icon-time::before {
-                  font-family: element-icons !important;
-                  content: '\e78e';
-                }
-
-                .el-input__suffix {
-                  right: 20px;
-                }
-              }
-            }
-          }
-
-          .export-reset {
-            border-left: 1px dashed #e5e6eb;
-            padding-left: 16px;
-            display: flex;
-            flex-direction: column;
-
-            .el-button {
-              height: 38px;
-              padding: 6px 0px;
-              width: 84px;
-              border-radius: 6px;
-              border: 1px solid #a8c5ff;
-              background: #f0f6ff;
-              margin-left: 0;
-              margin-bottom: 12px;
-            }
-
-            .el-button:last-of-type {
-              margin-bottom: 0;
-            }
-          }
-        }
-        .list{
+        .list {
           padding-right: 16px;
           height: 390px;
           overflow-y: auto;
@@ -1540,11 +2126,102 @@ export default {
           height: 454px;
         }
       }
+
+      .cont-reject {
+        .reject-tab {
+          width: 100%;
+          display: flex;
+          gap: 12px;
+          align-items: center;
+          line-height: 22px;
+          color: #1D2128;
+          position: relative;
+
+          .tab-name {
+            font-weight: 700;
+            cursor: pointer;
+
+            &.active {
+              color: #2D5CF6;
+            }
+          }
+
+          .line {
+            padding: 4px 0;
+            width: 1px;
+            background-color: #CACDD3;
+          }
+        }
+
+        .filters {
+          width: 100%;
+          margin-top: 24px;
+
+          .floor2-item {
+            width: 240px !important;
+
+            .el-select {
+              width: 100%;
+            }
+          }
+
+          .floor2-itemW {
+            width: 416px !important;
+          }
+        }
+
+        .reject-echart {
+          width: 100%;
+          margin-top: 24px;
+
+          .echart-com {
+            width: 100%;
+
+            .com-echart {
+              width: 680px;
+              height: 242px;
+            }
+
+            .com-echart-rate {
+              height: 288px;
+            }
+
+            .legend {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              flex-wrap: wrap;
+              padding: 0 40px;
+              font-size: 12px;
+
+              &-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                line-height: 20px;
+                margin-top: 8px;
+
+                &:not(:first-child) {
+                  margin-left: 24px;
+                }
+              }
+
+              &-icon {
+                width: 8px;
+                height: 8px;
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
 </style>
 <style lang="less">
+.el-range-editor.el-input__inner{
+  width: 100%;
+}
 .charts-tooltip-p {
   text-align: left;
   min-width: 80px;

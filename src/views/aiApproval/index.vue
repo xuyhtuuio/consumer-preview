@@ -212,6 +212,7 @@ export default {
     this.formBase = item;
     // 获取前面的审批意见
     this.getOpinionApprovalLetter();
+    this.getNodeHandleUserApi();
   },
   beforeDestroy() {
     this.lineRemove();

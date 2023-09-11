@@ -8,7 +8,8 @@ import {
   getOpinionApprovalLetter,
   queryFormItemPermissions,
   getNextUserOption,
-  rollback
+  rollback,
+  getNodeHandleUser
 } from '@/api/aiApproval';
 import { getApplyForm } from '@/api/front';
 
@@ -534,5 +535,15 @@ export default {
         }
       })
     },
+    // 获取节点审批人
+    getNodeHandleUserApi() {
+      const data = {
+        nodeId: this.formBase.nodeId,
+        templateId: this.formBase.templateId
+      }
+      getNodeHandleUser(data).then((res) => {
+        console.log(res);
+      })
+    }
   },
 };
