@@ -631,6 +631,7 @@ export default {
       this.$router.push({
         name: 'editApply',
         params: {
+          ...this.item,
           id: this.item.taskNumber,
           formManagementId: this.item.formManagementId
         }

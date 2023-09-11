@@ -304,6 +304,9 @@ export default {
       }
     },
     startTime(nextId, originVal) {
+      if (!nextId) {
+        return;
+      }
       const { value } = this.list.find((item) => item.id === nextId)
       let startDateTime = '00:00:00'
       let endDateTime = '23:59:59'
