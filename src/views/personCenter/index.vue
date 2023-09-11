@@ -16,12 +16,22 @@
           <div class="com-tit">选择机构
             <img src="../../assets/image/person-center/down.png" class="down" alt="">
           </div>
+          <el-cascader class="my-hidden" v-model="cascader" :options="organOptions" :props="{ checkStrictly: true }"
+            @change="handleOrganChange" @visible-change="handleOrganChange"></el-cascader>
           <el-tooltip class="item" effect="dark" content="选择机构提示文字" placement="top">
             <img src="@/assets/image/person-center/hintIcon.png" alt="" class="hintIcon">
           </el-tooltip>
         </div>
-        <div class="scrren-com">提单时间
-          <img src="../../assets/image/person-center/down.png" class="down" alt="">
+        <div class="scrren-com">
+          <el-popover placement="bottom-start" trigger="click" @show="handlePopoverShow" @hide="handlePopoverHide" :width="400">
+            <el-date-picker ref="my-date-picker" v-model="datePicker" type="monthrange" align="right" range-separator="至"
+              start-placeholder="开始月份" end-placeholder="结束月份" :picker-options="pickerOptions">
+            </el-date-picker>
+            <div slot="reference">
+              提单时间
+              <img src="../../assets/image/person-center/down.png" class="down" alt="" />
+            </div>
+          </el-popover>
         </div>
         <div class="scrren-btn">
           <img src="@/assets/image/person-center/reset.png" alt="" class="btnIcon">
@@ -384,6 +394,304 @@ export default {
     return {
       total: 5,
       pageNow: 1,
+      cascader: '',
+      organOptions: [
+        {
+          value: 'zhinan',
+          label: '指南',
+          children: [
+            {
+              value: 'shejiyuanze',
+              label: '设计原则',
+              children: [
+                {
+                  value: 'yizhi',
+                  label: '一致'
+                },
+                {
+                  value: 'fankui',
+                  label: '反馈'
+                },
+                {
+                  value: 'xiaolv',
+                  label: '效率'
+                },
+                {
+                  value: 'kekong',
+                  label: '可控'
+                }
+              ]
+            },
+            {
+              value: 'daohang',
+              label: '导航',
+              children: [
+                {
+                  value: 'cexiangdaohang',
+                  label: '侧向导航'
+                },
+                {
+                  value: 'dingbudaohang',
+                  label: '顶部导航'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          value: 'zujian',
+          label: '组件',
+          children: [
+            {
+              value: 'basic',
+              label: 'Basic',
+              children: [
+                {
+                  value: 'layout',
+                  label: 'Layout 布局'
+                },
+                {
+                  value: 'color',
+                  label: 'Color 色彩'
+                },
+                {
+                  value: 'typography',
+                  label: 'Typography 字体'
+                },
+                {
+                  value: 'icon',
+                  label: 'Icon 图标'
+                },
+                {
+                  value: 'button',
+                  label: 'Button 按钮'
+                }
+              ]
+            },
+            {
+              value: 'form',
+              label: 'Form',
+              children: [
+                {
+                  value: 'radio',
+                  label: 'Radio 单选框'
+                },
+                {
+                  value: 'checkbox',
+                  label: 'Checkbox 多选框'
+                },
+                {
+                  value: 'input',
+                  label: 'Input 输入框'
+                },
+                {
+                  value: 'input-number',
+                  label: 'InputNumber 计数器'
+                },
+                {
+                  value: 'select',
+                  label: 'Select 选择器'
+                },
+                {
+                  value: 'cascader',
+                  label: 'Cascader 级联选择器'
+                },
+                {
+                  value: 'switch',
+                  label: 'Switch 开关'
+                },
+                {
+                  value: 'slider',
+                  label: 'Slider 滑块'
+                },
+                {
+                  value: 'time-picker',
+                  label: 'TimePicker 时间选择器'
+                },
+                {
+                  value: 'date-picker',
+                  label: 'DatePicker 日期选择器'
+                },
+                {
+                  value: 'datetime-picker',
+                  label: 'DateTimePicker 日期时间选择器'
+                },
+                {
+                  value: 'upload',
+                  label: 'Upload 上传'
+                },
+                {
+                  value: 'rate',
+                  label: 'Rate 评分'
+                },
+                {
+                  value: 'form',
+                  label: 'Form 表单'
+                }
+              ]
+            },
+            {
+              value: 'data',
+              label: 'Data',
+              children: [
+                {
+                  value: 'table',
+                  label: 'Table 表格'
+                },
+                {
+                  value: 'tag',
+                  label: 'Tag 标签'
+                },
+                {
+                  value: 'progress',
+                  label: 'Progress 进度条'
+                },
+                {
+                  value: 'tree',
+                  label: 'Tree 树形控件'
+                },
+                {
+                  value: 'pagination',
+                  label: 'Pagination 分页'
+                },
+                {
+                  value: 'badge',
+                  label: 'Badge 标记'
+                }
+              ]
+            },
+            {
+              value: 'notice',
+              label: 'Notice',
+              children: [
+                {
+                  value: 'alert',
+                  label: 'Alert 警告'
+                },
+                {
+                  value: 'loading',
+                  label: 'Loading 加载'
+                },
+                {
+                  value: 'message',
+                  label: 'Message 消息提示'
+                },
+                {
+                  value: 'message-box',
+                  label: 'MessageBox 弹框'
+                },
+                {
+                  value: 'notification',
+                  label: 'Notification 通知'
+                }
+              ]
+            },
+            {
+              value: 'navigation',
+              label: 'Navigation',
+              children: [
+                {
+                  value: 'menu',
+                  label: 'NavMenu 导航菜单'
+                },
+                {
+                  value: 'tabs',
+                  label: 'Tabs 标签页'
+                },
+                {
+                  value: 'breadcrumb',
+                  label: 'Breadcrumb 面包屑'
+                },
+                {
+                  value: 'dropdown',
+                  label: 'Dropdown 下拉菜单'
+                },
+                {
+                  value: 'steps',
+                  label: 'Steps 步骤条'
+                }
+              ]
+            },
+            {
+              value: 'others',
+              label: 'Others',
+              children: [
+                {
+                  value: 'dialog',
+                  label: 'Dialog 对话框'
+                },
+                {
+                  value: 'tooltip',
+                  label: 'Tooltip 文字提示'
+                },
+                {
+                  value: 'popover',
+                  label: 'Popover 弹出框'
+                },
+                {
+                  value: 'card',
+                  label: 'Card 卡片'
+                },
+                {
+                  value: 'carousel',
+                  label: 'Carousel 走马灯'
+                },
+                {
+                  value: 'collapse',
+                  label: 'Collapse 折叠面板'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          value: 'ziyuan',
+          label: '资源',
+          children: [
+            {
+              value: 'axure',
+              label: 'Axure Components'
+            },
+            {
+              value: 'sketch',
+              label: 'Sketch Templates'
+            },
+            {
+              value: 'jiaohu',
+              label: '组件交互文档'
+            }
+          ]
+        }
+      ],
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: '本月',
+            onClick(picker) {
+              picker.$emit('pick', [new Date(), new Date()])
+            }
+          },
+          {
+            text: '上月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setMonth(start.getMonth() - 1)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '近一年',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setMonth(start.getMonth() - 12)
+              picker.$emit('pick', [start, end])
+            }
+          }
+        ]
+      },
+      datePicker: '',
       contributionData: {
         xData: ['＜100', '100(含)-200', '200(含)-300', '300(含)-400', '400(含)-500'],
         yData: [800, 1200, 390, 200, 1500],
@@ -1191,6 +1499,19 @@ export default {
       };
       this.initChart('reasonRate-echart', option)
     },
+    handleOrganChange(item) {
+      if (!item && this.cascader.length) {
+        this.handleSearchBlur()
+      }
+    },
+    handlePopoverShow() {
+      this.$refs['my-date-picker'].handleFocus()
+    },
+    handlePopoverHide() {
+      if (this.datePicker) {
+        this.handleSearchBlur()
+      }
+    },
   },
 }
 </script>
@@ -1249,6 +1570,11 @@ export default {
 
         &.active {
           color: #2D5CF6;
+        }
+
+        .my-hidden {
+          position: absolute;
+          opacity: 0;
         }
 
         .el-select {
@@ -1893,6 +2219,9 @@ export default {
 }
 </style>
 <style lang="less">
+.el-range-editor.el-input__inner{
+  width: 100%;
+}
 .charts-tooltip-p {
   text-align: left;
   min-width: 80px;
