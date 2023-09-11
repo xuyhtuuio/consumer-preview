@@ -610,7 +610,7 @@ export default {
       this.page = this.page1
     },
     tableRowClassName({ row }) {
-      if (row.run === '0') {
+      if (+row.run === 0) {
         return 'disable-row';
       }
       return '';
