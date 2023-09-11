@@ -254,7 +254,7 @@ export default {
         return;
       }
       let opinionLetterRecordDtoList = null;
-      const editedCommentsDtoList = this.submission.filter(item => item.associatedAttachmentsIds !== undefined)
+      const editedCommentsDtoList = this.submission.filter(item => item.associatedAttachmentsIds === undefined)
       if (this.approvalLetter.permissions === 'passAllow') {
         opinionLetterRecordDtoList = this.submission.map(item => {
           return {
@@ -263,7 +263,7 @@ export default {
             substantiveOpinions: item.opinion ? 1 : 0
           }
         }) || [];
-      } else {
+      } else if (this.approvalLetter.permissions === 'disPassNotAllow') {
         editedCommentsDtoList.forEach(item => {
           delete item.opinion
         })
