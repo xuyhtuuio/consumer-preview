@@ -363,7 +363,8 @@
 import { toCode, fromCode } from '@/utils/utils';
 import { editThePermissionsPage } from '@/api/admin/role'
 import md5 from 'js-md5';
-import moment from 'moment';
+// eslint-disable-next-line
+import * as dayjs from 'dayjs'
 // import Iframes from '@/components/iframe-send-message'
 // import "swiper/dist/css/swiper.min.css";
 // eslint-disable-next-line
@@ -732,8 +733,8 @@ export default {
         // 权限申请
         const { platform, expiryTime } = userinfo;
         const routeFrom = this.$route.query.from;
-        const startTime = moment().format('YYYY-MM-DD HH:mm:ss');
-        const diff = moment(expiryTime).diff(moment(startTime), 'seconds');
+        const startTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
+        const diff = dayjs(expiryTime).diff(dayjs(startTime), 'second');
         this.platlistBack = platform ? platform.split(',') : [];
         localStorage.setItem('platlistBack', JSON.stringify(this.platlistBack));
         this.platlist = platform ? platform.split(',') : [];
@@ -753,7 +754,7 @@ export default {
         } else if (expiryTime && diff <= 0) {
           // 说明过期
           this.expirydialog = true;
-          // this.expirytime = expiryTime || moment().format('YYYY-MM-DD HH:mm:ss')
+          // this.expirytime = expiryTime || dayjs().format('YYYY-MM-DD HH:mm:ss')
         } else if (
           routeFrom && !this.platDialog && !this.expirydialog && routeFrom && routeFrom !== 'trs'
         ) {

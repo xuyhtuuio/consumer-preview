@@ -8,7 +8,9 @@
           :hProp="hProp"
           :href="iconHref"
         />
-        <span class="content">{{ title }}</span>
+        <slot name="head-title"
+          ><span class="content">{{ title }}</span></slot
+        >
       </div>
       <div class="right">
         <slot name="head-right"></slot>

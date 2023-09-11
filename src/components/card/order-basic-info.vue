@@ -144,7 +144,8 @@
 <script >
 import { getApplyForm } from '@/api/front'
 import { downloadAllFiles } from '@/api/applyCenter'
-import moment from 'moment'
+// eslint-disable-next-line
+import * as dayjs from 'dayjs'
 import FileType from '@/components/common/file-type'
 export default {
   name: 'order-basic-info',
@@ -375,7 +376,7 @@ export default {
       }
       if (val.name === 'TimePicker') {
         if (!val.value) return '--'
-        return val.value.length < 8 ? val.value : moment(val.value).format('YYYY-MM-DD HH:mm:ss')
+        return val.value.length < 8 ? val.value : dayjs(val.value).format('YYYY-MM-DD HH:mm:ss')
       }
       if (val.name === 'MultipleSelect') {
         const { options } = val.props
