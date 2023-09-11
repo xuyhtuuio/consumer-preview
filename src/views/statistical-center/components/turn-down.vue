@@ -50,8 +50,21 @@
         <div class="main" v-show="currentTabListIndex === 1">
           <div class="my-echart" ref="stackBar-echart"></div>
         </div>
-        <div class="main" v-show="currentTabListIndex === 2">
+        <div class="main main-legend" v-show="currentTabListIndex === 2">
           <div class="my-echart" ref="reason-echart"></div>
+          <div class="legend">
+            <div
+              class="legend-item"
+              v-for="(item, index) in reasonData.xData"
+              :key="'legend' + index"
+            >
+              <span
+                class="legend-icon"
+                :style="{ backgroundColor: reasonData.color[index] }"
+              ></span>
+              <span>{{ item }}</span>
+            </div>
+          </div>
         </div>
       </template>
     </g-table-card>
@@ -71,7 +84,7 @@ export default {
         { id: 2, name: '驳回次数分布' },
         { id: 3, name: '驳回原因分布' }
       ],
-      currentTabListIndex: 0,
+      currentTabListIndex: 0
     }
   },
   methods: {
@@ -80,7 +93,7 @@ export default {
         this.currentTabListIndex = index
         this.handleEchartsToggle(index)
       }
-    },
+    }
   }
 }
 </script>
@@ -120,10 +133,35 @@ export default {
     flex: 1;
     width: 100%;
     display: flex;
+    &.main-legend {
+      flex-direction: column;
+      .legend {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 0 40px;
+        font-size: 12px;
+        &-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          line-height: 20px;
+          margin-top: 8px;
+          &:not(:first-child) {
+            margin-left: 24px;
+          }
+        }
+        &-icon {
+          width: 8px;
+          height: 8px;
+        }
+      }
+    }
     .my-echart {
       height: 100%;
     }
-    &>.my-echart {
+    & > .my-echart {
       width: 100%;
     }
     .left {
@@ -176,8 +214,8 @@ export default {
     display: inline-block;
     width: 10px;
     height: 10px;
-    background: #2D5CF6;
-    border: 2px solid #FFFFFF;
+    background: #2d5cf6;
+    border: 2px solid #ffffff;
     box-sizing: border-box;
     border-radius: 50%;
     margin-right: 8px;
