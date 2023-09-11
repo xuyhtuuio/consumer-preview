@@ -8,9 +8,7 @@
           :hProp="hProp"
           :href="iconHref"
         />
-        <slot name="head-title"
-          ><span class="content">{{ title }}</span></slot
-        >
+        <span class="content">{{ title }}</span>
       </div>
       <div class="right">
         <slot name="head-right"></slot>
@@ -54,7 +52,6 @@ export default {
   .head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     .left {
       display: flex;
       align-items: center;

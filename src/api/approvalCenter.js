@@ -158,3 +158,11 @@ export function endTask(param) {
     data: param,
   })
 }
+
+// 获取提单机构
+export function getOrgTree() {
+  return request({
+    url: '/cpr/censor/getOrgTree',
+    method: 'post',
+  })
+}

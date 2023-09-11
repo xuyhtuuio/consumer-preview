@@ -73,6 +73,7 @@
                 :show-all-levels="false"
                 @change="changeAgencies"
                 :props="{
+                  emitPath:false,
                   checkStrictly: true,
                   label: 'name',
                   value: 'id',
@@ -248,9 +249,9 @@ import {
   getApprovalType,
   getApprovalStage,
   getApprovalListStation,
-  exportApprovalList
+  exportApprovalList,
+  getOrgTree
 } from '@/api/approvalCenter'
-import { queryUserList } from '@/api/org'
 export default {
   components: {
     approvalEventCard
@@ -369,7 +370,7 @@ export default {
     })
     this.userStatus()
     this.getApprovalType()
-    this.queryUserList()
+    this.getOrgTree()
     this.searchList()
   },
   watch: {
@@ -604,20 +605,27 @@ export default {
     searchList() {
       this.getList(1)
     },
-    queryUserList() {
-      queryUserList().then((res) => {
-        const { root } = res.data.data
-        if (root) {
-          this.agenciesList = root.children.map((item) => {
-            return {
-              ...item,
-              children: null,
-              id: item.id,
-              name: item.name
-            }
-          })
+    getOrgTree() {
+      getOrgTree().then((res) => {
+        const { data } = res.data
+        if (data) {
+          const value = this.formatOrg(data.children)
+          this.agenciesList = [
+            { ...data,
+              children: value }
+          ]
         }
       })
+    },
+    formatOrg(data) {
+      data.forEach((m) => {
+        if (m.children && m.children.length) {
+          this.formatOrg(m.children)
+        } else {
+          m.children = null
+        }
+      })
+      return data
     },
     getList(pageNow) {
       this.$refs['box'].scrollTo({
@@ -693,20 +701,18 @@ export default {
           const { data } = res.data
           this.search.total = data.totalCount
           const flag = Array.isArray(data.list)
-          this.list = flag && data.list.length > 0
-            ? data.list.map((v) => {
-              return {
-                ...v,
-                taskNumber: v.recordId + '',
-                taskName: v.entryName,
-                initiator: {
-                  ...v.originator,
-                  label: v.institutional && v.institutional[1]
-                },
-                taskStatus: v.nodeStatus
-              }
-            })
-            : []
+          this.list = flag && data.list.length > 0 ? data.list.map((v) => {
+            return {
+              ...v,
+              taskNumber: v.recordId + '',
+              taskName: v.entryName,
+              initiator: {
+                ...v.originator,
+                label: v.institutional && v.institutional[1]
+              },
+              taskStatus: v.nodeStatus
+            }
+          }) : []
           this.search.loading = false
         })
         .catch(() => {
@@ -726,10 +732,10 @@ export default {
           status = '1'
           break
         case '待确认':
-          status = '3';
-          break;
+          status = '3'
+          break
         default:
-          break;
+          break
       }
       return status
     },
@@ -740,8 +746,8 @@ export default {
         urgent: '',
         hasOpinions: '',
         adoptionSituation: '',
-        updateTime: [1, 'asc'],
-        updateTime2: [1, 'asc'],
+        updateTime: [2, 'desc'],
+        updateTime2: [2, 'desc'],
         keywords: '',
         startDate: [],
         productLaunchDate: [],
@@ -1114,4 +1120,5 @@ export default {
       }
     }
   }
-}</style>
+}
+</style>

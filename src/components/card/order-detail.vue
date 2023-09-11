@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-11 10:23:03
+ * @LastEditTime: 2023-09-11 17:26:35
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -150,6 +150,7 @@
         <order-basic-info
           @preview="previewFile"
           :personInfo="item.initiator"
+          :personOrg = 'item.institutional'
           @sendReviewMaterials="sendReviewMaterials"
           @sendFilledInByApprover="sendFilledInByApprover"
         ></order-basic-info>
@@ -366,7 +367,6 @@ import {
   updateEditedComments,
   getTemplatedetail
 } from '@/api/applyCenter'
-
 export default {
   name: 'order-details',
   components: {
@@ -631,6 +631,7 @@ export default {
       this.$router.push({
         name: 'editApply',
         params: {
+          ...this.item,
           id: this.item.taskNumber,
           formManagementId: this.item.formManagementId
         }
@@ -950,6 +951,7 @@ export default {
         }
       }
       try {
+        const posts = [updateAdoptEditedComments(opinion_submit_params, this.item.taskId)]
         // 上传文件的逻辑 选中活动正常上线
         if (!opinions && uploadFileRadio === 1) {
           const params = fileUploadForm.map((v) => {
@@ -963,71 +965,67 @@ export default {
               otherUrl: v.relevantFile.url
             }
           })
-          await finalMaterial(
+          posts.push(finalMaterial(
             params,
             this.item.processInstanceId,
             this.item.taskId,
             that.item.taskNumber
-          )
+          ))
         }
-        updateAdoptEditedComments(opinion_submit_params, this.item.taskId)
-          .then((res) => {
-            this.loadings.submitLoading = false
-            // 有实质意见且采纳所以的有实质意见
-            const { success } = res.data
-            if (success) {
-              if (type && type === 1) {
-                this.$confirm(
-                  '审查意见已确认，请根据审查意见修改提单内容。',
-                  '',
-                  {
-                    customClass: 'confirmBox',
-                    confirmButtonText: '去修改',
-                    cancelButtonText: '知道了',
-                    closeOnClickModal: false,
-                    distinguishCancelAndClose: true,
-                    type: 'warning'
-                  }
-                )
-                  .then(() => {
-                    that.toModify()
-                  })
-                  .catch((e) => {
-                    // eslint-disable-next-line
-                    switch (e) {
-                      case 'close':
-                        that.toModify()
-                        break
-                      case 'cancel':
-                        break
-                    }
-                  })
-              } else {
-                this.$confirm('审查意见已确认，可在申请中心查看。', '', {
-                  customClass: 'confirmBox',
-                  cancelButtonText: '知道了',
-                  showConfirmButton: false,
-                  closeOnClickModal: false,
-                  type: 'warning'
-                })
-                  .then(() => {
-                    this.$router.replace('/applycenter')
-                  })
-                  .catch(() => {
-                    this.$router.replace('/applycenter')
-                  })
+        const arrData = await Promise.all(posts)
+        const values = Object.values(arrData)
+        const flag = values.every(m => m.data.success)
+        if (flag) {
+          this.loadings.submitLoading = false
+          // 有实质意见且采纳所以的有实质意见
+          if (type && type === 1) {
+            this.$confirm(
+              '审查意见已确认，请根据审查意见修改提单内容。',
+              '',
+              {
+                customClass: 'confirmBox',
+                confirmButtonText: '去修改',
+                cancelButtonText: '知道了',
+                closeOnClickModal: false,
+                distinguishCancelAndClose: true,
+                type: 'warning'
               }
-            } else {
-              this.$message.error(res.data.msg)
-            }
-          })
-          .catch(() => {
-            this.loadings.submitLoading = false
-          })
+            )
+              .then(() => {
+                that.toModify()
+              })
+              .catch((e) => {
+              // eslint-disable-next-line
+                switch (e) {
+                  case 'close':
+                    that.toModify()
+                    break
+                  case 'cancel':
+                    break
+                }
+              })
+          } else {
+            this.$confirm('审查意见已确认，可在申请中心查看。', '', {
+              customClass: 'confirmBox',
+              cancelButtonText: '知道了',
+              showConfirmButton: false,
+              closeOnClickModal: false,
+              type: 'warning'
+            })
+              .then(() => {
+                this.$router.replace('/applycenter')
+              })
+              .catch(() => {
+                this.$router.replace('/applycenter')
+              })
+          }
+        } else {
+          this.loadings.submitLoading = false
+        }
       } catch (error) {
-        this.loadings.submitLoading = false
+        this.$message.error(error)
       }
-    }
+    },
   }
 }
 </script>

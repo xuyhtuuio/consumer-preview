@@ -2,7 +2,7 @@
   <div class="addApply" v-loading.body="isGLoading">
     <g-breadcrunm />
     <div class="tag">
-      <add-tag ref="refAddTag" @submit="submit" @save="save">
+      <add-tag ref="refAddTag" @submit="submit" @save="save" :formBasicInfo="formBasicInfo">
         <div v-if="!reviewList.length"></div>
       </add-tag>
     </div>
@@ -29,8 +29,8 @@
         <review-material class="cnt-item" ref="reviewMaterialRef" :list="reviewMaterials" />
       </div>
       <div class="footer" v-if="!isLoading && reviewList.length">
-        <g-button class="btn" @click="previewFlow">流程总览</g-button>
-        <g-button class="btn" @click.native="save">保存草稿</g-button>
+        <g-button class="btn" @click="previewFlow" v-if="formBasicInfo.submitted !== 1">流程总览</g-button>
+        <g-button class="btn" @click.native="save" v-if="formBasicInfo.submitted !== 1">保存草稿</g-button>
         <g-button class="btn" type="primary" @click.native="submit">提交</g-button>
       </div>
     </div>
@@ -79,6 +79,9 @@ import {
   processStart,
   getProcess
 } from '@/api/front';
+import {
+  ocrApprovalSubmission
+} from '@/api/aiApproval';
 import AddTag from './components/add-tag';
 import ReviewMatters from './components/review-matters';
 import BasicInformation from './components/basic-information';
@@ -121,17 +124,24 @@ export default {
     templateId: '',
     processDefinitionId: '',
     currentRow: null,
-    currentRowInfo: ''
+    currentRowInfo: '',
+    formBasicInfo: {} // 编辑表单时，从路由处获取的基础信息
   }),
   created() {
     this.initialData();
   },
-  beforeRouteEnter({ name, params: { id, formManagementId } }, from, next) {
+  beforeRouteEnter({ name, params }, from, next) {
     if (name === 'addApply') return next();
     next(vm => {
+      const { id, formManagementId } = params
       if (id || window.localStorage.getItem('editId')) {
+        vm.formBasicInfo = {
+          ...JSON.parse(window.localStorage.getItem('formBasicInfo') || '{}'),
+          ...params
+        }
         vm.formId = id || window.localStorage.getItem('editId');
         vm.formManagementId = formManagementId || window.localStorage.getItem('formManagementId');
+        window.localStorage.setItem('formBasicInfo', JSON.stringify(vm.formBasicInfo));
         window.localStorage.setItem('editId', id || window.localStorage.getItem('editId'));
         window.localStorage.setItem(
           'formManagementId',
@@ -153,19 +163,22 @@ export default {
     _this.handleConfirm = () => {
       _this.dialogVisible = false;
       this.save(() => {
-        window.localStorage.removeItem('editId');
-        window.localStorage.removeItem('formManagementId');
+        this.removeStorage()
         next();
       });
     };
     _this.handleClose = () => {
       _this.dialogVisible = false;
-      window.localStorage.removeItem('editId');
-      window.localStorage.removeItem('formManagementId');
+      this.removeStorage()
       next();
     };
   },
   methods: {
+    removeStorage() {
+      window.localStorage.removeItem('editId');
+      window.localStorage.removeItem('formManagementId');
+      window.localStorage.removeItem('formBasicInfo');
+    },
     initialData() {
       this.isLoading = true;
       getFormCategoryArray().then(res => {
@@ -293,7 +306,7 @@ export default {
       }
       this.submitTrue();
     },
-    submitTrue(flag = true, success) {
+    async submitTrue(flag = true, success) {
       const result = {
         entryName: this.basicInformation[0].value,
         form_managementId: this.$refs.refReviewMatters.currentId,
@@ -334,34 +347,45 @@ export default {
       if (flag) {
         if (this.submitDialogVisible) return;
         this.submitDialogVisible = true;
-        // submit(result).then(res => {
-        //   this.$message({ type: 'success', message: res.data.data });
-        //   this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
-        // });
         const { userId: id, fullname: name } = this.$refs['refAddTag'];
-        processStart({
+        const user = JSON.parse(window.localStorage.getItem('user_name'))
+        let res = {};
+        const postData = {
+          submitDto: result,
+          ocessInstanceId: this.formBasicInfo.processInstanceId,
+          taskId: this.formBasicInfo.taskId,
           templateId: this.templateId,
-          processDefinitionId: this.processDefinitionId,
-          startUserInfo: {
-            id,
-            name
-          },
-          submitDto: result
-        })
-          .then(({ data: { success: sus, msg: message } }) => {
-            if (sus) {
-              this.submitDialogVisible = false;
-              this.$message({ type: 'success', message: '提交成功' });
-              this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
-            } else {
-              this.$message({ type: 'error', message });
-              this.submitDialogVisible = false;
-            }
-          })
-          .catch(() => {
-            // this.$message({ type: 'error', message: '提交失败' });
+          currentUserInfo: {
+            id: user.id,
+            name: user.fullname
+          }
+        }
+        if (this.formBasicInfo.submitted === 1) {
+          res = await ocrApprovalSubmission(postData).catch(() => {
             this.submitDialogVisible = false;
           });
+        } else {
+          res = await processStart({
+            templateId: this.templateId,
+            processDefinitionId: this.processDefinitionId,
+            startUserInfo: {
+              id,
+              name
+            },
+            submitDto: result
+          }).catch(() => {
+            this.submitDialogVisible = false;
+          });
+        }
+        const { success: sus, msg: message } = res.data;
+        if (sus) {
+          this.submitDialogVisible = false;
+          this.$message({ type: 'success', message: '提交成功' });
+          this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
+        } else {
+          this.$message({ type: 'error', message });
+          this.submitDialogVisible = false;
+        }
       } else {
         if (this.isGLoading) return;
         this.isGLoading = true;

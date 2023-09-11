@@ -15,7 +15,7 @@
     </div>
     <div class="right">
       <slot>
-        <g-button class="btn" @click="save">保存草稿</g-button>
+        <g-button class="btn" @click="save" v-if="formBasicInfo.submitted !== 1">保存草稿</g-button>
         <g-button class="btn" type="primary" @click="submit">提交</g-button>
       </slot>
     </div>
@@ -24,6 +24,12 @@
 
 <script>
 export default {
+  props: {
+    formBasicInfo: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data() {
     return {
       fullname: '',
