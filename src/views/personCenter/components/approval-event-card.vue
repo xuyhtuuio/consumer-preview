@@ -64,8 +64,9 @@
   </div>
 </template>
 <script>
+// eslint-disable-next-line
+import * as dayjs from 'dayjs'
 import { concernApplication } from '@/api/approvalCenter'
-import moment from 'moment'
 export default {
   name: 'applyEventCard',
   props: {
@@ -225,7 +226,7 @@ export default {
 
   filters: {
     timeFormate(val) {
-      return val ? moment(val).format('YYYY-MM-DD') : '--'
+      return val ? dayjs(val).format('YYYY-MM-DD') : '--'
     }
   }
 }
