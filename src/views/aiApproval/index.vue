@@ -198,7 +198,9 @@ export default {
   },
   mounted() {
     if (!this.$route.params.item) {
-      this.$router.go(-1);
+      this.$router.push({
+        name: 'approvalcenter',
+      })
       return;
     }
     const { item } = this.$route.params;

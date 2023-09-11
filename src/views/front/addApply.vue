@@ -136,12 +136,12 @@ export default {
       const { id, formManagementId } = params
       if (id || window.localStorage.getItem('editId')) {
         vm.formBasicInfo = {
-          ...params,
-          ...JSON.parse(window.localStorage.getItem('formBasicInfo') || '{}')
+          ...JSON.parse(window.localStorage.getItem('formBasicInfo') || '{}'),
+          ...params
         }
         vm.formId = id || window.localStorage.getItem('editId');
         vm.formManagementId = formManagementId || window.localStorage.getItem('formManagementId');
-        window.localStorage.setItem('formBasicInfo', JSON.stringify(params));
+        window.localStorage.setItem('formBasicInfo', JSON.stringify(vm.formBasicInfo));
         window.localStorage.setItem('editId', id || window.localStorage.getItem('editId'));
         window.localStorage.setItem(
           'formManagementId',
