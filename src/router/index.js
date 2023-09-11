@@ -69,7 +69,7 @@ const router = new Router({
         {
           path: 'opinionManage',
           name: 'OpinionManage',
-          component: () => import('@/views/admin/manage/opinionManage'),
+          component: () => import('@/views/admin/manage/opinionManage-1.0'),
           meta: { title: '意见管理' }
         },
         {
