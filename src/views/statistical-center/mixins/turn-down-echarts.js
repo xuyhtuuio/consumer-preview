@@ -260,7 +260,7 @@ export default {
           backgroundColor: 'rgba(255,255,255,0.8)',
           borderColor: 'rgba(255,255,255,0.8)',
           formatter(params) {
-            console.log(params)
+            // console.log(params)
             const p = `
             <div style="padding: 6px;display:flex;gap:8px;flex-direction:column;font-size:12px">
             <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">审查任务数</div>

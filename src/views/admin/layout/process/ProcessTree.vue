@@ -248,7 +248,10 @@ export default {
     },
     insertApprovalTWONode(parentNode) {
       this.$set(parentNode.children, 'name', '二次会签')
-      this.$set(parentNode.children, 'props', this.$deepCopy(APPROVAL_PROPS))
+      this.$set(parentNode.children, 'props', this.$deepCopy({
+        ...APPROVAL_PROPS,
+        assignedType: 'SECOND_HANDLE',
+      }))
     },
     insertCcNode(parentNode) {
       this.$set(parentNode.children, 'name', this.checkNewName('抄送人'))
