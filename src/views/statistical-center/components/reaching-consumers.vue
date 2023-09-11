@@ -130,7 +130,7 @@ export default {
             name: 'Access From',
             type: 'pie',
             selectedMode: 'single',
-            radius: [0, '30%'],
+            radius: [0, '60%'],
             label: {
               position: 'inner',
               fontSize: 14
@@ -147,7 +147,7 @@ export default {
           {
             name: 'Access From',
             type: 'pie',
-            radius: ['45%', '60%'],
+            radius: ['80%', '95%'],
             labelLine: {
               length: 30
             },
@@ -198,8 +198,8 @@ export default {
     }
   }
   .my-echart {
-    width: 50%;
-    right: -40px;
+    width: 45%;
+    right: -20px;
   }
   .right {
     flex: 1;
