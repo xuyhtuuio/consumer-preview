@@ -8,7 +8,7 @@
           {{ personInfo && personInfo.id }}
         </span>
         <span v-if="personOrg&&personOrg.length"> <i v-for="(item,index) in personOrg" :key="index">{{ item }}
-        <i v-if="index<personOrg.length-1">/</i>
+        <i v-if="index<personOrg.length-1"> | </i>
         </i></span>
       </div>
       <slot name="apply-modify"></slot>
