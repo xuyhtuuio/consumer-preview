@@ -358,7 +358,7 @@ export default {
           submitDto: result,
           ocessInstanceId: this.formBasicInfo.processInstanceId,
           taskId: this.formBasicInfo.taskId,
-          templateId: this.formBasicInfo.processTemplateId,
+          templateId: this.templateId,
           currentUserInfo: {
             id: user.id,
             name: user.fullname

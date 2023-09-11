@@ -565,6 +565,11 @@ export default {
 
 <style lang="less" scoped>
 .basic-information {
+  .tableCard{
+    /deep/ .head{
+      justify-content: flex-start;
+    }
+  }
   .cardInfo {
     display: flex;
     align-items: center;
