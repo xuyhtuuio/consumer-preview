@@ -70,7 +70,7 @@ export default {
         },
         legend: {
           orient: 'vertical',
-          bottom: '15%',
+          bottom: '30px',
           // y: 'center',
           // 设置图例形状
           icon: 'circle',
@@ -97,7 +97,7 @@ export default {
           {
             type: 'pie',
             radius: [0, 60],
-            center: ['50%', '20%'],
+            center: ['50%', '25%'],
             roseType: 'radius',
             itemStyle: {
               borderRadius: 5
@@ -114,6 +114,11 @@ export default {
     // 驳回次数分布
     initStackBarDataEcharts(industryDataVal) {
       // const colorList = ['#F9CC45', '#FFE7BA', '#FFA940', '#F76560'];
+      const newIndustryDataVal = JSON.parse(JSON.stringify(industryDataVal));
+      const xData = newIndustryDataVal.xData.reverse()
+      const yDataDy = newIndustryDataVal.yDataDy.reverse()
+      const yDataDe = newIndustryDataVal.yDataDe.reverse()
+      const yDataDs = newIndustryDataVal.yDataDs.reverse()
       const option = {
         tooltip: {
           backgroundColor: 'rgba(255,255,255,0.8)',
@@ -164,7 +169,7 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: industryDataVal.xData.reverse()
+          data: xData
         },
         dataZoom: [
           {
@@ -201,7 +206,7 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: industryDataVal.yDataDy.reverse()
+            data: yDataDy
           },
           {
             name: industryDataVal.seriesName[1],
@@ -216,7 +221,7 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: industryDataVal.yDataDe.reverse()
+            data: yDataDe
           },
           {
             name: industryDataVal.seriesName[2],
@@ -231,7 +236,7 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: industryDataVal.yDataDe.reverse()
+            data: yDataDe
           },
           {
             name: industryDataVal.seriesName[3],
@@ -247,7 +252,7 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: industryDataVal.yDataDs.reverse()
+            data: yDataDs
           }
         ]
       }
@@ -265,8 +270,8 @@ export default {
           formatter(params) {
             // console.log(params)
             const p = `
-            <div style="padding: 6px;display:flex;gap:8px;flex-direction:column;font-size:12px">
-            <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">审查任务数</div>
+            <div style="min-width:200px;padding: 6px;display:flex;gap:8px;flex-direction:column;font-size:12px">
+            <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">驳回原因</div>
             <div>
               <div style="display:flex;align-items:center;gap:12px;color:#1D2128;">
                 <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;background-color: ${params.color};"></span>

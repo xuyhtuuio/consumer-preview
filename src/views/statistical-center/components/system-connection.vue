@@ -78,7 +78,7 @@ export default {
                 <span>任务条数</span>
                 <span>${taskNum}</span>
                 <span>全行占比</span>
-                <span>${rate}</span>
+                <span>${rate}%</span>
               </div>
             </div>`
             return box
