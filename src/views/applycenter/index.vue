@@ -29,15 +29,15 @@
           <div class="filters-content">
             <div class="floor1">
               <!-- <div class="floor1-item"> -->
-              <el-select popper-class="transaction-select" v-model="search.form_management_id" placeholder="事项类型"
+              <el-select popper-class="transaction-select" v-model="search.formManagementId" placeholder="事项类型"
                 @change="changeArrrovalType" clearable @clear="searchList">
                 <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
                   :value="item.value"></el-option>
               </el-select>
-              <!-- <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable
+              <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable
                 @clear="searchList">
                 <el-option v-for="(item, index) in approvalPhases" :key="index" :label="item.label"
-                  :value="item.value"></el-option></el-select>  -->
+                  :value="item.value"></el-option></el-select>
               <!-- </div> -->
               <!-- <div class="floor1-item"> -->
               <el-select v-model="search.urgent" placeholder="是否加急" @change="searchList" clearable>
@@ -50,10 +50,7 @@
               </el-select>
               <!-- </div> -->
               <!-- <div class="floor1-item"> -->
-              <el-select v-model="search.adoptionStatus" placeholder="采纳情况" @change="searchList" clearable>
-                <el-option v-for="(item, index) in $field('adoptionSituations')" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
-              </el-select>
+
               <el-select v-model="search.isOneTimePassed" placeholder="是否一次通过" @change="searchList" clearable>
                 <el-option v-for="(item, index) in $field('isOncePass')" :key="index" :label="item.label"
                   :value="item.value"></el-option>
@@ -183,11 +180,10 @@ export default {
         }
       ],
       search: {
-        form_management_id: '',
+        formManagementId: '',
         approvalStage: '',
         urgent: '',
         hasOpinions: '',
-        adoptionStatus: '',
         updateTime: [2, 'desc'],
         updateTime2: [2, 'desc'],
         keywords: '',
@@ -224,7 +220,7 @@ export default {
     this.searchList()
   },
   watch: {
-    'search.form_management_id': {
+    'search.formManagementId': {
       handler(val) {
         if (!val) {
           this.approvalPhases = []
@@ -242,12 +238,12 @@ export default {
       }
     },
     changeArrrovalType() {
-      // if (this.search.form_management_id || this.search.form_management_id == 0) {
-      //   this.getApprovalStage();
-      // } else {
-      //   this.search.approvalStage = "";
-      //   this.approvalPhases = [];
-      // }
+      if (this.search.formManagementId || this.search.formManagementId === 0) {
+        this.getApprovalStage();
+      } else {
+        this.search.approvalStage = '';
+        this.approvalPhases = [];
+      }
       this.searchList()
     },
     getApprovalType() {
@@ -261,16 +257,13 @@ export default {
       })
     },
     getApprovalStage() {
-      const params = {
-        approvalPhases: this.search.form_management_id
-      }
-      getApprovalStage(params).then((res) => {
+      getApprovalStage(this.search.formManagementId).then((res) => {
         const { data } = res.data
         this.approvalPhases = data
           ? data.map((v) => {
             return {
-              label: v,
-              value: v
+              label: v.nodeName,
+              value: v.nodeId
             }
           })
           : []
@@ -285,7 +278,6 @@ export default {
         approvalStage: '',
         urgent: '',
         hasOpinions: '',
-        adoptionStatus: '',
         currentActivityName: this.search.approvalStage,
         sortType: 1,
         id: userinfo.id,
@@ -341,7 +333,7 @@ export default {
         pageNow,
         pageSize: 10,
         ...this.search,
-        currentActivityName: this.search.approvalStage,
+        // currentActivityName: this.search.approvalStage,
         id: userinfo.id,
         name: userinfo.fullname,
         startDate:
@@ -409,10 +401,10 @@ export default {
                 v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1
                   ? ''
                   : v.errorInfo,
-              ocr_approval_status:
+              errorStatus:
                 v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1
                   ? '智能解析中，请您耐心等待...'
-                  : v.ocr_approval_status,
+                  : v.errorStatus,
               formId: v.taskNumber,
               recordId: v.taskNumber,
               taskStatus: v.submitted === 0 ? '0' : v.businessStatus,
@@ -500,7 +492,7 @@ export default {
     },
     reset() {
       this.search = {
-        form_management_id: '',
+        formManagementId: '',
         approvalStage: '',
         urgent: '',
         hasOpinions: '',

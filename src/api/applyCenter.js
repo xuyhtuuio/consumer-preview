@@ -35,9 +35,8 @@ export function getApprovalType(param) {
 // 审批阶段下拉列表
 export function getApprovalStage(param) {
   return request({
-    url: '/cpr/applicationcenter/approvalStage',
-    method: 'post',
-    data: param
+    url: `/cpr/applicationcenter/approvalPhase/${param}`,
+    method: 'get',
   })
 }
 // 获取申请列表

@@ -42,6 +42,7 @@
               <span><i style="color: #86909C;">审查要点：</i>承担义务不得低于宣传所承诺的标准</span>
             </div>
           </div> -->
+          <!-- 有无实质意见-start -->
             <div v-for="(item, idx) in activity.optionVOList" :key="idx" class="opinions-item">
               <!-- v-if="activity.targetPage === 'ocr'" -->
               <div class="opinion-tag">
@@ -71,7 +72,34 @@
                   <i slot="reference" class="pointer">+{{ item.files.length - 1 }}</i>
                 </el-popover>
               </div>
+
             </div>
+          <!-- 有无实质意见-end -->
+                            <!-- 领导审批通过/驳回 --start-->
+          <!-- <div v-for="(item, idx) in activity.optionVOList" :key="idx" class="opinions-item">
+                    <div class="leader-approval">
+            <div class="opinion-tag">
+                <span v-if="item.opinion == 1" class="guanzhu2">
+                  <i class="iconfont icon icon-tubiao"></i>
+                  通过
+                </span>
+                <span v-if="item.opinion == 0" class="guanzhu">
+                  <i class="iconfont icon icon-tuihui1 pass"></i>
+                  驳回
+                </span>
+              </div>
+
+              <p class="opinion-text"  v-if="item.opinion == 1">
+                1.活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权；
+              </p>
+               <div class="opinion-text reject-desc" v-if="item.opinion == 0">
+                <p>驳回节点：<i>发起人</i></p>
+                <p>驳回原因：<i>附件材料与审批项目不匹配附件材料与审批项目不匹配</i></p>
+                <p>原因描述：<i>附件中“景顺长城集英成长策划”与审批项目不匹配，不能作为该项目的审查材料，请重新提交申请。</i></p>
+              </div>
+          </div>
+        </div> -->
+          <!-- 领导审批通过/驳回 --end-->
           </div>
         </div>
       </div>
@@ -316,7 +344,25 @@ export default {
         padding: 16px 16px 12px 16px;
         margin-bottom: 8px;
         position: relative;
+        .relevant-file {
+          color: #86909c;
+          display: flex;
+          align-items: center;
+          word-break: keep-all;
 
+          .file-name {
+            margin: 0 8px 0 0;
+            background: #fff;
+            padding: 2px 12px;
+            word-break: break-all;
+          }
+
+          i {
+            color: #306ef5;
+          }
+        }
+      }
+    }
         .opinion-tag {
           position: absolute;
           top: -2px;
@@ -342,33 +388,26 @@ export default {
             border-radius: 0px 6px 6px 6px;
             background: linear-gradient(90deg, #7b61ff 0%, #61a0ff 100%);
           }
+          .pass{
+            color: #fff;
+          }
         }
-
         .opinion-text {
           color: #1d2128;
           text-align: justify;
           margin-bottom: 6px;
         }
-
-        .relevant-file {
-          color: #86909c;
-          display: flex;
-          align-items: center;
-          word-break: keep-all;
-
-          .file-name {
-            margin: 0 8px 0 0;
-            background: #fff;
-            padding: 2px 12px;
-            word-break: break-all;
-          }
-
-          i {
-            color: #306ef5;
+        .reject-desc{
+          p{
+            display: flex;
+            color: #86909C;
+            i{
+              color: #1D2128;
+              flex: 1;
+            }
           }
         }
-      }
-    }
+
   }
 
   .task-item {
