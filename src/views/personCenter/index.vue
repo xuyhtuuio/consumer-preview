@@ -23,7 +23,8 @@
           </el-tooltip>
         </div>
         <div class="scrren-com">
-          <el-popover placement="bottom-start" trigger="click" @show="handlePopoverShow" @hide="handlePopoverHide" :width="400">
+          <el-popover placement="bottom-start" trigger="click" @show="handlePopoverShow" @hide="handlePopoverHide"
+            :width="400">
             <el-date-picker ref="my-date-picker" v-model="datePicker" type="monthrange" align="right" range-separator="至"
               start-placeholder="开始月份" end-placeholder="结束月份" :picker-options="pickerOptions">
             </el-date-picker>
@@ -57,7 +58,12 @@
         </div>
         <div class="top-com">
           <div class="com-tit">平均处理时长分布</div>
-          <div class="com-echarts" id="processing"></div>
+          <div class="com-echarts-wrap">
+            <div class="com-echarts" id="processing"></div>
+            <div class="com-lenged">
+
+            </div>
+          </div>
         </div>
       </div>
       <div class="approval-table">
@@ -80,13 +86,14 @@
                 <p class="black fs14">{{ scope.$index + 1 }}</p>
               </template>
             </el-table-column>
-            <el-table-column prop="name" show-overflow-tooltip label="审查人员">
+            <el-table-column prop="name" show-overflow-tooltip label="审查人员" min-width="90px">
               <template slot-scope="scope">
                 <p class="black fs14">{{ scope.row.name }}</p>
                 <p class="gray fs12">{{ scope.row.id }}</p>
               </template>
             </el-table-column>
-            <el-table-column prop="level" :sortable='true' show-overflow-tooltip label="等级" align="center">
+            <el-table-column prop="level" :sortable='true' show-overflow-tooltip label="等级" align="center"
+              min-width="130px">
               <template slot-scope="scope">
                 <div class="flex-box">
                   <img class="icon w24" v-if="scope.$index === 0" src="../../assets/image/person-center/level1.png"
@@ -99,7 +106,8 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="gxz" :sortable='true' show-overflow-tooltip label="贡献值" align="center">
+            <el-table-column prop="gxz" :sortable='true' show-overflow-tooltip label="贡献值" align="center"
+              min-width="90px">
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs14 fw">{{ scope.row.gxz }}</p>
@@ -108,7 +116,8 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="scs" :sortable='true' show-overflow-tooltip label="审查数" align="center">
+            <el-table-column prop="scs" :sortable='true' show-overflow-tooltip label="审查数" align="center"
+              min-width="100px">
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.scs }}</p>
@@ -117,7 +126,8 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="yjts" :sortable='true' show-overflow-tooltip label="意见条数" align="center">
+            <el-table-column prop="yjts" :sortable='true' show-overflow-tooltip label="意见条数" align="center"
+              min-width="120px">
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.yjts }}</p>
@@ -125,7 +135,8 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="szxyj" :sortable='true' show-overflow-tooltip label="实质性意见" align="center">
+            <el-table-column prop="szxyj" :sortable='true' show-overflow-tooltip label="实质性意见" align="center"
+              min-width="130px">
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.szxyj }}</p>
@@ -133,7 +144,8 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="fszxyj" :sortable='true' show-overflow-tooltip label="非质性意见" align="center">
+            <el-table-column prop="fszxyj" :sortable='true' show-overflow-tooltip label="非质性意见" align="center"
+              min-width="130px">
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.fszxyj }}</p>
@@ -141,7 +153,8 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="mpbs" :sortable='true' show-overflow-tooltip label="秒批笔数" align="center">
+            <el-table-column prop="mpbs" :sortable='true' show-overflow-tooltip label="秒批笔数" align="center"
+              min-width="130px">
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.mpbs }}</p>
@@ -149,7 +162,8 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="pjclsc" :sortable='true' show-overflow-tooltip label="平均处理时长" align="center">
+            <el-table-column prop="pjclsc" :sortable='true' show-overflow-tooltip label="平均处理时长" align="center"
+              min-width="130px">
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.pjclsc }}</p>
@@ -157,9 +171,11 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="jsl" :sortable='true' show-overflow-tooltip label="接受率" align="center">
+            <el-table-column prop="jsl" :sortable='true' show-overflow-tooltip label="接受率" align="center"
+              min-width="90px">
             </el-table-column>
-            <el-table-column prop="hjtgl" :sortable='true' show-overflow-tooltip label="回检通过率" align="center">
+            <el-table-column prop="hjtgl" :sortable='true' show-overflow-tooltip label="回检通过率" align="center"
+              min-width="130px">
             </el-table-column>
           </el-table>
           <trs-pagination :total="total" @getList="approvalList" :pageNow="pageNow"></trs-pagination>
@@ -207,13 +223,14 @@
                 <p class="black fs14">{{ scope.$index + 1 }}</p>
               </template>
             </el-table-column>
-            <el-table-column prop="name" show-overflow-tooltip label="提单人员">
+            <el-table-column prop="name" show-overflow-tooltip label="提单人员" min-width="100px">
               <template slot-scope="scope">
                 <p class="black fs14">{{ scope.row.name }}</p>
                 <p class="gray fs12">{{ scope.row.id }}</p>
               </template>
             </el-table-column>
-            <el-table-column prop="tds" :sortable='true' show-overflow-tooltip label="提单数" align="center">
+            <el-table-column prop="tds" :sortable='true' show-overflow-tooltip label="提单数" align="center"
+              min-width="90px">
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.tds }}</p>
@@ -223,7 +240,8 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="yjts" :sortable='true' show-overflow-tooltip label="意见条数" align="center">
+            <el-table-column prop="yjts" :sortable='true' show-overflow-tooltip label="意见条数" align="center"
+              min-width="120px">
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.yjts }}</p>
@@ -231,7 +249,8 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="szxyj" :sortable='true' show-overflow-tooltip label="实质性意见" align="center">
+            <el-table-column prop="szxyj" :sortable='true' show-overflow-tooltip label="实质性意见" align="center"
+              min-width="120px">
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.szxyj }}</p>
@@ -239,7 +258,8 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="fszxyj" :sortable='true' show-overflow-tooltip label="非质性意见" align="center">
+            <el-table-column prop="fszxyj" :sortable='true' show-overflow-tooltip label="非质性意见" align="center"
+              min-width="120px">
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.fszxyj }}</p>
@@ -247,11 +267,14 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="jsl" :sortable='true' show-overflow-tooltip label="接受率" align="center">
+            <el-table-column prop="jsl" :sortable='true' show-overflow-tooltip label="接受率" align="center"
+              min-width="90px">
             </el-table-column>
-            <el-table-column prop="yctgl" :sortable='true' show-overflow-tooltip label="一次通过率" align="center">
+            <el-table-column prop="yctgl" :sortable='true' show-overflow-tooltip label="一次通过率" align="center"
+              min-width="120px">
             </el-table-column>
-            <el-table-column prop="bhqk" :sortable='true' show-overflow-tooltip label="驳回情况" align="center">
+            <el-table-column prop="bhqk" :sortable='true' show-overflow-tooltip label="驳回情况" align="center"
+              min-width="120px">
               <template slot-scope="scope">
                 <div class="flex-box">
                   <p class="black fs16 ">{{ scope.row.bhqk }}</p>
@@ -261,7 +284,8 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="hjtgl" :sortable='true' show-overflow-tooltip label="回检通过率" align="center">
+            <el-table-column prop="hjtgl" :sortable='true' show-overflow-tooltip label="回检通过率" align="center"
+              min-width="120px">
             </el-table-column>
           </el-table>
           <trs-pagination :total="total" @getList="approvalList" :pageNow="pageNow"></trs-pagination>
@@ -703,12 +727,14 @@ export default {
         rate: ['10%', '20%', '30%', '10%', '40%'],
       },
       processingData: [
-        { value: 200, name: '产品类', rate: '20%' },
-        { value: 400, name: '活动类', rate: '40%' },
-        { value: 300, name: '客户类', rate: '30%' },
-        { value: 100, name: '其他', rate: '10%' },
+        { value: 200, name: '0-2h', rate: '12' },
+        { value: 400, name: '2-5h', rate: '14' },
+        { value: 300, name: '5-10h', rate: '16' },
+        { value: 100, name: '10-24h', rate: '20' },
+        { value: 100, name: '24-48h', rate: '40' },
+        { value: 100, name: '48h以上', rate: '10' },
       ],
-      colorListTimes: ['#5773F9', '#249EFF', '#21CCFF', '#81E2FF'],
+      colorListTimes: ['#5773F9', '#249EFF', '#21CCFF', '#81E2FF', '#81DC74', '#B7DB57'],
       approvalTable: [
         {
           name: '谭新宇',
@@ -1102,13 +1128,53 @@ export default {
       this.initChart('contribution', option)
     },
     // 平均处理时长分布
-    initProcessingEcharts() {
+    initProcessingEcharts(industryDataVal) {
       const option = {
         color: this.colorListTimes,
         tooltip: {
           trigger: 'item',
           backgroundColor: 'rgba(255,255,255,0.8)',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
+          borderWidth: 0,
+          formatter: (serie) => {
+            const { name } = serie
+            let params = `<p class="charts-tooltip-p fontw black"><span class="serieName"><span class="charts-tooltip-dot" style="background: ${serie.color}"></span>平均处理时长${name}</span><span><span class="blue">${serie.value}</span>人</span></p>`
+            params += `<p class="charts-tooltip-p black">占全部人员  <span class="blue">${serie.data.rate}</span>%</p>`
+            return params
+          },
+        },
+        // legend: {
+        //   right: 0,
+        //   bottom: 0,
+        //   itemWidth: 12,
+        //   itemHeight: 8,
+        //   // itemStyle: {
+        //   //   color: '#2D5CF6'
+        //   // }
+        // },
+        legend: {
+          orient: 'vertical',
+          right: 25,
+          y: 'center',
+          // 设置图例形状
+          itemWidth: 12,
+          itemHeight: 8,
+          itemGap: 15,
+          textStyle: {
+            fontSize: 12,
+            rich: {
+              a: {
+                fontWeight: 400,
+              },
+              b: {
+                width: '200px',
+                lintHeight: '28px'
+              }
+            }
+          },
+          formatter(name) {
+            const { value } = industryDataVal.find((item) => item.name === name)
+            return `{b|${name}} {a| ${value}人}`
+          }
         },
         grid: {
           left: '0',
@@ -1121,7 +1187,7 @@ export default {
             name: '平均处理时长',
             type: 'pie',
             radius: [10, 80],
-            center: ['50%', '50%'],
+            center: ['30%', '50%'],
             roseType: 'radius',
             itemStyle: {
               borderRadius: 5
@@ -1131,7 +1197,7 @@ export default {
             },
             emphasis: {
               label: {
-                show: true
+                show: false
               }
             },
             data: this.processingData
@@ -1512,6 +1578,9 @@ export default {
         this.handleSearchBlur()
       }
     },
+    handleSearchBlur() {
+      console.log(this.search)
+    }
   },
 }
 </script>
@@ -1763,6 +1832,7 @@ export default {
             .w24 {
               width: 24px;
               height: 24px;
+              flex-shrink: 0;
             }
 
             .pt6 {
@@ -2219,9 +2289,10 @@ export default {
 }
 </style>
 <style lang="less">
-.el-range-editor.el-input__inner{
+.el-range-editor.el-input__inner {
   width: 100%;
 }
+
 .charts-tooltip-p {
   text-align: left;
   min-width: 80px;

@@ -129,6 +129,18 @@ export default {
           clickPoint: 'taskName'
         })
       )
+      // const routeUrl = this.$router.resolve({
+      //   name: 'approval-details',
+      //   params: {
+      //     formId: item.recordId,
+      //     taskName: item.taskName,
+      //     processInstanceId: item.processInstanceId,
+      //     formManagementId: item.formManagementId,
+      //     nodeId: item.nodeId,
+      //     processTemplateId: item.processTemplateId
+      //   }
+      // });
+      // window.open(routeUrl.href, '_blank');
       this.$router.push({
         name: 'approval-details',
         params: {
