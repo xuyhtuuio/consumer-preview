@@ -9,7 +9,8 @@ import {
   queryFormItemPermissions,
   getNextUserOption,
   rollback,
-  getNodeHandleUser
+  getNodeHandleUser,
+  updateRuleCode,
 } from '@/api/aiApproval';
 import { getApplyForm } from '@/api/front';
 
@@ -509,7 +510,20 @@ export default {
       this.examineShow = !this.examineShow;
     },
     // 驳回方法
-    submit({ reason, txt, prevUser }) {
+    async submit({ reason, txt, prevUser }) {
+      this.refuseDisabled = true;
+      this.$message.info('正在驳回，请稍等！')
+      const nextUserInfo = this.refuseOpiton.filter(item => item.nodeId === prevUser);
+      const updateRuleRes = await updateRuleCode({
+        rollbackId: prevUser,
+        nextUserInfo: [{
+          id: nextUserInfo[0].userId
+        }],
+        templateId: this.formBase.processTemplateId
+      }).catch(() => {
+        updateRuleRes.data.status = 400;
+        this.refuseDisabled = false;
+      })
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       const data = {
         comments: `${reason}${txt.trim() ? '-' + txt : ''}`,
@@ -519,30 +533,40 @@ export default {
         },
         processInstanceId: this.formBase.processInstanceId,
         rollbackId: prevUser,
-        // || this.formBase.rollbackId
         signInfo: this.formBase.signInfo,
         nodeId: this.formBase.nodeId,
         taskId: this.formBase.taskId,
         templateId: this.formBase.templateId
       }
-      rollback(data).then((res) => {
-        const { status, msg } = res.data;
-        if (status === 200) {
-          this.$message.success('操作成功！');
-          this.$router.go(-1)
-        } else {
-          this.$message.error({ offset: 40, message: msg });
-        }
-      })
+      const { status: ruleStatus } = updateRuleRes.data;
+      if (ruleStatus === 200) {
+        rollback(data).then((res) => {
+          const { status, msg } = res.data;
+          if (status === 200) {
+            this.$message.success('操作成功！');
+            this.$router.go(-1)
+            this.refuseDisabled = false;
+          } else {
+            this.$message.error({ offset: 40, message: msg });
+            this.refuseDisabled = false;
+          }
+        }).catch(() => {
+          this.refuseDisabled = false;
+        })
+      }
     },
     // 获取节点审批人
     getNodeHandleUserApi() {
       const data = {
+        templateId: this.formBase.processTemplateId,
+        processInstanceId: this.formBase.processInstanceId,
         nodeId: this.formBase.nodeId,
-        templateId: this.formBase.templateId
       }
       getNodeHandleUser(data).then((res) => {
-        console.log(res);
+        const { status } = res.data;
+        if (status === 200) {
+          this.refuseOpiton = res.data.data
+        }
       })
     }
   },
