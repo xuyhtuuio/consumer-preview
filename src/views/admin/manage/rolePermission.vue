@@ -74,7 +74,7 @@
           </TrsPagination>
         </template>
         <template v-else>
-          <div class="my-role" v-show="roleId === -1">
+          <div class="my-role">
             <span>角色名称<i style="margin-left: 4px;color:#EB5757">*</i></span>
             <el-input
               ref="ref-input"
@@ -298,6 +298,7 @@ export default {
       this.cardLoading = true
       this.roleId = roleId
       this.roleName = roleName
+      this.newRoleName = roleName
       const {
         data: { data: res, success, msg }
       } = await editThePermissionsPage({ roleId })
@@ -350,7 +351,7 @@ export default {
         this.permissionList[1].isShowWarn = true
         return
       }
-      if (this.roleId === -1 && !this.newRoleName) {
+      if (!this.newRoleName) {
         this.showNewRoleName = true
         return
       }
