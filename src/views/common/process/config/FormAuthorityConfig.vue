@@ -86,7 +86,9 @@ export default {
   methods: {
     allSelect(type) {
       this.formPerms.forEach(f => {
-        f.perm = type
+        if (!this.fieldCheck(f)) {
+          f.perm = type
+        }
       })
       this.$nextTick(() => {
         this.permSelect = type

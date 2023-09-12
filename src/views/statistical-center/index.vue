@@ -46,12 +46,14 @@
 
         <div class="scrren-com" :class="search.datePicker ? 'active' : ''">
           <el-popover
+            width="400"
             placement="bottom-start"
             trigger="click"
             @show="handlePopoverShow"
             @hide="handlePopoverHide"
           >
             <el-date-picker
+              class="my-date-picker"
               ref="my-date-picker"
               v-model="search.datePicker"
               type="monthrange"
@@ -633,6 +635,12 @@ export default {
         margin-top: 16px;
       }
     }
+  }
+}
+.my-date-picker {
+  width: 100%;
+  /deep/.el-range-separator {
+    width: 10%;
   }
 }
 </style>

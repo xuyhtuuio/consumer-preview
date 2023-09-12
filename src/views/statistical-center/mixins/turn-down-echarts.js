@@ -70,7 +70,7 @@ export default {
         },
         legend: {
           orient: 'vertical',
-          bottom: '0',
+          bottom: '15%',
           // y: 'center',
           // 设置图例形状
           icon: 'circle',
@@ -96,8 +96,8 @@ export default {
         series: [
           {
             type: 'pie',
-            radius: [10, 80],
-            center: ['50%', '35%'],
+            radius: [0, 60],
+            center: ['50%', '20%'],
             roseType: 'radius',
             itemStyle: {
               borderRadius: 5
