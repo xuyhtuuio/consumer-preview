@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-11 17:26:35
+ * @LastEditTime: 2023-09-12 14:55:34
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -951,7 +951,6 @@ export default {
         }
       }
       try {
-        const posts = [updateAdoptEditedComments(opinion_submit_params, this.item.taskId)]
         // 上传文件的逻辑 选中活动正常上线
         if (!opinions && uploadFileRadio === 1) {
           const params = fileUploadForm.map((v) => {
@@ -965,17 +964,21 @@ export default {
               otherUrl: v.relevantFile.url
             }
           })
-          posts.push(finalMaterial(
+          const res = await finalMaterial(
             params,
             this.item.processInstanceId,
             this.item.taskId,
             that.item.taskNumber
-          ))
+          )
+          const { success, msg } = res?.data
+          if (!success) {
+            this.$message.error(msg)
+            return
+          }
         }
-        const arrData = await Promise.all(posts)
-        const values = Object.values(arrData)
-        const flag = values.every(m => m.data.success)
-        if (flag) {
+        const res = await updateAdoptEditedComments(opinion_submit_params, this.item.taskId)
+        const { success, msg } = res?.data
+        if (success) {
           this.loadings.submitLoading = false
           // 有实质意见且采纳所以的有实质意见
           if (type && type === 1) {
@@ -1021,6 +1024,7 @@ export default {
           }
         } else {
           this.loadings.submitLoading = false
+          this.$message.error(msg)
         }
       } catch (error) {
         this.$message.error(error)
