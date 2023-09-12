@@ -1,13 +1,9 @@
 <template>
-  <div class="data-overview">
-    <template v-for="(item,index) in list" >
+  <div class="data-overview" v-loading="isShow">
+    <template v-for="(item, index) in list">
       <div class="item" :key="'total' + item.id">
         <div class="top">
-          <img
-            class="left"
-            :src="item.title.src"
-            alt=""
-          />
+          <img class="left" :src="item.title.src" alt="" />
           <span class="right">
             <div class="right-top">
               <span class="top-name">{{ item.title.name }}</span>
@@ -18,47 +14,59 @@
               </el-tooltip>
             </div>
             <div class="right-content">
-              <i class="content-number">{{ item.title.num }}</i
+              <i class="content-number">{{ item.content.titleNum }}</i
               >{{ item.title.unit }}
             </div>
           </span>
         </div>
         <div class="bottom" v-if="index === 0">
           <div class="btn-item">
-            有实质性意见 <i class="color-blue">{{item.content.hasOption}}</i> 项 占
-            <i class="color-blue">{{item.content.hasPercentage}}</i> %
+            有实质性意见
+            <i class="color-blue">{{ item.content.hasOption }}</i> 项 占
+            <i class="color-blue">{{ item.content.hasPercentage }}</i> %
           </div>
           <div class="btn-item">
-            无实质性意见 <i class="color-blue">{{item.content.noPercentage}}</i> 项 占
-            <i class="color-blue">{{item.content.noPercentage}}</i> %
+            无实质性意见
+            <i class="color-blue">{{ item.content.noPercentage }}</i> 项 占
+            <i class="color-blue">{{ item.content.noPercentage }}</i> %
           </div>
         </div>
         <div class="bottom" v-else-if="index === 1">
           <div class="btn-item">
-            有实质性意见 <i class="color-blue">{{item.content.hasOption}}</i> 项 总接受
-            <i class="color-blue">{{item.content.hasAcceptance}} </i> 条
+            有实质性意见
+            <i class="color-blue">{{ item.content.hasOption }}</i> 项 总接受
+            <i class="color-blue">{{ item.content.hasAcceptance }} </i> 条
           </div>
           <div class="btn-item">
-            无实质性意见 <i class="color-blue">{{item.content.noOption}}</i> 条
+            无实质性意见
+            <i class="color-blue">{{ item.content.noOption }}</i> 条
           </div>
         </div>
         <div class="bottom" v-else-if="index === 2">
           <div class="btn-item">
-            最长审查时长 <i class="color-blue">{{item.content.longTime}}</i> h
+            最长审查时长 <i class="color-blue">{{ item.content.longTime }}</i> h
           </div>
-          <div class="btn-item">最短审查时长 <i class="color-blue">{{item.content.shortTime}}</i> h</div>
-        </div>
-        <div class="bottom" v-else-if="index === 3">
           <div class="btn-item">
-            有实质性意见的接受工单数 <i class="color-blue">{{item.content.num}}</i> 项
+            最短审查时长
+            <i class="color-blue">{{ item.content.shortTime }}</i> h
           </div>
         </div>
+        <!-- <div class="bottom" v-else-if="index === 3">
+          <div class="btn-item">
+            有实质性意见的接受工单数
+            <i class="color-blue">{{ item.content.num }}</i> 项
+          </div>
+        </div> -->
         <div class="bottom" v-else-if="index === 4">
           <div class="btn-item">
-            通过率最高的审查类型：<i class="color-blue">{{item.content.highTitle}}</i>
+            通过率最高的审查类型：<i class="color-blue">{{
+              item.content.highTitle
+            }}</i>
           </div>
           <div class="btn-item">
-            通过率最低的审查类型：<i class="color-blue">{{item.content.lowerTitle}}</i>
+            通过率最低的审查类型：<i class="color-blue">{{
+              item.content.lowerTitle
+            }}</i>
           </div>
         </div>
       </div>
@@ -71,6 +79,7 @@
 export default {
   data() {
     return {
+      isShow: false,
       list: [
         {
           id: '134',
@@ -78,10 +87,10 @@ export default {
             name: '审查总量',
             info: '展示选中的所提交审查任务的数量',
             src: require('@/assets/image/statistical-center/overview-1.svg'),
-            num: 4567,
             unit: '项'
           },
           content: {
+            titleNum: 90,
             hasOption: 112,
             hasPercentage: 80,
             noOption: 112,
@@ -94,10 +103,10 @@ export default {
             name: '审查意见总量',
             info: '展示选中所提的任务单收到的审查意见条数',
             src: require('@/assets/image/statistical-center/overview-2.svg'),
-            num: 24567,
             unit: '条'
           },
           content: {
+            titleNum: 90,
             hasOption: 112,
             hasAcceptance: 879,
             noOption: 112
@@ -109,10 +118,11 @@ export default {
             name: '平均审查时长',
             info: '展示选中所审批的任务单的平均处理时长',
             src: require('@/assets/image/statistical-center/overview-3.svg'),
-            num: 30,
+
             unit: 'h'
           },
           content: {
+            titleNum: 90,
             longTime: 56,
             shortTime: 1
           }
@@ -123,11 +133,11 @@ export default {
             name: '接受率',
             info: '接受率为有实质性修改意见的接受率',
             src: require('@/assets/image/statistical-center/overview-4.svg'),
-            num: 90,
+
             unit: '%'
           },
           content: {
-            num: 268
+            titleNum: 90,
           }
         },
         {
@@ -136,16 +146,19 @@ export default {
             name: '一次性通过率',
             info: '一审通过率为该机构所提任务单申请人确认时对全部意见点击采纳（第一次点击）和确认总数的占比',
             src: require('@/assets/image/statistical-center/overview-5.svg'),
-            num: 90,
             unit: '%'
           },
           content: {
+            titleNum: 90,
             highTitle: '产品类',
             lowerTitle: '活动类'
           }
         }
       ]
     }
+  },
+  mounted() {
+    this.initData()
   },
   watch: {
     list(val) {
@@ -156,7 +169,45 @@ export default {
   },
   methods: {
     initData() {
-
+      // const {
+      //   data
+      // } = {
+      //   status: 200,
+      //   success: true,
+      //   msg: 'success',
+      //   timestamp: '1694500929442',
+      //   exception: null,
+      //   data: {
+      //     reviewTotalAmount: {
+      //       haveSubstantiveOpinionForm: 0,
+      //       haveSubstantiveOpinionFormRate: '90%',
+      //       examineAllTotal: 0,
+      //       noHaveSubstantiveOpinionFormRate: '90%',
+      //       noHaveSubstantiveOpinionForm: 0
+      //     },
+      //     totalNumberOfReviewOpinions: {
+      //       nothingSubstantiveOpinion: 41,
+      //       opinionAdoptTotal: 28,
+      //       havingSubstantiveOpinion: 26,
+      //       examineOpinionTotal: 67
+      //     },
+      //     averageReviewFrequency: {
+      //       maximumReviewTime: 36324120,
+      //       averageReviewDuration: -1,
+      //       minimumReviewTime: 5019
+      //     },
+      //     acceptanceRate: {
+      //       viewAcceptanceRate: '42.31%'
+      //     },
+      //     oneTimePassRate: {
+      //       oneTimePassRate: '90%',
+      //       theLowestPassRateCategory: '活动类',
+      //       theHighestPassRateCategory: '产品类'
+      //     }
+      //   },
+      //   rtnEnum: null,
+      //   code: null
+      // }
     }
   }
 }
@@ -167,6 +218,7 @@ export default {
 @color-2: #2d5cf6;
 @color-3: #86909c;
 @color-4: #e5e6eb;
+@color-5: rgba(172, 177, 185, 1);
 .data-overview {
   display: flex;
   gap: 16px;
@@ -195,6 +247,7 @@ export default {
             color: @color-1;
           }
           .top-icon {
+            color: @color-5;
             font-size: 18px;
           }
         }

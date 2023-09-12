@@ -129,11 +129,26 @@ export default {
           {
             name: 'Access From',
             type: 'pie',
-            selectedMode: 'single',
             radius: [0, '60%'],
             label: {
-              position: 'inner',
-              fontSize: 14
+              show: false,
+              position: 'center',
+              fontSize: 14,
+              fontWeight: '700',
+              lineHeight: 30,
+              color: 'white',
+              formatter: '{a|{c}} \n {b}',
+              rich: {
+                a: {
+                  fontSize: 20,
+                  fontWeight: 700
+                }
+              }
+            },
+            emphasis: {
+              label: {
+                show: true,
+              }
             },
             tooltip: {
               trigger: 'item',
@@ -142,7 +157,7 @@ export default {
             labelLine: {
               show: false
             },
-            data: oneData
+            data: oneData,
           },
           {
             name: 'Access From',

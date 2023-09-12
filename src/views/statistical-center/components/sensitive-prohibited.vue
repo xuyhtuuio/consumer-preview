@@ -2,7 +2,7 @@
   <div class="sensitive-prohibited">
     <g-table-card :title="title">
       <template #head-right>
-        <el-tooltip placement="top" style="margin-left: 8px">
+        <el-tooltip placement="top">
           <div slot="content">{{ titleInfo }}</div>
           <i class="iconfont icon-tishi1 top-icon"></i>
         </el-tooltip>
@@ -59,7 +59,7 @@ export default {
   data() {
     return {
       title: '常见敏感词/禁用词',
-      titleInfo: '12313231313',
+      titleInfo: '置顶>做多引用>最近更新',
       page: {
         pageNow: 1,
         pageSize: 3,
@@ -114,11 +114,19 @@ export default {
 @color-3: #e5e6eb;
 .sensitive-prohibited {
   color: #1d2128;
+  .top-icon {
+    position: relative;
+    top: 1px;
+    font-size: 20px;
+    color: rgba(172, 177, 185, 1);
+
+  }
+
   .my-content {
     width: 100%;
     .content-item {
       line-height: 22px;
-      padding:16px;
+      padding: 16px;
       border-bottom: 1px dotted @color-3;
       &:first-child {
         padding-top: 0;

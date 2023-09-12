@@ -3,19 +3,29 @@
     <template>
       <div class="top">
         <template v-if="level">
-          <!-- <g-button type="primary" @click="handleNew">新增</g-button> -->
+          <g-button
+            type="primary"
+            @click="handleClick({ roleId: -1, roleName: '新增角色' })"
+            >新增</g-button
+          >
         </template>
         <template v-else>
           <span class="title"
-            ><i class="top-back" @click="handleReturn">{{ editAuth ? '编辑' : '查看' }}权限</i
-            >/{{roleName}}</span
+            ><i class="top-back" @click="handleReturn"
+              >{{ editAuth ? '编辑' : '查看' }}权限</i
+            >/{{ roleName }}</span
           >
           <div class="btn">
             <g-button class="btn-item" @click="handleReturn">
               <i class="iconfont icon-fanhui1 icon"></i>
               返回</g-button
             >
-            <g-button class="btn-item" type="primary" @click="handleSave" v-show="editAuth">
+            <g-button
+              class="btn-item"
+              type="primary"
+              @click="handleSave"
+              v-show="editAuth"
+            >
               <i class="iconfont icon-baocun icon"></i>
               保存</g-button
             >
@@ -64,6 +74,19 @@
           </TrsPagination>
         </template>
         <template v-else>
+          <div class="my-role" v-show="roleId === -1">
+            <span>角色名称<i style="margin-left: 4px;color:#EB5757">*</i></span>
+            <el-input
+              ref="ref-input"
+              v-model.trim="newRoleName"
+              placeholder="请输入角色名称"
+              @input="showNewRoleName = false"
+            ></el-input>
+            <p class="warn" v-show="showNewRoleName">
+              <g-icon class="right-icon" stylePx="18" href="#icon-a-tubiao1" />
+              请输入角色名称
+            </p>
+          </div>
           <g-table-card title="消保审查" v-loading="cardLoading" :hProp="22">
             <template #cardInfo> </template>
             <template #content>
@@ -71,7 +94,11 @@
                 <div class="con-top">
                   功能权限
                   <div class="con-main">
-                    <div class="con-main-item" v-for="(item, index) in permissionList" :key="index">
+                    <div
+                      class="con-main-item"
+                      v-for="(item, index) in permissionList"
+                      :key="index"
+                    >
                       <div class="item-left">
                         <el-checkbox
                           v-model="item.type"
@@ -82,7 +109,11 @@
                           >{{ item.title }}</el-checkbox
                         >
                         <p class="warn" v-if="item.isShowWarn">
-                          <g-icon class="right-icon" stylePx="20" href="#icon-a-tubiao1" />
+                          <g-icon
+                            class="right-icon"
+                            stylePx="20"
+                            href="#icon-a-tubiao1"
+                          />
                           至少选择一个
                         </p>
                       </div>
@@ -101,7 +132,9 @@
                               v-model="childItem.type"
                               :label="iten.label"
                               :disabled="!editAuth"
-                              @click.native.prevent="handleRadioChange(iten.label, childItem, item)"
+                              @click.native.prevent="
+                                handleRadioChange(iten.label, childItem, item)
+                              "
                               >{{ iten.value }}</el-radio
                             >
                           </div>
@@ -114,7 +147,9 @@
                 <div class="con-top">
                   <div class="title">
                     <span class="title-item">
-                      数据权限<span style="margin-left: 5px; color: #eb5757">*</span>
+                      数据权限<span style="margin-left: 5px; color: #eb5757"
+                        >*</span
+                      >
                     </span>
                     <span class="title-item">
                       <i></i>
@@ -148,14 +183,14 @@
 </template>
 
 <script>
-import SecondaryConfirmation from '@/components/common/secondaryConfirmation';
+import SecondaryConfirmation from '@/components/common/secondaryConfirmation'
 import {
   getRoleList,
   deactivateRecoveryRole,
   editThePermissionsPage,
   updateRolePermission
-} from '@/api/admin/role';
-import { permissionList } from '../data/rolePermission';
+} from '@/api/admin/role'
+import { permissionList } from '../data/rolePermission'
 export default {
   name: 'rolePermission',
   components: { SecondaryConfirmation },
@@ -206,6 +241,8 @@ export default {
       stopOrRun: {},
       roleId: '',
       roleName: '',
+      newRoleName: '',
+      showNewRoleName: false,
       permissionList: [],
       dataPerm: 'org',
       dataRadioList: [
@@ -215,186 +252,208 @@ export default {
         { value: '信用卡', label: 'card' }
       ],
       rolePermission: []
-    };
+    }
   },
   computed: {
     editAuth() {
-      const { permissionsPage = {} } = this.$store.state;
+      const { permissionsPage = {} } = this.$store.state
       const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(
-        item => item.pathName === 'RolePermission'
-      ) || {};
+        (item) => item.pathName === 'RolePermission'
+      ) || {}
       if (flowManage.type === 'edit') {
-        return true;
+        return true
       }
-      return false;
+      return false
     }
   },
   created() {
-    this.permissionList = JSON.parse(JSON.stringify(permissionList));
+    this.permissionList = JSON.parse(JSON.stringify(permissionList))
   },
   activated() {
-    this.initData();
+    this.initData()
   },
   deactivated() {
-    this.handleBack();
+    this.handleBack()
   },
   mounted() {},
   methods: {
     async initData() {
-      if (this.mainLoading) return;
-      this.mainLoading = true;
-      const { pageNow, pageSize } = this.page;
+      if (this.mainLoading) return
+      this.mainLoading = true
+      const { pageNow, pageSize } = this.page
       const {
         data: { data: res, success, msg }
-      } = await getRoleList({ pageNow, pageSize });
+      } = await getRoleList({ pageNow, pageSize })
       if (success) {
-        this.data = res.list;
-        this.page.total = res.totalCount;
+        this.data = res.list
+        this.page.total = res.totalCount
       } else {
-        this.$message.error(msg);
+        this.$message.error(msg)
       }
-      this.mainLoading = false;
+      this.mainLoading = false
     },
     // 编辑
     async handleClick({ roleId, roleName }) {
-      this.level = false;
-      this.cardLoading = true;
-      this.roleId = roleId;
-      this.roleName = roleName;
+      this.level = false
+      this.cardLoading = true
+      this.roleId = roleId
+      this.roleName = roleName
       const {
         data: { data: res, success, msg }
-      } = await editThePermissionsPage({ roleId });
+      } = await editThePermissionsPage({ roleId })
       if (success) {
-        this.formatDataZero(res);
+        this.formatDataZero(res)
       } else {
-        this.$message.error(msg);
+        this.$message.error(msg)
       }
-      this.cardLoading = false;
+      this.cardLoading = false
+      roleId === -1 && this.$refs['ref-input'].focus()
     },
     stopApllay({ roleId }, action) {
-      this.stopOrRun = { roleId, status: action === 'edit0' ? 0 : 1 };
-      action === 'edit1' && (this.$refs.confirmation.dialogVisible = true);
-      action === 'edit0' && this.editStatus(true);
+      this.stopOrRun = { roleId, status: action === 'edit0' ? 0 : 1 }
+      action === 'edit1' && (this.$refs.confirmation.dialogVisible = true)
+      action === 'edit0' && this.editStatus(true)
     },
     editStatus(flag = false) {
       if (this.action === 'edit2') {
-        return this.handleSave();
+        return this.handleSave()
       }
       deactivateRecoveryRole(this.stopOrRun).then(({ data: { success } }) => {
         if (success) {
-          this.initData();
+          this.initData()
           flag
             && this.$message({
               type: 'success',
               message: '已恢复该角色所有操作权限。'
-            });
-          !flag && this.$message.success('停用成功');
+            })
+          !flag && this.$message.success('停用成功')
         }
-      });
+      })
     },
     handleClose() {
       if (this.action === 'edit2') {
-        this.handleBack();
+        this.handleBack()
       }
     },
     sortChange() {},
     submitEdit() {},
     handleCurrentChange(val) {
-      this.page.pageNow = val;
-      this.initData();
+      this.page.pageNow = val
+      this.initData()
     },
     async handleSave() {
       // 红色警告
-      if (this.permissionList[1].type && !this.permissionList[1].children.some(item => item.type)) {
+      if (
+        this.permissionList[1].type
+        && !this.permissionList[1].children.some((item) => item.type)
+      ) {
         this.permissionList[1].isShowWarn = true
         return
       }
-      this.cardLoading = true;
-      this.formatData();
-      const { dataPerm, defaultPerm, funPerms } = this.rolePermission;
+      if (this.roleId === -1 && !this.newRoleName) {
+        this.showNewRoleName = true
+        return
+      }
+      this.cardLoading = true
+      this.formatData()
+      const { dataPerm, defaultPerm, funPerms } = this.rolePermission
       const {
         data: { success, msg }
       } = await updateRolePermission({
         roleId: this.roleId,
+        roleName: this.newRoleName,
         list: [{ defaultPerm, funPerms }],
         dataList: [{ dataPerm }]
-      });
+      })
       if (success) {
         this.$message({
           type: 'success',
-          message: msg || '已成功保存该角色的操作权限'
-        });
+          message: this.roleId === -1 ? '改角色创建成功' : '已成功保存该角色的操作权限'
+        })
+        this.handleBack()
       } else {
         this.$message({
           type: 'error',
           message: msg || '保存失败'
-        });
+        })
       }
-      this.handleBack();
-      this.cardLoading = false;
+      this.cardLoading = false
     },
     handleBack() {
-      this.level = true;
-      this.roleId = '';
-      this.action = 'edit1';
-      this.permissionList = JSON.parse(JSON.stringify(permissionList));
+      this.level = true
+      this.roleId = ''
+      this.newRoleName = ''
+      this.action = 'edit1'
+      this.permissionList = JSON.parse(JSON.stringify(permissionList))
       this.initData()
     },
     formatDataZero(data) {
-      const { funPerms, dataPerm } = data;
-      this.rolePermission = data;
+      const { funPerms, dataPerm } = data
+      this.rolePermission = data
       for (const key in this.permissionList) {
         if (Number(key) === 0) {
-          this.permissionList[key].type = funPerms[key].type;
-          this.permissionList[key].children[0].type = funPerms[key].child[0].type;
+          this.permissionList[key].type = funPerms[key].type
+          this.permissionList[key].children[0].type = funPerms[key].child[0].type
         } else if (Number(key) === 1) {
-          this.permissionList[key].type = funPerms[key].type;
-          const { children } = this.permissionList[key];
+          this.permissionList[key].type = funPerms[key].type
+          const { children } = this.permissionList[key]
           children.forEach((item) => {
-            item.type = funPerms.find(funItem => funItem.code === item.code).type;
-          });
+            item.type = funPerms.find(
+              (funItem) => funItem.code === item.code
+            ).type
+          })
         } else {
           const item = this.permissionList[key]
-          const funPermsItem = funPerms.find(funItem => funItem.code === item.code)
+          const funPermsItem = funPerms.find(
+            (funItem) => funItem.code === item.code
+          )
           if (funPermsItem) {
             item.type = funPermsItem.type
           }
         }
       }
-      this.dataPerm = Array.isArray(this.dataPerm) ? dataPerm : dataPerm[0];
+      this.dataPerm = Array.isArray(this.dataPerm) ? dataPerm : dataPerm[0]
     },
     formatData() {
-      const { funPerms, defaultPerm } = this.rolePermission;
-      this.rolePermission.dataPerm = Array.isArray(this.dataPerm) ? this.dataPerm : [this.dataPerm];
+      const { funPerms, defaultPerm } = this.rolePermission
+      this.rolePermission.dataPerm = Array.isArray(this.dataPerm)
+        ? this.dataPerm
+        : [this.dataPerm]
       for (const key in this.permissionList) {
-        const originVal = this.permissionList[key];
+        const originVal = this.permissionList[key]
         if (Number(key) === 0) {
           if (originVal.type !== funPerms[key].type) {
-            funPerms[key].type = originVal.type;
-            this.permissionList[key].reflect.forEach(reflectItem => {
-              defaultPerm.find(item => item.pathName === reflectItem).type = originVal.type;
-            });
+            funPerms[key].type = originVal.type
+            this.permissionList[key].reflect.forEach((reflectItem) => {
+              defaultPerm.find((item) => item.pathName === reflectItem).type = originVal.type
+            })
           }
-          funPerms[key].child[0].type = originVal.children[0].type;
+          funPerms[key].child[0].type = originVal.children[0].type
         } else if (Number(key) === 1) {
-          funPerms[key].type = originVal.type;
-          const { children } = originVal;
+          funPerms[key].type = originVal.type
+          const { children } = originVal
           children.forEach((item) => {
-            const funItem = funPerms.find(funPermsItem => funPermsItem.code === item.code);
+            const funItem = funPerms.find(
+              (funPermsItem) => funPermsItem.code === item.code
+            )
             if (item.title === '流程管理') {
               if (item.type !== funItem.type) {
-                funItem.type = item.type;
-                item.reflect.forEach(reflectItem => {
+                funItem.type = item.type
+                item.reflect.forEach((reflectItem) => {
                   // defaultPerm.find(item => item.pathName === reflectItem).type = item.type;
-                  defaultPerm.find(defaultItem => defaultItem.pathName === reflectItem).type = 'edit';
-                });
+                  defaultPerm.find(
+                    (defaultItem) => defaultItem.pathName === reflectItem
+                  ).type = 'edit'
+                })
               }
             } else {
-              funItem.type = item.type;
+              funItem.type = item.type
             }
-          });
+          })
         } else {
-          const funItem = funPerms.find(funPermsItem => funPermsItem.code === originVal.code)
+          const funItem = funPerms.find(
+            (funPermsItem) => funPermsItem.code === originVal.code
+          )
           funItem.type = originVal.type
         }
       }
@@ -403,27 +462,31 @@ export default {
     handleSubmitLimitTime() {},
     handleReturn() {
       if (this.editAuth) {
-        this.action = 'edit2';
-        this.$refs.confirmation.dialogVisible = true;
+        this.action = 'edit2'
+        this.$refs.confirmation.dialogVisible = true
       } else {
-        this.handleBack();
+        this.handleBack()
       }
     },
     handleCheckBoxChange(item) {
-      item.isShowWarn = false;
+      item.isShowWarn = false
       if (!item.type && item?.children?.length) {
-        item.children.forEach(childItem => { childItem.type = '' });
+        item.children.forEach((childItem) => {
+          childItem.type = ''
+        })
       }
     },
     // trueLabel，falseLabel 和permissionList里面的item的props的trueLabel，falseLabel相关
     handleRadioChange(value, data, origin, trueLabel = 'edit', falseLabel) {
-      if (!this.editAuth) return;
-      data.type = value === data.type ? '' : value;
-      origin.type = origin.children.some(item => item.type) ? trueLabel : falseLabel;
-      origin.isShowWarn = false;
+      if (!this.editAuth) return
+      data.type = value === data.type ? '' : value
+      origin.type = origin.children.some((item) => item.type)
+        ? trueLabel
+        : falseLabel
+      origin.isShowWarn = false
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>
@@ -437,6 +500,7 @@ export default {
   }
   .top {
     display: flex;
+    justify-content: end;
     height: 50px;
     margin: 0 -24px;
     padding: 0 24px;
@@ -472,6 +536,28 @@ export default {
     padding: 24px 0 0;
     height: calc(100% - 50px);
     overflow-y: auto;
+    .my-role {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      /deep/.el-input {
+        width: 320px;
+        border-radius: 4px;
+        background: #f7f8fa;
+        .el-input__inner {
+          background: #f7f8fa;
+          border: 0;
+        }
+      }
+      .warn {
+        display: flex;
+        gap: 8px;
+        margin-left: 4px;
+        font-size: 12px;
+        color: #eb5757;
+      }
+    }
     /deep/.tableCard {
       padding: 0;
       .content {
