@@ -406,6 +406,7 @@ import {
   getApprovalType,
   getApprovalListStation,
 } from '@/api/approvalCenter'
+import { proposeAcceptRate, proposeOnePassRate } from '@/api/personCenter'
 import approvalEventCard from './components/approval-event-card'
 import barEcharts from './components/bar-echarts'
 export default {
@@ -996,6 +997,8 @@ export default {
     }
   },
   mounted() {
+    this.getProposeAcceptRate()
+    this.getProposeOnePassRate()
   },
   watch: {
   },
@@ -1323,14 +1326,14 @@ export default {
       });
     },
     searchList() { },
-    getApprovalType() {
-      getApprovalType().then((res) => {
-        this.transactionTypes = res.data.data.map((v) => {
-          return {
-            label: v.examineTypesName,
-            value: v.recordId
-          }
-        })
+    getProposeAcceptRate() {
+      proposeAcceptRate({ dataFlag: 1 }).then((res) => {
+        console.log('res', res);
+      })
+    },
+    getProposeOnePassRate() {
+      proposeOnePassRate({ dataFlag: 1 }).then((res) => {
+        console.log('res', res);
       })
     },
     getList(pageNow) {
@@ -1580,7 +1583,17 @@ export default {
     },
     handleSearchBlur() {
       console.log(this.search)
-    }
+    },
+    getApprovalType() {
+      getApprovalType().then((res) => {
+        this.transactionTypes = res.data.data.map((v) => {
+          return {
+            label: v.examineTypesName,
+            value: v.recordId
+          }
+        })
+      })
+    },
   },
 }
 </script>

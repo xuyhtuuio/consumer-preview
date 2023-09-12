@@ -1,11 +1,13 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const path = require('path');
 
+// eslint-disable-next-line no-unused-vars
 const resolve = (dir) => path.join(__dirname, dir);
 const isProduction = process.env.NODE_ENV === 'production';
 module.exports = {
   lintOnSave: !isProduction,
   runtimeCompiler: true,
-  outputDir: "dist",
+  outputDir: 'dist',
   // 开发环境显示报错位置 生产环境设置为false减少打包体积
   productionSourceMap: false,
   chainWebpack: (config) => {
@@ -59,9 +61,10 @@ module.exports = {
         }
       },
       '/cpr': {
-        target: 'http://192.168.210.57:31602',
+        // target: 'http://192.168.210.57:31602',
         // target: 'http://10.8.0.60:8324', // 吕强后台
         // target: 'http://10.8.0.57:8324', // 王意杨后台
+        target: 'http://192.168.161.205:8324', // 郭子阳后台
         changeOrigin: true,
         ws: true,
         pathRewrite: {
