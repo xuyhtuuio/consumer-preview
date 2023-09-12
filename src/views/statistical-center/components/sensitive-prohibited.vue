@@ -14,7 +14,10 @@
             v-for="(item, index) in list"
             :key="'content' + index"
           >
-            <div class="cnt-title">{{ item.keywordContent }}</div>
+            <div class="cnt-title">
+              <span class="iconfont icon-Frame1" :class="[ item.type === 2 && 'active']"></span>
+              {{ item.keywordContent }}
+            </div>
             <div class="cnt-content my-ellipsis">
               {{ item.recommendedOpinions }}
             </div>
@@ -132,7 +135,18 @@ export default {
         padding-top: 0;
       }
       .cnt-title {
+        display: flex;
+        gap: 5px;
         font-weight: 700;
+        .iconfont {
+          width: 16px;
+          height: 16px;
+          color: #EB5757;
+          font-weight: 400;
+          &.active {
+            color: #FA8C16;
+          }
+        }
       }
       .cnt-content {
         margin: 4px 0;

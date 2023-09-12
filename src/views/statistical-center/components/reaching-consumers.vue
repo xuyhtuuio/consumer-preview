@@ -119,7 +119,7 @@ export default {
             <div style="display:flex;align-items: center;gap: 8px;font-size:14px;line-height:22px">
               <span style="border-radius:10px;width:8px;height:8px;background-color: ${color};"></span>
               <span>${data.name} </span>
-              <span>${data.value}</span>
+              <span style="font-size:12px">${data.value}</span>
             </div>
             </div>`
             return box
