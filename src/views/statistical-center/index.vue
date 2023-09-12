@@ -509,7 +509,6 @@ export default {
       this.$refs['my-date-picker'].handleFocus()
     },
     handleSearchBlur() {
-      console.log(this.search)
     }
   }
 }

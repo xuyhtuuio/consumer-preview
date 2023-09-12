@@ -294,7 +294,7 @@ export default {
   },
   methods: {
     // 初始化数据
-    initData() {
+    initData(pageNum, callback) {
       this.isLoading = true;
       const referSort = this.referSort ? 1 : 2
       const updateSort = this.updateSort ? 3 : 4
@@ -302,7 +302,7 @@ export default {
         keywordContent: this.search.baseline,
         opinionContent: this.search.review,
         orderType: this.currentSort ? referSort : updateSort,
-        pageNum: this.page.pageNow,
+        pageNum: pageNum || this.page.pageNow,
         pageSize: this.page.pageSize,
         isAll: this.pageConfig.isAll !== undefined ? this.pageConfig.isAll : 1
       };
@@ -316,6 +316,9 @@ export default {
           keywordName: ['goalName', this.search.baseline],
           recommendedOpinions: ['showItem', this.search.review]
         });
+        this.$rollTo(0, document
+          .querySelector('.main-body'))
+        callback && callback()
       });
       this.searchList.length = 0;
     },
@@ -365,7 +368,7 @@ export default {
     },
 
     onSearch() {
-      this.initData();
+      this.initData(1);
       this.changeStyle('none', '.el-autocomplete-suggestion');
     },
     load(el, flag = false) {
@@ -425,7 +428,7 @@ export default {
     },
     handleCurrentChange(val) {
       this.page.pageNow = val;
-      this.initData();
+      this.initData(val, () => { this.initSearchData() });
     },
     // 停用 或启用 意见， 或删除意见
     async editStatus() {
@@ -488,7 +491,7 @@ export default {
       if (this.limitTimeVisible) {
         this.dialogItem.keywordId = val.label;
       } else {
-        this.initData();
+        this.initData(1);
       }
     },
     // 复制
@@ -643,7 +646,6 @@ export default {
     .info {
       display: flex;
       justify-content: space-between;
-      margin-left: 16px;
       line-height: 22px;
 
       .left {

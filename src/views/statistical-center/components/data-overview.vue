@@ -51,12 +51,12 @@
             <i class="color-blue">{{ item.content.shortTime }}</i> h
           </div>
         </div>
-        <!-- <div class="bottom" v-else-if="index === 3">
+        <div class="bottom" v-else-if="index === 3">
           <div class="btn-item">
-            有实质性意见的接受工单数
+            有实质性意见的接受条数
             <i class="color-blue">{{ item.content.num }}</i> 项
           </div>
-        </div> -->
+        </div>
         <div class="bottom" v-else-if="index === 4">
           <div class="btn-item">
             通过率最高的审查类型：<i class="color-blue">{{
@@ -118,7 +118,6 @@ export default {
             name: '平均审查时长',
             info: '展示选中所审批的任务单的平均处理时长',
             src: require('@/assets/image/statistical-center/overview-3.svg'),
-
             unit: 'h'
           },
           content: {
@@ -137,6 +136,7 @@ export default {
             unit: '%'
           },
           content: {
+            num: 111,
             titleNum: 90,
           }
         },
