@@ -341,7 +341,9 @@ export default {
           if (status === 200) {
             this.$message.success({ offset: 40, message: '审查意见已提交,可在审批中心查看' });
             this.submitReviewDialog = false;
-            this.$router.go(-1)
+            this.$router.push({
+              name: 'approvalcenter',
+            })
           } else {
             this.$message.error({ offset: 40, message: msg });
           }
