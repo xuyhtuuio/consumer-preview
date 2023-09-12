@@ -96,12 +96,12 @@ export default {
   },
   created() {
     this.showValiding()
-    const formId = this.$route.query.code
+    const templateId = this.$route.query.code
     // 判断传参，决定是新建还是加载原始数据
 
-    if (!this.$isEmpty(formId)) {
+    if (!this.$isEmpty(templateId)) {
       this.isNew = false
-      this.loadFormInfo(formId)
+      this.loadFormInfo(templateId)
     } else {
       this.loadInitFrom()
     }
@@ -112,10 +112,11 @@ export default {
     this.stopTimer()
   },
   methods: {
-    async loadFormInfo(formId) {
-      const res = await getProcessDetail(formId)
+    async loadFormInfo(templateId) {
+      const res = await getProcessDetail(templateId)
       const design = res.data.data
       design.formId = +design.formId || ''
+      design.templateId = design.templateId || ''
       design.settings = JSON.parse(design.settings)
       design.formItems = JSON.parse(design.formItems)
       design.process = JSON.parse(design.process)
@@ -225,8 +226,18 @@ export default {
       const res = await saveProcess(template)
       if (res.data.data) {
         this.$message.success('已保存当前内容至草稿箱')
+        const { design } = this.$store.state
+        design.templateId = res.data.data
+        this.$store.commit('loadForm', design)
         this.$store.state.designSave = JSON.stringify(this.$store.state.design)
         callback && callback();
+        if (!this.$route.query.code) {
+          this.$router.push({
+            query: {
+              code: res.data.data
+            }
+          })
+        }
       }
     },
     publishProcess() {
