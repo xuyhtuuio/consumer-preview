@@ -191,6 +191,7 @@
       </div>
     </div>
     <reject-dialog ref="rejectDialog" :formBase="formBase" :nextStepObj="nextStepObj" :rejectOption="rejectOption" @submit="submit"></reject-dialog>
+    <reject-dialog ref="rejectDialog" :refuseDisabled="refuseDisabled" :refuseOpiton="refuseOpiton" :formBase="formBase" :nextStepObj="nextStepObj"  :rejectOption="rejectOption" @submit="submit"></reject-dialog>
     <div class="fullScreen-none" :class="{ fullScreen: showFullScreen }">
       <!-- 全屏关闭按钮 -->
       <i
@@ -227,7 +228,7 @@
 </template>
 
 <script>
-import { download, getNextUserOption, rollback, updateRuleCode, ocrApprovalSubmission } from '@/api/aiApproval';
+import { download, getNextUserOption, rollback, updateRuleCode, ocrApprovalSubmission, getNodeHandleUser } from '@/api/aiApproval';
 import { dualScreenPreview } from '@/api/approvalCenter';
 import { getApplyForm } from '@/api/front';
 import FileType from '@/components/common/file-type';
@@ -302,6 +303,9 @@ export default {
           label: '其他'
         }
       ],
+      // 驳回人列表
+      refuseOpiton: [],
+      refuseDisabled: false
     };
   },
   mounted() {
@@ -322,6 +326,7 @@ export default {
     this.itemBodyWidth = this.$refs.itemBodyRef.clientWidth.toFixed(2);
     this.bodyClientWidth = this.$refs.carouselBody.clientWidth.toFixed(2);
     this.getInfo();
+    this.getNodeHandleUserApi();
   },
   methods: {
     // 获取  下一审批人列表
@@ -396,8 +401,35 @@ export default {
     reject() {
       this.$refs.rejectDialog.init();
     },
+    // 获取节点审批人
+    getNodeHandleUserApi() {
+      const data = {
+        templateId: this.formBase.processTemplateId,
+        processInstanceId: this.formBase.processInstanceId,
+        nodeId: this.formBase.nodeId,
+      }
+      getNodeHandleUser(data).then((res) => {
+        const { status } = res.data;
+        if (status === 200) {
+          this.refuseOpiton = res.data.data
+        }
+      })
+    },
     // 驳回方法
-    submit({ reason, txt, prevUser }) {
+    async submit({ reason, txt, prevUser }) {
+      this.refuseDisabled = true;
+      this.$message.info('正在驳回，请稍等！')
+      const nextUserInfo = this.refuseOpiton.filter(item => item.nodeId === prevUser);
+      const updateRuleRes = await updateRuleCode({
+        rollbackId: prevUser,
+        nextUserInfo: [{
+          id: nextUserInfo[0].userId
+        }],
+        templateId: this.formBase.processTemplateId
+      }).catch(() => {
+        updateRuleRes.data.status = 400;
+        this.refuseDisabled = false;
+      })
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       const data = {
         comments: `${reason}${txt.trim() ? '-' + txt : ''}`,
@@ -407,21 +439,27 @@ export default {
         },
         processInstanceId: this.formBase.processInstanceId,
         rollbackId: prevUser,
-        // || this.formBase.rollbackId
         signInfo: this.formBase.signInfo,
         nodeId: this.formBase.nodeId,
         taskId: this.formBase.taskId,
         templateId: this.formBase.templateId
       }
-      rollback(data).then((res) => {
-        const { status, msg } = res.data;
-        if (status === 200) {
-          this.$message.success('操作成功！');
-          this.$router.go(-1)
-        } else {
-          this.$message.error({ offset: 40, message: msg });
-        }
-      })
+      const { status: ruleStatus } = updateRuleRes.data;
+      if (ruleStatus === 200) {
+        rollback(data).then((res) => {
+          const { status, msg } = res.data;
+          if (status === 200) {
+            this.$message.success('操作成功！');
+            this.$router.go(-1)
+            this.refuseDisabled = false;
+          } else {
+            this.$message.error({ offset: 40, message: msg });
+            this.refuseDisabled = false;
+          }
+        }).catch(() => {
+          this.refuseDisabled = false;
+        })
+      }
     },
     showSubmit() {
       this.$refs.confirmation.dialogVisible = true;

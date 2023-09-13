@@ -82,13 +82,13 @@
                 clearable
               ></el-cascader>
               <el-select
-                v-model="search.adoptionStatus"
-                placeholder="采纳情况"
+                v-model="search.returnSign"
+                placeholder="驳回次数"
                 @change="searchList"
                 clearable
               >
                 <el-option
-                  v-for="(item, index) in $field('adoptionSituations')"
+                  v-for="(item, index) in $field('isReject')"
                   :key="index"
                   :label="item.label"
                   :value="item.value"
@@ -119,19 +119,6 @@
                 </el-option-group>
               </el-select>
               <el-select
-                v-model="search.returnSign"
-                placeholder="驳回次数"
-                @change="searchList"
-                clearable
-              >
-                <el-option
-                  v-for="(item, index) in $field('isReject')"
-                  :key="index"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-              <el-select
                 v-model="search.onceAdopt"
                 placeholder="一次通过"
                 @change="searchList"
@@ -159,6 +146,8 @@
               </el-select>
               <div class="el-select"></div>
               <div class="el-select"></div>
+              <div class="el-select"></div>
+
             </div>
             <div class="floor2">
               <div class="floor2-item">
@@ -302,7 +291,6 @@ export default {
         approvalStage: '',
         urgent: '',
         hasOpinions: '',
-        adoptionStatus: '',
         updateTime: [2, 'desc'],
         updateTime2: [2, 'desc'],
         keywords: '',
@@ -745,7 +733,6 @@ export default {
         approvalStage: '',
         urgent: '',
         hasOpinions: '',
-        adoptionSituation: '',
         updateTime: [2, 'desc'],
         updateTime2: [2, 'desc'],
         keywords: '',

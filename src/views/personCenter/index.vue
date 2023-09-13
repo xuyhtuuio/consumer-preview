@@ -689,6 +689,9 @@ export default {
         }
       ],
       pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
         shortcuts: [
           {
             text: '本月',
@@ -1404,16 +1407,16 @@ export default {
     },
 
     // 驳回原因分布
-    initReasonEcharts({ color: colorBy, yData, xData }) {
-      const yData1 = JSON.parse(JSON.stringify(yData))
-      const xData1 = JSON.parse(JSON.stringify(xData))
-      const color = JSON.parse(JSON.stringify(colorBy)).reverse()
+    initReasonEcharts(industryDataVal) {
+      const yData1 = JSON.parse(JSON.stringify(industryDataVal.yData))
+      const xData1 = JSON.parse(JSON.stringify(industryDataVal.xData))
+      const color = JSON.parse(JSON.stringify(industryDataVal.colorBy)).reverse()
       const option = {
         tooltip: {
           backgroundColor: 'rgba(255,255,255,0.8)',
           borderColor: 'rgba(255,255,255,0.8)',
           formatter(params) {
-            // console.log(params)
+            console.log('params', params);
             const p = `
             <div style="padding: 6px;display:flex;gap:8px;flex-direction:column;font-size:12px">
             <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">驳回原因</div>

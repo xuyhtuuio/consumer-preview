@@ -551,10 +551,6 @@ export default {
           ...this.form.crtDisavower
         }
       }
-      // this.$nextTick(() => {
-      //   this.judgeWarnSave()
-      // })
-
       const customFlag = this.judgeWarnSave()
       this.$refs['form'].validate((valid) => {
         this.$store.commit('setEditOpinionRequired', valid && customFlag)

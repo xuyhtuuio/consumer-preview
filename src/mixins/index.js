@@ -7,6 +7,9 @@ Vue.mixin({
     },
     $field(key) {
       return $locale.FIELDS[key]
-    }
+    },
+    $rollTo(offsetTop, el, behavior) {
+      el.scrollTo({ top: Number(offsetTop), behavior, });
+    },
   }
 })

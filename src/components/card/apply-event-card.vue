@@ -20,7 +20,7 @@
         <span class="event-name" @click="toDetail(item)">{{
           item.taskName
         }}</span>
-        <span class="event-status" v-if="!item.ocr_approval_status">
+        <span class="event-status" v-if="!item.errorStatus">
           <i v-if="item.taskStatus === '0'" class="tag draft">{{
             $msg('NodeStatus')[item.taskStatus]
           }}</i>
@@ -74,8 +74,8 @@
             </i>
           </i>
         </span>
-        <span class="event-status" v-if="item.ocr_approval_status">
-          <i class="tag in-modify">{{ item.ocr_approval_status }}</i>
+        <span class="event-status" v-if="item.errorStatus">
+          <i class="tag in-modify">{{ item.errorStatus }}</i>
         </span>
       </div>
       <div class="event-infos" v-if="!item.errorInfo">
@@ -317,7 +317,7 @@ export default {
         return
       }
       // 判断是否解析中
-      if (item.errorInfo || item.ocr_approval_status) {
+      if (item.errorInfo || item.errorStatus) {
         return false
       }
       window.localStorage.setItem(
