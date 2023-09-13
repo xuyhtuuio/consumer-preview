@@ -190,7 +190,7 @@
         </div>
       </div>
     </div>
-    <reject-dialog ref="rejectDialog" :formBase="formBase" :nextStepObj="nextStepObj" :rejectOption="rejectOption" @submit="submit"></reject-dialog>
+    <!-- <reject-dialog ref="rejectDialog" :formBase="formBase" :nextStepObj="nextStepObj" :rejectOption="rejectOption" @submit="submit"></reject-dialog> -->
     <reject-dialog ref="rejectDialog" :refuseDisabled="refuseDisabled" :refuseOpiton="refuseOpiton" :formBase="formBase" :nextStepObj="nextStepObj"  :rejectOption="rejectOption" @submit="submit"></reject-dialog>
     <div class="fullScreen-none" :class="{ fullScreen: showFullScreen }">
       <!-- 全屏关闭按钮 -->
@@ -480,6 +480,7 @@ export default {
         },
         processInstanceId: this.formBase.processInstanceId,
         taskId: this.formBase.taskId,
+        nodeId: this.formBase.nodeId,
         templateId: this.formBase.processTemplateId,
         currentUserInfo: {
           id: user.id,
