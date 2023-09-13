@@ -512,18 +512,25 @@ export default {
     // 驳回方法
     async submit({ reason, txt, prevUser }) {
       this.refuseDisabled = true;
+      let updateRuleRes = {
+        data: {
+          status: 200,
+          msg: '',
+        }
+      }
       this.$message.info('正在驳回，请稍等！')
-      const nextUserInfo = this.refuseOpiton.filter(item => item.nodeId === prevUser);
-      const updateRuleRes = await updateRuleCode({
-        rollbackId: prevUser,
-        nextUserInfo: [{
-          id: nextUserInfo[0].userId
-        }],
-        templateId: this.formBase.processTemplateId
-      }).catch(() => {
-        updateRuleRes.data.status = 400;
-        this.refuseDisabled = false;
-      })
+      if (this.nextStepObj?.refuseWay === 'TO_BEFORE') {
+        updateRuleRes = await updateRuleCode({
+          rollbackId: prevUser.split('/')[0],
+          nextUserInfo: [{
+            id: prevUser.split('/')[1]
+          }],
+          templateId: this.formBase.processTemplateId
+        }).catch(() => {
+          updateRuleRes.data.status = 400;
+          this.refuseDisabled = false;
+        })
+      }
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       const data = {
         comments: `${reason}${txt.trim() ? '-' + txt : ''}`,
@@ -532,7 +539,7 @@ export default {
           name: user.fullname
         },
         processInstanceId: this.formBase.processInstanceId,
-        rollbackId: prevUser,
+        rollbackId: this.nextStepObj?.refuseWay === 'TO_BEFORE' ? prevUser.split('/')[0] : '',
         signInfo: this.formBase.signInfo,
         nodeId: this.formBase.nodeId,
         taskId: this.formBase.taskId,

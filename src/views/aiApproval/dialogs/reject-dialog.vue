@@ -13,7 +13,7 @@
             v-for="(item, index) in refuseOpiton"
             :key="index"
             :label="item.userName + '/' + item.orgName + ' 【' + item.nodeName + '】'"
-            :value="item.nodeId"
+            :value="item.nodeId + '/' + item.userId"
           >
             <div class="flex">
               <div class="item ellipsis ellipsis_1">{{ item.userName }}</div>

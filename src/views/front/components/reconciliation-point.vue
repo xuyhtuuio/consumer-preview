@@ -9,7 +9,7 @@
         <div class="warn" v-if="judgeWarnFlag">
           <warn-info :info="warnInfo"> </warn-info>
         </div>
-        <!-- <el-checkbox v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox> -->
+        <el-checkbox v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
       </template>
       <template #content>
         <div class="content">
@@ -120,15 +120,32 @@ export default {
       this.checkAll && (this.judgeWarnFlag = false);
     },
     // 全选
-    // handleCheckAllChange(val) {
-    //   this.list.forEach(listItem => {
-    //     val &&
-    //       listItem.props.options.forEach(({ id }) => {
-    //         listItem.value.push(id);
-    //       });
-    //     !val && (listItem.value = []);
-    //   });
-    // },
+    handleCheckAllChange(val) {
+      if (this.judgeWarnFlag) {
+        this.judgeWarnFlag = false;
+      }
+      this.list.forEach(listItem => {
+        if (val) {
+          if (listItem.name === 'MultipleSelect') {
+            listItem.props.options.forEach(({ id }) => {
+              listItem.value.push(id);
+            });
+          } else if (listItem.name === 'SingleGroupsSelect') {
+            listItem.props.options.forEach(optItem => {
+              optItem.value1 = optItem.children[0].id
+              listItem.value.push(optItem.value1)
+            })
+          }
+        } else {
+          listItem.value = []
+          if (listItem.name === 'SingleGroupsSelect') {
+            listItem.props.options.forEach(optItem => {
+              optItem.value1 = ''
+            })
+          }
+        }
+      });
+    },
     handleChange() {
       if (this.judgeWarnFlag) {
         this.judgeWarnFlag = false;
