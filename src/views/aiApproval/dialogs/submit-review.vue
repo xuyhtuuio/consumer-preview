@@ -9,7 +9,7 @@
                 </span>
                 <div>
                     <el-button @click="handleClose">取消</el-button>
-                    <el-button type="primary" @click="submit" :disabled="disabled"> 提交</el-button>
+                    <el-button type="primary" @click="submit" :disabled="disabled" :loading="disabled"> 提交</el-button>
                 </div>
             </div>
             <div class="line"></div>
@@ -241,7 +241,7 @@ export default {
         prevUser: ''
       },
       examineList: [],
-      examineInfo: '请选择当前项目是否包含以下要点，不勾选或选择“否”为不包含该要点信息，则会返回至发起人修改并二次会签。'
+      examineInfo: '请选择当前项目是否包含以下要点，不勾选或选择“否”为不包含该要点信息，则会返回至发起人修改并二次会签。',
     }
   },
   watch: {

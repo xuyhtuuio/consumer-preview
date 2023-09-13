@@ -982,47 +982,47 @@ export default {
         if (success) {
           this.loadings.submitLoading = false
           // 有实质意见且采纳所以的有实质意见
-          // if (type && type === 1) {
-          //   this.$confirm(
-          //     '审查意见已确认，请根据审查意见修改提单内容。',
-          //     '',
-          //     {
-          //       customClass: 'confirmBox',
-          //       confirmButtonText: '去修改',
-          //       cancelButtonText: '知道了',
-          //       closeOnClickModal: false,
-          //       distinguishCancelAndClose: true,
-          //       type: 'warning'
-          //     }
-          //   )
-          //     .then(() => {
-          //       that.toModify()
-          //     })
-          //     .catch((e) => {
-          //     // eslint-disable-next-line
-          //       switch (e) {
-          //         case 'close':
-          //           that.toModify()
-          //           break
-          //         case 'cancel':
-          //           break
-          //       }
-          //     })
-          // } else {
-          //   this.$confirm('审查意见已确认，可在申请中心查看。', '', {
-          //     customClass: 'confirmBox',
-          //     cancelButtonText: '知道了',
-          //     showConfirmButton: false,
-          //     closeOnClickModal: false,
-          //     type: 'warning'
-          //   })
-          //     .then(() => {
-          //       this.$router.replace('/applycenter')
-          //     })
-          //     .catch(() => {
-          //       this.$router.replace('/applycenter')
-          //     })
-          // }
+          /* if (type && type === 1) {
+            this.$confirm(
+              '审查意见已确认，请根据审查意见修改提单内容。',
+              '',
+              {
+                customClass: 'confirmBox',
+                confirmButtonText: '去修改',
+                cancelButtonText: '知道了',
+                closeOnClickModal: false,
+                distinguishCancelAndClose: true,
+                type: 'warning'
+              }
+            )
+              .then(() => {
+                that.toModify()
+              })
+              .catch((e) => {
+              // eslint-disable-next-line
+                switch (e) {
+                  case 'close':
+                    that.toModify()
+                    break
+                  case 'cancel':
+                    break
+                }
+              })
+          } else {
+            this.$confirm('审查意见已确认，可在申请中心查看。', '', {
+              customClass: 'confirmBox',
+              cancelButtonText: '知道了',
+              showConfirmButton: false,
+              closeOnClickModal: false,
+              type: 'warning'
+            })
+              .then(() => {
+                this.$router.replace('/applycenter')
+              })
+              .catch(() => {
+                this.$router.replace('/applycenter')
+              })
+          } */
           this.$message.success('提交成功')
           setTimeout(() => {
             this.$router.go(-1)
