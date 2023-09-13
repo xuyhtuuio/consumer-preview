@@ -5,6 +5,7 @@
         <div class="content df">
           <g-button
             class="button-btn"
+            :class="{disabled: !allawChange}"
             size="big"
             v-for="(item, index) in list"
             :key="index"
@@ -25,7 +26,6 @@
               href="#icon-chanpin1"
             /> -->
             <img class="icon button-img" :src="item.icon" alt="" />
-
             {{ item.examineTypesName }}
           </g-button>
         </div>
@@ -44,6 +44,10 @@ export default {
     formManagementId: {
       typeof: Number | String,
       required: true
+    },
+    allawChange: {
+      typeof: Boolean,
+      default: true
     }
   },
   data() {
@@ -70,7 +74,7 @@ export default {
       this.currentId = -1;
     },
     handleClick(id) {
-      if (id === this.currentId) return;
+      if (id === this.currentId || !this.allawChange) return;
       this.currentId = id;
       this.$emit('handleTo', id);
     }
@@ -93,7 +97,11 @@ export default {
     padding-bottom: 4px;
     .button-btn {
       margin-bottom: 10px;
-
+      &.disabled{
+        /deep/ .btn{
+          cursor: not-allowed;
+        }
+      }
       /deep/.btn {
         min-width: auto;
         padding: 10px 24px;

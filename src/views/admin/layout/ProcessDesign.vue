@@ -6,7 +6,7 @@
       <el-button icon="el-icon-minus" size="small" @click="scale -= 10" :disabled="scale <= 40" circle></el-button>
       <el-button @click="validate">校验流程</el-button>
     </div> -->
-    <div class="op-btns" v-show="from !== 'flowManage'">
+    <div class="op-btns">
       <span class="zoomIn" @click="handleZoom"><i class="el-icon-refresh" />恢复</span>
       <span class="zoomOut" @click="handleZoom(10)"><i class="el-icon-zoom-in" />放大</span>
       <span class="zoomIn" @click="handleZoom(-10)"><i class="el-icon-zoom-out" />缩小</span>

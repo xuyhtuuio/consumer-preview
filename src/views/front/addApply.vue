@@ -12,6 +12,7 @@
         class="cnt-head"
         :list="reviewList"
         :formManagementId="formManagementId"
+        :allawChange="formBasicInfo.submitted !== 1"
         @handleTo="handleReviewClick"
       />
       <div class="cnt-main" v-loading="isCntLoading">
@@ -59,7 +60,7 @@
       :showFooter="false"
       v-model="flowVisible"
       :title="currentRow?.templateName + '-预览'"
-      width="600px"
+      width="70%"
     >
       <process-design from="flowManage" ref="processDesign" style="background: #f5f6f6" />
     </w-dialog>
@@ -271,11 +272,11 @@ export default {
     async submit() {
       let result0 = true;
       if (!this.$refs['basicInformationRef'].judgeWarn()) {
-        await new Promise(() => {
+        await new Promise((resolve) => {
           this.$nextTick(() => {
-            const refs = this.$refs['basicInformationRef'].$refs['refWarn'];
-            result0 = refs?.length === 0 || false
-            if (refs?.length) {
+            const refs = this.$refs['basicInformationRef'].$refs['refWarn'] || [];
+            result0 = refs.length === 0 || false
+            if (refs.length) {
               let { offsetTop } = refs[0].$el.offsetParent;
               refs.forEach(item => {
                 if (item.$el?.offsetParent?.offsetTop < offsetTop) {
@@ -284,20 +285,23 @@ export default {
               });
               this.rollTo(offsetTop);
             }
+            resolve()
           });
         })
       }
+
       const [result, offsetTop] = this.$refs['publicityChannelsRef'].judgeWarn();
 
       const [result1, offsetTop1] = this.$refs['reconPointRef'].judgeWarn();
 
       const [result2, offsetTop2] = this.$refs['reviewMaterialRef'].judgeWarn();
+
       if (!result0 || !result || !result1 || !result2) {
         if (!result0) return;
         let rollToNum
-        if (offsetTop !== 0) {
+        if (offsetTop && offsetTop !== 0) {
           rollToNum = offsetTop
-        } else if (offsetTop1 !== 0) {
+        } else if (offsetTop1 && offsetTop1 !== 0) {
           rollToNum = offsetTop1
         } else {
           rollToNum = offsetTop2

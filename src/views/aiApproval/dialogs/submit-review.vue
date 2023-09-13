@@ -25,7 +25,7 @@
                         </el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item v-if="nextStepObj?.selectObject === '1'" style="width: 100%;" required label="请选择审批人"
+                <el-form-item v-if="nextStepObj?.selectObject === '1' && params.isPasses" style="width: 100%;" required label="请选择审批人"
                     label-width="110px" prop="nextUser" class="params-nextUser params-nextUser">
                     <el-select v-model.trim="params.nextUser" multiple :multiple-limit="1"
                         :placeholder="`需${nextStepObj.nextNodeName}审批，请选择审批人`" filterable>

@@ -9,7 +9,7 @@
         >
         <span class="content-btns">
           <el-button @click="goBack"><i class="iconfont icon-fanhui1"></i>返回</el-button>
-          <el-button type="tuihui" @click="reject" v-if="approvalLetter.permissions !== 'disPassNotAllow'">
+          <el-button type="tuihui" @click="reject" v-if="approvalLetter.permissions === 'passAllow'">
             <i class="iconfont icon-tuihui1"></i>退回/驳回</el-button
           >
           <el-button @click="save"><i class="iconfont icon-baocun"></i>保存</el-button>
