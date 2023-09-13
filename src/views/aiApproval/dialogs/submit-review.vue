@@ -25,7 +25,7 @@
                         </el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item v-if="nextStepObj?.selectObject === '1'" style="width: 100%;" required label="请选择审批人"
+                <el-form-item v-if="nextStepObj?.selectObject === '1' && params.isPasses" style="width: 100%;" required label="请选择审批人"
                     label-width="110px" prop="nextUser" class="params-nextUser params-nextUser">
                     <el-select v-model.trim="params.nextUser" multiple :multiple-limit="1"
                         :placeholder="`需${nextStepObj.nextNodeName}审批，请选择审批人`" filterable>
@@ -36,11 +36,41 @@
                 <template v-if="approvalLetter.permissions === 'passNotAllow' && !params.isPasses">
                     <el-form-item required prop="prevUser" class="params-prevUser" label=" "
                         v-if="nextStepObj?.refuseWay === 'TO_BEFORE'">
-                        <el-select v-model.trim="params.prevUser" placeholder="请选择驳回人">
-                            <el-option v-for="(item, code) in nextStepObj?.nodeSelectList?.[0] || {}" :key="code"
-                                :label="code" :value="item">
-                            </el-option>
-                        </el-select>
+                        <el-select
+                        v-model="params.prevUser"
+                        placeholder="请选择驳回节点/驳回人"
+                        popper-class="approver-select"
+                        value-key="id"
+                      >
+                        <el-option
+                          v-for="(item, index) in refuseOpiton"
+                          :key="index"
+                          :label="item.userName + '/' + item.orgName + ' 【' + item.nodeName + '】'"
+                          :value="item.nodeId + '/' + item.userId"
+                        >
+                          <div class="flex">
+                            <div class="item ellipsis ellipsis_1">{{ item.userName }}</div>
+                            <div class="item ellipsis ellipsis_1">{{ item.orgName }}</div>
+                            <div class="item ellipsis ellipsis_1">{{ item.nodeName }}</div>
+                            <!-- <el-popover
+                              placement="top-start"
+                              trigger="hover"
+                              :content="item.nodeName"
+                              class="item"
+                              popper-class="node-popover"
+                              style="padding: 0"
+                            >
+                              <span
+                                class="ellipsis ellipsis_1"
+                                slot="reference"
+                                style="font-weight: 400; color: #505968"
+                              >
+                                · {{ item.nodeName }}
+                              </span>
+                            </el-popover> -->
+                          </div>
+                        </el-option>
+                      </el-select>
                     </el-form-item>
                     <el-form-item required prop="reason" class="params-reason" label=" ">
                         <el-select v-model.trim="params.reason" placeholder="请选择驳回原因">
@@ -162,6 +192,10 @@ export default {
     nextStepObj: {
       type: Object,
       default: () => ({})
+    },
+    refuseOpiton: {
+      type: Array,
+      default: () => ([])
     },
   },
   data() {

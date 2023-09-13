@@ -12,6 +12,7 @@
         class="cnt-head"
         :list="reviewList"
         :formManagementId="formManagementId"
+        :allawChange="formBasicInfo.submitted !== 1"
         @handleTo="handleReviewClick"
       />
       <div class="cnt-main" v-loading="isCntLoading">

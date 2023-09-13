@@ -50,7 +50,7 @@ export default {
   methods: {
     editInputName(item) {
       if (this.viewDisable) return;
-      item.showInput = true
+      this.$set(item, 'showInput', true)
     },
     deleteOptions(data, index) {
       if (this.viewDisable) return;
