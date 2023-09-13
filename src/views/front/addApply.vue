@@ -273,9 +273,9 @@ export default {
       if (!this.$refs['basicInformationRef'].judgeWarn()) {
         await new Promise((resolve) => {
           this.$nextTick(() => {
-            const refs = this.$refs['basicInformationRef'].$refs['refWarn'];
-            result0 = refs?.length === 0 || false
-            if (refs?.length) {
+            const refs = this.$refs['basicInformationRef'].$refs['refWarn'] || [];
+            result0 = refs.length === 0 || false
+            if (refs.length) {
               let { offsetTop } = refs[0].$el.offsetParent;
               refs.forEach(item => {
                 if (item.$el?.offsetParent?.offsetTop < offsetTop) {
@@ -283,16 +283,18 @@ export default {
                 }
               });
               this.rollTo(offsetTop);
-              resolve()
             }
+            resolve()
           });
         })
       }
+
       const [result, offsetTop] = this.$refs['publicityChannelsRef'].judgeWarn();
 
       const [result1, offsetTop1] = this.$refs['reconPointRef'].judgeWarn();
 
       const [result2, offsetTop2] = this.$refs['reviewMaterialRef'].judgeWarn();
+
       if (!result0 || !result || !result1 || !result2) {
         if (!result0) return;
         let rollToNum
