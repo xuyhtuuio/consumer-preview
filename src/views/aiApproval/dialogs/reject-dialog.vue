@@ -3,8 +3,39 @@
     title="驳回">
     <el-form label-position="left" label-width="80px" :model="form" :rules="rules">
       <el-form-item label="驳回人" prop="prevUser" v-if="nextStepObj?.refuseWay === 'TO_BEFORE'">
-        <el-select v-model="form.prevUser" placeholder="请选择驳回人" size="medium">
-          <el-option v-for="(item, code) in nextStepObj?.nodeSelectList?.[0] || {}" :key="code" :label="code" :value="item">
+        <el-select
+          v-model="form.prevUser"
+          placeholder="请选择驳回节点/驳回人"
+          popper-class="approver-select"
+          value-key="id"
+        >
+          <el-option
+            v-for="(item, index) in refuseOpiton"
+            :key="index"
+            :label="item.userName + '/' + item.orgName + ' 【' + item.nodeName + '】'"
+            :value="item.nodeId"
+          >
+            <div class="flex">
+              <div class="item ellipsis ellipsis_1">{{ item.userName }}</div>
+              <div class="item ellipsis ellipsis_1">{{ item.orgName }}</div>
+              <div class="item ellipsis ellipsis_1">{{ item.nodeName }}</div>
+              <!-- <el-popover
+                placement="top-start"
+                trigger="hover"
+                :content="item.nodeName"
+                class="item"
+                popper-class="node-popover"
+                style="padding: 0"
+              >
+                <span
+                  class="ellipsis ellipsis_1"
+                  slot="reference"
+                  style="font-weight: 400; color: #505968"
+                >
+                  · {{ item.nodeName }}
+                </span>
+              </el-popover> -->
+            </div>
           </el-option>
         </el-select>
       </el-form-item>
@@ -21,7 +52,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="handleClose">取 消</el-button>
-      <el-button type="primary" @click="submit"> 确 定</el-button>
+      <el-button type="primary" :disabled="refuseDisabled" @click="submit"> 确 定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -41,6 +72,14 @@ export default {
       type: Object,
       default: () => ({})
     },
+    refuseOpiton: {
+      type: Array,
+      default: () => ([])
+    },
+    refuseDisabled: {
+      type: Boolean,
+      default: () => false
+    }
   },
   data() {
     return {
@@ -77,6 +116,9 @@ export default {
         ...this.form
       })
     },
+    changeNode(val) {
+      this.$emit('changeNode', val);
+    }
   }
 }
 </script>

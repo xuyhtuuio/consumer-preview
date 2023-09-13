@@ -329,7 +329,10 @@ export default {
         case 'FORM_USER':
           return true;
         case 'DEPT_USER_ROLE':
-          return this.nodeProps.assignedUser.length > 1;
+          const hasDept = this.nodeProps.assignedUser.find(item => item.type === 'dept');
+          const hasRole = this.nodeProps.assignedUser.find(item => item.type === 'role');
+          const hasUser = this.nodeProps.assignedUser.filter(item => item.type === 'user').length > 1;
+          return hasDept || hasRole || hasUser;
         case 'ROLE':
           return true;
         default:

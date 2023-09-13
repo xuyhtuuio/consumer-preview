@@ -27,7 +27,7 @@
         v-if="page.total">
       </TrsPagination>
     </div>
-    <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow.templateName + '-预览'" width="600px">
+    <w-dialog :showFooter="false" v-model="flowVisible" :title="currentRow.templateName + '-预览'" width="70%">
       <process-design from="flowManage" ref="processDesign" style="background: #f5f6f6;" />
     </w-dialog>
     <secondary-confirmation :option="confirmOption" ref="confirmation" @handleConfirm="handleConfirmation(confirmOption)"></secondary-confirmation>

@@ -141,16 +141,33 @@
                     <span class="iconfont icon-tijiao airplane-class"></span>
                     我发起的
                   </div>
-                  <div
-                    class="tag-item"
-                    :class="estimateClass(item.businessStatus)"
-                    v-if="item.businessStatus"
-                  >
-                    {{ getNodeStatus(item.businessStatus) }}
-                    <span v-if="item.currentActivityName">{{
-                      ">" + item.currentActivityName
-                    }}</span>
-                  </div>
+                  <span class="event-status" v-if="!item.ocr_approval_status">
+                    <i v-if="item.taskStatus === '0'" class="tag draft">{{
+                      $msg('NodeStatus')[item.taskStatus]
+                    }}</i>
+                    <i v-if="['1', '2'].includes(item.taskStatus)" class="tag in-approval"
+                      >{{ $msg('NodeStatus')[item.taskStatus] }}>{{
+                        item.currentActivityName
+                      }}</i
+                    >
+                    <i v-if="item.taskStatus === '3'" class="tag in-modify"
+                      >{{ $msg('NodeStatus')[item.taskStatus] }}>{{
+                        item.currentActivityName
+                      }}</i
+                    >
+                    <i v-if="['5', '6'].includes(item.taskStatus)" class="tag check"
+                      >{{ $msg('NodeStatus')[item.taskStatus] }}>{{
+                        item.currentActivityName
+                      }}</i
+                    >
+                    <i v-if="item.taskStatus === '4'" class="end">
+                      <i class="tag end-sign"
+                        >{{ $msg('NodeStatus')[item.taskStatus] }}>{{
+                          item.currentActivityName
+                        }}
+                      </i>
+                    </i>
+                  </span>
                   <div
                     class="tag-item-opt"
                     :class="{ 'tag-item-opt-red': item.hasOpinions === 1 }"
@@ -292,13 +309,42 @@ export default {
         sex: '',
         type: '',
         urgent: 0,
-        sortType: 1,
+        sortType: 4,
         form_management_id: 1,
       };
       getList(data)
         .then((res) => {
           if (res.data.data.list.length > 0) {
-            this.applyList = res.data.data.list;
+            this.applyList = res.data.data.list.map((v) => {
+              return {
+                ...v,
+                errorInfo:
+                  v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1
+                    ? ''
+                    : v.errorInfo,
+                ocr_approval_status:
+                  v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1
+                    ? '智能解析中，请您耐心等待...'
+                    : v.ocr_approval_status,
+                formId: v.taskNumber,
+                recordId: v.taskNumber,
+                taskStatus: v.submitted === 0 ? '0' : v.businessStatus,
+                initiator: {
+                  ...v.sponsorMap,
+                  label: v.industryList && v.industryList[1]
+                },
+                processInstanceId: v.process_instance_id,
+                currentAssignee:
+                  v.currentAssignee && v.currentAssignee.length
+                    ? v.currentAssignee.map((m) => {
+                      return {
+                        ...m,
+                        hasReminder: false
+                      }
+                    })
+                    : []
+              }
+            });
             this.applyData = res.data.data;
           }
           this.applyLoading = false;
@@ -659,6 +705,88 @@ export default {
                 .blue {
                   background: #f0f6ff;
                   color: #2d5cf6;
+                }
+                .event-status {
+                  display: flex;
+
+                  .tag {
+                    margin-left: 12px;
+                    display: inline-block;
+                    padding: 2px 12px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: 20px;
+                    display: flex;
+                    align-items: center;
+
+                    .icon {
+                      width: 20px;
+                      height: 20px;
+                      line-height: 22px;
+                      margin-right: 4px;
+                    }
+                  }
+
+                  .draft {
+                    background: #f0f6ff;
+                    color: #2d5cf6;
+                  }
+
+                  .end-sign {
+                    background: #ecfeec;
+                    color: #50b142;
+                  }
+
+                  .has-opinion {
+                    color: #fff;
+                    border-radius: 0px 6px 6px 6px;
+                    background: linear-gradient(90deg, #e85167 0%, #ff8193 100%);
+
+                    i {
+                      font-size: 16px;
+                    }
+                  }
+
+                  .has-no-opinion {
+                    border-radius: 0px 6px 6px 6px;
+                    color: #fff;
+                    background: linear-gradient(90deg, #7b61ff 0%, #61a0ff 100%);
+
+                    i {
+                      font-size: 16px;
+                    }
+                  }
+
+                  .no-opinion {
+                    background: #e7f0ff;
+                    color: #2d5cf6;
+                  }
+
+                  .in-modify {
+                    background: #fff1f0;
+                    color: #eb5757;
+                  }
+
+                  .adoption {
+                    border-radius: 8px;
+                    border: 1px solid #f2f3f5;
+                    background: #e7f0ff;
+                    color: #2d5cf6;
+                  }
+
+                  .check {
+                    border-radius: 4px;
+                    background: #e6fffb;
+                    color: #0da5aa;
+                  }
+
+                  .in-approval {
+                    border-radius: 4px;
+                    background: #fff7e6;
+                    color: #fa8c16;
+                  }
                 }
               }
             }

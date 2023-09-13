@@ -185,8 +185,8 @@ export default {
           return Object.keys(v)[0]
         })
         const { id } = JSON.parse(window.localStorage.getItem('user_name'))
-        this.hasAuth = currentProcessor.includes(id + '')
-        this.item.hasAuth = currentProcessor.includes(id + '')
+        this.hasAuth = currentProcessor?.includes(id + '') || false
+        this.item.hasAuth = currentProcessor?.includes(id + '') || false
       },
       immediate: true
     }

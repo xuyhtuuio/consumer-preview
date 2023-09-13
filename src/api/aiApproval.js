@@ -121,10 +121,10 @@ export function updateRuleCode(param) {
 }
 
 // 获取驳回节点审批人
-export function getNodeHandleUser(param) {
+export function getNodeHandleUser(params) {
   return request({
     url: '/cpr/externalLogicController/getNodeHandleUser',
-    method: 'post',
-    data: param
+    method: 'get',
+    params
   })
 }
