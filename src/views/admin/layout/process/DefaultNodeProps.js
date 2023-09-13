@@ -26,6 +26,7 @@ export const APPROVAL_PROPS = {
       }
     }
   },
+  targetPage: 'LEADER',
   assignedUser: [],
   changeHandleUser: [],
   formPerms: [],

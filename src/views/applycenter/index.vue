@@ -205,13 +205,7 @@ export default {
     this.searchList()
   },
   async mounted() {
-    const dom = document
-      .querySelectorAll('.arrow-select')[0]
-      .querySelector('.el-select__tags')
-    this.$nextTick(() => {
-      const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间'
-      dom.innerText = text
-    })
+    this.setDatePicker()
     const floor2 = document.querySelectorAll('.apply-center .floor2')[0]
     floor2 ? (floor2.style.paddingRight = 16 + 'px') : ''
     window.addEventListener('resize', () => {
@@ -239,6 +233,15 @@ export default {
       if (path !== this.$route.path) {
         this.$router.push(path)
       }
+    },
+    setDatePicker() {
+      const dom = document
+        .querySelectorAll('.arrow-select')[0]
+        .querySelector('.el-select__tags')
+      this.$nextTick(() => {
+        const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间'
+        dom.innerText = text
+      })
     },
     changeArrrovalType() {
       if (this.search.formManagementId || this.search.formManagementId === 0) {
@@ -501,13 +504,7 @@ export default {
         loading: false
       }
       // 时间排序
-      const dom = document
-        .querySelectorAll('.arrow-select')[0]
-        .querySelector('.el-select__tags')
-      this.$nextTick(() => {
-        const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间'
-        dom.innerText = text
-      })
+      this.setDatePicker()
       this.approvalPhases = []
       this.searchList()
     }

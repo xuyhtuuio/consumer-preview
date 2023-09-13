@@ -325,6 +325,7 @@ export default {
         },
         processInstanceId: this.formBase.processInstanceId,
         taskId: this.formBase.taskId,
+        nodeId: this.formBase.nodeId,
         templateId: this.formBase.processTemplateId,
         currentUserInfo: {
           id: user.id,
