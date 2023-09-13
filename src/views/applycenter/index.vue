@@ -200,7 +200,10 @@ export default {
       // list: []
     }
   },
-  activated() { },
+  activated() {
+    this.getDataStatistic()
+    this.searchList()
+  },
   async mounted() {
     const dom = document
       .querySelectorAll('.arrow-select')[0]
@@ -397,14 +400,6 @@ export default {
           ? data.list.map((v) => {
             return {
               ...v,
-              errorInfo:
-                v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1
-                  ? ''
-                  : v.errorInfo,
-              errorStatus:
-                v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1
-                  ? '智能解析中，请您耐心等待...'
-                  : v.errorStatus,
               formId: v.taskNumber,
               recordId: v.taskNumber,
               taskStatus: v.submitted === 0 ? '0' : v.businessStatus,
@@ -505,6 +500,14 @@ export default {
         total: 0,
         loading: false
       }
+      // 时间排序
+      const dom = document
+        .querySelectorAll('.arrow-select')[0]
+        .querySelector('.el-select__tags')
+      this.$nextTick(() => {
+        const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间'
+        dom.innerText = text
+      })
       this.approvalPhases = []
       this.searchList()
     }
