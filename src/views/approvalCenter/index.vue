@@ -349,13 +349,7 @@ export default {
     }
   },
   mounted() {
-    const dom = document
-      .querySelectorAll('.arrow-select')[0]
-      .querySelector('.el-select__tags')
-    this.$nextTick(() => {
-      const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间'
-      dom.innerText = text
-    })
+    this.setDatePicker()
     this.getApprovalType()
     this.getOrgTree()
     this.searchList()
@@ -376,6 +370,15 @@ export default {
     this.searchList()
   },
   methods: {
+    setDatePicker() {
+      const dom = document
+        .querySelectorAll('.arrow-select')[0]
+        .querySelector('.el-select__tags')
+      this.$nextTick(() => {
+        const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间'
+        dom.innerText = text
+      })
+    },
     changeAgencies() {
       this.$refs['agencies'].dropDownVisible = false
       this.searchList()
@@ -737,13 +740,7 @@ export default {
         orgIds: []
       }
       // 时间排序
-      const dom = document
-        .querySelectorAll('.arrow-select')[0]
-        .querySelector('.el-select__tags')
-      this.$nextTick(() => {
-        const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间'
-        dom.innerText = text
-      })
+      this.setDatePicker()
       this.approvalPhases = []
       this.searchList()
     }
