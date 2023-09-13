@@ -271,7 +271,7 @@ export default {
     async submit() {
       let result0 = true;
       if (!this.$refs['basicInformationRef'].judgeWarn()) {
-        await new Promise(() => {
+        await new Promise((resolve) => {
           this.$nextTick(() => {
             const refs = this.$refs['basicInformationRef'].$refs['refWarn'];
             result0 = refs?.length === 0 || false
@@ -283,6 +283,7 @@ export default {
                 }
               });
               this.rollTo(offsetTop);
+              resolve()
             }
           });
         })
@@ -295,9 +296,9 @@ export default {
       if (!result0 || !result || !result1 || !result2) {
         if (!result0) return;
         let rollToNum
-        if (offsetTop !== 0) {
+        if (offsetTop && offsetTop !== 0) {
           rollToNum = offsetTop
-        } else if (offsetTop1 !== 0) {
+        } else if (offsetTop1 && offsetTop1 !== 0) {
           rollToNum = offsetTop1
         } else {
           rollToNum = offsetTop2
