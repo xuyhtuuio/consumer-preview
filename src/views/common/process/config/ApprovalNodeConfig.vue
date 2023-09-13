@@ -136,7 +136,7 @@
 
       <el-divider>高级设置</el-divider>
       <el-form-item label="目标页面配置" prop="targetPage">
-        <el-radio-group class="radio-group" v-model="nodeProps.targetPage">
+        <el-radio-group class="radio-group" v-model="nodeProps.targetPage" @change="changeTargetPage">
           <el-radio label="LEADER">领导审批</el-radio>
           <el-radio label="XIAOBAO">消保审批</el-radio>
           <el-radio label="CONFIRM">确认意见</el-radio>
@@ -347,6 +347,9 @@ export default {
     // }, 500);
   },
   methods: {
+    changeTargetPage() {
+      this.$emit('changeTargetPage')
+    },
     // 展开收起
     handleCollapse(e, isCollapse) {
       const { height } = e.target.parentNode.getBoundingClientRect()
