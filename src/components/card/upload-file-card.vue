@@ -53,12 +53,11 @@
         <div class="left">{{ `${index + 1}.` }}</div>
         <div class="center" style="color: #1d2128">
           <file-type :fileName="item.fileName"></file-type>
-          <i>{{ item.fileName | getFileName }}</i>
-          <i style="color: #505968">
+          <i class="file-name">{{ item.fileName | getFileName }}   <i style="color: #505968" >
             .{{
               item.fileName.split('.')[item.fileName.split('.').length - 1]
             }}</i
-          >
+          ></i>
         </div>
         <div class="right">
           <div class="r-item progress" v-if="item.status === -1">上传中...</div>
@@ -153,14 +152,13 @@
               <span
                 >{{ index + 1 }}.
                 <file-type :fileName="item.fileName"></file-type>
-                <i>{{ item.fileName | getFileName }}</i>
-                <i style="color: #505968">
+                <i class="file-name">{{ item.fileName | getFileName }}<i style="color: #505968">
                   .{{
                     item.fileName.split('.')[
                       item.fileName.split('.').length - 1
                     ]
                   }}</i
-                >
+                ></i>
               </span>
               <span>
                 <i
@@ -603,6 +601,13 @@ export default {
         .icon {
           margin: 0 10px;
         }
+        .file-name{
+          white-space: pre;
+          max-width: 50%;
+          overflow: hidden;
+          text-overflow: ellipsis; //文本超出省略号替代
+          white-space: nowrap;
+        }
       }
 
       .right {
@@ -710,10 +715,13 @@ export default {
         line-height: 22px;
         padding: 8px 12px;
         margin: 16px 0;
-
-        .file-name {
+        .file-name{
+          white-space: pre;
+          max-width: 60%;
+          overflow: hidden;
+          text-overflow: ellipsis; //文本超出省略号替代
+          white-space: nowrap;
         }
-
         .icon {
           margin: 0 10px;
           font-size: 20px;
