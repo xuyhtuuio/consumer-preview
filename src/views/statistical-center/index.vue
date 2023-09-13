@@ -160,6 +160,9 @@ export default {
         cascader: ''
       },
       pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
         shortcuts: [
           {
             text: '近一个月',
