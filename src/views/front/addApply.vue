@@ -59,7 +59,7 @@
       :showFooter="false"
       v-model="flowVisible"
       :title="currentRow?.templateName + '-预览'"
-      width="600px"
+      width="70%"
     >
       <process-design from="flowManage" ref="processDesign" style="background: #f5f6f6" />
     </w-dialog>
