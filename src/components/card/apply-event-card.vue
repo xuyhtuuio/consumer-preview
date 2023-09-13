@@ -1,8 +1,9 @@
 <template>
   <div class="apply-event-card">
     <div class="event-info">
-      <div class="event-name-status">
+      <div class="event-name-status" ref="event-name-status">
         <!-- 加急 -->
+        <span class="order-status" ref="order-status">
         <svg
           class="icon urgent-icon"
           aria-hidden="true"
@@ -17,10 +18,12 @@
         >
           <use xlink:href="#icon-tongyongtubiao2"></use>
         </svg>
-        <span class="event-name" @click="toDetail(item)">{{
+        <span class="id" v-if="item.orderNo">{{ item.orderNo }}</span>
+      </span>
+        <span class="event-name " @click="toDetail(item)" ref="event-name">{{
           item.taskName
         }}</span>
-        <span class="event-status" v-if="!item.errorStatus">
+        <span class="event-status" v-if="!item.errorStatus" ref="event-status">
           <i v-if="item.taskStatus === '0'" class="tag draft">{{
             $msg('NodeStatus')[item.taskStatus]
           }}</i>
@@ -74,12 +77,11 @@
             </i>
           </i>
         </span>
-        <span class="event-status" v-if="item.errorStatus">
+        <span class="event-status" v-if="item.errorStatus" ref="event-status">
           <i class="tag in-modify">{{ item.errorStatus }}</i>
         </span>
       </div>
       <div class="event-infos" v-if="!item.errorInfo">
-        <span class="id" v-if="item.orderNo">{{ item.orderNo }}</span>
         <span class="sDate date">发起时间：{{ item.create_time || '--' }}</span>
         <span class="sDate date">更新时间：{{ item.update_time || '--' }}</span>
         <span class="sDate date"
@@ -262,6 +264,14 @@ export default {
         val.taskStatus === '1' ? this.getCanBeRoved(val) : ''
         // 判断当前节点审批人是不是当前用户
         val.taskStatus === '6' ? this.getTemplatedetail(val) : ''
+        // 获取info的长度
+        this.$nextTick(() => {
+          const fatherWidth = this.$refs['event-name-status'].offsetWidth
+          const statusWidth = this.$refs['order-status']?.offsetWidth || 0
+          const taskWidth = this.$refs['event-status']?.offsetWidth || 0
+          const nameWidth = fatherWidth - statusWidth - taskWidth
+          this.$refs['event-name'].style.maxWidth = nameWidth + 'px'
+        })
       },
       immediate: true
     }
@@ -460,6 +470,11 @@ export default {
       margin-bottom: 14px;
       display: flex;
       align-items: center;
+      .order-status{
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+      }
     }
 
     .urgent-icon {
@@ -470,7 +485,6 @@ export default {
 
     .event-name {
       color: #1d2128;
-      max-width: 50%;
       white-space: nowrap;
       overflow: hidden; //文本超出隐藏
       text-overflow: ellipsis; //文本超出省略号替代
@@ -481,6 +495,15 @@ export default {
       line-height: 22px;
       /* 157.143% */
     }
+    .id {
+        color: #2d5cf6;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 22px;
+        margin-right: 12px;
+        /* 157.143% */
+      }
 
     .event-status {
       display: flex;
@@ -496,6 +519,8 @@ export default {
         line-height: 22px;
         display: flex;
         align-items: center;
+        word-break: keep-all;
+        white-space: pre;
 
         .icon {
           width: 20px;
@@ -566,16 +591,6 @@ export default {
     }
 
     .event-infos {
-      .id {
-        color: #2d5cf6;
-        font-size: 14px;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 22px;
-        margin-right: 12px;
-        /* 157.143% */
-      }
-
       .date:after {
         content: '';
         display: inline-block;

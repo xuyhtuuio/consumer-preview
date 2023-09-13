@@ -542,7 +542,8 @@ export default {
         ...this.form,
         formId: this.externalData.formId,
         assignedType: this.assignedType,
-        formItemDataList: approver_params
+        formItemDataList: approver_params,
+        refuseWay: this.refuseWay
       }
       // 若审核员选择了驳回
       if (this.form.isAccept === '0') {

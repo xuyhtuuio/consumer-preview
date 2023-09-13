@@ -3,10 +3,10 @@
     <!-- <el-tabs v-model="active" v-if="name && formConfig.length > 0"> -->
     <el-tabs v-model="active" v-if="name">
       <el-tab-pane :label="name" name="properties">
-        <component :is="(selectNode.type||'').toLowerCase()" :nodeName="nodeName" :config="selectNode.props"/>
+        <component :is="(selectNode.type||'').toLowerCase()" :nodeName="nodeName" :config="selectNode.props" @changeTargetPage="changeTargetPage"/>
       </el-tab-pane>
       <el-tab-pane label="表单权限设置" name="permissions">
-        <form-authority-config :nodeName="nodeName"/>
+        <form-authority-config ref="formAuthorityConfig" :nodeName="nodeName"/>
       </el-tab-pane>
     </el-tabs>
     <component :is="(selectNode.type||'').toLowerCase()" v-else :nodeName="nodeName"  :config="selectNode.props"/>
@@ -69,6 +69,9 @@ export default {
   methods: {
     getIsActive(active) {
       this.active = active
+    },
+    changeTargetPage() {
+      this.$refs['formAuthorityConfig'].formPermsLoad()
     }
   }
 }

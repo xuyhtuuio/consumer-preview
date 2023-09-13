@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-12 14:55:34
+ * @LastEditTime: 2023-09-13 18:24:34
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -362,6 +362,8 @@ import approvedOpinionCard from '@/components/card/approved-opinion-card'
 import uploadFileCard from '@/components/card/upload-file-card'
 import filePreview from '@/components/filePreview'
 import { leaderEdit, finalMaterial } from '@/api/approvalCenter'
+import { updateRuleCode, rollback } from '@/api/aiApproval';
+
 import {
   updateAdoptEditedComments,
   updateEditedComments,
@@ -492,7 +494,7 @@ export default {
           return Object.keys(v)[0]
         })
         const { id } = JSON.parse(window.localStorage.getItem('user_name'))
-        const hasAuth = currentProcessor.includes(id + '')
+        const hasAuth = currentProcessor?.includes(id + '') || false
         if (!hasAuth) {
           this.status = 0
           this.crtComp = 'approvalRecordCard'
@@ -564,6 +566,7 @@ export default {
         assignedUser = data[data.length - 1].props['assignedUser']
           ?.filter((v) => v.type !== 'dept')
           ?.map((v) => v.id)
+
         if (targetPage === 'XIAOBAO') {
           // 如果是ocr审批,页面显示无需太多内容
           return { targetPage, refuseWay, assignedUser, taskId, formId }
@@ -707,6 +710,7 @@ export default {
      * @return {*}
      */
     saveEditOpinion(isSave) {
+      const that = this
       const { editOpinionForm } = this.$store.state.checkApprovedForm
       const { assignedUser } = editOpinionForm
       // eslint-disable-next-line
@@ -728,57 +732,115 @@ export default {
       ) {
         params.targetUser = editOpinionForm.crtApprover
       }
-      // 驳回时候
-      if (editOpinionForm.isAccept === '0') {
-        params.reason = editOpinionForm.reason
-        params.targetNodeId = editOpinionForm.targetNodeId
-        params.targetUser = editOpinionForm.id
-      }
-      // eslint-disable-next-line
-      const end_submit = {
-        ...params,
-        comments: params
-      }
-      isSave
-        ? (this.loadings.storageLoading = true)
-        : (this.loadings.submitLoading = true)
-      leaderEdit(end_submit)
-        .then((res) => {
-          const { success, msg } = res.data
-          if (success) {
-            if (isSave) {
+      // 驳回并且是提交，调用新的接口
+      if (editOpinionForm.isAccept === '0' && !isSave) {
+        that.leaderReject(isSave, editOpinionForm)
+      } else {
+        // 驳回保存的话，还用之前的接口
+        if (editOpinionForm.isAccept === '0') {
+          params.reason = editOpinionForm.reason
+          params.targetNodeId = editOpinionForm.targetNodeId
+          params.targetUser = editOpinionForm.id
+        }
+        // eslint-disable-next-line
+        const end_submit = {
+          ...params,
+          comments: params
+        }
+        isSave
+          ? (this.loadings.storageLoading = true)
+          : (this.loadings.submitLoading = true)
+        leaderEdit(end_submit)
+          .then((res) => {
+            const { success, msg } = res.data
+            if (success) {
+              if (isSave) {
               // 保存-------start
-              this.loadings.storageLoading = false
-              this.$store.commit('setEditOpinionStorage', true)
-              this.$message.success('审查意见已保存')
-              setTimeout(() => {
-                this.$router.replace({ name: 'approvalcenter' })
-              }, 600)
+                this.loadings.storageLoading = false
+                this.$store.commit('setEditOpinionStorage', true)
+                this.$message.success('审查意见已保存')
+                setTimeout(() => {
+                  this.$router.replace({ name: 'approvalcenter' })
+                }, 600)
               // 保存---------end
-            } else {
+              } else {
               // 提交-------start
-              this.loadings.submitLoading = false
-              this.$message.success('审查意见已提交')
-              setTimeout(() => {
-                this.$router.replace({ name: 'approvalcenter' })
-              }, 600)
+                this.loadings.submitLoading = false
+                this.$message.success('审查意见已提交')
+                setTimeout(() => {
+                  this.$router.replace({ name: 'approvalcenter' })
+                }, 600)
               // 提交-------end
+              }
+            } else {
+              this.loadings.submitLoading = false
+              this.$message.error(msg)
             }
-          } else {
-            this.loadings.submitLoading = false
-            this.$message.error(msg)
-          }
-        })
-        .catch(() => {
-          if (isSave) {
-            this.loadings.storageLoading = false
-            this.$message.error('审查意见保存失败')
-          } else {
-            this.loadings.submitLoading = false
-            this.$message.error('审查意见提交失败')
-          }
-        })
+          })
+          .catch(() => {
+            if (isSave) {
+              this.loadings.storageLoading = false
+              this.$message.error('审查意见保存失败')
+            } else {
+              this.loadings.submitLoading = false
+              this.$message.error('审查意见提交失败')
+            }
+          })
+      }
     },
+    /**
+     * @description: 领导审批驳回
+     * @return {*}
+     */
+    async leaderReject(isSave, editOpinionForm) {
+      let updateRuleRes = {
+        data: {
+          status: 200,
+          msg: '',
+        }
+      }
+      if (editOpinionForm.refuseWay === 'TO_BEFORE') {
+        updateRuleRes = await updateRuleCode({
+          rollbackId: editOpinionForm.targetNodeId,
+          nextUserInfo: [{
+            id: editOpinionForm.id
+          }],
+          templateId: this.item.processTemplateId
+        }).catch(() => {
+          updateRuleRes.data.status = 400;
+        })
+      }
+      const user = JSON.parse(window.localStorage.getItem('user_name'))
+      const data = {
+        comments: `${editOpinionForm.reason}${editOpinionForm.content?.trim() ? '-' + editOpinionForm.content : ''}`,
+        currentUserInfo: {
+          id: user.id,
+          name: user.name
+        },
+        processInstanceId: this.item.processInstanceId,
+        rollbackId: editOpinionForm.refuseWay === 'TO_BEFORE' ? editOpinionForm.id : '',
+        nodeId: this.item.nodeId,
+        taskId: this.item.taskId,
+        templateId: this.item.processTemplateId
+      }
+      const { status: ruleStatus } = updateRuleRes.data;
+      if (ruleStatus === 200) {
+        rollback(data).then((res) => {
+          const { status, msg } = res.data;
+          if (status === 200) {
+            this.$message.success('操作成功！');
+            this.$router.go(-1)
+            isSave ? this.loadings.storageLoading = false : this.loadings.submitLoading = false
+          } else {
+            this.$message.error({ offset: 40, message: msg });
+            isSave ? this.loadings.storageLoading = false : this.loadings.submitLoading = false
+          }
+        }).catch(() => {
+          isSave ? this.loadings.storageLoading = false : this.loadings.submitLoading = false
+        })
+      }
+    },
+
     /**
      * description: 用于审查意见书显示最下面的时间
      * param {*} info
@@ -786,7 +848,7 @@ export default {
      */
     sendOpinionInfo(info) {
       const arr = info[info.length - 1]
-      const time = dayjs(arr.substantiveopinion[arr.substantiveopinion.length - 1].updateTime).format('YYYY-MM-DD HH:mm:ss') || dayjs('YYYY-MM-DD HH:mm:ss')
+      const time = dayjs(arr?.substantiveopinion[arr.substantiveopinion.length - 1].createTime).format('YYYY-MM-DD HH:mm:ss') || dayjs().format('YYYY-MM-DD HH:mm:ss')
       this.timeNow = time
     },
     /**
@@ -926,7 +988,7 @@ export default {
      * param {*} type :1 已采纳所有意见 0: 存在未采纳
      * return {*}
      */
-    async submitOpinion(opinions, type) {
+    async submitOpinion(opinions) {
       const that = this
       const { approvedOpinionForm, fileUploadForm, uploadFileRadio } = this.$store.state.checkApprovedForm
       const approvedOpinionFormParams = approvedOpinionForm.map((v) => {
@@ -981,52 +1043,57 @@ export default {
         if (success) {
           this.loadings.submitLoading = false
           // 有实质意见且采纳所以的有实质意见
-          if (type && type === 1) {
-            this.$confirm(
-              '审查意见已确认，请根据审查意见修改提单内容。',
-              '',
-              {
-                customClass: 'confirmBox',
-                confirmButtonText: '去修改',
-                cancelButtonText: '知道了',
-                closeOnClickModal: false,
-                distinguishCancelAndClose: true,
-                type: 'warning'
-              }
-            )
-              .then(() => {
-                that.toModify()
-              })
-              .catch((e) => {
-              // eslint-disable-next-line
-                switch (e) {
-                  case 'close':
-                    that.toModify()
-                    break
-                  case 'cancel':
-                    break
-                }
-              })
-          } else {
-            this.$confirm('审查意见已确认，可在申请中心查看。', '', {
-              customClass: 'confirmBox',
-              cancelButtonText: '知道了',
-              showConfirmButton: false,
-              closeOnClickModal: false,
-              type: 'warning'
-            })
-              .then(() => {
-                this.$router.replace('/applycenter')
-              })
-              .catch(() => {
-                this.$router.replace('/applycenter')
-              })
-          }
+          // if (type && type === 1) {
+          //   this.$confirm(
+          //     '审查意见已确认，请根据审查意见修改提单内容。',
+          //     '',
+          //     {
+          //       customClass: 'confirmBox',
+          //       confirmButtonText: '去修改',
+          //       cancelButtonText: '知道了',
+          //       closeOnClickModal: false,
+          //       distinguishCancelAndClose: true,
+          //       type: 'warning'
+          //     }
+          //   )
+          //     .then(() => {
+          //       that.toModify()
+          //     })
+          //     .catch((e) => {
+          //     // eslint-disable-next-line
+          //       switch (e) {
+          //         case 'close':
+          //           that.toModify()
+          //           break
+          //         case 'cancel':
+          //           break
+          //       }
+          //     })
+          // } else {
+          //   this.$confirm('审查意见已确认，可在申请中心查看。', '', {
+          //     customClass: 'confirmBox',
+          //     cancelButtonText: '知道了',
+          //     showConfirmButton: false,
+          //     closeOnClickModal: false,
+          //     type: 'warning'
+          //   })
+          //     .then(() => {
+          //       this.$router.replace('/applycenter')
+          //     })
+          //     .catch(() => {
+          //       this.$router.replace('/applycenter')
+          //     })
+          // }
+          this.$message.success('提交成功')
+          setTimeout(() => {
+            this.$router.go(-1)
+          }, 1000)
         } else {
           this.loadings.submitLoading = false
           this.$message.error(msg)
         }
       } catch (error) {
+        this.loadings.submitLoading = false
         this.$message.error(error)
       }
     },

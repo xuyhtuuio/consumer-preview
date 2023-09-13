@@ -501,7 +501,7 @@ export default {
   }
   .top {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     height: 50px;
     margin: 0 -24px;
     padding: 0 24px;
