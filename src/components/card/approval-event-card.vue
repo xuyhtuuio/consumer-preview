@@ -71,7 +71,6 @@
         </span>
       </div>
       <div class="event-infos">
-        <span class="id">{{ item.orderNo }}</span>
         <span class="sDate date"
           >发起时间：{{ item.createTime | timeFormate }}</span
         >
