@@ -310,7 +310,7 @@ export default {
         const link = document.createElement('a');
         link.style.display = 'none'
         link.href = url
-        link.setAttribute('download', disposition)
+        link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
