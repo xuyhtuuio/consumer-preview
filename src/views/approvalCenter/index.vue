@@ -352,7 +352,6 @@ export default {
     this.setDatePicker()
     this.getApprovalType()
     this.getOrgTree()
-    this.searchList()
   },
   watch: {
     $route(to, from) {
@@ -363,7 +362,6 @@ export default {
     }
   },
   created() {
-    this.getDataStatistic()
   },
   activated() {
     this.getDataStatistic()
