@@ -362,7 +362,9 @@ export default {
         updateRuleRes = await updateRuleCode({
           nextNodeId: data.nextNodeId,
           nextUserInfo: data.nextUserInfo,
-          templateId: data.templateId
+          templateId: data.templateId,
+          processInstanceId: data.processInstanceI,
+          nodeId: data.nodeId
         }).catch(() => {
           updateRuleRes.data.status = 400;
           this.disabled = false;
