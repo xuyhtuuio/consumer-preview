@@ -133,10 +133,7 @@
       </div>
     </div>
     <div class="right-operation">
-      <div
-        v-if="item.taskStatus == 1 && !item.errorInfo && revoked"
-        class="flex"
-      >
+      <div v-if="item.taskStatus == 1 && !item.errorInfo && revoked" class="flex">
         <span class="modify icon-op" @click="cancel(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-tubiao1"></use>
@@ -175,17 +172,26 @@
           修改
         </span>
       </div>
-      <div class="flex" v-if="item.taskStatus == 0 || item.errorInfo">
-        <span class="modify icon-op" @click="modify(item)">
-          <svg class="icon urgent-icon" aria-hidden="true">
-            <use xlink:href="#icon-xianxingtubiao"></use></svg>修改
+      <div class="flex" v-if="(item.taskStatus == 0 || item.errorInfo)&&!item.errorStatus?.includes('智能解析中')">
+        <span class="edit icon-op" @click="modify(item)">
+           <i class="iconfont icon-xianxingtubiao"></i>
+            编辑
         </span>
         <span class="del icon-op" @click="del(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-xianxingtubiao-1"></use></svg>删除
         </span>
       </div>
-      <div v-if="item.taskStatus != 0 && !item.errorInfo">
+      <div class="flex" v-if="item.errorStatus?.includes('智能解析中')">
+        <span class="modify icon-op" @click="cancel(item)">
+          <svg class="icon urgent-icon" aria-hidden="true">
+            <use xlink:href="#icon-tubiao1"></use>
+          </svg>
+          撤销
+        </span>
+      </div>
+      <!-- 关注 -->
+      <div v-if="(item.taskStatus != 0 && !item.errorInfo)||item.errorStatus?.includes('智能解析中')">
         <span
           class="attention no-attention icon-op"
           v-if="item.concernId != 1"
@@ -260,6 +266,10 @@ export default {
   watch: {
     item: {
       handler(val) {
+        // 判断智能解析中
+        if (val.errorStatus?.includes('智能解析中')) {
+          this.item.errorInfo = ''
+        }
         // 判断是否可以撤销
         val.taskStatus === '1' ? this.getCanBeRoved(val) : ''
         // 判断当前节点审批人是不是当前用户
@@ -713,7 +723,21 @@ export default {
       background: #fff7e6;
       padding: 4px 8px 4px 4px;
     }
-
+    .edit {
+      color: #2D5CF6;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 22px;
+      .iconfont{
+        margin-right: 4px;
+      }
+    }
+    .edit:hover {
+      border-radius: 2px;
+      background: #E7F0FF;
+      padding: 4px 8px 4px 4px;
+    }
     .del:hover {
       border-radius: 2px;
       background: #fff1f0;
