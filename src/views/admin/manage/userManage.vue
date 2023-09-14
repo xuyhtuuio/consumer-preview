@@ -46,6 +46,7 @@
               placeholder="请输入姓名或一事通ID"
               @keyup.enter.native="onSearch"
               @blur="onSearch"
+              clearable
             ></el-input>
           </el-form-item>
         </el-form>
