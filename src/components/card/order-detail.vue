@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-13 18:39:06
+ * @LastEditTime: 2023-09-14 16:56:56
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -60,7 +60,7 @@
           >
         </el-button>
         <div
-          v-if="item.taskStatus == 1 && pagePath && pagePath == 'approval'"
+          v-if="item.taskStatus == 1 && pagePath && pagePath == 'approval'&&item?.approvedSign==0"
           class="flex"
         >
           <!-- <div class="back flex" @click="transferDialog = true">
@@ -433,7 +433,8 @@ export default {
     this.clearStoreStatus()
     this.judgeStatus()
   },
-  created() {},
+  created() {
+  },
   methods: {
     /**
      * description:  store置为默认值
@@ -487,8 +488,8 @@ export default {
       const info = JSON.parse(window.localStorage.getItem('order-detail'))
       this.info = info
       this.item = item
-      // 抄送功能，能看不能做其他操作
-      if (this.pagePath === 'approval') {
+      // 抄送功能，能看不能做其他操作 判断一下是否已经审批过
+      if (this.pagePath === 'approval' && item.taskStatus !== '4') {
         let { currentProcessor } = this.item
         currentProcessor = currentProcessor?.map((v) => {
           return Object.keys(v)[0]

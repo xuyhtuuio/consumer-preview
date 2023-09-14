@@ -213,8 +213,6 @@ export default {
       floor3 ? (floor3.style.paddingRight = 16 + 'px') : ''
     })
     this.getApprovalType()
-    this.getDataStatistic()
-    this.searchList()
   },
   watch: {
     'search.formManagementId': {
