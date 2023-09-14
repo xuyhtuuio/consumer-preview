@@ -343,8 +343,7 @@ export default {
       window.localStorage.setItem(
         'order-detail',
         JSON.stringify({
-          item,
-          clickPoint: 'taskName'
+          item
         })
       )
       this.$router.push({
@@ -353,7 +352,8 @@ export default {
           formId: item.taskNumber,
           processInstanceId: item.processInstanceId,
           formManagementId: item.form_management_id,
-          taskName: item.taskName
+          processTemplateId: item.processTemplateId,
+          taskName: item.taskName,
         }
       })
     },

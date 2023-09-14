@@ -136,37 +136,10 @@ export default {
   methods: {
     init() {
       this.loading = true
-      // const res = {data:xx}
-      // console.log('dd',xx)
-      // const { detailVOList } = res.data.data
-      // if (!detailVOList) {
-      //   return this.hasData = false
-      // }
-      // // detailVOList
-      // const keys = Object.keys(detailVOList)
-      // let arr = []
-      // for (let i in keys) {
-      //   let obj = {
-      //     ...detailVOList[keys[i]][0],
-      //     name:detailVOList[keys[i]][0].activityId=='endEventNode'?'已结束':detailVOList[keys[i]][0].name
-      //   }
-      //   arr.push(obj)
-      // }
-      // const arr_handler = arr.sort((a,b)=> {
-      //   return dayjs(a.createTime)-dayjs(b.createTime)
-      // })
-      // this.recordList = arr_handler instanceof Array && arr_handler.length ? arr_handler.map(v => {
-      //   const comments = v.optionVOList && v.optionVOList[0].comments
-      //   return {
-      //     ...v,
-      //     optionVOList: JSON.parse(comments),
-      //   }
-      // }) : []
-      // return this.hasData = true
-
       instanceInfo({
-        processInstanceId:
-          (this.$route.params && this.$route.params.processInstanceId) || (this.sidebarParam && this.sidebarParam.processInstanceId)
+        formId: this.$route.params?.formId || this.sidebarParam?.recordId,
+        templateId: this.$route.params?.processTemplateId || this.sidebarParam?.processTemplateId,
+        processInstanceId: this.$route.params?.processInstanceId || this.sidebarParam?.processInstanceId
       })
         .then((res) => {
           const { detailVOList } = res.data.data
