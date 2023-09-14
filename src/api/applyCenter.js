@@ -125,9 +125,9 @@ export function instanceInfo(param) {
 export function downloadAllFiles(param) {
   return request({
     url: '/cpr/applicationForm/downloadAllFiles',
-    method: 'post',
-
-    data: param
+    method: 'get',
+    responseType: 'blob',
+    params: param
   })
 }
 // 用id获取意见详情

@@ -128,6 +128,7 @@ export default {
       this.list.forEach(listItem => {
         if (val) {
           if (listItem.name === 'MultipleSelect') {
+            listItem.value = []
             listItem.props.options.forEach(({ id }) => {
               listItem.value.push(id);
             });
