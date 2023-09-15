@@ -441,6 +441,7 @@ export default {
     },
     // 复制表单
     copyForm: debounce(async function (row) {
+      this.$message.info('请稍等！')
       await copyFormCategory(row.recordId)
       this.getObtainExamineTypeList({
         orderColumn: 'updateTime',

@@ -66,14 +66,19 @@ export default {
     this.formPermsLoad()
   },
   computed: {
+    selectNode() {
+      return this.$store.state.selectedNode
+    },
     disabledForm() {
       return this.$route.name === 'FlowManage' || this.$route.meta.pTitle === '申请中心'
     },
     fieldCheck() {
       return (row) => {
-        const jude1 = this.nodeName === '申请人' && row.module === '审批人填写'
-        const jude2 = this.nodeName !== '申请人' && row.module === '审批人填写' && (row.title === '有无实质意见' || row.title === '意见采纳结果')
-        return jude1 || jude2
+        const jude1 = this.nodeName === '申请人' && (row.module === '审批人填写' || row.title === '有无实质意见' || row.title === '意见采纳结果')
+        const jude2 = this.nodeName !== '申请人' && this.selectNode.props.targetPage === 'LEADER' && (['基本信息', '核对要点'].includes(row.module) || (row.title === '有无实质意见' || row.title === '意见采纳结果'))
+        const jude3 = this.nodeName !== '申请人' && this.selectNode.props.targetPage === 'XIAOBAO' && (['基本信息'].includes(row.module) || (row.title === '有无实质意见' || row.title === '意见采纳结果'))
+        const jude4 = this.nodeName !== '申请人' && ['CONFIRM', 'CONTRAST'].includes(this.selectNode.props.targetPage)
+        return jude1 || jude2 || jude3 || jude4
       }
     },
     formData() {
@@ -99,23 +104,28 @@ export default {
       const { id, name } = this.formGroup.find(item => item.id === this.formId) || {}
       this.formData.forEach(form => {
         let isLoad = false
+        const isH = (form.module === '审批人填写' && !(this.nodeName !== '申请人' && ['LEADER', 'XIAOBAO'].includes(this.selectNode.props.targetPage))) || ['有无实质意见', '意见采纳结果'].includes(form.title)
+        const isR = this.nodeName !== '申请人' && ['基本信息', '核对要点'].includes(form.module) && !(this.selectNode.props.targetPage === 'XIAOBAO' && form.module === '核对要点')
+        let perm = 'E'
+        if (isH) {
+          perm = 'H'
+        } else if (isR) {
+          perm = 'R'
+        }
         for (const i in perms) {
           if (perms[i].id === form.id) {
             perms[i].title = form.title
             perms[i].module = form.module
             perms[i].formCategoryId = id
             perms[i].formCategoryName = name
+            perms[i].perm = perm
             isLoad = true
             break;
           }
         }
         if (!isLoad) {
-          const isRoot = this.$store.state.selectedNode.type === 'ROOT'
-          const secondCheck = this.$store.state.selectedNode.type === 'APPROVAL-TWO'
-          let perm = (isRoot || secondCheck) ? 'E' : 'R'
-          if (form.module === '审批人填写') {
-            perm = 'H'
-          }
+          // const isRoot = this.$store.state.selectedNode.type === 'ROOT'
+          // const secondCheck = this.$store.state.selectedNode.type === 'APPROVAL-TWO'
           perms.push({
             id: form.id,
             title: form.title,

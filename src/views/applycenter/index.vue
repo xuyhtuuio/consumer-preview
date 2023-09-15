@@ -200,15 +200,12 @@ export default {
       // list: []
     }
   },
-  activated() { },
+  activated() {
+    this.getDataStatistic()
+    this.searchList()
+  },
   async mounted() {
-    const dom = document
-      .querySelectorAll('.arrow-select')[0]
-      .querySelector('.el-select__tags')
-    this.$nextTick(() => {
-      const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间'
-      dom.innerText = text
-    })
+    this.setDatePicker()
     const floor2 = document.querySelectorAll('.apply-center .floor2')[0]
     floor2 ? (floor2.style.paddingRight = 16 + 'px') : ''
     window.addEventListener('resize', () => {
@@ -216,8 +213,6 @@ export default {
       floor3 ? (floor3.style.paddingRight = 16 + 'px') : ''
     })
     this.getApprovalType()
-    this.getDataStatistic()
-    this.searchList()
   },
   watch: {
     'search.formManagementId': {
@@ -236,6 +231,15 @@ export default {
       if (path !== this.$route.path) {
         this.$router.push(path)
       }
+    },
+    setDatePicker() {
+      const dom = document
+        .querySelectorAll('.arrow-select')[0]
+        .querySelector('.el-select__tags')
+      this.$nextTick(() => {
+        const text = this.search.updateTime[0] === 1 ? '发起时间' : '更新时间'
+        dom.innerText = text
+      })
     },
     changeArrrovalType() {
       if (this.search.formManagementId || this.search.formManagementId === 0) {
@@ -397,14 +401,6 @@ export default {
           ? data.list.map((v) => {
             return {
               ...v,
-              errorInfo:
-                v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1
-                  ? ''
-                  : v.errorInfo,
-              errorStatus:
-                v.errorInfo && v.errorInfo.indexOf('智能解析中') !== -1
-                  ? '智能解析中，请您耐心等待...'
-                  : v.errorStatus,
               formId: v.taskNumber,
               recordId: v.taskNumber,
               taskStatus: v.submitted === 0 ? '0' : v.businessStatus,
@@ -505,6 +501,8 @@ export default {
         total: 0,
         loading: false
       }
+      // 时间排序
+      this.setDatePicker()
       this.approvalPhases = []
       this.searchList()
     }
