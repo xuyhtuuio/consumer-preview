@@ -1184,7 +1184,7 @@ export default {
     initReasonEcharts(industryDataVal) {
       const yData1 = JSON.parse(JSON.stringify(industryDataVal.yData))
       const xData1 = JSON.parse(JSON.stringify(industryDataVal.xData))
-      const color = JSON.parse(JSON.stringify(industryDataVal.colorBy)).reverse()
+      const color = JSON.parse(JSON.stringify(industryDataVal.color)).reverse()
       const option = {
         tooltip: {
           backgroundColor: 'rgba(255,255,255,0.8)',
