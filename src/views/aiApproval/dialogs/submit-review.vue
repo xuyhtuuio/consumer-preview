@@ -83,7 +83,7 @@
                     </el-form-item>
                 </template>
             </el-form>
-            <el-form label-width="110px" label-position="left" v-if="params.isPasses !== false">
+            <el-form class="approvalForm" label-width="110px" label-position="left" v-if="params.isPasses !== false">
                 <!-- 其他审批人字段 -->
                 <com-form-item v-for="item in applyFormWithPermissions.filledInByApprover" :key="item.id"
                     :item="item"></com-form-item>
@@ -362,7 +362,9 @@ export default {
         updateRuleRes = await updateRuleCode({
           nextNodeId: data.nextNodeId,
           nextUserInfo: data.nextUserInfo,
-          templateId: data.templateId
+          templateId: data.templateId,
+          processInstanceId: data.processInstanceI,
+          nodeId: data.nodeId
         }).catch(() => {
           updateRuleRes.data.status = 400;
           this.disabled = false;
@@ -735,5 +737,10 @@ export default {
         line-height: 28px;
     }
 
+}
+.approvalForm{
+  display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 </style>

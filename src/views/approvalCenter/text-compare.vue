@@ -37,7 +37,7 @@
           <div class="all-similar">
             <span class="text"
               >总体文本比对相似度：{{
-                totalsimilarity ? totalsimilarity : "--"
+                totalsimilarity ? totalsimilarity : '--'
               }}</span
             >
             <span>
@@ -73,7 +73,7 @@
                       </div>
                       <div class="similar-level">
                         相似度：{{
-                          item.similarity ? item.similarity + "%" : "--"
+                          item.similarity ? item.similarity + '%' : '--'
                         }}
                       </div>
                     </div>
@@ -135,7 +135,7 @@
                   <div class="item-text">
                     <div class="text-style color-text">
                       文本相似度：{{
-                        item.similarity ? item.similarity + "%" : "--"
+                        item.similarity ? item.similarity + '%' : '--'
                       }}
                     </div>
                     <div class="text-style">
@@ -191,7 +191,15 @@
       </div>
     </div>
     <!-- <reject-dialog ref="rejectDialog" :formBase="formBase" :nextStepObj="nextStepObj" :rejectOption="rejectOption" @submit="submit"></reject-dialog> -->
-    <reject-dialog ref="rejectDialog" :refuseDisabled="refuseDisabled" :refuseOpiton="refuseOpiton" :formBase="formBase" :nextStepObj="nextStepObj"  :rejectOption="rejectOption" @submit="submit"></reject-dialog>
+    <reject-dialog
+      ref="rejectDialog"
+      :refuseDisabled="refuseDisabled"
+      :refuseOpiton="refuseOpiton"
+      :formBase="formBase"
+      :nextStepObj="nextStepObj"
+      :rejectOption="rejectOption"
+      @submit="submit"
+    ></reject-dialog>
     <div class="fullScreen-none" :class="{ fullScreen: showFullScreen }">
       <!-- 全屏关闭按钮 -->
       <i
@@ -228,16 +236,23 @@
 </template>
 
 <script>
-import { download, getNextUserOption, rollback, updateRuleCode, ocrApprovalSubmission, getNodeHandleUser } from '@/api/aiApproval';
-import { dualScreenPreview } from '@/api/approvalCenter';
-import { getApplyForm } from '@/api/front';
-import FileType from '@/components/common/file-type';
-import FilePreview from '@/components/filePreview';
-import SideBar from '../aiApproval/sidebar/sidebar';
-import rejectDialog from '../aiApproval/dialogs/reject-dialog';
-import SecondaryConfirmation from './dialogs/submit-dialog';
-import ImagePreview from '../aiApproval/components/imgae-preview';
-import ImagePreview1 from './image-preview';
+import {
+  download,
+  getNextUserOption,
+  rollback,
+  updateRuleCode,
+  ocrApprovalSubmission,
+  getNodeHandleUser
+} from '@/api/aiApproval'
+import { dualScreenPreview } from '@/api/approvalCenter'
+import { getApplyForm } from '@/api/front'
+import FileType from '@/components/common/file-type'
+import FilePreview from '@/components/filePreview'
+import SideBar from '../aiApproval/sidebar/sidebar'
+import rejectDialog from '../aiApproval/dialogs/reject-dialog'
+import SecondaryConfirmation from './dialogs/submit-dialog'
+import ImagePreview from '../aiApproval/components/imgae-preview'
+import ImagePreview1 from './image-preview'
 export default {
   name: 'compare',
   components: {
@@ -247,7 +262,7 @@ export default {
     SideBar,
     ImagePreview,
     FilePreview,
-    ImagePreview1,
+    ImagePreview1
   },
   data() {
     return {
@@ -259,7 +274,7 @@ export default {
       scrollX: 0,
       showFullScreen: false,
       approval: {
-        url: 'http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf',
+        url: 'http://192.168.210.51:9090/cpr/cpr_1692584431222_认证与上网.pdf'
       },
       compareList: [],
       formBase: {},
@@ -271,7 +286,7 @@ export default {
       option: {
         message: '确认结束后该申请单结束流转，不可再进行修改',
         cancelBtn: '取消',
-        confirmBtn: '确认',
+        confirmBtn: '确认'
       },
       optionOther: {
         message: '提交后该申请单进入下一审批阶段，不可再进行修改',
@@ -306,27 +321,27 @@ export default {
       // 驳回人列表
       refuseOpiton: [],
       refuseDisabled: false
-    };
+    }
   },
   mounted() {
     if (!this.$route.params.item) {
-      this.$router.go(-1);
-      return;
+      this.$router.go(-1)
+      return
     }
-    const { item } = this.$route.params;
-    this.formId = item.taskNumber;
-    this.inDraft = item.draftFlag === 1;
-    this.formCategoryId = item.formManagementId;
-    this.init(item);
-    this.formBase = item;
-    window.addEventListener('resize', this.resize, true);
+    const { item } = this.$route.params
+    this.formId = item.taskNumber
+    this.inDraft = item.draftFlag === 1
+    this.formCategoryId = item.formManagementId
+    this.init(item)
+    this.formBase = item
+    window.addEventListener('resize', this.resize, true)
     this.carouselWidth = Number(
       ((this.$refs.carouselBody.clientWidth - 40) / 6).toFixed(2)
-    );
-    this.itemBodyWidth = this.$refs.itemBodyRef.clientWidth.toFixed(2);
-    this.bodyClientWidth = this.$refs.carouselBody.clientWidth.toFixed(2);
-    this.getInfo();
-    this.getNodeHandleUserApi();
+    )
+    this.itemBodyWidth = this.$refs.itemBodyRef.clientWidth.toFixed(2)
+    this.bodyClientWidth = this.$refs.carouselBody.clientWidth.toFixed(2)
+    this.getInfo()
+    this.getNodeHandleUserApi()
   },
   methods: {
     // 获取  下一审批人列表
@@ -336,80 +351,81 @@ export default {
         templateId: this.formBase.processTemplateId,
         processInstanceId: this.formBase.processInstanceId
         // bool: 'Y'
-      }).then(res => {
-        const { data, status } = res.data;
-        const keys = Object.keys(data || {});
+      }).then((res) => {
+        const { data, status } = res.data
+        const keys = Object.keys(data || {})
         if (status === 200 && keys.length) {
-          this.nextStepObj = data;
+          this.nextStepObj = data
         }
-      });
+      })
     },
     // 获取工单基本信息
     init() {
       getApplyForm({
         formCategoryId: this.formCategoryId,
         formId: this.formId
-      }).then(res => {
-        const { data, status, message } = res.data;
+      }).then((res) => {
+        const { data, status, message } = res.data
         if (status === 200) {
-          this.applyForm = data;
-          this.getNextUserOption();
+          this.applyForm = data
+          this.getNextUserOption()
           this.$refs.sidebar.tools[0].sidebarParam = {
             ...data,
-            keyPointsForVerification: JSON.parse(JSON.stringify(data.keyPointsForVerification))
-          };
+            keyPointsForVerification: JSON.parse(
+              JSON.stringify(data.keyPointsForVerification)
+            )
+          }
         } else {
-          this.$message.error({ offset: 40, title: '提醒', message });
+          this.$message.error({ offset: 40, title: '提醒', message })
         }
-      });
+      })
     },
     resize() {
       this.carouselWidth = Number(
         ((this.$refs.carouselBody.clientWidth - 40) / 6).toFixed(2)
-      );
-      this.itemBodyWidth = this.$refs.itemBodyRef.clientWidth.toFixed(2);
-      this.bodyClientWidth = this.$refs.carouselBody.clientWidth.toFixed(2);
+      )
+      this.itemBodyWidth = this.$refs.itemBodyRef.clientWidth.toFixed(2)
+      this.bodyClientWidth = this.$refs.carouselBody.clientWidth.toFixed(2)
     },
     moveLeft() {
       if (this.canLeft && this.compareList.length > 6) {
-        this.scrollX = this.scrollX + this.carouselWidth + 8;
-        const element = document.getElementById('itemBody');
-        element.style.transform = `translateX(${this.scrollX}px)`;
-        element.style.transition = 'all 0.5s';
+        this.scrollX = this.scrollX + this.carouselWidth + 8
+        const element = document.getElementById('itemBody')
+        element.style.transform = `translateX(${this.scrollX}px)`
+        element.style.transition = 'all 0.5s'
         if (this.scrollX >= 0) {
-          this.canLeft = false;
-          this.canRight = true;
+          this.canLeft = false
+          this.canRight = true
         }
       }
     },
     moveRight() {
-      const { length } = document.querySelectorAll('.carousel-item');
+      const { length } = document.querySelectorAll('.carousel-item')
       if (this.canRight && this.compareList.length > 6) {
-        this.scrollX = this.scrollX - this.carouselWidth - 8;
-        const element = document.getElementById('itemBody');
-        element.style.transform = `translateX(${this.scrollX}px)`;
-        element.style.transition = 'all 0.5s';
+        this.scrollX = this.scrollX - this.carouselWidth - 8
+        const element = document.getElementById('itemBody')
+        element.style.transform = `translateX(${this.scrollX}px)`
+        element.style.transition = 'all 0.5s'
         if (
-          this.scrollX
-          <= this.bodyClientWidth - (this.carouselWidth + 8) * length + 8
+          this.scrollX <= this.bodyClientWidth - (this.carouselWidth + 8) * length + 8
         ) {
-          this.canLeft = true;
-          this.canRight = false;
+          this.canLeft = true
+          this.canRight = false
         }
       }
     },
     reject() {
-      this.$refs.rejectDialog.init();
+      this.$refs.rejectDialog.init()
     },
     // 获取节点审批人
     getNodeHandleUserApi() {
       const data = {
         templateId: this.formBase.processTemplateId,
         processInstanceId: this.formBase.processInstanceId,
-        nodeId: this.formBase.nodeId,
+        nodeId: this.formBase.nodeId
       }
       getNodeHandleUser(data).then((res) => {
-        const { status } = res.data;
+        const { status } = res.data
         if (status === 200) {
           this.refuseOpiton = res.data.data
         }
@@ -417,26 +433,31 @@ export default {
     },
     // 驳回方法
     async submit({ reason, txt, prevUser }) {
-      this.refuseDisabled = true;
+      this.refuseDisabled = true
       let updateRuleRes = {
         data: {
           status: 200,
-          msg: '',
+          msg: ''
         }
       }
       this.$message.info('正在驳回，请稍等！')
-      if (this.nextStepObj?.refuseWay === 'TO_BEFORE') {
-        updateRuleRes = await updateRuleCode({
-          rollbackId: prevUser.split('/')[0],
-          nextUserInfo: [{
-            id: prevUser.split('/')[1]
-          }],
-          templateId: this.formBase.processTemplateId
-        }).catch(() => {
-          updateRuleRes.data.status = 400;
-          this.refuseDisabled = false;
-        })
-      }
+      updateRuleRes = await updateRuleCode({
+        rollbackId:
+          this.nextStepObj?.refuseWay === 'TO_BEFORE'
+            ? prevUser.split('/')[0]
+            : '',
+        nextUserInfo: [
+          {
+            id: this.nextStepObj?.refuseWay === 'TO_BEFORE' ? prevUser.split('/')[1] : '',
+          }
+        ],
+        processInstanceId: this.formBase.processInstanceI,
+        templateId: this.formBase.processTemplateId,
+        nodeId: this.formBase.nodeId
+      }).catch(() => {
+        updateRuleRes.data.status = 400
+        this.refuseDisabled = false
+      })
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       const data = {
         comments: `${reason}${txt.trim() ? '-' + txt : ''}`,
@@ -445,31 +466,34 @@ export default {
           name: user.fullname
         },
         processInstanceId: this.formBase.processInstanceId,
-        rollbackId: this.nextStepObj?.refuseWay === 'TO_BEFORE' ? prevUser.split('/')[0] : '',
+        rollbackId:
+          this.nextStepObj?.refuseWay === 'TO_BEFORE' ? prevUser.split('/')[0] : '',
         signInfo: this.formBase.signInfo,
         nodeId: this.formBase.nodeId,
         taskId: this.formBase.taskId,
         templateId: this.formBase.templateId
       }
-      const { status: ruleStatus } = updateRuleRes.data;
+      const { status: ruleStatus } = updateRuleRes.data
       if (ruleStatus === 200) {
-        rollback(data).then((res) => {
-          const { status, msg } = res.data;
-          if (status === 200) {
-            this.$message.success('操作成功！');
-            this.$router.go(-1)
-            this.refuseDisabled = false;
-          } else {
-            this.$message.error({ offset: 40, message: msg });
-            this.refuseDisabled = false;
-          }
-        }).catch(() => {
-          this.refuseDisabled = false;
-        })
+        rollback(data)
+          .then((res) => {
+            const { status, msg } = res.data
+            if (status === 200) {
+              this.$message.success('操作成功！')
+              this.$router.go(-1)
+              this.refuseDisabled = false
+            } else {
+              this.$message.error({ offset: 40, message: msg })
+              this.refuseDisabled = false
+            }
+          })
+          .catch(() => {
+            this.refuseDisabled = false
+          })
       }
     },
     showSubmit() {
-      this.$refs.confirmation.dialogVisible = true;
+      this.$refs.confirmation.dialogVisible = true
     },
     async endTaskSubmit(val) {
       const user = JSON.parse(window.localStorage.getItem('user_name'))
@@ -488,126 +512,137 @@ export default {
         }
       }
       this.$message.info('提交中，请稍等！')
-      this.disabled = true;
+      this.disabled = true
       let updateRuleRes = {
         data: {
           status: 200,
-          msg: '',
+          msg: ''
         }
       }
       if (this.nextStepObj?.selectObject === '1') {
-        data.nextNodeId = this.nextStepObj.nextNodeId;
-        data.nextUserInfo = (this.nextStepObj?.nodeSelectUserList || []).filter(item => val.includes(item.id))
+        data.nextNodeId = this.nextStepObj.nextNodeId
+        data.nextUserInfo = (this.nextStepObj?.nodeSelectUserList || []).filter(
+          (item) => val.includes(item.id)
+        )
         updateRuleRes = await updateRuleCode({
           nextNodeId: data.nextNodeId,
           nextUserInfo: data.nextUserInfo,
           templateId: this.formBase.processTemplateId,
+          processInstanceId: this.formBase.processInstanceI,
+          nodeId: this.formBase.nodeId
         }).catch(() => {
-          updateRuleRes.data.status = 400;
-          this.disabled = false;
+          updateRuleRes.data.status = 400
+          this.disabled = false
         })
       }
-      const { status: ruleStatus, msg: ruleMsg } = updateRuleRes.data;
+      const { status: ruleStatus, msg: ruleMsg } = updateRuleRes.data
       if (ruleStatus === 200) {
-        ocrApprovalSubmission(data).then((res) => {
-          this.disabled = false;
-          const { status, msg } = res.data;
-          if (status === 200) {
-            this.$message.success({ offset: 40, message: '审查意见已提交,可在审批中心查看' });
-            this.submitReviewDialog = false;
-            this.$router.go(-1)
-          } else {
-            this.$message.error({ offset: 40, message: msg });
-          }
-        }).catch(() => {
-          this.disabled = false;
-        })
+        ocrApprovalSubmission(data)
+          .then((res) => {
+            this.disabled = false
+            const { status, msg } = res.data
+            if (status === 200) {
+              this.$message.success({
+                offset: 40,
+                message: '审查意见已提交,可在审批中心查看'
+              })
+              this.submitReviewDialog = false
+              this.$router.go(-1)
+            } else {
+              this.$message.error({ offset: 40, message: msg })
+            }
+          })
+          .catch(() => {
+            this.disabled = false
+          })
       } else {
-        ruleMsg && this.$message.error({ offset: 40, message: ruleMsg });
+        ruleMsg && this.$message.error({ offset: 40, message: ruleMsg })
       }
     },
     // 获取线上对比数据
     getInfo() {
-      this.loading = true;
+      this.loading = true
       const param = {
         formId: this.formId,
-        processInstanceId: this.formBase.processInstanceId,
-      };
+        processInstanceId: this.formBase.processInstanceId
+      }
       dualScreenPreview(param)
         .then((res) => {
           // if (res?.data?.data?.result && Array.isArray(res.data.data.result)) {
-          if (Object.prototype.toString.call(res.data.data) === '[object Object]' && Array.isArray(res.data.data.result)) {
-            this.compareList = res.data.data.result;
-            this.totalsimilarity = res.data.data.totalSimilarity;
+          if (
+            Object.prototype.toString.call(res.data.data) === '[object Object]' && Array.isArray(res.data.data.result)
+          ) {
+            this.compareList = res.data.data.result
+            this.totalsimilarity = res.data.data.totalSimilarity
             const item = this.compareList[0]
-            this.activeItem = item;
-            this.loading = false;
+            this.activeItem = item
+            this.loading = false
             this.$nextTick(() => {
               this.carouselWidth = Number(
                 ((this.$refs.carouselBody.clientWidth - 40) / 6).toFixed(2)
-              );
-              this.itemBodyWidth = this.$refs.itemBodyRef.clientWidth.toFixed(2);
-              this.bodyClientWidth = this.$refs.carouselBody.clientWidth.toFixed(2);
-            });
+              )
+              this.itemBodyWidth = this.$refs.itemBodyRef.clientWidth.toFixed(2)
+              this.bodyClientWidth = this.$refs.carouselBody.clientWidth.toFixed(2)
+            })
             if (this.compareList.length > 6) {
-              this.canRight = true;
+              this.canRight = true
             }
           } else {
-            this.loading = false;
+            this.loading = false
           }
         })
         .catch(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
       // this.totalsimilarity = "100%";
     },
     changeActive(item, index) {
-      this.activeItem = item;
-      this.activeIndex = index;
+      this.activeItem = item
+      this.activeIndex = index
     },
     // 返回
     goBack() {
-      this.$router.go(-1);
+      this.$router.go(-1)
     },
     saveFile(type) {
-      let key = '';
+      let key = ''
       if (type === 1) {
-        key = this.activeItem.otherKey;
+        key = this.activeItem.otherKey
       } else if (type === 2) {
-        key = this.activeItem.key;
+        key = this.activeItem.key
       }
       download({ key })
         .then((res) => {
-          const { data, status } = res.data;
+          const { data, status } = res.data
           if (status === 200) {
-            window.open(data);
+            window.open(data)
           }
         })
         .catch(() => {
-          this.list = [];
+          this.list = []
         })
         .finally(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
     fullScreen(type) {
-      this.showFullScreen = !this.showFullScreen;
-      this.fullScreenType = type;
+      this.showFullScreen = !this.showFullScreen
+      this.fullScreenType = type
       if (type === 1 && this.$refs.imageView1) {
         this.$nextTick(() => {
-          this.$refs.imageView1.handleImageLoaded();
-        });
+          this.$refs.imageView1.handleImageLoaded()
+        })
       } else if (type === 2 && this.$refs.imageView2) {
         this.$nextTick(() => {
-          this.$refs.imageView2.handleImageLoaded();
-        });
+          this.$refs.imageView2.handleImageLoaded()
+        })
       }
-    },
+    }
   },
   beforeDestroy() {
-    window.removeEventListener('resize', this.resize, true);
-  },
-};
+    window.removeEventListener('resize', this.resize, true)
+  }
+}
 </script>
 
 <style lang="less" scoped>
@@ -839,7 +874,7 @@ export default {
           line-height: 22px;
         }
         i + i::before {
-          content: " ";
+          content: ' ';
           width: 1px;
           height: 12px;
           display: inline-block;

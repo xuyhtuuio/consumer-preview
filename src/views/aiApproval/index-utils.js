@@ -511,26 +511,31 @@ export default {
     },
     // 驳回方法
     async submit({ reason, txt, prevUser }) {
-      this.refuseDisabled = true;
+      this.refuseDisabled = true
       let updateRuleRes = {
         data: {
           status: 200,
-          msg: '',
+          msg: ''
         }
       }
       this.$message.info('正在驳回，请稍等！')
-      if (this.nextStepObj?.refuseWay === 'TO_BEFORE') {
-        updateRuleRes = await updateRuleCode({
-          rollbackId: prevUser.split('/')[0],
-          nextUserInfo: [{
-            id: prevUser.split('/')[1]
-          }],
-          templateId: this.formBase.processTemplateId
-        }).catch(() => {
-          updateRuleRes.data.status = 400;
-          this.refuseDisabled = false;
-        })
-      }
+      updateRuleRes = await updateRuleCode({
+        rollbackId:
+          this.nextStepObj?.refuseWay === 'TO_BEFORE'
+            ? prevUser.split('/')[0]
+            : '',
+        nextUserInfo: [
+          {
+            id: this.nextStepObj?.refuseWay === 'TO_BEFORE' ? prevUser.split('/')[1] : '',
+          }
+        ],
+        processInstanceId: this.formBase.processInstanceI,
+        templateId: this.formBase.processTemplateId,
+        nodeId: this.formBase.nodeId
+      }).catch(() => {
+        updateRuleRes.data.status = 400
+        this.refuseDisabled = false
+      })
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       const data = {
         comments: `${reason}${txt.trim() ? '-' + txt : ''}`,
@@ -539,27 +544,32 @@ export default {
           name: user.fullname
         },
         processInstanceId: this.formBase.processInstanceId,
-        rollbackId: this.nextStepObj?.refuseWay === 'TO_BEFORE' ? prevUser.split('/')[0] : '',
+        rollbackId:
+          this.nextStepObj?.refuseWay === 'TO_BEFORE'
+            ? prevUser.split('/')[0]
+            : '',
         signInfo: this.formBase.signInfo,
         nodeId: this.formBase.nodeId,
         taskId: this.formBase.taskId,
         templateId: this.formBase.templateId
       }
-      const { status: ruleStatus } = updateRuleRes.data;
+      const { status: ruleStatus } = updateRuleRes.data
       if (ruleStatus === 200) {
-        rollback(data).then((res) => {
-          const { status, msg } = res.data;
-          if (status === 200) {
-            this.$message.success('操作成功！');
-            this.$router.go(-1)
-            this.refuseDisabled = false;
-          } else {
-            this.$message.error({ offset: 40, message: msg });
-            this.refuseDisabled = false;
-          }
-        }).catch(() => {
-          this.refuseDisabled = false;
-        })
+        rollback(data)
+          .then((res) => {
+            const { status, msg } = res.data
+            if (status === 200) {
+              this.$message.success('操作成功！')
+              this.$router.go(-1)
+              this.refuseDisabled = false
+            } else {
+              this.$message.error({ offset: 40, message: msg })
+              this.refuseDisabled = false
+            }
+          })
+          .catch(() => {
+            this.refuseDisabled = false
+          })
       }
     },
     // 获取节点审批人

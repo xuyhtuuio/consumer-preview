@@ -800,17 +800,17 @@ export default {
           msg: '',
         }
       }
-      if (editOpinionForm.refuseWay === 'TO_BEFORE') {
-        updateRuleRes = await updateRuleCode({
-          rollbackId: editOpinionForm.targetNodeId,
-          nextUserInfo: [{
-            id: editOpinionForm.id
-          }],
-          templateId: this.item.processTemplateId
-        }).catch(() => {
-          updateRuleRes.data.status = 400;
-        })
-      }
+      updateRuleRes = await updateRuleCode({
+        rollbackId: editOpinionForm.targetNodeId,
+        nextUserInfo: [{
+          id: editOpinionForm.refuseWay === 'TO_BEFORE' ? editOpinionForm.id : ''
+        }],
+        templateId: this.item.processTemplateId,
+        processInstanceId: this.item.processInstanceId,
+        nodeId: this.item.nodeId
+      }).catch(() => {
+        updateRuleRes.data.status = 400;
+      })
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       const data = {
         comments: `${editOpinionForm.reason}${editOpinionForm.content?.trim() ? '-' + editOpinionForm.content : ''}`,

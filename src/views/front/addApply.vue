@@ -359,6 +359,7 @@ export default {
           ocessInstanceId: this.formBasicInfo.processInstanceId,
           taskId: this.formBasicInfo.taskId,
           templateId: this.templateId,
+          nodeId: this.formBasicInfo.nodeId,
           currentUserInfo: {
             id: user.id,
             name: user.fullname
