@@ -59,7 +59,7 @@ export default {
         }
       })
     },
-    initOrderEcharts({ data, color }) {
+    initOrderEcharts({ data, color }, currentIndex) {
       const option = {
         color,
         grid: {
@@ -79,37 +79,62 @@ export default {
           textStyle: {
             fontSize: 12,
             rich: {
-              a: {
-                fontWeight: 700
+              active: {
+                color: 'blue'
               }
             },
           },
           formatter(name) {
             const { value } = data.find((item) => item.name === name)
+            const index = data.findIndex((item) => item.name === name)
             const all = data.reduce((item, next) => {
               return item + next.value
             }, 0)
             const rate = (value / all) * 100
+            if (index === currentIndex) {
+              return `{active|${name} ${value}项 ${rate}%}`
+            }
             return `${name} {a| ${value}项 ${rate}%}`
           },
         },
         series: [
           {
             type: 'pie',
-            radius: [0, 60],
+            radius: ['40%', '70%'],
             center: ['50%', '25%'],
-            roseType: 'radius',
-            itemStyle: {
-              borderRadius: 5
-            },
             label: {
-              show: false
+              show: false,
+              position: 'center'
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: 12,
+                formatter({ name, value }) {
+                  return `{a|${value}项}\n{b| ${name}}`
+                },
+                rich: {
+                  a: {
+                    lineHeight: 20,
+                    fontWeight: '700'
+                  },
+                  b: {
+                    color: '#505968'
+                  }
+                }
+              }
             },
             data
           }
         ]
       }
-      this.initChart('order-echart', option)
+      this.initChart('order-echart', option, () => {
+        // myChart.on('mouseover', ({ dataIndex }) => {
+        //   if (this.orderCurrentIndex === dataIndex) return
+        //   this.orderCurrentIndex = dataIndex
+        //   this.initOrderEcharts(this.orderData, this.orderCurrentIndex)
+        // });
+      })
     },
     // 驳回次数分布
     initStackBarDataEcharts(industryDataVal) {
@@ -268,7 +293,6 @@ export default {
           backgroundColor: 'rgba(255,255,255,0.8)',
           borderColor: 'rgba(255,255,255,0.8)',
           formatter(params) {
-            // console.log(params)
             const p = `
             <div style="min-width:200px;padding: 6px;display:flex;gap:8px;flex-direction:column;font-size:12px">
             <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">驳回原因</div>
@@ -339,7 +363,7 @@ export default {
       }
       this.initChart('reason-echart', option)
     },
-    initChart(ref, option) {
+    initChart(ref, option, callback) {
       const chart = this.$refs[ref]
       let myChart
       if (chart) {
@@ -349,6 +373,7 @@ export default {
           myChart.resize()
         })
       }
+      callback && callback(myChart)
       this.$on('hook:destroyed', () => {
         window.removeEventListener('resize', () => {
           myChart.resize()
