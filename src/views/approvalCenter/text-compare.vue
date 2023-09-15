@@ -35,7 +35,7 @@
       <div class="content-cont" v-loading="loading">
         <div v-show="compareList.length > 0" class="content-cont-header">
           <div class="all-similar">
-            <span class="text"
+            <span class="text" :class="totalsimilarity === '100.00%' ? 'text-green' : ''"
               >总体文本比对相似度：{{
                 totalsimilarity ? totalsimilarity : '--'
               }}</span
@@ -71,7 +71,7 @@
                           {{ item.otherFileName }}
                         </div>
                       </div>
-                      <div class="similar-level">
+                      <div class="similar-level" :class="item.similarity === 100 ? 'similar-level-green' : ''">
                         相似度：{{
                           item.similarity ? item.similarity + '%' : '--'
                         }}
@@ -133,7 +133,7 @@
                     :fileName="item.fileName"
                   ></file-type>
                   <div class="item-text">
-                    <div class="text-style color-text">
+                    <div class="text-style color-text" :class="item.similarity === 100 ? 'color-text-green' : ''">
                       文本相似度：{{
                         item.similarity ? item.similarity + '%' : '--'
                       }}
@@ -237,7 +237,6 @@
 
 <script>
 import {
-  download,
   getNextUserOption,
   rollback,
   updateRuleCode,
@@ -245,6 +244,7 @@ import {
   getNodeHandleUser
 } from '@/api/aiApproval'
 import { dualScreenPreview } from '@/api/approvalCenter'
+import { downloadAllFiles } from '@/api/applyCenter'
 import { getApplyForm } from '@/api/front'
 import FileType from '@/components/common/file-type'
 import FilePreview from '@/components/filePreview'
@@ -524,17 +524,18 @@ export default {
         data.nextUserInfo = (this.nextStepObj?.nodeSelectUserList || []).filter(
           (item) => val.includes(item.id)
         )
-        updateRuleRes = await updateRuleCode({
-          nextNodeId: data.nextNodeId,
-          nextUserInfo: data.nextUserInfo,
-          templateId: this.formBase.processTemplateId,
-          processInstanceId: this.formBase.processInstanceI,
-          nodeId: this.formBase.nodeId
-        }).catch(() => {
-          updateRuleRes.data.status = 400
-          this.disabled = false
-        })
       }
+
+      updateRuleRes = await updateRuleCode({
+        nextNodeId: this.nextStepObj?.selectObject === '1' ? data.nextNodeId : '',
+        nextUserInfo: this.nextStepObj?.selectObject === '1' ? data.nextUserInfo : [],
+        templateId: this.formBase.processTemplateId,
+        processInstanceId: this.formBase.processInstanceI,
+        nodeId: this.formBase.nodeId
+      }).catch(() => {
+        updateRuleRes.data.status = 400
+        this.disabled = false
+      })
       const { status: ruleStatus, msg: ruleMsg } = updateRuleRes.data
       if (ruleStatus === 200) {
         ocrApprovalSubmission(data)
@@ -605,25 +606,28 @@ export default {
       this.$router.go(-1)
     },
     saveFile(type) {
-      let key = ''
+      let key = '';
       if (type === 1) {
-        key = this.activeItem.otherKey
+        key = this.activeItem.otherKey;
       } else if (type === 2) {
-        key = this.activeItem.key
+        key = this.activeItem.key;
       }
-      download({ key })
-        .then((res) => {
-          const { data, status } = res.data
-          if (status === 200) {
-            window.open(data)
-          }
-        })
-        .catch(() => {
-          this.list = []
-        })
-        .finally(() => {
-          this.loading = false
-        })
+      const params = {
+        formId: this.formId,
+        key
+      }
+      this.$message.info('下载中，请稍等！')
+      downloadAllFiles(params).then((res) => {
+        const disposition = res.headers['content-disposition']
+        const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
+        const link = document.createElement('a');
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      })
     },
     fullScreen(type) {
       this.showFullScreen = !this.showFullScreen
@@ -739,6 +743,9 @@ export default {
         line-height: 22px;
         margin-right: 8px;
       }
+      .text-green {
+        color: #14C9C9;
+      }
       /deep/.el-popover__reference {
         cursor: pointer;
         color: #2d5cf6;
@@ -822,6 +829,9 @@ export default {
             }
             .color-text {
               color: #eb5757;
+            }
+            .color-text-green {
+              color: #14C9C9;
             }
           }
         }
@@ -1008,6 +1018,9 @@ svg.leader-line {
         font-weight: 400;
         line-height: 22px;
         margin-left: 12px;
+      }
+      .similar-level-green {
+        color: #14C9C9;
       }
     }
   }

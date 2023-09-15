@@ -265,7 +265,8 @@ export default {
           processInstanceId: item.processInstanceId,
           formManagementId: item.formManagementId,
           nodeId: item.nodeId,
-          processTemplateId: item.processTemplateId
+          processTemplateId: item.processTemplateId,
+          taskId: item.taskId
         }
       })
     },

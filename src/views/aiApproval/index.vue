@@ -44,6 +44,7 @@
           <file-preview
             ref="filePreview"
             :files="files"
+            :formId="formId"
             :activeIndex="activeIndex"
             @changeFile="changeFile"
             :lineWordItem="lineWordItem"

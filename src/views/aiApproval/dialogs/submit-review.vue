@@ -358,18 +358,16 @@ export default {
           msg: '',
         }
       }
-      if (this.nextStepObj?.selectObject === '1') {
-        updateRuleRes = await updateRuleCode({
-          nextNodeId: data.nextNodeId,
-          nextUserInfo: data.nextUserInfo,
-          templateId: data.templateId,
-          processInstanceId: data.processInstanceI,
-          nodeId: data.nodeId
-        }).catch(() => {
-          updateRuleRes.data.status = 400;
-          this.disabled = false;
-        })
-      }
+      updateRuleRes = await updateRuleCode({
+        nextNodeId: this.nextStepObj?.selectObject === '1' ? data.nextNodeId : '',
+        nextUserInfo: this.nextStepObj?.selectObject === '1' ? data.nextUserInfo : [],
+        templateId: data.templateId,
+        processInstanceId: data.processInstanceI,
+        nodeId: data.nodeId
+      }).catch(() => {
+        updateRuleRes.data.status = 400;
+        this.disabled = false;
+      })
       const { status: ruleStatus, msg: ruleMsg } = updateRuleRes.data;
       if (ruleStatus === 200) {
         ocrApprovalSubmission(data).then((res) => {
