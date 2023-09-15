@@ -761,7 +761,6 @@ export default {
             }
           ]
         }
-        console.log('agenciesList', this.agenciesList);
       })
     },
     formatOrg(data) {
@@ -957,18 +956,28 @@ export default {
           {
             name: '平均处理时长',
             type: 'pie',
-            radius: [10, 80],
+            radius: [35, 80],
             center: ['30%', '50%'],
-            roseType: 'radius',
-            itemStyle: {
-              borderRadius: 5
-            },
             label: {
-              show: false
+              show: false,
+              position: 'center'
             },
             emphasis: {
               label: {
-                show: false
+                show: true,
+                fontSize: 12,
+                formatter({ name, value }) {
+                  return `{a|${name}项}\n{b| ${value}}`
+                },
+                rich: {
+                  a: {
+                    lineHeight: 20,
+                    fontWeight: '700'
+                  },
+                  b: {
+                    color: '#505968'
+                  }
+                }
               }
             },
             data: this.processingData

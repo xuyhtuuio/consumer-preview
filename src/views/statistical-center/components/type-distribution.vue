@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import { distributionOfReviewTypes } from '@/api/statistical-center'
 export default {
   props: {
     list: {
@@ -63,20 +64,38 @@ export default {
     }
   },
   mounted() {
+    // this.initData()
     this.initMyEcharts(this.timesData, this.colorListTimes)
   },
   methods: {
+    initData(data) {
+      distributionOfReviewTypes(data).then(res => {
+        console.log(res)
+      })
+    },
     initMyEcharts(timesData, colorListTimes) {
       const all = timesData.reduce((item, next) => {
         return item + next.value
       }, 0)
       const option = {
         color: colorListTimes,
-        // tooltip: {
-        //   trigger: 'item',
-        //   backgroundColor: 'rgba(255,255,255,0.8)',
-        //   formatter: '{a} <br/>{b} : {c} ({d}%)'
-        // },
+        tooltip: {
+          backgroundColor: 'rgba(255,255,255,0.8)',
+          borderColor: 'rgba(255,255,255,0.8)',
+          extraCssText: 'backdrop-filter:blur(2px)',
+          formatter(params) {
+            const { value, name, color } = params
+
+            const rate = (value / all) * 100
+            return `
+              <div style="display:flex;gap: 12px; align-items: center;padding: 6px;font-size:12px;color:#1D2128;">
+                <span style="width:8px;height:8px;border-radius: 50%;background-color:${color}"></span>
+                <span>${name}</span>
+                <span>${value}项（${rate}%）</span>
+              </div>
+            `
+          }
+        },
         legend: {
           orient: 'vertical',
           right: 100,
@@ -106,14 +125,29 @@ export default {
         series: [
           {
             type: 'pie',
-            radius: [10, 80],
+            radius: ['40%', '70%'],
             center: ['20%', '50%'],
-            roseType: 'radius',
-            itemStyle: {
-              borderRadius: 5
-            },
             label: {
-              show: false
+              show: false,
+              position: 'center'
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: 12,
+                formatter({ name, value }) {
+                  return `{a|${value}项}\n{b| ${name}}`
+                },
+                rich: {
+                  a: {
+                    lineHeight: 20,
+                    fontWeight: '700'
+                  },
+                  b: {
+                    color: '#505968'
+                  }
+                }
+              }
             },
             data: timesData
           }

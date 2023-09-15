@@ -299,30 +299,21 @@ export default {
     preview(url) {
       this.$emit('preview', url)
     },
-    download(fileList) {
-      const list = fileList.map((v) => {
-        // return {
-        //     fileName: v.fileName,
-        //     key: v.key
-        // }
-        return v.key
-      })
+    download() {
       const params = {
-        ...list
+        formId: this.$route.params.formId || this.sidebarParam.formId,
       }
+      this.$message.info('下载中，请稍等！')
       downloadAllFiles(params).then((res) => {
-        const { data } = res.data
-        return
-        // eslint-disable-next-line
-        for (let i in data) {
-          const link = document.createElement('a')
-          link.href = data[i]
-          // link.setAttribute('download', fileList[i].key)
-          // link.download = fileList[i].key;
-          document.body.appendChild(link) // 生成下载链接
-          link.click() // 触发下载事件
-          document.body.removeChild(link)
-        }
+        const disposition = res.headers['content-disposition']
+        const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
+        const link = document.createElement('a');
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
       })
     },
     formatePoints(val) {

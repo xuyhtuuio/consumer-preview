@@ -12,6 +12,7 @@
         class="cnt-head"
         :list="reviewList"
         :formManagementId="formManagementId"
+        :allawChange="formBasicInfo.submitted !== 1"
         @handleTo="handleReviewClick"
       />
       <div class="cnt-main" v-loading="isCntLoading">
@@ -358,6 +359,7 @@ export default {
           ocessInstanceId: this.formBasicInfo.processInstanceId,
           taskId: this.formBasicInfo.taskId,
           templateId: this.templateId,
+          nodeId: this.formBasicInfo.nodeId,
           currentUserInfo: {
             id: user.id,
             name: user.fullname

@@ -8,12 +8,13 @@
           placeholder="请选择驳回节点/驳回人"
           popper-class="approver-select"
           value-key="id"
+          :popper-append-to-body="false"
         >
           <el-option
             v-for="(item, index) in refuseOpiton"
             :key="index"
             :label="item.userName + '/' + item.orgName + ' 【' + item.nodeName + '】'"
-            :value="item.nodeId"
+            :value="item.nodeId + '/' + item.userId"
           >
             <div class="flex">
               <div class="item ellipsis ellipsis_1">{{ item.userName }}</div>
@@ -222,5 +223,7 @@ export default {
   }
 }
 
-.el-dialog {}
+/deep/ .approver-select{
+  max-width: 500px;
+}
 </style>

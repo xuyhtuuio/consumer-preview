@@ -76,6 +76,7 @@
 </template>
 
 <script>
+import { overviewOfReviewData } from '@/api/statistical-center'
 export default {
   data() {
     return {
@@ -158,56 +159,14 @@ export default {
     }
   },
   mounted() {
-    this.initData()
   },
   watch: {
-    list(val) {
-      if (val) {
-        this.initData(val)
-      }
-    }
   },
   methods: {
-    initData() {
-      // const {
-      //   data
-      // } = {
-      //   status: 200,
-      //   success: true,
-      //   msg: 'success',
-      //   timestamp: '1694500929442',
-      //   exception: null,
-      //   data: {
-      //     reviewTotalAmount: {
-      //       haveSubstantiveOpinionForm: 0,
-      //       haveSubstantiveOpinionFormRate: '90%',
-      //       examineAllTotal: 0,
-      //       noHaveSubstantiveOpinionFormRate: '90%',
-      //       noHaveSubstantiveOpinionForm: 0
-      //     },
-      //     totalNumberOfReviewOpinions: {
-      //       nothingSubstantiveOpinion: 41,
-      //       opinionAdoptTotal: 28,
-      //       havingSubstantiveOpinion: 26,
-      //       examineOpinionTotal: 67
-      //     },
-      //     averageReviewFrequency: {
-      //       maximumReviewTime: 36324120,
-      //       averageReviewDuration: -1,
-      //       minimumReviewTime: 5019
-      //     },
-      //     acceptanceRate: {
-      //       viewAcceptanceRate: '42.31%'
-      //     },
-      //     oneTimePassRate: {
-      //       oneTimePassRate: '90%',
-      //       theLowestPassRateCategory: '活动类',
-      //       theHighestPassRateCategory: '产品类'
-      //     }
-      //   },
-      //   rtnEnum: null,
-      //   code: null
-      // }
+    initData(data) {
+      overviewOfReviewData(data).then(res => {
+        console.log(res)
+      })
     }
   }
 }

@@ -6,10 +6,11 @@
           <span style="color: #eb5757">*</span>
           {{ cardInfo }}
         </div>
+        <el-checkbox v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
         <div class="warn" v-if="judgeWarnFlag">
           <warn-info :info="warnInfo"> </warn-info>
         </div>
-        <el-checkbox v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
+
       </template>
       <template #content>
         <div class="content">
@@ -127,6 +128,7 @@ export default {
       this.list.forEach(listItem => {
         if (val) {
           if (listItem.name === 'MultipleSelect') {
+            listItem.value = []
             listItem.props.options.forEach(({ id }) => {
               listItem.value.push(id);
             });
