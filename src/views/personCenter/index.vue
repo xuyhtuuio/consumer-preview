@@ -49,254 +49,8 @@
         </div>
       </div>
     </div>
-    <div class="person-approval" v-if="billValue === '审批人员'">
-      <div class="approval-top">
-        <div class="top-com">
-          <div class="com-tit">贡献值分布</div>
-          <div class="com-echarts" id="contribution"></div>
-        </div>
-        <div class="top-com">
-          <div class="com-tit">接受率分布</div>
-          <div class="com-echarts">
-            <barEcharts :industryData="acceptanceData"></barEcharts>
-          </div>
-        </div>
-        <div class="top-com">
-          <div class="com-tit">平均处理时长分布</div>
-          <div class="com-echarts-wrap">
-            <div class="com-echarts" id="processing"></div>
-            <div class="com-lenged">
-
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="approval-table">
-        <div class="table-tit">
-          <div class="tit-left">
-            <div class="left-com">全部人员</div>
-            <div class="left-com black">共<span class="blue">1500</span>人</div>
-          </div>
-          <div class="tit-search">
-            <el-input v-model="keywords" placeholder="请输入审查人员姓名" clearable @clear="approvalList"
-              @keyup.enter.native="approvalList">
-              <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="approvalList"></i>
-            </el-input>
-          </div>
-        </div>
-        <div class="table-wrap  TRS-table-gray">
-          <el-table :header-cell-style="{ background: '#f5f6f6' }" :data="approvalTable" style="width: 100%;">
-            <el-table-column type="index" show-overflow-tooltip label="序号" align="center" width="75px">
-              <template slot-scope="scope">
-                <p class="black fs14">{{ scope.$index + 1 }}</p>
-              </template>
-            </el-table-column>
-            <el-table-column prop="name" show-overflow-tooltip label="审查人员" min-width="90px">
-              <template slot-scope="scope">
-                <p class="black fs14">{{ scope.row.name }}</p>
-                <p class="gray fs12">{{ scope.row.id }}</p>
-              </template>
-            </el-table-column>
-            <el-table-column prop="level" :sortable='true' show-overflow-tooltip label="等级" align="center"
-              min-width="130px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <img class="icon w24" v-if="scope.$index === 0" src="../../assets/image/person-center/level1.png"
-                    alt="">
-                  <img class="icon w24" v-else-if="scope.$index === 1" src="../../assets/image/person-center/level2.png"
-                    alt="">
-                  <img class="icon w24" v-else src="../../assets/image/person-center/level3.png" alt="">
-                  <p class="gray fs12 fw">Lv.{{ scope.row.level }}</p>
-                  <p class="black fs12">{{ scope.row.levelName }}</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="gxz" :sortable='true' show-overflow-tooltip label="贡献值" align="center"
-              min-width="90px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs14 fw">{{ scope.row.gxz }}</p>
-                  <img @click="rejectDialogShow('月度贡献值变化情况', scope.row)" class="icon pointer w16"
-                    src="../../assets/image/person-center/tc1.png" alt="">
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="scs" :sortable='true' show-overflow-tooltip label="审查数" align="center"
-              min-width="100px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.scs }}</p>
-                  <p class="gray fs12 pt6 flex-box ">项<img @click="rejectDialogShow('审批概览', scope.row)"
-                      class="icon pointer  w16" src="../../assets/image/person-center/tc2.png" alt=""></p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="yjts" :sortable='true' show-overflow-tooltip label="意见条数" align="center"
-              min-width="120px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.yjts }}</p>
-                  <p class="gray fs12 pt6">条</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="szxyj" :sortable='true' show-overflow-tooltip label="实质性意见" align="center"
-              min-width="130px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.szxyj }}</p>
-                  <p class="gray fs12 pt6">/{{ scope.row.szxyjRate }}</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="fszxyj" :sortable='true' show-overflow-tooltip label="非质性意见" align="center"
-              min-width="130px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.fszxyj }}</p>
-                  <p class="gray fs12 pt6">/{{ scope.row.fszxyjRate }}</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="mpbs" :sortable='true' show-overflow-tooltip label="秒批笔数" align="center"
-              min-width="130px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.mpbs }}</p>
-                  <p class="gray fs12 pt6">项</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="pjclsc" :sortable='true' show-overflow-tooltip label="平均处理时长" align="center"
-              min-width="130px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.pjclsc }}</p>
-                  <p class="gray fs12 pt6">h</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="jsl" :sortable='true' show-overflow-tooltip label="接受率" align="center"
-              min-width="90px">
-            </el-table-column>
-            <el-table-column prop="hjtgl" :sortable='true' show-overflow-tooltip label="回检通过率" align="center"
-              min-width="130px">
-            </el-table-column>
-          </el-table>
-          <trs-pagination :total="total" @getList="approvalList" :pageNow="pageNow"></trs-pagination>
-        </div>
-      </div>
-    </div>
-    <div class="person-approval" v-if="billValue === '提单人员'">
-      <div class="approval-top">
-        <div class="top-com">
-          <div class="com-tit">一次通过率分布</div>
-          <div class="com-echarts1">
-            <barEcharts :industryData="passData"></barEcharts>
-          </div>
-        </div>
-        <div class="top-com">
-          <div class="com-tit">接受率分布</div>
-          <div class="com-echarts1">
-            <barEcharts :industryData="acceptanceDataBill"></barEcharts>
-          </div>
-        </div>
-        <div class="top-com">
-          <div class="com-tit">驳回率分布</div>
-          <div class="com-echarts1">
-            <barEcharts :industryData="rejectionData"></barEcharts>
-          </div>
-        </div>
-      </div>
-      <div class="approval-table">
-        <div class="table-tit">
-          <div class="tit-left">
-            <div class="left-com">全部人员</div>
-            <div class="left-com black">共<span class="blue">1500</span>人</div>
-          </div>
-          <div class="tit-search">
-            <el-input v-model="keywords" placeholder="请输入提单人员姓名" clearable @clear="approvalList"
-              @keyup.enter.native="approvalList">
-              <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="approvalList"></i>
-            </el-input>
-          </div>
-        </div>
-        <div class="table-wrap  TRS-table-gray">
-          <el-table :header-cell-style="{ background: '#f5f6f6' }" :data="billTable" style="width: 100%;">
-            <el-table-column type="index" show-overflow-tooltip label="序号" align="center" width="75px">
-              <template slot-scope="scope">
-                <p class="black fs14">{{ scope.$index + 1 }}</p>
-              </template>
-            </el-table-column>
-            <el-table-column prop="name" show-overflow-tooltip label="提单人员" min-width="100px">
-              <template slot-scope="scope">
-                <p class="black fs14">{{ scope.row.name }}</p>
-                <p class="gray fs12">{{ scope.row.id }}</p>
-              </template>
-            </el-table-column>
-            <el-table-column prop="tds" :sortable='true' show-overflow-tooltip label="提单数" align="center"
-              min-width="90px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.tds }}</p>
-                  <p class="gray fs12 pt6 flex-box ">项<img class="icon pointer  w16"
-                      @click="rejectDialogShow('申请概览', scope.row)" src="../../assets/image/person-center/tc2.png" alt="">
-                  </p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="yjts" :sortable='true' show-overflow-tooltip label="意见条数" align="center"
-              min-width="120px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.yjts }}</p>
-                  <p class="gray fs12 pt6">条</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="szxyj" :sortable='true' show-overflow-tooltip label="实质性意见" align="center"
-              min-width="120px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.szxyj }}</p>
-                  <p class="gray fs12 pt6">/{{ scope.row.szxyjRate }}</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="fszxyj" :sortable='true' show-overflow-tooltip label="非质性意见" align="center"
-              min-width="120px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.fszxyj }}</p>
-                  <p class="gray fs12 pt6">/{{ scope.row.fszxyjRate }}</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="jsl" :sortable='true' show-overflow-tooltip label="接受率" align="center"
-              min-width="90px">
-            </el-table-column>
-            <el-table-column prop="yctgl" :sortable='true' show-overflow-tooltip label="一次通过率" align="center"
-              min-width="120px">
-            </el-table-column>
-            <el-table-column prop="bhqk" :sortable='true' show-overflow-tooltip label="驳回情况" align="center"
-              min-width="120px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.bhqk }}</p>
-                  <p class="gray fs12 pt6 flex-box">/{{ scope.row.bhqkRate }}<img class="icon pointer  w16"
-                      @click="rejectDialogShow('驳回情况', scope.row)" src="../../assets/image/person-center/tc1.png" alt="">
-                  </p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="hjtgl" :sortable='true' show-overflow-tooltip label="回检通过率" align="center"
-              min-width="120px">
-            </el-table-column>
-          </el-table>
-          <trs-pagination :total="total" @getList="approvalList" :pageNow="pageNow"></trs-pagination>
-        </div>
-      </div>
-    </div>
+    <personApproval v-if="billValue === '审批人员'" @rejectDialogShow="rejectDialogShow"></personApproval>
+    <personLading v-if="billValue === '提单人员'" @rejectDialogShow="rejectDialogShow"></personLading>
     <el-dialog :visible.sync="rejectDialog" :before-close="rejectDialogClose"
       :width="rejectDialogTit === '驳回情况' ? '800px' : '1000px'" center custom-class="transfer-dialog">
       <span slot="title">{{ rejectDialogTit }}</span>
@@ -412,13 +166,14 @@ import {
   getApprovalListStation,
   getOrgTree
 } from '@/api/approvalCenter'
-import { proposeAcceptRate, proposeOnePassRate } from '@/api/personCenter'
 import approvalEventCard from './components/approval-event-card'
-import barEcharts from './components/bar-echarts'
+import personApproval from './components/person-approval'
+import personLading from './components/person-lading'
 export default {
   components: {
-    barEcharts,
-    approvalEventCard
+    approvalEventCard,
+    personApproval,
+    personLading
   },
   name: 'person-center-index',
   data() {
@@ -459,189 +214,6 @@ export default {
         ]
       },
       datePicker: '',
-      contributionData: {
-        xData: ['＜100', '100(含)-200', '200(含)-300', '300(含)-400', '400(含)-500'],
-        yData: [800, 1200, 390, 200, 1500],
-      },
-      acceptanceData: {
-        name: '接受率（%）',
-        xData: ['＜20%', '20(含)-40%', '40(含)-60%', '60(含)-80%', '80(含)-100%'],
-        yData: [800, 1200, 390, 200, 1500],
-        rate: ['10%', '20%', '30%', '10%', '40%'],
-      },
-      processingData: [
-        { value: 200, name: '0-2h', rate: '12' },
-        { value: 400, name: '2-5h', rate: '14' },
-        { value: 300, name: '5-10h', rate: '16' },
-        { value: 100, name: '10-24h', rate: '20' },
-        { value: 100, name: '24-48h', rate: '40' },
-        { value: 100, name: '48h以上', rate: '10' },
-      ],
-      colorListTimes: ['#5773F9', '#249EFF', '#21CCFF', '#81E2FF', '#81DC74', '#B7DB57'],
-      approvalTable: [
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 1,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 2,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 3,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 4,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 5,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-      ],
-      billTable: [
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-      ],
       keywords: '',
       billOptions: [{
         value: '审批人员',
@@ -651,26 +223,6 @@ export default {
         label: '提单人员'
       }],
       billValue: '审批人员',
-      passData: {
-        name: '一次通过率分布（人）',
-        xData: ['＜20%', '20(含)-40%', '40(含)-60%', '60(含)-80%', '80(含)-100%'],
-        yData: [700, 1200, 390, 200, 1500],
-        rate: ['10%', '20%', '30%', '10%', '40%'],
-      },
-      acceptanceDataBill: {
-        name: '接受率分布（人）',
-        xData: ['＜20%', '20(含)-40%', '40(含)-60%', '60(含)-80%', '80(含)-100%'],
-        yData: [600, 1200, 390, 200, 1500],
-        rate: ['10%', '20%', '30%', '10%', '40%'],
-      },
-      rejectionData: {
-        name: '驳回率分布（人）',
-        xData: ['＜20%', '20(含)-40%', '40(含)-60%', '60(含)-80%', '80(含)-100%'],
-        yData: [100, 1100, 390, 200, 1500],
-        rate: ['10%', '20%', '30%', '10%', '40%'],
-        seriesItemStyle: ['rgba(255,221,100,0.6)', 'rgba(255,153,0,0.6)'],
-        emphasisItemStyle: ['#FFDD64', '#FF9900'],
-      },
       rejectDialog: false,
       rejectDialogTit: '',
       passingData: {
@@ -736,11 +288,13 @@ export default {
         xData: ['2022-11', '2022-12', '2023-01', '2023-02', '2023-03'],
         yData: [800, 1200, 390, 200, 1500],
       },
+      contributionLoading: false,
+      acceptanceLoading: false,
+      processingLoading: false,
+      rowData: {}
     }
   },
   mounted() {
-    this.getProposeAcceptRate()
-    this.getProposeOnePassRate()
     this.getOrgTree()
     this.billChange()
   },
@@ -779,15 +333,18 @@ export default {
     },
     billChange() {
       if (this.billValue === '审批人员') {
-        this.$nextTick(() => {
-          this.initContribuEcharts(this.contributionData)
-          this.initProcessingEcharts(this.processingData)
-        })
+        // this.$nextTick(() => {
+        //   this.getApproveContribution()
+        //   this.getApproveAcceptRate()
+        //   this.getApproveAvgTime()
+        // })
       }
     },
     // eslint-disable-next-line no-unused-vars
-    rejectDialogShow(rejectDialogTit, rowData) {
-      this.rejectDialogTit = rejectDialogTit;
+    rejectDialogShow(rejectDialogData) {
+      console.log('rejectDialogData', rejectDialogData);
+      this.rejectDialogTit = rejectDialogData.rejectDialogTit;
+      this.rowData = rejectDialogData.rowData;
       this.rejectDialog = true
       if (this.rejectDialogTit === '月度贡献值变化情况') {
         this.$nextTick(() => {
@@ -805,185 +362,6 @@ export default {
       }
     },
     approvalList() {
-    },
-    // 贡献值分布
-    initContribuEcharts(industryDataVal) {
-      const option = {
-        tooltip: {
-          backgroundColor: 'rgba(255,255,255,0.8)',
-          trigger: 'axis',
-          formatter: (serie) => {
-            const name = serie[0].axisValueLabel
-            let params = `<p class="charts-tooltip-p fontw black"><span class="serieName"><span class="charts-tooltip-dot" style="background: #5773F9;"></span>${name}</span><span><span class="blue">${serie[0].data}</span>人</span></p>`
-            params += `<p class="charts-tooltip-p black">占全部人员  <span class="blue">${serie[0].data}</span>%</p>`
-            return params
-          },
-        },
-        grid: {
-          left: '0',
-          right: '0',
-          top: '14%',
-          bottom: '12%',
-          containLabel: true
-        },
-        legend: {
-          bottom: 0,
-          itemWidth: 8,
-          itemHeight: 8,
-          itemStyle: {
-            color: '#2D5CF6'
-          }
-        },
-        yAxis: {
-          type: 'value',
-          name: '人',
-          minInterval: 1,
-        },
-        xAxis: {
-          type: 'category',
-          data: industryDataVal.xData,
-        },
-        series: [
-          {
-            // barWidth: '16px',
-            name: '贡献值（分）',
-            type: 'bar',
-            label: {
-              show: false
-            },
-            itemStyle: {
-              normal: {
-                // borderRadius: [8, 8, 0, 0],
-                color: {
-                  type: 'linear',
-                  x: 0,
-                  y: 0,
-                  x2: 0,
-                  y2: 1,
-                  colorStops: [
-                    {
-                      offset: 0, color: 'rgba(33,204,255,0.6)', opacity: 0.6, // 100% 处的颜色
-                    },
-                    {
-                      offset: 1, color: 'rgba(45,92,246,0.6)', opacity: 0.6, // 0% 处的颜色
-                    }
-                  ],
-                },
-              },
-            },
-            emphasis: {
-              itemStyle: {
-                // borderRadius: [8, 8, 0, 0],
-                color: {
-                  type: 'linear',
-                  x: 0,
-                  y: 0,
-                  x2: 0,
-                  y2: 1,
-                  colorStops: [
-                    {
-                      offset: 0, color: '#21CCFF', opacity: 1, // 100% 处的颜色
-                    },
-                    {
-                      offset: 1, color: '#2D5CF6', opacity: 1, // 0% 处的颜色
-                    }
-                  ],
-                },
-              },
-            },
-            data: industryDataVal.yData.reverse(),
-          },
-        ]
-      };
-      this.initChart('contribution', option)
-    },
-    // 平均处理时长分布
-    initProcessingEcharts(industryDataVal) {
-      const option = {
-        color: this.colorListTimes,
-        tooltip: {
-          trigger: 'item',
-          backgroundColor: 'rgba(255,255,255,0.8)',
-          borderWidth: 0,
-          formatter: (serie) => {
-            const { name } = serie
-            let params = `<p class="charts-tooltip-p fontw black"><span class="serieName"><span class="charts-tooltip-dot" style="background: ${serie.color}"></span>平均处理时长${name}</span><span><span class="blue">${serie.value}</span>人</span></p>`
-            params += `<p class="charts-tooltip-p black">占全部人员  <span class="blue">${serie.data.rate}</span>%</p>`
-            return params
-          },
-        },
-        // legend: {
-        //   right: 0,
-        //   bottom: 0,
-        //   itemWidth: 12,
-        //   itemHeight: 8,
-        //   // itemStyle: {
-        //   //   color: '#2D5CF6'
-        //   // }
-        // },
-        legend: {
-          orient: 'vertical',
-          right: 25,
-          y: 'center',
-          // 设置图例形状
-          itemWidth: 12,
-          itemHeight: 8,
-          itemGap: 15,
-          textStyle: {
-            fontSize: 12,
-            rich: {
-              a: {
-                fontWeight: 400,
-              },
-              b: {
-                width: '200px',
-                lintHeight: '28px'
-              }
-            }
-          },
-          formatter(name) {
-            const { value } = industryDataVal.find((item) => item.name === name)
-            return `{b|${name}} {a| ${value}人}`
-          }
-        },
-        grid: {
-          left: '0',
-          right: '0',
-          bottom: '14%',
-          containLabel: true
-        },
-        series: [
-          {
-            name: '平均处理时长',
-            type: 'pie',
-            radius: [35, 80],
-            center: ['30%', '50%'],
-            label: {
-              show: false,
-              position: 'center'
-            },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: 12,
-                formatter({ name, value }) {
-                  return `{a|${name}项}\n{b| ${value}}`
-                },
-                rich: {
-                  a: {
-                    lineHeight: 20,
-                    fontWeight: '700'
-                  },
-                  b: {
-                    color: '#505968'
-                  }
-                }
-              }
-            },
-            data: this.processingData
-          }]
-      };
-      this.initChart('processing', option)
     },
     // 月度贡献值变化情况
     initPassingEcharts(industryDataVal) {
@@ -1103,16 +481,6 @@ export default {
       });
     },
     searchList() { },
-    getProposeAcceptRate() {
-      proposeAcceptRate({ dataFlag: 1 }).then((res) => {
-        console.log('res', res);
-      })
-    },
-    getProposeOnePassRate() {
-      proposeOnePassRate({ dataFlag: 1 }).then((res) => {
-        console.log('res', res);
-      })
-    },
     getList(pageNow) {
       const listType = '4'
       this.pageNow = pageNow
@@ -1179,18 +547,16 @@ export default {
           this.list = []
         })
     },
-
     // 驳回原因分布
     initReasonEcharts(industryDataVal) {
       const yData1 = JSON.parse(JSON.stringify(industryDataVal.yData))
       const xData1 = JSON.parse(JSON.stringify(industryDataVal.xData))
-      const color = JSON.parse(JSON.stringify(industryDataVal.colorBy)).reverse()
+      const color = JSON.parse(JSON.stringify(industryDataVal.color)).reverse()
       const option = {
         tooltip: {
           backgroundColor: 'rgba(255,255,255,0.8)',
           borderColor: 'rgba(255,255,255,0.8)',
           formatter(params) {
-            console.log('params', params);
             const p = `
             <div style="padding: 6px;display:flex;gap:8px;flex-direction:column;font-size:12px">
             <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">驳回原因</div>
@@ -1466,180 +832,6 @@ export default {
 
         .btnIcon {
           width: 20px;
-        }
-      }
-    }
-  }
-
-  .person-approval {
-    margin-top: 16px;
-
-    .approval-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      .top-com {
-        width: calc((100% - 32px) / 3);
-        height: 290px;
-        padding: 16px;
-        box-sizing: border-box;
-        border-radius: 10px;
-        background: #FFFFFF;
-
-        .com-tit {
-          position: relative;
-          padding-left: 13px;
-          font-size: 14px;
-          font-weight: 700;
-          line-height: 22px;
-          color: #1D2128;
-
-          &::before {
-            content: '';
-            display: block;
-            width: 5px;
-            height: 20px;
-            background: #306EF5;
-            border-radius: 0px 10px 0px 10px;
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-          }
-        }
-
-        .com-echarts {
-          width: 100%;
-          height: 220px;
-          margin-top: 16px;
-        }
-
-        .com-echarts1 {
-          width: 100%;
-          height: 220px;
-          margin-top: 16px;
-        }
-      }
-    }
-
-    .approval-table {
-      background: #fff;
-      padding: 16px;
-      box-sizing: border-box;
-      border-radius: 10px;
-      margin-top: 16px;
-
-      .table-tit {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .tit-left {
-          font-size: 14px;
-          font-weight: 400;
-          line-height: 22px;
-          text-align: left;
-          color: #1D2128;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-
-          .black {
-            color: #000000;
-          }
-
-          .blue {
-            color: #2D5CF6;
-            font-weight: 600;
-            margin: 0 5px;
-          }
-        }
-
-        .tit-search {
-          width: 280px;
-
-          /deep/ .el-input__inner {
-            border-radius: 4px;
-            border: none;
-            background: #f7f8fa;
-            color: #1d2128;
-            font-size: 14px;
-            font-weight: 400;
-            height: 36px;
-            line-height: 36px;
-          }
-        }
-      }
-
-      .table-wrap {
-        margin-top: 16px;
-
-        &.TRS-table-gray {
-          /deep/ .el-table {
-            border: none;
-
-            &::before {
-              display: none;
-            }
-
-            th.el-table__cell {
-              font-size: 14px;
-              font-weight: 700;
-              color: #1D2128;
-            }
-
-            td.el-table__cell {
-              border-right: none;
-              border-bottom: 1px dashed #E5E6EB;
-            }
-
-            .black {
-              color: #1D2128;
-            }
-
-            .gray {
-              color: #505968;
-            }
-
-            .fs12 {
-              font-size: 12px;
-            }
-
-            .fs14 {
-              font-size: 14px;
-            }
-
-            .fw {
-              font-weight: 700;
-            }
-
-            .w16 {
-              width: 16px;
-              height: 16px;
-            }
-
-            .w24 {
-              width: 24px;
-              height: 24px;
-              flex-shrink: 0;
-            }
-
-            .pt6 {
-              padding-top: 6px;
-            }
-
-            .flex-box {
-              display: flex;
-              gap: 0 3px;
-              align-items: center;
-              justify-content: center;
-            }
-
-            .pointer {
-              cursor: pointer;
-            }
-          }
         }
       }
     }

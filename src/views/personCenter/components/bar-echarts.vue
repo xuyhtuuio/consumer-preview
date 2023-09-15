@@ -1,5 +1,5 @@
 <template>
-  <div class="bar-echarts 22222222" ref="barEcharts"></div>
+  <div class="bar-echarts" ref="barEcharts"></div>
 </template>
 
 <script>
@@ -33,7 +33,9 @@ export default {
           formatter: (serie) => {
             const name = serie[0].axisValueLabel
             let params = `<p class="charts-tooltip-p fontw black"><span class="serieName"><span class="charts-tooltip-dot" style="background:${industryDataVal.emphasisItemStyle ? industryDataVal.emphasisItemStyle[1] : '#5773F9'}"></span>${name}</span><span><span class="blue">${serie[0].data}</span>人</span></p>`
-            params += `<p class="charts-tooltip-p black">占全部人员  <span class="blue">${serie[0].data}</span>%</p>`
+            if (industryDataVal.rate && industryDataVal.rate.length) {
+              params += `<p class="charts-tooltip-p black">占全部人员  <span class="blue">${industryDataVal.rate[serie[0].dataIndex]}</span>%</p>`
+            }
             return params
           },
         },
