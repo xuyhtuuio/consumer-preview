@@ -10,24 +10,24 @@
         </div>
         <div class="right">
           <p class="taskname-staff">
-            <span class="taskname">{{ activity.name }}</span>
+            <span class="taskname">{{ activity.nodeName }}</span>
             <span class="staff">
-              <i>{{ activity.nodeUserName }}</i>
-              <i class="post" v-if="activity.orgName">（{{ activity.orgName }}）</i>
+              <i>{{ activity.userInfoList.name }}</i>
+              <i class="post" v-if="activity.userInfoList.name">（{{activity.userInfoList.org}}）</i>
               <img src="@/assets/image/ai-approval/record-avatar.svg" alt="" />
             </span>
           </p>
           <div class="time-notes">
-            <div v-if="activity.activityId == 'root'">
-              任务发起：{{ activity.createTime | timeFormat }}
+            <div v-if="activity.nodeId == 'root'">
+              任务发起：{{ activity.created | timeFormat }}
             </div>
             <div class="time-note" v-else>
-              <span>任务到达：{{ activity.createTime | timeFormat }}</span>
+              <span>任务到达：{{ activity.created | timeFormat }}</span>
               <span class="handle-time">处理：<i>{{ activity | handleTimeFormat }}</i> 小时</span>
-              <span>任务结束：{{ activity.endTime | timeFormat }}</span>
+              <span>任务结束：{{ activity.ended | timeFormat }}</span>
             </div>
           </div>
-          <div class="opinions" v-if="activity.activityId !== 'root'">
+          <div class="opinions" v-if="activity.nodeId !== 'root'">
             <!-- ocr审批有个关联的审查要点 -->
             <!-- <div class="point opinions-item">
             <div class="opinion-tag">
@@ -76,30 +76,36 @@
             </div>
           <!-- 有无实质意见-end -->
                             <!-- 领导审批通过/驳回 --start-->
-          <!-- <div v-for="(item, idx) in activity.optionVOList" :key="idx" class="opinions-item">
-                    <div class="leader-approval">
+           <div  v-if="activity.nodeType=='LEADER'" class="opinions-item">
+                    <div class="leader-approval" v-if="activity.opinion">
             <div class="opinion-tag">
-                <span v-if="item.opinion == 1" class="guanzhu2">
+                <span v-if="activity.opinion.success" class="guanzhu2">
                   <i class="iconfont icon icon-tubiao"></i>
                   通过
                 </span>
-                <span v-if="item.opinion == 0" class="guanzhu">
+                <span v-else class="guanzhu">
                   <i class="iconfont icon icon-tuihui1 pass"></i>
                   驳回
                 </span>
               </div>
 
-              <p class="opinion-text"  v-if="item.opinion == 1">
-                1.活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；如存在收费情况，应提前向金融消费者明示，尊重金融消费者知情权；
+              <p class="opinion-text"  v-if="activity.opinion.success">
+                {{ activity.opinion?.msg||'暂无审批意见' }}
               </p>
-               <div class="opinion-text reject-desc" v-if="item.opinion == 0">
+               <div class="opinion-text reject-desc" v-else>
                 <p>驳回节点：<i>发起人</i></p>
                 <p>驳回原因：<i>附件材料与审批项目不匹配附件材料与审批项目不匹配</i></p>
                 <p>原因描述：<i>附件中“景顺长城集英成长策划”与审批项目不匹配，不能作为该项目的审查材料，请重新提交申请。</i></p>
               </div>
           </div>
-        </div> -->
+        </div>
           <!-- 领导审批通过/驳回 --end-->
+          <!-- 驳回 -->
+          <div v-if="activity.nodeType=='REFUSE'" class="opinions-item">
+            <div class="opinion-text" v-if="activity.opinion">
+              {{ activity.opinion }}
+              </div>
+          </div>
           </div>
         </div>
       </div>
@@ -140,34 +146,21 @@ export default {
         formId: this.$route.params?.formId || this.sidebarParam?.recordId,
         templateId: this.$route.params?.processTemplateId || this.sidebarParam?.processTemplateId,
         processInstanceId: this.$route.params?.processInstanceId || this.sidebarParam?.processInstanceId
+        // formId: "64",
+        // processInstanceId: "a9d51153-52e7-11ee-849e-de2f9d9428ed",
+        // templateId: "1701536505711796224"
       })
         .then((res) => {
-          const { detailVOList } = res.data.data
+          const { detailVOList } = res.data?.data
           if (!detailVOList) {
             this.hasData = false
             return false
           }
           // detailVOList
-          const keys = Object.keys(detailVOList)
-          const arr = []
-          for (const i in keys) {
-            const obj = {
-              ...detailVOList[keys[i]][0],
-              name:
-                detailVOList[keys[i]][0].activityId === 'endEventNode'
-                  ? '已结束'
-                  : detailVOList[keys[i]][0].name
-            }
-            arr.push(obj)
-          }
           // eslint-disable-next-line
-          const arr_handler = arr.sort((a, b) => {
-            return dayjs(a.createTime) - dayjs(b.createTime)
-          })
-          // eslint-disable-next-line
-          this.recordList = arr_handler instanceof Array && arr_handler.length ? arr_handler.map((v) => {
-            const comments = v.optionVOList && v.optionVOList[0].comments
-            const handlerComents = JSON.parse(comments)
+          this.recordList = detailVOList instanceof Array && detailVOList.length ? detailVOList.map((v) => {
+            // const comments = v.optionVOList && v.optionVOList[0].comments
+            // const handlerComents = JSON.parse(comments)
             // handlerComents = handlerComents?.map(m => {
             //   return {
             //     ...m,
@@ -178,12 +171,22 @@ export default {
             //     }) || []
             //   }
             // })||[]
+            // 单独处理一下 opinion
+            let opinion = null
+            if (v.nodeType === 'REFUSE') {
+              opinion = v.opinion || ''
+            } else {
+              opinion = v.opinion ? JSON.parse(v.opinion) : ''
+            }
             return {
               ...v,
-              optionVOList: handlerComents
+              opinion,
+              userInfoList: v.userInfoList?.[0] || []
+              // optionVOList: handlerComents
             }
           })
             : []
+          // console.log('dd',this.recordList)
           this.hasData = true
         })
         .finally(() => {
@@ -196,12 +199,12 @@ export default {
       return val ? dayjs(val).format('MM-DD HH:mm') : '--'
     },
     handleTimeFormat(val) {
-      let timediff = dayjs(val.endTime).diff(dayjs(val.createTime), 'second')
+      let timediff = dayjs(val.ended).diff(dayjs(val.created), 'second')
       const _timediff = timediff > 0 ? (timediff / 3600).toFixed(1) : 0
       _timediff < 0.1
         ? (timediff = (timediff / 3600).toFixed(2))
         : (timediff = _timediff)
-      return val.endTime ? timediff : '--'
+      return val.ended ? timediff : '--'
     }
   }
 }
