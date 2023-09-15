@@ -106,6 +106,13 @@
               {{ activity.opinion }}
               </div>
           </div>
+          <!-- 确认 -->
+          <div v-if="activity.nodeType=='CONFIRM'" class="opinions-item">
+            <div class="opinion-text">
+             <p>已采纳意见<i style="color: #2D5CF6;">{{activity.adoptedResults||'0'  }}</i>条，不采纳意见<i style="color: #2D5CF6;">{{activity.unAdoptedResults||'0'  }}</i>条；</p>
+             <p style="color: #86909C; margin-top: 6px;">可在审查意见书查看详情</p>
+              </div>
+          </div>
           </div>
         </div>
       </div>
