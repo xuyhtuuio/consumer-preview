@@ -49,7 +49,7 @@ export default {
       colorListTimes: ['#5773F9', '#249EFF', '#21CCFF', '#81E2FF'],
       colorListTimesTwo: ['#65CFE4', '#FADC6D', '#CF84CD'],
       timesData: [
-        { value: 200, name: '产品类' },
+        { value: 200, name: '产品类', rate: '', children: [{ id: '', value: '', name: '', rate: '' }, { id: '', value: '', name: '', rate: '' }] },
         { value: 400, name: '活动类' },
         { value: 300, name: '客户类' },
         { value: 100, name: '其他' }

@@ -157,8 +157,8 @@ export default {
     TypeDistribution
   },
   async created() {
-    // await this.initData()
-    // this.passData()
+    await this.initData()
+    this.passData()
   },
   data() {
     return {
