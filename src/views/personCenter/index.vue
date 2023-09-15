@@ -16,8 +16,13 @@
           <div class="com-tit">选择机构
             <img src="../../assets/image/person-center/down.png" class="down" alt="">
           </div>
-          <el-cascader class="my-hidden" v-model="cascader" :options="organOptions" :props="{ checkStrictly: true }"
-            @change="handleOrganChange" @visible-change="handleOrganChange"></el-cascader>
+          <el-cascader class="my-hidden" v-model="cascader" :options="agenciesList" :show-all-levels="false" :props="{
+            emitPath: false,
+            checkStrictly: true,
+            label: 'name',
+            value: 'id',
+            children: 'children'
+          }" @change="handleOrganChange"></el-cascader>
           <el-tooltip class="item" effect="dark" content="选择机构提示文字" placement="top">
             <img src="@/assets/image/person-center/hintIcon.png" alt="" class="hintIcon">
           </el-tooltip>
@@ -405,7 +410,9 @@
 import {
   getApprovalType,
   getApprovalListStation,
+  getOrgTree
 } from '@/api/approvalCenter'
+import { proposeAcceptRate, proposeOnePassRate } from '@/api/personCenter'
 import approvalEventCard from './components/approval-event-card'
 import barEcharts from './components/bar-echarts'
 export default {
@@ -419,274 +426,7 @@ export default {
       total: 5,
       pageNow: 1,
       cascader: '',
-      organOptions: [
-        {
-          value: 'zhinan',
-          label: '指南',
-          children: [
-            {
-              value: 'shejiyuanze',
-              label: '设计原则',
-              children: [
-                {
-                  value: 'yizhi',
-                  label: '一致'
-                },
-                {
-                  value: 'fankui',
-                  label: '反馈'
-                },
-                {
-                  value: 'xiaolv',
-                  label: '效率'
-                },
-                {
-                  value: 'kekong',
-                  label: '可控'
-                }
-              ]
-            },
-            {
-              value: 'daohang',
-              label: '导航',
-              children: [
-                {
-                  value: 'cexiangdaohang',
-                  label: '侧向导航'
-                },
-                {
-                  value: 'dingbudaohang',
-                  label: '顶部导航'
-                }
-              ]
-            }
-          ]
-        },
-        {
-          value: 'zujian',
-          label: '组件',
-          children: [
-            {
-              value: 'basic',
-              label: 'Basic',
-              children: [
-                {
-                  value: 'layout',
-                  label: 'Layout 布局'
-                },
-                {
-                  value: 'color',
-                  label: 'Color 色彩'
-                },
-                {
-                  value: 'typography',
-                  label: 'Typography 字体'
-                },
-                {
-                  value: 'icon',
-                  label: 'Icon 图标'
-                },
-                {
-                  value: 'button',
-                  label: 'Button 按钮'
-                }
-              ]
-            },
-            {
-              value: 'form',
-              label: 'Form',
-              children: [
-                {
-                  value: 'radio',
-                  label: 'Radio 单选框'
-                },
-                {
-                  value: 'checkbox',
-                  label: 'Checkbox 多选框'
-                },
-                {
-                  value: 'input',
-                  label: 'Input 输入框'
-                },
-                {
-                  value: 'input-number',
-                  label: 'InputNumber 计数器'
-                },
-                {
-                  value: 'select',
-                  label: 'Select 选择器'
-                },
-                {
-                  value: 'cascader',
-                  label: 'Cascader 级联选择器'
-                },
-                {
-                  value: 'switch',
-                  label: 'Switch 开关'
-                },
-                {
-                  value: 'slider',
-                  label: 'Slider 滑块'
-                },
-                {
-                  value: 'time-picker',
-                  label: 'TimePicker 时间选择器'
-                },
-                {
-                  value: 'date-picker',
-                  label: 'DatePicker 日期选择器'
-                },
-                {
-                  value: 'datetime-picker',
-                  label: 'DateTimePicker 日期时间选择器'
-                },
-                {
-                  value: 'upload',
-                  label: 'Upload 上传'
-                },
-                {
-                  value: 'rate',
-                  label: 'Rate 评分'
-                },
-                {
-                  value: 'form',
-                  label: 'Form 表单'
-                }
-              ]
-            },
-            {
-              value: 'data',
-              label: 'Data',
-              children: [
-                {
-                  value: 'table',
-                  label: 'Table 表格'
-                },
-                {
-                  value: 'tag',
-                  label: 'Tag 标签'
-                },
-                {
-                  value: 'progress',
-                  label: 'Progress 进度条'
-                },
-                {
-                  value: 'tree',
-                  label: 'Tree 树形控件'
-                },
-                {
-                  value: 'pagination',
-                  label: 'Pagination 分页'
-                },
-                {
-                  value: 'badge',
-                  label: 'Badge 标记'
-                }
-              ]
-            },
-            {
-              value: 'notice',
-              label: 'Notice',
-              children: [
-                {
-                  value: 'alert',
-                  label: 'Alert 警告'
-                },
-                {
-                  value: 'loading',
-                  label: 'Loading 加载'
-                },
-                {
-                  value: 'message',
-                  label: 'Message 消息提示'
-                },
-                {
-                  value: 'message-box',
-                  label: 'MessageBox 弹框'
-                },
-                {
-                  value: 'notification',
-                  label: 'Notification 通知'
-                }
-              ]
-            },
-            {
-              value: 'navigation',
-              label: 'Navigation',
-              children: [
-                {
-                  value: 'menu',
-                  label: 'NavMenu 导航菜单'
-                },
-                {
-                  value: 'tabs',
-                  label: 'Tabs 标签页'
-                },
-                {
-                  value: 'breadcrumb',
-                  label: 'Breadcrumb 面包屑'
-                },
-                {
-                  value: 'dropdown',
-                  label: 'Dropdown 下拉菜单'
-                },
-                {
-                  value: 'steps',
-                  label: 'Steps 步骤条'
-                }
-              ]
-            },
-            {
-              value: 'others',
-              label: 'Others',
-              children: [
-                {
-                  value: 'dialog',
-                  label: 'Dialog 对话框'
-                },
-                {
-                  value: 'tooltip',
-                  label: 'Tooltip 文字提示'
-                },
-                {
-                  value: 'popover',
-                  label: 'Popover 弹出框'
-                },
-                {
-                  value: 'card',
-                  label: 'Card 卡片'
-                },
-                {
-                  value: 'carousel',
-                  label: 'Carousel 走马灯'
-                },
-                {
-                  value: 'collapse',
-                  label: 'Collapse 折叠面板'
-                }
-              ]
-            }
-          ]
-        },
-        {
-          value: 'ziyuan',
-          label: '资源',
-          children: [
-            {
-              value: 'axure',
-              label: 'Axure Components'
-            },
-            {
-              value: 'sketch',
-              label: 'Sketch Templates'
-            },
-            {
-              value: 'jiaohu',
-              label: '组件交互文档'
-            }
-          ]
-        }
-      ],
+      agenciesList: [],
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now();
@@ -999,13 +739,40 @@ export default {
     }
   },
   mounted() {
+    this.getProposeAcceptRate()
+    this.getProposeOnePassRate()
+    this.getOrgTree()
+    this.billChange()
   },
   watch: {
   },
   created() {
-    this.billChange()
   },
   methods: {
+    getOrgTree() {
+      getOrgTree().then((res) => {
+        const { data } = res.data
+        if (data) {
+          const value = this.formatOrg(data.children)
+          this.agenciesList = [
+            {
+              ...data,
+              children: value
+            }
+          ]
+        }
+      })
+    },
+    formatOrg(data) {
+      data.forEach((m) => {
+        if (m.children && m.children.length) {
+          this.formatOrg(m.children)
+        } else {
+          m.children = null
+        }
+      })
+      return data
+    },
     rejectDialogClose() {
       this.rejectDialog = false
       this.rejectDialogTit = ''
@@ -1189,18 +956,28 @@ export default {
           {
             name: '平均处理时长',
             type: 'pie',
-            radius: [10, 80],
+            radius: [35, 80],
             center: ['30%', '50%'],
-            roseType: 'radius',
-            itemStyle: {
-              borderRadius: 5
-            },
             label: {
-              show: false
+              show: false,
+              position: 'center'
             },
             emphasis: {
               label: {
-                show: false
+                show: true,
+                fontSize: 12,
+                formatter({ name, value }) {
+                  return `{a|${name}项}\n{b| ${value}}`
+                },
+                rich: {
+                  a: {
+                    lineHeight: 20,
+                    fontWeight: '700'
+                  },
+                  b: {
+                    color: '#505968'
+                  }
+                }
               }
             },
             data: this.processingData
@@ -1326,14 +1103,14 @@ export default {
       });
     },
     searchList() { },
-    getApprovalType() {
-      getApprovalType().then((res) => {
-        this.transactionTypes = res.data.data.map((v) => {
-          return {
-            label: v.examineTypesName,
-            value: v.recordId
-          }
-        })
+    getProposeAcceptRate() {
+      proposeAcceptRate({ dataFlag: 1 }).then((res) => {
+        console.log('res', res);
+      })
+    },
+    getProposeOnePassRate() {
+      proposeOnePassRate({ dataFlag: 1 }).then((res) => {
+        console.log('res', res);
       })
     },
     getList(pageNow) {
@@ -1583,7 +1360,17 @@ export default {
     },
     handleSearchBlur() {
       console.log(this.search)
-    }
+    },
+    getApprovalType() {
+      getApprovalType().then((res) => {
+        this.transactionTypes = res.data.data.map((v) => {
+          return {
+            label: v.examineTypesName,
+            value: v.recordId
+          }
+        })
+      })
+    },
   },
 }
 </script>
