@@ -2,10 +2,18 @@
   <div class="record-detail" v-loading="loading">
     <empty v-if="!hasData"></empty>
     <div v-else>
-      <div v-for="(activity, index) in recordList" :key="index" class="task-item">
+      <div
+        v-for="(activity, index) in recordList"
+        :key="index"
+        class="task-item"
+      >
         <div class="left">
           <div class="top-line"></div>
-          <img src="@/assets/image/ai-approval/timeline-ellipse.svg" alt="" class="dot" />
+          <img
+            src="@/assets/image/ai-approval/timeline-ellipse.svg"
+            alt=""
+            class="dot"
+          />
           <div class="bottom-line"></div>
         </div>
         <div class="right">
@@ -13,7 +21,9 @@
             <span class="taskname">{{ activity.nodeName }}</span>
             <span class="staff">
               <i>{{ activity.userInfoList.name }}</i>
-              <i class="post" v-if="activity.userInfoList.name">（{{activity.userInfoList.org}}）</i>
+              <i class="post" v-if="activity.userInfoList.name"
+                >（{{ activity.userInfoList.org }}）</i
+              >
               <img src="@/assets/image/ai-approval/record-avatar.svg" alt="" />
             </span>
           </p>
@@ -23,43 +33,49 @@
             </div>
             <div class="time-note" v-else>
               <span>任务到达：{{ activity.created | timeFormat }}</span>
-              <span class="handle-time">处理：<i>{{ activity | handleTimeFormat }}</i> 小时</span>
+              <span class="handle-time"
+                >处理：<i>{{ activity | handleTimeFormat }}</i> 小时</span
+              >
               <span>任务结束：{{ activity.ended | timeFormat }}</span>
             </div>
           </div>
           <div class="opinions" v-if="activity.nodeId !== 'root'">
-            <!-- ocr审批有个关联的审查要点 -->
-            <!-- <div class="point opinions-item">
-            <div class="opinion-tag">
-              <span class="approval-point-icon guanzhu" style="background: #505968;color: #fff">
-                <i class="iconfont icon icon-tubiao4"></i>审查要点
-              </span>
-            </div>
-            <div>
-              <span>缺少以下要点</span><br />
-              <span><i style="color: #86909C;">产品要点：</i>重要提示(理财有风险、投资需谨慎等）</span><br />
-              <span>不符合以下要点</span><br />
-              <span><i style="color: #86909C;">审查要点：</i>承担义务不得低于宣传所承诺的标准</span>
-            </div>
-          </div> -->
-          <!-- 有无实质意见-start -->
-            <div v-for="(item, idx) in activity.optionVOList" :key="idx" class="opinions-item">
-              <!-- v-if="activity.targetPage === 'ocr'" -->
+            <div v-if="activity.nodeType == 'XIAOBAO'">
+              <!-- ocr审批有个关联的审查要点 -->
+             <div v-if="activity.keyPointsForVerification&&activity.keyPointsForVerification.length" class="point opinions-item">
               <div class="opinion-tag">
-                <span v-if="item.opinion == 1" class="guanzhu">
-                  <i class="iconfont icon icon-guanzhu"></i>
-                  有实质意见
+                <span class="approval-point-icon guanzhu" style="background: #505968;color: #fff">
+                  <i class="iconfont icon icon-tubiao4"></i>审查要点
                 </span>
-                <span v-if="item.opinion == 0" class="guanzhu2">
-                  <i class="iconfont icon icon-guanzhu2"></i>
-                  无实质意见
-                </span>
-              </div>
-              <p class="opinion-text">
-                <i v-if="activity.optionVOList.length > 1">{{ idx + 1 }}</i>
-                {{ item.str }}
-              </p>
-              <div class="relevant-file" v-if="item.files && item.files.length">
+               </div>
+               <div v-for="(keyPoint,index) in activity.keyPointsForVerification" :key="index" class="prod-point">
+                <!-- 如果是 -->
+                 <div  v-html="handleKeyPointer(keyPoint)">
+                 </div>
+                </div>
+             </div>
+           <!-- 有无实质意见-start -->
+              <div
+                v-for="(item, idx) in activity.substantiveOpinionList"
+                :key="idx"
+                class="opinions-item"
+              >
+                <!-- v-if="activity.targetPage === 'ocr'" -->
+                <div class="opinion-tag">
+                  <span v-if="item.substantiveOpinons == 1" class="guanzhu">
+                    <i class="iconfont icon icon-guanzhu"></i>
+                    有实质意见
+                  </span>
+                  <span v-if="item.substantiveOpinons == 0" class="guanzhu2">
+                    <i class="iconfont icon icon-guanzhu2"></i>
+                    无实质意见
+                  </span>
+                </div>
+                <p class="opinion-text">
+                  <i>{{ idx + 1 }}</i>
+                  {{ item.content }}
+                </p>
+                <!-- <div class="relevant-file" v-if="item.files && item.files.length">
                 关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.files && item.files[0] }}
                 </i>
                 <el-popover placement="bottom-end" popper-class="file-overview-popper" trigger="click"
@@ -71,48 +87,82 @@
                   </div>
                   <i slot="reference" class="pointer">+{{ item.files.length - 1 }}</i>
                 </el-popover>
+              </div> -->
               </div>
-
             </div>
-          <!-- 有无实质意见-end -->
-                            <!-- 领导审批通过/驳回 --start-->
-           <div  v-if="activity.nodeType=='LEADER'" class="opinions-item">
-                    <div class="leader-approval" v-if="activity.opinion">
-            <div class="opinion-tag">
-                <span v-if="activity.opinion.success" class="guanzhu2">
-                  <i class="iconfont icon icon-tubiao"></i>
-                  通过
-                </span>
-                <span v-else class="guanzhu">
-                  <i class="iconfont icon icon-tuihui1 pass"></i>
-                  驳回
-                </span>
-              </div>
+            <!-- 有无实质意见-end -->
+            <!-- 领导审批通过/驳回 --start-->
+            <div v-if="activity.nodeType == 'LEADER'" class="opinions-item">
+              <div class="leader-approval" v-if="activity.opinion">
+                <div class="opinion-tag">
+                  <span v-if="activity.opinion.success" class="guanzhu2">
+                    <i class="iconfont icon icon-tubiao"></i>
+                    通过
+                  </span>
+                  <span v-else class="guanzhu">
+                    <i class="iconfont icon icon-tuihui1 pass"></i>
+                    驳回
+                  </span>
+                </div>
 
-              <p class="opinion-text"  v-if="activity.opinion.success">
-                {{ activity.opinion?.msg||'暂无审批意见' }}
-              </p>
-               <div class="opinion-text reject-desc" v-else>
-                <p>驳回节点：<i>发起人</i></p>
-                <p>驳回原因：<i>附件材料与审批项目不匹配附件材料与审批项目不匹配</i></p>
-                <p>原因描述：<i>附件中“景顺长城集英成长策划”与审批项目不匹配，不能作为该项目的审查材料，请重新提交申请。</i></p>
+                <p class="opinion-text" v-if="activity.opinion.success">
+                  {{ activity.opinion?.msg || '暂无审批意见' }}
+                </p>
+                <div class="opinion-text reject-desc" v-else>
+                  <p>驳回节点：<i>发起人</i></p>
+                  <p>
+                    驳回原因：<i
+                      >附件材料与审批项目不匹配附件材料与审批项目不匹配</i
+                    >
+                  </p>
+                  <p>
+                    原因描述：<i
+                      >附件中“景顺长城集英成长策划”与审批项目不匹配，不能作为该项目的审查材料，请重新提交申请。</i
+                    >
+                  </p>
+                </div>
               </div>
-          </div>
-        </div>
-          <!-- 领导审批通过/驳回 --end-->
-          <!-- 驳回 -->
-          <div v-if="activity.nodeType=='REFUSE'" class="opinions-item">
-            <div class="opinion-text" v-if="activity.opinion">
-              {{ activity.opinion }}
+            </div>
+            <!-- 领导审批通过/驳回 --end-->
+            <!-- 消保的驳回 -->
+            <div v-if="activity.nodeType == 'REFUSE'" class="opinions-item">
+              <div class="opinion-tag">
+                  <span class="guanzhu">
+                    <i class="iconfont icon icon-tuihui1 pass"></i>
+                    驳回
+                  </span>
               </div>
-          </div>
-          <!-- 确认 -->
-          <div v-if="activity.nodeType=='CONFIRM'" class="opinions-item">
-            <div class="opinion-text">
-             <p>已采纳意见<i style="color: #2D5CF6;">{{activity.adoptedResults||'0'  }}</i>条，不采纳意见<i style="color: #2D5CF6;">{{activity.unAdoptedResults||'0'  }}</i>条；</p>
-             <p style="color: #86909C; margin-top: 6px;">可在审查意见书查看详情</p>
+              <div class="opinion-text reject-desc">
+                  <p v-if="activity.refuseName">驳回节点：<i>{{ activity.refuseName }}</i></p>
+                  <p>
+                    驳回原因：<i
+                      >{{ activity.opinion }}</i
+                    >
+                  </p>
+                  <p>
+                    原因描述：<i
+                      ></i
+                    >
+                  </p>
+                </div>
+            </div>
+            <!-- 确认 -->
+            <div v-if="activity.nodeType == 'CONFIRM'" class="opinions-item">
+              <div class="opinion-text">
+                <p>
+                  已采纳意见<i style="color: #2d5cf6">{{
+                    activity.adoptedResults || '0'
+                  }}</i
+                  >条，不采纳意见<i style="color: #2d5cf6">{{
+                    activity.unAdoptedResults || '0'
+                  }}</i
+                  >条；
+                </p>
+                <p style="color: #86909c; margin-top: 6px">
+                  可在审查意见书查看详情
+                </p>
               </div>
-          </div>
+            </div>
           </div>
         </div>
       </div>
@@ -130,7 +180,7 @@ export default {
   props: {
     sidebarParam: {
       type: Object,
-      default: () => { }
+      default: () => {}
     }
   },
   data() {
@@ -145,7 +195,7 @@ export default {
       this.init()
     }
   },
-  activated() { },
+  activated() {},
   methods: {
     init() {
       this.loading = true
@@ -156,6 +206,9 @@ export default {
         // formId: "64",
         // processInstanceId: "a9d51153-52e7-11ee-849e-de2f9d9428ed",
         // templateId: "1701536505711796224"
+        // formId: 71,
+        // templateId: '1702548115348959232',
+        // processInstanceId: '49c116b7-5389-11ee-95de-ee3758b84c49'
       })
         .then((res) => {
           const { detailVOList } = res.data?.data
@@ -163,42 +216,60 @@ export default {
             this.hasData = false
             return false
           }
-          // detailVOList
           // eslint-disable-next-line
-          this.recordList = detailVOList instanceof Array && detailVOList.length ? detailVOList.map((v) => {
-            // const comments = v.optionVOList && v.optionVOList[0].comments
-            // const handlerComents = JSON.parse(comments)
-            // handlerComents = handlerComents?.map(m => {
-            //   return {
-            //     ...m,
-            //     files: m.files?.map(m => {
-            //       let arr = m.split('_')
-            //       arr = arr.slice(2)
-            //       return arr.join('_')
-            //     }) || []
-            //   }
-            // })||[]
-            // 单独处理一下 opinion
-            let opinion = null
-            if (v.nodeType === 'REFUSE') {
-              opinion = v.opinion || ''
-            } else {
-              opinion = v.opinion ? JSON.parse(v.opinion) : ''
-            }
-            return {
-              ...v,
-              opinion,
-              userInfoList: v.userInfoList?.[0] || []
-              // optionVOList: handlerComents
-            }
-          })
-            : []
-          // console.log('dd',this.recordList)
+          this.recordList =
+            detailVOList instanceof Array && detailVOList.length
+              ? detailVOList.map((v) => {
+                // 单独处理一下 opinion
+                let opinion = null
+                if (v.nodeType === 'REFUSE') {
+                  opinion = v.opinion || ''
+                } else {
+                  opinion = v.opinion ? JSON.parse(v.opinion) : ''
+                }
+                return {
+                  ...v,
+                  opinion,
+                  keyPointsForVerification: v.keyPointsForVerification ? JSON.parse(v.keyPointsForVerification) : '',
+                  userInfoList: v.userInfoList?.[0] || []
+                }
+              })
+              : []
           this.hasData = true
         })
         .finally(() => {
           this.loading = false
         })
+    },
+    handleKeyPointer(val) {
+      let box = ''
+      // 用户配置的选项组
+      const { options } = val.props
+      // 用户针对配置的选项组后做的勾选
+      const { value } = val
+      if (val.name === 'MultipleSelect') {
+        const missPoint = options.filter(v => !value.includes(v.id))
+        if (missPoint.length) {
+          box += '<p style="color:#505968;">（缺少以下要点）</p>'
+          missPoint.forEach(m => {
+            box += `<p style='margin-bottom:4px;color:#1D2128;'>${m.value}</p>`
+          })
+        } else {
+          box += '<p style="color:#505968;">符合所有要点</p>'
+        }
+      } else if (val.name === 'SingleGroupsSelect') {
+        const relativeValue = options.map((labelItem) => {
+          const isRelative = labelItem.children.filter((childValue) => val.value.includes(childValue.id))[0]?.value || ''
+          return {
+            point: labelItem.value,
+            isRelative
+          }
+        })
+        relativeValue.forEach(m => {
+          box += `<p style='margin-bottom:4px;display:flex; justify-content: space-between;align-items:flex-start;'><span style="margin-right:10px;">${m.point}</span><span style='color:#86909C;'>${m.isRelative}</span></p>`
+        })
+      }
+      return box
     }
   },
   filters: {
@@ -346,51 +417,60 @@ export default {
         }
       }
     }
-        .opinion-tag {
-          position: absolute;
-          top: -2px;
-          left: -8px;
-          border-radius: 0px 6px 6px 6px;
-          color: #fff;
-          font-style: normal;
-          line-height: 14px;
-          overflow: hidden;
-          font-size: 10px;
-          -webkit-transform: scale(0.8);
+    .opinion-tag {
+      position: absolute;
+      top: -2px;
+      left: -8px;
+      border-radius: 0px 6px 6px 6px;
+      color: #fff;
+      font-style: normal;
+      line-height: 14px;
+      overflow: hidden;
+      font-size: 10px;
+      -webkit-transform: scale(0.8);
 
-          .guanzhu {
-            display: inline-block;
-            padding: 2px 4px;
-            border-radius: 0px 6px 6px 6px;
-            background: linear-gradient(90deg, #e85167 0%, #ff8193 100%);
-          }
+      .guanzhu {
+        display: inline-block;
+        padding: 2px 4px;
+        border-radius: 0px 6px 6px 6px;
+        background: linear-gradient(90deg, #e85167 0%, #ff8193 100%);
+      }
 
-          .guanzhu2 {
-            display: inline-block;
-            padding: 2px 4px;
-            border-radius: 0px 6px 6px 6px;
-            background: linear-gradient(90deg, #7b61ff 0%, #61a0ff 100%);
-          }
-          .pass{
-            color: #fff;
-          }
-        }
-        .opinion-text {
+      .guanzhu2 {
+        display: inline-block;
+        padding: 2px 4px;
+        border-radius: 0px 6px 6px 6px;
+        background: linear-gradient(90deg, #7b61ff 0%, #61a0ff 100%);
+      }
+      .pass {
+        color: #fff;
+      }
+    }
+    .opinion-text {
+      color: #1d2128;
+      text-align: justify;
+      margin-bottom: 6px;
+    }
+    .reject-desc {
+      p {
+        display: flex;
+        color: #86909c;
+        i {
           color: #1d2128;
-          text-align: justify;
-          margin-bottom: 6px;
+          flex: 1;
         }
-        .reject-desc{
-          p{
-            display: flex;
-            color: #86909C;
-            i{
-              color: #1D2128;
-              flex: 1;
-            }
-          }
-        }
-
+      }
+    }
+    .prod-point{
+      border-bottom: 1px dashed #E5E6EB;
+      padding-bottom: 2px;
+      margin: 6px 0;
+    }
+    .prod-point:last-of-type{
+      border-bottom: none;
+      padding-bottom:0;
+      margin: 0;
+    }
   }
 
   .task-item {
@@ -462,4 +542,5 @@ export default {
       margin-bottom: 8px;
     }
   }
-}</style>
+}
+</style>

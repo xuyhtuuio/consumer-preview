@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-14 16:56:56
+ * @LastEditTime: 2023-09-15 16:46:18
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -18,6 +18,7 @@
           <i class="btn">返回</i>
         </div>
         <!-- 只有有修改权限的人能看到 -->
+        <div v-if="((pagePath== 'approval'&&item?.approvedSign==0)||pagePath=='apply')&&hasAuth">
         <div
           class="back flex white"
           v-if="status == 5 && item.taskStatus == 3"
@@ -59,6 +60,7 @@
             <i class="iconfont icon-tijiao"></i> <i class="btn">去比对</i></span
           >
         </el-button>
+      </div>
         <div
           v-if="item.taskStatus == 1 && pagePath && pagePath == 'approval'&&item?.approvedSign==0"
           class="flex"
@@ -139,6 +141,11 @@
             >
             <i v-if="item.taskStatus === '5'" class="tag check"
               >待确认<i v-if="item.currentActivityName || item.nodeName"
+                >>{{ item.currentActivityName || item.nodeName }}</i
+              ></i
+            >
+            <i v-if="item.taskStatus === '6'" class="tag check"
+              >待比对<i v-if="item.currentActivityName || item.nodeName"
                 >>{{ item.currentActivityName || item.nodeName }}</i
               ></i
             >
@@ -410,6 +417,7 @@ export default {
       },
       reviewMaterials: [], // 工单上已上传的文件
       filledInByApprover: [], // 审批模块配置项目
+      hasAuth: false, // 是否有权限
       peoples: [
         { name: '王明明', code: 1 },
         { name: '王明明', code: 2 },
@@ -496,6 +504,7 @@ export default {
         })
         const { id } = JSON.parse(window.localStorage.getItem('user_name'))
         const hasAuth = currentProcessor?.includes(id + '') || false
+        this.hasAuth = hasAuth
         if (!hasAuth) {
           this.status = 0
           this.crtComp = 'approvalRecordCard'
@@ -564,9 +573,7 @@ export default {
         const { data } = res.data
         targetPage = data[data.length - 1].props['targetPage']
         refuseWay = data[data.length - 1].props['refuseWay']
-        assignedUser = data[data.length - 1].props['assignedUser']
-          ?.filter((v) => v.type !== 'dept')
-          ?.map((v) => v.id)
+        assignedUser = data[data.length - 1].props['assignedUser']?.map((v) => v.id)
 
         if (targetPage === 'XIAOBAO') {
           // 如果是ocr审批,页面显示无需太多内容
@@ -898,12 +905,24 @@ export default {
           })
           return false
         }
-        // 2. 最终上线材料模块：选中活动正常上线：radio=1,需要上传材料; 选中活动未开展：radio=0，不需要上传材料
+        // 2.  2.1 最终上线材料模块：选中活动正常上线：radio=1,需要上传材料; 选中活动未开展：radio=0，不需要上传材料
         if (uploadFileRadio === 1 && !uploadFileRequired) {
           this.$message({
             type: 'warning',
             customClass: 'el-icon-warning-one',
             message: '当前未上传最终上线材料，请上传材料后提交'
+          })
+          this.crtComp = 'uploadFileCard'
+          return false
+        }
+        // 2.  2.2 最终上线材料模块：选中活动正常上线：radio=1,需要上传材料; 选中活动未开展：radio=0，不需要上传材料;校验是否全部关联文件
+        const { fileUploadForm } = this.$store.state.checkApprovedForm
+        const hasAllRelevant = fileUploadForm.every(m => m.relevantFile && m.relevantFile.url)
+        if (uploadFileRadio === 1 && !hasAllRelevant) {
+          this.$message({
+            type: 'warning',
+            customClass: 'el-icon-warning-one',
+            message: '存在未关联的文件，请在关联后提交'
           })
           this.crtComp = 'uploadFileCard'
           return false
