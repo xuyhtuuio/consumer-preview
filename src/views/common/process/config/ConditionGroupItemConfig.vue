@@ -184,7 +184,8 @@ export default {
     selectOptions() {
       return (id) => {
         const { formItems } = this.$store.state.design
-        return formItems.find(item => item.id === id).props.options
+        const formItem = formItems.find(item => item.id === id);
+        return formItem.props.options
       }
     },
     selectedNode() {
@@ -195,7 +196,7 @@ export default {
     },
     conditionList() {
       const conditionItems = this.$store.state.design.formItems.filter(f => {
-        if (f.props.required && f.run === 1 && this.supportTypes.indexOf(f.valueType) !== -1) {
+        if (f.props.required && f.run === 1 && this.supportTypes.indexOf(f.valueType) !== -1 && f.name !== 'SingleGroupsSelect') {
           return { title: f.title, id: f.id, valueType: f.valueType }
         }
       })
@@ -296,7 +297,14 @@ export default {
           // 新增条件
           const condition = { ...this.conditionList[index] }
           condition.compare = '';
-          condition.value = []
+          condition.value = [];
+          if (condition.name === 'MultipleGroupsSelect') {
+            const options = []
+            condition.props.options.map(item => {
+              options.push(...item.children)
+            })
+            condition.props.options = options;
+          }
           group.conditions.push(condition)
         }
       })

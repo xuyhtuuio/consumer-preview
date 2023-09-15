@@ -591,19 +591,19 @@ export default {
       }
 
       .center {
-        flex: 1;
         display: flex;
         align-items: center;
         font-size: 14px;
         font-weight: 400;
         line-height: 22px;
+        max-width: 76%;
 
         .icon {
           margin: 0 10px;
         }
         .file-name{
           white-space: pre;
-          max-width: 50%;
+          max-width: 80%;
           overflow: hidden;
           text-overflow: ellipsis; //文本超出省略号替代
           white-space: nowrap;
@@ -611,8 +611,10 @@ export default {
       }
 
       .right {
+        flex: 1;
         .r-item {
           display: flex;
+          justify-content: flex-end;
         }
 
         .progress {

@@ -1,5 +1,5 @@
 <template>
-    <el-form-item class="com-form-item">
+    <el-form-item :class="['com-form-item', item.name, item?.props?.expanding?.toString()]">
       <label slot="label"
         >{{ item.title
         }}<span :style="{ color: 'red', opacity: item.props.required || 0 }"> * </span></label
@@ -116,5 +116,23 @@ export default {
 <style lang="less" scoped>
 .com-form-item {
   width: 100%;
+  .el-select,.el-cascader{
+    width: 100%;
+  }
+  /deep/ .el-input__inner,/deep/ .el-textarea__inner{
+    background: transparent;
+    border: none;
+  }
+}
+.SelectInput.false, .MultipleSelect.false, .Cascader,.TimePicker{
+  width: 49%;
+  /deep/ .el-form-item__content{
+    padding: 0 !important;
+  }
+}
+.TextareaInput, .TextInput{
+  /deep/ .el-form-item__content{
+    padding: 0 !important;
+  }
 }
 </style>
