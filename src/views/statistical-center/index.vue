@@ -46,6 +46,7 @@
 
         <div class="scrren-com" :class="search.datePicker ? 'active' : ''">
           <el-popover
+            ref="ref-popover"
             width="400"
             placement="bottom-start"
             trigger="click"
@@ -62,6 +63,7 @@
               start-placeholder="开始月份"
               end-placeholder="结束月份"
               :picker-options="pickerOptions"
+              @change="handleDatePicker"
             >
             </el-date-picker>
             <div slot="reference">
@@ -158,19 +160,25 @@ export default {
         cascader: ''
       },
       pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
         shortcuts: [
           {
-            text: '本月',
-            onClick(picker) {
-              picker.$emit('pick', [new Date(), new Date()])
-            }
-          },
-          {
-            text: '上月',
+            text: '近一个月',
             onClick(picker) {
               const end = new Date()
               const start = new Date()
               start.setMonth(start.getMonth() - 1)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '近一个季度',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setMonth(start.getMonth() - 3)
               picker.$emit('pick', [start, end])
             }
           },
@@ -485,8 +493,10 @@ export default {
         cascader: ''
       }
     },
-    billChange(item) {
-      console.log(item)
+    billChange() {
+    },
+    handleDatePicker() {
+      this.$refs['ref-popover'].handleBlur()
     },
     handlePopoverHide() {
       if (this.search.datePicker) {
@@ -502,7 +512,6 @@ export default {
       this.$refs['my-date-picker'].handleFocus()
     },
     handleSearchBlur() {
-      console.log(this.search)
     }
   }
 }

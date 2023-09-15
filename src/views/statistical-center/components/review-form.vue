@@ -6,7 +6,7 @@
       :colConfig="colConfig"
       @sort-change="sortChange"
       @submitEdit="submitEdit"
-      :header-cell-style="{ 'text-align': 'center','font-weight':400 }"
+      :header-cell-style="{ 'text-align': 'center', 'font-weight': 400 }"
       :cell-style="{ 'text-align': 'center' }"
     >
       <template #id="{ $index }">
@@ -14,10 +14,23 @@
           {{ $index + 1 }}
         </div>
       </template>
+      <template #org="scope">
+        <div class="org">
+          <span
+            class="org-icon"
+            :style="{'background-color' : colorData[scope.$index%7]} "
+          ></span>
+          {{ scope.row.org }}
+        </div>
+      </template>
     </TrsTable>
-     <TrsPagination :pageSize="page.pageSize" :pageNow="page.pageNow" :total="page.total"
-        @getList="handleCurrentChange">
-      </TrsPagination>
+    <TrsPagination
+      :pageSize="page.pageSize"
+      :pageNow="page.pageNow"
+      :total="page.total"
+      @getList="handleCurrentChange"
+    >
+    </TrsPagination>
   </div>
 </template>
 
@@ -38,6 +51,7 @@ export default {
           label: '机构',
           prop: 'org',
           bind: {
+            width: 140,
             align: 'center'
           }
         },
@@ -47,7 +61,11 @@ export default {
         },
         {
           label: '平均审查时长',
-          prop: 'average'
+          prop: 'average',
+          bind: {
+            width: 120,
+            align: 'center'
+          }
         },
         {
           label: '一次通过率',
@@ -118,7 +136,16 @@ export default {
           average: '3h',
           firstTime: '90.3%',
           acceptanceRate: '89.3%'
-        }
+        },
+      ],
+      colorData: [
+        '#2D5CF6',
+        '#14C9C9',
+        '#FA8C16',
+        '#F7BA1E',
+        '#CF84CD',
+        '#52C41A',
+        '#EB2F96'
       ],
       page: {
         pageNow: 1,
@@ -128,12 +155,8 @@ export default {
     }
   },
   methods: {
-    sortChange() {
-
-    },
-    submitEdit() {
-
-    },
+    sortChange() {},
+    submitEdit() {},
     handleCurrentChange() {}
   }
 }
@@ -142,5 +165,15 @@ export default {
 <style lang="less" scoped>
 .review-form {
   width: 50%;
+  .org {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    .org-icon {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+  }
 }
 </style>
