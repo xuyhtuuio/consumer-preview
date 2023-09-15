@@ -978,7 +978,7 @@ svg.leader-line {
   padding: 24px;
   width: 400px !important;
   .show-compare {
-    max-height: 430px;
+    max-height: 340px;
     overflow-y: scroll;
     .compare-item {
       height: 70px;
