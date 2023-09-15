@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import { distributionOfReviewTypes } from '@/api/statistical-center'
 export default {
   props: {
     list: {
@@ -63,9 +64,15 @@ export default {
     }
   },
   mounted() {
+    // this.initData()
     this.initMyEcharts(this.timesData, this.colorListTimes)
   },
   methods: {
+    initData(data) {
+      distributionOfReviewTypes(data).then(res => {
+        console.log(res)
+      })
+    },
     initMyEcharts(timesData, colorListTimes) {
       const all = timesData.reduce((item, next) => {
         return item + next.value
