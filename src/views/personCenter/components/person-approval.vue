@@ -20,116 +20,121 @@
       <div class="table-tit">
         <div class="tit-left">
           <div class="left-com">全部人员</div>
-          <div class="left-com black">共<span class="blue">1500</span>人</div>
+          <div class="left-com black">共<span class="blue">{{ personListData.personTotalCount }}</span>人</div>
         </div>
         <div class="tit-search">
-          <el-input v-model="keywords" placeholder="请输入审查人员姓名" clearable @clear="approvalList"
-            @keyup.enter.native="approvalList">
-            <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="approvalList"></i>
+          <el-input v-model="personListData.username" placeholder="请输入审查人员姓名" clearable @clear="getApprovePersonList(1)"
+            @keyup.enter.native="getApprovePersonList(1)">
+            <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="getApprovePersonList(1)"></i>
           </el-input>
         </div>
       </div>
-      <div class="table-wrap  TRS-table-gray">
-        <el-table :header-cell-style="{ background: '#f5f6f6' }" :data="approvalTable" style="width: 100%;">
+      <div class="table-wrap  TRS-table-gray" v-loading="personListLoading">
+        <el-table :header-cell-style="{ background: '#f5f6f6' }" :data="personListData.list" style="width: 100%;"
+          @sort-change="sortChange">
           <el-table-column type="index" show-overflow-tooltip label="序号" align="center" width="75px">
             <template slot-scope="scope">
               <p class="black fs14">{{ scope.$index + 1 }}</p>
             </template>
           </el-table-column>
-          <el-table-column prop="name" show-overflow-tooltip label="审查人员" min-width="90px">
+          <el-table-column prop="userName" show-overflow-tooltip label="审查人员" min-width="90px">
             <template slot-scope="scope">
-              <p class="black fs14">{{ scope.row.name }}</p>
-              <p class="gray fs12">{{ scope.row.id }}</p>
+              <p class="black fs14">{{ scope.row.userName }}</p>
+              <p class="gray fs12">{{ scope.row.userId }}</p>
             </template>
           </el-table-column>
-          <el-table-column prop="level" :sortable='true' show-overflow-tooltip label="等级" align="center"
+          <el-table-column prop="levelNum" :sortable="'custom'" show-overflow-tooltip label="等级" align="center"
             min-width="130px">
             <template slot-scope="scope">
               <div class="flex-box">
                 <img class="icon w24" v-if="scope.$index === 0" src="@/assets/image/person-center/level1.png" alt="">
                 <img class="icon w24" v-else-if="scope.$index === 1" src="@/assets/image/person-center/level2.png" alt="">
                 <img class="icon w24" v-else src="@/assets/image/person-center/level3.png" alt="">
-                <p class="gray fs12 fw">Lv.{{ scope.row.level }}</p>
+                <p class="gray fs12 fw">Lv.{{ scope.row.levelNum }}</p>
                 <p class="black fs12">{{ scope.row.levelName }}</p>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="gxz" :sortable='true' show-overflow-tooltip label="贡献值" align="center" min-width="90px">
+          <el-table-column prop="contribution" :sortable="'custom'" show-overflow-tooltip label="贡献值" align="center"
+            min-width="90px">
             <template slot-scope="scope">
               <div class="flex-box">
-                <p class="black fs14 fw">{{ scope.row.gxz }}</p>
+                <p class="black fs14 fw">{{ scope.row.contribution }}</p>
                 <img @click="rejectDialogShow('月度贡献值变化情况', scope.row)" class="icon pointer w16"
                   src="@/assets/image/person-center/tc1.png" alt="">
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="scs" :sortable='true' show-overflow-tooltip label="审查数" align="center" min-width="100px">
+          <el-table-column prop="approvalNum" :sortable="'custom'" show-overflow-tooltip label="审查数" align="center"
+            min-width="100px">
             <template slot-scope="scope">
               <div class="flex-box">
-                <p class="black fs16 ">{{ scope.row.scs }}</p>
+                <p class="black fs16 ">{{ scope.row.approvalNum }}</p>
                 <p class="gray fs12 pt6 flex-box ">项<img @click="rejectDialogShow('审批概览', scope.row)"
                     class="icon pointer  w16" src="@/assets/image/person-center/tc2.png" alt=""></p>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="yjts" :sortable='true' show-overflow-tooltip label="意见条数" align="center"
+          <el-table-column prop="opinionCount" :sortable="'custom'" show-overflow-tooltip label="意见条数" align="center"
             min-width="120px">
             <template slot-scope="scope">
               <div class="flex-box">
-                <p class="black fs16 ">{{ scope.row.yjts }}</p>
+                <p class="black fs16 ">{{ scope.row.opinionCount }}</p>
                 <p class="gray fs12 pt6">条</p>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="szxyj" :sortable='true' show-overflow-tooltip label="实质性意见" align="center"
+          <el-table-column prop="substanCount" :sortable="'custom'" show-overflow-tooltip label="实质性意见" align="center"
             min-width="130px">
             <template slot-scope="scope">
               <div class="flex-box">
-                <p class="black fs16 ">{{ scope.row.szxyj }}</p>
-                <p class="gray fs12 pt6">/{{ scope.row.szxyjRate }}</p>
+                <p class="black fs16 ">{{ scope.row.substanCount }}</p>
+                <p class="gray fs12 pt6">/{{ scope.row.substantiveRate }}</p>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="fszxyj" :sortable='true' show-overflow-tooltip label="非质性意见" align="center"
+          <el-table-column prop="unSubstanCount" :sortable="'custom'" show-overflow-tooltip label="非质性意见" align="center"
             min-width="130px">
             <template slot-scope="scope">
               <div class="flex-box">
-                <p class="black fs16 ">{{ scope.row.fszxyj }}</p>
-                <p class="gray fs12 pt6">/{{ scope.row.fszxyjRate }}</p>
+                <p class="black fs16 ">{{ scope.row.unSubstanCount }}</p>
+                <p class="gray fs12 pt6">/{{ scope.row.unSubstantiveRate }}</p>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="mpbs" :sortable='true' show-overflow-tooltip label="秒批笔数" align="center"
+          <el-table-column prop="secondBatchNum" :sortable="'custom'" show-overflow-tooltip label="秒批笔数" align="center"
             min-width="130px">
             <template slot-scope="scope">
               <div class="flex-box">
-                <p class="black fs16 ">{{ scope.row.mpbs }}</p>
+                <p class="black fs16 ">{{ scope.row.secondBatchNum }}</p>
                 <p class="gray fs12 pt6">项</p>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="pjclsc" :sortable='true' show-overflow-tooltip label="平均处理时长" align="center"
+          <el-table-column prop="avgHandleTime" :sortable="'custom'" show-overflow-tooltip label="平均处理时长" align="center"
             min-width="130px">
             <template slot-scope="scope">
               <div class="flex-box">
-                <p class="black fs16 ">{{ scope.row.pjclsc }}</p>
+                <p class="black fs16 ">{{ scope.row.avgHandleTime }}</p>
                 <p class="gray fs12 pt6">h</p>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="jsl" :sortable='true' show-overflow-tooltip label="接受率" align="center" min-width="90px">
+          <el-table-column prop="acceptRate" :sortable="'custom'" show-overflow-tooltip label="接受率" align="center"
+            min-width="90px">
           </el-table-column>
-          <el-table-column prop="hjtgl" :sortable='true' show-overflow-tooltip label="回检通过率" align="center"
+          <el-table-column prop="returnPassRate" :sortable="'custom'" show-overflow-tooltip label="回检通过率" align="center"
             min-width="130px">
           </el-table-column>
         </el-table>
-        <trs-pagination :total="total" @getList="approvalList" :pageNow="pageNow"></trs-pagination>
+        <trs-pagination :total="personListData.totalCount" @getList="getApprovePersonList"
+          :pageNow="personListData.pageNow"></trs-pagination>
       </div>
     </div>
   </div>
 </template>
 <script>
-import { contributionChange, approveContribution, approveAcceptRate, approveAvgTime } from '@/api/personCenter'
+import { approveContribution, approveAcceptRate, approveAvgTime, approvePersonList } from '@/api/personCenter'
 import barEcharts from './bar-echarts'
 export default {
   components: {
@@ -153,111 +158,53 @@ export default {
       },
       processingData: [],
       colorListTimes: ['#5773F9', '#249EFF', '#21CCFF', '#81E2FF', '#81DC74', '#B7DB57'],
-      approvalTable: [
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 1,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 2,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 3,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 4,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 5,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-      ],
       keywords: '',
       rejectDialog: false,
       rejectDialogTit: '',
       contributionLoading: false,
       acceptanceLoading: false,
-      processingLoading: false
+      processingLoading: false,
+      personListLoading: false,
+      personListData: {
+        username: '',
+        list: [],
+        pageNow: 1,
+        totalCount: 0,
+        personTotalCount: 0,
+        sortValue: null,
+        sortType: ''
+      }
     }
   },
   mounted() {
     this.getApproveContribution()
     this.getApproveAcceptRate()
     this.getApproveAvgTime()
+    this.getApprovePersonList(1)
   },
   watch: {
   },
   created() {
   },
   methods: {
+    sortChange({ prop, order }) {
+      const propList = {
+        levelNum: 1,
+        contribution: 2,
+        approvalNum: 3,
+        opinionCount: 4,
+        substanCount: 5,
+        unSubstanCount: 6,
+        secondBatchNum: 7,
+        avgHandleTime: 8,
+        acceptRate: 9,
+        returnPassRate: 10,
+      }
+      this.personListData.sortValue = propList[prop]
+      // eslint-disable-next-line no-nested-ternary
+      this.personListData.sortType = order === 'ascending' ? 'asc' : order === 'descending' ? 'desc' : ''
+      this.getApprovePersonList(1)
+    },
     rejectDialogShow(rejectDialogTit, rowData) {
       const rejectDialogData = {
         rejectDialogTit,
@@ -265,8 +212,6 @@ export default {
         rejectDialog: true
       }
       this.$emit('rejectDialogShow', rejectDialogData)
-    },
-    approvalList() {
     },
     // 贡献值分布
     initContribuEcharts(industryDataVal) {
@@ -555,12 +500,6 @@ export default {
         });
       });
     },
-    // 贡献值月度变化
-    getContributionChange() {
-      contributionChange({ dataFlag: 1 }).then((res) => {
-        console.log('res', res);
-      })
-    },
     // 审批人员-贡献值月度变化
     getApproveContribution() {
       this.contributionLoading = true
@@ -604,6 +543,28 @@ export default {
           this.initProcessingEcharts(this.processingData)
         }
         this.processingLoading = false
+      })
+    },
+
+    getApprovePersonList(pageNow) {
+      if (pageNow) {
+        this.personListData.pageNow = pageNow
+      }
+      this.personListLoading = true
+      this.personListData.list = []
+      approvePersonList({
+        dataFlag: 3,
+        orgId: 23,
+        sortValue: this.personListData.sortValue,
+        sortType: this.personListData.sortType,
+        pageNow: this.personListData.pageNow,
+        username: this.personListData.username
+      }).then((res) => {
+        const { data } = res
+        this.personListData.list = data.data.page.list
+        this.personListData.totalCount = data.data.page.totalCount
+        this.personListData.personTotalCount = data.data.personTotalCount
+        this.personListLoading = false
       })
     },
   },
