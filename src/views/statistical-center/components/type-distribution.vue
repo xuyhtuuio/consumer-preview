@@ -69,8 +69,8 @@ export default {
   },
   methods: {
     initData(data) {
-      distributionOfReviewTypes(data).then(res => {
-        console.log(res)
+      distributionOfReviewTypes(data).then(() => {
+        // console.log(res)
       })
     },
     initMyEcharts(timesData, colorListTimes) {
