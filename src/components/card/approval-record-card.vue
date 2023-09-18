@@ -108,19 +108,6 @@
                 <p class="opinion-text" v-if="activity.opinion.success">
                   {{ activity.opinion?.msg || '暂无审批意见' }}
                 </p>
-                <div class="opinion-text reject-desc" v-else>
-                  <p>驳回节点：<i>发起人</i></p>
-                  <p>
-                    驳回原因：<i
-                      >附件材料与审批项目不匹配附件材料与审批项目不匹配</i
-                    >
-                  </p>
-                  <p>
-                    原因描述：<i
-                      >附件中“景顺长城集英成长策划”与审批项目不匹配，不能作为该项目的审查材料，请重新提交申请。</i
-                    >
-                  </p>
-                </div>
               </div>
             </div>
             <!-- 领导审批通过/驳回 --end-->
