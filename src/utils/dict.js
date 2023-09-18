@@ -26,11 +26,11 @@ export const feildTypes = [
     valueType: 'Array',
     disable: true
   },
-  {
-    label: '单选选项组',
-    value: 'SingleGroupsSelect',
-    valueType: 'Array'
-  },
+  // {
+  //   label: '单选选项组',
+  //   value: 'SingleGroupsSelect',
+  //   valueType: 'Array'
+  // },
   {
     label: '级联选择框',
     value: 'Cascader',
