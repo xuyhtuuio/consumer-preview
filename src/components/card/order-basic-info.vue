@@ -73,7 +73,7 @@
         >
       </p>
       <div
-        class="proj-info"
+        class="proj-info review-pointer1"
       >
       <!-- v-for="(item, index) in orderInfo.reviewPointer" -->
         <div class="item" v-for="(item, index) in orderInfo.reviewPointer['MultipleSelect']" :key="index">
@@ -546,7 +546,8 @@ export default {
 
   .review-pointer1 {
     .item {
-      flex: 1;
+
+      width: 100%;
     }
   }
 
