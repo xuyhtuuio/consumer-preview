@@ -202,6 +202,11 @@ export default {
         if (this.currentRow.special.name && this.currentRow.special.props.options) {
           this.setOptions(this.currentRow.special.name, this.currentRow.special.props.options)
         }
+        if (this.currentRow.module === '核对要点' && this.currentRow.special.name === 'SelectInput') {
+          this.setRuleMaxLength(16)
+        } else {
+          this.setRuleMaxLength(6)
+        }
       } else {
         this.currentRow = {}
         this.ruleForm = this.$options.data().ruleForm
