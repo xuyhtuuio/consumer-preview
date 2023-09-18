@@ -61,7 +61,7 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: industryDataVal.xData.reverse(),
+          data: industryDataVal.xData,
         },
         series: [
           {
@@ -111,7 +111,7 @@ export default {
                 },
               },
             },
-            data: industryDataVal.yData.reverse(),
+            data: industryDataVal.yData,
           },
         ]
       };

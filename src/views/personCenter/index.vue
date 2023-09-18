@@ -111,7 +111,9 @@
           </div>
         </div>
         <div class="cont-echart" v-if="rejectDialogTit === '月度贡献值变化情况'">
-          <div class="stackBar-echarts" id="passing-echarts"></div>
+          <div v-loading="passingLoading">
+            <div class="stackBar-echarts" id="passing-echarts"></div>
+          </div>
         </div>
         <div class="cont-reject" v-if="rejectDialogTit === '驳回情况'">
           <div class="reject-tab">
@@ -166,6 +168,8 @@ import {
   getApprovalListStation,
   getOrgTree
 } from '@/api/approvalCenter'
+// eslint-disable-next-line no-unused-vars
+import { contributionChange, rejectReason } from '@/api/personCenter'
 import approvalEventCard from './components/approval-event-card'
 import personApproval from './components/person-approval'
 import personLading from './components/person-lading'
@@ -222,12 +226,12 @@ export default {
         value: '提单人员',
         label: '提单人员'
       }],
-      billValue: '审批人员',
+      billValue: '提单人员',
       rejectDialog: false,
       rejectDialogTit: '',
       passingData: {
-        xData: ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01'],
-        yData: [10, 12, 30, 20, 15],
+        xData: [],
+        yData: [],
       },
       search: {
         approvalType: '',
@@ -291,6 +295,7 @@ export default {
       contributionLoading: false,
       acceptanceLoading: false,
       processingLoading: false,
+      passingLoading: false,
       rowData: {}
     }
   },
@@ -348,7 +353,7 @@ export default {
       this.rejectDialog = true
       if (this.rejectDialogTit === '月度贡献值变化情况') {
         this.$nextTick(() => {
-          this.initPassingEcharts(this.passingData);
+          this.getContributionChange(this.rowData.userId)
         })
       }
       if (this.rejectDialogTit === '审批概览' || this.rejectDialogTit === '申请概览') {
@@ -362,6 +367,21 @@ export default {
       }
     },
     approvalList() {
+    },
+    // 贡献值月度变化
+    async getContributionChange(userId) {
+      this.passingData.xData = [];
+      this.passingData.yData = []
+      await contributionChange({ userId }).then((res) => {
+        this.passingLoading = true
+        const { data } = res
+        if (data) {
+          this.passingData.xData = data.data.titleList
+          this.passingData.yData = data.data.numList
+          this.initPassingEcharts(this.passingData);
+        }
+        this.passingLoading = false
+      })
     },
     // 月度贡献值变化情况
     initPassingEcharts(industryDataVal) {

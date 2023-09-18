@@ -17,10 +17,46 @@ export function proposeOnePassRate(data) {
   })
 }
 
+// 提单人员-驳回率分布
+export function proposeRejectRate(data) {
+  return request({
+    url: '/cpr/personController/proposeRejectRate',
+    method: 'POST',
+    data
+  })
+}
+
 // 提单人员-贡献值月度变化
 export function contributionChange(params) {
   return request({
     url: '/cpr/personController/contributionChange',
+    method: 'GET',
+    params
+  })
+}
+
+// 提单人员-申请列表
+export function oneApplicationList(data) {
+  return request({
+    url: '/cpr/personController/oneApplicationList',
+    method: 'POST',
+    data
+  })
+}
+
+// 提单人员-列表
+export function proposePersonList(data) {
+  return request({
+    url: '/cpr/personController/proposePersonList',
+    method: 'POST',
+    data
+  })
+}
+
+// 驳回情况-驳回原因
+export function rejectReason(params) {
+  return request({
+    url: '/cpr/personController/rejectReason',
     method: 'GET',
     params
   })
@@ -47,6 +83,15 @@ export function approveAcceptRate(data) {
 export function approveAvgTime(data) {
   return request({
     url: '/cpr/personController/approveAvgTime',
+    method: 'POST',
+    data
+  })
+}
+
+// 审批人员-列表
+export function approvePersonList(data) {
+  return request({
+    url: '/cpr/personController/approvePersonList',
     method: 'POST',
     data
   })
