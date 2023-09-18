@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-15 16:46:18
+ * @LastEditTime: 2023-09-18 11:22:52
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -406,7 +406,7 @@ export default {
     return {
       status: 0,
       crtComp: '',
-      formBase: {},
+      item: {},
       transferDialog: false,
       staff: {
         // 转办功能用的
@@ -418,7 +418,6 @@ export default {
       previewDialog: false,
       previewUrl: '',
       orderBaseInfo: {},
-      item: {},
       isOCR: false,
       loadings: {
         // 点击保存、确认时候的loading状态
@@ -470,10 +469,8 @@ export default {
       })
       return
     }
-    this.formBase = this.$route.params;
     this.clearStoreStatus()
     this.judgeStatus()
-    this.getNextUserOption()
   },
   created() {
   },
@@ -488,9 +485,9 @@ export default {
     // 获取  下一审批人列表
     getNextUserOption() {
       getNextUserOption({
-        nodeId: this.formBase.nodeId,
-        templateId: this.formBase.processTemplateId,
-        processInstanceId: this.formBase.processInstanceId
+        nodeId: this.item.nodeId,
+        templateId: this.item.processTemplateId,
+        processInstanceId: this.item.processInstanceId
         // bool: 'Y'
       }).then((res) => {
         const { data, status } = res.data
@@ -520,9 +517,9 @@ export default {
       updateRuleRes = await updateRuleCode({
         nextNodeId: this.nextStepObj?.selectObject === '1' ? data.nextNodeId : '',
         nextUserInfo: this.nextStepObj?.selectObject === '1' ? data.nextUserInfo : [],
-        templateId: this.formBase.processTemplateId,
-        processInstanceId: this.formBase.processInstanceI,
-        nodeId: this.formBase.nodeId
+        templateId: this.item.processTemplateId,
+        processInstanceId: this.item.processInstanceI,
+        nodeId: this.item.nodeId
       }).catch(() => {
         updateRuleRes.data.status = 400
         this.disabled = false
@@ -623,6 +620,7 @@ export default {
       }
       //  工单-待确认状态
       if (item.taskStatus === '5') {
+        this.getNextUserOption()
         // 工单-有实质性意见 status=5 ；无实质性意见：status=3，有无实质意见的区别在页面上表现为：是否要上传最终上线材料
         this.status = item.substantiveOpinions === 1 ? 5 : 3
         this.crtComp = 'approvedOpinionCard'
