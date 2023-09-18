@@ -19,7 +19,7 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      this.initEcharts();
+      this.initEcharts()
     })
   },
   methods: {
@@ -46,10 +46,10 @@ export default {
           borderColor: 'rgba(255,255,255,0.8)',
           extraCssText: 'width:240px;',
           formatter: (params) => {
-            const myColor = ['#2D5CF6', '#21CCFF', '#F7BA1E'];
+            const myColor = ['#2D5CF6', '#21CCFF', '#F7BA1E']
             const title = `<div style="display:flex;align-items: center;justify-content: space-between;font-size:10px;color:#1D2128">${params[0].axisValue}</div>`
             let p = ''
-            for (let i = params.length - 1; i > -1; i--) {
+            for (let i = 0; i < params.length; i++) {
               p += `<div style="display:flex;align-items: center;justify-content: space-between;margin-top:4px">
                         <div style="display:flex;align-items: center;">
                         <span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color: ${myColor[i]};"></span>
@@ -64,7 +64,7 @@ export default {
         },
         legend: {
           data: ['总审查任务', '无实质意见任务', '有实质意见任务'],
-          bottom: '-20px',
+          bottom: '-20px'
         },
         grid: {
           left: '3%',

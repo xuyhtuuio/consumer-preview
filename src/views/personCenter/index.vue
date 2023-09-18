@@ -347,7 +347,7 @@ export default {
     },
     // eslint-disable-next-line no-unused-vars
     rejectDialogShow(rejectDialogData) {
-      console.log('rejectDialogData', rejectDialogData);
+      // console.log('rejectDialogData', rejectDialogData);
       this.rejectDialogTit = rejectDialogData.rejectDialogTit;
       this.rowData = rejectDialogData.rowData;
       this.rejectDialog = true
@@ -745,7 +745,7 @@ export default {
       }
     },
     handleSearchBlur() {
-      console.log(this.search)
+      // console.log(this.search)
     },
     getApprovalType() {
       getApprovalType().then((res) => {
