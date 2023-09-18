@@ -85,25 +85,24 @@
           v-for="(item, index) in orderInfo.reviewPointer"
           :key="index"
         >
-          <span class="label">{{ item.title }}</span>
+          <span class="label" v-if="item.name !== 'SingleGroupsSelect'">{{ item.title }}</span>
           <span class="value" v-if="item.name == 'MultipleSelect'">
             <i
               v-for="(points, index) in formatePoints(item)"
               :key="index"
-              style="display: block"
             >
-              {{ points }}</i
-            >
+              {{ points }}<i v-if="index<formatePoints(item).length-1">;</i>
+          </i>
           </span>
-          <span class="value" v-if="item.name == 'SingleGroupsSelect'">
+          <span class="value flex" v-if="item.name == 'SingleGroupsSelect'"  style="padding-left: 0;">
             <span
               v-for="(points, index) in formatePoints(item)"
               :key="index"
-              style="justify-content: space-between"
               class="flex"
+              style="flex-direction: column; width: 25%;"
             >
-              <i>-{{ points.point }}</i>
-              <i>{{ points.isRelative }}</i>
+              <i class="label ellipsis ellipsis_1" style="font-weight: 400;" >{{ points.point }}</i>
+              <i style="padding-left: 14px;">{{ points.isRelative }}</i>
             </span>
           </span>
         </div>
@@ -536,12 +535,10 @@ export default {
   }
 
   .review-pointer {
+    flex-direction: column;
     flex-wrap: wrap;
     justify-content: space-between;
 
-    .item {
-      width: 49% !important;
-    }
   }
 
   .review-pointer1 {
