@@ -1,6 +1,6 @@
 <template>
   <div class="upload-file-card">
-    <p v-if="status !== 4" class="normal-onLine">
+    <p v-if="status !== 4&&onlineFlag" class="normal-onLine">
       <span> 请选择活动是否正常上线 <i>*</i></span
       ><br />
       <el-radio-group v-model="radio">
@@ -37,7 +37,7 @@
         </div>
       </div>
     </div>
-
+<p style="color: #EB5757;margin: 16px 0; font-size: 12px;"  v-if="status !== 4 && radio == 1">材料上传完成后，请与初次上传材料进行关联</p>
     <div
       :class="{ 'upload-list': true, status4: status == 4 }"
       v-loading="loading"
@@ -196,6 +196,11 @@ export default {
       // 3 代表待确认  4 已结束
       default: 0
     },
+    filledInByApprover: {
+      type: Array,
+      default: () => []
+
+    },
     processInstanceId: {
       type: String,
       default: ''
@@ -231,7 +236,8 @@ export default {
       },
       radio: 1,
       relevantDocumentDialog: false,
-      waitRelevantDocument: {} // 等待关联的文件
+      waitRelevantDocument: {}, // 等待关联的文件
+      onlineFlag: false, // 判断活动是否上线
     }
   },
   watch: {
@@ -241,6 +247,10 @@ export default {
   },
   mounted() {
     if (this.status === 3) {
+      // 判断活动是否上线
+      const onlineFlag = this.filledInByApprover?.filter(m => m.title === '活动是否上线') || false
+      this.onlineFlag = onlineFlag
+
       // 3 待确认，需要上传材料
       this.reviewMaterials = this.reviewMaterials.map((v) => {
         return {
@@ -591,19 +601,19 @@ export default {
       }
 
       .center {
-        flex: 1;
         display: flex;
         align-items: center;
         font-size: 14px;
         font-weight: 400;
         line-height: 22px;
+        max-width: 76%;
 
         .icon {
           margin: 0 10px;
         }
         .file-name{
           white-space: pre;
-          max-width: 50%;
+          max-width: 80%;
           overflow: hidden;
           text-overflow: ellipsis; //文本超出省略号替代
           white-space: nowrap;
@@ -611,8 +621,10 @@ export default {
       }
 
       .right {
+        flex: 1;
         .r-item {
           display: flex;
+          justify-content: flex-end;
         }
 
         .progress {
