@@ -62,7 +62,7 @@
       </div>
     </div>
     <!-- 审查要点 -->
-    <div v-if="orderInfo.reviewPointer">
+    <div v-if="orderInfo.hasReviewpointer">
       <div class="line"></div>
       <p class="poppver-title">
         <span>
@@ -275,11 +275,14 @@ export default {
       newKeyPointsForVerification['SelectInput'] = keyPointsForVerification.filter((v) => {
         return ['SelectInput'].includes(v.name)
       }) || []
+      // 判断reviewPointer 至少有一个属性key的长度>0
+      const hasReviewpointer = Object.values(newKeyPointsForVerification).some(m => m.length)
       this.orderInfo = {
         baseInfo: noTextAreaBeseInfo,
         textAreaBaseInfo,
         newBaseInfo: this.getMapping(noTextAreaBeseInfo),
         reviewPointer: newKeyPointsForVerification,
+        hasReviewpointer,
         promotionChannels: MultipleGroupsSelect,
         fileList: reviewMaterials && reviewMaterials[0].value
       }
@@ -512,7 +515,7 @@ export default {
       .item{
         display: flex;
         flex-direction: column;
-        width: 25%;
+        width: 33.3%;
       }
 
     }

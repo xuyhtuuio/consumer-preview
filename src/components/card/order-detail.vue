@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-18 11:22:52
+ * @LastEditTime: 2023-09-18 16:31:25
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -589,11 +589,11 @@ export default {
           return
         }
       }
-
       // 工单状态: 草稿 待比对  taskStatus为6时，右上角增加去比对按钮
-      if (['0', '6'].includes(item.taskStatus)) {
+      if (['0', '6'].includes(item.taskStatus) || item.approvedSign === 1) {
         this.status = 0
         this.crtComp = 'approvalRecordCard'
+        return
       }
       // 工单-审批中状态 主要区分是否OCR审批、部门审批
       if (item.taskStatus === '1') {
