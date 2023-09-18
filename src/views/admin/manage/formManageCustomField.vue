@@ -33,14 +33,14 @@
         <el-button icon="el-icon-plus" type="text" size="mini" style="position: relative;left:260px;" @click="addSelectOptions">新增选项</el-button>
         <SelectField :data="selectOptions" :viewDisable="viewDisable" class="cascader-content"/>
       </el-form-item>
-      <el-form-item v-if="ruleForm.name === 'MultipleGroupsSelect' || ruleForm.name === 'SingleGroupsSelect' " label="选项设置" prop="cascaderItem" class="is-dark input">
+      <el-form-item v-if="ruleForm.name === 'MultipleGroupsSelect'" label="选项设置" prop="cascaderItem" class="is-dark input">
         <el-button icon="el-icon-plus" type="primary" size="mini" style="position: relative;left:333px;padding: 4px 20px;" @click="addSelectGroupOptions">添加选项组</el-button>
         <SelectGroupField :data="selectGroupOptions" :viewDisable="viewDisable" class="cascader-content"/>
       </el-form-item>
       <el-form-item v-if="ruleForm.name === 'TextInput' || ruleForm.name === 'TextareaInput'" label="文字个数" prop="numberOfWords" class="is-dark input">
         <el-input v-model="ruleForm.numberOfWords" maxlength="7" placeholder="请输入文字个数" oninput="value=value.replace(/^0|[^0-9]/g, '')" class="is-dark input"></el-input>
       </el-form-item>
-      <el-form-item v-if="ruleForm.name === 'TextInput'" label="独占一行" prop="exclusiveRowOrNot" class="is-dark input">
+      <el-form-item v-if="ruleForm.name === 'TextInput' || (ruleForm.module === '核对要点' && ruleForm.name === 'SelectInput')" label="独占一行" prop="exclusiveRowOrNot" class="is-dark input">
         <el-switch v-model="ruleForm.exclusiveRowOrNot"></el-switch>
       </el-form-item>
       <el-form-item v-if="showExpanding" label="选项展开" prop="expanding" class="is-dark input">
@@ -147,14 +147,10 @@ export default {
     },
     nameOptionDisable() {
       return (name) => {
-        const arr = ['MultipleSelect', 'SingleGroupsSelect']
+        const arr = ['MultipleSelect', 'SelectInput']
         const jude1 = !arr.includes(name) && this.ruleForm.module === '核对要点'
-        const jude2 = (this.ruleForm.module !== '核对要点') && name === 'SingleGroupsSelect'
-        return jude1 || jude2
+        return jude1
       }
-    },
-    isSingleGroupsSelect() {
-      return this.ruleForm.name === 'SingleGroupsSelect'
     },
     isMultipleGroupsSelect() {
       return this.ruleForm.name === 'MultipleGroupsSelect'
@@ -163,10 +159,10 @@ export default {
       return this.isMultipleGroupsSelect || this.titleDisable
     },
     expandingDisable() {
-      return this.isMultipleGroupsSelect || this.isSingleGroupsSelect || this.ruleForm.module === '核对要点'
+      return this.isMultipleGroupsSelect || this.ruleForm.module === '核对要点'
     },
     showExpanding() {
-      const arr = ['SelectInput', 'MultipleSelect', 'MultipleGroupsSelect', 'SingleGroupsSelect']
+      const arr = ['SelectInput', 'MultipleSelect', 'MultipleGroupsSelect']
       return arr.includes(this.ruleForm.name)
     },
     isRequired() {
@@ -175,12 +171,13 @@ export default {
   },
   methods: {
     resetOptions() {
+      this.setRuleMaxLength(6)
       this.selectOptions = this.$options.data().selectOptions
       this.selectGroupOptions = this.$options.data().selectGroupOptions
       this.cascaderOptions = this.$options.data().cascaderOptions
     },
     setOptions(name, options) {
-      if (name === 'MultipleGroupsSelect' || name === 'SingleGroupsSelect') {
+      if (name === 'MultipleGroupsSelect') {
         this.selectGroupOptions = options
       } else if (name === 'Cascader') {
         this.cascaderOptions = options
@@ -214,6 +211,7 @@ export default {
       })
     },
     changeModule(val) {
+      this.setRuleMaxLength(6)
       if (val === '核对要点') {
         this.$set(this.ruleForm, 'name', 'MultipleSelect')
         this.$set(this.ruleForm, 'expanding', true)
@@ -223,22 +221,27 @@ export default {
       }
       this.$refs['ruleForm'].clearValidate()
     },
+    setRuleMaxLength(max) {
+      this.$set(this.rules.title[1], 'max', max)
+      this.$set(this.rules.title[1], 'message', `长度在 2 到 ${max} 个字符`)
+    },
     changeFiledType(val) {
+      this.setRuleMaxLength(6)
       if (val === 'MultipleGroupsSelect') {
         this.$set(this.ruleForm, 'title', '宣传渠道')
         this.$set(this.ruleForm, 'module', '基本信息')
         this.$set(this.ruleForm, 'expanding', true)
         this.$set(this.ruleForm, 'required', true)
-      } else if (val === 'SingleGroupsSelect') {
-        this.$set(this.ruleForm, 'module', '核对要点')
-        this.$set(this.ruleForm, 'expanding', true)
-        this.$set(this.ruleForm, 'required', true)
       } else {
         this.$set(this.ruleForm, 'expanding', false)
       }
-      if (this.ruleForm.module === '核对要点' && this.ruleForm.name === 'MultipleSelect') {
+      if (this.ruleForm.module === '核对要点') {
         this.$set(this.ruleForm, 'expanding', true)
         this.$set(this.ruleForm, 'required', true)
+        // 核对要点 单选项
+        if (val === 'SelectInput') {
+          this.setRuleMaxLength(16)
+        }
       }
       this.$refs['ruleForm'].clearValidate()
     },
@@ -382,6 +385,7 @@ export default {
             required,
             placeholder,
             expanding,
+            exclusiveRowOrNot,
             options: this.selectOptions
           }
         },
@@ -400,20 +404,6 @@ export default {
           }
         },
         MultipleGroupsSelect: {
-          id: this.getId(),
-          title,
-          name,
-          module,
-          value: [],
-          valueType: 'Array',
-          props: {
-            required,
-            placeholder,
-            expanding,
-            options: this.selectGroupOptions
-          }
-        },
-        SingleGroupsSelect: {
           id: this.getId(),
           title,
           name,
