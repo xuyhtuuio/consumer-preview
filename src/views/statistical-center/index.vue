@@ -101,7 +101,7 @@
       </div>
       <div class="main-item flex" style="gap: 16px">
         <TypeDistribution class="common" ref="ref-type-distribution" />
-        <MissionTrends class="common" />
+        <MissionTrends class="common" ref="ref-mission-trends" />
       </div>
       <div class="main-item common">
         <g-table-card title="审查任务分布">
@@ -221,15 +221,16 @@ export default {
       }
     },
     passData() {
-      // const { billValue, cascader, datePicker } = this.search
-      // const data = {
-      //   orgId: billValue,
-      //   formCategoryId: cascader[cascader.length - 1] || '',
-      //   startTime: '2023-08-01 00:00:00',
-      //   endTime: '2023-09-15 17:55:00'
-      // }
-      // this.$refs['ref-data-overview'].initData(data)
-      // this.$refs['ref-type-distribution'].initData(data)
+      const { billValue, cascader, datePicker } = this.search
+      const data = {
+        orgId: billValue,
+        formCategoryId: cascader[cascader.length - 1] || '',
+        startTimeStr: datePicker[0],
+        endTimeStr: datePicker[1]
+      }
+      this.$refs['ref-data-overview'].initData(data)
+      this.$refs['ref-type-distribution'].initData(data)
+      this.$refs['ref-mission-trends'].initData(data)
     },
     handleReset() {
       this.search = {
@@ -242,6 +243,7 @@ export default {
     },
     handleDatePicker() {
       this.$refs['ref-popover'].handleBlur()
+      this.passData()
     },
     handlePopoverHide() {
       if (this.search.datePicker) {
