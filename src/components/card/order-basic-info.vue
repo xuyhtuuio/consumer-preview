@@ -62,7 +62,7 @@
       </div>
     </div>
     <!-- 审查要点 -->
-    <div v-if="orderInfo.reviewPointer && orderInfo.reviewPointer.length > 0">
+    <div v-if="orderInfo.reviewPointer">
       <div class="line"></div>
       <p class="poppver-title">
         <span>
@@ -73,39 +73,25 @@
         >
       </p>
       <div
-        :class="[
-          'proj-info',
-          orderInfo.reviewPointer && orderInfo.reviewPointer.length > 0
-            ? 'review-pointer'
-            : 'review-pointer1'
-        ]"
+        class="proj-info review-pointer1"
       >
-        <div
-          class="item"
-          v-for="(item, index) in orderInfo.reviewPointer"
-          :key="index"
-        >
+      <!-- v-for="(item, index) in orderInfo.reviewPointer" -->
+        <div class="item" v-for="(item, index) in orderInfo.reviewPointer['MultipleSelect']" :key="index">
           <span class="label">{{ item.title }}</span>
-          <span class="value" v-if="item.name == 'MultipleSelect'">
-            <i
+          <span style="padding-left: 14px;"  class="value">
+              <i
               v-for="(points, index) in formatePoints(item)"
               :key="index"
-              style="display: block"
             >
-              {{ points }}</i
-            >
+              {{ points }}<i v-if="index<formatePoints(item).length-1">;</i></i>
           </span>
-          <span class="value" v-if="item.name == 'SingleGroupsSelect'">
-            <span
-              v-for="(points, index) in formatePoints(item)"
-              :key="index"
-              style="justify-content: space-between"
-              class="flex"
-            >
-              <i>-{{ points.point }}</i>
-              <i>{{ points.isRelative }}</i>
-            </span>
-          </span>
+        </div>
+        <div class="SelectInput-item">
+        <div  v-for="(item, index) in orderInfo.reviewPointer['SelectInput']" :key="index" class="item">
+            <i class="label ellipsis ellipsis_1" style="font-weight: 400;" >{{ formatePoints(item)['point']}}
+        </i>
+        <i style="padding-left: 14px;" class="value">{{ formatePoints(item)['isRelative'] }}</i>
+          </div>
         </div>
       </div>
     </div>
@@ -282,11 +268,18 @@ export default {
       const MultipleGroupsSelect = basicInformation.filter((v) => {
         return ['MultipleGroupsSelect'].includes(v.name)
       }) || []
+      const newKeyPointsForVerification = {}
+      newKeyPointsForVerification['MultipleSelect'] = keyPointsForVerification.filter((v) => {
+        return ['MultipleSelect'].includes(v.name)
+      }) || []
+      newKeyPointsForVerification['SelectInput'] = keyPointsForVerification.filter((v) => {
+        return ['SelectInput'].includes(v.name)
+      }) || []
       this.orderInfo = {
         baseInfo: noTextAreaBeseInfo,
         textAreaBaseInfo,
         newBaseInfo: this.getMapping(noTextAreaBeseInfo),
-        reviewPointer: keyPointsForVerification,
+        reviewPointer: newKeyPointsForVerification,
         promotionChannels: MultipleGroupsSelect,
         fileList: reviewMaterials && reviewMaterials[0].value
       }
@@ -328,16 +321,14 @@ export default {
           return m.value
         })
         return label || '--'
-      } else if (val.name === 'SingleGroupsSelect') {
+      } else if (val.name === 'SelectInput') {
         const { options } = val.props
         // 展示所有的 label
-        const label = options.map((labelItem) => {
-          const isRelative = labelItem.children.filter((childValue) => val.value.includes(childValue.id))[0].value
-          return {
-            point: labelItem.value,
-            isRelative,
-          }
-        })
+        const isRelative = options.filter((labelItem) => labelItem.id === val.value)[0].value
+        const label = {
+          point: val.title,
+          isRelative
+        }
         return label || '--'
       }
     },
@@ -515,6 +506,17 @@ export default {
     .proj-info-item:last-of-type {
       margin-right: 0;
     }
+    .SelectInput-item{
+      display: flex;
+      flex: 1;
+      .item{
+        display: flex;
+        flex-direction: column;
+        width: 25%;
+      }
+
+    }
+
   }
 
   .pro-info-textarea {
@@ -536,17 +538,16 @@ export default {
   }
 
   .review-pointer {
+    flex-direction: column;
     flex-wrap: wrap;
     justify-content: space-between;
 
-    .item {
-      width: 49% !important;
-    }
   }
 
   .review-pointer1 {
     .item {
-      flex: 1;
+
+      width: 100%;
     }
   }
 

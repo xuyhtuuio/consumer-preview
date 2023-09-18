@@ -103,6 +103,7 @@ export default {
           }
         });
         this.$store.state.design.formItems = formItems
+        console.log(this.$store.state.design.formItems)
       }
     },
     async getObtainExamineTypeList() {

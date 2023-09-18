@@ -74,11 +74,13 @@ export default {
     },
     fieldCheck() {
       return (row) => {
-        const jude1 = this.nodeName === '申请人' && (row.module === '审批人填写' || row.title === '有无实质意见' || row.title === '意见采纳结果')
-        const jude2 = this.nodeName !== '申请人' && this.selectNode.props.targetPage === 'LEADER' && (['基本信息', '核对要点'].includes(row.module) || (row.title === '有无实质意见' || row.title === '意见采纳结果'))
-        const jude3 = this.nodeName !== '申请人' && this.selectNode.props.targetPage === 'XIAOBAO' && (['基本信息'].includes(row.module) || (row.title === '有无实质意见' || row.title === '意见采纳结果'))
-        const jude4 = this.nodeName !== '申请人' && ['CONFIRM', 'CONTRAST'].includes(this.selectNode.props.targetPage)
-        return jude1 || jude2 || jude3 || jude4
+        const titleJude = ['有无实质意见', '意见采纳结果', '活动是否正常上线'].includes(row.title)
+        const jude1 = this.nodeName === '申请人' && (row.module === '审批人填写' || titleJude)
+        const jude2 = this.nodeName !== '申请人' && this.selectNode.props.targetPage === 'LEADER' && (['基本信息', '核对要点'].includes(row.module) || titleJude)
+        const jude3 = this.nodeName !== '申请人' && this.selectNode.props.targetPage === 'XIAOBAO' && (['基本信息'].includes(row.module) || titleJude)
+        const jude4 = this.nodeName !== '申请人' && this.selectNode.props.targetPage === 'CONFIRM' && row.title !== '活动是否正常上线'
+        const jude5 = this.nodeName !== '申请人' && this.selectNode.props.targetPage === 'CONTRAST'
+        return jude1 || jude2 || jude3 || jude4 || jude5
       }
     },
     formData() {
@@ -104,13 +106,16 @@ export default {
       const { id, name } = this.formGroup.find(item => item.id === this.formId) || {}
       this.formData.forEach(form => {
         let isLoad = false
-        const isH = (form.module === '审批人填写' && !(this.nodeName !== '申请人' && ['LEADER', 'XIAOBAO'].includes(this.selectNode.props.targetPage))) || ['有无实质意见', '意见采纳结果'].includes(form.title)
+        const isH = (form.module === '审批人填写' && !(this.nodeName !== '申请人' && ['LEADER', 'XIAOBAO'].includes(this.selectNode.props.targetPage))) || ['有无实质意见', '意见采纳结果'].includes(form.title) || (this.selectNode.props.targetPage !== 'CONFIRM' && form.title === '活动是否正常上线')
         const isR = this.nodeName !== '申请人' && ['基本信息', '核对要点'].includes(form.module) && !(this.selectNode.props.targetPage === 'XIAOBAO' && form.module === '核对要点')
         let perm = 'E'
         if (isH) {
           perm = 'H'
         } else if (isR) {
           perm = 'R'
+        }
+        if (this.selectNode.props.targetPage === 'CONFIRM' && form.title === '活动是否正常上线') {
+          perm = 'E'
         }
         for (const i in perms) {
           if (perms[i].id === form.id) {

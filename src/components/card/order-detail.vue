@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-14 16:56:56
+ * @LastEditTime: 2023-09-18 11:22:52
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -18,6 +18,7 @@
           <i class="btn">返回</i>
         </div>
         <!-- 只有有修改权限的人能看到 -->
+        <div v-if="((pagePath== 'approval'&&item?.approvedSign==0)||pagePath=='apply')&&hasAuth" class="flex">
         <div
           class="back flex white"
           v-if="status == 5 && item.taskStatus == 3"
@@ -59,6 +60,7 @@
             <i class="iconfont icon-tijiao"></i> <i class="btn">去比对</i></span
           >
         </el-button>
+      </div>
         <div
           v-if="item.taskStatus == 1 && pagePath && pagePath == 'approval'&&item?.approvedSign==0"
           class="flex"
@@ -139,6 +141,11 @@
             >
             <i v-if="item.taskStatus === '5'" class="tag check"
               >待确认<i v-if="item.currentActivityName || item.nodeName"
+                >>{{ item.currentActivityName || item.nodeName }}</i
+              ></i
+            >
+            <i v-if="item.taskStatus === '6'" class="tag check"
+              >待比对<i v-if="item.currentActivityName || item.nodeName"
                 >>{{ item.currentActivityName || item.nodeName }}</i
               ></i
             >
@@ -350,6 +357,13 @@
     >
       <filePreview :url="previewUrl"></filePreview>
     </el-dialog>
+    <SubmitDialog
+      :option="nextStepObj?.selectObject === '1' ? optionOther : option"
+      :nextStepObj="nextStepObj"
+      ref="confirmation"
+      @handleConfirm="endTaskSubmit"
+      :disabled="disabled"
+    ></SubmitDialog>
   </div>
 </template>
 <script>
@@ -361,8 +375,9 @@ import approvalRecordCard from '@/components/card/approval-record-card'
 import approvedOpinionCard from '@/components/card/approved-opinion-card'
 import uploadFileCard from '@/components/card/upload-file-card'
 import filePreview from '@/components/filePreview'
+import SubmitDialog from '@/components/common/submit-dialog'
 import { leaderEdit, finalMaterial } from '@/api/approvalCenter'
-import { updateRuleCode, rollback } from '@/api/aiApproval';
+import { updateRuleCode, rollback, getNextUserOption } from '@/api/aiApproval';
 
 import {
   updateAdoptEditedComments,
@@ -377,7 +392,8 @@ export default {
     leaderEditOpinion,
     approvedOpinionCard,
     uploadFileCard,
-    filePreview
+    filePreview,
+    SubmitDialog
   },
   props: {
     pagePath: {
@@ -390,6 +406,7 @@ export default {
     return {
       status: 0,
       crtComp: '',
+      item: {},
       transferDialog: false,
       staff: {
         // 转办功能用的
@@ -401,7 +418,6 @@ export default {
       previewDialog: false,
       previewUrl: '',
       orderBaseInfo: {},
-      item: {},
       isOCR: false,
       loadings: {
         // 点击保存、确认时候的loading状态
@@ -410,6 +426,7 @@ export default {
       },
       reviewMaterials: [], // 工单上已上传的文件
       filledInByApprover: [], // 审批模块配置项目
+      hasAuth: false, // 是否有权限
       peoples: [
         { name: '王明明', code: 1 },
         { name: '王明明', code: 2 },
@@ -418,7 +435,29 @@ export default {
         { name: '王明明', code: 5 },
         { name: '王明明', code: 6 },
         { name: '王明明', code: 7 }
-      ]
+      ],
+      nextStepObj: {
+        // 提交： selectObject：1 上一审批选择，nodeSelectUserList
+        // 驳回：  "refuseWay": "TO_BEFORE" ： 调回指定节点  nodeSelectList
+        nextNodeName: '',
+        selectObject: '',
+        nodeSelectUserList: [],
+        refuseWay: '',
+        nodeSelectList: [],
+      },
+      option: {
+        message: '确认结束后该申请单结束流转，不可再进行修改',
+        cancelBtn: '取消',
+        confirmBtn: '确认',
+        noClose: true
+      },
+      optionOther: {
+        message: '确认后该申请单进入下一审批阶段，不可再进行修改',
+        cancelBtn: '取消',
+        confirmBtn: '确认',
+        noClose: true
+      },
+      disabled: false,
     }
   },
   mounted() {
@@ -442,6 +481,53 @@ export default {
      */
     clearStoreStatus() {
       this.$store.commit('setCheckApprovedFormFalse')
+    },
+    // 获取  下一审批人列表
+    getNextUserOption() {
+      getNextUserOption({
+        nodeId: this.item.nodeId,
+        templateId: this.item.processTemplateId,
+        processInstanceId: this.item.processInstanceId
+        // bool: 'Y'
+      }).then((res) => {
+        const { data, status } = res.data
+        const keys = Object.keys(data || {})
+        if (status === 200 && keys.length) {
+          this.nextStepObj = data
+        }
+      })
+    },
+    async endTaskSubmit(val) {
+      this.$message.info('提交中，请稍等！')
+      this.disabled = true
+      let updateRuleRes = {
+        data: {
+          status: 200,
+          msg: ''
+        }
+      }
+      const data = {};
+      if (this.nextStepObj?.selectObject === '1') {
+        data.nextNodeId = this.nextStepObj.nextNodeId
+        data.nextUserInfo = (this.nextStepObj?.nodeSelectUserList || []).filter(
+          (item) => val.includes(item.id)
+        )
+      }
+
+      updateRuleRes = await updateRuleCode({
+        nextNodeId: this.nextStepObj?.selectObject === '1' ? data.nextNodeId : '',
+        nextUserInfo: this.nextStepObj?.selectObject === '1' ? data.nextUserInfo : [],
+        templateId: this.item.processTemplateId,
+        processInstanceId: this.item.processInstanceI,
+        nodeId: this.item.nodeId
+      }).catch(() => {
+        updateRuleRes.data.status = 400
+        this.disabled = false
+      })
+      const { status: ruleStatus } = updateRuleRes.data;
+      if (ruleStatus === 200) {
+        this.submitOpinion();
+      }
     },
     /**
      * description: 打开弹窗，预览文件
@@ -496,6 +582,7 @@ export default {
         })
         const { id } = JSON.parse(window.localStorage.getItem('user_name'))
         const hasAuth = currentProcessor?.includes(id + '') || false
+        this.hasAuth = hasAuth
         if (!hasAuth) {
           this.status = 0
           this.crtComp = 'approvalRecordCard'
@@ -533,6 +620,7 @@ export default {
       }
       //  工单-待确认状态
       if (item.taskStatus === '5') {
+        this.getNextUserOption()
         // 工单-有实质性意见 status=5 ；无实质性意见：status=3，有无实质意见的区别在页面上表现为：是否要上传最终上线材料
         this.status = item.substantiveOpinions === 1 ? 5 : 3
         this.crtComp = 'approvedOpinionCard'
@@ -564,9 +652,7 @@ export default {
         const { data } = res.data
         targetPage = data[data.length - 1].props['targetPage']
         refuseWay = data[data.length - 1].props['refuseWay']
-        assignedUser = data[data.length - 1].props['assignedUser']
-          ?.filter((v) => v.type !== 'dept')
-          ?.map((v) => v.id)
+        assignedUser = data[data.length - 1].props['assignedUser']?.map((v) => v.id)
 
         if (targetPage === 'XIAOBAO') {
           // 如果是ocr审批,页面显示无需太多内容
@@ -898,12 +984,24 @@ export default {
           })
           return false
         }
-        // 2. 最终上线材料模块：选中活动正常上线：radio=1,需要上传材料; 选中活动未开展：radio=0，不需要上传材料
+        // 2.  2.1 最终上线材料模块：选中活动正常上线：radio=1,需要上传材料; 选中活动未开展：radio=0，不需要上传材料
         if (uploadFileRadio === 1 && !uploadFileRequired) {
           this.$message({
             type: 'warning',
             customClass: 'el-icon-warning-one',
             message: '当前未上传最终上线材料，请上传材料后提交'
+          })
+          this.crtComp = 'uploadFileCard'
+          return false
+        }
+        // 2.  2.2 最终上线材料模块：选中活动正常上线：radio=1,需要上传材料; 选中活动未开展：radio=0，不需要上传材料;校验是否全部关联文件
+        const { fileUploadForm } = this.$store.state.checkApprovedForm
+        const hasAllRelevant = fileUploadForm.every(m => m.relevantFile && m.relevantFile.url)
+        if (uploadFileRadio === 1 && !hasAllRelevant) {
+          this.$message({
+            type: 'warning',
+            customClass: 'el-icon-warning-one',
+            message: '存在未关联的文件，请在关联后提交'
           })
           this.crtComp = 'uploadFileCard'
           return false
@@ -918,19 +1016,21 @@ export default {
           const msg = isAllAccept
             ? '当前已采纳所有意见，是否继续提交？'
             : '当前存在不采纳意见，是否继续提交？'
-          this.$confirm(msg, '', {
-            customClass: 'confirmBox',
-            confirmButtonText: '提交',
-            cancelButtonText: '取消',
-            type: 'warning'
-          })
-            .then(() => {
-              this.loadings.submitLoading = true
-              that.submitOpinion()
-            })
-            .catch(() => {
-              // this.loadings.submitLoading = false
-            })
+          this.option.message = msg;
+          this.$refs.confirmation.dialogVisible = true
+          // this.$confirm(msg, '', {
+          //   customClass: 'confirmBox',
+          //   confirmButtonText: '提交',
+          //   cancelButtonText: '取消',
+          //   type: 'warning'
+          // })
+          //   .then(() => {
+          //     this.loadings.submitLoading = true
+          //     that.submitOpinion()
+          //   })
+          //   .catch(() => {
+          //     // this.loadings.submitLoading = false
+          //   })
         }
       }
       // 提交功能  工单待确认状态，为有实质性意见的，需要提交审查意见书
