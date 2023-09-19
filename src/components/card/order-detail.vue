@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-18 16:31:25
+ * @LastEditTime: 2023-09-19 15:14:02
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -18,87 +18,50 @@
           <i class="btn">返回</i>
         </div>
         <!-- 只有有修改权限的人能看到 -->
-        <div v-if="((pagePath== 'approval'&&item?.approvedSign==0)||pagePath=='apply')&&hasAuth" class="flex">
-        <div
-          class="back flex white"
-          v-if="status == 5 && item.taskStatus == 3"
-          @click="toModify"
-        >
-          <i class="iconfont icon-xianxingtubiao"></i>
-          <i class="btn">去修改</i>
+        <div v-if="((pagePath == 'approval' && item?.approvedSign == 0) || pagePath == 'apply') && hasAuth" class="flex">
+          <div class="back flex white" v-if="status == 5 && item.taskStatus == 3" @click="toModify">
+            <i class="iconfont icon-xianxingtubiao"></i>
+            <i class="btn">去修改</i>
+          </div>
+          <el-button
+            class="back flex"
+            type="primary"
+            style="border: none"
+            :loading="loadings.storageLoading"
+            @click="turnTo"
+            v-if="nextStepObj.isChangeHandle !== null"
+          >
+            <span class="flex">
+              <i class="iconfont icon-baocun"></i> <i class="btn">转办</i></span
+            >
+          </el-button>
+          <el-button class="back flex" type="primary" style="border: none" :loading="loadings.storageLoading"
+            @click="submit('storage')" v-if="([3, 5].includes(status)) && item.taskStatus != 3">
+            <span class="flex">
+              <i class="iconfont icon-baocun"></i> <i class="btn">保存</i></span>
+          </el-button>
+          <el-button class="back flex white" type="primary" :loading="loadings.submitLoading" @click="submit('update')"
+            v-if="([3, 5].includes(status)) && item.taskStatus != 3">
+            <span class="flex">
+              <i class="iconfont icon-tijiao"></i> <i class="btn">确认</i></span>
+          </el-button>
+          <el-button class="back flex white" type="primary" @click="compare" v-if="item.taskStatus == 6">
+            <span class="flex">
+              <i class="iconfont icon-tijiao"></i> <i class="btn">去比对</i></span>
+          </el-button>
         </div>
-        <el-button
-          class="back flex"
-          type="primary"
-          style="border: none"
-          :loading="loadings.storageLoading"
-          @click="turnTo"
-          v-if="nextStepObj.isChangeHandle !== null"
-        >
-          <span class="flex">
-            <i class="iconfont icon-baocun"></i> <i class="btn">转办</i></span
-          >
-        </el-button>
-        <el-button
-          class="back flex"
-          type="primary"
-          style="border: none"
-          :loading="loadings.storageLoading"
-          @click="submit('storage')"
-          v-if="(status == 3 || status == 5) && item.taskStatus != 3"
-        >
-          <span class="flex">
-            <i class="iconfont icon-baocun"></i> <i class="btn">保存</i></span
-          >
-        </el-button>
-        <el-button
-          class="back flex white"
-          type="primary"
-          :loading="loadings.submitLoading"
-          @click="submit('update')"
-          v-if="(status == 3 || status == 5) && item.taskStatus != 3"
-        >
-          <span class="flex">
-            <i class="iconfont icon-tijiao"></i> <i class="btn">确认</i></span
-          >
-        </el-button>
-        <el-button
-          class="back flex white"
-          type="primary"
-          @click="compare"
-          v-if="item.taskStatus == 6"
-        >
-          <span class="flex">
-            <i class="iconfont icon-tijiao"></i> <i class="btn">去比对</i></span
-          >
-        </el-button>
-      </div>
-        <div
-          v-if="item.taskStatus == 1 && pagePath && pagePath == 'approval'&&item?.approvedSign==0"
-          class="flex"
-        >
+        <div v-if="item.taskStatus == 1 && pagePath && pagePath == 'approval' && item?.approvedSign == 0" class="flex">
           <!-- <div class="back flex" @click="transferDialog = true">
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
           </div> -->
-          <el-button
-            class="back flex"
-            style="border: none"
-            v-if="!isOCR"
-            :loading="loadings.storageLoading"
-            @click="submit('storage')"
-          >
+          <el-button class="back flex" style="border: none" v-if="!isOCR" :loading="loadings.storageLoading"
+            @click="submit('storage')">
             <span class="flex">
-              <i class="iconfont icon-baocun"></i> <i class="btn">保存</i></span
-            >
+              <i class="iconfont icon-baocun"></i> <i class="btn">保存</i></span>
           </el-button>
-          <el-button
-            class="back flex white"
-            type="primary"
-            :loading="loadings.submitLoading"
-            @click="submit('update')"
-            v-if="!isOCR"
-          >
+          <el-button class="back flex white" type="primary" :loading="loadings.submitLoading" @click="submit('update')"
+            v-if="!isOCR">
             <i class="iconfont icon-tijiao"></i>
             <i class="btn">提交</i>
           </el-button>
@@ -109,25 +72,14 @@
         </div>
       </div>
     </div>
-    <div
-      class="flex"
-      style="align-items: flex-start; height: calc(100% - 50px)"
-    >
+    <div class="flex" style="align-items: flex-start; height: calc(100% - 50px)">
       <!-- 左侧工单信息 -->
       <div class="left-info">
         <div class="order-name">
-          <svg
-            class="icon urgent-icon"
-            aria-hidden="true"
-            v-if="item.urgent == 1"
-          >
+          <svg class="icon urgent-icon" aria-hidden="true" v-if="item.urgent == 1">
             <use xlink:href="#icon-shenpiyemiantubiao"></use>
           </svg>
-          <svg
-            class="icon urgent-icon"
-            aria-hidden="true"
-            v-if="item.dismissalMark == 1"
-          >
+          <svg class="icon urgent-icon" aria-hidden="true" v-if="item.dismissalMark == 1">
             <use xlink:href="#icon-tongyongtubiao2"></use>
           </svg>
           {{ item.taskName }}
@@ -135,174 +87,87 @@
             item.formManagementName
           }}</span>
           <span class="event-status">
-            <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
-            <i v-if="item.taskStatus === '1'" class="tag in-approval"
-              >审批中<i v-if="item.currentActivityName || item.nodeName"
-                >>{{ item.currentActivityName || item.nodeName }}</i
-              ></i
-            >
-            <i v-if="item.taskStatus === '2'" class="tag in-approval"
-              >撤销<i v-if="item.currentActivityName || item.nodeName"
-                >>{{ item.currentActivityName || item.nodeName }}</i
-              ></i
-            >
-            <i v-if="item.taskStatus === '3'" class="tag in-modify"
-              >待修改<i v-if="item.currentActivityName || item.nodeName"
-                >>{{ item.currentActivityName || item.nodeName }}</i
-              ></i
-            >
-            <i v-if="item.taskStatus === '5'" class="tag check"
-              >待确认<i v-if="item.currentActivityName || item.nodeName"
-                >>{{ item.currentActivityName || item.nodeName }}</i
-              ></i
-            >
-            <i v-if="item.taskStatus === '6'" class="tag check"
-              >待比对<i v-if="item.currentActivityName || item.nodeName"
-                >>{{ item.currentActivityName || item.nodeName }}</i
-              ></i
-            >
-            <i v-if="item.taskStatus === '4'" class="end">
-              <i class="tag end-sign"> 已结束 </i>
-            </i>
+            <i :class="{
+                  'tag draft': ['0'].includes(item.taskStatus),
+                  'tag in-approval': ['1', '2'].includes(item.taskStatus),
+                  'tag in-modify': ['3'].includes(item.taskStatus),
+                  'tag check': ['5', '6'].includes(item.taskStatus),
+                  'tag end-sign': ['4'].includes(item.taskStatus)
+                }">{{ $msg('NodeStatus')[item.taskStatus] }}<i v-if="item.currentActivityName || item.nodeName">></i>{{
+      item.currentActivityName || item.nodeName }}</i>
           </span>
         </div>
-        <order-basic-info
-          @preview="previewFile"
-          :personInfo="item.initiator"
-          :personOrg = 'item.institutional'
-          @sendReviewMaterials="sendReviewMaterials"
-          @sendFilledInByApprover="sendFilledInByApprover"
-        ></order-basic-info>
+        <order-basic-info @preview="previewFile" :personInfo="item.initiator" :personOrg='item.institutional'
+          @sendReviewMaterials="sendReviewMaterials" @sendFilledInByApprover="sendFilledInByApprover"></order-basic-info>
       </div>
       <div class="right">
         <!-- 消保审查/详情页/审批中预览 -->
         <div class="right-nav">
           <nav class="nav active-nav" v-if="status == 0">
-            <span class="active-nav" style="text-align: left"
-              >审批记录明细</span
-            >
+            <span class="active-nav" style="text-align: left">审批记录明细</span>
           </nav>
           <!-- 消保审查/详情页/审批人审批（非消保 -->
           <nav class="nav" v-if="status == 2">
-            <span
-              :class="crtComp == 'leaderEditOpinion' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'leaderEditOpinion'
-                }
-              "
-              >编辑意见</span
-            >
-            <span
-              :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvalRecordCard'
-                }
-              "
-              >审批记录明细</span
-            >
+            <span :class="crtComp == 'leaderEditOpinion' ? 'active-nav' : ''" @click="() => {
+                crtComp = 'leaderEditOpinion'
+              }
+              ">编辑意见</span>
+            <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
+                crtComp = 'approvalRecordCard'
+              }
+              ">审批记录明细</span>
           </nav>
           <nav class="nav" v-if="status == 3">
-            <span
-              :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvedOpinionCard'
-                }
-              "
-              >审查意见书</span
-            >
-            <span
-              :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'uploadFileCard'
-                }
-              "
-              ><i style="color: #eb5757">*</i> 最终上线材料</span
-            >
-            <span
-              :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvalRecordCard'
-                }
-              "
-              >审批记录明细</span
-            >
+            <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
+                crtComp = 'approvedOpinionCard'
+              }
+              ">审查意见书</span>
+            <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
+                crtComp = 'uploadFileCard'
+              }
+              "><i style="color: #eb5757">*</i> 最终上线材料</span>
+            <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
+                crtComp = 'approvalRecordCard'
+              }
+              ">审批记录明细</span>
           </nav>
           <!-- 已经结束-->
           <nav class="nav" v-if="status == 4">
-            <span
-              :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvedOpinionCard'
-                }
-              "
-              >审查意见书</span
-            >
-            <span
-              :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'uploadFileCard'
-                }
-              "
-              ><i style="color: #eb5757">*</i> 最终上线材料</span
-            >
-            <span
-              :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvalRecordCard'
-                }
-              "
-              >审批记录明细</span
-            >
+            <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
+                crtComp = 'approvedOpinionCard'
+              }
+              ">审查意见书</span>
+            <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
+                crtComp = 'uploadFileCard'
+              }
+              "><i style="color: #eb5757">*</i> 最终上线材料</span>
+            <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
+                crtComp = 'approvalRecordCard'
+              }
+              ">审批记录明细</span>
           </nav>
           <nav class="nav" v-if="status == 5">
-            <span
-              :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvedOpinionCard'
-                }
-              "
-              >审查意见书</span
-            >
-            <span
-              :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvalRecordCard'
-                }
-              "
-              >审批记录明细</span
-            >
+            <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
+                crtComp = 'approvedOpinionCard'
+              }
+              ">审查意见书</span>
+            <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
+                crtComp = 'approvalRecordCard'
+              }
+              ">审批记录明细</span>
           </nav>
         </div>
         <div class="right-content">
           <keep-alive>
-            <component
-              :is="crtComp"
-              :status="status"
-              ref="child"
-              :taskStatus="item.taskStatus"
-              @sendOpinionInfo="sendOpinionInfo"
-              :reviewMaterial="reviewMaterials"
-              :processInstanceId="item.processInstanceId"
-              :taskId="item.taskId"
-              @preview="previewFile"
-              :filledInByApprover="filledInByApprover"
-            >
+            <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus"
+              @sendOpinionInfo="sendOpinionInfo" :reviewMaterial="reviewMaterials"
+              :processInstanceId="item.processInstanceId" :taskId="item.taskId" @preview="previewFile" :formId="item.taskNumber"
+              :filledInByApprover="filledInByApprover">
               <template slot="head">
                 <div class="approved-opinion-head">
                   <h2>消保审查意见书</h2>
                   <p>
-                    <i>拟同意该申请项目，并提出以下消保审查意见，</i
-                    >请您确认是否采纳以下意见：
+                    <i>拟同意该申请项目，并提出以下消保审查意见，</i>请您确认是否采纳以下意见：
                   </p>
                 </div>
               </template>
@@ -323,50 +188,23 @@
         </div>
       </div>
     </div>
-    <el-dialog
-      :visible.sync="transferDialog"
-      width="800px"
-      center
-      custom-class="transfer-dialog"
-    >
+    <el-dialog :visible.sync="transferDialog" width="800px" center custom-class="transfer-dialog">
       <span slot="title">请选择转办对象</span>
       <div>
-        <el-input
-          v-model="staff.keyword"
-          placeholder="搜索人员，支持拼音、姓名"
-        >
-          <i slot="prefix" class="el-input__icon el-icon-search pointer"></i
-        ></el-input>
+        <el-input v-model="staff.keyword" placeholder="搜索人员，支持拼音、姓名">
+          <i slot="prefix" class="el-input__icon el-icon-search pointer"></i></el-input>
         <el-radio-group v-model="staff.people" class="trs-scroll">
-          <el-radio
-            :label="item.code"
-            v-for="(item, index) in peoples"
-            :key="index"
-          >
-            <span class="avatar"
-              ><img src="@/assets/image/apply-center/avatar.png" alt=""
-            /></span>
-            {{ item.name }}</el-radio
-          >
+          <el-radio :label="item.code" v-for="(item, index) in peoples" :key="index">
+            <span class="avatar"><img src="@/assets/image/apply-center/avatar.png" alt="" /></span>
+            {{ item.name }}</el-radio>
         </el-radio-group>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="transferDialog = false" type="text" class="cancel"
-          >取消</el-button
-        >
-        <el-button
-          type="text"
-          @click="transferDialog = false"
-          class="submit-btn"
-          >确定</el-button
-        >
+        <el-button @click="transferDialog = false" type="text" class="cancel">取消</el-button>
+        <el-button type="text" @click="transferDialog = false" class="submit-btn">确定</el-button>
       </span>
     </el-dialog>
-    <el-dialog
-      :visible.sync="previewDialog"
-      width="800px"
-      custom-class="preview-dialog"
-    >
+    <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <filePreview :url="previewUrl"></filePreview>
     </el-dialog>
     <SubmitDialog
@@ -862,22 +700,22 @@ export default {
             const { success, msg } = res.data
             if (success) {
               if (isSave) {
-              // 保存-------start
+                // 保存-------start
                 this.loadings.storageLoading = false
                 this.$store.commit('setEditOpinionStorage', true)
                 this.$message.success('审查意见已保存')
                 setTimeout(() => {
                   this.$router.replace({ name: 'approvalcenter' })
                 }, 600)
-              // 保存---------end
+                // 保存---------end
               } else {
-              // 提交-------start
+                // 提交-------start
                 this.loadings.submitLoading = false
                 this.$message.success('审查意见已提交')
                 setTimeout(() => {
                   this.$router.replace({ name: 'approvalcenter' })
                 }, 600)
-              // 提交-------end
+                // 提交-------end
               }
             } else {
               this.loadings.submitLoading = false
@@ -977,7 +815,7 @@ export default {
           .then(() => {
             that.saveOpinion()
           })
-          .catch(() => {})
+          .catch(() => { })
         return false
       }
       // 保存功能  状态-审批中；编辑意见
@@ -991,7 +829,7 @@ export default {
           .then(() => {
             that.saveEditOpinion(true)
           })
-          .catch(() => {})
+          .catch(() => { })
         return false
       }
       // 提交功能   工单待确认状态，为无实质性意见的，需要提交审查意见书和最终上线材料

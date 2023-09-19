@@ -4,43 +4,25 @@
       <div class="event-name-status" ref="event-name-status">
         <!-- 加急 -->
         <span class="order-status" ref="order-status">
-        <svg
-          class="icon urgent-icon"
-          aria-hidden="true"
-          v-if="item.urgent == 1"
-        >
-          <use xlink:href="#icon-shenpiyemiantubiao"></use>
-        </svg>
-        <svg
-          class="icon urgent-icon"
-          aria-hidden="true"
-          v-if="item.dismissalMark == 1"
-        >
-          <use xlink:href="#icon-tongyongtubiao2"></use>
-        </svg>
-        <span class="id" v-if="item.orderNo">{{ item.orderNo }}</span>
-      </span>
+          <svg class="icon urgent-icon" aria-hidden="true" v-if="item.urgent == 1">
+            <use xlink:href="#icon-shenpiyemiantubiao"></use>
+          </svg>
+          <svg class="icon urgent-icon" aria-hidden="true" v-if="item.dismissalMark == 1">
+            <use xlink:href="#icon-tongyongtubiao2"></use>
+          </svg>
+          <span class="id" v-if="item.orderNo">{{ item.orderNo }}</span>
+        </span>
         <span class="event-name pointer" @click="toDetail(item)" ref="event-name">{{
           item.entryName
         }}</span>
         <span class="event-status" ref="event-status">
-          <i v-if="item.taskStatus === '0'" class="tag draft">{{
-            $msg('NodeStatus')[item.taskStatus]
-          }}</i>
-          <i v-if="['1', '2'].includes(item.taskStatus)" class="tag in-approval"
-            >{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i
-          >
-          <i v-if="item.taskStatus === '3'" class="tag in-modify"
-            >{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i
-          >
-          <i v-if="['5', '6'].includes(item.taskStatus)" class="tag check"
-            >{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}</i
-          >
-          <i v-if="item.taskStatus === '4'" class="end">
-            <i class="tag end-sign">
-              {{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.nodeName }}
-            </i>
-          </i>
+          <i :class="{
+                'tag draft': ['0'].includes(item.taskStatus),
+                'tag in-approval': ['1', '2'].includes(item.taskStatus),
+                'tag in-modify': ['3'].includes(item.taskStatus),
+                'tag check': ['5', '6'].includes(item.taskStatus),
+                'tag end-sign': ['4'].includes(item.taskStatus)
+              }">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ $msg('NodeStatus')[item.taskStatus] }}</i>
           <!-- 有无意见 -->
           <i v-if="['4', '5', '6'].includes(item.taskStatus)" class="flex">
             <i class="tag has-opinion" v-if="item.substantiveOpinions == 1">
@@ -51,17 +33,11 @@
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
-            <i
-              class="tag check"
-              v-if="item.adoptSign == 0 && item.taskStatus != '5'"
-            >
+            <i class="tag check" v-if="item.adoptSign == 0 && item.taskStatus != '5'">
               <i class="iconfont icon-guanzhu2"></i>
               不采纳
             </i>
-            <i
-              class="tag adoption"
-              v-if="item.adoptSign == 1 && item.taskStatus != '5'"
-            >
+            <i class="tag adoption" v-if="item.adoptSign == 1 && item.taskStatus != '5'">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tubiao"></use>
               </svg>
@@ -71,35 +47,20 @@
         </span>
       </div>
       <div class="event-infos">
-        <span class="sDate date"
-          >发起时间：{{ item.createTime | timeFormate }}</span
-        >
-        <span class="sDate date"
-          >更新时间：{{ item.updateTime | timeFormate }}</span
-        >
-        <span class="sDate date"
-          >上线时间：{{ item.uptime | timeFormate }}</span
-        >
-        <span class="handler date"
-          >发起人：{{ item.originator && item.originator.name }}</span
-        >
-        <span
-          class="handler"
-          v-if="item.institutional && item.institutional[item.institutional.length-1]"
-        >
+        <span class="sDate date">发起时间：{{ item.createTime | timeFormate }}</span>
+        <span class="sDate date">更新时间：{{ item.updateTime | timeFormate }}</span>
+        <span class="sDate date">上线时间：{{ item.uptime | timeFormate }}</span>
+        <span class="handler date">发起人：{{ item.originator && item.originator.name }}</span>
+        <span class="handler" v-if="item.institutional && item.institutional[item.institutional.length - 1]">
           <i class="iconfont icon-dept"></i>
-          {{ item.institutional && item.institutional[item.institutional.length-1] }}</span
-        >
+          {{ item.institutional && item.institutional[item.institutional.length - 1] }}</span>
       </div>
     </div>
     <!-- 任务状态（0:草稿 1：审查中 2：待修改 3：待确认 4：已完成 -->
     <div class="right-operation">
       <!-- 待审核状态显示审查 -->
-      <span
-        class="attention icon-op"
-        v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'&&hasAuth"
-        @click="toApproval(item)"
-      >
+      <span class="attention icon-op" v-if="item.taskStatus == '1' && crtSign !== 'approvedCount' && hasAuth"
+        @click="toApproval(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-tubiao3"></use>
         </svg>
@@ -121,40 +82,24 @@
       </span> -->
 
       <!-- 待确认状态的工单 需要该审批人确认的工单-->
-      <span
-        class="attention check icon-op"
-        v-if="item.taskStatus == 5 && crtSign !== 'approvedCount'&&hasAuth"
-        @click="check(item)"
-      >
+      <span class="attention check icon-op" v-if="item.taskStatus == 5 && crtSign !== 'approvedCount' && hasAuth"
+        @click="check(item)">
         <span class="iconfont icon icon-tubiao urgent-icon"></span>
-        确认</span
-      >
-      <span
-        class="attention check icon-op"
-        v-if="item.taskStatus == 6 && crtSign !== 'approvedCount'&&hasAuth"
-        @click="compare(item)"
-      >
+        确认</span>
+      <span class="attention check icon-op" v-if="item.taskStatus == 6 && crtSign !== 'approvedCount' && hasAuth"
+        @click="compare(item)">
         <span class="iconfont icon icon-compare urgent-icon"></span>
-        比对</span
-      >
+        比对</span>
       <!-- 关注 -->
-      <span
-        class="attention no-attention icon-op"
-        v-if="item.followed != 1"
-        @click="concern(item)"
-      >
+      <span class="attention no-attention icon-op" v-if="item.followed != 1" @click="concern(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-tubiao-1"></use>
         </svg>
-        关注</span
-      >
-      <span
-        class="attention has-attention icon-op"
-        v-if="item.followed == 1"
-        @click="concern(item)"
-      >
+        关注</span>
+      <span class="attention has-attention icon-op" v-if="item.followed == 1" @click="concern(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
-          <use xlink:href="#icon-guanzhu-1"></use></svg>已关注</span>
+          <use xlink:href="#icon-guanzhu-1"></use>
+        </svg>已关注</span>
     </div>
   </div>
 </template>
@@ -167,7 +112,7 @@ export default {
   props: {
     item: {
       type: Object,
-      default: () => {}
+      default: () => { }
     },
     crtSign: {
       type: String,
@@ -195,18 +140,19 @@ export default {
           const taskWidth = this.$refs['event-status']?.offsetWidth || 0
           const nameWidth = fatherWidth - statusWidth - taskWidth
           this.$refs['event-name'].style.maxWidth = nameWidth + 'px'
+          this.$refs['event-name'].style.minWidth = 10 + 'px'
         })
       },
       immediate: true
     }
   },
-  mounted() {},
+  mounted() { },
   methods: {
     async toApproval(item) {
       // 判断是领导审批 还是 OCR 审批
       const { targetPage } = item
       // eslint-disable-next-line
-        switch (targetPage) {
+      switch (targetPage) {
         case 'LEADER':
           this.toDetail(item)
           break
@@ -359,7 +305,8 @@ export default {
       margin-bottom: 17px;
       display: flex;
       align-items: center;
-      .order-status{
+
+      .order-status {
         display: flex;
         flex-wrap: nowrap;
         align-items: center;
@@ -384,15 +331,16 @@ export default {
       line-height: 22px;
       /* 157.143% */
     }
+
     .id {
-        color: #2d5cf6;
-        font-size: 14px;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 22px;
-        margin-right: 12px;
-        /* 157.143% */
-      }
+      color: #2d5cf6;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 22px;
+      margin-right: 12px;
+      /* 157.143% */
+    }
 
     .event-status {
       display: flex;
