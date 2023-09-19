@@ -22,7 +22,7 @@
             'tag in-modify': ['3'].includes(item.taskStatus),
             'tag check': ['5', '6'].includes(item.taskStatus),
             'tag end-sign': ['4'].includes(item.taskStatus)
-          }">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ $msg('NodeStatus')[item.taskStatus] }}</i>
+          }">{{ $msg('NodeStatus')[item.taskStatus] }}>{{item.currentActivityName}}</i>
           <!-- 有无意见 -->
           <i class="flex" v-if="['4', '5', '6'].includes(item.taskStatus)">
             <i class="tag has-opinion" v-if="item.substantiveOpinions == 1">
