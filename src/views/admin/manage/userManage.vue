@@ -154,7 +154,7 @@ export default {
         },
         {
           label: '所属部门',
-          prop: 'department'
+          prop: 'dep'
         },
         {
           label: '姓名',
