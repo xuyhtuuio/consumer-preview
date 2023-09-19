@@ -452,7 +452,7 @@ export default {
         noClose: true
       },
       optionOther: {
-        message: '确认后该申请单进入下一审批阶段，不可再进行修改',
+        message: '采纳后该申请单进入下一审批阶段，不可再进行修改',
         cancelBtn: '取消',
         confirmBtn: '确认',
         noClose: true
@@ -517,9 +517,9 @@ export default {
       updateRuleRes = await updateRuleCode({
         nextNodeId: this.nextStepObj?.selectObject === '1' ? data.nextNodeId : '',
         nextUserInfo: this.nextStepObj?.selectObject === '1' ? data.nextUserInfo : [],
-        templateId: this.item.processTemplateId,
-        processInstanceId: this.item.processInstanceI,
-        nodeId: this.item.nodeId
+        templateId: this.formBase.processTemplateId,
+        processInstanceId: this.formBase.processInstanceId,
+        nodeId: this.formBase.nodeId
       }).catch(() => {
         updateRuleRes.data.status = 400
         this.disabled = false

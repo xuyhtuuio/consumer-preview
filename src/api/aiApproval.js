@@ -128,3 +128,12 @@ export function getNodeHandleUser(params) {
     params
   })
 }
+
+// 转办
+export function setAssignee(params) {
+  return request({
+    url: '/cpr/workspace/assignee',
+    method: 'post',
+    data: params
+  })
+}

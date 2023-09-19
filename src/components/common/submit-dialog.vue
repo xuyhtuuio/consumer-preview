@@ -28,7 +28,7 @@
             v-model.trim="params.nextUser"
             multiple
             :multiple-limit="1"
-            :placeholder="`需${nextStepObj.nextNodeName}审批，请选择审批人`"
+            :placeholder="`需【${nextStepObj.nextNodeName}】审批，请选择审批人`"
             filterable
           >
             <el-option v-for="item in nextStepObj?.nodeSelectUserList || []" :key="item.id" :label="item.name" :value="item.id"></el-option>
