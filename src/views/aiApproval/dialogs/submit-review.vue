@@ -28,7 +28,7 @@
                 <el-form-item v-if="nextStepObj?.selectObject === '1' && params.isPasses" style="width: 100%;" required label="请选择审批人"
                     label-width="110px" prop="nextUser" class="params-nextUser params-nextUser">
                     <el-select v-model.trim="params.nextUser" multiple :multiple-limit="1"
-                        :placeholder="`需${nextStepObj.nextNodeName}审批，请选择审批人`" filterable>
+                        :placeholder="`需【${nextStepObj.nextNodeName}】审批，请选择审批人`" filterable>
                         <el-option v-for="item in nextStepObj?.nodeSelectUserList || []" :key="item.id" :label="item.name"
                             :value="item.id"></el-option>
                     </el-select>
@@ -362,7 +362,7 @@ export default {
         nextNodeId: this.nextStepObj?.selectObject === '1' ? data.nextNodeId : '',
         nextUserInfo: this.nextStepObj?.selectObject === '1' ? data.nextUserInfo : [],
         templateId: data.templateId,
-        processInstanceId: data.processInstanceI,
+        processInstanceId: data.processInstanceId,
         nodeId: data.nodeId
       }).catch(() => {
         updateRuleRes.data.status = 400;

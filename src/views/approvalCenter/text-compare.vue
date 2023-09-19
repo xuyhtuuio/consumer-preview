@@ -21,6 +21,9 @@
           {{ formBase.entryName }}</span
         >
         <span class="content-btns">
+          <el-button @click="turnTo" v-if="nextStepObj.isChangeHandle !== null"
+            ><i class="iconfont icon-zhuanban1"></i>转办</el-button
+          >
           <el-button @click="goBack"
             ><i class="iconfont icon-fanhui1"></i>返回</el-button
           >
@@ -232,6 +235,7 @@
       @handleConfirm="endTaskSubmit"
       :disabled="disabled"
     ></SecondaryConfirmation>
+    <TurnDialog ref="turnDialog" :formBase="formBase" :nextStepObj="nextStepObj"></TurnDialog>
   </div>
 </template>
 
@@ -247,6 +251,7 @@ import { dualScreenPreview } from '@/api/approvalCenter'
 import { downloadAllFiles } from '@/api/applyCenter'
 import { getApplyForm } from '@/api/front'
 import FileType from '@/components/common/file-type'
+import TurnDialog from '@/components/common/turn-dialog'
 import FilePreview from '@/components/filePreview'
 import SideBar from '../aiApproval/sidebar/sidebar'
 import rejectDialog from '../aiApproval/dialogs/reject-dialog'
@@ -262,7 +267,8 @@ export default {
     SideBar,
     ImagePreview,
     FilePreview,
-    ImagePreview1
+    ImagePreview1,
+    TurnDialog
   },
   data() {
     return {
@@ -302,7 +308,8 @@ export default {
         selectObject: '',
         nodeSelectUserList: [],
         refuseWay: '',
-        nodeSelectList: []
+        nodeSelectList: [],
+        isChangeHandle: null
       },
       rejectOption: [
         {
@@ -356,6 +363,7 @@ export default {
         const keys = Object.keys(data || {})
         if (status === 200 && keys.length) {
           this.nextStepObj = data
+          console.log(this.nextStepObj);
         }
       })
     },
@@ -451,7 +459,7 @@ export default {
             id: this.nextStepObj?.refuseWay === 'TO_BEFORE' ? prevUser.split('/')[1] : '',
           }
         ],
-        processInstanceId: this.formBase.processInstanceI,
+        processInstanceId: this.formBase.processInstanceId,
         templateId: this.formBase.processTemplateId,
         nodeId: this.formBase.nodeId
       }).catch(() => {
@@ -530,7 +538,7 @@ export default {
         nextNodeId: this.nextStepObj?.selectObject === '1' ? data.nextNodeId : '',
         nextUserInfo: this.nextStepObj?.selectObject === '1' ? data.nextUserInfo : [],
         templateId: this.formBase.processTemplateId,
-        processInstanceId: this.formBase.processInstanceI,
+        processInstanceId: this.formBase.processInstanceId,
         nodeId: this.formBase.nodeId
       }).catch(() => {
         updateRuleRes.data.status = 400
@@ -641,6 +649,9 @@ export default {
           this.$refs.imageView2.handleImageLoaded()
         })
       }
+    },
+    turnTo() {
+      this.$refs.turnDialog.turnDialog = true;
     }
   },
   beforeDestroy() {

@@ -13,6 +13,13 @@ export function queryRoleList(params) {
   })
 }
 
+export function getOrgTree(params) {
+  return request({
+    url: '/cpr/censor/getOrgTree',
+    method: 'post',
+    params
+  })
+}
 export function getUserList(data) {
   return request({
     url: '/cpr/userManagement/getUserList',

@@ -123,9 +123,9 @@
 <script>
 import SecondaryConfirmation from '@/components/common/secondaryConfirmation';
 import {
-  queryUserList,
   queryRoleList,
   getUserList,
+  getOrgTree,
   deactivateRecoveryUser,
   changeUserRoles
 } from '@/api/admin/user';
@@ -154,11 +154,7 @@ export default {
         },
         {
           label: '所属部门',
-          prop: 'department'
-        },
-        {
-          label: '所属团队',
-          prop: 'team'
+          prop: 'dep'
         },
         {
           label: '姓名',
@@ -258,9 +254,9 @@ export default {
       this.formLoading = false;
     },
     initOrganizationData() {
-      queryUserList().then(res => {
+      getOrgTree().then(res => {
         if (res.data.success) {
-          this.cascaderOptions = this.getTreeData(res.data.data.root.children);
+          this.cascaderOptions = res.data.data.children
         }
       });
     },
