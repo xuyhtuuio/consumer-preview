@@ -408,6 +408,7 @@ export default {
                 ...v.sponsorMap,
                 label: v.industryList && v.industryList[1]
               },
+              institutional: v.industryList,
               processInstanceId: v.process_instance_id,
               currentAssignee:
                 v.currentAssignee && v.currentAssignee.length

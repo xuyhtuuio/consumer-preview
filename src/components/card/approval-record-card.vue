@@ -75,7 +75,7 @@
                   <i>{{ idx + 1 }}</i>
                   {{ item.content }}
                 </p>
-                <!-- <div class="relevant-file" v-if="item.files && item.files.length">
+                <div class="relevant-file" v-if="item.files && item.files.length">
                 关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.files && item.files[0] }}
                 </i>
                 <el-popover placement="bottom-end" popper-class="file-overview-popper" trigger="click"
@@ -87,7 +87,7 @@
                   </div>
                   <i slot="reference" class="pointer">+{{ item.files.length - 1 }}</i>
                 </el-popover>
-              </div> -->
+              </div>
               </div>
             </div>
             <!-- 有无实质意见-end -->
@@ -108,19 +108,6 @@
                 <p class="opinion-text" v-if="activity.opinion.success">
                   {{ activity.opinion?.msg || '暂无审批意见' }}
                 </p>
-                <div class="opinion-text reject-desc" v-else>
-                  <p>驳回节点：<i>发起人</i></p>
-                  <p>
-                    驳回原因：<i
-                      >附件材料与审批项目不匹配附件材料与审批项目不匹配</i
-                    >
-                  </p>
-                  <p>
-                    原因描述：<i
-                      >附件中“景顺长城集英成长策划”与审批项目不匹配，不能作为该项目的审查材料，请重新提交申请。</i
-                    >
-                  </p>
-                </div>
               </div>
             </div>
             <!-- 领导审批通过/驳回 --end-->
@@ -135,14 +122,10 @@
               <div class="opinion-text reject-desc">
                   <p v-if="activity.refuseName">驳回节点：<i>{{ activity.refuseName }}</i></p>
                   <p>
-                    驳回原因：<i
-                      >{{ activity.opinion }}</i
-                    >
+                    驳回原因：<i>{{ activity.opinion }}</i>
                   </p>
-                  <p>
-                    原因描述：<i
-                      ></i
-                    >
+                  <p v-if="activity.refuseDesc">
+                    原因描述：<i>{{ activity.refuseDesc }}</i>
                   </p>
                 </div>
             </div>
@@ -203,12 +186,6 @@ export default {
         formId: this.$route.params?.formId || this.sidebarParam?.recordId,
         templateId: this.$route.params?.processTemplateId || this.sidebarParam?.processTemplateId,
         processInstanceId: this.$route.params?.processInstanceId || this.sidebarParam?.processInstanceId
-        // formId: "64",
-        // processInstanceId: "a9d51153-52e7-11ee-849e-de2f9d9428ed",
-        // templateId: "1701536505711796224"
-        // formId: 71,
-        // templateId: '1702548115348959232',
-        // processInstanceId: '49c116b7-5389-11ee-95de-ee3758b84c49'
       })
         .then((res) => {
           const { detailVOList } = res.data?.data
@@ -220,16 +197,19 @@ export default {
           this.recordList =
             detailVOList instanceof Array && detailVOList.length
               ? detailVOList.map((v) => {
-                // 单独处理一下 opinion
                 let opinion = null
+                let refuseDesc = null
                 if (v.nodeType === 'REFUSE') {
-                  opinion = v.opinion || ''
+                  const len = v.opinion?.indexOf('-')
+                  opinion = len > 0 ? v.opinion?.substring(0, len) : v.opinion
+                  refuseDesc = len > 0 ? v.opinion?.substring(len + 1, v.opinion.length) : ''
                 } else {
                   opinion = v.opinion ? JSON.parse(v.opinion) : ''
                 }
                 return {
                   ...v,
                   opinion,
+                  refuseDesc,
                   keyPointsForVerification: v.keyPointsForVerification ? JSON.parse(v.keyPointsForVerification) : '',
                   userInfoList: v.userInfoList?.[0] || []
                 }

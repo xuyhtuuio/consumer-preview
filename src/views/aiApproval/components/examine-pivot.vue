@@ -11,7 +11,7 @@
         <i class="iconfont icon-a-tubiaoguding item"></i>
       </header>
       <content class="content">
-        <div class="content-main" v-for="item in newList" :key="item.id">
+        <div class="content-main" v-for="item in newList" :key="item.id" :class="[item.name === 'SelectInput' && 'SelectInput']">
           <div class="item-title">
             {{ item.title }}
             <span v-if="isWidthDiff" :style="{ color: 'red', opacity: item.props.required || 0 }">
@@ -41,6 +41,20 @@
               </el-radio-group>
             </div>
           </div>
+          <el-radio-group
+            class="my-radio-group"
+            v-else-if="item.name === 'SelectInput'"
+            :disabled="item.perm === 'R'"
+            v-model.trim="item.value"
+            @change="handleChange"
+          >
+            <el-radio
+              v-for="(iten, indey) in item.props.options"
+              :key="indey"
+              :label="iten.id"
+              >{{ iten.value }}</el-radio
+            >
+          </el-radio-group>
         </div>
       </content>
     </div>
@@ -130,11 +144,15 @@ export default {
         this.title = val[0].module;
 
         val.forEach(item => {
-          item.value.length = 0;
-          if (item.name === 'SingleGroupsSelect') {
-            item.props.options.forEach((propItem) => {
-              this.$set(propItem, 'value1', '');
-            });
+          if (item.name === 'SelectInput') {
+            item.value = item.props.options[0].id
+          } else {
+            item.value.length = 0;
+            if (item.name === 'SingleGroupsSelect') {
+              item.props.options.forEach((propItem) => {
+                this.$set(propItem, 'value1', '');
+              });
+            }
           }
         });
       }
@@ -207,6 +225,22 @@ export default {
       .item-title {
         margin-bottom: 8px;
       }
+      .my-radio-group {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        width: 100%;
+        height: 38px;
+        border-radius: 4px;
+        background: #f7f8fa;
+        /deep/.el-radio {
+          &.is-checked {
+            .el-radio__label {
+              color: #606266;
+            }
+          }
+        }
+      }
       /deep/.el-checkbox-group {
         padding: 8px 16px;
         background: #f7f8fa;
@@ -260,10 +294,21 @@ export default {
   .content-main {
     display: flex;
     align-items: center;
+    &.SelectInput {
+      display: inline-block;
+      width: calc(50% - 10px);
+      flex-direction: column;
+      align-items: flex-start;
+      &:nth-child(2n-1) {
+        margin-right: 20px;
+      }
+    }
     &:first-child {
       margin-top: 0;
     }
     .item-title {
+      display: flex;
+      min-width: 80px;
       margin-right: 12px;
     }
     /deep/.el-checkbox-group {
