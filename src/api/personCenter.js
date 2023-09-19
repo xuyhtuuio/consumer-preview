@@ -61,6 +61,14 @@ export function rejectReason(params) {
     params
   })
 }
+// 驳回情况-驳回率
+export function rejectRate(params) {
+  return request({
+    url: '/cpr/personController/rejectRate',
+    method: 'GET',
+    params
+  })
+}
 
 // 审批人员-贡献值分布
 export function approveContribution(data) {
@@ -92,6 +100,15 @@ export function approveAvgTime(data) {
 export function approvePersonList(data) {
   return request({
     url: '/cpr/personController/approvePersonList',
+    method: 'POST',
+    data
+  })
+}
+
+// 审批人员-审批列表
+export function oneApprovalList(data) {
+  return request({
+    url: '/cpr/personController/oneApprovalList',
     method: 'POST',
     data
   })
