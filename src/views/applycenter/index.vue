@@ -1,5 +1,5 @@
 <template>
-  <div class="apply-center" v-cloak>
+  <div class="apply-center" v-cloak ref="apply-center">
     <p class="welcoming">欢迎来到消保管控平台！</p>
     <p class="tips" v-if="tipsMsg">
       <i class="iconfont icon-xiaoxi-tongzhi"></i>{{ tipsMsg }}
@@ -11,7 +11,7 @@
             : 'data-statistics-item active-item'
           ">
           <div class="icon">
-            <img :src="item.value == crtSign ? item.activeIcon : item.icon" alt=""
+            <img :src="item.value == crtSign ? item.activeIcon : item.icon" :alt="item.name"
               :class="item.value == crtSign ? 'active-icon' : 'default-icon'" />
           </div>
           <div class="name-count">
@@ -93,17 +93,11 @@
             <el-button type="text" @click="reset">重置</el-button>
           </div>
         </div>
-        <div class="list" v-loading="search.loading">
-          <div v-if="list.length">
-            <div v-for="(item, index) in list" :key="index">
-              <applyEventCard :item="item" @del="del" @quash="quash" @concern="concern"></applyEventCard>
-            </div>
-            <trs-pagination :total="search.total" @getList="getApplicationListAll" :pageNow="pageNow"></trs-pagination>
-          </div>
-          <div v-else>
-            <Empty></Empty>
-          </div>
+        <div v-if="list.length" v-loading="search.loading" class="list">
+          <applyEventCard :item="item" @del="del" @quash="quash" @concern="concern" v-for="(item, index) in list" :key="index"> </applyEventCard>
+          <trs-pagination :total="search.total" @getList="getApplicationListAll" :pageNow="pageNow"></trs-pagination>
         </div>
+        <Empty v-else v-loading="search.loading" class="list"></Empty>
       </div>
     </div>
   </div>
@@ -125,7 +119,6 @@ export default {
   },
   data() {
     return {
-      imageSize: 292,
       tipsMsg: null,
       crtSign: 'applyAll',
       crtId: 0,
@@ -197,7 +190,6 @@ export default {
       approvalPhases: [],
 
       list: []
-      // list: []
     }
   },
   activated() {
@@ -206,12 +198,6 @@ export default {
   },
   async mounted() {
     this.setDatePicker()
-    const floor2 = document.querySelectorAll('.apply-center .floor2')[0]
-    floor2 ? (floor2.style.paddingRight = 16 + 'px') : ''
-    window.addEventListener('resize', () => {
-      const floor3 = document.querySelectorAll('.apply-center .floor2')[0]
-      floor3 ? (floor3.style.paddingRight = 16 + 'px') : ''
-    })
     this.getApprovalType()
   },
   watch: {
@@ -232,6 +218,10 @@ export default {
         this.$router.push(path)
       }
     },
+    /**
+     * @description: 回显时间排序
+     * @return {*}
+     */
     setDatePicker() {
       const dom = document
         .querySelectorAll('.arrow-select')[0]
@@ -250,6 +240,10 @@ export default {
       }
       this.searchList()
     },
+    /**
+     * @description: 获取事项类型
+     * @return {*}
+     */
     getApprovalType() {
       getApprovalType().then((res) => {
         this.transactionTypes = res.data.data.map((v) => {
@@ -260,19 +254,25 @@ export default {
         })
       })
     },
+    /**
+     * @description: 获取事项类型对应的审批阶段
+     * @return {*}
+     */
     getApprovalStage() {
       getApprovalStage(this.search.formManagementId).then((res) => {
         const { data } = res.data
-        this.approvalPhases = data
-          ? data.map((v) => {
-            return {
-              label: v.nodeName,
-              value: v.nodeId
-            }
-          })
-          : []
+        this.approvalPhases = data?.map((v) => {
+          return {
+            label: v.nodeName,
+            value: v.nodeId
+          }
+        }) || []
       })
     },
+    /**
+     * @description: 获取头部各类型的统计
+     * @return {*}
+     */
     getDataStatistic() {
       const userinfo = JSON.parse(window.localStorage.getItem('user_name'))
       const param = {
@@ -285,7 +285,6 @@ export default {
         currentActivityName: this.search.approvalStage,
         sortType: 1,
         id: userinfo.id,
-        // id: '25',
         name: userinfo.fullname
       }
       getsTheNumberOfHeaders(param).then((res) => {
@@ -300,6 +299,10 @@ export default {
         this.userStatus(data)
       })
     },
+    /**
+     * @description: 时间排序筛选
+     * @return {*}
+     */
     changeSort() {
       const lastKey = this.search.updateTime2[this.search.updateTime2.length - 1]
       if (this.search.updateTime2.length < 2) {
@@ -328,6 +331,11 @@ export default {
         this.searchList()
       })
     },
+    /**
+     * @description: 调用列表接口
+     * @param {*} pageNow
+     * @return {*}
+     */
     async getApplicationListAll(pageNow) {
       // 在此时分流  调不同的接口
       this.pageNow = pageNow
@@ -337,25 +345,10 @@ export default {
         pageNow,
         pageSize: 10,
         ...this.search,
-        // currentActivityName: this.search.approvalStage,
         id: userinfo.id,
         name: userinfo.fullname,
-        startDate:
-          this.search.startDate && this.search.startDate.length > 0
-            ? this.search.startDate
-              .map((v, index) => {
-                return v + (index > 0 ? ' 23:59:59' : ' 00:00:00')
-              })
-              .join('TO')
-            : '',
-        productLaunchDate:
-          this.search.productLaunchDate && this.search.productLaunchDate.length > 0
-            ? this.search.productLaunchDate
-              .map((v, index) => {
-                return v + (index > 0 ? ' 23:59:59' : ' 00:00:00')
-              })
-              .join('TO')
-            : ''
+        startDate: this.search.startDate?.map((v, index) => { return v + (index > 0 ? ' 23:59:59' : ' 00:00:00') }).join('TO'),
+        productLaunchDate: this.search.productLaunchDate?.map((v, index) => { return v + (index > 0 ? ' 23:59:59' : ' 00:00:00') }).join('TO')
       }
       let sortType = ''
       // desc:降序 asc 升序 1 发起时间 2 更新时间
@@ -396,33 +389,30 @@ export default {
       const { data } = res.data
       this.search.total = data.totalCount
       // eslint-disable-next-line
-      this.list =
-        data.list && data.list.length
-          ? data.list.map((v) => {
+      this.list = data.list?.map((v) => {
+        return {
+          ...v,
+          formId: v.taskNumber,
+          recordId: v.taskNumber,
+          taskStatus: v.submitted === 0 ? '0' : v.businessStatus,
+          initiator: {
+            ...v.sponsorMap,
+            label: v.industryList?.[1]
+          },
+          institutional: v.industryList,
+          processInstanceId: v.process_instance_id,
+          currentAssignee: v.currentAssignee?.map((m) => {
             return {
-              ...v,
-              formId: v.taskNumber,
-              recordId: v.taskNumber,
-              taskStatus: v.submitted === 0 ? '0' : v.businessStatus,
-              initiator: {
-                ...v.sponsorMap,
-                label: v.industryList && v.industryList[1]
-              },
-              institutional: v.industryList,
-              processInstanceId: v.process_instance_id,
-              currentAssignee:
-                v.currentAssignee && v.currentAssignee.length
-                  ? v.currentAssignee.map((m) => {
-                    return {
-                      ...m,
-                      hasReminder: false
-                    }
-                  })
-                  : []
+              ...m,
+              hasReminder: false
             }
-          })
-          : []
+          }) || []
+        }
+      }) || []
       this.search.loading = false
+      this.$refs['apply-center'].scrollTo({
+        top: 0, behavior: 'smooth'
+      })
     },
     concern() {
       this.getDataStatistic()

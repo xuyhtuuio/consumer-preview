@@ -121,10 +121,22 @@ export function getEditById(param) {
     data: param,
   })
 }
-// 上线材料提交
+// 上线材料 提交
 export function finalMaterial(param, processInstanceId, taskId, formId) {
   return request({
     url: `/cpr/workspace/finalMaterial/${processInstanceId}/${taskId}/${formId}`,
+    method: 'post',
+    contentType: 'application/json',
+    data: param,
+  })
+}
+/**
+ * @description: 最终上线材料 上传文件
+ * @return {*}
+ */
+export function uploadCompareFile(param) {
+  return request({
+    url: '/cpr/onlineComparison/uploadCompareFile',
     method: 'post',
     contentType: 'application/json',
     data: param,

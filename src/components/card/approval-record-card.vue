@@ -2,18 +2,10 @@
   <div class="record-detail" v-loading="loading">
     <empty v-if="!hasData"></empty>
     <div v-else>
-      <div
-        v-for="(activity, index) in recordList"
-        :key="index"
-        class="task-item"
-      >
+      <div v-for="(activity, index) in recordList" :key="index" class="task-item">
         <div class="left">
           <div class="top-line"></div>
-          <img
-            src="@/assets/image/ai-approval/timeline-ellipse.svg"
-            alt=""
-            class="dot"
-          />
+          <img src="@/assets/image/ai-approval/timeline-ellipse.svg" alt="" class="dot" />
           <div class="bottom-line"></div>
         </div>
         <div class="right">
@@ -21,9 +13,7 @@
             <span class="taskname">{{ activity.nodeName }}</span>
             <span class="staff">
               <i>{{ activity.userInfoList.name }}</i>
-              <i class="post" v-if="activity.userInfoList.name"
-                >（{{ activity.userInfoList.org }}）</i
-              >
+              <i class="post" v-if="activity.userInfoList.name">（{{ activity.userInfoList.org }}）</i>
               <img src="@/assets/image/ai-approval/record-avatar.svg" alt="" />
             </span>
           </p>
@@ -33,33 +23,28 @@
             </div>
             <div class="time-note" v-else>
               <span>任务到达：{{ activity.created | timeFormat }}</span>
-              <span class="handle-time"
-                >处理：<i>{{ activity | handleTimeFormat }}</i> 小时</span
-              >
+              <span class="handle-time">处理：<i>{{ activity | handleTimeFormat }}</i> 小时</span>
               <span>任务结束：{{ activity.ended | timeFormat }}</span>
             </div>
           </div>
           <div class="opinions" v-if="activity.nodeId !== 'root'">
             <div v-if="activity.nodeType == 'XIAOBAO'">
               <!-- ocr审批有个关联的审查要点 -->
-             <div v-if="activity.keyPointsForVerification&&activity.keyPointsForVerification.length" class="point opinions-item">
-              <div class="opinion-tag">
-                <span class="approval-point-icon guanzhu" style="background: #505968;color: #fff">
-                  <i class="iconfont icon icon-tubiao4"></i>审查要点
-                </span>
-               </div>
-               <div v-for="(keyPoint,index) in activity.keyPointsForVerification" :key="index" class="prod-point">
-                <!-- 如果是 -->
-                 <div  v-html="handleKeyPointer(keyPoint)">
-                 </div>
+              <div v-if="activity.keyPointsForVerification && activity.keyPointsForVerification.length"
+                class="point opinions-item">
+                <div class="opinion-tag">
+                  <span class="approval-point-icon guanzhu" style="background: #505968;color: #fff">
+                    <i class="iconfont icon icon-tubiao4"></i>审查要点
+                  </span>
                 </div>
-             </div>
-           <!-- 有无实质意见-start -->
-              <div
-                v-for="(item, idx) in activity.substantiveOpinionList"
-                :key="idx"
-                class="opinions-item"
-              >
+                <div v-for="(keyPoint, index) in activity.keyPointsForVerification" :key="index" class="prod-point">
+                  <!-- 如果是 -->
+                  <div v-html="handleKeyPointer(keyPoint)">
+                  </div>
+                </div>
+              </div>
+              <!-- 有无实质意见-start -->
+              <div v-for="(item, idx) in activity.substantiveOpinionList" :key="idx" class="opinions-item">
                 <!-- v-if="activity.targetPage === 'ocr'" -->
                 <div class="opinion-tag">
                   <span v-if="item.substantiveOpinons == 1" class="guanzhu">
@@ -76,21 +61,21 @@
                   {{ item.content }}
                 </p>
                 <div class="relevant-file" v-if="item.files && item.files.length">
-                关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.files && item.files[0] }}
-                </i>
-                <el-popover placement="bottom-end" popper-class="file-overview-popper" trigger="click"
-                  v-if="item.files && item.files.length > 1">
-                  <div class="file-list">
-                    <div class="file-list-item ellipsis ellipsis_1" v-for="(file, idx) in item.files" :key="idx">
-                      {{ file }}
+                  关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.files && item.files[0] }}
+                  </i>
+                  <el-popover placement="bottom-end" popper-class="file-overview-popper" trigger="click"
+                    v-if="item.files && item.files.length > 1">
+                    <div class="file-list">
+                      <div class="file-list-item ellipsis ellipsis_1" v-for="(file, idx) in item.files" :key="idx">
+                        {{ file }}
+                      </div>
                     </div>
-                  </div>
-                  <i slot="reference" class="pointer">+{{ item.files.length - 1 }}</i>
-                </el-popover>
+                    <i slot="reference" class="pointer">+{{ item.files.length - 1 }}</i>
+                  </el-popover>
+                </div>
               </div>
-              </div>
+              <!-- 有无实质意见-end -->
             </div>
-            <!-- 有无实质意见-end -->
             <!-- 领导审批通过/驳回 --start-->
             <div v-if="activity.nodeType == 'LEADER'" class="opinions-item">
               <div class="leader-approval" v-if="activity.opinion">
@@ -110,42 +95,48 @@
                 </p>
               </div>
             </div>
-            <!-- 领导审批通过/驳回 --end-->
+            <!-- 领导审批通过/驳回 --end -->
             <!-- 消保的驳回 -->
             <div v-if="activity.nodeType == 'REFUSE'" class="opinions-item">
               <div class="opinion-tag">
-                  <span class="guanzhu">
-                    <i class="iconfont icon icon-tuihui1 pass"></i>
-                    驳回
-                  </span>
+                <span class="guanzhu">
+                  <i class="iconfont icon icon-tuihui1 pass"></i>
+                  驳回
+                </span>
               </div>
               <div class="opinion-text reject-desc">
-                  <p v-if="activity.refuseName">驳回节点：<i>{{ activity.refuseName }}</i></p>
-                  <p>
-                    驳回原因：<i>{{ activity.opinion }}</i>
-                  </p>
-                  <p v-if="activity.refuseDesc">
-                    原因描述：<i>{{ activity.refuseDesc }}</i>
-                  </p>
-                </div>
+                <p v-if="activity.refuseName">驳回节点：<i>{{ activity.refuseName }}</i></p>
+                <p>
+                  驳回原因：<i>{{ activity.opinion }}</i>
+                </p>
+                <p v-if="activity.refuseDesc">
+                  原因描述：<i>{{ activity.refuseDesc }}</i>
+                </p>
+              </div>
             </div>
-            <!-- 确认 -->
+            <!-- 确认--start  -->
             <div v-if="activity.nodeType == 'CONFIRM'" class="opinions-item">
               <div class="opinion-text">
                 <p>
                   已采纳意见<i style="color: #2d5cf6">{{
                     activity.adoptedResults || '0'
-                  }}</i
-                  >条，不采纳意见<i style="color: #2d5cf6">{{
-                    activity.unAdoptedResults || '0'
-                  }}</i
-                  >条；
+                  }}</i>条，不采纳意见<i style="color: #2d5cf6">{{
+  activity.unAdoptedResults || '0'
+}}</i>条；
                 </p>
                 <p style="color: #86909c; margin-top: 6px">
                   可在审查意见书查看详情
                 </p>
               </div>
             </div>
+            <!-- 确认--end  -->
+            <!-- 转办--start  -->
+            <div v-if="activity.nodeType == 'TRANSFER'" class="opinions-item">
+              <div class="opinion-text">
+                转办
+              </div>
+            </div>
+            <!-- 转办--end  -->
           </div>
         </div>
       </div>
@@ -163,7 +154,7 @@ export default {
   props: {
     sidebarParam: {
       type: Object,
-      default: () => {}
+      default: () => { }
     }
   },
   data() {
@@ -178,7 +169,7 @@ export default {
       this.init()
     }
   },
-  activated() {},
+  activated() { },
   methods: {
     init() {
       this.loading = true
@@ -378,6 +369,7 @@ export default {
         padding: 16px 16px 12px 16px;
         margin-bottom: 8px;
         position: relative;
+
         .relevant-file {
           color: #86909c;
           display: flex;
@@ -397,6 +389,7 @@ export default {
         }
       }
     }
+
     .opinion-tag {
       position: absolute;
       top: -2px;
@@ -422,33 +415,39 @@ export default {
         border-radius: 0px 6px 6px 6px;
         background: linear-gradient(90deg, #7b61ff 0%, #61a0ff 100%);
       }
+
       .pass {
         color: #fff;
       }
     }
+
     .opinion-text {
       color: #1d2128;
       text-align: justify;
       margin-bottom: 6px;
     }
+
     .reject-desc {
       p {
         display: flex;
         color: #86909c;
+
         i {
           color: #1d2128;
           flex: 1;
         }
       }
     }
-    .prod-point{
+
+    .prod-point {
       border-bottom: 1px dashed #E5E6EB;
       padding-bottom: 2px;
       margin: 6px 0;
     }
-    .prod-point:last-of-type{
+
+    .prod-point:last-of-type {
       border-bottom: none;
-      padding-bottom:0;
+      padding-bottom: 0;
       margin: 0;
     }
   }

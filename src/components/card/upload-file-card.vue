@@ -1,8 +1,7 @@
 <template>
   <div class="upload-file-card">
-    <p v-if="status !== 4&&onlineFlag" class="normal-onLine">
-      <span> 请选择活动是否正常上线 <i>*</i></span
-      ><br />
+    <p v-if="status !== 4 && onlineFlag" class="normal-onLine">
+      <span> 请选择活动是否正常上线 <i>*</i></span><br />
       <el-radio-group v-model="radio">
         <el-radio :label="1">活动正常上线</el-radio>
         <el-radio :label="0">活动未开展</el-radio>
@@ -11,18 +10,9 @@
     <p class="head" v-if="status !== 4">
       请上传最终上线版本，且已审批通过的材料
     </p>
-    <el-upload
-      v-if="status !== 4 && radio == 1"
-      class="upload-demo"
-      drag
-      action
-      :http-request="uploadBpmn"
-      :file-list="fileList"
-      :on-success="handleSuccess"
-      :before-upload="handleBefore"
-      :on-error="handleError"
-      :show-file-list="false"
-    >
+    <el-upload v-if="status !== 4 && radio == 1" class="upload-demo" drag action :http-request="uploadBpmn"
+      :file-list="fileList" :on-success="handleSuccess" :before-upload="checkFileLegal" :on-error="handleError"
+      :show-file-list="false">
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">
         <p>将文件拖到此处，或<em>点击上传</em></p>
@@ -37,143 +27,73 @@
         </div>
       </div>
     </div>
-<p style="color: #EB5757;margin: 16px 0; font-size: 12px;"  v-if="status !== 4 && radio == 1">材料上传完成后，请与初次上传材料进行关联</p>
-    <div
-      :class="{ 'upload-list': true, status4: status == 4 }"
-      v-loading="loading"
-    >
+    <p style="color: #EB5757;margin: 16px 0; font-size: 12px;" v-if="status !== 4 && radio == 1&&fileList.length">材料上传完成后，请与初次上传材料进行关联</p>
+    <div :class="{ 'upload-list': true, status4: status == 4 }" v-loading="loading">
       <Empty v-if="status == 4 && fileList && fileList.length == 0"></Empty>
-      <div
-        class="item"
-        v-for="(item, index) in fileList"
-        :key="index"
-        @mouseenter="handleMouseEnter(item)"
-        @mouseleave="handleMouseLeave(item)"
-      >
+      <div class="item" v-for="(item, index) in fileList" :key="index" @mouseenter="handleMouseEnter(item,index)"
+        @mouseleave="handleMouseLeave(item,index)">
         <div class="left">{{ `${index + 1}.` }}</div>
         <div class="center" style="color: #1d2128">
           <file-type :fileName="item.fileName"></file-type>
-          <i class="file-name">{{ item.fileName | getFileName }}   <i style="color: #505968" >
-            .{{
-              item.fileName.split('.')[item.fileName.split('.').length - 1]
-            }}</i
-          ></i>
+          <i class="file-name">{{ item.fileName | getFileName }} <i style="color: #505968">
+              .{{
+                item.fileName.split('.')[item.fileName.split('.').length - 1]
+              }}</i></i>
         </div>
         <div class="right">
           <div class="r-item progress" v-if="item.status === -1">上传中...</div>
           <div class="r-item progress" v-if="item.status === 1">
             <!-- 在这里匹配是否关联成功 -->
-            <span
-              v-if="item.hasRelevant && !item.isClick"
-              class="flex"
-              style="line-height: 18px; color: #14c9c9"
-            >
-              <i
-                class="icon el-icon-circle-check"
-                style="margin-right: 4px; font-size: 18px; color: #14c9c9"
-              ></i>
+            <span v-if="item.hasRelevant && !item.isClick" class="flex" style="line-height: 18px; color: #14c9c9">
+              <i class="icon el-icon-circle-check" style="margin-right: 4px; font-size: 18px; color: #14c9c9"></i>
               已关联
             </span>
-            <span
-              v-if="!item.hasRelevant"
-              class="flex"
-              style="line-height: 18px; color: #eb5757"
-              @click="openRelevant(item)"
-            >
-              <i
-                class="icon el-icon-warning-outline"
-                style="margin-right: 4px; font-size: 18px; color: #eb5757"
-              ></i>
+            <span v-if="!item.hasRelevant" class="flex" style="line-height: 18px; color: #eb5757"
+              @click="openRelevant(item)">
+              <i class="icon el-icon-warning-outline" style="margin-right: 4px; font-size: 18px; color: #eb5757"></i>
               去关联
             </span>
-            <span
-              v-if="item.hasRelevant && item.isClick"
-              @click="cancelRelevant(item)"
-            >
+            <span v-if="item.hasRelevant && item.isClick" @click="cancelRelevant(item)">
               取消关联
             </span>
-            <span
-              v-if="item.isClick"
-              @click="delItem(item)"
-              style="margin-left: 3px"
-            >
-              <i
-                class="icon el-icon-circle-close"
-                style="color: #86909c; font-size: 18px"
-              ></i>
+            <span v-if="item.isClick" @click="delItem(item)" style="margin-left: 3px">
+              <i class="icon el-icon-circle-close" style="color: #86909c; font-size: 18px"></i>
             </span>
           </div>
           <div class="r-item error" v-if="item.status === -2 && !item.isClick">
             上传失败
           </div>
-          <div
-            class="r-item progress"
-            style="color: #2d5cf6"
-            v-if="item.isClick && status == 4"
-            @click="proview(item)"
-          >
-            预览
+          <div class="r-item progress" style="color: #2d5cf6" v-if="item.isClick && status == 4" >
+            <span @click="preview(item)" style="margin-right: 6px;">预览</span>
+            <span @click="download(item)">下载</span>
           </div>
-          <div
-            class="r-item progress"
-            style="color: #2d5cf6"
-            v-if="item.isClick && status == 4"
-          >
-            下载
-          </div>
-          <!-- <div class="r-item success" v-if="item.status === 1 && item.isClick">
-            <span class="s-item" @click="handleUploadDelete(item)" v-if="status !== 4">删除</span>
-          </div> -->
-          <!-- <div class="r-item error" v-if="item.status === -2 && item.isClick">
-            <span class="s-item success" @click="handleUploadDelete(item)">删除</span>
-          </div> -->
         </div>
       </div>
     </div>
     <div v-if="status == 4 && fileList && fileList.length">
-      <p class="downloadAll">下载全部</p>
+      <p class="downloadAll" @click="downloadAll">下载全部</p>
     </div>
-    <!-- <el-button @click="so">断点</el-button> -->
-    <el-dialog
-      title="关联文件"
-      :visible.sync="relevantDocumentDialog"
-      width="624"
-      :before-close="handleClose"
-      custom-class="relevant-dialog"
-    >
+    <el-dialog title="关联文件" :visible.sync="relevantDocumentDialog" width="624" :before-close="handleClose"
+      custom-class="relevant-dialog">
       <div>
         <p class="relevant-filename">
-          请选择与<i style="color: #2d5cf6">{{ waitRelevantDocument.name }}</i
-          >关联的文件：
+          请选择与<i style="color: #2d5cf6">{{ waitRelevantDocument.name }}</i>关联的文件：
         </p>
         <ul style="overflow: hidden; padding-top: 16px">
           <div style="overflow: auto; max-height: 300px" class="trs-scroll">
             <li v-for="(item, index) in reviewMaterials" :key="index">
-              <span
-                >{{ index + 1 }}.
+              <span>{{ index + 1 }}.
                 <file-type :fileName="item.fileName"></file-type>
                 <i class="file-name">{{ item.fileName | getFileName }}<i style="color: #505968">
-                  .{{
-                    item.fileName.split('.')[
-                      item.fileName.split('.').length - 1
-                    ]
-                  }}</i
-                ></i>
+                    .{{
+                      item.fileName.split('.')[
+                        item.fileName.split('.').length - 1
+                      ]
+                    }}</i></i>
               </span>
               <span>
-                <i
-                  style="color: #2d5cf6"
-                  class="pointer"
-                  v-if="!item.hasRelevant"
-                  @click="relevantItem(item)"
-                  >关联</i
-                >
-                <i
-                  style="color: #86909c"
-                  class="pointer"
-                  v-if="item.hasRelevant"
-                  >已关联</i
-                >
+                <i style="color: #2d5cf6" class="pointer" v-if="!item.hasRelevant" @click="relevantItem(item)">关联</i>
+                <i style="color: #86909c" class="pointer" v-if="item.hasRelevant">已关联</i>
               </span>
             </li>
           </div>
@@ -183,10 +103,10 @@
   </div>
 </template>
 <script>
-import { getFormGroups, deleteFormGroups } from '@/api/front'
+import { deleteFormGroups } from '@/api/front'
 import FileType from '@/components/common/file-type'
-import { findFinalMaterial } from '@/api/approvalCenter'
-
+import { findFinalMaterial, uploadCompareFile } from '@/api/approvalCenter'
+import { downloadAllFiles } from '@/api/applyCenter'
 export default {
   name: 'upload-file-card',
   components: { FileType },
@@ -202,6 +122,10 @@ export default {
 
     },
     processInstanceId: {
+      type: String,
+      default: ''
+    },
+    formId: {
       type: String,
       default: ''
     },
@@ -280,9 +204,38 @@ export default {
     //         }
     //       })
     // },
+    /**
+     * @description: 全部下载（循环文件下载）
+     * @return {*}
+     */
+    downloadAll() {
+
+    },
+    download(item) {
+      const params = {
+        formId: this.formId,
+        key: item.key
+      }
+      this.$message.info('下载中，请稍等！')
+      downloadAllFiles(params).then((res) => {
+        const disposition = res.headers['content-disposition']
+        const url = window.URL.createObjectURL(new Blob([res.data]))
+        const link = document.createElement('a');
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      })
+    },
     preview(item) {
       this.$emit('preview', item.url)
     },
+    /**
+     * @description: 查询已经上传的最终上线材料
+     * @return {*}
+     */
     getMaterials() {
       this.loading = true
       findFinalMaterial(this.processInstanceId, this.taskId)
@@ -445,7 +398,8 @@ export default {
     uploadBpmn(param) {
       const formData = new FormData()
       formData.append('mf', param.file) // 传入bpmn文件
-      getFormGroups(formData).then((res) => {
+      formData.append('formId', this.formId) // 传入bpmn文件
+      uploadCompareFile(formData).then((res) => {
         const { success } = res.data
         if (success) {
           this.handleSuccess(res.data.data, param.file.uid)
@@ -457,11 +411,13 @@ export default {
     handleUploadLook(url) {
       window.open(url)
     },
-    handleMouseEnter(item) {
+    handleMouseEnter(item, index) {
       item.isClick = true
+      this.$set(this.fileList, index, item)
     },
-    handleMouseLeave(item) {
+    handleMouseLeave(item, index) {
       item.isClick = false
+      this.$set(this.fileList, index, item)
     },
     // 删除图片
     handleUploadDelete(item) {
@@ -474,8 +430,12 @@ export default {
         this.$store.commit('setUploadFileForm', this.fileList)
       })
     },
-    handleBefore(file) {
-      // 上传文件之前钩子
+    /**
+     * @description: 上传文件之前校验文件格式
+     * @param {*} file
+     * @return {*}
+     */
+    checkFileLegal(file) {
       const type = file.name.replace(/.+\./, '')
       const judgeArr = this.judgment.split('/')
       const judgeRes = judgeArr.includes(type)
@@ -611,7 +571,8 @@ export default {
         .icon {
           margin: 0 10px;
         }
-        .file-name{
+
+        .file-name {
           white-space: pre;
           max-width: 80%;
           overflow: hidden;
@@ -622,9 +583,13 @@ export default {
 
       .right {
         flex: 1;
+        display: flex;
+        text-align: right;
+        justify-content: flex-end;
         .r-item {
           display: flex;
           justify-content: flex-end;
+          margin-left: 4px;
         }
 
         .progress {
@@ -727,13 +692,15 @@ export default {
         line-height: 22px;
         padding: 8px 12px;
         margin: 16px 0;
-        .file-name{
+
+        .file-name {
           white-space: pre;
           max-width: 60%;
           overflow: hidden;
           text-overflow: ellipsis; //文本超出省略号替代
           white-space: nowrap;
         }
+
         .icon {
           margin: 0 10px;
           font-size: 20px;
@@ -745,4 +712,5 @@ export default {
       }
     }
   }
-}</style>
+}
+</style>
