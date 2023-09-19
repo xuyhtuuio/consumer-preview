@@ -1,28 +1,83 @@
 <template>
-  <div class="rect-tree">
+  <div class="rect-tree" v-loading="isShow">
     <div class="my-echart" ref="my-chart"></div>
   </div>
 </template>
 
 <script>
+import { reviewTaskDistributionChart } from '@/api/statistical-center'
 export default {
   data() {
-    return {}
-  },
-  mounted() {
-    this.$nextTick(() => {
-      this.initEcharts();
-    })
+    return {
+      isShow: true
+    }
   },
   methods: {
-    initEcharts() {
-      const data = [
-        { value: '67', name: '总行' },
-        { value: '30', name: '北京分行' },
-        { value: '17', name: '陕西分行' },
-        { value: '7', name: '吕梁分行' },
-        { value: '5', name: '内蒙古分行' }
-      ]
+    async initData(data) {
+      this.isShow = true
+      const { data: res } = await reviewTaskDistributionChart(data)
+      if (res.success) {
+        this.isShow = false
+        this.$nextTick(() => {
+          this.initEcharts(res.data)
+        })
+      }
+    },
+    initEcharts(originData) {
+      const data = originData
+      console.log(data)
+      //  [
+      //   {
+      //     value: '67',
+      //     name: '总行',
+      //     children: [
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 }
+      //     ]
+      //   },
+      //   {
+      //     value: '30',
+      //     name: '北京分行',
+      //     children: [
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 }
+      //     ]
+      //   },
+      //   {
+      //     value: '17',
+      //     name: '陕西分行',
+      //     children: [
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 }
+      //     ]
+      //   },
+      //   {
+      //     value: '7',
+      //     name: '吕梁分行',
+      //     children: [
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 }
+      //     ]
+      //   },
+      //   {
+      //     value: '5',
+      //     name: '内蒙古分行',
+      //     children: [
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 },
+      //       { name: '产品类', value: 230 }
+      //     ]
+      //   }
+      // ]
       const color = [
         '#2D5CF6',
         '#5ACFD6',
@@ -89,7 +144,7 @@ export default {
             top: 0,
             bottom: 0,
             itemStyle: {
-              gapWidth: 6,
+              gapWidth: 6
             },
             upperLabel: {
               show: false

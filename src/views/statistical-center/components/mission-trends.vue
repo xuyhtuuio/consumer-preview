@@ -1,5 +1,5 @@
 <template>
-  <div class="mission-trends">
+  <div class="mission-trends" v-loading="isShow">
     <g-table-card :title="title">
       <template #content>
         <div class="content">
@@ -11,34 +11,36 @@
 </template>
 
 <script>
+import { reviewTaskTrends } from '@/api/statistical-center'
 export default {
   data() {
     return {
-      title: '审查任务趋势'
+      title: '审查任务趋势',
+      isShow: true,
+      echartsData: {
+        year: [],
+        overallReviewTask: [],
+        tasksWithoutSubstantiveOpinions: [],
+        tasksWithSubstantiveOpinions: []
+      }
     }
   },
-  mounted() {
-    this.$nextTick(() => {
-      this.initEcharts()
-    })
-  },
   methods: {
-    initEcharts() {
-      const year = [
-        '2022-11',
-        '2022-12',
-        '2023-01',
-        '2023-02',
-        '2023-03',
-        '2023-04',
-        '2023-05',
-        '2023-06',
-        '2023-07',
-        '2023-08'
-      ]
-      const newQuickRatio = [4, 2, 3, 10, 5, 2, 6, 4, 2, 5]
-      const newCurrentRatio = [4, 5, 3, 1, 8, 5, 3, 8, 5, 2]
-      const newAssetLiabilityRadio = [7, 8, 9, 1, 7, 6, 2, 5, 3, 7]
+    async initData(data) {
+      this.isShow = true
+      const { data: res } = await reviewTaskTrends(data)
+      if (res.success) {
+        this.echartsData = res.data
+        this.initEcharts(this.echartsData)
+        this.isShow = false
+      }
+    },
+    initEcharts({
+      year,
+      overallReviewTask,
+      tasksWithSubstantiveOpinions,
+      tasksWithoutSubstantiveOpinions
+    }) {
       const option = {
         tooltip: {
           trigger: 'axis',
@@ -98,7 +100,7 @@ export default {
             name: '总审查任务',
             type: 'line',
             smooth: true,
-            data: newQuickRatio,
+            data: overallReviewTask,
             areaStyle: { normal: {} },
             itemStyle: {
               normal: {
@@ -123,7 +125,7 @@ export default {
             name: '无实质意见任务',
             type: 'line',
             smooth: true,
-            data: newCurrentRatio,
+            data: tasksWithoutSubstantiveOpinions,
             areaStyle: { normal: {} },
             itemStyle: {
               normal: {
@@ -148,7 +150,7 @@ export default {
             name: '有实质意见任务',
             type: 'line',
             smooth: true,
-            data: newAssetLiabilityRadio,
+            data: tasksWithSubstantiveOpinions,
             areaStyle: { normal: {} },
             itemStyle: {
               normal: {
