@@ -12,6 +12,9 @@
           <el-button type="tuihui" @click="reject" v-if="approvalLetter.permissions === 'passAllow'">
             <i class="iconfont icon-tuihui1"></i>退回/驳回</el-button
           >
+          <el-button @click="turnTo" v-if="nextStepObj.isChangeHandle !== null"
+            ><i class="iconfont icon-zhuanban1"></i>转办</el-button
+          >
           <el-button @click="save"><i class="iconfont icon-baocun"></i>保存</el-button>
           <el-button
             type="primary"
@@ -93,12 +96,14 @@
       @handleClose="goBack"
       @handleConfirm="save"
     ></secondary-confirmation>
+    <TurnDialog ref="turnDialog" :formBase="formBase" :nextStepObj="nextStepObj"></TurnDialog>
   </div>
 </template>
 
 <script>
 import applyFormFilePreview from '@/components/filePreview';
 import secondaryConfirmation from '@/components/common/secondaryConfirmation';
+import TurnDialog from '@/components/common/turn-dialog'
 
 import sidebar from './sidebar/sidebar';
 import filePreview from './components/file-preview';
@@ -122,6 +127,7 @@ export default {
     submitReview,
     secondaryConfirmation,
     rejectDialog,
+    TurnDialog,
     sidebar,
     ExaminePivot
   },
@@ -176,7 +182,8 @@ export default {
         selectObject: '',
         nodeSelectUserList: [],
         refuseWay: '',
-        nodeSelectList: []
+        nodeSelectList: [],
+        isChangeHandle: null
       },
       rejectOption: [
         {

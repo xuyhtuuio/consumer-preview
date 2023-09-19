@@ -16,6 +16,9 @@ import { getApplyForm } from '@/api/front';
 
 export default {
   methods: {
+    turnTo() {
+      this.$refs.turnDialog.turnDialog = true;
+    },
     reject() {
       this.$refs.rejectDialog.init();
     },

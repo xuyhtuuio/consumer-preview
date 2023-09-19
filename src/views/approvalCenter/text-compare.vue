@@ -21,14 +21,14 @@
           {{ formBase.entryName }}</span
         >
         <span class="content-btns">
-          <el-button @click="turnTo" v-if="nextStepObj.isChangeHandle !== null"
-            ><i class="iconfont icon-zhuanban1"></i>转办</el-button
-          >
           <el-button @click="goBack"
             ><i class="iconfont icon-fanhui1"></i>返回</el-button
           >
           <el-button type="tuihui" @click="reject"
             ><i class="iconfont icon-tuihui1"></i>退回/驳回</el-button
+          >
+          <el-button @click="turnTo" v-if="nextStepObj.isChangeHandle !== null"
+            ><i class="iconfont icon-zhuanban1"></i>转办</el-button
           >
           <el-button type="primary" @click="showSubmit"
             ><i class="iconfont icon-tijiao"></i>提交</el-button
@@ -248,7 +248,7 @@ import {
   getNodeHandleUser
 } from '@/api/aiApproval'
 import { dualScreenPreview } from '@/api/approvalCenter'
-import { downloadAllFiles } from '@/api/applyCenter'
+import { downloadAllFiles, downloadAllFilesOther } from '@/api/applyCenter'
 import { getApplyForm } from '@/api/front'
 import FileType from '@/components/common/file-type'
 import TurnDialog from '@/components/common/turn-dialog'
@@ -363,7 +363,6 @@ export default {
         const keys = Object.keys(data || {})
         if (status === 200 && keys.length) {
           this.nextStepObj = data
-          console.log(this.nextStepObj);
         }
       })
     },
@@ -615,27 +614,42 @@ export default {
     },
     saveFile(type) {
       let key = '';
+      this.$message.info('下载中，请稍等！')
       if (type === 1) {
         key = this.activeItem.otherKey;
+        const params = {
+          formId: this.formId,
+          key
+        }
+        downloadAllFiles(params).then((res) => {
+          const disposition = res.headers['content-disposition']
+          const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
+          const link = document.createElement('a');
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        })
       } else if (type === 2) {
         key = this.activeItem.key;
+        const params = {
+          formId: this.formId,
+          key
+        }
+        downloadAllFilesOther(params).then((res) => {
+          const disposition = res.headers['content-disposition']
+          const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
+          const link = document.createElement('a');
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        })
       }
-      const params = {
-        formId: this.formId,
-        key
-      }
-      this.$message.info('下载中，请稍等！')
-      downloadAllFiles(params).then((res) => {
-        const disposition = res.headers['content-disposition']
-        const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
-        const link = document.createElement('a');
-        link.style.display = 'none'
-        link.href = url
-        link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-      })
     },
     fullScreen(type) {
       this.showFullScreen = !this.showFullScreen

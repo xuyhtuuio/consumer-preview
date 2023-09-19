@@ -23,6 +23,18 @@
             <i class="iconfont icon-xianxingtubiao"></i>
             <i class="btn">去修改</i>
           </div>
+          <el-button
+            class="back flex"
+            type="primary"
+            style="border: none"
+            :loading="loadings.storageLoading"
+            @click="turnTo"
+            v-if="nextStepObj.isChangeHandle !== null"
+          >
+            <span class="flex">
+              <i class="iconfont icon-baocun"></i> <i class="btn">转办</i></span
+            >
+          </el-button>
           <el-button class="back flex" type="primary" style="border: none" :loading="loadings.storageLoading"
             @click="submit('storage')" v-if="([3, 5].includes(status)) && item.taskStatus != 3">
             <span class="flex">
@@ -195,8 +207,14 @@
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <filePreview :url="previewUrl"></filePreview>
     </el-dialog>
-    <SubmitDialog :option="nextStepObj?.selectObject === '1' ? optionOther : option" :nextStepObj="nextStepObj"
-      ref="confirmation" @handleConfirm="endTaskSubmit" :disabled="disabled"></SubmitDialog>
+    <SubmitDialog
+      :option="nextStepObj?.selectObject === '1' ? optionOther : option"
+      :nextStepObj="nextStepObj"
+      ref="confirmation"
+      @handleConfirm="endTaskSubmit"
+      :disabled="disabled"
+    ></SubmitDialog>
+    <TurnDialog ref="turnDialog" :formBase="item" :nextStepObj="nextStepObj"></TurnDialog>
   </div>
 </template>
 <script>
@@ -209,6 +227,7 @@ import approvedOpinionCard from '@/components/card/approved-opinion-card'
 import uploadFileCard from '@/components/card/upload-file-card'
 import filePreview from '@/components/filePreview'
 import SubmitDialog from '@/components/common/submit-dialog'
+import TurnDialog from '@/components/common/turn-dialog'
 import { leaderEdit, finalMaterial } from '@/api/approvalCenter'
 import { updateRuleCode, rollback, getNextUserOption } from '@/api/aiApproval';
 
@@ -226,7 +245,8 @@ export default {
     approvedOpinionCard,
     uploadFileCard,
     filePreview,
-    SubmitDialog
+    SubmitDialog,
+    TurnDialog
   },
   props: {
     pagePath: {
@@ -277,6 +297,7 @@ export default {
         nodeSelectUserList: [],
         refuseWay: '',
         nodeSelectList: [],
+        isChangeHandle: null
       },
       option: {
         message: '确认结束后该申请单结束流转，不可再进行修改',
@@ -308,6 +329,9 @@ export default {
   created() {
   },
   methods: {
+    turnTo() {
+      this.$refs.turnDialog.turnDialog = true;
+    },
     /**
      * description:  store置为默认值
      * return {*}
@@ -350,9 +374,9 @@ export default {
       updateRuleRes = await updateRuleCode({
         nextNodeId: this.nextStepObj?.selectObject === '1' ? data.nextNodeId : '',
         nextUserInfo: this.nextStepObj?.selectObject === '1' ? data.nextUserInfo : [],
-        templateId: this.formBase.processTemplateId,
-        processInstanceId: this.formBase.processInstanceId,
-        nodeId: this.formBase.nodeId
+        templateId: this.item.processTemplateId,
+        processInstanceId: this.item.processInstanceId,
+        nodeId: this.item.nodeId
       }).catch(() => {
         updateRuleRes.data.status = 400
         this.disabled = false
@@ -453,7 +477,7 @@ export default {
       }
       //  工单-待确认状态
       if (item.taskStatus === '5') {
-        this.getNextUserOption()
+        // this.getNextUserOption()
         // 工单-有实质性意见 status=5 ；无实质性意见：status=3，有无实质意见的区别在页面上表现为：是否要上传最终上线材料
         this.status = item.substantiveOpinions === 1 ? 5 : 3
         this.crtComp = 'approvedOpinionCard'
@@ -463,6 +487,7 @@ export default {
         this.status = 4
         this.crtComp = 'approvedOpinionCard'
       }
+      this.getNextUserOption()
     },
     /**
      * @description: 获取申请单的所有节点信息，从root根节点一直到下一节点
