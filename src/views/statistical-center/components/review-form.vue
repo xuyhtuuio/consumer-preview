@@ -1,5 +1,5 @@
 <template>
-  <div class="review-form">
+  <div class="review-form" v-loading="isShow">
     <TrsTable
       theme="TRS-table-gray"
       :data="data"
@@ -15,7 +15,7 @@
         </div>
       </template>
       <template #org="scope">
-        <div class="org">
+        <div class="orgName">
           <span
             class="org-icon"
             :style="{'background-color' : colorData[scope.$index%7]} "
@@ -35,9 +35,11 @@
 </template>
 
 <script>
+import { reviewTaskDistribution } from '@/api/statistical-center'
 export default {
   data() {
     return {
+      isShow: true,
       colConfig: [
         {
           label: '序号',
@@ -49,7 +51,7 @@ export default {
         },
         {
           label: '机构',
-          prop: 'org',
+          prop: 'orgName',
           bind: {
             width: 140,
             align: 'center'
@@ -57,11 +59,11 @@ export default {
         },
         {
           label: '审查项目数',
-          prop: 'project'
+          prop: 'examineAllTotal'
         },
         {
           label: '平均审查时长',
-          prop: 'average',
+          prop: 'averageReviewDuration',
           bind: {
             width: 120,
             align: 'center'
@@ -69,11 +71,11 @@ export default {
         },
         {
           label: '一次通过率',
-          prop: 'firstTime'
+          prop: 'formOneTimePassRate'
         },
         {
           label: '接受率',
-          prop: 'acceptanceRate',
+          prop: 'viewAcceptanceRate',
           bind: {
             align: 'center',
             sortable: 'custom'
@@ -155,6 +157,15 @@ export default {
     }
   },
   methods: {
+    async initData(data) {
+      this.isShow = true
+      const { data: res } = await reviewTaskDistribution(data)
+      if (res.success) {
+        console.log(res.data)
+        this.data = res.data.list
+        this.isShow = false
+      }
+    },
     sortChange() {},
     submitEdit() {},
     handleCurrentChange() {}

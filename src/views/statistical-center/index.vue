@@ -107,7 +107,7 @@
         <g-table-card title="审查任务分布">
           <template #content>
             <RectTree ref="ref-rect-tree"></RectTree>
-            <ReviewForm></ReviewForm>
+            <ReviewForm ref="ref-review-form"></ReviewForm>
           </template>
         </g-table-card>
       </div>
@@ -232,6 +232,7 @@ export default {
       this.$refs['ref-type-distribution'].initData(data)
       this.$refs['ref-mission-trends'].initData(data)
       this.$refs['ref-rect-tree'].initData(data)
+      this.$refs['ref-review-form'].initData(data)
     },
     handleReset() {
       this.search = {

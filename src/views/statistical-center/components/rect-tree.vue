@@ -17,12 +17,9 @@ export default {
       this.isShow = true
       const { data: res } = await reviewTaskDistributionChart(data)
       if (res.success) {
-        console.log(res.data)
         this.isShow = false
         this.$nextTick(() => {
-          if (res.data.length > 1) {
-            this.initEcharts(res.data[0].children)
-          }
+          this.initEcharts(res.data)
         })
       }
     },

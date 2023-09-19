@@ -48,3 +48,12 @@ export function reviewTaskDistributionChart(data) {
     data
   })
 }
+
+// 审查任务分布图
+export function reviewTaskDistribution(data) {
+  return request({
+    url: '/cpr/Statistics/reviewTaskDistribution',
+    method: 'POST',
+    data
+  })
+}
