@@ -130,6 +130,14 @@ export function downloadAllFiles(param) {
     params: param
   })
 }
+export function downloadAllFilesOther(param) {
+  return request({
+    url: '/cpr//onlineComparison/downloadAllFiles',
+    method: 'get',
+    responseType: 'blob',
+    params: param
+  })
+}
 // 用id获取意见详情
 export function getEditedCommentsByFormId(param) {
   return request({
