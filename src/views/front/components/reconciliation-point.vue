@@ -258,6 +258,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     /deep/.el-form-item {
+      width: 100%;
       position: relative;
       &.SelectInput {
         width: calc((100% - 20px) / 2);
