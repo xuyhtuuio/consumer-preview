@@ -40,3 +40,11 @@ export function reviewTaskTrends(data) {
     data
   })
 }
+// 审查任务分布图
+export function reviewTaskDistributionChart(data) {
+  return request({
+    url: '/cpr/Statistics/reviewTaskDistributionChart',
+    method: 'POST',
+    data
+  })
+}

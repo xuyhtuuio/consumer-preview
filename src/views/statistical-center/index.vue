@@ -106,7 +106,7 @@
       <div class="main-item common">
         <g-table-card title="审查任务分布">
           <template #content>
-            <RectTree></RectTree>
+            <RectTree ref="ref-rect-tree"></RectTree>
             <ReviewForm></ReviewForm>
           </template>
         </g-table-card>
@@ -223,7 +223,7 @@ export default {
     passData() {
       const { billValue, cascader, datePicker } = this.search
       const data = {
-        orgId: billValue,
+        orgId: '516' || billValue,
         formCategoryId: cascader[cascader.length - 1] || '',
         startTimeStr: datePicker[0],
         endTimeStr: datePicker[1]
@@ -231,6 +231,7 @@ export default {
       this.$refs['ref-data-overview'].initData(data)
       this.$refs['ref-type-distribution'].initData(data)
       this.$refs['ref-mission-trends'].initData(data)
+      this.$refs['ref-rect-tree'].initData(data)
     },
     handleReset() {
       this.search = {
