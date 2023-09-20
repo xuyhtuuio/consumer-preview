@@ -2,6 +2,7 @@
   <div class="reaching-consumers" v-loading="isShow">
     <g-table-card :title="title">
       <template #content>
+        <template v-if="echartsData.length">
         <div class="my-echart" ref="my-chart"></div>
         <div class="right">
           <div class="right-main">
@@ -33,6 +34,9 @@
             </div>
           </div>
         </div>
+
+        </template>
+        <empty v-else></empty>
       </template>
     </g-table-card>
   </div>
@@ -58,39 +62,39 @@ export default {
       ],
       echartsTitle: '',
       echartsData: [
-        {
-          value: 1548,
-          name: '总行渠道',
-          rate: 25,
-          children: [
-            { name: '网点', value: 104 },
-            { name: '官网', value: 33 },
-            { name: '手机银行', value: 22 },
-            { name: '手机银行直播平台', value: 44 },
-            { name: '短信', value: 33 },
-            { name: '电话银行', value: 65 },
-            { name: '抖音，bilibili，小红书等视频等线上渠道', value: 23 }
-          ]
-        },
-        {
-          value: 775,
-          rate: 25,
-          name: '分行渠道',
-          children: [
-            { name: '网点(分行)', value: 104 },
-            { name: '官网(分行)', value: 33 },
-            { name: '抖音，bilibili，小红书等视频等线上渠道', value: 23 }
-          ]
-        },
-        {
-          value: 679,
-          rate: 25,
-          name: '支行渠道',
-          children: [
-            { name: '网点(支行)', value: 104 },
-            { name: '短信(支行)', value: 33 }
-          ]
-        }
+        // {
+        //   value: 1548,
+        //   name: '总行渠道',
+        //   rate: 25,
+        //   children: [
+        //     { name: '网点', value: 104 },
+        //     { name: '官网', value: 33 },
+        //     { name: '手机银行', value: 22 },
+        //     { name: '手机银行直播平台', value: 44 },
+        //     { name: '短信', value: 33 },
+        //     { name: '电话银行', value: 65 },
+        //     { name: '抖音，bilibili，小红书等视频等线上渠道', value: 23 }
+        //   ]
+        // },
+        // {
+        //   value: 775,
+        //   rate: 25,
+        //   name: '分行渠道',
+        //   children: [
+        //     { name: '网点(分行)', value: 104 },
+        //     { name: '官网(分行)', value: 33 },
+        //     { name: '抖音，bilibili，小红书等视频等线上渠道', value: 23 }
+        //   ]
+        // },
+        // {
+        //   value: 679,
+        //   rate: 25,
+        //   name: '支行渠道',
+        //   children: [
+        //     { name: '网点(支行)', value: 104 },
+        //     { name: '短信(支行)', value: 33 }
+        //   ]
+        // }
       ],
       currentEchartIndex: 0
     }
@@ -106,9 +110,13 @@ export default {
       const { data: res } = await touchingConsumerChannels(data)
       if (res.success) {
         this.echartsData = res.data
-        this.initEcharts(res.data)
-        this.isShow = false
+        this.$nextTick(() => {
+          this.initEcharts(res.data)
+        })
+      } else {
+        this.echartsData = []
       }
+      this.isShow = false
     },
     initEcharts(data = this.echartsData, title = '') {
       const oneData = data

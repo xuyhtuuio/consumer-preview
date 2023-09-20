@@ -1,5 +1,5 @@
 <template>
-  <div class="turn-down">
+  <div class="turn-down" v-loading="isShow">
     <g-table-card :title="title">
       <template #content>
         <div class="tab">
@@ -14,6 +14,7 @@
             <span v-if="index !== 2" class="line" :key="item.id"></span>
           </template>
         </div>
+        <template>
         <div class="main" v-show="currentTabListIndex === 0">
           <div class="left">
             <div class="top">
@@ -55,23 +56,26 @@
           <div class="legend">
             <div
               class="legend-item"
-              v-for="(item, index) in reasonData.xData"
+              v-for="(item, index) in reasonData"
               :key="'legend' + index"
             >
               <span
                 class="legend-icon"
                 :style="{ backgroundColor: reasonData.color[index] }"
               ></span>
-              <span>{{ item }}</span>
+              <span>{{ item.name }}</span>
             </div>
           </div>
         </div>
+
+        </template>
       </template>
     </g-table-card>
   </div>
 </template>
 
 <script>
+import { rejectStatistics } from '@/api/statistical-center'
 import tableMixin from '../mixins/turn-down-table'
 import echartMixin from '../mixins/turn-down-echarts'
 export default {
@@ -79,15 +83,45 @@ export default {
   data() {
     return {
       title: '驳回统计',
+      isShow: true,
       tabList: [
-        { id: 1, name: '驳回单及驳回率' },
-        { id: 2, name: '驳回次数分布' },
-        { id: 3, name: '驳回原因分布' }
+        { id: 1, name: '驳回单及驳回率', url: '/cpr/Statistics/distributionOfRejectionTimes' },
+        { id: 2, name: '驳回次数分布', url: '/cpr/Statistics/distributionOfRejectionTimes' },
+        { id: 3, name: '驳回原因分布', url: '/cpr/Statistics/distributionOfRejectionReasons' }
       ],
-      currentTabListIndex: 0
+      dataMap: ['orderData', 'stackBarData', 'reasonData'],
+      currentTabListIndex: 1
     }
   },
   methods: {
+    async initData(data) {
+      this.searchData = data
+      this.isShow = true
+      const requestArr = []
+      this.tabList.forEach(item => {
+        requestArr.push(rejectStatistics(data, item.url))
+      })
+      const [{ data: res1 }, { data: res2 }, { data: res3 }] = await Promise.all(requestArr)
+      if (res1.success) {
+        // console.log(res1.data)
+      }
+      if (res2) {
+        this.stackBarData = res2.data
+      }
+      if (res3) {
+        this.reasonData = res3.data
+        this.reasonData.color = [
+          '#249EFF',
+          '#65CFE4',
+          '#74E4BD',
+          '#14C9C9',
+          '#2D5CF6',
+          '#21CCFF'
+        ]
+      }
+      this.isShow = false
+      this.handleEchartsToggle(this.currentTabListIndex)
+    },
     handleTabToggle(index) {
       if (this.currentTabListIndex !== index) {
         this.currentTabListIndex = index

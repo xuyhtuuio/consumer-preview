@@ -10,42 +10,9 @@ export default {
         ],
         color: ['#5773F9', '#249EFF', '#21CCFF', '#81E2FF']
       },
-      stackBarData: {
-        xData: ['总行', '北京分行', '上海分行', '山西分行', '内蒙分行'],
-        yDataDy: [10, 12, 30, 20, 15],
-        yDataDe: [10, 12, 30, 20, 15],
-        yDataDs: [10, 12, 30, 20, 15],
-        yDataDsi: [10, 12, 30, 20, 15],
-        rate: ['10%', '12%', '30%', '20%', '22%'],
-        seriesName: ['驳回1次', '驳回2次', '驳回3次', '驳回4次及以上']
-      },
-      reasonData: {
-        xData: [
-          '承担义务低于承诺的标准',
-          '误导宣传',
-          '上级审核备案程序误导客户',
-          '隐瞒限制条件',
-          '缺少免责条款',
-          '其他'
-        ],
-        yDataDy: [10, 12, 30, 20, 15, 30],
-        color: [
-          '#249EFF',
-          '#65CFE4',
-          '#74E4BD',
-          '#14C9C9',
-          '#2D5CF6',
-          '#21CCFF'
-        ]
-      }
+      stackBarData: {},
+      reasonData: []
     }
-  },
-  mounted() {
-    this.$nextTick(() => {
-      this.initOrderEcharts(this.orderData)
-      // this.initStackBarDataEcharts(this.stackBarData)
-      // this.initReasonEcharts(this.reasonData)
-    })
   },
   methods: {
     handleEchartsToggle(index) {
@@ -138,12 +105,8 @@ export default {
     },
     // 驳回次数分布
     initStackBarDataEcharts(industryDataVal) {
-      // const colorList = ['#F9CC45', '#FFE7BA', '#FFA940', '#F76560'];
       const newIndustryDataVal = JSON.parse(JSON.stringify(industryDataVal));
-      const xData = newIndustryDataVal.xData.reverse()
-      const yDataDy = newIndustryDataVal.yDataDy.reverse()
-      const yDataDe = newIndustryDataVal.yDataDe.reverse()
-      const yDataDs = newIndustryDataVal.yDataDs.reverse()
+      const { xData, yDataDy, yDataDe, yDataDs, yDataDsi, AllCount } = newIndustryDataVal
       const option = {
         tooltip: {
           backgroundColor: 'rgba(255,255,255,0.8)',
@@ -163,8 +126,8 @@ export default {
             const name = serie[0].axisValueLabel
             let params = '<p class="charts-tooltip-p fontw black">驳回次数</p>'
             params += `<p class="charts-tooltip-p black"><span>${name}</span><span>${countAll}项</span><span>全行占比${
-              industryDataVal.rate[serie[0].dataIndex]
-            }</span></p>`
+              countAll / AllCount
+            }%</span></p>`
             params += `<div class="charts-tooltip-box">${paramsList}</div>`
             return params
           }
@@ -261,7 +224,7 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: yDataDe
+            data: yDataDs
           },
           {
             name: industryDataVal.seriesName[3],
@@ -277,22 +240,44 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: yDataDs
+            data: yDataDsi
           }
         ]
       }
       this.initChart('stackBar-echart', option)
     },
     // 原因分布
-    initReasonEcharts({ color: colorBy, yDataDy, xData }) {
-      const yDataDy1 = JSON.parse(JSON.stringify(yDataDy))
-      const xData1 = JSON.parse(JSON.stringify(xData))
-      const color = colorBy.reverse()
+    initReasonEcharts(originData) {
+      const yDataDy1 = []
+      const xData1 = []
+
+      originData.map(item => {
+        xData1.push(item.name)
+        yDataDy1.push(item.value)
+      })
+      const color = [
+        '#249EFF',
+        '#65CFE4',
+        '#74E4BD',
+        '#14C9C9',
+        '#2D5CF6',
+        '#21CCFF'
+      ]
       const option = {
         tooltip: {
           backgroundColor: 'rgba(255,255,255,0.8)',
           borderColor: 'rgba(255,255,255,0.8)',
           formatter(params) {
+            let child = ''
+            const idx = params.dataIndex
+            originData[idx].children.forEach(item => {
+              child += `
+                <div style="width:45%;display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
+                  <span>${item.name}</span>
+                  <span>${item.value}项</span>
+                </div>
+              `
+            })
             const p = `
             <div style="min-width:200px;padding: 6px;display:flex;gap:8px;flex-direction:column;font-size:12px">
             <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">驳回原因</div>
@@ -304,29 +289,10 @@ export default {
               </div>
               <div style="display:flex;gap:12px;">
                 <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;"></span>
-                <div style="flex:1;display:flex;justify-content: space-between;">
-                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                    <span>产品类</span>
-                    <span>230项</span>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                    <span>活动类</span>
-                    <span>23项</span>
-                  </div>
-                </div>
+
+                <div style="flex:1;display:flex;justify-content: space-between;flex-wrap:wrap">
+                ${child}
               </div>
-              <div style="display:flex;gap:12px;">
-                <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;"></span>
-                <div style="flex:1;display:flex;justify-content: space-between">
-                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                    <span>产品类</span>
-                    <span>230项</span>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                    <span>活动类</span>
-                    <span>23项</span>
-                  </div>
-                </div>
               </div>
             </div>
             </div>
@@ -342,15 +308,13 @@ export default {
           containLabel: true
         },
         legend: {
-          show: true,
+          show: false,
           top: '0',
           icon: 'rect',
-          data: xData1.reverse()[0]
         },
         xAxis: {},
-        yAxis: { type: 'category', data: xData1.reverse() },
+        yAxis: { type: 'category', data: xData1 },
         series: {
-          name: xData1.reverse()[0],
           type: 'bar',
           itemStyle: {
             color: (params) => {
@@ -358,7 +322,7 @@ export default {
             }
           },
 
-          data: yDataDy1.reverse()
+          data: yDataDy1
         }
       }
       this.initChart('reason-echart', option)

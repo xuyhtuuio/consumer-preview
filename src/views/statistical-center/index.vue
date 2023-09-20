@@ -116,7 +116,7 @@
       </div>
       <div class="main-item flex" style="gap: 16px; height: 430px">
         <SystemConnection class="common" />
-        <TurnDown class="common" />
+        <TurnDown class="common" ref="ref-turn-down"/>
       </div>
       <div class="main-item flex" style="gap: 16px">
         <SensitiveProhibited
@@ -206,7 +206,6 @@ export default {
     }
   },
   methods: {
-
     async  initData() {
       const newMonth = dayjs().format('YYYY-MM');
       const oldMonth = newMonth.split('')
@@ -234,6 +233,7 @@ export default {
       this.$refs['ref-rect-tree'].initData(data)
       this.$refs['ref-review-form'].initData(data)
       this.$refs['ref-reaching-consumers'].initData(data)
+      this.$refs['ref-turn-down'].initData(data)
     },
     handleReset() {
       this.search = {

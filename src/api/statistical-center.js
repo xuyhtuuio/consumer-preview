@@ -66,3 +66,13 @@ export function touchingConsumerChannels(data) {
     data
   })
 }
+
+// 驳回统计
+
+export function rejectStatistics(data, url) {
+  return request({
+    url,
+    method: 'POST',
+    data
+  })
+}
