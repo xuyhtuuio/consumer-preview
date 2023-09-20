@@ -7,7 +7,7 @@
       <div class="scrren-right">
         <div class="scrren-com" :class="billValue ? 'active' : ''">{{ billValue }}
           <img src="../../assets/image/person-center/down.png" class="down" alt="">
-          <el-select v-model="billValue" placeholder="请选择" @change="billChange">
+          <el-select v-model="billValue" placeholder="请选择">
             <el-option v-for="item in billOptions" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
@@ -69,43 +69,49 @@
           <div class="filters">
             <div class="filters-content">
               <div class="floor1">
-                <el-select v-model="search.approvalType" placeholder="审批事项类型" @change="searchList" clearable>
+                <el-select v-model="approvalSearch.formManagementId" placeholder="审批事项类型" @change="getApprovaSearch(1)"
+                  clearable>
                   <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
                     :value="item.value"></el-option>
                 </el-select>
-                <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @change="searchList" clearable>
+                <el-select v-model="approvalSearch.hasOpinions" placeholder="有/无实质意见" @change="getApprovaSearch(1)"
+                  clearable>
                   <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
                     :value="item.value"></el-option>
                 </el-select>
-                <el-select v-model="search.onceAdopt" placeholder="一次通过" @change="searchList" clearable>
+                <el-select v-model="approvalSearch.onceAdopt" placeholder="是否一次通过" @change="getApprovaSearch(1)"
+                  clearable>
                   <el-option v-for="(item, index) in $field('isOncePass')" :key="index" :label="item.label"
                     :value="item.value"></el-option>
                 </el-select>
               </div>
               <div class="floor2">
                 <div class="floor2-item">
-                  <el-input v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
-                    @keyup.enter.native="searchList">
-                    <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
+                  <el-input v-model="approvalSearch.keywords" placeholder="请输入项目名称关键词查询" clearable
+                    @clear="getApprovaSearch(1)" @keyup.enter.native="getApprovaSearch(1)">
+                    <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="getApprovaSearch(1)"></i>
                   </el-input>
                 </div>
                 <div class="floor2-item floor2-itemW">
                   <span>提单时间</span>
-                  <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
-                    value-format="yyyy-MM-dd" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间">
+                  <el-date-picker v-model="approvalSearch.startDate" type="daterange" clearable
+                    @change="getApprovaSearch(1)" value-format="yyyy-MM-dd" range-separator="-" start-placeholder="开始时间"
+                    end-placeholder="结束时间">
                   </el-date-picker>
                 </div>
               </div>
             </div>
           </div>
-          <div class="list trs-scroll" v-loading="search.loading" ref="box">
+          <div class="list trs-scroll" v-loading="approvalSearch.loading" ref="box">
             <div v-if="list.length">
               <div v-for="(item, index) in list" :key="index">
-                <approvalEventCard :item="item" :crtSign="crtSign"></approvalEventCard>
+                <approvalEventCard :item="item" :crtSign="crtSign" v-if="rejectDialogTit === '审批概览'"></approvalEventCard>
+                <applyEventCard :item="item" v-if="rejectDialogTit === '申请概览'"></applyEventCard>
               </div>
-              <trs-pagination :total="search.total" @getList="getList" :pageNow="pageNow"></trs-pagination>
+              <trs-pagination :total="approvalSearch.total" @getList="getApprovaSearch"
+                :pageNow="approvalSearch.pageNow"></trs-pagination>
             </div>
-            <div v-loading="search.loading" v-else>
+            <div v-else>
               <Empty></Empty>
             </div>
           </div>
@@ -129,21 +135,23 @@
             <div class="filters-content">
               <div class="floor2">
                 <div class="floor2-item">
-                  <el-select v-model="search.approvalType" placeholder="审批事项类型" @change="searchList" clearable>
+                  <el-select v-model="rejectSearch.recordId" placeholder="审批事项类型" @change="rejectSearchChange()"
+                    clearable>
                     <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
                       :value="item.value"></el-option>
                   </el-select>
                 </div>
                 <div class="floor2-item floor2-itemW">
                   <span>提单时间</span>
-                  <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
-                    value-format="yyyy-MM-dd" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间">
+                  <el-date-picker v-model="rejectSearch.seachTime" type="daterange" clearable
+                    :picker-options="rejectPickerOptions" @change="rejectSearchChange()" value-format="yyyy-MM-dd"
+                    range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间">
                   </el-date-picker>
                 </div>
               </div>
             </div>
           </div>
-          <div class="reject-echart">
+          <div class="reject-echart" v-loading="rejectLoading">
             <div class="echart-com" v-show="currentTabListIndex === 0">
               <div class="com-echart" id="reason-echart"></div>
               <div class="legend">
@@ -165,18 +173,18 @@
 <script>
 import {
   getApprovalType,
-  getApprovalListStation,
   getOrgTree
 } from '@/api/approvalCenter'
-// eslint-disable-next-line no-unused-vars
-import { contributionChange, rejectReason } from '@/api/personCenter'
+import { contributionChange, rejectReason, rejectRate, oneApprovalList, oneApplicationList } from '@/api/personCenter'
 import approvalEventCard from './components/approval-event-card'
+import applyEventCard from './components/apply-event-card'
 import personApproval from './components/person-approval'
 import personLading from './components/person-lading'
 export default {
   components: {
     approvalEventCard,
     personApproval,
+    applyEventCard,
     personLading
   },
   name: 'person-center-index',
@@ -217,8 +225,12 @@ export default {
           }
         ]
       },
+      rejectPickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
+      },
       datePicker: '',
-      keywords: '',
       billOptions: [{
         value: '审批人员',
         label: '审批人员'
@@ -226,25 +238,23 @@ export default {
         value: '提单人员',
         label: '提单人员'
       }],
-      billValue: '提单人员',
+      billValue: '审批人员',
       rejectDialog: false,
       rejectDialogTit: '',
       passingData: {
         xData: [],
         yData: [],
       },
-      search: {
-        approvalType: '',
-        approvalStage: '',
-        urgent: '',
+      approvalSearch: {
+        formManagementId: '',
         hasOpinions: '',
-        adoptionStatus: '',
+        onceAdopt: '',
         keywords: '',
         startDate: [],
-        productLaunchDate: [],
+        pageNow: 1,
+        pageSize: 10,
         total: 0,
-        loading: false,
-        orgIds: []
+        loading: false
       },
       transactionTypes: [],
       crtSign: 'allTask',
@@ -253,7 +263,7 @@ export default {
         { id: 1, name: '驳回原因分布' },
         { id: 2, name: '驳回率' }
       ],
-      currentTabListIndex: 0,
+      currentTabListIndex: null,
       reasonData: {
         xData: [
           '文件预览失败（文件损坏/清晰度过低）',
@@ -292,16 +302,17 @@ export default {
         xData: ['2022-11', '2022-12', '2023-01', '2023-02', '2023-03'],
         yData: [800, 1200, 390, 200, 1500],
       },
-      contributionLoading: false,
-      acceptanceLoading: false,
-      processingLoading: false,
       passingLoading: false,
-      rowData: {}
+      rowData: {},
+      rejectLoading: false,
+      rejectSearch: {
+        recordId: '',
+        seachTime: [],
+      }
     }
   },
   mounted() {
     this.getOrgTree()
-    this.billChange()
   },
   watch: {
   },
@@ -335,17 +346,21 @@ export default {
     rejectDialogClose() {
       this.rejectDialog = false
       this.rejectDialogTit = ''
+      this.currentTabListIndex = null
+      this.approvalSearch.formManagementId = ''
+      this.approvalSearch.hasOpinions = ''
+      this.approvalSearch.onceAdopt = ''
+      this.approvalSearch.keywords = ''
+      this.approvalSearch.startDate = []
     },
-    billChange() {
-      if (this.billValue === '审批人员') {
-        // this.$nextTick(() => {
-        //   this.getApproveContribution()
-        //   this.getApproveAcceptRate()
-        //   this.getApproveAvgTime()
-        // })
+    getApprovaSearch(pageNow) {
+      if (this.rejectDialogTit === '审批概览') {
+        this.getApprovaList(pageNow)
+      }
+      if (this.rejectDialogTit === '申请概览') {
+        this.getApplicatList(pageNow)
       }
     },
-    // eslint-disable-next-line no-unused-vars
     rejectDialogShow(rejectDialogData) {
       // console.log('rejectDialogData', rejectDialogData);
       this.rejectDialogTit = rejectDialogData.rejectDialogTit;
@@ -353,26 +368,29 @@ export default {
       this.rejectDialog = true
       if (this.rejectDialogTit === '月度贡献值变化情况') {
         this.$nextTick(() => {
-          this.getContributionChange(this.rowData.userId)
+          this.getContributionChange()
         })
       }
-      if (this.rejectDialogTit === '审批概览' || this.rejectDialogTit === '申请概览') {
+      if (this.rejectDialogTit === '审批概览') {
         this.getApprovalType()
-        this.getList(1)
+        this.getApprovaList(1)
+      }
+      if (this.rejectDialogTit === '申请概览') {
+        this.getApprovalType()
+        this.getApplicatList(1)
       }
       if (this.rejectDialogTit === '驳回情况') {
         this.$nextTick(() => {
-          this.initReasonEcharts(this.reasonData);
+          this.getApprovalType()
+          this.handleTabToggle(0)
         })
       }
     },
-    approvalList() {
-    },
     // 贡献值月度变化
-    async getContributionChange(userId) {
+    async getContributionChange() {
       this.passingData.xData = [];
       this.passingData.yData = []
-      await contributionChange({ userId }).then((res) => {
+      await contributionChange({ userId: this.rowData.userId }).then((res) => {
         this.passingLoading = true
         const { data } = res
         if (data) {
@@ -500,50 +518,29 @@ export default {
         });
       });
     },
-    searchList() { },
-    getList(pageNow) {
-      const listType = '4'
-      this.pageNow = pageNow
+    // 审批列表
+    getApprovaList(pageNow) {
+      this.approvalSearch.pageNow = pageNow
       const param = {
-        pageNow,
-        pageSize: 10,
-        ...this.search,
-        listType,
-        formManagementId: this.search.approvalType,
-        nodeid: this.search.approvalStage,
-        orgIds: this.search.orgIds.length ? this.search.orgIds : null,
+        ...this.approvalSearch,
+        userId: this.rowData.userId,
         createTimeStart:
-          this.search.startDate && this.search.startDate.length > 0
-            ? this.search.startDate[0] + ' 00:00:00'
+          this.approvalSearch.startDate && this.approvalSearch.startDate.length > 0
+            ? this.approvalSearch.startDate[0] + ' 00:00:00'
             : '',
         createTimeEnd:
-          this.search.startDate && this.search.startDate.length > 0
-            ? this.search.startDate[1] + ' 23:59:59'
+          this.approvalSearch.startDate && this.approvalSearch.startDate.length > 0
+            ? this.approvalSearch.startDate[1] + ' 23:59:59'
             : '',
       }
       Reflect.deleteProperty(param, 'total')
       Reflect.deleteProperty(param, 'loading')
-      Reflect.deleteProperty(param, 'productLaunchDate')
       Reflect.deleteProperty(param, 'startDate')
-      this.search.loading = true
-      const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
-      const taskDTO = {
-        pageNo: 0,
-        pageSize: 10,
-        currentUserInfo: {
-          id: userInfo.id,
-          name: userInfo.fullname
-        }
-      }
-      // eslint-disable-next-line
-      const wait_param = {
-        ...param,
-        taskDTO
-      }
-      getApprovalListStation(wait_param)
+      this.approvalSearch.loading = true
+      oneApprovalList(param)
         .then((res) => {
           const { data } = res.data
-          this.search.total = data.totalCount
+          this.approvalSearch.total = data.totalCount
           const flag = Array.isArray(data.list)
           this.list = flag && data.list.length > 0
             ? data.list.map((v) => {
@@ -559,11 +556,57 @@ export default {
               }
             })
             : []
-          this.search.loading = false
+          this.approvalSearch.loading = false
         })
         .catch(() => {
-          this.search.loading = false
-          this.search.total = 0
+          this.approvalSearch.loading = false
+          this.approvalSearch.total = 0
+          this.list = []
+        })
+    },
+    // 申请列表
+    getApplicatList(pageNow) {
+      this.approvalSearch.pageNow = pageNow
+      const param = {
+        ...this.approvalSearch,
+        userId: this.rowData.userId,
+        createTimeStart:
+          this.approvalSearch.startDate && this.approvalSearch.startDate.length > 0
+            ? this.approvalSearch.startDate[0] + ' 00:00:00'
+            : '',
+        createTimeEnd:
+          this.approvalSearch.startDate && this.approvalSearch.startDate.length > 0
+            ? this.approvalSearch.startDate[1] + ' 23:59:59'
+            : '',
+      }
+      Reflect.deleteProperty(param, 'total')
+      Reflect.deleteProperty(param, 'loading')
+      Reflect.deleteProperty(param, 'startDate')
+      this.approvalSearch.loading = true
+      oneApplicationList(param)
+        .then((res) => {
+          const { data } = res.data
+          this.approvalSearch.total = data.totalCount
+          const flag = Array.isArray(data.list)
+          this.list = flag && data.list.length > 0
+            ? data.list.map((v) => {
+              return {
+                ...v,
+                taskNumber: v.recordId + '',
+                taskName: v.entryName,
+                initiator: {
+                  ...v.originator,
+                  label: v.institutional && v.institutional[1]
+                },
+                taskStatus: v.nodeStatus
+              }
+            })
+            : []
+          this.approvalSearch.loading = false
+        })
+        .catch(() => {
+          this.approvalSearch.loading = false
+          this.approvalSearch.total = 0
           this.list = []
         })
     },
@@ -668,12 +711,18 @@ export default {
     handleTabToggle(index) {
       if (this.currentTabListIndex !== index) {
         this.currentTabListIndex = index
-        if (index === 0) {
-          this.initReasonEcharts(this.reasonData)
-        }
-        if (index === 1) {
-          this.initRejectionRateEcharts(this.rejectionRateData)
-        }
+        this.rejectSearch.recordId = '';
+        this.rejectSearch.seachTime = [];
+        this.rejectSearchChange()
+      }
+    },
+    rejectSearchChange() {
+      if (this.currentTabListIndex === 0) {
+        this.initReasonEcharts(this.reasonData)
+        this.getRejectReason()
+      }
+      if (this.currentTabListIndex === 1) {
+        this.getRejectRate()
       }
     },
     initRejectionRateEcharts(industryDataVal) {
@@ -755,6 +804,39 @@ export default {
             value: v.recordId
           }
         })
+      })
+    },
+    getRejectReason() {
+      this.rejectLoading = true
+      const getData = {
+        userId: this.rowData.userId,
+        recordId: this.rejectSearch.recordId,
+        startTime: this.rejectSearch.seachTime?.length ? this.rejectSearch.seachTime[0] : '',
+        endTime: this.rejectSearch.seachTime?.length ? this.rejectSearch.seachTime[1] : ''
+      }
+      rejectReason(getData).then((res) => {
+        // eslint-disable-next-line no-unused-vars
+        const { data } = res.data
+        // this.reasonData.xData = data.titleList
+        // this.reasonData.yData = data.countList
+        // this.reasonData.yDataHint = data.dataList
+        this.rejectLoading = false
+      })
+    },
+    getRejectRate() {
+      this.rejectLoading = true
+      const getData = {
+        userId: this.rowData.userId,
+        recordId: this.rejectSearch.recordId,
+        startTime: this.rejectSearch.seachTime?.length ? this.rejectSearch.seachTime[0] : '',
+        endTime: this.rejectSearch.seachTime?.length ? this.rejectSearch.seachTime[1] : ''
+      }
+      rejectRate(getData).then((res) => {
+        const { data } = res.data
+        this.rejectionRateData.xData = data.titleList
+        this.rejectionRateData.yData = data.rateList
+        this.initRejectionRateEcharts(this.rejectionRateData)
+        this.rejectLoading = false
       })
     },
   },
@@ -967,7 +1049,7 @@ export default {
             }
 
             .floor2-itemW {
-              width: 40%;
+              width: 44%;
             }
 
             .floor2-item:last-of-type {
@@ -1293,6 +1375,11 @@ export default {
 <style lang="less">
 .el-range-editor.el-input__inner {
   width: 100%;
+  display: block;
+}
+
+.el-date-editor .el-range__close-icon {
+  margin-right: 15px;
 }
 
 .charts-tooltip-p {

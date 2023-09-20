@@ -341,7 +341,7 @@ export default {
             margin: 0 8px 0 0;
             background: #fff;
             padding: 2px 12px;
-            word-break: keep-all;
+            word-break: break-all;
           }
 
           i {
