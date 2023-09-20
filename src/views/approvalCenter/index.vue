@@ -30,9 +30,9 @@
                 <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
                   :value="item.value"></el-option>
               </el-select>
-              <!-- <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable>
+              <el-select v-model="search.approvalStage" placeholder="审批阶段" @change="searchList" clearable>
                 <el-option v-for="(item, index) in approvalPhases" :key="index" :label="item.label"
-                  :value="item.value"></el-option></el-select> -->
+                  :value="item.value"></el-option></el-select>
               <el-select v-model="search.urgent" placeholder="是否加急" @change="searchList" clearable>
                 <el-option v-for="(item, index) in $field('isUrgent')" :key="index" :label="item.label"
                   :value="item.value"></el-option>
@@ -45,10 +45,7 @@
                   value: 'id',
                   children: 'children'
                 }" clearable></el-cascader>
-              <el-select v-model="search.returnSign" placeholder="驳回次数" @change="searchList" clearable>
-                <el-option v-for="(item, index) in $field('isReject')" :key="index" :label="item.label"
-                  :value="item.value"></el-option>
-              </el-select>
+
               <el-select v-model="search.updateTime2" ref="multiSelect" multiple @change="changeSort" :class="search.updateTime2[1] == 'desc'
                 ? 'arrow-select descArrow'
                 : 'arrow-select ascArrow'
@@ -58,6 +55,10 @@
                   </el-option>
                 </el-option-group>
               </el-select>
+              <el-select v-model="search.returnSign" placeholder="驳回次数" @change="searchList" clearable>
+                <el-option v-for="(item, index) in $field('isReject')" :key="index" :label="item.label"
+                  :value="item.value"></el-option>
+              </el-select>
               <el-select v-model="search.onceAdopt" placeholder="一次通过" @change="searchList" clearable>
                 <el-option v-for="(item, index) in $field('isOncePass')" :key="index" :label="item.label"
                   :value="item.value"></el-option>
@@ -66,7 +67,6 @@
                 <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
                   :value="item.value"></el-option>
               </el-select>
-              <div class="el-select"></div>
               <div class="el-select"></div>
               <div class="el-select"></div>
             </div>
@@ -115,11 +115,13 @@ import approvalEventCard from '@/components/card/approval-event-card'
 import {
   getDataStatistics,
   getApprovalType,
-  getApprovalStage,
   getApprovalListStation,
   exportApprovalList,
   getOrgTree
 } from '@/api/approvalCenter'
+import {
+  getApprovalStage,
+} from '@/api/applyCenter'
 export default {
   components: {
     approvalEventCard
@@ -395,28 +397,25 @@ export default {
         })
     },
     getApprovalStage() {
-      const params = {
-        form_management_id: this.search.approvalType
-      }
-      getApprovalStage(params).then((res) => {
+      getApprovalStage(this.search.approvalType).then((res) => {
         const { data } = res.data
         this.approvalPhases = data
           ? data.map((v) => {
             return {
-              label: v,
-              value: v
+              label: v.nodeName,
+              value: v.nodeId
             }
           })
           : []
       })
     },
     changeArrrovalType() {
-      // if (this.search.approvalType || this.search.approvalType == 0) {
-      //   this.getApprovalStage();
-      // } else {
-      //   this.search.approvalStage = "";
-      //   this.approvalPhases = [];
-      // }
+      if (this.search.approvalType || this.search.approvalType === 0) {
+        this.getApprovalStage();
+      } else {
+        this.search.approvalStage = ''
+        this.approvalPhases = [];
+      }
       this.searchList()
     },
     changeStatis(item) {

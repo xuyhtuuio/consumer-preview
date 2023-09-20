@@ -71,7 +71,7 @@
       </div>
     </div>
     <div v-if="status == 4 && fileList && fileList.length">
-      <p class="downloadAll" @click="downloadAll">下载全部</p>
+      <p class="downloadAll" @click="download">下载全部</p>
     </div>
     <el-dialog title="关联文件" :visible.sync="relevantDocumentDialog" width="624" :before-close="handleClose"
       custom-class="relevant-dialog">
@@ -106,7 +106,7 @@
 import { deleteFormGroups } from '@/api/front'
 import FileType from '@/components/common/file-type'
 import { findFinalMaterial, uploadCompareFile } from '@/api/approvalCenter'
-import { downloadAllFiles } from '@/api/applyCenter'
+import { downloadAllFilesOther } from '@/api/applyCenter'
 export default {
   name: 'upload-file-card',
   components: { FileType },
@@ -205,19 +205,18 @@ export default {
     //       })
     // },
     /**
-     * @description: 全部下载（循环文件下载）
+     * @description: 下载
      * @return {*}
      */
-    downloadAll() {
-
-    },
     download(item) {
       const params = {
         formId: this.formId,
-        key: item.key
+      }
+      if (item) {
+        params.key = item.key
       }
       this.$message.info('下载中，请稍等！')
-      downloadAllFiles(params).then((res) => {
+      downloadAllFilesOther(params).then((res) => {
         const disposition = res.headers['content-disposition']
         const url = window.URL.createObjectURL(new Blob([res.data]))
         const link = document.createElement('a');
