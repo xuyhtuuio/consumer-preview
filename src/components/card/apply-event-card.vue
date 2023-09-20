@@ -24,12 +24,12 @@
             'tag end-sign': ['4'].includes(item.taskStatus)
           }">{{ $msg('NodeStatus')[item.taskStatus] }}>{{item.currentActivityName}}</i>
           <!-- 有无意见 -->
-          <i class="flex" v-if="['4', '5', '6'].includes(item.taskStatus)">
+          <i class="flex" v-if="['4', '5', '6'].includes(item.taskStatus)&&[1,0].includes(item.substantiveOpinions)">
             <i class="tag has-opinion" v-if="item.substantiveOpinions == 1">
               <i class="iconfont icon-guanzhu2"></i>
               有实质性意见
             </i>
-            <i class="tag has-no-opinion" v-if="item.substantiveOpinions !== 1">
+            <i class="tag has-no-opinion" v-if="item.substantiveOpinions == 0">
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
