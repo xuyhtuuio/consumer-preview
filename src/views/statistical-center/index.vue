@@ -112,7 +112,7 @@
         </g-table-card>
       </div>
       <div class="main-item common">
-        <ReachingConsumers />
+        <ReachingConsumers ref="ref-reaching-consumers"/>
       </div>
       <div class="main-item flex" style="gap: 16px; height: 430px">
         <SystemConnection class="common" />
@@ -233,6 +233,7 @@ export default {
       this.$refs['ref-mission-trends'].initData(data)
       this.$refs['ref-rect-tree'].initData(data)
       this.$refs['ref-review-form'].initData(data)
+      this.$refs['ref-reaching-consumers'].initData(data)
     },
     handleReset() {
       this.search = {

@@ -83,62 +83,6 @@ export default {
         }
       ],
       data: [
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
       ],
       colorData: [
         '#2D5CF6',
@@ -153,15 +97,16 @@ export default {
         pageNow: 1,
         total: 20,
         pageSize: 8
-      }
+      },
+      searchData: null
     }
   },
   methods: {
-    async initData(data) {
+    async initData(data = this.searchData) {
       this.isShow = true
+      this.searchData = data
       const { data: res } = await reviewTaskDistribution(data)
       if (res.success) {
-        console.log(res.data)
         this.data = res.data.list
         this.isShow = false
       }

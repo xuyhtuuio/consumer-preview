@@ -57,3 +57,12 @@ export function reviewTaskDistribution(data) {
     data
   })
 }
+// 触达消费者渠道
+
+export function touchingConsumerChannels(data) {
+  return request({
+    url: '/cpr/Statistics/touchingConsumerChannels',
+    method: 'POST',
+    data
+  })
+}

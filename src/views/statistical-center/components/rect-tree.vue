@@ -9,75 +9,23 @@ import { reviewTaskDistributionChart } from '@/api/statistical-center'
 export default {
   data() {
     return {
-      isShow: true
+      isShow: true,
     }
   },
   methods: {
     async initData(data) {
       this.isShow = true
+      this.searchData = data
       const { data: res } = await reviewTaskDistributionChart(data)
       if (res.success) {
         this.isShow = false
         this.$nextTick(() => {
-          this.initEcharts(res.data)
+          this.initEcharts(res.data.length === 1 ? res.data[0].children : res.data)
         })
       }
     },
     initEcharts(originData) {
       const data = originData
-      console.log(data)
-      //  [
-      //   {
-      //     value: '67',
-      //     name: '总行',
-      //     children: [
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 }
-      //     ]
-      //   },
-      //   {
-      //     value: '30',
-      //     name: '北京分行',
-      //     children: [
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 }
-      //     ]
-      //   },
-      //   {
-      //     value: '17',
-      //     name: '陕西分行',
-      //     children: [
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 }
-      //     ]
-      //   },
-      //   {
-      //     value: '7',
-      //     name: '吕梁分行',
-      //     children: [
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 }
-      //     ]
-      //   },
-      //   {
-      //     value: '5',
-      //     name: '内蒙古分行',
-      //     children: [
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 },
-      //       { name: '产品类', value: 230 }
-      //     ]
-      //   }
-      // ]
       const color = [
         '#2D5CF6',
         '#5ACFD6',
@@ -101,32 +49,6 @@ export default {
                       <span>北京分行</span>
                       <span>230项</span>
                       <span>全行占比8%</span>
-                    </div>
-                    <div style="display:flex;gap:12px;">
-                      <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;"></span>
-                      <div style="flex:1;display:flex;justify-content: space-between;">
-                        <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                          <span>产品类</span>
-                          <span>230项</span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                          <span>活动类</span>
-                          <span>23项</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div style="display:flex;gap:12px;">
-                      <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;"></span>
-                      <div style="flex:1;display:flex;justify-content: space-between">
-                        <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                          <span>产品类</span>
-                          <span>230项</span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                          <span>活动类</span>
-                          <span>23项</span>
-                        </div>
-                      </div>
                     </div>
                   </div>
               `
