@@ -413,7 +413,7 @@ export default {
     },
     handleClick(row) {
       this.titleDialog = row ? '编辑意见' : '新建意见';
-      this.dialogItem = row ? { ...row, keywordId: row.keywordType } : {};
+      this.dialogItem = row ? { ...row } : {};
       this.limitTimeVisible = true;
       this.initSearchData(true);
     },
