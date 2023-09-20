@@ -78,12 +78,13 @@
           v-model="form.crtApprover"
           popper-class="approver-select"
           placeholder="需【下一节点名称】审批，请选择审批人"
+          value-key="id"
         >
           <el-option
             v-for="item in approver"
             :key="item.id"
             :label="item.name + '/' + item.label + ' 【' + item.nodeName + '】'"
-            :value="item.id"
+            :value="item"
           >
             <div class="flex">
               <div class="item ellipsis ellipsis_1">{{ item.name }}</div>

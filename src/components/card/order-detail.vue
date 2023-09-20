@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-19 15:14:02
+ * @LastEditTime: 2023-09-20 10:54:45
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -549,11 +549,12 @@ export default {
         }
         // 2.选中通过时的下一级审批人
         let approver = []
-        let nextApprovers = data[data.length - 1]?.children?.props?.assignedUser.filter((v) => v.type === 'user') || []
+        let nextApprovers = data[data.length - 1]?.children?.props?.assignedUser || []
         nextApprovers = nextApprovers?.map((v) => {
           return {
             ...v,
-            nodeName: data[data.length - 1]?.children?.name
+            nodeName: data[data.length - 1]?.children?.name,
+            targetNodeId: data[data.length - 1]?.children?.id
           }
         })
         approver = nextApprovers
@@ -654,7 +655,7 @@ export default {
      * @param {*} isSave  true为保存，false提交
      * @return {*}
      */
-    saveEditOpinion(isSave) {
+    async saveEditOpinion(isSave) {
       const that = this
       const { editOpinionForm } = this.$store.state.checkApprovedForm
       const { assignedUser } = editOpinionForm
@@ -695,6 +696,32 @@ export default {
         isSave
           ? (this.loadings.storageLoading = true)
           : (this.loadings.submitLoading = true)
+        // 提交前需要加个接口
+        if (!isSave) {
+          const updateRuleRes = {
+            data: {
+              status: 200,
+              msg: '',
+              nextNodeId: '',
+              nextUserInfo: []
+            }
+          }
+          if (editOpinionForm.assignedType === 'SELF_SELECT') {
+            updateRuleRes.data.nextNodeId = editOpinionForm.targetNodeId
+            updateRuleRes.data.nextUserInfo = [{
+              id: editOpinionForm.crtApprover,
+            }]
+          }
+          const res = await updateRuleCode({
+            nextNodeId: updateRuleRes.data.nextNodeId,
+            nextUserInfo: updateRuleRes.data.nextUserInfo,
+            templateId: this.item.processTemplateId,
+            processInstanceId: this.item.processInstanceId,
+            nodeId: this.item.nodeId
+          })
+          const { success } = res?.data
+          if (!success) return false
+        }
         leaderEdit(end_submit)
           .then((res) => {
             const { success, msg } = res.data
@@ -763,7 +790,7 @@ export default {
           name: user.name
         },
         processInstanceId: this.item.processInstanceId,
-        rollbackId: editOpinionForm.refuseWay === 'TO_BEFORE' ? editOpinionForm.id : '',
+        rollbackId: editOpinionForm.refuseWay === 'TO_BEFORE' ? editOpinionForm.targetNodeId : '',
         nodeId: this.item.nodeId,
         taskId: this.item.taskId,
         templateId: this.item.processTemplateId
