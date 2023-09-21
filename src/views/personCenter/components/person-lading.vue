@@ -34,7 +34,8 @@
         </div>
       </div>
       <div class="table-wrap  TRS-table-gray" v-loading="personListLoading">
-        <el-table :header-cell-style="{ background: '#f5f6f6' }" :data="billListData.list" style="width: 100%;"  @sort-change="sortChange">
+        <el-table :header-cell-style="{ background: '#f5f6f6' }" :data="billListData.list" style="width: 100%;"
+          @sort-change="sortChange">
           <el-table-column type="index" show-overflow-tooltip label="序号" align="center" width="75px">
             <template slot-scope="scope">
               <p class="black fs14">{{ scope.$index + 1 }}</p>
@@ -46,7 +47,8 @@
               <p class="gray fs12">{{ scope.row.userId }}</p>
             </template>
           </el-table-column>
-          <el-table-column prop="allCount" :sortable="'custom'" show-overflow-tooltip label="提单数" align="center" min-width="90px">
+          <el-table-column prop="allCount" :sortable="'custom'" show-overflow-tooltip label="提单数" align="center"
+            min-width="90px">
             <template slot-scope="scope">
               <div class="flex-box">
                 <p class="black fs16 ">{{ scope.row.allCount }}</p>
@@ -78,12 +80,13 @@
             min-width="120px">
             <template slot-scope="scope">
               <div class="flex-box">
-                <p class="black fs16 ">{{ scope.row. unSubstanCount }}</p>
+                <p class="black fs16 ">{{ scope.row.unSubstanCount }}</p>
                 <p class="gray fs12 pt6">/{{ scope.row.unSubstantiveRate }}</p>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="acceptRate" :sortable="'custom'" show-overflow-tooltip label="接受率" align="center" min-width="90px">
+          <el-table-column prop="acceptRate" :sortable="'custom'" show-overflow-tooltip label="接受率" align="center"
+            min-width="90px">
           </el-table-column>
           <el-table-column prop="onePassRate" :sortable="'custom'" show-overflow-tooltip label="一次通过率" align="center"
             min-width="120px">
@@ -116,7 +119,13 @@ export default {
   components: {
     barEcharts,
   },
-  name: 'person-center-index',
+  name: 'person-lading-index',
+  props: {
+    searchData: {
+      type: Object,
+      default: () => { }
+    }
+  },
   data() {
     return {
       billListData: {
@@ -128,83 +137,6 @@ export default {
         sortValue: null,
         sortType: ''
       },
-      billTable: [
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-      ],
       keywords: '',
       passData: {
         name: '一次通过率分布（人）',
@@ -275,7 +207,12 @@ export default {
     // 一次通过率分布
     getProposeOnePassRate() {
       this.passDataLoading = true
-      proposeOnePassRate({ dataFlag: 1 }).then((res) => {
+      const getData = {
+        orgId: this.searchData.orgId?.length ? this.searchData.orgId[0] : '',
+        startTime: this.searchData.datePicker?.length ? this.searchData.datePicker[0] : '',
+        endTime: this.searchData.datePicker?.length ? this.searchData.datePicker[1] : ''
+      }
+      proposeOnePassRate(getData).then((res) => {
         const { data } = res
         if (data.data) {
           this.passData.xData = data.data.title
@@ -288,7 +225,12 @@ export default {
     // 接受率分布
     getProposeAcceptRate() {
       this.acceptanceLoading = true
-      proposeAcceptRate({ dataFlag: 1 }).then((res) => {
+      const getData = {
+        orgId: this.searchData.orgId?.length ? this.searchData.orgId[0] : '',
+        startTime: this.searchData.datePicker?.length ? this.searchData.datePicker[0] : '',
+        endTime: this.searchData.datePicker?.length ? this.searchData.datePicker[1] : ''
+      }
+      proposeAcceptRate(getData).then((res) => {
         const { data } = res
         if (data.data) {
           this.acceptanceDataBill.xData = data.data.title
@@ -301,7 +243,12 @@ export default {
     // 驳回率分布
     getProposeRejectRate() {
       this.rejectionLoading = true
-      proposeRejectRate({ dataFlag: 1 }).then((res) => {
+      const getData = {
+        orgId: this.searchData.orgId?.length ? this.searchData.orgId[0] : '',
+        startTime: this.searchData.datePicker?.length ? this.searchData.datePicker[0] : '',
+        endTime: this.searchData.datePicker?.length ? this.searchData.datePicker[1] : ''
+      }
+      proposeRejectRate(getData).then((res) => {
         const { data } = res
         if (data.data) {
           this.rejectionData.xData = data.data.title
@@ -318,8 +265,9 @@ export default {
       this.personListLoading = true
       this.billListData.list = []
       proposePersonList({
-        dataFlag: 3,
-        orgId: 23,
+        orgId: this.searchData.orgId?.length ? this.searchData.orgId[0] : '',
+        startTime: this.searchData.datePicker?.length ? this.searchData.datePicker[0] : '',
+        endTime: this.searchData.datePicker?.length ? this.searchData.datePicker[1] : '',
         sortValue: this.billListData.sortValue,
         sortType: this.billListData.sortType,
         pageNow: this.billListData.pageNow,
@@ -524,5 +472,4 @@ export default {
       }
     }
   }
-}
-</style>
+}</style>

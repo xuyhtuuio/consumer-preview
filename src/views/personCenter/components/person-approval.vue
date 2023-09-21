@@ -141,11 +141,14 @@ export default {
     barEcharts,
   },
   name: 'person-approval',
+  props: {
+    searchData: {
+      type: Object,
+      default: () => { }
+    }
+  },
   data() {
     return {
-      total: 5,
-      pageNow: 1,
-      agenciesList: [],
       contributionData: {
         xData: ['＜100', '100(含)-200', '200(含)-300', '300(含)-400', '400(含)-500'],
         yData: [800, 1200, 390, 200, 1500],
@@ -177,10 +180,6 @@ export default {
     }
   },
   mounted() {
-    this.getApproveContribution()
-    this.getApproveAcceptRate()
-    this.getApproveAvgTime()
-    this.getApprovePersonList(1)
   },
   watch: {
   },
@@ -500,10 +499,15 @@ export default {
         });
       });
     },
-    // 审批人员-贡献值月度变化
+    // 审批人员-贡献值分布
     getApproveContribution() {
       this.contributionLoading = true
-      approveContribution({ dataFlag: 1 }).then((res) => {
+      const getData = {
+        orgId: this.searchData.orgId?.length ? this.searchData.orgId[0] : '',
+        startTime: this.searchData.datePicker?.length ? this.searchData.datePicker[0] : '',
+        endTime: this.searchData.datePicker?.length ? this.searchData.datePicker[1] : ''
+      }
+      approveContribution(getData).then((res) => {
         const { data } = res
         if (data.data) {
           this.contributionData = data.data
@@ -515,7 +519,12 @@ export default {
     // 审批人员-接受率分布
     getApproveAcceptRate() {
       this.acceptanceLoading = true
-      approveAcceptRate({ dataFlag: 1 }).then((res) => {
+      const getData = {
+        orgId: this.searchData.orgId?.length ? this.searchData.orgId[0] : '',
+        startTime: this.searchData.datePicker?.length ? this.searchData.datePicker[0] : '',
+        endTime: this.searchData.datePicker?.length ? this.searchData.datePicker[1] : ''
+      }
+      approveAcceptRate(getData).then((res) => {
         const { data } = res
         if (data.data) {
           // this.acceptanceData = data.data
@@ -530,7 +539,12 @@ export default {
     getApproveAvgTime() {
       this.processingLoading = true
       this.processingData = []
-      approveAvgTime({ dataFlag: 1 }).then((res) => {
+      const getData = {
+        orgId: this.searchData.orgId?.length ? this.searchData.orgId[0] : '',
+        startTime: this.searchData.datePicker?.length ? this.searchData.datePicker[0] : '',
+        endTime: this.searchData.datePicker?.length ? this.searchData.datePicker[1] : ''
+      }
+      approveAvgTime(getData).then((res) => {
         const { data } = res
         if (data.data) {
           data.data.title.map((item, index) => {
@@ -553,8 +567,9 @@ export default {
       this.personListLoading = true
       this.personListData.list = []
       approvePersonList({
-        dataFlag: 3,
-        orgId: 23,
+        orgId: this.searchData.orgId?.length ? this.searchData.orgId[0] : '',
+        startTime: this.searchData.datePicker?.length ? this.searchData.datePicker[0] : '',
+        endTime: this.searchData.datePicker?.length ? this.searchData.datePicker[1] : '',
         sortValue: this.personListData.sortValue,
         sortType: this.personListData.sortType,
         pageNow: this.personListData.pageNow,

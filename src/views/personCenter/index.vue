@@ -12,26 +12,22 @@
             </el-option>
           </el-select>
         </div>
-        <div class="scrren-com">
+        <div class="scrren-com" :class="searchData.orgId ? 'active' : ''">
           <div class="com-tit">选择机构
             <img src="../../assets/image/person-center/down.png" class="down" alt="">
           </div>
-          <el-cascader class="my-hidden" v-model="cascader" :options="agenciesList" :show-all-levels="false" :props="{
-            emitPath: false,
-            checkStrictly: true,
-            label: 'name',
-            value: 'id',
-            children: 'children'
-          }" @change="handleOrganChange"></el-cascader>
+          <el-cascader class="my-hidden" v-model="searchData.orgId" :options="agenciesList" :show-all-levels="false"
+            :props="{ label: 'name', value: 'id', checkStrictly: true }" @change="handleSearchBlur"></el-cascader>
           <el-tooltip class="item" effect="dark" content="选择机构提示文字" placement="top">
             <img src="@/assets/image/person-center/hintIcon.png" alt="" class="hintIcon">
           </el-tooltip>
         </div>
-        <div class="scrren-com">
-          <el-popover placement="bottom-start" trigger="click" @show="handlePopoverShow" @hide="handlePopoverHide"
+        <div class="scrren-com" :class="searchData.datePicker.length ? 'active' : ''">
+          <el-popover placement="bottom-start" trigger="click" @show="handlePopoverShow" @hide="handleSearchBlur"
             :width="400">
-            <el-date-picker ref="my-date-picker" v-model="datePicker" type="monthrange" align="right" range-separator="至"
-              start-placeholder="开始月份" end-placeholder="结束月份" :picker-options="pickerOptions">
+            <el-date-picker ref="my-date-picker" v-model="searchData.datePicker" type="monthrange" align="right"
+              value-format="yyyy-MM" range-separator="至" start-placeholder="开始月份" end-placeholder="结束月份"
+              :picker-options="pickerOptions">
             </el-date-picker>
             <div slot="reference">
               提单时间
@@ -39,7 +35,7 @@
             </div>
           </el-popover>
         </div>
-        <div class="scrren-btn">
+        <div class="scrren-btn" @click="resetSearchData()">
           <img src="@/assets/image/person-center/reset.png" alt="" class="btnIcon">
           重置
         </div>
@@ -49,8 +45,12 @@
         </div>
       </div>
     </div>
-    <personApproval v-if="billValue === '审批人员'" @rejectDialogShow="rejectDialogShow"></personApproval>
-    <personLading v-if="billValue === '提单人员'" @rejectDialogShow="rejectDialogShow"></personLading>
+    <personApproval v-if="billValue === '审批人员'" ref="personApproval" @rejectDialogShow="rejectDialogShow"
+      :searchData="searchData">
+    </personApproval>
+    <personLading v-if="billValue === '提单人员'" ref="personLading" @rejectDialogShow="rejectDialogShow"
+      :searchData="searchData">
+    </personLading>
     <el-dialog :visible.sync="rejectDialog" :before-close="rejectDialogClose"
       :width="rejectDialogTit === '驳回情况' ? '800px' : '1000px'" center custom-class="transfer-dialog">
       <span slot="title">{{ rejectDialogTit }}</span>
@@ -60,9 +60,13 @@
             <div class="user-info">
               <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
               <span class="nickname">
-                谭新宇
+                {{ approvalUser.userName }}
               </span>
-              <span>总行 | 财富平台部 | 财富客群团队</span>
+              <div class="user-org" v-if="approvalUser.orgList.length">
+                <span v-for="(item, index) in approvalUser.orgList" :key="index">
+                  {{ item }} <i v-if="index < approvalUser.orgList.length - 1"> | </i>
+                </span>
+              </div>
             </div>
             <slot name="apply-modify"></slot>
           </div>
@@ -173,8 +177,8 @@
 <script>
 import {
   getApprovalType,
-  getOrgTree
 } from '@/api/approvalCenter'
+import { onlyBankOrgTree } from '@/api/statistical-center'
 import { contributionChange, rejectReason, rejectRate, oneApprovalList, oneApplicationList } from '@/api/personCenter'
 import approvalEventCard from './components/approval-event-card'
 import applyEventCard from './components/apply-event-card'
@@ -190,9 +194,10 @@ export default {
   name: 'person-center-index',
   data() {
     return {
-      total: 5,
-      pageNow: 1,
-      cascader: '',
+      searchData: {
+        orgId: '',
+        datePicker: [],
+      },
       agenciesList: [],
       pickerOptions: {
         disabledDate(time) {
@@ -230,7 +235,6 @@ export default {
           return time.getTime() > Date.now();
         },
       },
-      datePicker: '',
       billOptions: [{
         value: '审批人员',
         label: '审批人员'
@@ -308,40 +312,32 @@ export default {
       rejectSearch: {
         recordId: '',
         seachTime: [],
+      },
+      approvalUser: {
+        userName: '',
+        orgList: []
       }
     }
   },
   mounted() {
     this.getOrgTree()
+    this.handleSearchBlur()
   },
   watch: {
   },
   created() {
   },
   methods: {
-    getOrgTree() {
-      getOrgTree().then((res) => {
-        const { data } = res.data
-        if (data) {
-          const value = this.formatOrg(data.children)
-          this.agenciesList = [
-            {
-              ...data,
-              children: value
-            }
-          ]
-        }
-      })
+    resetSearchData() {
+      this.searchData.orgId = ''
+      this.searchData.datePicker = []
+      this.handleSearchBlur()
     },
-    formatOrg(data) {
-      data.forEach((m) => {
-        if (m.children && m.children.length) {
-          this.formatOrg(m.children)
-        } else {
-          m.children = null
-        }
+    getOrgTree() {
+      onlyBankOrgTree().then((res) => {
+        const { data } = res.data
+        this.agenciesList = data || []
       })
-      return data
     },
     rejectDialogClose() {
       this.rejectDialog = false
@@ -540,10 +536,12 @@ export default {
       oneApprovalList(param)
         .then((res) => {
           const { data } = res.data
-          this.approvalSearch.total = data.totalCount
-          const flag = Array.isArray(data.list)
-          this.list = flag && data.list.length > 0
-            ? data.list.map((v) => {
+          this.approvalUser.userName = data.userName
+          this.approvalUser.orgList = data.orgList
+          this.approvalSearch.total = data.page.totalCount
+          const flag = Array.isArray(data.page.list)
+          this.list = flag && data.page.list.length > 0
+            ? data.page.list.map((v) => {
               return {
                 ...v,
                 taskNumber: v.recordId + '',
@@ -586,10 +584,12 @@ export default {
       oneApplicationList(param)
         .then((res) => {
           const { data } = res.data
-          this.approvalSearch.total = data.totalCount
-          const flag = Array.isArray(data.list)
-          this.list = flag && data.list.length > 0
-            ? data.list.map((v) => {
+          this.approvalUser.userName = data.userName
+          this.approvalUser.orgList = data.orgList
+          this.approvalSearch.total = data.page.totalCount
+          const flag = Array.isArray(data.page.list)
+          this.list = flag && data.page.list.length > 0
+            ? data.page.list.map((v) => {
               return {
                 ...v,
                 taskNumber: v.recordId + '',
@@ -780,21 +780,23 @@ export default {
       };
       this.initChart('reasonRate-echart', option)
     },
-    handleOrganChange(item) {
-      if (!item && this.cascader.length) {
-        this.handleSearchBlur()
-      }
-    },
     handlePopoverShow() {
       this.$refs['my-date-picker'].handleFocus()
     },
-    handlePopoverHide() {
-      if (this.datePicker) {
-        this.handleSearchBlur()
-      }
-    },
     handleSearchBlur() {
-      // console.log(this.search)
+      this.$nextTick(() => {
+        if (this.billValue === '审批人员') {
+          this.$refs.personApproval.getApproveContribution()
+          this.$refs.personApproval.getApproveAcceptRate()
+          this.$refs.personApproval.getApproveAvgTime()
+          this.$refs.personApproval.getApprovePersonList(1)
+        } else {
+          this.$refs.personLading.getProposeOnePassRate()
+          this.$refs.personLading.getProposeAcceptRate()
+          this.$refs.personLading.getProposeRejectRate()
+          this.$refs.personLading.getProposePersonList(1)
+        }
+      })
     },
     getApprovalType() {
       getApprovalType().then((res) => {
@@ -1147,6 +1149,13 @@ export default {
               line-height: 32px;
               margin-right: 16px;
             }
+            .user-org{
+              display: flex;
+              align-items: center;
+              i{
+                margin: 0 4px;
+              }
+            }
           }
         }
 
@@ -1375,7 +1384,7 @@ export default {
 <style lang="less">
 .el-range-editor.el-input__inner {
   width: 100%;
-  display: block;
+  // display: block;
 }
 
 .el-date-editor .el-range__close-icon {
