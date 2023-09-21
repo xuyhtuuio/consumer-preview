@@ -2,7 +2,7 @@
   <div class="type-distribution" v-loading="isShow">
     <g-table-card :title="title">
       <template #head-right>
-        <div class="btns flex">
+        <div class="btns flex" v-if="timesData.length">
           <span
             :class="{ 'btn-item': true, active: currentEchartType === 1 }"
             @click="handleEchartsToggle(1)"
@@ -16,7 +16,7 @@
         </div>
       </template>
       <template v-slot:content>
-        <div class="content">
+        <div class="content" v-if="timesData.length">
           <div
             class="content-title"
             v-show="isToggleNext"
@@ -28,6 +28,7 @@
             <div class="echarts-box" ref="my-echarts"></div>
           </div>
         </div>
+        <empty v-else></empty>
       </template>
     </g-table-card>
   </div>
@@ -49,24 +50,10 @@ export default {
       currentEchartType: 1,
       colorListTimes: ['#5773F9', '#249EFF', '#21CCFF', '#81E2FF'],
       colorListTimesTwo: ['#65CFE4', '#FADC6D', '#CF84CD'],
-      timesData: [
-        { value: 200, name: '产品类', rate: '', children: [{ id: '', value: '', name: '', rate: '' }, { id: '', value: '', name: '', rate: '' }] },
-        { value: 400, name: '活动类' },
-        { value: 300, name: '客户类' },
-        { value: 100, name: '其他' }
-      ],
-      timesDataTwo: [
-        { value: 400, name: '有实质意见' },
-        { value: 300, name: '非实质意见' },
-        { value: 100, name: '活动未开展' }
-      ],
+      timesData: [],
       isToggleNext: false,
       isToggleNextData: null
     }
-  },
-  mounted() {
-    // this.initData()
-    // this.initMyEcharts(this.timesData)
   },
   methods: {
     async initData(data = this.searchData) {
@@ -75,7 +62,9 @@ export default {
       const { data: res } = await distributionOfReviewTypes({ ...data, distributionOfReviewTypesSign: this.currentEchartType })
       if (res.success) {
         this.timesData = res.data
-        this.initMyEcharts(res.data)
+        this.$nextTick(() => {
+          this.initMyEcharts(res.data)
+        })
       }
       this.isShow = false
     },

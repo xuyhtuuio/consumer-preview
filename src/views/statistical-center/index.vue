@@ -118,12 +118,13 @@
         <SystemConnection class="common" />
         <TurnDown class="common" ref="ref-turn-down"/>
       </div>
-      <div class="main-item flex" style="gap: 16px">
+      <div class="main-item flex" style="gap: 16px;">
         <SensitiveProhibited
           class="common"
           style="width: 60%"
-        ></SensitiveProhibited>
-        <HighWord class="common" style="flex: 1"></HighWord>
+          ref="ref-sensitive-prohibited">
+        </SensitiveProhibited>
+        <HighWord class="common" style="flex: 1" ref="ref-high-word"></HighWord>
       </div>
     </div>
   </div>
@@ -227,13 +228,28 @@ export default {
         startTimeStr: datePicker[0],
         endTimeStr: datePicker[1]
       }
-      this.$refs['ref-data-overview'].initData(data)
-      this.$refs['ref-type-distribution'].initData(data)
-      this.$refs['ref-mission-trends'].initData(data)
-      this.$refs['ref-rect-tree'].initData(data)
-      this.$refs['ref-review-form'].initData(data)
-      this.$refs['ref-reaching-consumers'].initData(data)
-      this.$refs['ref-turn-down'].initData(data)
+      const componentRefs = [
+        'ref-data-overview',
+        'ref-type-distribution',
+        'ref-mission-trends',
+        'ref-rect-tree',
+        'ref-review-form',
+        'ref-reaching-consumers',
+        'ref-turn-down',
+        'ref-high-word',
+        'ref-sensitive-prohibited'
+      ];
+      const initDataPromises = componentRefs.map(refName => {
+        return this.$refs[refName].initData(JSON.parse(JSON.stringify(data)));
+      });
+
+      Promise.all(initDataPromises)
+        .then(() => {
+          // 所有异步调用都已完成
+        })
+        .catch(() => {
+          // 处理任何错误
+        });
     },
     handleReset() {
       this.search = {
@@ -255,13 +271,14 @@ export default {
     },
     handleOrganChange(item) {
       if (!item && this.search.cascader.length) {
-        this.handleSearchBlur()
+        this.passData()
       }
     },
     handlePopoverShow() {
       this.$refs['my-date-picker'].handleFocus()
     },
     handleSearchBlur() {
+      this.passData()
     }
   }
 }

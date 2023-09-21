@@ -68,10 +68,26 @@ export function touchingConsumerChannels(data) {
 }
 
 // 驳回统计
-
 export function rejectStatistics(data, url) {
   return request({
     url,
+    method: 'POST',
+    data
+  })
+}
+
+// 常见禁用词/敏感词
+export function commonKeywordsPaginationList(data) {
+  return request({
+    url: '/cpr/Statistics/commonKeywordsPaginationList',
+    method: 'POST',
+    data
+  })
+}
+// 高频词汇
+export function highFrequencyVocabulary(data) {
+  return request({
+    url: '/cpr/Statistics/highFrequencyVocabulary',
     method: 'POST',
     data
   })
