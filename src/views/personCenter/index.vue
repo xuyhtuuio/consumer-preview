@@ -7,7 +7,7 @@
       <div class="scrren-right">
         <div class="scrren-com" :class="billValue ? 'active' : ''">{{ billValue }}
           <img src="../../assets/image/person-center/down.png" class="down" alt="">
-          <el-select v-model="billValue" placeholder="请选择">
+          <el-select v-model="billValue" placeholder="请选择" @change="handleSearchBlur">
             <el-option v-for="item in billOptions" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
@@ -1149,10 +1149,12 @@ export default {
               line-height: 32px;
               margin-right: 16px;
             }
-            .user-org{
+
+            .user-org {
               display: flex;
               align-items: center;
-              i{
+
+              i {
                 margin: 0 4px;
               }
             }

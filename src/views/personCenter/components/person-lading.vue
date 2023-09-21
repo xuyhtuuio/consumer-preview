@@ -167,10 +167,6 @@ export default {
     }
   },
   mounted() {
-    this.getProposeOnePassRate()
-    this.getProposeAcceptRate()
-    this.getProposeRejectRate()
-    this.getProposePersonList(1)
   },
   watch: {
   },
