@@ -111,7 +111,7 @@
                 <el-option
                   v-for="(iten, indey) in item.props.options"
                   :key="indey"
-                  :label="iten.value"
+                  :label="iten.value || iten.name"
                   :value="iten.id"
                 ></el-option>
               </el-select>
@@ -280,7 +280,7 @@ export default {
       return (item) => {
         if (item.name === 'SelectInput' && !item.props.expanding) {
           return ['form-item']
-        } else if (item.name === 'MultipleSelect' && !item.props.expanding) {
+        } else if (item.name === 'MultipleSelect' && !item.props.expanding && item.id !== '-1') {
           return ['form-item']
         } else if (item.name === 'TimePicker' || item.name === 'Cascader') {
           return ['form-item']
@@ -312,7 +312,6 @@ export default {
       let endDateTime = '23:59:59'
       // 关联的下线时间
       if (value) {
-        console.log(123, value, originVal)
         if (
           this.handleDate(value) === this.handleDate(originVal)
         ) {

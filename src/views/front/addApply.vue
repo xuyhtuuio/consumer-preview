@@ -81,8 +81,10 @@ import {
   getProcess
 } from '@/api/front';
 import {
-  ocrApprovalSubmission
-} from '@/api/aiApproval';
+  getNextUserOption,
+  ocrApprovalSubmission,
+  updateRuleCode
+} from '@/api/aiApproval'
 import AddTag from './components/add-tag';
 import ReviewMatters from './components/review-matters';
 import BasicInformation from './components/basic-information';
@@ -126,6 +128,7 @@ export default {
     processDefinitionId: '',
     currentRow: null,
     currentRowInfo: '',
+    nodeSelectUserList: null,
     formBasicInfo: {} // 编辑表单时，从路由处获取的基础信息
   }),
   created() {
@@ -198,6 +201,33 @@ export default {
       this.isCntLoading = true;
       this.clearForm();
       await this.handleAllListprefix(id);
+      const { data: result } = await getNextUserOption({ nodeId: 'root', templateId: this.templateId })
+
+      if (result.success) {
+        if (result.data.selectObject === '1') {
+          const options = result.data.nodeSelectUserList
+          const { nextNodeId } = result.data
+          // TODO: 选择审批人（关联后台流程配置）
+          const data = {
+            id: '-1',
+            title: '审批人',
+            name: 'MultipleSelect',
+            module: '基本信息',
+            value: [],
+            valueType: 'Array',
+            props: {
+              required: true,
+              placeholder: '因选择渠道涉及总行，请选择总行对应业务部门的审批人',
+              expanding: false,
+              options
+            },
+            nextNodeId
+          }
+          this.nodeSelectUserList = data
+        } else {
+          this.nodeSelectUserList = null
+        }
+      }
       getApplyForm({
         formId: this.formId,
         processTemplateId: this.templateId,
@@ -208,7 +238,9 @@ export default {
         this.isGLoading = false;
         if (success) {
           const { basicInformation, promotionChannels, keyPointsForVerification, reviewMaterials } = res;
-          this.basicInformation = basicInformation;
+          const data = this.nodeSelectUserList
+          this.basicInformation = data
+            ? [...basicInformation, data] : basicInformation;
           this.promotionChannels = promotionChannels;
           this.keyPointsForVerification = keyPointsForVerification;
           this.reviewMaterials = reviewMaterials;
@@ -219,24 +251,6 @@ export default {
       });
     },
     handleAllListprefix(id) {
-      // externalLogicController({ formId: id }).then(({ data: { data: res, msg, success } }) => {
-      //   if (success) {
-      //     this.templateId = res.templateId;
-      //     this.processDefinitionId = res.processDefinitionId;
-      //   } else {
-      //     // this.$message.error(msg)
-      //     this.isLoading = false;
-      //   }
-      // });
-      // // 获取该表单id的流程
-      // getProcess({ formId: id }).then(({ data: { data: res, msg, success } }) => {
-      //   if (success) {
-      //     this.currentRow = res.list.length ? res.list[0] : null;
-      //   } else {
-      //     this.currentRow = null;
-      //     this.currentRowInfo = msg;
-      //   }
-      // });
       return Promise.all([externalLogicController({ formId: id }), getProcess({ formId: id })])
         .then(([res1, res2]) => {
           this.isLoading = false;
@@ -261,7 +275,7 @@ export default {
             this.currentRowInfo = msg2;
           }
           if (!flag) {
-            // return Promise.reject()
+            return Promise.reject()
           }
         })
         .finally(() => {
@@ -327,11 +341,13 @@ export default {
           if (Number(iten.props.order) === 1 && iten.props.placeholder === '永久' && iten.props.isRoyalty && iten.lastProps) {
             iten.value = iten.props.placeholder
           }
-          formItemDataList.push({
-            formItemId: iten.id,
-            value: iten.value,
-            valueType: iten.valueType
-          });
+          if (iten.id !== '-1') {
+            formItemDataList.push({
+              formItemId: iten.id,
+              value: iten.value,
+              valueType: iten.valueType
+            });
+          }
         });
       });
       const reviewMaterialsData = {
@@ -370,6 +386,17 @@ export default {
             this.submitDialogVisible = false;
           });
         } else {
+          const data = this.nodeSelectUserList
+          if (data) {
+            const dataObj = []
+            data.value.forEach(item => dataObj.push({ id: item }))
+            await updateRuleCode({
+              nextNodeId: data.nextNodeId || '',
+              nextUserInfo: dataObj || [],
+              templateId: this.templateId,
+              nodeId: 'root'
+            })
+          }
           res = await processStart({
             templateId: this.templateId,
             processDefinitionId: this.processDefinitionId,
