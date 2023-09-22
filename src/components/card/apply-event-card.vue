@@ -12,7 +12,7 @@
           </svg>
           <span class="id" v-if="item.orderNo">{{ item.orderNo }}</span>
         </span>
-        <span class="event-name"  ref="event-name">{{
+        <span class="event-name" ref="event-name">{{
           item.taskName
         }}</span>
         <span class="event-status" v-if="!item.errorStatus" ref="event-status">
@@ -22,9 +22,9 @@
             'tag in-modify': ['3'].includes(item.taskStatus),
             'tag check': ['5', '6'].includes(item.taskStatus),
             'tag end-sign': ['4'].includes(item.taskStatus)
-          }">{{ $msg('NodeStatus')[item.taskStatus] }}>{{item.currentActivityName}}</i>
+          }">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }}</i>
           <!-- 有无意见 -->
-          <i class="flex" v-if="['4', '5', '6'].includes(item.taskStatus)&&[1,0].includes(item.substantiveOpinions)">
+          <i class="flex" v-if="['4', '5', '6'].includes(item.taskStatus) && [1, 0].includes(item.substantiveOpinions)">
             <i class="tag has-opinion" v-if="item.substantiveOpinions == 1">
               <i class="iconfont icon-guanzhu2"></i>
               有实质性意见
@@ -169,7 +169,7 @@
 </template>
 <script>
 // canRoved
-import { concernApplication, getTemplatedetail } from '@/api/applyCenter'
+import { concernApplication } from '@/api/applyCenter'
 // import { revoked } from '../../api/applyCenter'
 
 export default {
@@ -198,7 +198,8 @@ export default {
         // 判断是否可以撤销
         val.taskStatus === '1' ? this.getCanBeRoved(val) : ''
         // 判断当前节点审批人是不是当前用户
-        val.taskStatus === '6' ? this.getTemplatedetail(val) : ''
+        this.handleUser(val)
+        val.taskStatus === '6' ? this.handleUser(val) : ''
         // 获取info的长度
         this.$nextTick(() => {
           const fatherWidth = this.$refs['event-name-status'].offsetWidth
@@ -217,18 +218,14 @@ export default {
      * @description: 查询当前节点的审批人是否包含当前登录用户
      * @return {*}
      */
-    async getTemplatedetail() {
-      const params = {
-        processInstanceId: this.item.processInstanceId
-      }
-      const res = await getTemplatedetail(params)
-      if (res.data) {
-        const { data } = res.data
-        const assignedUser = data[data.length - 1].props['assignedUser']
-          ?.filter((v) => v.type !== 'dept')
-          ?.map((v) => v.id)
+    async handleUser(val) {
+      const { currentAssignee } = val
+      if (currentAssignee?.length) {
+        const users = currentAssignee.map((v) => { return v.id })
         const user = JSON.parse(window.localStorage.getItem('user_name'))
-        this.canCompared = assignedUser.includes(user.id + '')
+        this.canCompared = users.includes(user.id + '')
+      } else {
+        this.canCompared = false
       }
     },
     getCanBeRoved() {
@@ -432,6 +429,7 @@ export default {
       line-height: 22px;
       /* 157.143% */
     }
+
     .id {
       color: #1D2128;
       font-size: 14px;

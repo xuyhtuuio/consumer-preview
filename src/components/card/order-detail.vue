@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-22 11:16:41
+ * @LastEditTime: 2023-09-22 14:52:28
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -23,17 +23,10 @@
             <i class="iconfont icon-xianxingtubiao"></i>
             <i class="btn">去修改</i>
           </div>
-          <el-button
-            class="back flex"
-            type="primary"
-            style="border: none"
-            :loading="loadings.storageLoading"
-            @click="turnTo"
-            v-if="nextStepObj.isChangeHandle !== null"
-          >
+          <el-button class="back flex" type="primary" style="border: none" :loading="loadings.storageLoading"
+            @click="turnTo" v-if="nextStepObj.isChangeHandle !== null">
             <span class="flex">
-              <i class="iconfont icon-baocun"></i> <i class="btn">转办</i></span
-            >
+              <i class="iconfont icon-baocun"></i> <i class="btn">转办</i></span>
           </el-button>
           <el-button class="back flex" type="primary" style="border: none" :loading="loadings.storageLoading"
             @click="submit('storage')" v-if="([3, 5].includes(status)) && item.taskStatus != 3">
@@ -50,7 +43,7 @@
               <i class="iconfont icon-tijiao"></i> <i class="btn">去比对</i></span>
           </el-button>
         </div>
-        <div v-if="item.taskStatus == 1 &&  pagePath == 'approval' && item?.approvedSign == 0&&hasAuth" class="flex">
+        <div v-if="item.taskStatus == 1 && pagePath == 'approval' && item?.approvedSign == 0 && hasAuth" class="flex">
           <!-- <div class="back flex" @click="transferDialog = true">
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
@@ -109,51 +102,51 @@
           <!-- 消保审查/详情页/审批人审批（非消保 -->
           <nav class="nav" v-if="status == 2">
             <span :class="crtComp == 'leaderEditOpinion' ? 'active-nav' : ''" @click="() => {
-                crtComp = 'leaderEditOpinion'
-              }
+              crtComp = 'leaderEditOpinion'
+            }
               ">编辑意见</span>
             <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
-                crtComp = 'approvalRecordCard'
-              }
+              crtComp = 'approvalRecordCard'
+            }
               ">审批记录明细</span>
           </nav>
           <nav class="nav" v-if="status == 3">
             <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
-                crtComp = 'approvedOpinionCard'
-              }
+              crtComp = 'approvedOpinionCard'
+            }
               ">审查意见书</span>
             <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
-                crtComp = 'uploadFileCard'
-              }
+              crtComp = 'uploadFileCard'
+            }
               "><i style="color: #eb5757">*</i> 最终上线材料</span>
             <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
-                crtComp = 'approvalRecordCard'
-              }
+              crtComp = 'approvalRecordCard'
+            }
               ">审批记录明细</span>
           </nav>
           <!-- 已经结束-->
           <nav class="nav" v-if="status == 4">
             <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
-                crtComp = 'approvedOpinionCard'
-              }
+              crtComp = 'approvedOpinionCard'
+            }
               ">审查意见书</span>
             <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
-                crtComp = 'uploadFileCard'
-              }
+              crtComp = 'uploadFileCard'
+            }
               "><i style="color: #eb5757">*</i> 最终上线材料</span>
             <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
-                crtComp = 'approvalRecordCard'
-              }
+              crtComp = 'approvalRecordCard'
+            }
               ">审批记录明细</span>
           </nav>
           <nav class="nav" v-if="status == 5">
             <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
-                crtComp = 'approvedOpinionCard'
-              }
+              crtComp = 'approvedOpinionCard'
+            }
               ">审查意见书</span>
             <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
-                crtComp = 'approvalRecordCard'
-              }
+              crtComp = 'approvalRecordCard'
+            }
               ">审批记录明细</span>
           </nav>
         </div>
@@ -161,8 +154,8 @@
           <keep-alive>
             <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus"
               @sendOpinionInfo="sendOpinionInfo" :reviewMaterial="reviewMaterials"
-              :processInstanceId="item.processInstanceId" :taskId="item.taskId" @preview="previewFile" :formId="item.taskNumber"
-              :filledInByApprover="filledInByApprover">
+              :processInstanceId="item.processInstanceId" :taskId="item.taskId" @preview="previewFile"
+              :formId="item.taskNumber" :filledInByApprover="filledInByApprover">
               <template slot="head">
                 <div class="approved-opinion-head">
                   <h2>消保审查意见书</h2>
@@ -207,13 +200,8 @@
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <filePreview :url="previewUrl"></filePreview>
     </el-dialog>
-    <SubmitDialog
-      :option="nextStepObj?.selectObject === '1' ? optionOther : option"
-      :nextStepObj="nextStepObj"
-      ref="confirmation"
-      @handleConfirm="endTaskSubmit"
-      :disabled="disabled"
-    ></SubmitDialog>
+    <SubmitDialog :option="nextStepObj?.selectObject === '1' ? optionOther : option" :nextStepObj="nextStepObj"
+      ref="confirmation" @handleConfirm="endTaskSubmit" :disabled="disabled"></SubmitDialog>
     <TurnDialog ref="turnDialog" :formBase="item" :nextStepObj="nextStepObj"></TurnDialog>
   </div>
 </template>
@@ -229,7 +217,7 @@ import filePreview from '@/components/filePreview'
 import SubmitDialog from '@/components/common/submit-dialog'
 import TurnDialog from '@/components/common/turn-dialog'
 import { leaderEdit, finalMaterial } from '@/api/approvalCenter'
-import { updateRuleCode, rollback, getNextUserOption } from '@/api/aiApproval';
+import { updateRuleCode, rollback, getNextUserOption, getNodeHandleUser } from '@/api/aiApproval';
 
 import {
   updateAdoptEditedComments,
@@ -515,57 +503,51 @@ export default {
       const { success } = res.data
       if (success) {
         const { data } = res.data
-        targetPage = data[data.length - 1].props['targetPage']
-        refuseWay = data[data.length - 1].props['refuseWay']
-        assignedUser = data[data.length - 1].props['assignedUser']?.map((v) => v.id)
+        targetPage = data.props['targetPage']
+        refuseWay = data.props['refuseWay']
+        assignedUser = data.props['assignedUser']?.map((v) => v.id)
 
         if (targetPage === 'XIAOBAO') {
           // 如果是ocr审批,页面显示无需太多内容
           return { targetPage, refuseWay, assignedUser, taskId, formId }
         }
         // 如果是领导审批，走下面的判断
-        // 1、获取驳回人列表 disavower  1.1 第一个节点是发起人initiator
-        const { name, id } = this.item['originator']
-        const { institutional } = this.item
-        const initiator = {
-          label: institutional?.[institutional.length - 1],
-          name,
-          id,
-          nodeName: data[0].name,
-          targetNodeId: 'root'
+        // 1、获取驳回人列表 disavower
+        const disavowerparams = {
+          templateId: this.item.processTemplateId,
+          processInstanceId: this.item.processInstanceId,
+          nodeId: this.item.nodeId,
         }
-        disavower.push(initiator)
-        // 1.2 该接口返回当前流程的所有的节点[node_1,node_2,node_3...],
-        //    arr[0]虽然是发起节点，但是发起人信息要从该工单详情里获取，不通过 arr[0]，原因好像是手动加 targetNodeId='root'
-        //    arr[arr.length-1]为当前节点，不能驳回到当前节点，因此要获取 1～arr.length-1之间的节点assignedUser信息
-        if (data.length > 2) {
-          const othersArray = data.slice(1, data.length - 1)
-          // eslint-disable-next-line
-          let other_disavower = []
-          for (let i = 0; i < othersArray.length; i++) {
-            const arr = othersArray[i].props?.assignedUser?.map((m) => {
-              return {
-                ...m,
-                nodeName: othersArray[i].name,
-                targetNodeId: othersArray[i].id
-              }
-            }) || []
-            other_disavower.push(...arr)
-            disavower = disavower.concat(other_disavower)
-          }
+        const disavowerRes = await getNodeHandleUser(disavowerparams)
+        if (disavowerRes.data.success) {
+          disavower = disavowerRes.data?.data?.map((m) => {
+            return {
+              ...m,
+              id: m.userId,
+              label: m.orgName,
+              targetNodeId: m.nodeId,
+              name: m.userName
+            }
+          })
         }
         // 2.选中通过时的下一级审批人
         let approver = []
-        let nextApprovers = data[data.length - 1]?.children?.props?.assignedUser || []
-        nextApprovers = nextApprovers?.map((v) => {
-          return {
-            ...v,
-            nodeName: data[data.length - 1]?.children?.name,
-            targetNodeId: data[data.length - 1]?.children?.id
-          }
+        const nextUsers = await getNextUserOption({
+          nodeId: this.item.nodeId,
+          templateId: this.item.processTemplateId,
+          processInstanceId: this.item.processInstanceId
         })
-        approver = nextApprovers
-        assignedType = data[data.length - 1]?.children?.props?.assignedType
+        if (nextUsers.data.success) {
+          const { data: nextUserData } = nextUsers.data
+          approver = nextUserData.nodeSelectUserList?.map(v => {
+            return {
+              ...v,
+              nodeName: nextUserData.nodeName,
+              targetNodeId: nextUserData.nextNodeId
+            }
+          })
+        }
+        assignedType = data?.children?.props?.assignedType
         return {
           targetPage,
           refuseWay,
