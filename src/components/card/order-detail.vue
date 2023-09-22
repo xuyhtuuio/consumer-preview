@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-22 10:58:00
+ * @LastEditTime: 2023-09-22 11:16:41
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -50,7 +50,7 @@
               <i class="iconfont icon-tijiao"></i> <i class="btn">去比对</i></span>
           </el-button>
         </div>
-        <div v-if="item.taskStatus == 1 && pagePath && pagePath == 'approval' && item?.approvedSign == 0" class="flex">
+        <div v-if="item.taskStatus == 1 &&  pagePath == 'approval' && item?.approvedSign == 0&&hasAuth" class="flex">
           <!-- <div class="back flex" @click="transferDialog = true">
             <i class="iconfont icon-zhuanban1"></i>
             <i class="btn">转办</i>
@@ -461,6 +461,12 @@ export default {
         } else if (originRouter === 'approvalcenter') {
           // OCR审批或领导审批 由targetPage确认【 LEADER XIAOBAO 】  注：targetPage：[‘线上比对’ ，taskStatus=6，不在此判断]、[确认 taskStatus=5，也不在此判断]
           const res = await this.getTemplatedetail()
+          if (!res) {
+            this.status = 0
+            this.crtComp = 'approvalRecordCard'
+            this.hasAuth = false
+            return
+          }
           this.isOCR = res.targetPage !== 'LEADER'
           !this.isOCR
             ? ((this.status = 2), (this.crtComp = 'leaderEditOpinion'))
@@ -506,7 +512,8 @@ export default {
         processInstanceId: this.item.processInstanceId
       }
       const res = await getTemplatedetail(params)
-      if (res.data) {
+      const { success } = res.data
+      if (success) {
         const { data } = res.data
         targetPage = data[data.length - 1].props['targetPage']
         refuseWay = data[data.length - 1].props['refuseWay']
@@ -570,6 +577,8 @@ export default {
           processInstanceId,
           formId
         }
+      } else {
+        return false
       }
     },
     /**
