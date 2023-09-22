@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-20 10:54:45
+ * @LastEditTime: 2023-09-22 10:58:00
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -676,7 +676,7 @@ export default {
       if (
         editOpinionForm.isAccept === '1' && editOpinionForm.assignedType === 'SELF_SELECT'
       ) {
-        params.targetUser = editOpinionForm.crtApprover
+        params.targetUser = editOpinionForm.crtApprover.id
       }
       // 驳回并且是提交，调用新的接口
       if (editOpinionForm.isAccept === '0' && !isSave) {
@@ -709,7 +709,7 @@ export default {
           if (editOpinionForm.assignedType === 'SELF_SELECT') {
             updateRuleRes.data.nextNodeId = editOpinionForm.targetNodeId
             updateRuleRes.data.nextUserInfo = [{
-              id: editOpinionForm.crtApprover,
+              ...editOpinionForm.crtApprover,
             }]
           }
           const res = await updateRuleCode({

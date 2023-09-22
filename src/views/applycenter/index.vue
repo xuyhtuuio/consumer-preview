@@ -95,7 +95,7 @@
         </div>
         <div v-if="list.length" v-loading="search.loading" class="list">
           <applyEventCard :item="item" @del="del" @quash="quash" @concern="concern" v-for="(item, index) in list" :key="index"> </applyEventCard>
-          <trs-pagination :total="search.total" @getList="getApplicationListAll" :pageNow="pageNow"></trs-pagination>
+          <trs-pagination :total="search.total" @getList="nextPage" :pageNow="pageNow"></trs-pagination>
         </div>
         <Empty v-else v-loading="search.loading" class="list"></Empty>
       </div>
@@ -410,6 +410,9 @@ export default {
         }
       }) || []
       this.search.loading = false
+    },
+    nextPage(pageNow) {
+      this.getApplicationListAll(pageNow)
       this.$refs['apply-center'].scrollTo({
         top: 0, behavior: 'smooth'
       })

@@ -1,6 +1,6 @@
 <template>
   <div class="apply-event-card">
-    <div class="event-info">
+    <div class="event-info" @click="toDetail(item)">
       <div class="event-name-status" ref="event-name-status">
         <!-- 加急 -->
         <span class="order-status" ref="order-status">
@@ -12,7 +12,7 @@
           </svg>
           <span class="id" v-if="item.orderNo">{{ item.orderNo }}</span>
         </span>
-        <span class="event-name" @click="toDetail(item)" ref="event-name">{{
+        <span class="event-name"  ref="event-name">{{
           item.taskName
         }}</span>
         <span class="event-status" v-if="!item.errorStatus" ref="event-status">
@@ -66,12 +66,11 @@
               </div>
             </div>
             <span slot="reference" class="handler pointer">
-              当前处理人：{{ item.currentAssignee?.[0].fullname || '--' }}
+              处理人：{{ item.currentAssignee?.[0].fullname || '--' }}
               <i v-if="item.currentAssignee && item.currentAssignee.length > 1">+{{
                 item.currentAssignee && item.currentAssignee.length - 1
               }}</i></span>
           </el-popover>
-          <span class="handler" v-else>当前处理人：--</span>
         </span>
       </div>
       <div class="event-infos error" v-else>
@@ -433,9 +432,8 @@ export default {
       line-height: 22px;
       /* 157.143% */
     }
-
     .id {
-      color: #2d5cf6;
+      color: #1D2128;
       font-size: 14px;
       font-style: normal;
       font-weight: 400;
@@ -450,9 +448,9 @@ export default {
       .tag {
         margin-left: 12px;
         display: inline-block;
-        padding: 2px 12px;
+        padding: 1px 6px;
         border-radius: 4px;
-        font-size: 14px;
+        font-size: 12px;
         font-style: normal;
         font-weight: 400;
         line-height: 22px;
@@ -707,11 +705,7 @@ export default {
 
 .apply-event-card:hover {
   background: #f7f8fa;
-
-  .event-name {
-    color: #2d5cf6;
-    cursor: pointer;
-  }
+  cursor: pointer;
 }
 </style>
 <style lang="less">
