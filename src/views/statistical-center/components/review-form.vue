@@ -18,7 +18,7 @@
         <div class="orgName">
           <span
             class="org-icon"
-            :style="{'background-color' : colorData[scope.$index%7]} "
+            :style="{ 'background-color': colorData[scope.$index % 7] }"
           ></span>
           {{ scope.row.org }}
         </div>
@@ -40,6 +40,7 @@ export default {
   data() {
     return {
       isShow: true,
+      sortSign: 1,
       colConfig: [
         {
           label: '序号',
@@ -53,25 +54,35 @@ export default {
           label: '机构',
           prop: 'orgName',
           bind: {
-            width: 140,
+            width: 80,
             align: 'center'
           }
         },
         {
           label: '审查项目数',
-          prop: 'examineAllTotal'
+          prop: 'examineAllTotal',
+          bind: {
+            width: 120,
+            align: 'center',
+            sortable: 'custom'
+          }
         },
         {
           label: '平均审查时长',
           prop: 'averageReviewDuration',
           bind: {
-            width: 120,
-            align: 'center'
+            width: 140,
+            align: 'center',
+            sortable: 'custom'
           }
         },
         {
           label: '一次通过率',
-          prop: 'formOneTimePassRate'
+          prop: 'formOneTimePassRate',
+          bind: {
+            width: 130,
+            sortable: 'custom'
+          }
         },
         {
           label: '接受率',
@@ -82,8 +93,7 @@ export default {
           }
         }
       ],
-      data: [
-      ],
+      data: [],
       colorData: [
         '#2D5CF6',
         '#14C9C9',
@@ -102,16 +112,39 @@ export default {
     }
   },
   methods: {
-    async initData(data = this.searchData) {
+    async initData(data = this.searchData, sortSign) {
       this.isShow = true
       this.searchData = data
-      const { data: res } = await reviewTaskDistribution(data)
+      const { data: res } = await reviewTaskDistribution(sortSign ? { ...data, sortSign } : data)
       if (res.success) {
         this.data = res.data.list
         this.isShow = false
       }
     },
-    sortChange() {},
+    sortChange(data) {
+      if (data.order) {
+        const [asc, desc] = this.judgeSortSign(data.prop)
+        if (data.order && data.order.includes('asc')) {
+          this.initData(this.searchData, asc)
+        } else {
+          this.initData(this.searchData, desc)
+        }
+      }
+    },
+    judgeSortSign(origin) {
+      switch (origin) {
+        case 'examineAllTotal':
+          return [1, 2]
+        case 'averageReviewDuration':
+          return [3, 4]
+        case 'formOneTimePassRate':
+          return [5, 6]
+        case 'viewAcceptanceRate':
+          return [7, 8]
+        default:
+          return [1, 2]
+      }
+    },
     submitEdit() {},
     handleCurrentChange() {}
   }
