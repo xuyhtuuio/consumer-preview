@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-22 14:52:28
+ * @LastEditTime: 2023-09-22 15:42:31
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -698,7 +698,7 @@ export default {
             }
           }
           if (editOpinionForm.assignedType === 'SELF_SELECT') {
-            updateRuleRes.data.nextNodeId = editOpinionForm.targetNodeId
+            updateRuleRes.data.nextNodeId = editOpinionForm.crtApprover.targetNodeId
             updateRuleRes.data.nextUserInfo = [{
               ...editOpinionForm.crtApprover,
             }]
