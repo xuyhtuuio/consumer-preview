@@ -67,20 +67,12 @@
         审查
       </span>
       <!-- 超级管理员的删除功能 -->
-      <!-- <span class="attention icon-op del" v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'" @click="del(item)">
+      <span class="attention icon-op del" v-if="crtSign == 'allTask'" @click="del(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
           <use xlink:href="#icon-xianxingtubiao-1"></use>
         </svg>
         删除
-      </span> -->
-      <!-- 待修改状态的工单 需要该审批人修改的工单显示修改-->
-      <!-- <span class="modify icon-op" v-if="item.taskStatus == 3" @click="modify(item)">
-        <svg class="icon urgent-icon" aria-hidden="true">
-          <use xlink:href="#icon-xianxingtubiao"></use>
-        </svg>
-        修改
-      </span> -->
-
+      </span>
       <!-- 待确认状态的工单 需要该审批人确认的工单-->
       <span class="attention check icon-op" v-if="item.taskStatus == 5 && crtSign !== 'approvedCount' && hasAuth"
         @click="check(item)">
@@ -218,7 +210,6 @@ export default {
     },
     // 超级管理员的删除功能
     del(item) {
-      return this.$message.info('此功能暂未开放')
       // eslint-disable-next-line
       this.$confirm('确定删除该工单吗？', '', {
         customClass: 'confirmBox',

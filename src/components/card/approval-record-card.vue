@@ -37,10 +37,9 @@
                     <i class="iconfont icon icon-tubiao4"></i>审查要点
                   </span>
                 </div>
-                <div v-for="(keyPoint, index) in activity.keyPointsForVerification" :key="index" class="prod-point">
+                <div v-for="(keyPoint, index) in activity.keyPointsForVerification" :key="index" :class="{'prod-point':true,'prod-point-mult':keyPoint.name=='MultipleSelect' }">
                   <!-- 如果是 -->
-                  <div v-html="handleKeyPointer(keyPoint)">
-                  </div>
+                  <div v-html="handleKeyPointer(keyPoint)" ></div>
                 </div>
               </div>
               <!-- 有无实质意见-start -->
@@ -60,17 +59,17 @@
                   <i>{{ idx + 1 }}</i>
                   {{ item.content }}
                 </p>
-                <div class="relevant-file" v-if="item.files && item.files.length">
-                  关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.files && item.files[0] }}
+                <div class="relevant-file" v-if="item.fileNames && item.fileNames.length">
+                  关联文件：<i class="file-name ellipsis ellipsis_1">{{ item.fileNames && item.fileNames[0] }}
                   </i>
                   <el-popover placement="bottom-end" popper-class="file-overview-popper" trigger="click"
-                    v-if="item.files && item.files.length > 1">
+                    v-if="item.fileNames && item.fileNames.length > 1">
                     <div class="file-list">
-                      <div class="file-list-item ellipsis ellipsis_1" v-for="(file, idx) in item.files" :key="idx">
+                      <div class="file-list-item ellipsis ellipsis_1" v-for="(file, idx) in item.fileNames" :key="idx">
                         {{ file }}
                       </div>
                     </div>
-                    <i slot="reference" class="pointer">+{{ item.files.length - 1 }}</i>
+                    <i slot="reference" class="pointer">+{{ item.fileNames.length - 1 }}</i>
                   </el-popover>
                 </div>
               </div>
@@ -120,9 +119,7 @@
                 <p>
                   已采纳意见<i style="color: #2d5cf6">{{
                     activity.adoptedResults || '0'
-                  }}</i>条，不采纳意见<i style="color: #2d5cf6">{{
-  activity.unAdoptedResults || '0'
-}}</i>条；
+                  }}</i>条，不采纳意见<i style="color: #2d5cf6">{{ activity.unAdoptedResults || '0' }}</i>条；
                 </p>
                 <p style="color: #86909c; margin-top: 6px">
                   可在审查意见书查看详情
@@ -228,14 +225,13 @@ export default {
         } else {
           box += '<p style="color:#505968;">符合所有要点</p>'
         }
-      } else if (val.name === 'SingleGroupsSelect') {
-        const relativeValue = options.map((labelItem) => {
-          const isRelative = labelItem.children.filter((childValue) => val.value.includes(childValue.id))[0]?.value || ''
-          return {
-            point: labelItem.value,
-            isRelative
+      } else if (val.name === 'SelectInput') {
+        const relativeValue = [
+          {
+            point: val.title,
+            isRelative: options.filter(m => { return m.id === value })?.[0].value
           }
-        })
+        ]
         relativeValue.forEach(m => {
           box += `<p style='margin-bottom:4px;display:flex; justify-content: space-between;align-items:flex-start;'><span style="margin-right:10px;">${m.point}</span><span style='color:#86909C;'>${m.isRelative}</span></p>`
         })
@@ -440,15 +436,12 @@ export default {
     }
 
     .prod-point {
-      border-bottom: 1px dashed #E5E6EB;
+
       padding-bottom: 2px;
       margin: 6px 0;
     }
-
-    .prod-point:last-of-type {
-      border-bottom: none;
-      padding-bottom: 0;
-      margin: 0;
+    .prod-point-mult{
+      border-bottom: 1px dashed #E5E6EB;
     }
   }
 

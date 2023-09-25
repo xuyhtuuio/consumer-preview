@@ -100,7 +100,7 @@
         </div>
         <div class="list">
           <div v-if="list.length" v-loading="search.loading">
-            <approvalEventCard :item="item" @concern="concern" :crtSign="crtSign" @del="del" v-for="(item, index) in list"
+            <approvalEventCard :item="item" @concern="concern" :crtSign="crtSign" @del="delOrder" v-for="(item, index) in list"
               :key="index"></approvalEventCard>
             <trs-pagination :total="search.total" @getList="getList" :pageNow="pageNow"></trs-pagination>
           </div>
@@ -117,7 +117,8 @@ import {
   getApprovalType,
   getApprovalListStation,
   exportApprovalList,
-  getOrgTree
+  getOrgTree,
+  del
 } from '@/api/approvalCenter'
 import {
   getApprovalStage,
@@ -289,17 +290,17 @@ export default {
       this.getDataStatistic()
       this.searchList()
     },
-    del() {
-      // const param = {
-      //   recordId: id
-      // }
-      // delApplication(param).then((res) => {
-      //   if (res.status === 200) {
-      //     this.$message.success('删除成功')
-      //     this.getDataStatistic()
-      //     this.getApplicationListAll(1)
-      //   }
-      // })
+    delOrder(id) {
+      const param = {
+        formId: id
+      }
+      del(param).then((res) => {
+        if (res.status === 200) {
+          this.$message.success('删除成功')
+          this.getDataStatistic()
+          this.searchList(1)
+        }
+      })
     },
     getApprovalType() {
       getApprovalType().then((res) => {
