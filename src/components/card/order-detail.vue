@@ -481,7 +481,9 @@ export default {
         this.status = 4
         this.crtComp = 'approvedOpinionCard'
       }
-      this.getNextUserOption()
+      if (this.item.nodeId) {
+        this.getNextUserOption()
+      }
     },
     /**
      * @description: 获取申请单的所有节点信息，从root根节点一直到下一节点

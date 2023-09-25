@@ -41,6 +41,7 @@
                         placeholder="请选择驳回节点/驳回人"
                         popper-class="approver-select"
                         value-key="id"
+                        :popper-append-to-body="false"
                       >
                         <el-option
                           v-for="(item, index) in refuseOpiton"
@@ -740,5 +741,8 @@ export default {
   display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+}
+/deep/ .approver-select{
+  max-width: 500px;
 }
 </style>
