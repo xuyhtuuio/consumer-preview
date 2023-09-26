@@ -40,7 +40,12 @@ export default {
       naturalWidth: 0,
       scale: 1,
       BoundingClientRect: {},
-      highLightBoundingClientRect: {}
+      highLightBoundingClientRect: {},
+      wordDomStyle: {
+        width: 0,
+        height: 0,
+        scale: 1,
+      }
     }
   },
   watch: {
@@ -94,6 +99,10 @@ export default {
       this.naturalWidth = this.$refs.imgDom.naturalWidth;
       this.naturalHeight = this.$refs.imgDom.naturalHeight;
       this.scale = this.$refs.imgDom.clientWidth / this.$refs.imgDom.naturalWidth;
+      const imgDomElement = document.getElementById('picture');
+      this.wordDomStyle.width = imgDomElement.clientWidth;
+      this.wordDomStyle.height = imgDomElement.clientHeight;
+      this.wordDomStyle.scale = (imgDomElement.naturalWidth / imgDomElement.clientWidth).toFixed(2);
       this.getMaxPosition()
       this.initCenter()
       // 绑定缩放事件
@@ -141,6 +150,12 @@ export default {
         this.params.top = this.getCss(target, 'top');
       }
       target.style.transform = 'scale(1)';
+      this.$emit('getProps', {
+        height: target.height,
+        width: target.width,
+        style: target.style,
+        wordDomStyle: this.wordDomStyle
+      })
     },
     // 获取相关CSS属性
     getCss(o, key) {
@@ -297,7 +312,7 @@ export default {
     left: 0;
     height: auto;
     max-width: 100%;
-    max-height: 100%;
+    // max-height: 100%;
   }
 }
 

@@ -53,6 +53,7 @@
             :lineWordItem="lineWordItem"
             @linePosition="linePosition"
             :approval="approval"
+            @getProps="getProps"
           ></file-preview>
           <orcTxt
             ref="ocrTxt"
@@ -62,6 +63,7 @@
             v-if="specialFileType.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length-1]) && showOcr"
             @showLine="showLine"
             :lineWordItem="lineWordItem"
+            :styleProp="styleProp"
           >
           </orcTxt>
           <editorial
@@ -107,7 +109,7 @@ import TurnDialog from '@/components/common/turn-dialog'
 
 import sidebar from './sidebar/sidebar';
 import filePreview from './components/file-preview';
-import orcTxt from './components/ocr-txt';
+import orcTxt from './components/ocr-txt-new';
 import editorial from './components/editorial';
 import addReview from './dialogs/add-review';
 import submitReview from './dialogs/submit-review';
@@ -201,11 +203,17 @@ export default {
       ],
       // 驳回人列表
       refuseOpiton: [],
-      refuseDisabled: false
+      refuseDisabled: false,
+      styleProp: {}
     };
   },
   created() {
     this.getElHeight();
+  },
+  methods: {
+    getProps(val) {
+      this.styleProp = val;
+    }
   },
   mounted() {
     if (!this.$route.params.item) {

@@ -43,7 +43,7 @@
       <!-- 全屏关闭按钮 -->
       <i class="el-icon-circle-close" v-show="showFullScreen" @click="fullScreen"></i>
       <!-- 图片 -->
-      <imgae-preview ref="imgPreview" v-if="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))"
+      <imgae-preview @getProps="getProps" ref="imgPreview" v-if="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))"
         :lineWordItem="lineWordItem" @linePosition="linePosition" :url="approval.url"></imgae-preview>
       <!-- 其他类型文件 -->
       <filePreview v-else :url="approval.url"></filePreview>
@@ -136,6 +136,9 @@ export default {
         link.click()
         document.body.removeChild(link)
       })
+    },
+    getProps(val) {
+      this.$emit('getProps', val);
     },
     // 初始化
     init() {
