@@ -56,7 +56,7 @@
                   </span>
                 </div>
                 <p class="opinion-text">
-                  <i>{{ idx + 1 }}</i>
+                  <i>{{ idx + 1 }}.</i>
                   {{ item.content }}
                 </p>
                 <div class="relevant-file" v-if="item.fileNames && item.fileNames.length">

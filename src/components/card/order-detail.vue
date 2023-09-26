@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-22 15:42:31
+ * @LastEditTime: 2023-09-26 15:27:18
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -93,7 +93,7 @@
         <order-basic-info @preview="previewFile" :personInfo="item.initiator" :personOrg='item.institutional'
           @sendReviewMaterials="sendReviewMaterials" @sendFilledInByApprover="sendFilledInByApprover"></order-basic-info>
       </div>
-      <div class="right">
+      <div class="right" v-loading="loadings.initLoading">
         <!-- 消保审查/详情页/审批中预览 -->
         <div class="right-nav">
           <nav class="nav active-nav" v-if="status == 0">
@@ -198,7 +198,9 @@
       </span>
     </el-dialog>
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
-      <filePreview :url="previewUrl"></filePreview>
+      <keep-alive exclude="file-preview">
+        <filePreview :url="previewUrl"></filePreview>
+      </keep-alive>
     </el-dialog>
     <SubmitDialog :option="nextStepObj?.selectObject === '1' ? optionOther : option" :nextStepObj="nextStepObj"
       ref="confirmation" @handleConfirm="endTaskSubmit" :disabled="disabled"></SubmitDialog>
@@ -263,7 +265,8 @@ export default {
       loadings: {
         // 点击保存、确认时候的loading状态
         submitLoading: false,
-        storageLoading: false
+        storageLoading: false,
+        initLoading: false
       },
       reviewMaterials: [], // 工单上已上传的文件
       filledInByApprover: [], // 审批模块配置项目
@@ -490,6 +493,7 @@ export default {
      * @return {*}
      */
     async getTemplatedetail() {
+      this.loadings.initLoading = true;
       // 要传递给编辑意见组件的字段 ---start
       let targetPage = ''
       let refuseWay = ''
@@ -502,6 +506,7 @@ export default {
         processInstanceId: this.item.processInstanceId
       }
       const res = await getTemplatedetail(params)
+      this.loadings.initLoading = false
       const { success } = res.data
       if (success) {
         const { data } = res.data

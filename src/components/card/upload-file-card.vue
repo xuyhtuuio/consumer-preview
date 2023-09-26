@@ -28,7 +28,8 @@
       </div>
     </div>
     <p style="color: #EB5757;margin: 16px 0; font-size: 12px;" v-if="status !== 4 && radio == 1&&fileList.length">材料上传完成后，请与初次上传材料进行关联</p>
-    <div :class="{ 'upload-list': true, status4: status == 4 }" v-loading="loading">
+    <div v-if="(status !== 4&&radio==1)||status==4">
+    <div :class="{ 'upload-list': true, status4: status == 4 }" v-loading="loading" >
       <Empty v-if="status == 4 && fileList && fileList.length == 0"></Empty>
       <div class="item" v-for="(item, index) in fileList" :key="index" @mouseenter="handleMouseEnter(item,index)"
         @mouseleave="handleMouseLeave(item,index)">
@@ -73,6 +74,7 @@
     <div v-if="status == 4 && fileList && fileList.length">
       <p class="downloadAll" @click="download">下载全部</p>
     </div>
+  </div>
     <el-dialog title="关联文件" :visible.sync="relevantDocumentDialog" width="624" :before-close="handleClose"
       custom-class="relevant-dialog">
       <div>
