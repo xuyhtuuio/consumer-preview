@@ -93,7 +93,7 @@
         <order-basic-info @preview="previewFile" :personInfo="item.initiator" :personOrg='item.institutional'
           @sendReviewMaterials="sendReviewMaterials" @sendFilledInByApprover="sendFilledInByApprover"></order-basic-info>
       </div>
-      <div class="right">
+      <div class="right" v-loading="loadings.initLoading">
         <!-- 消保审查/详情页/审批中预览 -->
         <div class="right-nav">
           <nav class="nav active-nav" v-if="status == 0">
@@ -263,7 +263,8 @@ export default {
       loadings: {
         // 点击保存、确认时候的loading状态
         submitLoading: false,
-        storageLoading: false
+        storageLoading: false,
+        initLoading: false
       },
       reviewMaterials: [], // 工单上已上传的文件
       filledInByApprover: [], // 审批模块配置项目
@@ -490,6 +491,7 @@ export default {
      * @return {*}
      */
     async getTemplatedetail() {
+      this.loadings.initLoading = true;
       // 要传递给编辑意见组件的字段 ---start
       let targetPage = ''
       let refuseWay = ''
@@ -502,6 +504,7 @@ export default {
         processInstanceId: this.item.processInstanceId
       }
       const res = await getTemplatedetail(params)
+      this.loadings.initLoading = false
       const { success } = res.data
       if (success) {
         const { data } = res.data
