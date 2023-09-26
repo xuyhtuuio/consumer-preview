@@ -101,7 +101,7 @@
         <div class="list">
           <div v-if="list.length" v-loading="search.loading">
             <approvalEventCard :item="item" @concern="concern" :crtSign="crtSign" @del="delOrder" v-for="(item, index) in list"
-              :key="index"></approvalEventCard>
+              :key="index" :showExport="showExport"></approvalEventCard>
             <trs-pagination :total="search.total" @getList="getList" :pageNow="pageNow"></trs-pagination>
           </div>
           <Empty v-loading="search.loading" v-else></Empty>

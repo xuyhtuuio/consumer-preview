@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-22 15:42:31
+ * @LastEditTime: 2023-09-26 15:27:18
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -198,7 +198,9 @@
       </span>
     </el-dialog>
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
-      <filePreview :url="previewUrl"></filePreview>
+      <keep-alive exclude="file-preview">
+        <filePreview :url="previewUrl"></filePreview>
+      </keep-alive>
     </el-dialog>
     <SubmitDialog :option="nextStepObj?.selectObject === '1' ? optionOther : option" :nextStepObj="nextStepObj"
       ref="confirmation" @handleConfirm="endTaskSubmit" :disabled="disabled"></SubmitDialog>
