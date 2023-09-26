@@ -503,7 +503,7 @@ export default {
     getApproveContribution() {
       this.contributionLoading = true
       const getData = {
-        orgId: this.searchData.orgId?.length ? this.searchData.orgId[0] : '',
+        orgId: this.searchData.orgId?.length ? this.searchData.orgId[this.searchData.orgId.length - 1] : '',
         startTime: this.searchData.datePicker?.length ? this.searchData.datePicker[0] : '',
         endTime: this.searchData.datePicker?.length ? this.searchData.datePicker[1] : ''
       }
@@ -520,7 +520,7 @@ export default {
     getApproveAcceptRate() {
       this.acceptanceLoading = true
       const getData = {
-        orgId: this.searchData.orgId?.length ? this.searchData.orgId[0] : '',
+        orgId: this.searchData.orgId?.length ? this.searchData.orgId[this.searchData.orgId.length - 1] : '',
         startTime: this.searchData.datePicker?.length ? this.searchData.datePicker[0] : '',
         endTime: this.searchData.datePicker?.length ? this.searchData.datePicker[1] : ''
       }
@@ -540,7 +540,7 @@ export default {
       this.processingLoading = true
       this.processingData = []
       const getData = {
-        orgId: this.searchData.orgId?.length ? this.searchData.orgId[0] : '',
+        orgId: this.searchData.orgId?.length ? this.searchData.orgId[this.searchData.orgId.length - 1] : '',
         startTime: this.searchData.datePicker?.length ? this.searchData.datePicker[0] : '',
         endTime: this.searchData.datePicker?.length ? this.searchData.datePicker[1] : ''
       }
@@ -567,7 +567,7 @@ export default {
       this.personListLoading = true
       this.personListData.list = []
       approvePersonList({
-        orgId: this.searchData.orgId?.length ? this.searchData.orgId[0] : '',
+        orgId: this.searchData.orgId?.length ? this.searchData.orgId[this.searchData.orgId.length - 1] : '',
         startTime: this.searchData.datePicker?.length ? this.searchData.datePicker[0] : '',
         endTime: this.searchData.datePicker?.length ? this.searchData.datePicker[1] : '',
         sortValue: this.personListData.sortValue,
