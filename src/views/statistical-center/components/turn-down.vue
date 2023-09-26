@@ -85,7 +85,7 @@ export default {
       title: '驳回统计',
       isShow: true,
       tabList: [
-        { id: 1, name: '驳回单及驳回率', url: '/cpr/Statistics/distributionOfRejectionTimes' },
+        { id: 1, name: '驳回单及驳回率', url: '/cpr/Statistics/refusalReceiptAndRejectionRate' },
         { id: 2, name: '驳回次数分布', url: '/cpr/Statistics/distributionOfRejectionTimes' },
         { id: 3, name: '驳回原因分布', url: '/cpr/Statistics/distributionOfRejectionReasons' }
       ],
@@ -94,16 +94,32 @@ export default {
     }
   },
   methods: {
-    async initData(data) {
+    async initData(data, sortSign, lineId) {
       this.searchData = data
       this.isShow = true
-      const requestArr = []
+      let requestArr = []
       this.tabList.forEach(item => {
+        if (item.id === 1) {
+          data.pageSize = this.page.pageSize
+          data.pageNow = this.page.pageNow
+          data = sortSign ? { ...data, sortSign, lineId } : data
+        }
         requestArr.push(rejectStatistics(data, item.url))
       })
-      const [{ data: res1 }, { data: res2 }, { data: res3 }] = await Promise.all(requestArr)
+      if (sortSign) {
+        requestArr = [requestArr[0]]
+      }
+      console.log(requestArr)
+      const [{ data: res1 }, { data: res2 } = {}, { data: res3 } = {}] = await Promise.all(requestArr)
       if (res1.success) {
-        // console.log(res1.data)
+        const { head, data: colData, chart } = res1.data
+        console.log(colData, head)
+        this.colConfig = head
+        this.data = colData.list
+        this.page.pageNow = colData.pageNow
+        this.page.total = colData.totalCount
+        this.orderData.data = chart
+        this.isShow = false
       }
       if (res2) {
         this.stackBarData = res2.data
