@@ -214,7 +214,7 @@ export default {
           this.$message({ type: 'success', message: res.data.data });
         });
       } else {
-        const idx = this.fileList.findIndex(iten => iten.key === item.key);
+        const idx = this.fileList.findIndex(iten => iten.id === item.id);
         this.fileList.splice(idx, 1);
         this.$message({ type: 'success', message: '删除成功' });
       }
