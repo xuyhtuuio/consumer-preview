@@ -1,6 +1,6 @@
 <template>
   <div class="apply-event-card">
-    <div class="event-info" @click="toDetail(item)">
+    <div class="event-info" @click.stop="toDetail(item)">
       <div class="event-name-status" ref="event-name-status">
         <!-- 加急 -->
         <span class="order-status" ref="order-status">
@@ -65,7 +65,7 @@
               }}</span> -->
               </div>
             </div>
-            <span slot="reference" class="handler pointer">
+            <span slot="reference" class="handler pointer"  @click.stop="popoverClick">
               处理人：{{ item.currentAssignee?.[0].fullname || '--' }}
               <i v-if="item.currentAssignee && item.currentAssignee.length > 1">+{{
                 item.currentAssignee && item.currentAssignee.length - 1
@@ -227,6 +227,8 @@ export default {
       } else {
         this.canCompared = false
       }
+    },
+    popoverClick() {
     },
     getCanBeRoved() {
       // const params = {

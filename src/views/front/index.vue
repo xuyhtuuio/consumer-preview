@@ -291,26 +291,19 @@ export default {
       this.applyLoading = true;
       const that = this;
       const data = {
-        adoptionStatus: '',
         approvalStage: '',
-        approvalType: '',
-        create_time: '',
-        currentActivityName: '',
-        hasOpinions: 0,
+        formManagementId: '',
+        hasOpinions: '',
         id: that.userInfo.id,
+        isOneTimePassed: '',
         keywords: '',
-        label: '',
-        launchDate: '',
         name: that.userInfo.fullname,
         pageNow: 1,
         pageSize: 5,
-        roleRange: '',
-        selected: true,
-        sex: '',
-        type: '',
-        urgent: 0,
+        productLaunchDate: '',
         sortType: 4,
-        form_management_id: 1,
+        startDate: '',
+        urgent: ''
       };
       getList(data)
         .then((res) => {

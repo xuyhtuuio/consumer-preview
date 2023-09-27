@@ -12,7 +12,7 @@
           </svg>
           <span class="id" v-if="item.orderNo">{{ item.orderNo }}</span>
         </span>
-        <span class="event-name pointer"  ref="event-name">{{
+        <span class="event-name pointer" ref="event-name">{{
           item.entryName
         }}</span>
         <span class="event-status" ref="event-status">
@@ -66,20 +66,6 @@
         </svg>
         审查
       </span>
-      <!-- 超级管理员的删除功能 -->
-      <!-- <span class="attention icon-op del" v-if="item.taskStatus == '1' && crtSign !== 'approvedCount'" @click="del(item)">
-        <svg class="icon urgent-icon" aria-hidden="true">
-          <use xlink:href="#icon-xianxingtubiao-1"></use>
-        </svg>
-        删除
-      </span> -->
-      <!-- 待修改状态的工单 需要该审批人修改的工单显示修改-->
-      <!-- <span class="modify icon-op" v-if="item.taskStatus == 3" @click="modify(item)">
-        <svg class="icon urgent-icon" aria-hidden="true">
-          <use xlink:href="#icon-xianxingtubiao"></use>
-        </svg>
-        修改
-      </span> -->
 
       <!-- 待确认状态的工单 需要该审批人确认的工单-->
       <span class="attention check icon-op" v-if="item.taskStatus == 5 && crtSign !== 'approvedCount' && hasAuth"
@@ -90,6 +76,13 @@
         @click="compare(item)">
         <span class="iconfont icon icon-compare urgent-icon"></span>
         比对</span>
+      <!-- 超级管理员的删除功能 -->
+      <span class="attention icon-op del" v-if="crtSign == 'allTask'&&showExport" @click="del(item)">
+        <svg class="icon urgent-icon" aria-hidden="true">
+          <use xlink:href="#icon-xianxingtubiao-1"></use>
+        </svg>
+        删除
+      </span>
       <!-- 关注 -->
       <span class="attention no-attention icon-op" v-if="item.followed != 1" @click="concern(item)">
         <svg class="icon urgent-icon" aria-hidden="true">
@@ -117,7 +110,11 @@ export default {
     crtSign: {
       type: String,
       default: ''
-    }
+    },
+    showExport: {
+      type: Boolean,
+      default: false
+    },
   },
   data() {
     return {
@@ -218,7 +215,6 @@ export default {
     },
     // 超级管理员的删除功能
     del(item) {
-      return this.$message.info('此功能暂未开放')
       // eslint-disable-next-line
       this.$confirm('确定删除该工单吗？', '', {
         customClass: 'confirmBox',

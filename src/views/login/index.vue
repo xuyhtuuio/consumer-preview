@@ -147,7 +147,7 @@
               <!-- <p class="no-account">没有账号，去 <span class="register" @click="register">免费注册</span></p> -->
             </div>
             <div class="pwd-login">
-              <el-button type="text" class="nextPwd" @click="next">登录</el-button>
+              <el-button type="text" class="nextPwd" @click="next" :loading="loading" :disabled="loading" v-once-click>登录</el-button>
               <!-- 服务协议 -->
             </div>
           </div>
@@ -365,8 +365,6 @@ import { editThePermissionsPage } from '@/api/admin/role'
 import md5 from 'js-md5';
 // eslint-disable-next-line
 import * as dayjs from 'dayjs'
-// import Iframes from '@/components/iframe-send-message'
-// import "swiper/dist/css/swiper.min.css";
 // eslint-disable-next-line
 import register from './register';
 import swiperContent from './swiper';
@@ -492,43 +490,10 @@ export default {
       ],
       findPwd: false,
       hostArr: ['www.aikn.trs.com.cn', 'dataelite.trs.com.cn'],
-      iframeSrc: [
-        {
-          develop: 'http://192.168.210.57:31588/404',
-          prod: 'https://ib.dataelite.trs.com.cn/404',
-          route: '/404',
-          value: 'teisdata',
-          loaded: false,
-          label: '数星产业大脑'
-        },
-        {
-          develop: 'http://192.168.210.57:30630/404',
-          prod: 'https://tag.dataelite.trs.com.cn/404',
-          route: '/404',
-          value: 'trs-middle-platform',
-          loaded: false,
-          label: '数星智能标签平台'
-        },
-        {
-          develop: 'http://192.168.210.57:31199/404',
-          prod: 'https://api.dataelite.trs.com.cn/404',
-          route: '/404',
-          value: 'openapi',
-          loaded: false,
-          label: '数星API平台'
-        },
-        {
-          // develop: 'http://localhost/rwscwebv3/loginEmpty.html',
-          develop: 'http://192.168.210.57:30648/loginEmpty.html',
-          prod: 'https://rm.dataelite.trs.com.cn/loginEmpty.html',
-          route: '/loginEmpty.html',
-          value: 'rwscdata',
-          loaded: false,
-          label: '数星智能风控'
-        }
-      ],
+      iframeSrc: [],
       iframeType: 'develop',
-      gohistory: false
+      gohistory: false,
+      loading: false,
     };
   },
   watch: {
@@ -635,9 +600,10 @@ export default {
               this.checkAgreement = true;
               return;
             }
+            this.loading = true
             try {
               const res = await this.loginByPwd();
-
+              this.loading = false
               if (!res.access_token) {
                 this.$message.error(res?.error_description);
                 this.codeFun();
@@ -667,6 +633,7 @@ export default {
                 // this.checkToken()
               }
             } catch (err) {
+              this.loading = false
               if (err.data.error_description === '用户帐号已过期') {
                 _this.expirydialog = true;
                 return;

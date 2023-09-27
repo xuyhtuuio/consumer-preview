@@ -178,3 +178,12 @@ export function getOrgTree() {
     method: 'post',
   })
 }
+
+// 管理员删除工单
+export function del(param) {
+  return request({
+    url: '/cpr/censor/delete',
+    method: 'get',
+    params: param
+  })
+}
