@@ -393,6 +393,7 @@ export default {
     },
     handleAvatarSuccess(data) {
       this.imageUrl = data.url;
+      this.imageKey = data.key;
     },
     reUpload() {
       document.querySelector('#icon-uploader').click()
@@ -544,7 +545,7 @@ export default {
         await modifyTimeLimitFormCategory({
           formCategoryId: this.currentRow.recordId,
           timeLimit: this.limitTime,
-          fileUrl: this.imageUrl
+          fileUrl: this.imageKey
         })
         this.getObtainExamineTypeList()
         this.limitTimeVisible = false
