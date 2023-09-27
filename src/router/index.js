@@ -244,7 +244,18 @@ router.beforeEach((to, from, next) => {
   next();
   sessionStorage.setItem('router-path', to.path)
 })
-
+// 解决报错
+const originalPush = Router.prototype.push
+const originalReplace = Router.prototype.replace
+Router.prototype.push = function push(location, onResolve, onReject) {
+  if (onResolve || onReject) return originalPush.call(this, location, onResolve, onReject)
+  return originalPush.call(this, location).catch(err => err)
+}
+// replace
+Router.prototype.replace = function push(location, onResolve, onReject) {
+  if (onResolve || onReject) return originalReplace.call(this, location, onResolve, onReject)
+  return originalReplace.call(this, location).catch(err => err)
+}
 // 权限处理
 function handleAuth(to) {
   // 本地化持久存储
