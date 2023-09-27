@@ -223,6 +223,7 @@ export default {
 .ocr-txt {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .header {
