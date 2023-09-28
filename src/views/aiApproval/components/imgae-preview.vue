@@ -318,7 +318,7 @@ export default {
 
 .light {
   position: absolute;
-  box-shadow: 0 0 0px 100vh rgba(51, 51, 51, 0.4);
+  box-shadow: 0 0 0px 1000vh rgba(51, 51, 51, 0.4);
   z-index: 1;
 
   &::before {
