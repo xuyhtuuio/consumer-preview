@@ -182,7 +182,6 @@ export default {
   data() {
     return {
       reminderDialog: false,
-      allowConcernClick: true,
       persons: [],
       revoked: false, // 是否可以撤销
       canCompared: false // 当前登录用户可以使用对比功能

@@ -174,8 +174,7 @@ export default {
       window.localStorage.setItem(
         'order-detail',
         JSON.stringify({
-          item,
-          clickPoint: 'taskName'
+          item
         })
       )
       this.$router.push({

@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-27 17:41:21
+ * @LastEditTime: 2023-09-28 14:05:09
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -44,10 +44,6 @@
           </el-button>
         </div>
         <div v-if="item.taskStatus == 1 && pagePath == 'approval' && item?.approvedSign == 0 && hasAuth" class="flex">
-          <!-- <div class="back flex" @click="transferDialog = true">
-            <i class="iconfont icon-zhuanban1"></i>
-            <i class="btn">转办</i>
-          </div> -->
           <el-button class="back flex" style="border: none" v-if="!isOCR" :loading="loadings.storageLoading"
             @click="submit('storage')">
             <span class="flex">
@@ -181,22 +177,6 @@
         </div>
       </div>
     </div>
-    <el-dialog :visible.sync="transferDialog" width="800px" center custom-class="transfer-dialog">
-      <span slot="title">请选择转办对象</span>
-      <div>
-        <el-input v-model="staff.keyword" placeholder="搜索人员，支持拼音、姓名">
-          <i slot="prefix" class="el-input__icon el-icon-search pointer"></i></el-input>
-        <el-radio-group v-model="staff.people" class="trs-scroll">
-          <el-radio :label="item.code" v-for="(item, index) in peoples" :key="index">
-            <span class="avatar"><img src="@/assets/image/apply-center/avatar.png" alt="" /></span>
-            {{ item.name }}</el-radio>
-        </el-radio-group>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="transferDialog = false" type="text" class="cancel">取消</el-button>
-        <el-button type="text" @click="transferDialog = false" class="submit-btn">确定</el-button>
-      </span>
-    </el-dialog>
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <keep-alive exclude="file-preview">
         <filePreview :url="previewUrl"></filePreview>
@@ -250,14 +230,12 @@ export default {
       status: 0,
       crtComp: '',
       item: {},
-      transferDialog: false,
       staff: {
         // 转办功能用的
         keyword: '',
         people: ''
       },
       timeNow: '',
-      info: {},
       previewDialog: false,
       previewUrl: '',
       orderBaseInfo: {},
@@ -271,15 +249,6 @@ export default {
       reviewMaterials: [], // 工单上已上传的文件
       filledInByApprover: [], // 审批模块配置项目
       hasAuth: false, // 是否有权限
-      peoples: [
-        { name: '王明明', code: 1 },
-        { name: '王明明', code: 2 },
-        { name: '王明明', code: 3 },
-        { name: '王明明', code: 4 },
-        { name: '王明明', code: 5 },
-        { name: '王明明', code: 6 },
-        { name: '王明明', code: 7 }
-      ],
       nextStepObj: {
         // 提交： selectObject：1 上一审批选择，nodeSelectUserList
         // 驳回：  "refuseWay": "TO_BEFORE" ： 调回指定节点  nodeSelectList
@@ -419,14 +388,11 @@ export default {
       const originRouter = path.match(/\/(\S*)\//)[1]
       // 一般进入详情页只：展示返回按钮 及 审批记录详细
       const { item } = JSON.parse(window.localStorage.getItem('order-detail'))
-      const info = JSON.parse(window.localStorage.getItem('order-detail'))
-      this.info = info
       this.item = item
-      // 抄送功能，能看不能做其他操作 判断一下是否已经审批过
+      // 能看不能做其他操作 判断一下是否已经审批过
       if ((this.pagePath === 'approval' && item.taskStatus !== '4') || (this.pagePath === 'apply' && item.taskStatus !== '4')) {
         let currentProcessor = this.item.currentProcessor || this.item.currentAssignee
         currentProcessor = currentProcessor?.map((v) => {
-          // return Object.keys(v)[0]
           if (this.pagePath === 'approval') {
             return Object.keys(v)[0]
           }
@@ -485,7 +451,6 @@ export default {
         this.status = item.substantiveOpinions === 1 ? 5 : 3
         this.crtComp = 'approvedOpinionCard'
       }
-      console.log('d')
       // 工单-已结束状态  页面回显: 返回按钮、审批记录详细、审查意见书、最终上线材
       if (item.taskStatus === '4') {
         this.status = 4

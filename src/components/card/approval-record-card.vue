@@ -11,13 +11,13 @@
         <div class="right">
           <p class="taskname-staff">
             <span class="taskname">{{ activity.nodeName }}</span>
-            <span class="staff">
+            <span class="staff" v-if="activity.nodeId!=='endEvent'">
               <i>{{ activity.userInfoList.name }}</i>
               <i class="post" v-if="activity.userInfoList.name">（{{ activity.userInfoList.org }}）</i>
               <img src="@/assets/image/ai-approval/record-avatar.svg" alt="" />
             </span>
           </p>
-          <div class="time-notes">
+          <div class="time-notes" v-if="activity.nodeId&&activity.nodeId!=='endEvent'">
             <div v-if="activity.nodeId == 'root'">
               任务发起：{{ activity.created | timeFormat }}
             </div>
@@ -27,7 +27,7 @@
               <span>任务结束：{{ activity.ended | timeFormat }}</span>
             </div>
           </div>
-          <div class="opinions" v-if="activity.nodeId !== 'root'">
+          <div class="opinions" v-if="!['root','endEvent'].includes(activity.nodeId)">
             <div v-if="activity.nodeType == 'XIAOBAO'">
               <!-- ocr审批有个关联的审查要点 -->
               <div v-if="activity.keyPointsForVerification && activity.keyPointsForVerification.length"
@@ -193,6 +193,9 @@ export default {
                   refuseDesc = len > 0 ? v.opinion?.substring(len + 1, v.opinion.length) : ''
                 } else {
                   opinion = v.opinion ? JSON.parse(v.opinion) : ''
+                }
+                if (v.nodeId === 'endEvent') {
+                  v.nodeName = '已结束'
                 }
                 return {
                   ...v,
