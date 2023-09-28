@@ -344,7 +344,7 @@ export default {
         const array = []
         val.value.forEach((id) => {
           const strings = options.filter((v) => v.id === id)[0]
-          array.push(strings)
+          strings && array.push(strings)
         })
         const label = array
           .map((m) => {
