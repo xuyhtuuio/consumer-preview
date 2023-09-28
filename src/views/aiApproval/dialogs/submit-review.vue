@@ -96,9 +96,9 @@
             <template v-if="params.isPasses !== false">
                 <p class="title">消保审查意见书</p>
                 <div class="submission-content" v-if="submission.length">
-                    <!-- <p class="submission-name">
-                    拟同意该申请项目，并提出以下消保审查意见，<i style="color: #505968;">请您确认是否采纳以下意见：</i>
-                </p> -->
+                    <p class="submission-name">
+                      拟同意该产品/活动上线，并提出以下消保审查意见：
+                    </p>
                     <div class="submission-list">
                         <div class="submission-item" v-for="(item, index) in submission" :key="index"
                             @mouseleave="mouseleave" @mouseenter="mouseenter(item, index)">
