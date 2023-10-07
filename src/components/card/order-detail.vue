@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-28 14:05:09
+ * @LastEditTime: 2023-10-07 11:58:34
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -817,6 +817,9 @@ export default {
       }
       // 保存功能  状态-审批中；编辑意见
       if (this.status === 2 && way === 'storage') {
+      // 先切换当前的显示组件
+        this.crtComp = 'leaderEditOpinion'
+        this.$refs['child'].updateForm()
         this.$confirm('是否保存已编辑的意见确认信息？', '', {
           customClass: 'confirmBox',
           confirmButtonText: '保存',
