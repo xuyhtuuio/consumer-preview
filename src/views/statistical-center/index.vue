@@ -114,7 +114,7 @@
       <div class="main-item common">
         <ReachingConsumers ref="ref-reaching-consumers"/>
       </div>
-      <div class="main-item flex" style="gap: 16px; height: 430px">
+      <div class="main-item flex" style="gap: 16px; min-height: 430px">
         <SystemConnection class="common" />
         <TurnDown class="common" ref="ref-turn-down"/>
       </div>
@@ -134,15 +134,15 @@
 import dayjs from 'dayjs'
 import { onlyBankOrgTree, getFormCategoryArray } from '@/api/statistical-center'
 import HighWord from './components/high-word'
-import SensitiveProhibited from './components/sensitive-prohibited'
 import TurnDown from './components/turn-down'
-import SystemConnection from './components/system-connection'
-import ReachingConsumers from './components/reaching-consumers'
-import ReviewForm from './components/review-form'
 import RectTree from './components/rect-tree'
+import ReviewForm from './components/review-form'
 import DataOverview from './components/data-overview'
 import MissionTrends from './components/mission-trends'
 import TypeDistribution from './components/type-distribution'
+import SystemConnection from './components/system-connection'
+import ReachingConsumers from './components/reaching-consumers'
+import SensitiveProhibited from './components/sensitive-prohibited'
 
 export default {
   components: {
@@ -209,9 +209,9 @@ export default {
   methods: {
     async  initData() {
       const newMonth = dayjs().format('YYYY-MM');
-      const oldMonth = newMonth.split('')
-      oldMonth[newMonth.length - 1] = newMonth.at(-1) - 1
-      this.search.datePicker = [oldMonth.join(''), newMonth]
+      const oldMonth = newMonth.split('-')
+      oldMonth[oldMonth.length - 1] = `${oldMonth.at(-1) - 1}`.padStart(2, '0')
+      this.search.datePicker = [oldMonth.join('-'), newMonth]
       const [{ data: res1 }, { data: res2 }] = await Promise.all([onlyBankOrgTree(), getFormCategoryArray()])
       if (res1.success) {
         this.organOptions = res1.data || []

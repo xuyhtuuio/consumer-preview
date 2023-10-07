@@ -15,59 +15,64 @@
           </template>
         </div>
         <template>
-        <div class="main" v-show="currentTabListIndex === 0">
-          <div class="left">
-            <div class="top">
-              总驳回数: <span class="high">{{ 123 }}</span> 单
-            </div>
-            <div class="my-echart" ref="order-echart"></div>
+          <div class="main" v-show="currentTabListIndex === 0">
+            <template v-if="orderData.data.length">
+              <div class="left">
+                <div class="top" v-show="totalCount > 0">
+                  总驳回数: <span class="high">{{ totalCount }}</span> 单
+                </div>
+                <div class="my-echart" ref="order-echart"></div>
+              </div>
+              <div class="right">
+                <div class="my-table">
+                  <TrsTable
+                    theme="TRS-table-gray"
+                    :data="data"
+                    :colConfig="colConfig"
+                    @sort-change="sortChange"
+                    @submitEdit="submitEdit"
+                    :header-cell-style="{
+                      'text-align': 'center',
+                      'font-weight': 400,
+                      'font-size': '12px'
+                    }"
+                    :cell-style="{
+                      'text-align': 'center',
+                      'font-size': '12px'
+                    }"
+                  >
+                  </TrsTable>
+                  <TrsPagination
+                    :pageSize="page.pageSize"
+                    :pageNow="page.pageNow"
+                    :total="page.total"
+                    @getList="handleCurrentChange"
+                  >
+                  </TrsPagination>
+                </div>
+              </div>
+            </template>
+            <el-empty v-else style="width: 100%;"></el-empty>
           </div>
-          <div class="right">
-            <div class="my-table">
-              <TrsTable
-                theme="TRS-table-gray"
-                :data="data"
-                :colConfig="colConfig"
-                @sort-change="sortChange"
-                @submitEdit="submitEdit"
-                :header-cell-style="{
-                  'text-align': 'center',
-                  'font-weight': 400,
-                  'font-size': '12px'
-                }"
-                :cell-style="{ 'text-align': 'center', 'font-size': '12px' }"
+          <div class="main" v-show="currentTabListIndex === 1">
+            <div class="my-echart" ref="stackBar-echart"></div>
+          </div>
+          <div class="main main-legend" v-show="currentTabListIndex === 2">
+            <div class="my-echart" ref="reason-echart"></div>
+            <div class="legend">
+              <div
+                class="legend-item"
+                v-for="(item, index) in reasonData"
+                :key="'legend' + index"
               >
-              </TrsTable>
-              <TrsPagination
-                :pageSize="page.pageSize"
-                :pageNow="page.pageNow"
-                :total="page.total"
-                @getList="handleCurrentChange"
-              >
-              </TrsPagination>
+                <span
+                  class="legend-icon"
+                  :style="{ backgroundColor: reasonData.color[index] }"
+                ></span>
+                <span>{{ item.name }}</span>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="main" v-show="currentTabListIndex === 1">
-          <div class="my-echart" ref="stackBar-echart"></div>
-        </div>
-        <div class="main main-legend" v-show="currentTabListIndex === 2">
-          <div class="my-echart" ref="reason-echart"></div>
-          <div class="legend">
-            <div
-              class="legend-item"
-              v-for="(item, index) in reasonData"
-              :key="'legend' + index"
-            >
-              <span
-                class="legend-icon"
-                :style="{ backgroundColor: reasonData.color[index] }"
-              ></span>
-              <span>{{ item.name }}</span>
-            </div>
-          </div>
-        </div>
-
         </template>
       </template>
     </g-table-card>
@@ -85,12 +90,25 @@ export default {
       title: '驳回统计',
       isShow: true,
       tabList: [
-        { id: 1, name: '驳回单及驳回率', url: '/cpr/Statistics/refusalReceiptAndRejectionRate' },
-        { id: 2, name: '驳回次数分布', url: '/cpr/Statistics/distributionOfRejectionTimes' },
-        { id: 3, name: '驳回原因分布', url: '/cpr/Statistics/distributionOfRejectionReasons' }
+        {
+          id: 1,
+          name: '驳回单及驳回率',
+          url: '/cpr/Statistics/refusalReceiptAndRejectionRate'
+        },
+        {
+          id: 2,
+          name: '驳回次数分布',
+          url: '/cpr/Statistics/distributionOfRejectionTimes'
+        },
+        {
+          id: 3,
+          name: '驳回原因分布',
+          url: '/cpr/Statistics/distributionOfRejectionReasons'
+        }
       ],
       dataMap: ['orderData', 'stackBarData', 'reasonData'],
-      currentTabListIndex: 1
+      currentTabListIndex: 0,
+      totalCount: 0
     }
   },
   methods: {
@@ -98,7 +116,7 @@ export default {
       this.searchData = data
       this.isShow = true
       let requestArr = []
-      this.tabList.forEach(item => {
+      this.tabList.forEach((item) => {
         if (item.id === 1) {
           data.pageSize = this.page.pageSize
           data.pageNow = this.page.pageNow
@@ -109,23 +127,23 @@ export default {
       if (sortSign) {
         requestArr = [requestArr[0]]
       }
-      console.log(requestArr)
-      const [{ data: res1 }, { data: res2 } = {}, { data: res3 } = {}] = await Promise.all(requestArr)
-      if (res1.success) {
-        const { head, data: colData, chart } = res1.data
-        console.log(colData, head)
-        this.colConfig = head
-        this.data = colData.list
-        this.page.pageNow = colData.pageNow
-        this.page.total = colData.totalCount
-        this.orderData.data = chart
-        this.isShow = false
+      const [{ value: res1 }, { value: res2 }, { value: res3 }] = await Promise.allSettled(requestArr)
+      if (res1.data && res1.data.success) {
+        if (res1.data.success) {
+          const { head, data: colData, chart } = res1.data.data
+          this.colConfig = head
+          this.data = colData.list
+          this.page.pageNow = colData.pageNow
+          this.page.total = colData.totalCount
+          this.orderData.data = chart
+          this.totalCount = colData.totalCount || 0
+        }
       }
-      if (res2) {
-        this.stackBarData = res2.data
+      if (res2.data && res2.data.success) {
+        this.stackBarData = res2.data.data
       }
-      if (res3) {
-        this.reasonData = res3.data
+      if (res3.data && res3.data.data) {
+        this.reasonData = res3.data.data
         this.reasonData.color = [
           '#249EFF',
           '#65CFE4',

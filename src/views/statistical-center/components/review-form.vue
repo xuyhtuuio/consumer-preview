@@ -118,6 +118,7 @@ export default {
       const { data: res } = await reviewTaskDistribution(sortSign ? { ...data, sortSign } : data)
       if (res.success) {
         this.data = res.data.list
+        this.page.total = res.data.totalCount
         this.isShow = false
       }
     },

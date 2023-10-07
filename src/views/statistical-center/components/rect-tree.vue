@@ -40,19 +40,20 @@ export default {
           backgroundColor: 'rgba(255,255,255,0.8)',
           borderColor: 'rgba(255,255,255,0.8)',
           trigger: 'item',
-          formatter: ({ dataIndex }) => {
+          formatter: (params) => {
+            const { dataIndex, data: { name, value } } = params
             const p = `
                   <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">审查任务数</div>
                   <div>
                     <div style="display:flex;align-items:center;gap:12px;color:#1D2128">
                       <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;background-color: ${color[dataIndex - 1]};"></span>
-                      <span>北京分行</span>
-                      <span>230项</span>
+                      <span>${name}</span>
+                      <span>${value}项</span>
                       <span>全行占比8%</span>
                     </div>
                   </div>
               `
-            const box = `<div style="width:230px;padding:16px;font-size:12px">${p}</div>`
+            const box = `<div style="min-width:230px;padding:16px;font-size:12px">${p}</div>`
             return box
           }
         },

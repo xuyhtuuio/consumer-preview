@@ -2,12 +2,7 @@ export default {
   data() {
     return {
       orderData: {
-        data: [
-          { value: 200, name: '产品类' },
-          { value: 400, name: '活动类' },
-          { value: 300, name: '客户类' },
-          { value: 100, name: '其他' }
-        ],
+        data: [],
         color: ['#5773F9', '#249EFF', '#21CCFF', '#81E2FF']
       },
       stackBarData: {},

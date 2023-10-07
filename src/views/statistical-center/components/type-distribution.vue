@@ -28,7 +28,7 @@
             <div class="echarts-box" ref="my-echarts"></div>
           </div>
         </div>
-        <empty v-else></empty>
+        <el-empty v-else style="width:100%;padding:0"></el-empty>
       </template>
     </g-table-card>
   </div>
@@ -76,7 +76,9 @@ export default {
           borderColor: 'rgba(255,255,255,0.8)',
           extraCssText: 'backdrop-filter:blur(2px)',
           formatter(params) {
-            const { value, name, color, rate } = params
+            console.log(params)
+            const { value, name, color } = params
+            const { rate } = params.data
             return `
               <div style="display:flex;gap: 12px; align-items: center;padding: 6px;font-size:12px;color:#1D2128;">
                 <span style="width:8px;height:8px;border-radius: 50%;background-color:${color}"></span>
@@ -112,7 +114,7 @@ export default {
           },
           formatter(name) {
             const { value, rate } = timesData.find((item) => item.name === name)
-            return `{b|${name}} {a| ${value}项 ${rate}%}`
+            return `{b|${name.length >= 10 ? name.slice(0, 10) + '...' : name}} {a| ${value}项 ${rate}%}`
           }
         },
         series: [
@@ -129,7 +131,7 @@ export default {
                 show: true,
                 fontSize: 12,
                 formatter({ name, value }) {
-                  return `{a|${value}项}\n{b| ${name}}`
+                  return `{a|${value}项}\n{b| ${name.length >= 10 ? name.slice(0, 5) + '...' : name}}`
                 },
                 rich: {
                   a: {

@@ -25,7 +25,7 @@ export default {
       const { data: res } = await highFrequencyVocabulary(data)
       if (res.success) {
         this.$nextTick(() => {
-          this.initEcharts([{ name: '高频词汇', value: 230 }])
+          this.initEcharts(res.data)
           this.isShow = false
         })
       }
