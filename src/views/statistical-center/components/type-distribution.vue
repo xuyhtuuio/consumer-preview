@@ -76,7 +76,6 @@ export default {
           borderColor: 'rgba(255,255,255,0.8)',
           extraCssText: 'backdrop-filter:blur(2px)',
           formatter(params) {
-            console.log(params)
             const { value, name, color } = params
             const { rate } = params.data
             return `
