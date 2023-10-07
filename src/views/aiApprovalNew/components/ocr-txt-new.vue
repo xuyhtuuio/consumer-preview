@@ -194,8 +194,9 @@ export default {
       this.html = html
     },
     // 高亮检索的关键词
-    search() {
+    search(keyWords) {
       this.resultKey++
+      this.keyWords = keyWords
       if (!this.keyWords) {
         return
       }

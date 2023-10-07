@@ -185,7 +185,11 @@ export default {
   },
   methods: {
     search() {
-
+      console.log(this.keyWords)
+      if (this.keyWords) {
+        console.log(this.$refs.ocrTxt.search)
+        this.$refs.ocrTxt.search(this.keyWords)
+      }
     },
     getProps(val) {
       this.styleProp = val;
