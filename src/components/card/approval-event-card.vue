@@ -164,7 +164,8 @@ export default {
           break
         case 'XIAOBAO':
           this.$router.push({
-            name: 'aiApproval',
+            name: 'aiApprovalNew',
+            // name: 'aiApproval',
             params: { item }
           })
           break

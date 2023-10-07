@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "37571723",
+      "name": "change",
+      "font_class": "dianjitianjiapizhu",
+      "unicode": "e65e",
+      "unicode_decimal": 58974
+    },
+    {
+      "icon_id": "37571693",
+      "name": "frame",
+      "font_class": "Frame2",
+      "unicode": "e65d",
+      "unicode_decimal": 58973
+    },
+    {
       "icon_id": "37335579",
       "name": "Frame",
       "font_class": "Frame1",

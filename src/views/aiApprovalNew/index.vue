@@ -1,0 +1,393 @@
+<template>
+  <div class="container" ref="refContainer" v-loading="containLoading">
+    <sidebar ref="sidebar"></sidebar>
+    <div class="content">
+      <div class="content-header" ref="refContentHeader">
+        <span class="content-title">
+          <i class="iconfont icon-shenpiyemiantubiao" v-if="formBase?.urgent === '1'"></i>{{ formBase?.entryName }}</span>
+        <span class="content-btns">
+          <el-button @click="goBack"><i class="iconfont icon-fanhui1"></i>返回</el-button>
+          <el-button type="tuihui" @click="reject" v-if="approvalLetter.permissions === 'passAllow'">
+            <i class="iconfont icon-tuihui1"></i>退回/驳回</el-button>
+          <el-button @click="turnTo" v-if="nextStepObj.isChangeHandle !== null"><i
+              class="iconfont icon-zhuanban1"></i>转办</el-button>
+          <el-button @click="save"><i class="iconfont icon-baocun"></i>保存</el-button>
+          <el-button type="primary" @click="changeOcrView"
+            v-if="specialFileType.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1])"><i
+              class="iconfont icon-ocr"></i>{{ showOcr ? '关闭' : '打开' }}智能审批</el-button>
+          <el-popover v-show="examineIsShow" popper-class="con-popover" style="margin: 0 0 0 10px" placement="bottom"
+            width="380" trigger="click">
+            <ExaminePivot class="cont-examine" :style="myContStyle" ref="refExamine">
+            </ExaminePivot>
+            <el-button slot="reference" type="primary" @click="handleExamine">
+              <i class="iconfont icon-heduiyaodian"></i>要点核对
+            </el-button>
+          </el-popover>
+
+          <el-button type="primary" @click="showSubmit" style="margin-left: 10px"><i
+              class="iconfont icon-tijiao"></i>提交</el-button>
+        </span>
+      </div>
+      <div class="content-cont" v-loading="fileloading">
+        <div class="content-cont-body">
+          <div class="content-cont-body-top">
+            <div class="cont-top-btns">
+              <span>
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#icon-Frame2"></use>
+                </svg>
+                更多材料</span>
+              <span>
+                <!-- <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#icon-xiazai"></use>
+                </svg> -->
+                <i class="iconfont icon-xiazai"></i>
+                下载</span>
+              <span>
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#icon-dianjitianjiapizhu"></use>
+                </svg>
+                切换模式</span>
+            </div>
+            <div class="cont-top-infos">
+              <span>提醒：共发现 4 处风险信息，请认真核对</span>
+              <el-input v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search"
+                size="medium">
+                <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
+              </el-input>
+            </div>
+          </div>
+          <div class="content-cont-body-bottom">
+            <file-preview ref="filePreview" :files="files" :formId="formId" :activeIndex="activeIndex"
+              @changeFile="changeFile" :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"
+              @getProps="getProps"></file-preview>
+            <orcTxtNew ref="ocrTxt" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
+              v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
+              @showLine="showLine" :lineWordItem="lineWordItem" :styleProp="styleProp">
+            </orcTxtNew>
+            <orcTxt ref="ocrTxt" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
+              v-if="specialFileType2.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
+              @showLine="showLine" :lineWordItem="lineWordItem">
+            </orcTxt>
+          </div>
+        </div>
+        <div class="content-cont-editor">
+          <editorial ref="editorial" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
+            :lineWordItem="lineWordItem" @upDateComments="upDateComments" @showLine="showLine"
+            :activeWordType="activeWordType" @changeEditorialType="changeEditorialType" :showOcr="showOcr"
+            :formBase="formBase">
+          </editorial>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import sidebar from './sidebar/sidebar';
+import filePreview from './components/file-preview';
+import orcTxt from './components/ocr-txt';
+import orcTxtNew from './components/ocr-txt-new';
+import ExaminePivot from './components/examine-pivot';
+import editorial from './components/editorial';
+
+import utils from './index-utils'
+export default {
+  name: 'aiApprovalNew',
+  mixins: [utils],
+  components: {
+    sidebar,
+    filePreview,
+    ExaminePivot,
+    orcTxtNew,
+    orcTxt,
+    editorial,
+  },
+  data() {
+    return {
+      keyWords: '',
+      formBase: {},
+      previewDialog: false,
+      previewfileUrl: '',
+      containLoading: false,
+      fileloading: false,
+      examineShow: false,
+      specialFileType: ['jpeg', 'jpg', 'png', 'pdf'],
+      specialFileType1: ['jpeg', 'jpg', 'png'],
+      specialFileType2: ['pdf'],
+      files: [], // 文件相关信息
+      comments: [], // 编辑意见
+      approval: {}, // 当前审批文件的相关内容
+      activeIndex: null,
+      word_lines: [], // 连线
+      lineWordItem: {}, // 当前展示连线的词的基本信息
+      increasedIds: {
+        words: [],
+        strIds: []
+      },
+      showOcr: true,
+      formId: '',
+      inDraft: false, // 判断当前单子是否有 已存的审批意见
+      formCategoryId: '',
+      saveOption: {
+        message: '是否保存本审查项目的审查意见？',
+        cancelBtn: '不保存',
+        confirmBtn: '保存'
+      },
+      activeWordType: 0, // 高亮禁用词或敏感词, 1 禁用词,  2 敏感词
+      myContStyle: {
+        height: '0px'
+      },
+      examineIsShow: false,
+      // 允许提有实质性意见 passAllow 允许提意见以及驳回；passNotAllow不可提意见允许驳回；disPassNotAllow不允许
+      approvalLetter: {
+        permissions: 'passNotAllow',
+        list: []
+      },
+      applyForm: {},
+      applyFormWithPermissions: {
+        keyPointsForVerification: [],
+        filledInByApprover: []
+      },
+      formItemPermissions: [],
+      nextStepObj: {
+        // 提交： selectObject：1 上一审批选择，nodeSelectUserList
+        // 驳回：  "refuseWay": "TO_BEFORE" ： 调回指定节点  nodeSelectList
+        nextNodeName: '',
+        selectObject: '',
+        nodeSelectUserList: [],
+        refuseWay: '',
+        nodeSelectList: [],
+        isChangeHandle: null
+      },
+      rejectOption: [
+        {
+          value: '文件预览失败（文件损坏/清晰度过低）',
+          label: '文件预览失败（文件损坏/清晰度过低）'
+        },
+        {
+          value: '附件材料与审批项目不匹配',
+          label: '附件材料与审批项目不匹配'
+        },
+        {
+          value: '其他',
+          label: '其他'
+        }
+      ],
+      // 驳回人列表
+      refuseOpiton: [],
+      refuseDisabled: false,
+      styleProp: {}
+    };
+  },
+  created() {
+    this.getElHeight();
+  },
+  methods: {
+    search() {
+
+    },
+    getProps(val) {
+      this.styleProp = val;
+    }
+  },
+  mounted() {
+    const { item } = this.$route.params;
+    this.formId = item.taskNumber;
+    this.inDraft = item.draftFlag === 1;
+    this.formCategoryId = item.formManagementId;
+    this.init(item);
+    this.formBase = item;
+    // 获取前面的审批意见
+    this.getOpinionApprovalLetter();
+    this.getNodeHandleUserApi();
+  },
+}
+</script>
+
+<style lang="less" scoped>
+.container {
+  display: flex;
+  padding: 0 !important;
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 16px 24px;
+  }
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .el-button {
+    line-height: 22px;
+    padding: 6px 16px;
+    border: none;
+  }
+
+  .content-title {
+    font-size: 16px;
+    font-weight: 700;
+
+    i {
+      color: #eb5d78;
+      margin-right: 12px;
+    }
+  }
+
+  .content-btns {
+    margin-left: 20px;
+    white-space: pre;
+
+    .iconfont {
+      font-size: 20px;
+      margin-right: 4px;
+    }
+
+    /deep/ .el-button {
+      >span {
+        display: flex;
+      }
+    }
+
+    .el-button--tuihui {
+      background: #ffffff;
+      color: #eb5757;
+    }
+  }
+}
+
+.content-cont {
+  position: relative;
+  flex: 1;
+  display: flex;
+  gap: 12px;
+  overflow: hidden;
+
+  &-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    &-top {
+      padding: 12px 16px 12px 16px;
+      border-bottom: 1px solid #E5E6EB;
+      border-radius: 10px 10px 0px 0px;
+      background: #ffffff;
+      height: 48px;
+      display: flex;
+      justify-content: space-between;
+
+      .cont-top-infos {
+        display: inline-flex;
+
+        span {
+          min-width: 243px;
+          display: flex;
+          height: 24px;
+          align-items: center;
+          border-radius: 13px;
+          padding: 2px 12px 2px 12px;
+          background: #FFFCE8;
+          color: #FA8C16;
+          margin-right: 8px;
+        }
+
+        .el-input {
+          width: 240px;
+          height: 24px;
+        }
+
+        /deep/ .el-input__inner {
+          border-radius: 18px;
+          border: none;
+          background: #F2F3F5;
+          height: 24px;
+        }
+
+        /deep/ .el-input__suffix {
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      .cont-top-btns {
+        display: flex;
+        align-items: center;
+
+        span:nth-of-type(n + 2) {
+          &::before {
+            content: " ";
+            width: 1px;
+            height: 12px;
+            display: inline-block;
+            margin: 0 10px;
+            background: #cacdd3;
+            cursor: default;
+          }
+        }
+        span{
+          .icon{
+            width: 16px;
+            height: 16px;
+          }
+          cursor: pointer;
+          color: #505968;
+        }
+        .icon-xiazai {
+          display: inline-block;
+          width: 14px;
+          height: 14px;
+          color: #86909C;
+        }
+      }
+    }
+
+    &-bottom {
+      flex: 1;
+      display: flex;
+      gap: 1px;
+      overflow: hidden;
+
+      >div {
+        background: #ffffff;
+        border-radius: 0px 0px 10px 10px;
+        box-shadow: 0px 0px 10px 0px #4343430d;
+        width: 380px;
+        overflow: auto;
+
+        &:first-child {
+          overflow: hidden;
+
+          &:first-child {
+            flex: 1;
+            // width: calc(100% - 60% - 24px);
+          }
+        }
+      }
+    }
+  }
+
+  &-editor {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px 0px #4343430d;
+    width: 380px;
+    overflow: auto;
+
+    &:first-child {
+      overflow: hidden;
+
+      &:first-child {
+        flex: 1;
+        // width: calc(100% - 60% - 24px);
+      }
+    }
+  }
+}
+</style>

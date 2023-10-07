@@ -166,12 +166,21 @@ const router = new Router({
           name: 'approval-details',
           component: () => import('@/views/approvalCenter/details'),
           meta: { title: '申请单详情', }
-        }, {
+        },
+        {
           path: 'aiApproval',
           name: 'aiApproval',
           component: () => import('@/views/aiApproval/index'),
           meta: { title: '智能审批', viewport }
-        }, {
+        },
+        // OCR重构页
+        {
+          path: 'aiApprovalNew',
+          name: 'aiApprovalNew',
+          component: () => import('@/views/aiApprovalNew/index'),
+          meta: { title: '智能审批', viewport }
+        },
+        {
           path: 'compare',
           name: 'compare',
           component: () => import('@/views/approvalCenter/text-compare'),
@@ -266,7 +275,13 @@ function handleAuth(to) {
     }
   }
   const { permissionsPage } = store.state
-  const auth = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(item => ((item.pathName === to.name) && item.type))
+  const auth = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm,
+    {
+      pathName: 'aiApprovalNew',
+      name: 'aiApprovalNew',
+      type: 'editer'
+    }
+  ].find(item => ((item.pathName === to.name) && item.type))
   if (auth || to.name === 'login' || to.name === '404') {
     return true
   }
