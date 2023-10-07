@@ -37,7 +37,7 @@
                   <use xlink:href="#icon-Frame2"></use>
                 </svg>
                 更多材料</span>
-              <span>
+              <span @click="saveFile">
                 <!-- <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-xiazai"></use>
                 </svg> -->

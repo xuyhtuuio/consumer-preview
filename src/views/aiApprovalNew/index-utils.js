@@ -12,10 +12,29 @@ import {
   getNodeHandleUser,
   updateRuleCode,
 } from '@/api/aiApproval';
+import { downloadAllFiles } from '@/api/applyCenter'
 import { getApplyForm } from '@/api/front';
 
 export default {
   methods: {
+    saveFile() {
+      const params = {
+        formId: this.formId,
+        key: this.approval.id
+      }
+      this.$message.info('下载中，请稍等！')
+      downloadAllFiles(params).then((res) => {
+        const disposition = res.headers['content-disposition']
+        const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
+        const link = document.createElement('a');
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      })
+    },
     turnTo() {
       this.$refs.turnDialog.turnDialog = true;
     },
