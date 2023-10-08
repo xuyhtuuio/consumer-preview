@@ -1,6 +1,6 @@
 import request from '@/api/request'
 
-// 上传图片
+// 上传文件
 export function getFormGroups(formData) {
   return request({
     url: '/cpr/file/upload',
@@ -10,13 +10,53 @@ export function getFormGroups(formData) {
   })
 }
 
-// 删除图片
+// 删除文件
 export function deleteFormGroups(params) {
   return request({
     url: '/cpr/file/remove',
     method: 'post',
     params,
   })
+}
+
+/**
+ * 根据文件的md5获取未上传完的任务
+ * @param identifier 文件md5
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const taskInfo = (identifier) => {
+  return request.get(`/v1/minio/tasks/${identifier}`)
+}
+
+/**
+* 初始化一个分片上传任务
+* @param identifier 文件md5
+* @param fileName 文件名称
+* @param totalSize 文件大小
+* @param chunkSize 分块大小
+* @returns {Promise<AxiosResponse<any>>}
+*/
+export const initTask = ({ identifier, fileName, totalSize, chunkSize }) => {
+  return request.post('/v1/minio/tasks', { identifier, fileName, totalSize, chunkSize })
+}
+
+/**
+* 获取预签名分片上传地址
+* @param identifier 文件md5
+* @param partNumber 分片编号
+* @returns {Promise<AxiosResponse<any>>}
+*/
+export const preSignUrl = ({ identifier, partNumber }) => {
+  return request.get(`/v1/minio/tasks/${identifier}/${partNumber}`)
+}
+
+/**
+* 合并分片
+* @param identifier
+* @returns {Promise<AxiosResponse<any>>}
+*/
+export const merge = (identifier) => {
+  return request.post(`/v1/minio/tasks/merge/${identifier}`)
 }
 
 export function getFormCategoryArray(params) {
