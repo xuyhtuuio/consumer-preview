@@ -199,9 +199,10 @@ export default {
           }
         })
         this.collection = arr
+        // this.collection.push(item)
         this.newFiles = [this.approval.id];
         this.newInput = '';
-        this.$emit('upDateComments', 'add', item)
+        this.$emit('upDateComments', 'upd', arr)
       }
       this.newFocus = false
     },

@@ -379,7 +379,10 @@ export default {
     },
     // 编辑意见后,同步更新  文件的推荐意见状态
     upDateComments(type, item, newVal) {
-      const filterFiles = this.files.filter(file => item.files.includes(file.id));
+      let filterFiles = [];
+      if (type !== 'upd') {
+        filterFiles = this.files.filter(file => item.files.includes(file.id))
+      }
       switch (type) {
         // 新增意见,至少找到一个 关联文件,将新增意见插入即可
         case 'add':
@@ -484,6 +487,17 @@ export default {
               addFile.comments ? addFile.comments.push(newItem) : (addFile.comments = [newItem]);
             }
           });
+          break;
+        // 新增意见后执行意见同步操作
+        case 'upd':
+          this.files.filter(file => item?.some((f) => {
+            if (f.files.includes(file.id)) {
+              if (!file.comments) {
+                file.comments = []
+              }
+              file.comments = [...new Set([...file.comments, f])]
+            }
+          }))
           break;
         default:
           break;
