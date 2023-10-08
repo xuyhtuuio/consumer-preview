@@ -287,7 +287,6 @@ export default {
         JSON.stringify({
           item,
           pageFrom: 'apply',
-          op: 'check'
         })
       )
       this.$router.push({
@@ -295,7 +294,9 @@ export default {
         params: {
           formId: item.taskNumber,
           formManagementId: item.form_management_id,
-          taskName: item.taskName
+          taskName: item.taskName,
+          processInstanceId: item.processInstanceId,
+          processTemplateId: item.processTemplateId,
         }
       })
     },
