@@ -6,4 +6,6 @@ consumer-p1: 浙商招标生产版本
 
 main-pic-ocr：ocr结果定位到图片功能[杨凡霆]
 img-editer:  图片编辑分支[王恩泽]
+develop-ocr-recycle:  OCR重构分支[王恩泽]
+develop-ocr-line:  OCR连线调研分支[王恩泽]
 develop-show: 浙商招标开发版本
