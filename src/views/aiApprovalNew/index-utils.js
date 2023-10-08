@@ -340,6 +340,7 @@ export default {
       }
     },
     getComments() {
+      // console.log(this.files)
       const arr = [];
       this.files.forEach(file => {
         // 存在推荐意见
@@ -358,21 +359,23 @@ export default {
         // 未关联word的 意见
         file?.comments && arr.push(...file?.comments);
       });
+      // console.log(arr)
       // 去重
-      const setArr = [];
-      arr.forEach(comment => {
-        if (comment) {
-          const exist = setArr.filter(a => a.str === comment.str);
-          if (exist.length === 0) {
-            setArr.push(comment);
-          } else if (exist.length) {
-            exist[0].files = [...new Set([...exist[0].files, ...comment.files])];
-            exist[0].words = [...new Set([...exist[0].words, ...comment.words])];
-            exist[0].id = exist[0].id || comment.id;
-          }
-        }
-      });
-      this.comments = setArr;
+      // const setArr = [];
+      // arr.forEach(comment => {
+      //   if (comment) {
+      //     const exist = setArr.filter(a => a.str === comment.str);
+      //     if (exist.length === 0) {
+      //       setArr.push(comment);
+      //     } else if (exist.length) {
+      //       exist[0].files = [...new Set([...exist[0].files, ...comment.files])];
+      //       exist[0].words = [...new Set([...exist[0].words, ...comment.words])];
+      //       exist[0].id = exist[0].id || comment.id;
+      //     }
+      //   }
+      // });
+      // console.log(setArr)
+      this.comments = arr;
     },
     // 编辑意见后,同步更新  文件的推荐意见状态
     upDateComments(type, item, newVal) {

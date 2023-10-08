@@ -182,7 +182,23 @@ export default {
           files: [...this.newFiles],
           words: [],
         }
-        this.collection.push(item)
+        // 去重处理
+        const arrPre = [...this.collection, item]
+        const arr = []
+        const strs = []
+        arrPre.map((collection) => {
+          if (strs.includes(collection.str)) {
+            arr.map((i) => {
+              if (i.str === collection.str) {
+                i.files = [...new Set([...i.files, ...collection.files])]
+              }
+            })
+          } else {
+            strs.push(collection.str)
+            arr.push(collection)
+          }
+        })
+        this.collection = arr
         this.newFiles = [this.approval.id];
         this.newInput = '';
         this.$emit('upDateComments', 'add', item)
