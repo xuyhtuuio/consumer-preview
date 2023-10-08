@@ -375,7 +375,7 @@ export default {
       //   }
       // });
       // console.log(setArr)
-      this.comments = arr;
+      this.comments = [...new Set([...arr])];
     },
     // 编辑意见后,同步更新  文件的推荐意见状态
     upDateComments(type, item, newVal) {
