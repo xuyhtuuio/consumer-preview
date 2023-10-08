@@ -348,12 +348,15 @@ export default {
           // 存在选择意见
           if (recommend.selected) {
             const selected = recommend.list.filter(a => a.id === recommend.selected);
-            arr.push({
-              id: selected?.[0].id,
-              str: selected?.[0].str,
-              files: [file.id],
-              words: [recommend.id]
-            });
+            const isRepeat = file.comments?.filter(f => f.id === selected?.[0].id)
+            if (!isRepeat) {
+              arr.push({
+                id: selected?.[0].id,
+                str: selected?.[0].str,
+                files: [file.id],
+                words: [recommend.id]
+              });
+            }
           }
         })
         // 未关联word的 意见
@@ -375,7 +378,7 @@ export default {
       //   }
       // });
       // console.log(setArr)
-      this.comments = [...new Set([...arr])];
+      this.comments = arr;
     },
     // 编辑意见后,同步更新  文件的推荐意见状态
     upDateComments(type, item, newVal) {
@@ -397,16 +400,27 @@ export default {
         // eslint-disable-next-line
         case 'remove':
           filterFiles.map(file => {
-            const matchWord = file?.recommends?.filter(word => item.words.includes(word.id));
-            matchWord
-              && matchWord.forEach(word => {
+            // const matchWord = file?.recommends?.filter(word => item.words.includes(word.id));
+            // matchWord
+            //   && matchWord.forEach(word => {
+            //     if (type === 'remove') {
+            //       word.selected = null;
+            //     } else if (type === 'editStr') {
+            //       const recommend = word.list.filter(a => a.id === word.selected);
+            //       recommend[0].str = newVal;
+            //     }
+            //   });
+            // 对于推荐意见处理
+            file?.recommends?.map((word) => {
+              if (item.words.includes(word.id)) {
                 if (type === 'remove') {
                   word.selected = null;
                 } else if (type === 'editStr') {
                   const recommend = word.list.filter(a => a.id === word.selected);
                   recommend[0].str = newVal;
                 }
-              });
+              }
+            })
             file?.comments
               && file?.comments.map((comment, i) => {
                 if (item.str === comment.str) {
@@ -488,14 +502,15 @@ export default {
             }
           });
           break;
-        // 新增意见后执行意见同步操作
+        // 新增意见 后执行意见同步操作: 查找新增意见所关联的文件，将意见绑定到对应的文件上
         case 'upd':
           this.files.filter(file => item?.some((f) => {
             if (f.files.includes(file.id)) {
               if (!file.comments) {
                 file.comments = []
               }
-              file.comments = [...new Set([...file.comments, f])]
+              // file.comments = [...new Set([...file.comments, f])]
+              file.comments.push(f)
             }
           }))
           break;
