@@ -55,7 +55,7 @@
                   </el-option>
                 </el-option-group>
               </el-select>
-              <el-select v-model="search.returnSign" placeholder="驳回次数" @change="searchList" clearable>
+              <el-select v-model="search.returnCount" placeholder="驳回次数" @change="searchList" clearable>
                 <el-option v-for="(item, index) in $field('isReject')" :key="index" :label="item.label"
                   :value="item.value"></el-option>
               </el-select>

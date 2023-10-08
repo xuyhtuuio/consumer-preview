@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-08 17:05:48
+ * @LastEditTime: 2023-10-08 10:55:16
  * @FilePath: /consumer-preview/src/utils/service/$locale.js
  * @Description:
  */
@@ -33,8 +33,12 @@ export default (function () {
     { label: '不是一次通过', value: '0' },
   ]
   fields.isReject = [
-    { label: '驳回', value: '1' },
-    { label: '未驳回', value: '0' },
+    { label: '0次', value: '0' },
+    { label: '1次', value: '1' },
+    { label: '2次', value: '2' },
+    { label: '3次', value: '3' },
+    { label: '4次及以上', value: '4' },
+
   ]
   fields.updateTimeGroup = [
     {
