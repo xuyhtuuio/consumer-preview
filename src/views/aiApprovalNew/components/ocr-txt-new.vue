@@ -358,7 +358,7 @@ export default {
   position: relative;
   background: #ffffff;
   flex: 1;
-  margin: 53px 0 15px;
+  margin: 0px 0 15px;
   color: #333333;
   line-height: 22px;
   font-size: 14px;
