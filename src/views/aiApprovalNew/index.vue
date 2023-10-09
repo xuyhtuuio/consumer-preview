@@ -295,7 +295,7 @@ export default {
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding: 16px 24px;
+    padding: 12px 16px 24px;
   }
 }
 
@@ -303,7 +303,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 
   .el-button {
     line-height: 22px;
