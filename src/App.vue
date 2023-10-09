@@ -37,7 +37,7 @@ export default {
 
 body {
   margin: 0;
-  min-width: 500px;
+  min-width: 1060px;
   background-color: #f5f6f6;
 }
 
