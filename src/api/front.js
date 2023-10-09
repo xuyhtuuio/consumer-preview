@@ -25,7 +25,12 @@ export function deleteFormGroups(params) {
  * @returns {Promise<AxiosResponse<any>>}
  */
 export const taskInfo = (identifier) => {
-  return request.get(`/v1/minio/tasks/${identifier}`)
+  return request({
+    url: '/cpr/minioUpload/taskInfo',
+    params: {
+      identifier
+    }
+  })
 }
 
 /**
@@ -37,7 +42,7 @@ export const taskInfo = (identifier) => {
 * @returns {Promise<AxiosResponse<any>>}
 */
 export const initTask = ({ identifier, fileName, totalSize, chunkSize }) => {
-  return request.post('/v1/minio/tasks', { identifier, fileName, totalSize, chunkSize })
+  return request.post('/cpr/minioUpload/initTask', { identifier, fileName, totalSize, chunkSize })
 }
 
 /**
@@ -47,7 +52,13 @@ export const initTask = ({ identifier, fileName, totalSize, chunkSize }) => {
 * @returns {Promise<AxiosResponse<any>>}
 */
 export const preSignUrl = ({ identifier, partNumber }) => {
-  return request.get(`/v1/minio/tasks/${identifier}/${partNumber}`)
+  return request({
+    url: '/cpr/minioUpload/preSignUploadUrl',
+    params: {
+      identifier,
+      partNumber
+    }
+  })
 }
 
 /**
@@ -56,7 +67,14 @@ export const preSignUrl = ({ identifier, partNumber }) => {
 * @returns {Promise<AxiosResponse<any>>}
 */
 export const merge = (identifier) => {
-  return request.post(`/v1/minio/tasks/merge/${identifier}`)
+  return request({
+    url: '/cpr/minioUpload/merge',
+    method: 'post',
+    params: {
+      identifier
+    }
+
+  })
 }
 
 export function getFormCategoryArray(params) {
