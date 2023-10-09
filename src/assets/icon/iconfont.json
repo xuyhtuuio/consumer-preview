@@ -6,6 +6,34 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "37597237",
+      "name": "Component 13",
+      "font_class": "a-Component133",
+      "unicode": "e65f",
+      "unicode_decimal": 58975
+    },
+    {
+      "icon_id": "37597190",
+      "name": "Component 13",
+      "font_class": "a-Component132",
+      "unicode": "e662",
+      "unicode_decimal": 58978
+    },
+    {
+      "icon_id": "37597209",
+      "name": "Component 13",
+      "font_class": "a-Component131",
+      "unicode": "e661",
+      "unicode_decimal": 58977
+    },
+    {
+      "icon_id": "37597171",
+      "name": "Component 13",
+      "font_class": "a-Component13",
+      "unicode": "e660",
+      "unicode_decimal": 58976
+    },
+    {
       "icon_id": "37571723",
       "name": "change",
       "font_class": "dianjitianjiapizhu",

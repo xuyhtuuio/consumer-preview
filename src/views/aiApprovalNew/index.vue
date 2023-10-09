@@ -80,7 +80,7 @@
                 </svg> -->
                 <i class="iconfont icon-xiazai"></i>
                 下载</span>
-              <span>
+              <span @click="toggleMode">
                 <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-dianjitianjiapizhu"></use>
                 </svg>
@@ -98,14 +98,36 @@
             <file-preview ref="filePreview" :files="files" :formId="formId" :activeIndex="activeIndex"
               @changeFile="changeFile" :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"
               @getProps="getProps"></file-preview>
-            <orcTxtNew ref="ocrTxt" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
+            <orcTxtNew ref="ocrTxt" v-show="curMode === 0" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
               v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
               @showLine="showLine" :lineWordItem="lineWordItem" :styleProp="styleProp">
             </orcTxtNew>
-            <orcTxt ref="ocrTxt" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
+            <orcTxt ref="ocrTxt" v-show="curMode === 0" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
               v-if="specialFileType2.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
               @showLine="showLine" :lineWordItem="lineWordItem">
             </orcTxt>
+            <p class="content-cont-icons" style="display: none;">
+              <span>
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#icon-a-Component13"></use>
+                </svg>
+              </span>
+              <span>
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#icon-a-Component132"></use>
+                </svg>
+              </span>
+              <span>
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#icon-a-Component131"></use>
+                </svg>
+              </span>
+              <span>
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#icon-a-Component133"></use>
+                </svg>
+              </span>
+            </p>
           </div>
         </div>
         <div class="content-cont-editor">
@@ -217,7 +239,8 @@ export default {
       // 驳回人列表
       refuseOpiton: [],
       refuseDisabled: false,
-      styleProp: {}
+      styleProp: {},
+      curMode: 0,
     };
   },
   created() {
@@ -236,6 +259,10 @@ export default {
     },
   },
   methods: {
+    // 三屏双屏切换 0 为三屏 1 为双屏
+    toggleMode() {
+      this.curMode = this.curMode === 0 ? 1 : 0
+    },
     search() {
       if (this.keyWords) {
         this.$refs.ocrTxt.search(this.keyWords)
@@ -422,6 +449,21 @@ export default {
             flex: 1;
             // width: calc(100% - 60% - 24px);
           }
+        }
+      }
+      >p{
+        background: #ffffff;
+        border-radius: 0px 0px 10px 10px;
+        box-shadow: 0px 0px 10px 0px #4343430d;
+      }
+      .content-cont-icons{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        .icon{
+          width: 15px;
+          height: 15px;
+          cursor: pointer;
         }
       }
     }
