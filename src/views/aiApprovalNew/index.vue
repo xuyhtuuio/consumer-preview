@@ -439,7 +439,7 @@ export default {
         background: #ffffff;
         border-radius: 0px 0px 10px 10px;
         box-shadow: 0px 0px 10px 0px #4343430d;
-        width: 380px;
+        width: 470px;
         overflow: auto;
 
         &:first-child {

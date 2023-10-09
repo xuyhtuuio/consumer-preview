@@ -4,6 +4,12 @@
     <div class="light" ref="light" v-if="lineWordItem?.word" :style="this.BoundingClientRect">
       <div class="light" id="imgLight" :style="this.highLightBoundingClientRect"></div>
     </div>
+    <!-- <div class="tool">
+      <span>下载</span>
+      <span @click="fullScreen">全屏</span>
+      <span @click="changeSize(1)">放大</span>
+      <span @click="changeSize(0)">缩小</span>
+    </div> -->
   </div>
 </template>
 
@@ -45,7 +51,8 @@ export default {
         width: 0,
         height: 0,
         scale: 1,
-      }
+      },
+      zoomVal: 1,
     }
   },
   watch: {
@@ -290,7 +297,18 @@ export default {
           return false;
         }
       };
-    }
+    },
+    // 点击按钮缩放事件
+    changeSize(type) {
+      const size = 0.02
+      if (type) {
+        this.zoomVal += size
+        this.$refs.imgDom.style.transform = 'scale(' + this.zoomVal + ')';
+      } else {
+        this.zoomVal -= size
+        this.$refs.imgDom.style.transform = 'scale(' + this.zoomVal + ')';
+      }
+    },
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleImageLoaded)

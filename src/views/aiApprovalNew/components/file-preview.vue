@@ -44,9 +44,15 @@
       <i class="el-icon-circle-close" v-show="showFullScreen" @click="fullScreen"></i>
       <!-- 图片 -->
       <imgae-preview @getProps="getProps" ref="imgPreview" v-if="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))"
-        :lineWordItem="lineWordItem" @linePosition="linePosition" :url="approval.url"></imgae-preview>
+        :lineWordItem="lineWordItem" @linePosition="linePosition" @showFullScreen="fullScreen" :url="approval.url"></imgae-preview>
       <!-- 其他类型文件 -->
       <filePreview v-else :url="approval.url"></filePreview>
+      <div class="tool">
+        <span @click="saveFile">下载</span>
+        <span @click="fullScreen">全屏</span>
+        <span @click="changeSize(1)">放大</span>
+        <span @click="changeSize(0)">缩小</span>
+      </div>
     </div>
     <el-dialog class="imgEditor" title="图片编辑" width="1200px" :visible.sync="imgEditorDialogVisible">
       <imgEditor :url="approval.url" @saveImg="upDateImg"></imgEditor>
@@ -112,6 +118,9 @@ export default {
     // this.init();
   },
   methods: {
+    changeSize(type) {
+      this.$refs.imgPreview.changeSize(type)
+    },
     upDateImg(img) {
       this.approval.url = img
       this.imgEditorDialogVisible = false
@@ -179,7 +188,7 @@ export default {
       this.$nextTick(() => {
         this.$refs.imgPreview.handleImageLoaded()
       })
-    }
+    },
   }
 }
 </script>
@@ -391,7 +400,9 @@ export default {
     width: calc(100% - 60px);
     height: calc(100% - 60px);
   }
-
+  /deep/ .tool{
+    display: none;
+  }
   .el-icon-circle-close {
     position: absolute;
     font-size: 30px;
@@ -410,6 +421,25 @@ export default {
 .imgEditor{
   /deep/ .el-dialog__body{
     height: 72vh;
+  }
+}
+.tool{
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  position: absolute;
+  bottom: 0;
+  left: 113.5px;
+  z-index: 1;
+  width: 248px;
+  box-shadow: 0px 0px 10px 0px #4343431A;
+  height: 38px;
+  border-radius: 8px;
+  background-color: #1D2128BF;
+  span{
+    cursor: pointer;
+    font-size: 14px;
+    color: #FFFFFF;
   }
 }
 </style>
