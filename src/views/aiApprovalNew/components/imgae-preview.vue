@@ -58,6 +58,7 @@ export default {
   watch: {
     lineWordItem: {
       handler(val) {
+        console.log(val)
         this.setBoundingClientRect(val)
       },
       // deep: true
@@ -89,11 +90,20 @@ export default {
           top: parseInt(this.params.top, 10) + 'px',
           transform: `scale(${this.params.zoomVal})`
         }
-        this.highLightBoundingClientRect = {
-          width: val?.location.w * this.scale + 'px',
-          height: val?.location.h * this.scale + 'px',
-          left: val?.location.x * this.scale + 'px',
-          top: val?.location.y * this.scale + 'px',
+        if (val.isComment) {
+          this.highLightBoundingClientRect = {
+            width: val?.location.w + 'px',
+            height: val?.location.h + 'px',
+            left: val?.location.x + 'px',
+            top: val?.location.y + 'px',
+          }
+        } else {
+          this.highLightBoundingClientRect = {
+            width: val?.location.w * this.scale + 'px',
+            height: val?.location.h * this.scale + 'px',
+            left: val?.location.x * this.scale + 'px',
+            top: val?.location.y * this.scale + 'px',
+          }
         }
       }
     },

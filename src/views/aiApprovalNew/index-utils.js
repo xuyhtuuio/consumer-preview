@@ -244,6 +244,8 @@ export default {
         newDom.style.height = `${(item.height)}px`
         const highlight = {
           word: obj.str,
+          // 证明为点击意见连线
+          isComment: true,
           location: {
             x: item.left,
             y: item.top,

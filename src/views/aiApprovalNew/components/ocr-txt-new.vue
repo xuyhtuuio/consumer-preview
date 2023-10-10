@@ -301,9 +301,9 @@ export default {
       nodes.forEach((item) => {
         left.push(item.offsetLeft)
         // right.push(item.offsetLeft + (item.offsetWidth) * (1 / this.wordDomStyle.scale))
-        right.push(item.offsetLeft + item.offsetWidth)
+        right.push(item.offsetLeft + (item.offsetWidth) * (1 / this.styleProp.wordDomStyle.scale))
         top.push(item.offsetTop)
-        bottom.push(item.offsetTop + item.offsetHeight)
+        bottom.push(item.offsetTop + (item.offsetHeight * (1 / this.styleProp.wordDomStyle.scale)))
         // bottom.push(item.offsetTop + item.offsetHeight * (1 / this.wordDomStyle.scale))
       })
       const l = left.sort((a, b) => a - b)[0]
