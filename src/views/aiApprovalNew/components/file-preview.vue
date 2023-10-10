@@ -48,10 +48,18 @@
       <!-- 其他类型文件 -->
       <filePreview v-else :url="approval.url"></filePreview>
       <div class="tool" v-show="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))">
-        <span @click="saveFile">下载</span>
-        <span @click="fullScreen">全屏</span>
-        <span @click="changeSize(1)">放大</span>
-        <span @click="changeSize(0)">缩小</span>
+        <span @click="saveFile">
+          <i><img src="@/assets/image/ai-approval/download-white.png" alt=""></i>
+          下载</span>
+        <span @click="fullScreen">
+          <i><img src="@/assets/image/ai-approval/fullscreen.png" alt=""></i>
+          全屏</span>
+        <span @click="changeSize(1)">
+          <i><img src="@/assets/image/ai-approval/size-up.png" alt=""></i>
+          放大</span>
+        <span @click="changeSize(0)">
+          <i><img src="@/assets/image/ai-approval/size-down.png" alt=""></i>
+          缩小</span>
       </div>
     </div>
     <el-dialog class="imgEditor" title="图片编辑" width="1200px" :visible.sync="imgEditorDialogVisible">
@@ -439,6 +447,15 @@ export default {
   border-radius: 8px;
   background-color: #1D2128BF;
   span{
+    i{
+      margin-right: 2px;
+      img{
+        width: 16px;
+        height: 16px;
+      }
+    }
+    display: flex;
+    align-items: center;
     cursor: pointer;
     font-size: 14px;
     color: #FFFFFF;
