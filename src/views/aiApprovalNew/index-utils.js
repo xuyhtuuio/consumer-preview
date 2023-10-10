@@ -202,10 +202,26 @@ export default {
       //   comments: this.comments
       // });
     },
-    // 添加关键词
-    addWord(word) {
-      this.$refs.addReview.init(word);
-      window.getSelection().removeAllRanges();
+    // 鼠标选中 添加新批注
+    addWord(obj) {
+      this.popoverShow = true
+      this.domInfo = obj
+    },
+    addCommentWithPosition() {
+      const timestamp = new Date().getTime()
+      const files = this.files.map((file) => {
+        return file.id
+      })
+      const newComment = {
+        id: timestamp,
+        str: this.postil.textarea,
+        files: [...files],
+        words: [],
+        position: [this.domInfo?.position],
+        selectText: this.domInfo?.string
+      }
+      this.upDateComments('add', newComment)
+      this.popoverShow = false
     },
     // 切换审批文件
     async changeFile(i) {

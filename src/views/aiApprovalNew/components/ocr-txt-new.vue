@@ -21,43 +21,23 @@
         ></i>
       </el-input>
     </div> -->
-    <div
-      class="results"
-      ref="results"
-      :key="resultKey"
-      :class="{ light: lineWordItem?.word }"
-      @mousedown="statrGetSelection"
-      @mouseup="getSelection"
-    >
+    <div class="results" ref="results" :key="resultKey" :class="{ light: lineWordItem?.word }"
+      @mousedown="statrGetSelection" @mouseup="getSelection">
       <div class="results-div" :style="styleSet">
-        <div
-          v-for="(ocr, i) in html"
-          class="div-position"
-          :key="i"
-          :style="returnStyle(i)"
-        >
+        <div v-for="(ocr, i) in html" class="div-position" :key="i" :style="returnStyle(i)">
           <template v-for="(item, j) in ocr">
             <template v-if="typeof item === 'string'">{{ item }}</template>
-            <span
-              v-else
-              :key="i + '_' + j"
-              :wordType="item.wordType"
-              :id="`word_${i}_${j}`"
-              :class="{
-                active:
-                  activeWordType === item.wordType || activeWordType === 0,
-                gray: lineWordItem?.word && lineWordItem?.word !== item.word
-              }"
-              :word="item.word"
-              @click="showLine(item, `word_${i}_${j}`)"
-              >{{ item.word }}</span
-            >
+            <span v-else :key="i + '_' + j" :wordType="item.wordType" :id="`word_${i}_${j}`" :class="{
+              active:
+                activeWordType === item.wordType || activeWordType === 0,
+              gray: lineWordItem?.word && lineWordItem?.word !== item.word
+            }" :word="item.word" @click="showLine(item, `word_${i}_${j}`)">{{ item.word }}</span>
           </template>
         </div>
       </div>
       <Empty v-if="html.length === 0"></Empty>
     </div>
-    <div class="isAdd" ref="isAdd" v-if="seletTxt" :style="askIsAddPosition">
+    <div class="isAdd" ref="isAdd" v-if="seletText" :style="askIsAddPosition">
       <p>针对该词添加审查意见</p>
       <el-button size="small" @click="addWord">添加</el-button>
     </div>
@@ -88,7 +68,8 @@ export default {
       html: [],
       activeWordType: 0, // 高亮禁用词或敏感词, 1 禁用词,  2 敏感词
       resultKey: 0,
-      seletTxt: '',
+      seletText: '',
+      selectNodes: [],
       askIsAddPosition: {
         left: '',
         right: ''
@@ -122,14 +103,15 @@ export default {
   },
   methods: {
     addWord() {
-      this.$emit('addWord', this.seletTxt.trim())
-      this.seletTxt = ''
+      // this.$emit('addWord', this.seletText.trim())
+      // this.seletText = ''
+      this.getRectOverDom(this.selectNodes)
     },
     hideAdd(e) {
       e = e || window.event
       const elem = e.target
-      if (this.$refs?.isAdd && !this.$refs.isAdd.contains(elem) && this.seletTxt) {
-        this.seletTxt = ''
+      if (this.$refs?.isAdd && !this.$refs.isAdd.contains(elem) && this.seletText) {
+        this.seletText = ''
       }
     },
     statrGetSelection() {
@@ -138,15 +120,29 @@ export default {
         : document.selection.empty()
     },
     getSelection(event) {
-      const seletTxt = window.getSelection
+      const select = window.getSelection()
+      const range = select.getRangeAt(0)
+      const allNodes = Array.from(range.commonAncestorContainer.childNodes)
+      const seletText = window.getSelection
         ? window.getSelection().toString()
         : document.selection.createRange().text
-      if (seletTxt) {
+      if (seletText) {
         setTimeout(() => {
-          this.seletTxt = seletTxt
+          this.seletText = seletText
           this.askIsAddPosition = {
             left: event.clientX + 10 + 'px',
             top: event.clientY - 100 + 'px'
+          }
+          // 存在 allNodes ，代表选中的文本是由多个 dom 拼接
+          if (allNodes.length) {
+            const selectNodes = allNodes.filter((item) => {
+              return this.selectText.includes(item.innerText)
+            })
+            this.selectNodes = selectNodes
+          } else {
+            // 不存在 allNodes，证明选中文本仅为一个 dom
+            const selectNodes = [range.commonAncestorContainer.parentNode]
+            this.selectNodes = selectNodes
           }
         }, 300)
       }
@@ -288,15 +284,50 @@ export default {
       return {
         left: `${this.approval.ocr[i].location.x / this.styleProp.wordDomStyle.scale}px`,
         top: `${this.approval.ocr[i].location.y / this.styleProp.wordDomStyle.scale}px`,
-        fontSize: `${
-          this.approval.ocr[i].location.w / this.approval.ocr[i].text.length
+        fontSize: `${this.approval.ocr[i].location.w / this.approval.ocr[i].text.length
         }px`,
         transform: `scale(${1 / this.styleProp.wordDomStyle.scale})`,
         height: `${this.approval.ocr[i].location.h}px`,
         width: `${this.approval.ocr[i].location.w}px`,
         lineHeight: `${this.approval.ocr[i].location.h}px`
       }
-    }
+    },
+    // 获取计算后的覆盖在选中文字上的 dom 的宽高
+    getRectOverDom(nodes) {
+      const left = []
+      const right = []
+      const top = []
+      const bottom = []
+      nodes.forEach((item) => {
+        left.push(item.offsetLeft)
+        // right.push(item.offsetLeft + (item.offsetWidth) * (1 / this.wordDomStyle.scale))
+        right.push(item.offsetLeft + item.offsetWidth)
+        top.push(item.offsetTop)
+        bottom.push(item.offsetTop + item.offsetHeight)
+        // bottom.push(item.offsetTop + item.offsetHeight * (1 / this.wordDomStyle.scale))
+      })
+      const l = left.sort((a, b) => a - b)[0]
+      const t = top.sort((a, b) => a - b)[0]
+      const r = right.sort((a, b) => a - b)[right.length - 1]
+      const b = bottom.sort((c, d) => c - d)[bottom.length - 1]
+      this.addRectOverDom(l, t, r, b)
+    },
+    // 添加覆盖 dom
+    addRectOverDom(l, t, r, b) {
+      const position = {
+        left: l,
+        top: t,
+        height: b - t,
+        width: r - l
+      }
+      const string = this.seletText
+      const obj = {
+        position,
+        string
+      }
+      this.$emit('addWord', obj)
+    },
+
   }
 }
 </script>
@@ -315,7 +346,7 @@ export default {
   gap: 10px;
   align-items: center;
 
-  > span {
+  >span {
     padding: 3px 16px;
     border-radius: 4px;
     line-height: 24px;
@@ -330,7 +361,7 @@ export default {
       background: #fff1f0;
     }
 
-    + span {
+    +span {
       color: #fdb123;
 
       &.active {
@@ -372,15 +403,18 @@ export default {
     -moz-user-select: none;
     cursor: pointer;
   }
+
   .results-div {
     position: absolute;
     background-color: red;
     transform-origin: 0 0;
+
     .div-position {
       position: absolute;
       transform-origin: 0 0;
     }
   }
+
   .active[wordtype='1'] {
     color: #f76560;
   }

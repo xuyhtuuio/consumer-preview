@@ -102,6 +102,35 @@
               v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
               @showLine="showLine" :lineWordItem="lineWordItem" :styleProp="styleProp">
             </orcTxtNew>
+            <el-popover class="postil-popover" v-model="popoverShow" id="popover" placement="right" width="400" trigger="manual">
+              <div class="postil-header">
+                <div>
+                  <!-- <span><img src="@/assets/image/ai-approval/ocr-postil.png" alt=""></span> -->
+                  <span class="postil-text">{{ isEdit ? '添加批注' : '修改批注' }}</span>
+                </div>
+                <div>
+                  <span class="postil-btn cancle" @click="popoverShow = false">取消</span>
+                  <span class="postil-btn verify" @click="addCommentWithPosition">确认</span>
+                </div>
+              </div>
+              <div class="line"></div>
+              <div class="postil-tabs">
+                <span>批注意见</span>
+                <span>关联意见</span>
+              </div>
+              <div class="postil-input">
+                <el-input type="textarea" resize="none" placeholder="请输入批注意见描述" v-model="postil.textarea">
+                </el-input>
+              </div>
+              <div class="postil-keyword">
+                <span>添加关键字</span>
+                <el-radio v-model="postil.isKeyWord" label="1">是</el-radio>
+                <el-radio v-model="postil.isKeyWord" label="0">否</el-radio>
+              </div>
+              <div class="postil-keyword-content">
+                <span></span>
+              </div>
+            </el-popover>
             <orcTxt ref="ocrTxt" v-show="curMode === 0" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
               v-if="specialFileType2.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
               @showLine="showLine" :lineWordItem="lineWordItem">
@@ -166,6 +195,13 @@ export default {
   },
   data() {
     return {
+      domInfo: {},
+      popoverShow: false,
+      isEdit: false,
+      postil: {
+        isKeyWord: '0',
+        textarea: ''
+      },
       keyWords: '',
       filterFocus: false,
       formBase: {},
@@ -560,6 +596,86 @@ export default {
         color: #1D2128;
       }
       background: #F2F3F5;
+    }
+  }
+}
+.postil-popover {
+  border-radius: 10px;
+  width: 380px;
+  position: absolute;
+  right: 0;
+
+  .postil-header {
+    display: flex;
+    margin-bottom: 16px;
+    align-items: center;
+    justify-content: space-between;
+
+    span {
+      img {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .postil-text {
+      margin-left: 4px;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 24px;
+      letter-spacing: 0em;
+      text-align: left;
+      color: #1D2128;
+    }
+
+    .postil-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      width: 60px;
+      height: 30px;
+      padding: 4px, 16px, 4px, 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: 0em;
+    }
+
+    .cancle {
+      border: 1px solid #CACDD3;
+      color: #1D2128;
+    }
+
+    .verify {
+      margin-left: 8px;
+      background: #2D5CF6;
+      color: #fff;
+    }
+  }
+
+  .line {
+    background-color: #E5E6EB;
+    width: 372px;
+    height: 1px;
+  }
+
+  .postil-tabs {
+    margin-top: 16px;
+    margin-bottom: 8px;
+
+    span {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: 0em;
+      text-align: left;
+      color: #1D2128;
+
+      &:first-child {
+        margin-right: 8px;
+      }
     }
   }
 }
