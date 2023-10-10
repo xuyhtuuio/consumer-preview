@@ -197,6 +197,11 @@ export default {
         this.$refs.imgPreview.handleImageLoaded()
       })
     },
+    setHighLight(arr) {
+      arr.map((light) => {
+        this.lineWordItem = light
+      })
+    },
   }
 }
 </script>

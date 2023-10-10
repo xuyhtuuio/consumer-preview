@@ -43,7 +43,7 @@
       </template>
       <!-- 编辑意见 -->
       <div v-else class="recommend">
-        <div class="list-item list-item2" v-for="(item, i) in collection" :key="i" :class="{ edit: item.showEdit }">
+        <div class="list-item list-item2" :data-commenid="`c${item.id}`" @click="showCommentLine(item.id)" v-for="(item, i) in collection" :key="i" :class="{ edit: item.showEdit }">
           <p style="cursor: pointer;" @dblclick="showEdit_collection(i)" v-if="!item.showEdit">{{ item.str }}</p>
           <el-input v-else :ref="`input_${i}`" @blur="hideEdit_collection(i)" v-model.trim="input" placeholder="请输入意见"
             type="textarea" :rows="3" class="edit-input" resize="none"
@@ -305,7 +305,15 @@ export default {
     changeType(val) {
       this.active = val;
       this.$emit('changeEditorialType', val)
+    },
+    // 连线
+    showCommentLine(id) {
+      const commenId = this.collection.filter((item) => {
+        return item.id === id
+      })
+      this.$emit('showCommentLine', commenId[0])
     }
+
   }
 }
 </script>

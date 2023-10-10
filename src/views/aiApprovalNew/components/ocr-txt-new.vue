@@ -37,7 +37,7 @@
       </div>
       <Empty v-if="html.length === 0"></Empty>
     </div>
-    <div class="isAdd" ref="isAdd" v-if="seletText" :style="askIsAddPosition">
+    <div class="isAdd" ref="isAdd" v-if="selectText" :style="askIsAddPosition">
       <p>针对该词添加审查意见</p>
       <el-button size="small" @click="addWord">添加</el-button>
     </div>
@@ -68,7 +68,7 @@ export default {
       html: [],
       activeWordType: 0, // 高亮禁用词或敏感词, 1 禁用词,  2 敏感词
       resultKey: 0,
-      seletText: '',
+      selectText: '',
       selectNodes: [],
       askIsAddPosition: {
         left: '',
@@ -103,15 +103,15 @@ export default {
   },
   methods: {
     addWord() {
-      // this.$emit('addWord', this.seletText.trim())
-      // this.seletText = ''
+      // this.$emit('addWord', this.selectText.trim())
+      // this.selectText = ''
       this.getRectOverDom(this.selectNodes)
     },
     hideAdd(e) {
       e = e || window.event
       const elem = e.target
-      if (this.$refs?.isAdd && !this.$refs.isAdd.contains(elem) && this.seletText) {
-        this.seletText = ''
+      if (this.$refs?.isAdd && !this.$refs.isAdd.contains(elem) && this.selectText) {
+        this.selectText = ''
       }
     },
     statrGetSelection() {
@@ -123,12 +123,12 @@ export default {
       const select = window.getSelection()
       const range = select.getRangeAt(0)
       const allNodes = Array.from(range.commonAncestorContainer.childNodes)
-      const seletText = window.getSelection
+      const selectText = window.getSelection
         ? window.getSelection().toString()
         : document.selection.createRange().text
-      if (seletText) {
+      if (selectText) {
         setTimeout(() => {
-          this.seletText = seletText
+          this.selectText = selectText
           this.askIsAddPosition = {
             left: event.clientX + 10 + 'px',
             top: event.clientY - 100 + 'px'
@@ -136,7 +136,7 @@ export default {
           // 存在 allNodes ，代表选中的文本是由多个 dom 拼接
           if (allNodes.length) {
             const selectNodes = allNodes.filter((item) => {
-              return this.selectText.includes(item.innerText)
+              return selectText.includes(item.innerText)
             })
             this.selectNodes = selectNodes
           } else {
@@ -320,7 +320,7 @@ export default {
         height: b - t,
         width: r - l
       }
-      const string = this.seletText
+      const string = this.selectText
       const obj = {
         position,
         string

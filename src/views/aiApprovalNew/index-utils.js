@@ -223,6 +223,80 @@ export default {
       this.upDateComments('add', newComment)
       this.popoverShow = false
     },
+    // 展示连线
+    showCommentLine(obj) {
+      // console.log(obj)
+      const commenDom = document.querySelector(`div[data-commenid=c${obj.id}]`)
+      this.appendHighLightDom(obj, commenDom)
+      // this.showLine(obj.string)
+      // this.$refs.ocrTxt.
+    },
+    appendHighLightDom(obj, commenDom) {
+      const data = obj.position
+      const doms = []
+      const location = []
+      data.forEach((item) => {
+        const newDom = document.createElement('div')
+        newDom.style.position = 'absolute'
+        newDom.style.left = `${item.left}px`
+        newDom.style.top = `${item.top}px`
+        newDom.style.width = `${(item.width)}px`
+        newDom.style.height = `${(item.height)}px`
+        const highlight = {
+          word: obj.str,
+          location: {
+            x: item.left,
+            y: item.top,
+            w: item.width,
+            h: item.height
+          }
+        }
+        location.push(highlight)
+        const rootDom = document.getElementsByClassName('results-div')[0]
+        rootDom.appendChild(newDom)
+        doms.push(newDom)
+      })
+      this.drawCommentLine(doms, commenDom)
+      this.$refs.filePreview.setHighLight(location)
+    },
+    drawCommentLine(start, end) {
+      const endDomId = end.getAttribute('data-commenid')
+      const rootDom = document.getElementsByClassName('results-div')[0]
+      const onlyHide = endDomId === this.endDomId
+      if (onlyHide) {
+        this.lineRemove();
+        this.endDomId = ''
+        this.preDoms.forEach((child) => {
+          rootDom.removeChild(child)
+        })
+        return;
+      }
+      // 动画参数
+      const animOptions = {
+        duration: 2000,
+        timing: 'linear'
+      };
+      this.endDomId = endDomId
+      start.forEach((item, index) => {
+        this.word_lines[index] = new LeaderLine(end, item, {
+          color: '#EB5D78',
+          size: 1,
+          startPlug: 'disc',
+          endPlug: 'disc'
+          // endSocket: 'auto'
+        });
+        const showEffectName = 'draw';
+        this.word_lines[index].show(showEffectName, animOptions);
+      })
+      this.preDoms = start
+      document.querySelector('.ocr-txt .results').addEventListener('scroll', () => {
+        this.linePosition();
+      });
+      document.querySelector('.editorial .results').addEventListener('scroll', () => {
+        this.linePosition();
+      });
+    },
+
     // 切换审批文件
     async changeFile(i) {
       if (this.activeIndex === i) {
@@ -407,8 +481,24 @@ export default {
         case 'add':
           if (!filterFiles[0]?.comments) {
             filterFiles[0].comments = [];
+            filterFiles[0].comments.push(item);
+          } else {
+            let num = 0
+            filterFiles?.[0]?.comments.map((comment) => {
+              if (comment.str === item.str) {
+                if (!comment.position) {
+                  comment.position = item.position
+                } else {
+                  comment.position = [comment.position, ...item.position]
+                }
+              } else {
+                num++
+              }
+            })
+            if (num === filterFiles?.[0]?.comments.length) {
+              filterFiles[0].comments.push(item);
+            }
           }
-          filterFiles?.[0]?.comments && filterFiles[0].comments.push(item);
           break;
         // 修改类型为修改意见字符串,找到意见关联的所有文件,  如果意见存在关联 关键词,修改对应词,对应意见的str,  如果 comments下包含,则修改 该意见
         case 'editStr':

@@ -162,7 +162,7 @@
         <div class="content-cont-editor">
           <editorial ref="editorial" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
             :lineWordItem="lineWordItem" @upDateComments="upDateComments" @showLine="showLine"
-            :activeWordType="activeWordType" @changeEditorialType="changeEditorialType" :showOcr="showOcr"
+            :activeWordType="activeWordType" @showCommentLine="showCommentLine" @changeEditorialType="changeEditorialType" :showOcr="showOcr"
             :formBase="formBase">
           </editorial>
         </div>
@@ -195,6 +195,7 @@ export default {
   },
   data() {
     return {
+      preDoms: [],
       domInfo: {},
       popoverShow: false,
       isEdit: false,
