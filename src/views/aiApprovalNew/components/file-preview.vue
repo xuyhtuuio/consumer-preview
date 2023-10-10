@@ -382,6 +382,7 @@ export default {
 .preview {
   background: #ffffff;
   flex: 1;
+  position: relative;
 }
 
 .fullScreen {
@@ -429,7 +430,8 @@ export default {
   justify-content: space-around;
   position: absolute;
   bottom: 0;
-  left: 113.5px;
+  left: 50%;
+  transform: translate(-50%);
   z-index: 1;
   width: 248px;
   box-shadow: 0px 0px 10px 0px #4343431A;
