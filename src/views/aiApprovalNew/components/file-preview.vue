@@ -47,7 +47,7 @@
         :lineWordItem="lineWordItem" @linePosition="linePosition" @showFullScreen="fullScreen" :url="approval.url"></imgae-preview>
       <!-- 其他类型文件 -->
       <filePreview v-else :url="approval.url"></filePreview>
-      <div class="tool">
+      <div class="tool" v-show="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))">
         <span @click="saveFile">下载</span>
         <span @click="fullScreen">全屏</span>
         <span @click="changeSize(1)">放大</span>

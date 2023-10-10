@@ -113,9 +113,9 @@ export default {
       this.getMaxPosition()
       this.initCenter()
       // 绑定缩放事件
-      const content = this.$refs.contentDom
-      content.removeEventListener('wheel', this.handleWheel)
-      content.addEventListener('wheel', this.handleWheel)
+      // const content = this.$refs.contentDom
+      // content.removeEventListener('wheel', this.handleWheel)
+      // content.addEventListener('wheel', this.handleWheel)
       // 绑定拖拽
       this.startDrag()
     },
@@ -300,7 +300,7 @@ export default {
     },
     // 点击按钮缩放事件
     changeSize(type) {
-      const size = 0.02
+      const size = 0.05
       if (type) {
         this.zoomVal += size
         this.$refs.imgDom.style.transform = 'scale(' + this.zoomVal + ')';
