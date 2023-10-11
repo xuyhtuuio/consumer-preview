@@ -811,7 +811,8 @@ export default {
     getRejectReason() {
       this.rejectLoading = true
       const getData = {
-        userId: this.rowData.userId,
+        userId: 1416,
+        // this.rowData.userId
         recordId: this.rejectSearch.recordId,
         startTime: this.rejectSearch.seachTime?.length ? this.rejectSearch.seachTime[0] : '',
         endTime: this.rejectSearch.seachTime?.length ? this.rejectSearch.seachTime[1] : ''
