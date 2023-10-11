@@ -420,7 +420,7 @@ export default {
           label: '提单人员'
         }
       ],
-      billValue: '提单人员',
+      billValue: '审批人员',
       rejectDialog: false,
       rejectDialogTit: '',
       passingData: {
@@ -1401,6 +1401,8 @@ export default {
           .hintIcon {
             width: 20px;
             margin-left: 4px;
+            position: relative;
+            z-index: 111;
           }
         }
 
