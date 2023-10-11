@@ -2,60 +2,141 @@
   <div class="person-center">
     <div class="center-scrren">
       <div class="tips">
-        <i class="iconfont icon-xiaoxi-tongzhi"></i>消保审查个人月报已生成 <span>立即查看 ↓</span>
+        <i class="iconfont icon-xiaoxi-tongzhi"></i>消保审查个人月报已生成
+        <span>立即查看 ↓</span>
       </div>
       <div class="scrren-right">
-        <div class="scrren-com" :class="billValue ? 'active' : ''">{{ billValue }}
-          <img src="../../assets/image/person-center/down.png" class="down" alt="">
-          <el-select v-model="billValue" placeholder="请选择" @change="handleSearchBlur">
-            <el-option v-for="item in billOptions" :key="item.value" :label="item.label" :value="item.value">
+        <div class="scrren-com" :class="billValue ? 'active' : ''">
+          {{ billValue }}
+          <img
+            src="../../assets/image/person-center/down.png"
+            class="down"
+            alt=""
+          />
+          <el-select
+            v-model="billValue"
+            placeholder="请选择"
+            @change="handleSearchBlur"
+          >
+            <el-option
+              v-for="item in billOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
             </el-option>
           </el-select>
         </div>
         <div class="scrren-com" :class="searchData.orgId ? 'active' : ''">
-          <div class="com-tit">选择机构
-            <img src="../../assets/image/person-center/down.png" class="down" alt="">
+          <div class="com-tit">
+            选择机构
+            <img
+              src="../../assets/image/person-center/down.png"
+              class="down"
+              alt=""
+            />
           </div>
-          <el-cascader class="my-hidden" v-model="searchData.orgId" :options="agenciesList" :show-all-levels="false"
-            :props="{ label: 'name', value: 'id', checkStrictly: true }" @change="handleSearchBlur"></el-cascader>
-          <el-tooltip class="item" effect="dark" content="选择机构提示文字" placement="top">
-            <img src="@/assets/image/person-center/hintIcon.png" alt="" class="hintIcon">
+          <el-cascader
+            class="my-hidden"
+            v-model="searchData.orgId"
+            :options="agenciesList"
+            :show-all-levels="false"
+            :props="{ label: 'name', value: 'id', checkStrictly: true }"
+            @change="handleSearchBlur"
+          ></el-cascader>
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="选择机构提示文字"
+            placement="top"
+          >
+            <img
+              src="@/assets/image/person-center/hintIcon.png"
+              alt=""
+              class="hintIcon"
+            />
           </el-tooltip>
         </div>
-        <div class="scrren-com" :class="searchData.datePicker.length ? 'active' : ''">
-          <el-popover placement="bottom-start" trigger="click" @show="handlePopoverShow" @hide="handleSearchBlur"
-            :width="400">
-            <el-date-picker ref="my-date-picker" v-model="searchData.datePicker" type="monthrange" align="right"
-              value-format="yyyy-MM" range-separator="至" start-placeholder="开始月份" end-placeholder="结束月份"
-              :picker-options="pickerOptions">
+        <div
+          class="scrren-com"
+          :class="searchData.datePicker.length ? 'active' : ''"
+        >
+          <el-popover
+            placement="bottom-start"
+            trigger="click"
+            @show="handlePopoverShow"
+            @hide="handleSearchBlur"
+            :width="400"
+          >
+            <el-date-picker
+              ref="my-date-picker"
+              v-model="searchData.datePicker"
+              type="monthrange"
+              align="right"
+              value-format="yyyy-MM"
+              range-separator="至"
+              start-placeholder="开始月份"
+              end-placeholder="结束月份"
+              :picker-options="pickerOptions"
+            >
             </el-date-picker>
             <div slot="reference">
               提单时间
-              <img src="../../assets/image/person-center/down.png" class="down" alt="" />
+              <img
+                src="../../assets/image/person-center/down.png"
+                class="down"
+                alt=""
+              />
             </div>
           </el-popover>
         </div>
         <div class="scrren-btn" @click="resetSearchData()">
-          <img src="@/assets/image/person-center/reset.png" alt="" class="btnIcon">
+          <img
+            src="@/assets/image/person-center/reset.png"
+            alt=""
+            class="btnIcon"
+          />
           重置
         </div>
         <div class="scrren-btn">
-          <img src="@/assets/image/person-center/share.png" alt="" class="btnIcon">
+          <img
+            src="@/assets/image/person-center/share.png"
+            alt=""
+            class="btnIcon"
+          />
           导出数据
         </div>
       </div>
     </div>
-    <personApproval v-if="billValue === '审批人员'" ref="personApproval" @rejectDialogShow="rejectDialogShow"
-      :searchData="searchData">
+    <personApproval
+      v-if="billValue === '审批人员'"
+      ref="personApproval"
+      @rejectDialogShow="rejectDialogShow"
+      :searchData="searchData"
+    >
     </personApproval>
-    <personLading v-if="billValue === '提单人员'" ref="personLading" @rejectDialogShow="rejectDialogShow"
-      :searchData="searchData">
+    <personLading
+      v-if="billValue === '提单人员'"
+      ref="personLading"
+      @rejectDialogShow="rejectDialogShow"
+      :searchData="searchData"
+    >
     </personLading>
-    <el-dialog :visible.sync="rejectDialog" :before-close="rejectDialogClose"
-      :width="rejectDialogTit === '驳回情况' ? '800px' : '1000px'" center custom-class="transfer-dialog">
+    <el-dialog
+      :visible.sync="rejectDialog"
+      :before-close="rejectDialogClose"
+      :width="rejectDialogTit === '驳回情况' ? '800px' : '1000px'"
+      center
+      custom-class="transfer-dialog"
+    >
       <span slot="title">{{ rejectDialogTit }}</span>
       <div class="dialog-cont">
-        <div class="cont-approve" v-if="rejectDialogTit === '审批概览' || rejectDialogTit === '申请概览'">
+        <div
+          class="cont-approve"
+          v-if="
+            rejectDialogTit === '审批概览' || rejectDialogTit === '申请概览'
+          "
+        >
           <div class="user">
             <div class="user-info">
               <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
@@ -63,8 +144,12 @@
                 {{ approvalUser.userName }}
               </span>
               <div class="user-org" v-if="approvalUser.orgList.length">
-                <span v-for="(item, index) in approvalUser.orgList" :key="index">
-                  {{ item }} <i v-if="index < approvalUser.orgList.length - 1"> | </i>
+                <span
+                  v-for="(item, index) in approvalUser.orgList"
+                  :key="index"
+                >
+                  {{ item }}
+                  <i v-if="index < approvalUser.orgList.length - 1"> | </i>
                 </span>
               </div>
             </div>
@@ -73,54 +158,111 @@
           <div class="filters">
             <div class="filters-content">
               <div class="floor1">
-                <el-select v-model="approvalSearch.formManagementId" placeholder="审批事项类型" @change="getApprovaSearch(1)"
-                  clearable>
-                  <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
-                    :value="item.value"></el-option>
+                <el-select
+                  v-model="approvalSearch.formManagementId"
+                  placeholder="审批事项类型"
+                  @change="getApprovaSearch(1)"
+                  clearable
+                >
+                  <el-option
+                    v-for="(item, index) in transactionTypes"
+                    :key="index"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
                 </el-select>
-                <el-select v-model="approvalSearch.hasOpinions" placeholder="有/无实质意见" @change="getApprovaSearch(1)"
-                  clearable>
-                  <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
-                    :value="item.value"></el-option>
+                <el-select
+                  v-model="approvalSearch.hasOpinions"
+                  placeholder="有/无实质意见"
+                  @change="getApprovaSearch(1)"
+                  clearable
+                >
+                  <el-option
+                    v-for="(item, index) in $field('isOpinions')"
+                    :key="index"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
                 </el-select>
-                <el-select v-model="approvalSearch.onceAdopt" placeholder="是否一次通过" @change="getApprovaSearch(1)"
-                  clearable>
-                  <el-option v-for="(item, index) in $field('isOncePass')" :key="index" :label="item.label"
-                    :value="item.value"></el-option>
+                <el-select
+                  v-model="approvalSearch.onceAdopt"
+                  placeholder="是否一次通过"
+                  @change="getApprovaSearch(1)"
+                  clearable
+                >
+                  <el-option
+                    v-for="(item, index) in $field('isOncePass')"
+                    :key="index"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
                 </el-select>
               </div>
               <div class="floor2">
                 <div class="floor2-item">
-                  <el-input v-model="approvalSearch.keywords" placeholder="请输入项目名称关键词查询" clearable
-                    @clear="getApprovaSearch(1)" @keyup.enter.native="getApprovaSearch(1)">
-                    <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="getApprovaSearch(1)"></i>
+                  <el-input
+                    v-model="approvalSearch.keywords"
+                    placeholder="请输入项目名称关键词查询"
+                    clearable
+                    @clear="getApprovaSearch(1)"
+                    @keyup.enter.native="getApprovaSearch(1)"
+                  >
+                    <i
+                      slot="suffix"
+                      class="el-input__icon el-icon-search pointer"
+                      @click="getApprovaSearch(1)"
+                    ></i>
                   </el-input>
                 </div>
                 <div class="floor2-item floor2-itemW">
                   <span>提单时间</span>
-                  <el-date-picker v-model="approvalSearch.startDate" type="daterange" clearable
-                    @change="getApprovaSearch(1)" value-format="yyyy-MM-dd" range-separator="-" start-placeholder="开始时间"
-                    end-placeholder="结束时间">
+                  <el-date-picker
+                    v-model="approvalSearch.startDate"
+                    type="daterange"
+                    clearable
+                    @change="getApprovaSearch(1)"
+                    value-format="yyyy-MM-dd"
+                    range-separator="-"
+                    start-placeholder="开始时间"
+                    end-placeholder="结束时间"
+                  >
                   </el-date-picker>
                 </div>
               </div>
             </div>
           </div>
-          <div class="list trs-scroll" v-loading="approvalSearch.loading" ref="box">
+          <div
+            class="list trs-scroll"
+            v-loading="approvalSearch.loading"
+            ref="box"
+          >
             <div v-if="list.length">
               <div v-for="(item, index) in list" :key="index">
-                <approvalEventCard :item="item" :crtSign="crtSign" v-if="rejectDialogTit === '审批概览'"></approvalEventCard>
-                <applyEventCard :item="item" v-if="rejectDialogTit === '申请概览'"></applyEventCard>
+                <approvalEventCard
+                  :item="item"
+                  :crtSign="crtSign"
+                  v-if="rejectDialogTit === '审批概览'"
+                ></approvalEventCard>
+                <applyEventCard
+                  :item="item"
+                  v-if="rejectDialogTit === '申请概览'"
+                ></applyEventCard>
               </div>
-              <trs-pagination :total="approvalSearch.total" @getList="getApprovaSearch"
-                :pageNow="approvalSearch.pageNow"></trs-pagination>
+              <trs-pagination
+                :total="approvalSearch.total"
+                @getList="getApprovaSearch"
+                :pageNow="approvalSearch.pageNow"
+              ></trs-pagination>
             </div>
             <div v-else>
               <Empty></Empty>
             </div>
           </div>
         </div>
-        <div class="cont-echart" v-if="rejectDialogTit === '月度贡献值变化情况'">
+        <div
+          class="cont-echart"
+          v-if="rejectDialogTit === '月度贡献值变化情况'"
+        >
           <div v-loading="passingLoading">
             <div class="stackBar-echarts" id="passing-echarts"></div>
           </div>
@@ -128,8 +270,11 @@
         <div class="cont-reject" v-if="rejectDialogTit === '驳回情况'">
           <div class="reject-tab">
             <template v-for="(item, index) in tabList">
-              <div :class="['tab-name', currentTabListIndex === index && 'active']" :key="'total' + item.id"
-                @click="handleTabToggle(index)">
+              <div
+                :class="['tab-name', currentTabListIndex === index && 'active']"
+                :key="'total' + item.id"
+                @click="handleTabToggle(index)"
+              >
                 {{ item.name }}
               </div>
               <span v-if="index !== 1" class="line" :key="index"></span>
@@ -139,17 +284,33 @@
             <div class="filters-content">
               <div class="floor2">
                 <div class="floor2-item">
-                  <el-select v-model="rejectSearch.recordId" placeholder="审批事项类型" @change="rejectSearchChange()"
-                    clearable>
-                    <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
-                      :value="item.value"></el-option>
+                  <el-select
+                    v-model="rejectSearch.recordId"
+                    placeholder="审批事项类型"
+                    @change="rejectSearchChange()"
+                    clearable
+                  >
+                    <el-option
+                      v-for="(item, index) in transactionTypes"
+                      :key="index"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
                   </el-select>
                 </div>
                 <div class="floor2-item floor2-itemW">
                   <span>提单时间</span>
-                  <el-date-picker v-model="rejectSearch.seachTime" type="daterange" clearable
-                    :picker-options="rejectPickerOptions" @change="rejectSearchChange()" value-format="yyyy-MM-dd"
-                    range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间">
+                  <el-date-picker
+                    v-model="rejectSearch.seachTime"
+                    type="daterange"
+                    clearable
+                    :picker-options="rejectPickerOptions"
+                    @change="rejectSearchChange()"
+                    value-format="yyyy-MM-dd"
+                    range-separator="-"
+                    start-placeholder="开始时间"
+                    end-placeholder="结束时间"
+                  >
                   </el-date-picker>
                 </div>
               </div>
@@ -159,14 +320,24 @@
             <div class="echart-com" v-show="currentTabListIndex === 0">
               <div class="com-echart" id="reason-echart"></div>
               <div class="legend">
-                <div class="legend-item" v-for="(item, index) in reasonData.xData" :key="'legend' + index">
-                  <span class="legend-icon" :style="{ backgroundColor: reasonData.color[index] }"></span>
+                <div
+                  class="legend-item"
+                  v-for="(item, index) in reasonData.xData"
+                  :key="'legend' + index"
+                >
+                  <span
+                    class="legend-icon"
+                    :style="{ backgroundColor: reasonData.color[index] }"
+                  ></span>
                   <span>{{ item }}</span>
                 </div>
               </div>
             </div>
             <div class="echart-com" v-show="currentTabListIndex === 1">
-              <div class="com-echart com-echart-rate" id="reasonRate-echart"></div>
+              <div
+                class="com-echart com-echart-rate"
+                id="reasonRate-echart"
+              ></div>
             </div>
           </div>
         </div>
@@ -175,11 +346,15 @@
   </div>
 </template>
 <script>
-import {
-  getApprovalType,
-} from '@/api/approvalCenter'
+import { getApprovalType } from '@/api/approvalCenter'
 import { onlyBankOrgTree } from '@/api/statistical-center'
-import { contributionChange, rejectReason, rejectRate, oneApprovalList, oneApplicationList } from '@/api/personCenter'
+import {
+  contributionChange,
+  rejectReason,
+  rejectRate,
+  oneApprovalList,
+  oneApplicationList
+} from '@/api/personCenter'
 import approvalEventCard from './components/approval-event-card'
 import applyEventCard from './components/apply-event-card'
 import personApproval from './components/person-approval'
@@ -196,12 +371,12 @@ export default {
     return {
       searchData: {
         orgId: '',
-        datePicker: [],
+        datePicker: []
       },
       agenciesList: [],
       pickerOptions: {
         disabledDate(time) {
-          return time.getTime() > Date.now();
+          return time.getTime() > Date.now()
         },
         shortcuts: [
           {
@@ -232,22 +407,25 @@ export default {
       },
       rejectPickerOptions: {
         disabledDate(time) {
-          return time.getTime() > Date.now();
-        },
+          return time.getTime() > Date.now()
+        }
       },
-      billOptions: [{
-        value: '审批人员',
-        label: '审批人员'
-      }, {
-        value: '提单人员',
-        label: '提单人员'
-      }],
-      billValue: '审批人员',
+      billOptions: [
+        {
+          value: '审批人员',
+          label: '审批人员'
+        },
+        {
+          value: '提单人员',
+          label: '提单人员'
+        }
+      ],
+      billValue: '提单人员',
       rejectDialog: false,
       rejectDialogTit: '',
       passingData: {
         xData: [],
-        yData: [],
+        yData: []
       },
       approvalSearch: {
         formManagementId: '',
@@ -271,43 +449,20 @@ export default {
       reasonData: {
         xData: [],
         yData: [],
-        color: [
-          '#249EFF',
-          '#65CFE4',
-          '#74E4BD',
-        ],
-        yDataHint: [
-          {
-            cp: 210,
-            hd: 230,
-            kh: 220,
-            qt: 240,
-          },
-          {
-            cp: 210,
-            hd: 230,
-            kh: 220,
-            qt: 240,
-          },
-          {
-            cp: 210,
-            hd: 230,
-            kh: 220,
-            qt: 240,
-          }
-        ],
+        color: ['#249EFF', '#65CFE4', '#74E4BD'],
+        yDataHint: []
       },
       rejectionRateData: {
         name: '驳回率',
         xData: ['2022-11', '2022-12', '2023-01', '2023-02', '2023-03'],
-        yData: [800, 1200, 390, 200, 1500],
+        yData: [800, 1200, 390, 200, 1500]
       },
       passingLoading: false,
       rowData: {},
       rejectLoading: false,
       rejectSearch: {
         recordId: '',
-        seachTime: [],
+        seachTime: []
       },
       approvalUser: {
         userName: '',
@@ -319,10 +474,8 @@ export default {
     this.getOrgTree()
     this.handleSearchBlur()
   },
-  watch: {
-  },
-  created() {
-  },
+  watch: {},
+  created() {},
   methods: {
     resetSearchData() {
       this.searchData.orgId = ''
@@ -355,8 +508,8 @@ export default {
     },
     rejectDialogShow(rejectDialogData) {
       // console.log('rejectDialogData', rejectDialogData);
-      this.rejectDialogTit = rejectDialogData.rejectDialogTit;
-      this.rowData = rejectDialogData.rowData;
+      this.rejectDialogTit = rejectDialogData.rejectDialogTit
+      this.rowData = rejectDialogData.rowData
       this.rejectDialog = true
       if (this.rejectDialogTit === '月度贡献值变化情况') {
         this.$nextTick(() => {
@@ -380,7 +533,7 @@ export default {
     },
     // 贡献值月度变化
     async getContributionChange() {
-      this.passingData.xData = [];
+      this.passingData.xData = []
       this.passingData.yData = []
       await contributionChange({ userId: this.rowData.userId }).then((res) => {
         this.passingLoading = true
@@ -388,7 +541,7 @@ export default {
         if (data) {
           this.passingData.xData = data.data.titleList
           this.passingData.yData = data.data.numList
-          this.initPassingEcharts(this.passingData);
+          this.initPassingEcharts(this.passingData)
         }
         this.passingLoading = false
       })
@@ -404,7 +557,7 @@ export default {
             let params = '<p class="charts-tooltip-p fontw black">贡献值</p>'
             params += `<p class="charts-tooltip-p black"><span style="margin-right:12px">${name}</span><span>贡献值${serie[0].data}</span></p>`
             return params
-          },
+          }
         },
         grid: {
           left: '0',
@@ -415,11 +568,11 @@ export default {
         yAxis: {
           type: 'value',
           name: '分',
-          minInterval: 1,
+          minInterval: 1
         },
         xAxis: {
           type: 'category',
-          data: industryDataVal.xData,
+          data: industryDataVal.xData
         },
         dataZoom: [
           {
@@ -432,12 +585,13 @@ export default {
             fillerColor: '#E5F9FF',
             moveHandleSize: 0,
             handleSize: '180%',
-            handleIcon: 'image://data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAABCcAAAQnAEmzTo0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAIuSURBVHgBtVXBTttAEH2zDiZRixRoT1UrkgP3Vj311H5ApVb9gbZfAHwByReQP2i/oCpSP4CeekLlzgEjEHAJRAKU4MReZpI42qzXlmOJJ1nyjj1vdmZn3hJycKx1vTrCptb4wE+DTY3ppx4RDuMR9oaE380aBVkc5DJe9HVDe/ghxCgCws8wQtsVSNmGy1Bvxgr/C5MLNL757HM+0Fu5AS6GeifS6PBrHYujrgm7wmEaZyWSnU/JUwhj4OQeuIkm62dL/FSAp547Emlsv6hSZxZAai5lsXcuxP9ugaO+m2ijBrx94gzUY983cibjEjH5jk1+y7v9dZVNLpBvf64n/1qoL3OTjDOY7v7YJs9wdEIy+LIG+FbLhD5WFdf9s+1wcFecPNmQlNJGZYAtpSr4ZP+cV5YsiI+cmQnPw3vF/f7aNHZHKI3gfn4t0y9Vmzvc7hCl4ShrQ+GRoXjMA9Ow4qE01iopU0+Rmg+wXkVpPF+aX7N0HKoowl/T6PNsb5QIIj6piY6xR6L5fohr0x5qnuLuYoP2cTUdgNu2qZpEcnnsmx8kC5fDIuRyR4gW5YqdZHAgYjdwk0tZ3q2kJQKG2M3k+owvC85k10UkgWQAkxmRTltfdhKPwQO2/dKU6wSnfd1SE2UtjThG+1WNWsk6dSdPM0nJdwH0eOftZOeZAQRyJlyVFs/IVxQA9/v+MMJ316VPeY7jQCLnrLg0EcUkq4BJA80zNKqiI52YxfEArMjodcM5n8kAAAAASUVORK5CYII=',
+            handleIcon:
+              'image://data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAABCcAAAQnAEmzTo0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAIuSURBVHgBtVXBTttAEH2zDiZRixRoT1UrkgP3Vj311H5ApVb9gbZfAHwByReQP2i/oCpSP4CeekLlzgEjEHAJRAKU4MReZpI42qzXlmOJJ1nyjj1vdmZn3hJycKx1vTrCptb4wE+DTY3ppx4RDuMR9oaE380aBVkc5DJe9HVDe/ghxCgCws8wQtsVSNmGy1Bvxgr/C5MLNL757HM+0Fu5AS6GeifS6PBrHYujrgm7wmEaZyWSnU/JUwhj4OQeuIkm62dL/FSAp547Emlsv6hSZxZAai5lsXcuxP9ugaO+m2ijBrx94gzUY983cibjEjH5jk1+y7v9dZVNLpBvf64n/1qoL3OTjDOY7v7YJs9wdEIy+LIG+FbLhD5WFdf9s+1wcFecPNmQlNJGZYAtpSr4ZP+cV5YsiI+cmQnPw3vF/f7aNHZHKI3gfn4t0y9Vmzvc7hCl4ShrQ+GRoXjMA9Ow4qE01iopU0+Rmg+wXkVpPF+aX7N0HKoowl/T6PNsb5QIIj6piY6xR6L5fohr0x5qnuLuYoP2cTUdgNu2qZpEcnnsmx8kC5fDIuRyR4gW5YqdZHAgYjdwk0tZ3q2kJQKG2M3k+owvC85k10UkgWQAkxmRTltfdhKPwQO2/dKU6wSnfd1SE2UtjThG+1WNWsk6dSdPM0nJdwH0eOftZOeZAQRyJlyVFs/IVxQA9/v+MMJ316VPeY7jQCLnrLg0EcUkq4BJA80zNKqiI52YxfEArMjodcM5n8kAAAAASUVORK5CYII='
           },
           {
             type: 'inside',
             start: 5,
-            end: 95,
+            end: 95
           }
         ],
         series: [
@@ -459,14 +613,20 @@ export default {
                   y2: 1,
                   colorStops: [
                     {
-                      offset: 0, color: industryDataVal.seriesItemStyle ? industryDataVal.seriesItemStyle[0] : 'rgba(33,204,255,0.6)' // 100% 处的颜色
+                      offset: 0,
+                      color: industryDataVal.seriesItemStyle
+                        ? industryDataVal.seriesItemStyle[0]
+                        : 'rgba(33,204,255,0.6)' // 100% 处的颜色
                     },
                     {
-                      offset: 1, color: industryDataVal.seriesItemStyle ? industryDataVal.seriesItemStyle[1] : 'rgba(33,204,255,0.6)' // 0% 处的颜色
+                      offset: 1,
+                      color: industryDataVal.seriesItemStyle
+                        ? industryDataVal.seriesItemStyle[1]
+                        : 'rgba(33,204,255,0.6)' // 0% 处的颜色
                     }
-                  ],
-                },
-              },
+                  ]
+                }
+              }
             },
             emphasis: {
               itemStyle: {
@@ -479,36 +639,42 @@ export default {
                   y2: 1,
                   colorStops: [
                     {
-                      offset: 0, color: industryDataVal.emphasisItemStyle ? industryDataVal.emphasisItemStyle[0] : '#21CCFF' // 100% 处的颜色
+                      offset: 0,
+                      color: industryDataVal.emphasisItemStyle
+                        ? industryDataVal.emphasisItemStyle[0]
+                        : '#21CCFF' // 100% 处的颜色
                     },
                     {
-                      offset: 1, color: industryDataVal.emphasisItemStyle ? industryDataVal.emphasisItemStyle[1] : '#2D5CF6' // 0% 处的颜色
+                      offset: 1,
+                      color: industryDataVal.emphasisItemStyle
+                        ? industryDataVal.emphasisItemStyle[1]
+                        : '#2D5CF6' // 0% 处的颜色
                     }
-                  ],
-                },
-              },
+                  ]
+                }
+              }
             },
-            data: industryDataVal.yData,
-          },
+            data: industryDataVal.yData
+          }
         ]
-      };
+      }
       this.initChart('passing-echarts', option)
     },
     initChart(ref, option) {
-      const chart = document.getElementById(ref);
-      let myChart;
+      const chart = document.getElementById(ref)
+      let myChart
       if (chart) {
-        myChart = this.$echarts.init(chart);
-        myChart.setOption(option);
+        myChart = this.$echarts.init(chart)
+        myChart.setOption(option)
         window.addEventListener('resize', () => {
-          myChart.resize();
-        });
+          myChart.resize()
+        })
       }
       this.$on('hook:destroyed', () => {
         window.removeEventListener('resize', () => {
-          myChart.resize();
-        });
-      });
+          myChart.resize()
+        })
+      })
     },
     // 审批列表
     getApprovaList(pageNow) {
@@ -517,13 +683,15 @@ export default {
         ...this.approvalSearch,
         userId: this.rowData.userId,
         createTimeStart:
-          this.approvalSearch.startDate && this.approvalSearch.startDate.length > 0
+          this.approvalSearch.startDate
+          && this.approvalSearch.startDate.length > 0
             ? this.approvalSearch.startDate[0] + ' 00:00:00'
             : '',
         createTimeEnd:
-          this.approvalSearch.startDate && this.approvalSearch.startDate.length > 0
+          this.approvalSearch.startDate
+          && this.approvalSearch.startDate.length > 0
             ? this.approvalSearch.startDate[1] + ' 23:59:59'
-            : '',
+            : ''
       }
       Reflect.deleteProperty(param, 'total')
       Reflect.deleteProperty(param, 'loading')
@@ -565,13 +733,15 @@ export default {
         ...this.approvalSearch,
         userId: this.rowData.userId,
         createTimeStart:
-          this.approvalSearch.startDate && this.approvalSearch.startDate.length > 0
+          this.approvalSearch.startDate
+          && this.approvalSearch.startDate.length > 0
             ? this.approvalSearch.startDate[0] + ' 00:00:00'
             : '',
         createTimeEnd:
-          this.approvalSearch.startDate && this.approvalSearch.startDate.length > 0
+          this.approvalSearch.startDate
+          && this.approvalSearch.startDate.length > 0
             ? this.approvalSearch.startDate[1] + ' 23:59:59'
-            : '',
+            : ''
       }
       Reflect.deleteProperty(param, 'total')
       Reflect.deleteProperty(param, 'loading')
@@ -610,50 +780,32 @@ export default {
     initReasonEcharts(industryDataVal) {
       const yData1 = JSON.parse(JSON.stringify(industryDataVal.yData))
       const xData1 = JSON.parse(JSON.stringify(industryDataVal.xData))
+      const yDataHint1 = JSON.parse(JSON.stringify(industryDataVal.yDataHint?.reverse()))
       const color = JSON.parse(JSON.stringify(industryDataVal.color)).reverse()
       const option = {
         tooltip: {
           backgroundColor: 'rgba(255,255,255,0.8)',
           borderColor: 'rgba(255,255,255,0.8)',
           formatter(params) {
-            const p = `
-            <div style="padding: 6px;display:flex;gap:8px;flex-direction:column;font-size:12px">
-            <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">驳回原因</div>
-            <div>
-              <div style="display:flex;align-items:center;gap:12px;color:#1D2128;">
-                <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;background-color: ${params.color};"></span>
-                <span>${params.name}</span>
-                <span>${params.data}项</span>
-              </div>
-              <div style="display:flex;gap:12px;">
-                <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;"></span>
-                <div style="flex:1;display:flex;justify-content: space-between;">
-                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                    <span>产品类</span>
-                    <span>230项</span>
+            let child = ''
+            const idx = params.dataIndex
+            yDataHint1[idx].forEach((item) => {
+              child += `<div style="width:45%;display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5"><span>${item.label}</span><span>${item.value}项</span></div>`
+            })
+            const p = `<div style="min-width:200px;padding: 6px;display:flex;gap:8px;flex-direction:column;font-size:12px">
+              <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">驳回原因分布</div>
+              <div>
+                <div style="display:flex;align-items:center;gap:12px;color:#1D2128;">
+                  <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;background-color: ${params.color};"></span>
+                  <span>${params.name}</span>
+                  <span>${params.data}项</span>
                   </div>
-                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                    <span>活动类</span>
-                    <span>23项</span>
+                  <div style="display:flex;gap:12px;">
+                    <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;"></span>
+                    <div style="flex:1;display:flex;justify-content: space-between;flex-wrap:wrap">${child}</div>
                   </div>
                 </div>
-              </div>
-              <div style="display:flex;gap:12px;">
-                <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;"></span>
-                <div style="flex:1;display:flex;justify-content: space-between">
-                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                    <span>产品类</span>
-                    <span>230项</span>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                    <span>活动类</span>
-                    <span>23项</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            </div>
-            `
+              </div>`
             return p
           }
         },
@@ -667,25 +819,25 @@ export default {
         xAxis: {},
         yAxis: {
           type: 'category',
-          data: xData1,
+          data: xData1?.reverse(),
           axisLabel: {
             formatter(value) {
-              let str = '';
-              const num = 9; // 每行显示字数
-              const valLength = value.length; // 该项x轴字数
-              const rowNum = Math.ceil(valLength / num); // 行数
+              let str = ''
+              const num = 9 // 每行显示字数
+              const valLength = value.length // 该项x轴字数
+              const rowNum = Math.ceil(valLength / num) // 行数
               if (rowNum > 1) {
                 for (let i = 0; i < rowNum; i++) {
-                  let temp = '';
-                  const start = i * num;
-                  const end = start + num;
+                  let temp = ''
+                  const start = i * num
+                  const end = start + num
 
-                  temp = value.substring(start, end) + '\n';
-                  str += temp;
+                  temp = value.substring(start, end) + '\n'
+                  str += temp
                 }
-                return str;
+                return str
               } else {
-                return value;
+                return value
               }
             }
           }
@@ -707,14 +859,13 @@ export default {
     handleTabToggle(index) {
       if (this.currentTabListIndex !== index) {
         this.currentTabListIndex = index
-        this.rejectSearch.recordId = '';
-        this.rejectSearch.seachTime = [];
+        this.rejectSearch.recordId = ''
+        this.rejectSearch.seachTime = []
         this.rejectSearchChange()
       }
     },
     rejectSearchChange() {
       if (this.currentTabListIndex === 0) {
-        this.initReasonEcharts(this.reasonData)
         this.getRejectReason()
       }
       if (this.currentTabListIndex === 1) {
@@ -730,7 +881,7 @@ export default {
             const name = serie[0].axisValueLabel
             const params = `<p class="charts-tooltip-p fontw black">${name}</p><p class="charts-tooltip-p fontw black"><span class="serieName"><span class="charts-tooltip-dot" style="background: #21CCFF;"></span>驳回率</span><span><span class="blue">${serie[0].data}</span>%</span></p>`
             return params
-          },
+          }
         },
         grid: {
           left: '0',
@@ -745,7 +896,7 @@ export default {
         },
         yAxis: {
           type: 'value',
-          name: '%',
+          name: '%'
         },
         series: [
           {
@@ -773,7 +924,7 @@ export default {
             smooth: true
           }
         ]
-      };
+      }
       this.initChart('reasonRate-echart', option)
     },
     handlePopoverShow() {
@@ -807,18 +958,21 @@ export default {
     getRejectReason() {
       this.rejectLoading = true
       const getData = {
-        userId: 1416,
-        // this.rowData.userId
+        userId: this.rowData.userId, // 1416
         recordId: this.rejectSearch.recordId,
-        startTime: this.rejectSearch.seachTime?.length ? this.rejectSearch.seachTime[0] : '',
-        endTime: this.rejectSearch.seachTime?.length ? this.rejectSearch.seachTime[1] : ''
+        startTime: this.rejectSearch.seachTime?.length
+          ? this.rejectSearch.seachTime[0]
+          : '',
+        endTime: this.rejectSearch.seachTime?.length
+          ? this.rejectSearch.seachTime[1]
+          : ''
       }
       rejectReason(getData).then((res) => {
-        // eslint-disable-next-line no-unused-vars
         const { data } = res.data
-        this.reasonData.xData = data.titleList
+        this.reasonData.xData = data.titleList?.reverse()
         this.reasonData.yData = data.countList
         this.reasonData.yDataHint = data.dataList
+        this.initReasonEcharts(this.reasonData)
         this.rejectLoading = false
       })
     },
@@ -827,8 +981,12 @@ export default {
       const getData = {
         userId: this.rowData.userId,
         recordId: this.rejectSearch.recordId,
-        startTime: this.rejectSearch.seachTime?.length ? this.rejectSearch.seachTime[0] : '',
-        endTime: this.rejectSearch.seachTime?.length ? this.rejectSearch.seachTime[1] : ''
+        startTime: this.rejectSearch.seachTime?.length
+          ? this.rejectSearch.seachTime[0]
+          : '',
+        endTime: this.rejectSearch.seachTime?.length
+          ? this.rejectSearch.seachTime[1]
+          : ''
       }
       rejectRate(getData).then((res) => {
         const { data } = res.data
@@ -837,8 +995,8 @@ export default {
         this.initRejectionRateEcharts(this.rejectionRateData)
         this.rejectLoading = false
       })
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="less" scoped>
@@ -850,21 +1008,25 @@ export default {
 
     .tips {
       display: inline-block;
-      color: #FA8C16;
+      color: #fa8c16;
       font-size: 12px;
       font-style: normal;
       font-weight: 400;
       line-height: 22px;
       padding: 6px 12px;
       border-radius: 20px;
-      background: linear-gradient(90deg, #FFE7C0 0%, rgba(255, 213, 145, 0) 67.75%);
+      background: linear-gradient(
+        90deg,
+        #ffe7c0 0%,
+        rgba(255, 213, 145, 0) 67.75%
+      );
       margin-bottom: 8px;
       width: 400px;
       cursor: default;
       align-items: center;
 
       span {
-        border-bottom: 1px solid #FA8C16;
+        border-bottom: 1px solid #fa8c16;
         display: inline-block;
         cursor: pointer;
         margin-left: 5px;
@@ -883,7 +1045,7 @@ export default {
 
       .scrren-com {
         cursor: pointer;
-        color: #1D2128;
+        color: #1d2128;
         font-size: 16px;
         line-height: 24px;
         width: fit-content;
@@ -895,7 +1057,7 @@ export default {
         position: relative;
 
         &.active {
-          color: #2D5CF6;
+          color: #2d5cf6;
         }
 
         .my-hidden {
@@ -927,8 +1089,8 @@ export default {
         padding: 6px 16px 6px 16px;
         border-radius: 4px;
         gap: 4px;
-        background: #2D5CF6;
-        color: #FFFFFF;
+        background: #2d5cf6;
+        color: #ffffff;
         font-size: 14px;
 
         .btnIcon {
@@ -1204,12 +1366,12 @@ export default {
 
           .el-cascader .el-input .el-icon-arrow-down::before {
             font-family: element-icons !important;
-            content: "\e790";
+            content: '\e790';
           }
 
           .el-select .el-input .el-icon-arrow-up::before {
             font-family: element-icons !important;
-            content: "\e78f";
+            content: '\e78f';
           }
 
           .el-range-editor .el-icon-date {
@@ -1220,7 +1382,7 @@ export default {
           }
 
           .item-tit {
-            color: #1D2128;
+            color: #1d2128;
             font-size: 14px;
             font-weight: 400;
             line-height: 22px;
@@ -1229,7 +1391,7 @@ export default {
           }
 
           span {
-            color: #86909C;
+            color: #86909c;
           }
         }
 
@@ -1271,7 +1433,7 @@ export default {
 
           .el-icon-time::before {
             font-family: element-icons !important;
-            content: "\e78e";
+            content: '\e78e';
           }
 
           .el-input__suffix {
@@ -1296,7 +1458,7 @@ export default {
           gap: 12px;
           align-items: center;
           line-height: 22px;
-          color: #1D2128;
+          color: #1d2128;
           position: relative;
 
           .tab-name {
@@ -1304,14 +1466,14 @@ export default {
             cursor: pointer;
 
             &.active {
-              color: #2D5CF6;
+              color: #2d5cf6;
             }
           }
 
           .line {
             padding: 4px 0;
             width: 1px;
-            background-color: #CACDD3;
+            background-color: #cacdd3;
           }
         }
 
@@ -1415,8 +1577,8 @@ export default {
     display: inline-block;
     width: 10px;
     height: 10px;
-    background: #2D5CF6;
-    border: 2px solid #FFFFFF;
+    background: #2d5cf6;
+    border: 2px solid #ffffff;
     box-sizing: border-box;
     border-radius: 50%;
     margin-right: 8px;
@@ -1446,7 +1608,7 @@ export default {
   }
 
   .blue {
-    color: #2D5CF6;
+    color: #2d5cf6;
   }
 
   .bold {
