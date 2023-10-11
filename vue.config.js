@@ -52,7 +52,7 @@ module.exports = {
         }
       },
       '/uaa/': {
-        target: 'http://192.168.210.52:30606',
+        target: 'http://39.104.62.255',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
