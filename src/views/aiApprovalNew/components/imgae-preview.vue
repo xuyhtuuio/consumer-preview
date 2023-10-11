@@ -1,7 +1,7 @@
 <template>
   <div class="preview" ref="contentDom" v-loading="!loaded">
     <img id="picture" :src="url" @load="handleImageLoaded" ref="imgDom" />
-    <div class="light" ref="light" v-show="lineWordItem?.word" :style="this.BoundingClientRect">
+    <div class="light" ref="light" v-if="lineWordItem?.word" :style="this.BoundingClientRect">
       <div class="light" id="imgLight" :style="this.highLightBoundingClientRect"></div>
     </div>
     <!-- <div class="tool">

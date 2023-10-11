@@ -37,43 +37,39 @@
                   <use xlink:href="#icon-Frame2"></use>
                 </svg>
                 更多材料</span> -->
-                <el-popover
-                  placement="bottom"
-                  popper-class="cont-top-popover"
-                  width="300" :offset="100"
-                  trigger="click" :visible-arrow=false>
-                  <div class="cont-top-fileList">
-                    <div class="fileList-search">
-                      <el-input v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search">
-                        <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
-                      </el-input>
-                    </div>
-                    <div class="fileList-tip">
-                      <el-switch
-                        v-model="filterFocus"
-                        active-color="#165DFF"
-                        inactive-color="#C9CDD4">
-                      </el-switch>
-                      <span class="fileList-tip-text">仅看问题文件</span>
-                    </div>
-                    <div class="fileList-list-item" @click="changeFile(index)" v-for="(file,index) in files" :key="index"
-                      :class="{
-                        'swiper-slide-img': ['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))}">
-                      <span class="">{{ index + 1 }}.</span>
-                     <el-image v-if="['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))" :src="file.url"></el-image>
-                     <file-type class="icon" v-else :fileName="file.fileName"></file-type>
-                     <span class="fileList-list-item-fileName">{{ getfileName(file.fileName) }}
+              <el-popover placement="bottom" popper-class="cont-top-popover" width="300" :offset="100" trigger="click"
+                :visible-arrow=false>
+                <div class="cont-top-fileList">
+                  <div class="fileList-search">
+                    <el-input v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search">
+                      <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
+                    </el-input>
+                  </div>
+                  <div class="fileList-tip">
+                    <el-switch v-model="filterFocus" active-color="#165DFF" inactive-color="#C9CDD4">
+                    </el-switch>
+                    <span class="fileList-tip-text">仅看问题文件</span>
+                  </div>
+                  <div class="fileList-list-item" @click="changeFile(index)" v-for="(file, index) in files" :key="index"
+                    :class="{
+                      'swiper-slide-img': ['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))
+                    }">
+                    <span class="">{{ index + 1 }}.</span>
+                    <el-image v-if="['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))"
+                      :src="file.url"></el-image>
+                    <file-type class="icon" v-else :fileName="file.fileName"></file-type>
+                    <span class="fileList-list-item-fileName">{{ getfileName(file.fileName) }}
                       <i class="fileList-list-item-fileSuf">.{{ getfileType(file.fileName) }}</i>
                     </span>
-                    </div>
                   </div>
-                  <span  slot="reference">
-                    <svg class="icon" aria-hidden="true">
-                      <use xlink:href="#icon-Frame2"></use>
-                    </svg>
-                    更多材料
-                  </span>
-                </el-popover>
+                </div>
+                <span slot="reference">
+                  <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#icon-Frame2"></use>
+                  </svg>
+                  更多材料
+                </span>
+              </el-popover>
               <span @click="saveFile">
                 <!-- <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-xiazai"></use>
@@ -98,11 +94,13 @@
             <file-preview ref="filePreview" :files="files" :formId="formId" :activeIndex="activeIndex"
               @changeFile="changeFile" :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"
               @getProps="getProps"></file-preview>
-            <orcTxtNew ref="ocrTxt" v-show="curMode === 0" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
+            <orcTxtNew ref="ocrTxt" v-show="curMode === 0" :approval="approval" @addWord="addWord"
+              @lineRemove="lineRemove"
               v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
               @showLine="showLine" :lineWordItem="lineWordItem" :styleProp="styleProp">
             </orcTxtNew>
-            <el-popover class="postil-popover" v-model="popoverShow" id="popover" placement="right" width="400" trigger="manual">
+            <el-popover class="postil-popover" v-model="popoverShow" id="popover" placement="right" width="400"
+              trigger="manual">
               <div class="postil-header">
                 <div>
                   <!-- <span><img src="@/assets/image/ai-approval/ocr-postil.png" alt=""></span> -->
@@ -135,26 +133,28 @@
               v-if="specialFileType2.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
               @showLine="showLine" :lineWordItem="lineWordItem">
             </orcTxt>
-            <p class="content-cont-icons" style="display: none;">
-              <span>
-                <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-a-Component13"></use>
-                </svg>
-              </span>
-              <span>
-                <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-a-Component132"></use>
-                </svg>
-              </span>
-              <span>
-                <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-a-Component131"></use>
-                </svg>
-              </span>
-              <span>
-                <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-a-Component133"></use>
-                </svg>
+            <p class="content-cont-icons" v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr">
+              <span v-for="(item,index) in icons" :key="index">
+                <span :data-icon="index">
+                  <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#icon-a-Component13"></use>
+                  </svg>
+                </span>
+                <span :data-icon="index">
+                  <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#icon-a-Component132"></use>
+                  </svg>
+                </span>
+                <span :data-icon="index">
+                  <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#icon-a-Component131"></use>
+                  </svg>
+                </span>
+                <span :data-icon="index">
+                  <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#icon-a-Component133"></use>
+                  </svg>
+                </span>
               </span>
             </p>
           </div>
@@ -162,8 +162,8 @@
         <div class="content-cont-editor">
           <editorial ref="editorial" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
             :lineWordItem="lineWordItem" @upDateComments="upDateComments" @showLine="showLine"
-            :activeWordType="activeWordType" @showCommentLine="showCommentLine" @changeEditorialType="changeEditorialType" :showOcr="showOcr"
-            :formBase="formBase">
+            :activeWordType="activeWordType" @showCommentLine="showCommentLine" @changeEditorialType="changeEditorialType"
+            :showOcr="showOcr" :formBase="formBase">
           </editorial>
         </div>
       </div>
@@ -195,6 +195,7 @@ export default {
   },
   data() {
     return {
+      icons: [],
       preDoms: [],
       domInfo: {},
       popoverShow: false,
@@ -219,6 +220,7 @@ export default {
       approval: {}, // 当前审批文件的相关内容
       activeIndex: null,
       word_lines: [], // 连线
+      high_light_lines: [], // ocr与原图高亮地区连线
       lineWordItem: {}, // 当前展示连线的词的基本信息
       increasedIds: {
         words: [],
@@ -282,6 +284,7 @@ export default {
   },
   created() {
     this.getElHeight();
+    this.findIconPosition()
   },
   computed: {
     getfileType() {
@@ -449,14 +452,17 @@ export default {
             cursor: default;
           }
         }
-        span{
-          .icon{
+
+        span {
+          .icon {
             width: 16px;
             height: 16px;
           }
+
           cursor: pointer;
           color: #505968;
         }
+
         .icon-xiazai {
           display: inline-block;
           width: 14px;
@@ -488,16 +494,19 @@ export default {
           }
         }
       }
-      >p{
+
+      >p {
         background: #ffffff;
         border-radius: 0px 0px 10px 10px;
         box-shadow: 0px 0px 10px 0px #4343430d;
       }
-      .content-cont-icons{
+
+      .content-cont-icons {
         display: flex;
         flex-direction: column;
         justify-content: space-around;
-        .icon{
+
+        .icon {
           width: 15px;
           height: 15px;
           cursor: pointer;
@@ -523,21 +532,25 @@ export default {
     }
   }
 }
-.cont-top-popover{
-  .cont-top-fileList{
+
+.cont-top-popover {
+  .cont-top-fileList {
     height: calc(508px - 32px);
     overflow-y: auto;
+
     &::-webkit-scrollbar {
       display: inline-block;
     }
   }
-  .fileList-search{
+
+  .fileList-search {
     padding: 0px 16px;
     padding-bottom: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
-    /deep/ .el-input__inner{
+
+    /deep/ .el-input__inner {
       padding: 2px 12px 2px 12px;
       border: none;
       background: #F2F3F5;
@@ -547,59 +560,72 @@ export default {
       border-radius: 18px;
     }
   }
-  .fileList-tip{
+
+  .fileList-tip {
     padding: 0 16px;
-    .fileList-tip-text{
+
+    .fileList-tip-text {
       margin-left: 4px;
       color: #86909C;
       font-size: 12px;
     }
-    /deep/.el-switch__core{
+
+    /deep/.el-switch__core {
       width: 28px !important;
       height: 16px !important;
-      &::after{
+
+      &::after {
         width: 12px;
         height: 12px;
       }
     }
-    /deep/ .el-switch.is-checked .el-switch__core::after{
+
+    /deep/ .el-switch.is-checked .el-switch__core::after {
       margin-left: -13px;
     }
   }
-  .fileList-list-item{
+
+  .fileList-list-item {
     border-bottom: 1px dashed #E5E6EB;
     cursor: pointer;
     padding: 10px 24px 10px 24px;
     display: flex;
-    /deep/ .el-image{
+
+    /deep/ .el-image {
       width: 20px;
       height: 20px;
       margin: 0 10px;
     }
-    .icon{
+
+    .icon {
       width: 20px;
       height: 20px;
       margin: 0 10px;
     }
-    .fileList-list-item-fileName{
+
+    .fileList-list-item-fileName {
       width: 170px;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
     }
-    &:hover{
-      .fileList-list-item-fileName{
+
+    &:hover {
+      .fileList-list-item-fileName {
         font-weight: 700;
         color: #1D2128;
       }
-      .fileList-list-item-fileSuf{
-      font-weight: 400;
+
+      .fileList-list-item-fileSuf {
+        font-weight: 400;
         color: #1D2128;
       }
+
       background: #F2F3F5;
     }
   }
 }
+
 .postil-popover {
   border-radius: 10px;
   width: 380px;
@@ -679,11 +705,8 @@ export default {
       }
     }
   }
-}
-</style>
+}</style>
 
-<style lang="less">
-.cont-top-popover{
+<style lang="less">.cont-top-popover {
   padding: 16px 0px;
-}
-</style>
+}</style>

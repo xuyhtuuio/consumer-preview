@@ -44,7 +44,7 @@
       <i class="el-icon-circle-close" v-show="showFullScreen" @click="fullScreen"></i>
       <!-- 图片 -->
       <imgae-preview @getProps="getProps" ref="imgPreview" v-if="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))"
-        :lineWordItem="lineWordItem" @linePosition="linePosition" @showFullScreen="fullScreen" :url="approval.url"></imgae-preview>
+        :lineWordItem="newLineWordItem" @linePosition="linePosition" @showFullScreen="fullScreen" :url="approval.url"></imgae-preview>
       <!-- 其他类型文件 -->
       <filePreview v-else :url="approval.url"></filePreview>
       <div class="tool" v-show="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))">
@@ -106,6 +106,7 @@ export default {
       imgEditorDialogVisible: false,
       swiper: null,
       showFullScreen: false,
+      newLineWordItem: {}
     }
   },
   computed: {
@@ -121,6 +122,9 @@ export default {
         return isEnd || isStart;
       }
     },
+  },
+  created() {
+    this.newLineWordItem = this.lineWordItem;
   },
   mounted() {
     // this.init();
@@ -198,9 +202,11 @@ export default {
       })
     },
     setHighLight(arr) {
-      arr.map((light) => {
-        this.lineWordItem = light
-      })
+      // arr.map((light) => {
+      //   this.lineWordItem = light
+      // })
+      // eslint-disable-next-line prefer-destructuring
+      this.newLineWordItem = arr[0]
     },
   }
 }

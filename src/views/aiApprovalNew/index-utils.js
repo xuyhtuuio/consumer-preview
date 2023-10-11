@@ -196,11 +196,6 @@ export default {
           })
         )
       );
-      // console.log({
-      //   files: this.files,
-      //   increasedIds: this.increasedIds,
-      //   comments: this.comments
-      // });
     },
     // 鼠标选中 添加新批注
     addWord(obj) {
@@ -225,7 +220,6 @@ export default {
     },
     // 展示连线
     showCommentLine(obj) {
-      // console.log(obj)
       const commenDom = document.querySelector(`div[data-commenid=c${obj.id}]`)
       this.appendHighLightDom(obj, commenDom)
       // this.showLine(obj.string)
@@ -258,10 +252,12 @@ export default {
         rootDom.appendChild(newDom)
         doms.push(newDom)
       })
-      this.drawCommentLine(doms, commenDom)
+      // 获取高亮元素 dom
       this.$refs.filePreview.setHighLight(location)
+      this.drawCommentLine(doms, commenDom)
     },
     drawCommentLine(start, end) {
+      // const highLightDom = document.getElementById('imgLight')
       const endDomId = end.getAttribute('data-commenid')
       const rootDom = document.getElementsByClassName('results-div')[0]
       const onlyHide = endDomId === this.endDomId
@@ -289,6 +285,18 @@ export default {
         });
         const showEffectName = 'draw';
         this.word_lines[index].show(showEffectName, animOptions);
+        this.$nextTick(() => {
+          const highLightDom = document.querySelector('#imgLight');
+          // debugger
+          this.high_light_lines[index] = new LeaderLine(highLightDom, item, {
+            color: '#EB5D78',
+            size: 1,
+            startPlug: 'disc',
+            endPlug: 'disc'
+            // endSocket: 'auto'
+          });
+          this.high_light_lines[index].show(showEffectName, animOptions);
+        })
       })
       this.preDoms = start
       document.querySelector('.ocr-txt .results').addEventListener('scroll', () => {
@@ -405,13 +413,20 @@ export default {
       this.word_lines.forEach(line => {
         line.position();
       });
+      this.high_light_lines.forEach(line => {
+        line.position()
+      })
     },
     // 仅移除连线不做其他操作
     lineRemoveOnly() {
       (this.word_lines || []).forEach(item => {
         item.remove();
       });
+      (this.high_light_lines || []).forEach(item => {
+        item.remove();
+      });
       this.word_lines = [];
+      this.high_light_lines = []
     },
     // 移除连线
     lineRemove(activeWordType) {
@@ -432,7 +447,6 @@ export default {
       }
     },
     getComments() {
-      // console.log(this.files)
       const arr = [];
       this.files.forEach(file => {
         // 存在推荐意见
@@ -747,6 +761,31 @@ export default {
           this.refuseOpiton = res.data.data
         }
       })
+    },
+    // icon 数量计算
+    findIconPosition() {
+      const container = document.querySelector('.content-cont-icons')
+      const containerHeight = container.offsetHeight
+      const iconNum = Math.floor(containerHeight / 50)
+      const timestamp = new Date().getTime()
+      for (let i = 0; i < iconNum; i++) {
+        this.icons.push({ timestamp })
+      }
+      this.dealIconWithComment()
+    },
+    // icon 管理的意见计算
+    dealIconWithComment() {
+      const { comments } = this
+      comments.map((comment) => {
+        // console.log(comment)
+        // 如果该意见存在批注
+        if (comment.position.length) {
+          comment.position.map((pos) => {
+            console.log(pos)
+          })
+        }
+      })
     }
+
   },
 };
