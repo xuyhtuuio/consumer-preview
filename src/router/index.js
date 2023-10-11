@@ -2,20 +2,31 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import store from '@/store/index'
 import request from '@/api/request'
+import Qs from 'qs'
+import { editThePermissionsPage } from '@/api/admin/role'
 Vue.use(Router);
 
 const viewport = {
   content: 'width=device-width, initial-scale=1.0, user-scalable=no'
 }
-
 // meta: { title: '新增详情' ,viewport: viewport ,pTitle: "首页",pPath: "/home"}
 const router = new Router({
   // mode: 'history',
+  mode: 'history',
   base: __dirname,
   routes: [
+    // {
+    //   path: '/',
+    //   redirect: '/applycenter'
+    // },
     {
       path: '/',
-      redirect: '/applycenter'
+      name: 'homePage',
+      meta: {
+        title: '',
+      },
+      redirect: '/front',
+      component: () => import('@/views/front/home'),
     },
     {
       path: '/login',
@@ -220,7 +231,8 @@ const router = new Router({
   ]
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  await getToken()
   const auth = handleAuth(to)
   if (!auth) {
     getUserRole()
@@ -267,7 +279,7 @@ function handleAuth(to) {
   }
   const { permissionsPage } = store.state
   const auth = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(item => ((item.pathName === to.name) && item.type))
-  if (auth || to.name === 'login' || to.name === '404') {
+  if (auth || to.name === 'login' || to.name === '404' || to.name === 'front') {
     return true
   }
   return false
@@ -276,29 +288,86 @@ function handleAuth(to) {
 async function getUserRole() {
   const token = window.localStorage.getItem('AI_token')
   if (!token) {
-    router.push({ name: 'login' })
-    return false
-  }
-  try {
-    const res = await request({
-      method: 'post',
-      url: '/cpr/oauth/check_token',
-      contentType: 'application/x-www-form-urlencoded',
-      data: {
-        token
-      },
-      msg: false
-    });
-    const role = (res.data.client_id === 'cpr')
-    if (!role) {
-      router.push({ name: 'login' })
+    const newWindow = window.open('', '_self');
+    if (window.location.host === '192.168.210.57:31603') {
+      newWindow.location = 'http://192.168.210.57:31963/#/login?from=cpr';
+    } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
+      newWindow.location = 'https://dataelite.trs.com.cn/#/login?from=cpr';
     } else {
-      router.push({ name: '404' })
+      const name = window.self === window.top ? 'login' : 'loginAuto';
+      router.push({
+        name,
+      });
     }
-    return role;
-  } catch {
-    router.push({ name: '404' })
+    return false
+  } else {
+    await getPermissionsPage()
   }
+  // try {
+  //   const res = await request({
+  //     method: 'post',
+  //     url: '/cpr/oauth/check_token',
+  //     contentType: 'application/x-www-form-urlencoded',
+  //     data: {
+  //       token
+  //     },
+  //     msg: false
+  //   });
+  //   const role = (res.data.client_id === 'cpr')
+  //   console.log('role', role)
+  //   if (!role) {
+  // const newWindow = window.open('', '_self');
+  // if (window.location.host === '192.168.210.57:31603') {
+  //   newWindow.location = 'http://192.168.210.57:31963/#/login?from=cpr';
+  // } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
+  //   newWindow.location = 'https://dataelite.trs.com.cn/#/login?from=cpr';
+  // } else {
+  //   const name = window.self === window.top ? 'login' : 'loginAuto';
+  //   router.push({
+  //     name,
+  //   });
+  // }
+  //     return
+  //   }
+  //   return role;
+  // } catch {
+  //   // router.push({ name: '404' })
+  // }
+}
+// 根据传递过来的id 解析token
+async function getToken() {
+  // let hasToken = false
+  try {
+    // hasToken = false
+    const searchObj = Qs.parse(window.location.search.slice(1))
+    if (searchObj && searchObj.id) {
+      const res = await request({
+        method: 'post',
+        url: `uaa/user/getToken?key=${searchObj.id}`,
+        showErrorMsg: false
+      })
+      if (res.data.data.scope.includes('cpr')) {
+        window.localStorage.setItem('AI_token', res.data.data.value)
+        window.localStorage.setItem('user_name', res.data.data.user_name)
+        await getPermissionsPage()
+        window.location.href = window.location.href.replace(`id=${searchObj.id}`, '')
+      } else {
+        // hasToken = true
+      }
+    } else {
+      // hasToken = true
+    }
+  } catch {
+    // hasToken = true
+  }
+}
+async function getPermissionsPage() {
+  const res = await editThePermissionsPage();
+  const data = res.data.data || {}
+  data.funPerms = data.funPerms.filter(item => item.type)
+  data.defaultPerm = data.defaultPerm.filter(item => item.type)
+  store.state.permissionsPage = data
+  window.localStorage.setItem('permissionsPage', JSON.stringify(data))
 }
 
 export default router;
