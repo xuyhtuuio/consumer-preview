@@ -269,12 +269,8 @@ export default {
       ],
       currentTabListIndex: null,
       reasonData: {
-        xData: [
-          '文件预览失败（文件损坏/清晰度过低）',
-          '附件材料与审批项目不匹配',
-          '其他',
-        ],
-        yData: [10, 12, 30],
+        xData: [],
+        yData: [],
         color: [
           '#249EFF',
           '#65CFE4',
@@ -820,9 +816,9 @@ export default {
       rejectReason(getData).then((res) => {
         // eslint-disable-next-line no-unused-vars
         const { data } = res.data
-        // this.reasonData.xData = data.titleList
-        // this.reasonData.yData = data.countList
-        // this.reasonData.yDataHint = data.dataList
+        this.reasonData.xData = data.titleList
+        this.reasonData.yData = data.countList
+        this.reasonData.yDataHint = data.dataList
         this.rejectLoading = false
       })
     },
