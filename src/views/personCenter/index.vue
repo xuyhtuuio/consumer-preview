@@ -47,7 +47,7 @@
           <el-tooltip
             class="item"
             effect="dark"
-            content="选择机构提示文字"
+            content="可筛选至任意层级"
             placement="top"
           >
             <img
@@ -780,7 +780,9 @@ export default {
     initReasonEcharts(industryDataVal) {
       const yData1 = JSON.parse(JSON.stringify(industryDataVal.yData))
       const xData1 = JSON.parse(JSON.stringify(industryDataVal.xData))
-      const yDataHint1 = JSON.parse(JSON.stringify(industryDataVal.yDataHint?.reverse()))
+      const yDataHint1 = JSON.parse(
+        JSON.stringify(industryDataVal.yDataHint?.reverse())
+      )
       const color = JSON.parse(JSON.stringify(industryDataVal.color)).reverse()
       const option = {
         tooltip: {
@@ -1077,6 +1079,8 @@ export default {
         .hintIcon {
           width: 20px;
           margin-left: 4px;
+          position: relative;
+          z-index: 111;
         }
       }
 
