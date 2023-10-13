@@ -229,9 +229,10 @@ export default {
       const data = obj.position
       const doms = []
       const location = []
-      data.forEach((item) => {
+      data.map((item, index) => {
         const newDom = document.createElement('div')
         newDom.style.position = 'absolute'
+        newDom.innerText = index
         newDom.style.left = `${item.left}px`
         newDom.style.top = `${item.top}px`
         newDom.style.width = `${(item.width)}px`
@@ -248,8 +249,6 @@ export default {
           }
         }
         location.push(highlight)
-        const rootDom = document.getElementsByClassName('results-div')[0]
-        rootDom.appendChild(newDom)
         doms.push(newDom)
       })
       // 获取高亮元素 dom
@@ -264,8 +263,9 @@ export default {
       if (onlyHide) {
         this.lineRemove();
         this.endDomId = ''
-        this.preDoms.forEach((child) => {
-          rootDom.removeChild(child)
+        this.preDoms = [...this.preDoms]
+        this.preDoms.map((child) => {
+          child.remove()
         })
         return;
       }
@@ -275,7 +275,8 @@ export default {
         timing: 'linear'
       };
       this.endDomId = endDomId
-      start.forEach((item, index) => {
+      start.map((item, index) => {
+        rootDom.appendChild(item)
         this.word_lines[index] = new LeaderLine(end, item, {
           color: '#EB5D78',
           size: 1,
@@ -287,7 +288,6 @@ export default {
         this.word_lines[index].show(showEffectName, animOptions);
         this.$nextTick(() => {
           const highLightDom = document.querySelector('#imgLight');
-          // debugger
           this.high_light_lines[index] = new LeaderLine(highLightDom, item, {
             color: '#EB5D78',
             size: 1,
