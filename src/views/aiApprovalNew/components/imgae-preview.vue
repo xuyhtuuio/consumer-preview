@@ -58,7 +58,6 @@ export default {
   watch: {
     lineWordItem: {
       handler(val) {
-        console.log(val)
         this.setBoundingClientRect(val)
       },
       // deep: true

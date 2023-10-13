@@ -129,6 +129,11 @@ export default {
   mounted() {
     // this.init();
   },
+  watch: {
+    lineWordItem(val) {
+      this.newLineWordItem = val
+    }
+  },
   methods: {
     changeSize(type) {
       this.$refs.imgPreview.changeSize(type)

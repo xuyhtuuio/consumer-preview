@@ -120,13 +120,13 @@ export default {
         : document.selection.empty()
     },
     getSelection(event) {
-      const select = window.getSelection()
-      const range = select.getRangeAt(0)
-      const allNodes = Array.from(range.commonAncestorContainer.childNodes)
       const selectText = window.getSelection
         ? window.getSelection().toString()
         : document.selection.createRange().text
       if (selectText) {
+        const select = window.getSelection()
+        const range = select?.getRangeAt(0)
+        const allNodes = Array.from(range.commonAncestorContainer.childNodes)
         setTimeout(() => {
           this.selectText = selectText
           this.askIsAddPosition = {
