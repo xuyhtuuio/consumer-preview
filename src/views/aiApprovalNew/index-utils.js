@@ -229,10 +229,9 @@ export default {
       const data = obj.position
       const doms = []
       const location = []
-      data.map((item, index) => {
+      data.map((item) => {
         const newDom = document.createElement('div')
         newDom.style.position = 'absolute'
-        newDom.innerText = index
         newDom.style.left = `${item.left}px`
         newDom.style.top = `${item.top}px`
         newDom.style.width = `${(item.width)}px`
