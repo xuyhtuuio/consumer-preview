@@ -767,20 +767,39 @@ export default {
       const containerHeight = container.offsetHeight
       const iconNum = Math.floor(containerHeight / 50)
       const timestamp = new Date().getTime()
+      const icons = []
       for (let i = 0; i < iconNum; i++) {
-        this.icons.push({ timestamp })
+        icons.push({
+          icon_id: timestamp,
+          handleArea: [i * 50, (i + 1) * 50],
+          showIndex: -1
+        })
       }
+      this.icons = icons
       this.dealIconWithComment()
     },
     // icon 管理的意见计算
     dealIconWithComment() {
       const { comments } = this
+      const iconTotal = this.icons.length
       comments.map((comment) => {
-        // console.log(comment)
         // 如果该意见存在批注
         if (comment.position.length) {
           comment.position.map((pos) => {
-            console.log(pos)
+            let sort = Math.floor(pos.top / 50) + 1
+            if (sort >= iconTotal) {
+              sort = iconTotal - 1
+            }
+            const newIcon = {
+              ...this.icons[sort],
+              files: comment.files,
+              comment_ids: [comment.id, ...(this.icons[sort].comment_ids ? this.icons[sort].comment_ids : [])],
+              selectText: comment.selectText,
+              str: comment.str,
+              words: comment.words,
+              position: [pos, ...(this.icons[sort].position ? this.icons[sort].position : [])]
+            }
+            this.icons[sort] = newIcon
           })
         }
       })

@@ -135,22 +135,26 @@
             </orcTxt>
             <p class="content-cont-icons" v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr">
               <span v-for="(item,index) in icons" :key="index">
-                <span :data-icon="index">
+                <!-- 单一评论 - 未激活 -->
+                <span :data-icon="index" v-if="item.comment_ids?.length === 1">
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Component13"></use>
                   </svg>
                 </span>
-                <span :data-icon="index">
+                <!-- 多评论 - 未激活 -->
+                <span :data-icon="index" v-if="item.comment_ids?.length > 1">
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Component132"></use>
                   </svg>
                 </span>
-                <span :data-icon="index">
+                <!-- 单一评论 - 激活 -->
+                <span :data-icon="index" v-if="item.comment_ids?.length === 1 && item.showIndex === 1">
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Component131"></use>
                   </svg>
                 </span>
-                <span :data-icon="index">
+                <!-- 多评论 - 激活 -->
+                <span :data-icon="index" v-if="item.comment_ids?.length > 1 && item.showIndex === 1">
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Component133"></use>
                   </svg>
@@ -284,7 +288,6 @@ export default {
   },
   created() {
     this.getElHeight();
-    this.findIconPosition()
   },
   computed: {
     getfileType() {
@@ -297,6 +300,17 @@ export default {
         return val?.split('.')[0]
       }
     },
+  },
+  watch: {
+    comments: {
+      handler(val) {
+        if (val) {
+          this.findIconPosition()
+          console.log(this.icons)
+        }
+      },
+      deep: true
+    }
   },
   methods: {
     // 三屏双屏切换 0 为三屏 1 为双屏
@@ -322,6 +336,7 @@ export default {
     // 获取前面的审批意见
     this.getOpinionApprovalLetter();
     this.getNodeHandleUserApi();
+    this.findIconPosition()
   },
 }
 </script>
