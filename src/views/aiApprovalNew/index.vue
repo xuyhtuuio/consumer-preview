@@ -199,6 +199,7 @@ export default {
   },
   data() {
     return {
+      curIconLine: 0,
       curActiveIcon: '',
       icons: [],
       preDoms: [],

@@ -221,6 +221,7 @@ export default {
     // 展示连线
     showCommentLine(obj) {
       console.log(obj)
+      this.lineRemoveOnly();
       const commenDom = document.querySelector(`div[data-commenid=c${obj.id}]`)
       this.appendHighLightDom(obj, commenDom)
       // this.showLine(obj.string)
@@ -261,6 +262,7 @@ export default {
       const rootDom = document.getElementsByClassName('results-div')[0]
       const onlyHide = endDomId === this.endDomId
       if (onlyHide) {
+        console.log('sss')
         this.lineRemove();
         this.endDomId = ''
         this.preDoms = [...this.preDoms]
@@ -302,7 +304,7 @@ export default {
       document.querySelector('.ocr-txt .results').addEventListener('scroll', () => {
         this.linePosition();
       });
-      document.querySelector('.editorial .results').addEventListener('scroll', () => {
+      document.querySelector('.content-cont-editor').addEventListener('scroll', () => {
         this.linePosition();
       });
     },
@@ -767,11 +769,10 @@ export default {
       const container = document.querySelector('.content-cont-icons')
       const containerHeight = container.offsetHeight
       const iconNum = Math.floor(containerHeight / 50)
-      const timestamp = new Date().getTime()
       const icons = []
       for (let i = 0; i < iconNum; i++) {
         icons.push({
-          icon_id: timestamp,
+          icon_id: new Date().getTime(),
           handleArea: [i * 50, (i + 1) * 50],
           showIndex: -1
         })
@@ -807,26 +808,44 @@ export default {
     },
     // 展示 icon 的连线
     showIconLine(icon) {
-      console.log(icon)
-      if (this.curActiveIcon !== icon.icon_id) {
+      this.lineRemoveOnly()
+      if (this.curActiveIcon !== icon.icon_id) { // 点击新icon
+        this.curIconLine = 0
         this.changeIconShow(this.curActiveIcon, -1)
         this.changeIconShow(icon.icon_id, 1)
         this.curActiveIcon = icon.icon_id
-      } else {
+      } else if (this.curIconLine >= icon.comment_ids.length) { // 此时为当前icon对应的最后一条线
         this.changeIconShow(icon.icon_id, -1)
         this.curActiveIcon = ''
       }
-      this.$forceUpdate()
-      const obj = {
-        id: icon.comment_ids[0],
-        files: icon.files,
-        icon_id: icon.icon_id,
-        position: [icon.position[0]],
-        str: icon.str,
-        selectText: icon.selectText,
-        words: icon.words
+      let obj = {}
+      // 存在当前激活的 icon 即代表可执行连线操作
+      if (this.curActiveIcon) {
+        // 传入正常对象 并 进行连线
+        obj = {
+          id: icon.comment_ids[this.curIconLine],
+          files: icon.files,
+          icon_id: icon.icon_id,
+          position: [icon.position[this.curIconLine]],
+          str: icon.str,
+          selectText: icon.selectText,
+          words: icon.words
+        }
+      } else {
+        // 传入上一次的对象 且 取消连线
+        obj = {
+          id: icon.comment_ids[this.curIconLine - 1],
+          files: icon.files,
+          icon_id: icon.icon_id,
+          position: [icon.position[this.curIconLine - 1]],
+          str: icon.str,
+          selectText: icon.selectText,
+          words: icon.words
+        }
       }
       this.showCommentLine(obj)
+      this.$forceUpdate()
+      this.curIconLine += 1
     },
     // 修改 icon 激活状态 showIndex 为 1 为激活 -1 为不激活
     changeIconShow(id, showIndex) {
