@@ -83,6 +83,7 @@ export default {
       const navList = [
         { title: '申请中心', name: 'apply-list', sign: 'applycenter' },
         { title: '审批中心', name: 'approval-list', sign: 'approvalcenter' },
+        { title: '智能回检', name: 'recheck-index', sign: 'recheckIndex' },
         { title: '产品图谱', name: 'productmap', sign: 'productmap' },
         {
           title: '统计中心',
@@ -133,6 +134,9 @@ export default {
       }
       if (fullPath.indexOf('applycenter') !== -1) {
         this.activeMenu = 'applycenter'
+      }
+      if (fullPath.indexOf('recheck') !== -1) {
+        this.activeMenu = 'recheckIndex'
       }
       if (fullPath.indexOf('approvalcenter') !== -1) {
         this.activeMenu = 'approvalcenter'
