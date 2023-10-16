@@ -227,6 +227,7 @@ export default {
       },
       curIconLine: 0,
       curActiveIcon: '',
+      comments_nodes: [],
       icons: [],
       preDoms: [],
       domInfo: {},
@@ -784,7 +785,12 @@ export default {
       color: #fff;
     }
   }
-}</style>
+}
+/deep/ .commentNode{
+  background: #D1E2FF;
+  cursor: pointer;
+}
+</style>
 
 <style lang="less">.cont-top-popover {
   padding: 16px 0px;

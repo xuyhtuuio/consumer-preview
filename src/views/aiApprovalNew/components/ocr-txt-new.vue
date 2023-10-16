@@ -310,10 +310,10 @@ export default {
       const t = top.sort((a, b) => a - b)[0]
       const r = right.sort((a, b) => a - b)[right.length - 1]
       const b = bottom.sort((c, d) => c - d)[bottom.length - 1]
-      this.addRectOverDom(l, t, r, b)
+      this.addRectOverDom(l, t, r, b, nodes)
     },
     // 添加覆盖 dom
-    addRectOverDom(l, t, r, b) {
+    addRectOverDom(l, t, r, b, nodes) {
       const position = {
         left: l,
         top: t,
@@ -325,7 +325,7 @@ export default {
         position,
         string
       }
-      this.$emit('addWord', obj)
+      this.$emit('addWord', obj, nodes)
     },
 
   }

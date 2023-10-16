@@ -198,9 +198,15 @@ export default {
       );
     },
     // 鼠标选中 添加新批注
-    addWord(obj) {
+    addWord(obj, nodes) {
       this.popoverShow = true
       this.domInfo = obj
+      this.comments_nodes = Array.from(nodes)
+    },
+    addBg(nodes) {
+      nodes.forEach((node) => {
+        node.classList.add('commentNode')
+      })
     },
     addCommentWithPosition() {
       const timestamp = new Date().getTime()
@@ -216,11 +222,11 @@ export default {
         selectText: this.domInfo?.string
       }
       this.upDateComments('add', newComment)
+      this.addBg(this.comments_nodes)
       this.popoverShow = false
     },
     // 展示连线
     showCommentLine(obj) {
-      console.log(obj)
       this.lineRemoveOnly();
       const commenDom = document.querySelector(`div[data-commenid=c${obj.id}]`)
       this.appendHighLightDom(obj, commenDom)
@@ -808,6 +814,7 @@ export default {
     },
     // 展示 icon 的连线
     showIconLine(icon) {
+      this.changeEditorialType(2)
       this.lineRemoveOnly()
       if (this.curActiveIcon !== icon.icon_id) { // 点击新icon
         this.curIconLine = 0
@@ -854,6 +861,10 @@ export default {
           icon.showIndex = showIndex
         }
       })
+    },
+    // ocr 点击批注进行连线
+    showOcrCommentLine(ocr) {
+      console.log(ocr)
     }
   },
 };
