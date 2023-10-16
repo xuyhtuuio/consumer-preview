@@ -99,16 +99,12 @@
               v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
               @showLine="showLine" :lineWordItem="lineWordItem" :styleProp="styleProp">
             </orcTxtNew>
-            <el-popover class="postil-popover" v-model="popoverShow" id="popover" placement="right" width="400"
+            <el-popover class="postil-popover" v-model="popoverShow" id="popover" placement="right"
               trigger="manual">
               <div class="postil-header">
                 <div>
                   <!-- <span><img src="@/assets/image/ai-approval/ocr-postil.png" alt=""></span> -->
                   <span class="postil-text">{{ isEdit ? '添加批注' : '修改批注' }}</span>
-                </div>
-                <div>
-                  <span class="postil-btn cancle" @click="popoverShow = false">取消</span>
-                  <span class="postil-btn verify" @click="addCommentWithPosition">确认</span>
                 </div>
               </div>
               <div class="line"></div>
@@ -120,13 +116,30 @@
                 <el-input type="textarea" resize="none" placeholder="请输入批注意见描述" v-model="postil.textarea">
                 </el-input>
               </div>
+              <div class="postil-tipText">编辑完成后该条批注可在已编辑意见中查看</div>
               <div class="postil-keyword">
                 <span>添加关键字</span>
                 <el-radio v-model="postil.isKeyWord" label="1">是</el-radio>
                 <el-radio v-model="postil.isKeyWord" label="0">否</el-radio>
               </div>
-              <div class="postil-keyword-content">
-                <span></span>
+              <el-form v-show="postil.isKeyWord==='1'" :rules="keywordsRules" v-model="keywordsInfo" class="postil-keyword-form">
+                <el-form-item label="关键词内容" prop="content" class="postil-keyword-item">
+                  <el-input v-model="keywordsInfo.content" placeholder="请输入关键词"></el-input>
+                </el-form-item>
+                <el-form-item label="关键词类型" prop="type" class="postil-keyword-item">
+                  <el-select v-model="keywordsInfo.type" placeholder="请选择">
+                    <el-option
+                      v-for="item in keywordsOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form>
+              <div class="postil-btn-group">
+                <span class="postil-btn cancle" @click="popoverShow = false">取消</span>
+                <span class="postil-btn verify" @click="addCommentWithPosition">确认</span>
               </div>
             </el-popover>
             <orcTxt ref="ocrTxt" v-show="curMode === 0" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
@@ -199,6 +212,19 @@ export default {
   },
   data() {
     return {
+      keywordsInfo: {
+        content: '',
+        type: ''
+      },
+      keywordsOptions: [],
+      keywordsRules: {
+        content: [
+          { required: true, message: '请填写关键词内容', trigger: 'blur' },
+        ],
+        type: [
+          { required: true, message: '请选择关键词类型', trigger: 'blur' },
+        ],
+      },
       curIconLine: 0,
       curActiveIcon: '',
       icons: [],
@@ -645,15 +671,19 @@ export default {
 
 .postil-popover {
   border-radius: 10px;
-  width: 380px;
-  position: absolute;
-  right: 0;
-
+  height: calc(100% - 48px);
+  /deep/ .el-popover{
+    display: flex;
+    margin-left: 12px;
+    flex-direction: column;
+    height: calc(100% - 48px);
+    width: 380px;
+  }
   .postil-header {
     display: flex;
     margin-bottom: 16px;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
 
     span {
       img {
@@ -670,32 +700,6 @@ export default {
       letter-spacing: 0em;
       text-align: left;
       color: #1D2128;
-    }
-
-    .postil-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      width: 60px;
-      height: 30px;
-      padding: 4px, 16px, 4px, 16px;
-      border-radius: 4px;
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 22px;
-      letter-spacing: 0em;
-    }
-
-    .cancle {
-      border: 1px solid #CACDD3;
-      color: #1D2128;
-    }
-
-    .verify {
-      margin-left: 8px;
-      background: #2D5CF6;
-      color: #fff;
     }
   }
 
@@ -720,6 +724,64 @@ export default {
       &:first-child {
         margin-right: 8px;
       }
+    }
+  }
+  .postil-tipText {
+    margin-top: 4px;
+    color: #86909C;
+    font-weight: 400;
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+  .postil-keyword {
+    span{
+      margin-right: 12px;
+      color: #1d2128;
+    }
+  }
+  .postil-keyword-form {
+    /deep/ .el-input{
+      .el-input__inner{
+        border: none;
+        width: 340px;
+        height: 36px;
+        border-radius: 4px;
+        background: #F7F8FA;
+      }
+    }
+    /deep/ .el-form-item__label{
+      color: #1D2128;
+    }
+  }
+  .postil-btn-group{
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: flex-end;
+    .postil-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      width: 108px;
+      height: 38px;
+      padding: 8px, 40px, 8px, 40px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: 0em;
+    }
+
+    .cancle {
+      border: 1px solid #CACDD3;
+      color: #1D2128;
+    }
+
+    .verify {
+      margin-left: 20px;
+      background: #2D5CF6;
+      color: #fff;
     }
   }
 }</style>
