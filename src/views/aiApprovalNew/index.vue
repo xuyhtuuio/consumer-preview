@@ -134,27 +134,27 @@
               @showLine="showLine" :lineWordItem="lineWordItem">
             </orcTxt>
             <p class="content-cont-icons" v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr">
-              <span v-for="(item,index) in icons" :key="index">
+              <span v-for="(item,index) in icons" :key="index" @click="showIconLine(item)">
                 <!-- 单一评论 - 未激活 -->
-                <span :data-icon="index" v-if="item.comment_ids?.length === 1">
+                <span :data-icon="index" v-if="item.comment_ids?.length === 1 && item.showIndex === -1">
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Component13"></use>
                   </svg>
                 </span>
                 <!-- 多评论 - 未激活 -->
-                <span :data-icon="index" v-if="item.comment_ids?.length > 1">
+                <span :data-icon="index" v-else-if="item.comment_ids?.length > 1 && item.showIndex === -1">
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Component132"></use>
                   </svg>
                 </span>
-                <!-- 单一评论 - 激活 -->
-                <span :data-icon="index" v-if="item.comment_ids?.length === 1 && item.showIndex === 1">
+                <!-- 多评论 - 激活 -->
+                <span :data-icon="index" v-else-if="item.comment_ids?.length > 1 && item.showIndex === 1">
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Component131"></use>
                   </svg>
                 </span>
-                <!-- 多评论 - 激活 -->
-                <span :data-icon="index" v-if="item.comment_ids?.length > 1 && item.showIndex === 1">
+                <!-- 单一评论 - 激活 -->
+                <span :data-icon="index" v-else-if="item.comment_ids?.length === 1 && item.showIndex === 1">
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Component133"></use>
                   </svg>
@@ -199,6 +199,7 @@ export default {
   },
   data() {
     return {
+      curActiveIcon: '',
       icons: [],
       preDoms: [],
       domInfo: {},

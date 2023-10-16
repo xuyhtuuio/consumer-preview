@@ -220,6 +220,7 @@ export default {
     },
     // 展示连线
     showCommentLine(obj) {
+      console.log(obj)
       const commenDom = document.querySelector(`div[data-commenid=c${obj.id}]`)
       this.appendHighLightDom(obj, commenDom)
       // this.showLine(obj.string)
@@ -803,7 +804,37 @@ export default {
           })
         }
       })
+    },
+    // 展示 icon 的连线
+    showIconLine(icon) {
+      console.log(icon)
+      if (this.curActiveIcon !== icon.icon_id) {
+        this.changeIconShow(this.curActiveIcon, -1)
+        this.changeIconShow(icon.icon_id, 1)
+        this.curActiveIcon = icon.icon_id
+      } else {
+        this.changeIconShow(icon.icon_id, -1)
+        this.curActiveIcon = ''
+      }
+      this.$forceUpdate()
+      const obj = {
+        id: icon.comment_ids[0],
+        files: icon.files,
+        icon_id: icon.icon_id,
+        position: [icon.position[0]],
+        str: icon.str,
+        selectText: icon.selectText,
+        words: icon.words
+      }
+      this.showCommentLine(obj)
+    },
+    // 修改 icon 激活状态 showIndex 为 1 为激活 -1 为不激活
+    changeIconShow(id, showIndex) {
+      this.icons?.map((icon) => {
+        if (id === icon.icon_id) {
+          icon.showIndex = showIndex
+        }
+      })
     }
-
   },
 };
