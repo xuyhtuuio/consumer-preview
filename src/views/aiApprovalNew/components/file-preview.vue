@@ -93,7 +93,7 @@ export default {
       default: 0
     },
     lineWordItem: {
-      type: Object,
+      type: [Object, Array],
       default: () => ({})
     },
     formId: {
@@ -130,8 +130,11 @@ export default {
     // this.init();
   },
   watch: {
-    lineWordItem(val) {
-      this.newLineWordItem = val
+    lineWordItem: {
+      handler(val) {
+        this.newLineWordItem = val
+      },
+      deep: true
     }
   },
   methods: {
@@ -207,11 +210,7 @@ export default {
       })
     },
     setHighLight(arr) {
-      // arr.map((light) => {
-      //   this.lineWordItem = light
-      // })
-      // eslint-disable-next-line prefer-destructuring
-      this.newLineWordItem = arr[0]
+      this.newLineWordItem = arr
     },
   }
 }

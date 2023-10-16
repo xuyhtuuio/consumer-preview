@@ -255,7 +255,7 @@ export default {
       this.drawCommentLine(doms, commenDom)
     },
     drawCommentLine(start, end) {
-      // const highLightDom = document.getElementById('imgLight')
+      // const highLightDoms = Array.from(document.getElementsByClassName('imgLight'));
       const endDomId = end.getAttribute('data-commenid')
       const rootDom = document.getElementsByClassName('results-div')[0]
       const onlyHide = endDomId === this.endDomId
@@ -286,8 +286,8 @@ export default {
         const showEffectName = 'draw';
         this.word_lines[index].show(showEffectName, animOptions);
         this.$nextTick(() => {
-          const highLightDom = document.querySelector('#imgLight');
-          this.high_light_lines[index] = new LeaderLine(highLightDom, item, {
+          const highLightDoms = Array.from(document.getElementsByClassName('imgLight'));
+          this.high_light_lines[index] = new LeaderLine(highLightDoms[index], item, {
             color: '#EB5D78',
             size: 1,
             startPlug: 'disc',
@@ -504,7 +504,7 @@ export default {
                 if (!comment.position) {
                   comment.position = item.position
                 } else {
-                  comment.position = [comment.position, ...item.position]
+                  comment.position = [...comment.position, ...item.position]
                 }
               } else {
                 num++

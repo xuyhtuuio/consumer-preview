@@ -4,6 +4,10 @@
     <div class="light" ref="light" v-if="lineWordItem?.word" :style="this.BoundingClientRect">
       <div class="light" id="imgLight" :style="this.highLightBoundingClientRect"></div>
     </div>
+    <div class="light" ref="light" v-if="Array.isArray(lineWordItem)" :style="this.BoundingClientRect">
+      <div class="light imgLight" id="imgLight" v-for="(hls, index) in highLightStyles" :key="index"
+      :style="highLightStyles[index]"></div>
+    </div>
     <!-- <div class="tool">
       <span>下载</span>
       <span @click="fullScreen">全屏</span>
@@ -30,7 +34,7 @@ const paramsInit = Object.freeze({
 export default {
   props: {
     lineWordItem: {
-      type: Object,
+      type: [Object, Array],
       default: () => ({})
     },
     url: {
@@ -53,14 +57,20 @@ export default {
         scale: 1,
       },
       zoomVal: 1,
+      highLightStyles: []
     }
   },
   watch: {
     lineWordItem: {
       handler(val) {
-        this.setBoundingClientRect(val)
+        if (Array.isArray(val)) {
+          console.log(val)
+          this.setBoundingClientRectArr(val)
+        } else {
+          this.setBoundingClientRect(val)
+        }
       },
-      // deep: true
+      deep: true
     },
     url() {
       this.loaded = false;
@@ -105,6 +115,27 @@ export default {
           }
         }
       }
+    },
+    // 当高亮为多个时
+    setBoundingClientRectArr(val) {
+      const highLightStyles = []
+      this.BoundingClientRect = {
+        width: this.$refs.imgDom.clientWidth + 'px',
+        height: this.$refs.imgDom.clientHeight + 'px',
+        left: parseInt(this.params.left, 10) + 'px',
+        top: parseInt(this.params.top, 10) + 'px',
+        transform: `scale(${this.params.zoomVal})`
+      }
+      val.map((hls) => {
+        const h = {
+          width: hls?.location.w + 'px',
+          height: hls?.location.h + 'px',
+          left: hls?.location.x + 'px',
+          top: hls?.location.y + 'px',
+        }
+        highLightStyles.push(h)
+      })
+      this.highLightStyles = highLightStyles
     },
     // 图片加载完后,初始化
     handleImageLoaded() {
