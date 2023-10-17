@@ -333,8 +333,8 @@ export default {
       const node = event.target.parentNode
       const { childNodes } = node
       const childNode = childNodes[0]
-      const bg = childNode.style.background
-      if (!bg) return
+      const classs = Array.from(childNode.classList)
+      if (!classs.includes('commentNode')) return
       const position = {
         left: node.offsetLeft,
         height: (node.offsetHeight * (1 / this.styleProp.wordDomStyle.scale)),

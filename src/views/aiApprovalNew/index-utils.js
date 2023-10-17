@@ -795,7 +795,7 @@ export default {
           comment.position.map((pos) => {
             let sort = Math.floor(pos.top / 50) + 1
             if (sort >= iconTotal) {
-              sort = (iconTotal - 1) ? (iconTotal - 1) : 0
+              sort = (iconTotal - 1) >= 0 ? (iconTotal - 1) : 0
             }
             // 构造icon对象
             const commentId = comment.id
@@ -853,10 +853,10 @@ export default {
       } else {
         // 传入上一次的对象 且 取消连线
         obj = {
-          id: icon.positionWithId[(this.curIconLine - 1) ? this.curIconLine - 1 : 0]?.commentId,
+          id: icon.positionWithId[(this.curIconLine - 1) >= 0 ? this.curIconLine - 1 : 0]?.commentId,
           files: icon.files,
           icon_id: icon.icon_id,
-          position: [icon.positionWithId[(this.curIconLine - 1) ? this.curIconLine - 1 : 0]?.pos],
+          position: [icon.positionWithId[(this.curIconLine - 1) >= 0 ? this.curIconLine - 1 : 0]?.pos],
           str: icon.str,
           selectText: icon.selectText,
           words: icon.words

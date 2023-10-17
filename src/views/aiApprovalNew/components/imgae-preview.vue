@@ -78,6 +78,9 @@ export default {
       target.style.top = '0px';
     }
   },
+  created() {
+    this.$emit('findIconPosition')
+  },
   mounted() {
     window.addEventListener('resize', this.handleImageLoaded)
   },

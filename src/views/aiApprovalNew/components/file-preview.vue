@@ -44,7 +44,7 @@
       <i class="el-icon-circle-close" v-show="showFullScreen" @click="fullScreen"></i>
       <!-- 图片 -->
       <imgae-preview @getProps="getProps" ref="imgPreview" v-if="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))"
-        :lineWordItem="lineWordItem" @linePosition="linePosition" @showFullScreen="fullScreen" :url="approval.url"></imgae-preview>
+        :lineWordItem="lineWordItem" @findIconPosition="findIconPosition" @linePosition="linePosition" @showFullScreen="fullScreen" :url="approval.url"></imgae-preview>
       <!-- 其他类型文件 -->
       <filePreview v-else :url="approval.url"></filePreview>
       <div class="tool" v-show="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))">
@@ -202,6 +202,9 @@ export default {
       this.$nextTick(() => {
         this.$refs.imgPreview.handleImageLoaded()
       })
+    },
+    findIconPosition() {
+      this.$emit('findIconPosition')
     },
   }
 }

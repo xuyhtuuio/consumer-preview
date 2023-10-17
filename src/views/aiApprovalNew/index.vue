@@ -93,7 +93,7 @@
           <div class="content-cont-body-bottom">
             <file-preview ref="filePreview" :files="files" :formId="formId" :activeIndex="activeIndex"
               @changeFile="changeFile" :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"
-              @getProps="getProps"></file-preview>
+              @getProps="getProps" @findIconPosition="findIconPosition"></file-preview>
             <orcTxtNew ref="ocrTxt" v-show="curMode === 0" :approval="approval" @addWord="addWord"
               @lineRemove="lineRemove"
               v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
