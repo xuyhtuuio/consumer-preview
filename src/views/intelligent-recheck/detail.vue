@@ -6,7 +6,7 @@
           <div class="input-icon">
             <img src="@/assets/image/intelligent-recheck/recheck-icon.png" alt="">
           </div>
-          <div class="input-left">
+          <div class="input-left" :class="{ 'input-left-focus': inputFocus }">
             <el-input
               placeholder="请输入关键词或上传图片进行回检"
               v-model="recheckInput"
@@ -132,23 +132,23 @@
               <i v-if="item.sort === 'desc'" class="el-icon-bottom"></i>
               <i v-if="item.sort === 'asc'" class="el-icon-top"></i>
             </div>
-            <div class="right-icon">
+            <!-- <div class="right-icon">
               <img src="@/assets/image/intelligent-recheck/icon1.png" alt="" />
             </div>
             <div class="right-icon">
               <img src="@/assets/image/intelligent-recheck/icon2.png" alt="" />
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
       <div class="detail-bottom">
         <div class="bottom-left">
-          <div class="img-header">
+          <!-- <div class="img-header">
             <span class="header-btns">
               <i class="iconfont">&#xe62e;</i>
               <i class="iconfont" @click="fullScreen(1)">&#xe62f;</i>
             </span>
-          </div>
+          </div> -->
           <div class="img-show">
             <div class="preview" :class="{ fullScreen: showFullScreen }">
               <!-- 全屏关闭按钮 -->
@@ -466,6 +466,21 @@ export default {
                 margin-right: 4px;
               }
             }
+          }
+        }
+      }
+    }
+    .input-left-focus {
+      border: 2px solid  #A8C5FF;
+      background: #F9FBFF;
+      /deep/ .el-input {
+        .el-input__inner {
+          background: #F9FBFF;
+        }
+        .el-input-group__append {
+          background: #F9FBFF;
+          .upload {
+            background: #F9FBFF!important;
           }
         }
       }

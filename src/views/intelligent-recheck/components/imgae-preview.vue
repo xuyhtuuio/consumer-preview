@@ -312,7 +312,7 @@ export default {
     left: 0;
     height: auto;
     max-width: 100%;
-    max-height: 100%;
+    // max-height: 100%;
   }
 }
 
