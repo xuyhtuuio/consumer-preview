@@ -3,45 +3,47 @@
     <div class="detail-body">
       <div class="detail-top">
         <div class="detail-input">
+          <div class="input-icon">
+            <img src="@/assets/image/intelligent-recheck/recheck-icon.png" alt="">
+          </div>
           <div class="input-left">
             <el-input
               placeholder="请输入关键词或上传图片进行回检"
               v-model="recheckInput"
               class="input-with-select"
+              @focus="inputFocusFun"
+              @blur="inputBlurFun"
+              clearable
             >
-              <el-select v-model="select" slot="prepend" placeholder="请选择">
+              <el-select v-model="select" slot="prepend" placeholder="请选择" popper-class="content-select">
                 <el-option label="按文件名称" value="1"></el-option>
                 <el-option label="按文本内容" value="2"></el-option>
               </el-select>
               <div slot="append">
                 <div class="append-set">
-                  <div class="upload">
+                  <div class="upload" :style="{ 'padding-right': !inputFocus ? '0' : '4px', 'margin-right': !inputFocus ? '16px' : '0'}">
                     <i class="el-icon-camera" @click="showUpload"></i>
                   </div>
+                  <div v-show="inputFocus" class="append-btn"><i class="el-icon-search"></i>搜索</div>
                 </div>
               </div>
             </el-input>
           </div>
           <div class="input-right">
-            <div class="right-tip">查看回检记录</div>
-            <img src="@/assets/image/intelligent-recheck/txt.png" alt="" />
+            <img src="@/assets/image/intelligent-recheck/show-more.png" alt="" />
+            <div class="right-tip">回检记录</div>
           </div>
         </div>
         <div class="list-select">
           <div class="select-left">
-            <div class="select-item">
-              <el-select
-                v-model="selectType"
-                slot="prepend"
-                placeholder="选择文件格式"
-              >
-                <el-option label="png" value="1"></el-option>
-                <el-option label="pdf" value="2"></el-option>
-              </el-select>
-            </div>
             <div class="select-item select-org">
+              <div class="select-set">
+                <div class="tip-style">选择机构</div>
+                <i class="el-icon-caret-bottom"></i>
+              </div>
               <el-select
-                v-model="selectOrg"
+                popper-class="content-select op-select"
+                v-model="searchForm.org"
                 slot="prepend"
                 placeholder="选择机构"
               >
@@ -51,34 +53,68 @@
               <img src="@/assets/image/intelligent-recheck/tip.png" alt="" />
             </div>
             <div class="select-item select-time">
-              <el-select
-                v-model="selectTime"
-                slot="prepend"
-                placeholder="上线时间"
+              <el-popover
+                ref="ref-popover"
+                popper-class="date-style"
+                width="400"
+                placement="bottom-start"
+                trigger="click"
+                @show="handlePopoverShow"
               >
-                <el-option label="今天" value="1"></el-option>
-                <el-option label="昨天" value="2"></el-option>
-              </el-select>
+                <el-date-picker
+                  v-model="searchForm.setTime"
+                  type="daterange"
+                  ref="my-date-picker"
+                  align="right"
+                  unlink-panels
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  popper-class="date-style"
+                >
+                </el-date-picker>
+                <div slot="reference">
+                  <div class="select-set">
+                    <div class="tip-style">上线时间</div>
+                    <i class="el-icon-caret-bottom"></i>
+                  </div>
+                </div>
+              </el-popover>
             </div>
             <div class="select-item select-time">
-              <el-select
-                v-model="selectTime"
-                slot="prepend"
-                placeholder="提单时间"
+              <el-popover
+                ref="ref-popover"
+                width="400"
+                popper-class="date-style"
+                placement="bottom-start"
+                trigger="click"
+                @show="handlePopoverShow"
               >
-                <el-option label="今天" value="1"></el-option>
-                <el-option label="昨天" value="2"></el-option>
-              </el-select>
+                <el-date-picker
+                  v-model="searchForm.getTime"
+                  type="daterange"
+                  ref="my-date-picker"
+                  align="right"
+                  unlink-panels
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  popper-class="date-style"
+                >
+                </el-date-picker>
+                <div slot="reference">
+                  <div class="select-set">
+                    <div class="tip-style">提单时间</div>
+                    <i class="el-icon-caret-bottom"></i>
+                  </div>
+                </div>
+              </el-popover>
             </div>
-            <div class="select-item select-time">
-              <el-select
-                v-model="selectTime"
-                slot="prepend"
-                placeholder="是否回检"
-              >
-                <el-option label="今天" value="1"></el-option>
-                <el-option label="昨天" value="2"></el-option>
-              </el-select>
+            <div class="select-item select-time" style="width: 92px">
+              <el-switch
+                v-model="searchForm.recheck"
+                active-text="已回检">
+              </el-switch>
             </div>
           </div>
           <div class="select-right">
@@ -181,9 +217,12 @@ export default {
   data: () => ({
     recheckInput: '',
     select: '1',
-    selectType: '',
-    selectOrg: '',
-    selectTime: '',
+    searchForm: {
+      org: '',
+      setTime: '',
+      getTime: '',
+      recheck: false
+    },
     showFullScreen: false,
     sortList: [
       {
@@ -215,17 +254,26 @@ export default {
     totalList: [],
     listItemActive: {
       fileUrl: ''
-    }
+    },
+    inputFocus: false
   }),
   created() {
     if (this.$route.params.item) {
       this.item = this.$route.params.item
       this.getSimilarityComparisonList()
     } else {
-      this.$router.go(-1)
+      // this.$router.go(-1)
     }
   },
   methods: {
+    inputFocusFun() {
+      this.inputFocus = true;
+    },
+    inputBlurFun() {
+      if (!this.recheckInput) {
+        this.inputFocus = false;
+      }
+    },
     showUpload() {
       this.$refs.uploadDia.turnDialog = true
     },
@@ -295,7 +343,10 @@ export default {
         .catch(() => {
           this.loading = false
         })
-    }
+    },
+    handlePopoverShow() {
+      this.$refs['my-date-picker'].handleFocus()
+    },
   }
 }
 </script>
@@ -316,12 +367,19 @@ export default {
     display: flex;
     align-items: center;
     margin-bottom: 13px;
+    .input-icon {
+      margin-right: 19px;
+      img {
+        width: 80px;
+        height: 24px;
+      }
+    }
     .input-left {
       flex: 1;
       border-radius: 20px;
       overflow: hidden;
       background-color: #f2f3f5;
-      padding: 0 20px;
+      padding: 0 4px 0 20px;
       /deep/ .el-input {
         height: 40px;
         .el-icon-arrow-up::before {
@@ -356,7 +414,11 @@ export default {
             background-color: #cacdd3;
           }
         }
+        .el-input__suffix {
+          height: 44px;
+        }
         .el-input-group__append {
+          padding: 0;
           height: 40px;
           border: none;
           background: #f2f3f5;
@@ -374,7 +436,7 @@ export default {
             .upload {
               width: 40px;
               height: 40px;
-              margin-right: 20px;
+              padding-right: 20px;
               background: #f2f3f5;
               margin-right: -20px;
               display: flex;
@@ -387,27 +449,52 @@ export default {
                 cursor: pointer;
               }
             }
+            .append-btn {
+              margin-left: 6px;
+              height: 32px;
+              padding: 0 12px;
+              border-radius: 40px;
+              background: #2D5CF6;
+              font-size: 12px;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 32px;
+              color: #FFF;
+              cursor: pointer;
+              .el-icon-search {
+                font-size: 14px;
+                margin-right: 4px;
+              }
+            }
           }
         }
       }
     }
     .input-right {
       margin-left: 18px;
-      width: 124px;
       display: flex;
       align-items: center;
       cursor: pointer;
+      border-radius: 6px;
+      padding: 6px;
+      background: linear-gradient(90deg, #F0F6FF 0%, #D1E4FF 100%);
       .right-tip {
-        color: #1d2128;
-        font-size: 16px;
+        display: none;
+        color: #2D5CF6;
+        font-size: 12px;
         font-style: normal;
-        font-weight: 400;
-        line-height: 24px;
-        margin-right: 8px;
+        font-weight: 700;
+        line-height: 20px;
+        margin-left: 4px;
       }
       img {
         width: 20px;
         height: 20px;
+      }
+    }
+    .input-right:hover {
+      .right-tip {
+        display: block;
       }
     }
   }
@@ -419,12 +506,31 @@ export default {
       display: flex;
       align-items: center;
       .select-item {
+        position: relative;
         margin-right: 24px;
         display: flex;
         align-items: center;
         width: 104px;
+        color: #1d2128;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 22px;
+        .select-set {
+          display: flex;
+          align-items: center;
+          .tip-style {
+            color: var(--gray-gray-9, #1D2128);
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 22px;
+          }
+        }
         /deep/.el-select {
+          position: absolute;
           height: 22px;
+          opacity: 0;
           .el-input__inner {
             height: 22px;
             border: none;
@@ -443,9 +549,14 @@ export default {
           }
         }
         img {
+          position: absolute;
+          right: 10px;
           width: 20px;
           height: 20px;
           cursor: pointer;
+        }
+        /deep/.is-active {
+          color: #2D5CF6;
         }
       }
       .select-org {
@@ -647,5 +758,30 @@ export default {
 .perview-div {
   width: 100%;
   height: 100%;
+}
+</style>
+<style lang="less">
+.content-select {
+  padding: 16px 8px;
+  margin-top: 8px;
+  .el-scrollbar__view {
+    padding: 0;
+  }
+  .el-select-dropdown__item {
+    padding: 6px 16px;
+    color: #1D2128;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+  }
+  .popper__arrow::after {
+    border-bottom-color: transparent!important;
+  }
+}
+.date-style {
+  .el-input__inner {
+    width: 100%!important;
+  }
 }
 </style>

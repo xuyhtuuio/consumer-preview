@@ -57,7 +57,7 @@ export default {
           if (res.data.success) {
             this.uploading = false
             this.$router.push({
-              name: 'intelligent-recheck-detail',
+              name: 'recheck-detail',
               params: {
                 item: res.data.data
               }

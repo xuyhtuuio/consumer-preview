@@ -2,13 +2,15 @@
   <div class="recheck">
     <div class="recheck-header">
       <img src="@/assets/image/intelligent-recheck/bgc.png" alt="" />
-      <div class="recheck-input">
+      <div class="recheck-input" :class="{ 'recheck-input-focus': focus }">
         <el-input
           placeholder="请输入关键词或上传图片进行回检"
           v-model="recheckInput"
+          @focus="focusInput"
+          @blur="blurInput"
           class="input-with-select"
         >
-          <el-select v-model="select" slot="prepend" placeholder="请选择">
+          <el-select v-model="select" slot="prepend" placeholder="请选择" popper-class="content-select">
             <el-option label="按文件名称" value="1"></el-option>
             <el-option label="按文本内容" value="2"></el-option>
           </el-select>
@@ -29,16 +31,18 @@
     <div class="recheck-bottom">
       <div class="bottom-tip">查看回检记录</div>
       <div class="bottom-list">
-        <div class="list-item">
-          <div>· 2023/09/01</div>
-          <div class="middle-1">景顺长城集英成长月报景顺长城集英成长月报</div>
+        <div class="swiper-container">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide list-item">
+              <div>· 2023/09/01</div>
+              <div class="middle-1">景顺长城集英成长月报景顺长城集英成长月报</div>
           <div class="middle-2">未通过回检</div>
           <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
-          <div class="middle-2">李阿慧/300592</div>
-          <div class="middle-2">北京银行天津分行</div>
-          <div class="middle-2">1小时前更新一条回检记录</div>
-        </div>
-        <div class="list-item">
+              <div class="middle-2">李阿慧/300592</div>
+              <div class="middle-2">北京银行天津分行</div>
+              <div class="middle-2">1小时前更新一条回检记录</div>
+            </div>
+            <div class="swiper-slide list-item">
           <div>· 2023/09/01</div>
           <div class="middle-1">景顺长城集英成长月报景顺长城集英成长月报</div>
           <div class="middle-2">已通过回检</div>
@@ -46,8 +50,8 @@
           <div class="middle-2">李阿慧/300592</div>
           <div class="middle-2">北京银行天津分行</div>
           <div class="middle-2">18小时前更新一条回检记录</div>
-        </div>
-        <div class="list-item">
+            </div>
+            <div class="swiper-slide list-item">
           <div>· 2023/09/01</div>
           <div class="middle-1">景顺长城集英成长月报景顺长城集英成长月报</div>
           <div class="middle-2">已通过回检</div>
@@ -55,6 +59,8 @@
           <div class="middle-2">李阿慧/300592</div>
           <div class="middle-2">总行</div>
           <div class="middle-2">12天前更新一条回检记录</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -63,6 +69,8 @@
 </template>
 
 <script>
+import 'swiper/css/swiper.css'
+import Swiper from 'swiper'
 import UploadDialog from './components/upload-dialog'
 export default {
   components: {
@@ -70,11 +78,32 @@ export default {
   },
   data: () => ({
     recheckInput: '',
-    select: '1'
+    select: '1',
+    swiper: null,
+    focus: false,
   }),
+  mounted() {
+    const swiper = new Swiper('.swiper-container', {
+      loop: true, // 循环
+      direction: 'vertical',
+      slidesPerView: 3,
+      spaceBetween: 0, // swiper-slide 间的距离为30
+      autoplay: {
+        delay: 3000, // 自动播放的间隔时间，单位ms，默认3000ms
+        disableOnInteraction: false // 点击不会取消自动
+      }
+    });
+    this.swiper = swiper
+  },
   methods: {
     showUpload() {
       this.$refs.uploadDia.turnDialog = true
+    },
+    focusInput() {
+      this.focus = true;
+    },
+    blurInput() {
+      this.focus = false;
     }
   }
 }
@@ -103,7 +132,7 @@ export default {
       left: 50%;
       transform: translateX(-50%);
       border-radius: 60px;
-      border: 1px solid #306ef5;
+      border: 1px solid #CACDD3;
       background: #fff;
       overflow: hidden;
       /deep/ .el-input {
@@ -174,6 +203,9 @@ export default {
         }
       }
     }
+    .recheck-input-focus {
+      border: 1px solid #306ef5;
+    }
   }
   &-body {
     display: flex;
@@ -195,6 +227,9 @@ export default {
       margin-bottom: 4px;
     }
     .bottom-list {
+      .swiper-container {
+        height: 66px;
+      }
       .list-item {
         display: flex;
         align-items: center;
@@ -203,6 +238,7 @@ export default {
         font-style: normal;
         font-weight: 400;
         line-height: 20px;
+        opacity: 0.6;
         .middle-1 {
           margin-left: 8px;
           width: 160px;
@@ -221,7 +257,30 @@ export default {
           margin-left: 8px;
         }
       }
+      .swiper-slide-next {
+        opacity: 1;
+      }
     }
+  }
+}
+</style>
+<style lang="less">
+.content-select {
+  padding: 16px 8px;
+  margin-top: 8px;
+  .el-scrollbar__view {
+    padding: 0;
+  }
+  .el-select-dropdown__item {
+    padding: 6px 16px;
+    color: #1D2128;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+  }
+  .popper__arrow::after {
+    border-bottom-color: transparent!important;
   }
 }
 </style>
