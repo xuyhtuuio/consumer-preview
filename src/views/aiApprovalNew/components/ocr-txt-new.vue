@@ -317,10 +317,10 @@ export default {
     // 添加覆盖 dom
     addRectOverDom(l, t, r, b, nodes) {
       const position = {
-        left: l,
-        top: t,
-        height: b - t,
-        width: r - l
+        left: Math.floor(l),
+        top: Math.floor(t),
+        height: Math.floor(b - t),
+        width: Math.floor(r - l)
       }
       const string = this.selectText
       const obj = {
@@ -336,11 +336,11 @@ export default {
       const classs = Array.from(childNode.classList)
       if (!classs.includes('commentNode')) return
       const position = {
-        left: node.offsetLeft,
-        height: (node.offsetHeight * (1 / this.styleProp.wordDomStyle.scale)),
+        left: Math.floor(node.offsetLeft),
+        height: Math.floor((node.offsetHeight * (1 / this.styleProp.wordDomStyle.scale))),
         // right.push(item.offsetLeft + (item.offsetWidth) * (1 / this.wordDomStyle.scale))
-        top: node.offsetTop,
-        width: (node.offsetWidth) * (1 / this.styleProp.wordDomStyle.scale),
+        top: Math.floor(node.offsetTop),
+        width: Math.floor((node.offsetWidth) * (1 / this.styleProp.wordDomStyle.scale)),
       }
       this.$emit('showOcrCommentLine', position)
     }
