@@ -235,6 +235,7 @@ export default {
       // this.$refs.ocrTxt.
     },
     appendHighLightDom(obj, commenDom) {
+      console.log(obj)
       const data = obj.position
       const doms = []
       const location = []
@@ -894,15 +895,18 @@ export default {
     findIconPos(findComment) {
       let resIcon = {}
       this.icons.map((icon) => {
-        const findIcon = icon.positionWithId?.map((ipos) => {
+        let findIcon = icon.positionWithId?.map((ipos) => {
           if (this.objIsSame(ipos.pos, findComment.position && findComment.position[0])) {
             return ipos
           }
         })
-        resIcon = {
-          ...icon
+        findIcon = findIcon?.filter((fi) => fi !== undefined)
+        if (Array.isArray(findIcon) && findIcon.length) {
+          resIcon = {
+            ...icon
+          }
+          resIcon.positionWithId = findIcon
         }
-        resIcon.positionWithId = findIcon
       })
       return resIcon
     },
