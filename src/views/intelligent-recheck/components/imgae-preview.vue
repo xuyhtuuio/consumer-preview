@@ -30,7 +30,7 @@
       <img v-else src="@/assets/image/intelligent-recheck/edit-yes.png" alt="" />
     </div>
     <div class="edit-success" v-if="editImg" @click="changeEditImg">
-      <img class="blur" src="@/assets/image/intelligent-recheck/edit-show.png" alt="" />
+      <img class="blur" style="width: 25px" src="@/assets/image/intelligent-recheck/edit-show.png" alt="" />
       <img class="focus" src="@/assets/image/intelligent-recheck/edit-success.png" alt="" />
       <div class="tip-edit">完成</div>
     </div>
@@ -338,6 +338,7 @@ export default {
   }
 }
 .edit-success:hover {
+  padding-left: 7px;
   .blur {
     display: none;
   }
