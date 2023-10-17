@@ -104,7 +104,7 @@ export default {
       default: () => ({})
     },
     lineWordItem: {
-      type: Object,
+      type: [Object, Array],
       default: () => ({})
     },
     files: {

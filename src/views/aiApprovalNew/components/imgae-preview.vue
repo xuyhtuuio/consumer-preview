@@ -1,12 +1,12 @@
 <template>
   <div class="preview" ref="contentDom" v-loading="!loaded">
     <img id="picture" :src="url" @load="handleImageLoaded" ref="imgDom" />
-    <div class="light" ref="light" v-if="lineWordItem?.word" :style="this.BoundingClientRect">
-      <div class="light" id="imgLight" :style="this.highLightBoundingClientRect"></div>
-    </div>
     <div class="light" ref="light" v-if="Array.isArray(lineWordItem)" :style="this.BoundingClientRect">
       <div class="light imgLight" id="imgLight" v-for="(hls, index) in highLightStyles" :key="index"
       :style="highLightStyles[index]"></div>
+    </div>
+    <div class="light" ref="light" v-if="lineWordItem?.word" :style="this.BoundingClientRect">
+      <div class="light imgLight" id="imgLight" :style="this.highLightBoundingClientRect"></div>
     </div>
     <!-- <div class="tool">
       <span>下载</span>
@@ -64,7 +64,6 @@ export default {
     lineWordItem: {
       handler(val) {
         if (Array.isArray(val)) {
-          console.log(val)
           this.setBoundingClientRectArr(val)
         } else {
           this.setBoundingClientRect(val)

@@ -26,7 +26,8 @@
       <div class="results-div" :style="styleSet">
         <div v-for="(ocr, i) in html" class="div-position" :key="i" :style="returnStyle(i)">
           <template v-for="(item, j) in ocr">
-            <template v-if="typeof item === 'string'">{{ item }}</template>
+            <!-- <template  v-if="typeof item === 'string'">{{ item }}</template> -->
+            <div v-if="(typeof item === 'string')" :key="i + '_' + j + '_'" @click="showOcrCommentLine">{{ item }}</div>
             <span v-else :key="i + '_' + j" :wordType="item.wordType" :id="`word_${i}_${j}`" :class="{
               active:
                 activeWordType === item.wordType || activeWordType === 0,
@@ -53,7 +54,7 @@ export default {
       default: () => ({})
     },
     lineWordItem: {
-      type: Object,
+      type: [Object, Array],
       default: () => ({})
     },
     styleProp: {
@@ -298,7 +299,8 @@ export default {
       const right = []
       const top = []
       const bottom = []
-      nodes.forEach((item) => {
+      nodes.forEach((node) => {
+        const item = node.parentNode
         left.push(item.offsetLeft)
         // right.push(item.offsetLeft + (item.offsetWidth) * (1 / this.wordDomStyle.scale))
         right.push(item.offsetLeft + (item.offsetWidth) * (1 / this.styleProp.wordDomStyle.scale))
@@ -327,7 +329,21 @@ export default {
       }
       this.$emit('addWord', obj, nodes)
     },
-
+    showOcrCommentLine(event) {
+      const node = event.target.parentNode
+      const { childNodes } = node
+      const childNode = childNodes[0]
+      const bg = childNode.style.background
+      if (!bg) return
+      const position = {
+        left: node.offsetLeft,
+        height: (node.offsetHeight * (1 / this.styleProp.wordDomStyle.scale)),
+        // right.push(item.offsetLeft + (item.offsetWidth) * (1 / this.wordDomStyle.scale))
+        top: node.offsetTop,
+        width: (node.offsetWidth) * (1 / this.styleProp.wordDomStyle.scale),
+      }
+      this.$emit('showOcrCommentLine', position)
+    }
   }
 }
 </script>

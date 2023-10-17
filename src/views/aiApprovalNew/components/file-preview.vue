@@ -44,7 +44,7 @@
       <i class="el-icon-circle-close" v-show="showFullScreen" @click="fullScreen"></i>
       <!-- 图片 -->
       <imgae-preview @getProps="getProps" ref="imgPreview" v-if="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))"
-        :lineWordItem="newLineWordItem" @linePosition="linePosition" @showFullScreen="fullScreen" :url="approval.url"></imgae-preview>
+        :lineWordItem="lineWordItem" @linePosition="linePosition" @showFullScreen="fullScreen" :url="approval.url"></imgae-preview>
       <!-- 其他类型文件 -->
       <filePreview v-else :url="approval.url"></filePreview>
       <div class="tool" v-show="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))">
@@ -106,7 +106,6 @@ export default {
       imgEditorDialogVisible: false,
       swiper: null,
       showFullScreen: false,
-      newLineWordItem: {}
     }
   },
   computed: {
@@ -124,18 +123,13 @@ export default {
     },
   },
   created() {
-    this.newLineWordItem = this.lineWordItem;
+    // this.newLineWordItem = this.lineWordItem;
   },
   mounted() {
     // this.init();
   },
   watch: {
-    lineWordItem: {
-      handler(val) {
-        this.newLineWordItem = val
-      },
-      deep: true
-    }
+
   },
   methods: {
     changeSize(type) {
@@ -208,9 +202,6 @@ export default {
       this.$nextTick(() => {
         this.$refs.imgPreview.handleImageLoaded()
       })
-    },
-    setHighLight(arr) {
-      this.newLineWordItem = arr
     },
   }
 }

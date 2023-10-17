@@ -224,6 +224,7 @@ export default {
       this.upDateComments('add', newComment)
       this.addBg(this.comments_nodes)
       this.popoverShow = false
+      this.$refs.editorial.changeType(2)
     },
     // 展示连线
     showCommentLine(obj) {
@@ -259,7 +260,8 @@ export default {
         doms.push(newDom)
       })
       // 获取高亮元素 dom
-      this.$refs.filePreview.setHighLight(location)
+      // this.$refs.filePreview.setHighLight(location)
+      this.lineWordItem = location
       this.drawCommentLine(doms, commenDom)
     },
     drawCommentLine(start, end) {
@@ -268,7 +270,6 @@ export default {
       const rootDom = document.getElementsByClassName('results-div')[0]
       const onlyHide = endDomId === this.endDomId
       if (onlyHide) {
-        console.log('sss')
         this.lineRemove();
         this.endDomId = ''
         this.preDoms = [...this.preDoms]
@@ -476,7 +477,6 @@ export default {
         // 未关联word的 意见
         file?.comments && arr.push(...file?.comments);
       });
-      // console.log(arr)
       // 去重
       // const setArr = [];
       // arr.forEach(comment => {
@@ -491,7 +491,6 @@ export default {
       //     }
       //   }
       // });
-      // console.log(setArr)
       this.comments = arr;
     },
     // 编辑意见后,同步更新  文件的推荐意见状态
@@ -778,7 +777,7 @@ export default {
       const icons = []
       for (let i = 0; i < iconNum; i++) {
         icons.push({
-          icon_id: new Date().getTime(),
+          icon_id: new Date().getTime() + i,
           handleArea: [i * 50, (i + 1) * 50],
           showIndex: -1
         })
@@ -796,16 +795,29 @@ export default {
           comment.position.map((pos) => {
             let sort = Math.floor(pos.top / 50) + 1
             if (sort >= iconTotal) {
-              sort = iconTotal - 1
+              sort = (iconTotal - 1) ? (iconTotal - 1) : 0
+            }
+            // 构造icon对象
+            const commentId = comment.id
+            if (!this.icons[sort]?.positionWithId) {
+              this.icons[sort].positionWithId = []
             }
             const newIcon = {
               ...this.icons[sort],
               files: comment.files,
-              comment_ids: [comment.id, ...(this.icons[sort].comment_ids ? this.icons[sort].comment_ids : [])],
               selectText: comment.selectText,
               str: comment.str,
               words: comment.words,
-              position: [pos, ...(this.icons[sort].position ? this.icons[sort].position : [])]
+              positionWithId: [
+                ...this.icons[sort].positionWithId,
+                { commentId, pos },
+              ]
+            }
+            newIcon.positionWithId = newIcon?.positionWithId.filter((pwi) => {
+              if (!this.objIsSame(pos, pwi.pos)) return pwi
+            })
+            if (!newIcon.positionWithId.length) {
+              newIcon.positionWithId.push({ commentId, pos })
             }
             this.icons[sort] = newIcon
           })
@@ -814,14 +826,14 @@ export default {
     },
     // 展示 icon 的连线
     showIconLine(icon) {
-      this.changeEditorialType(2)
-      this.lineRemoveOnly()
+      this.$refs.editorial.changeType(2)
+      this.lineRemove()
       if (this.curActiveIcon !== icon.icon_id) { // 点击新icon
         this.curIconLine = 0
         this.changeIconShow(this.curActiveIcon, -1)
         this.changeIconShow(icon.icon_id, 1)
         this.curActiveIcon = icon.icon_id
-      } else if (this.curIconLine >= icon.comment_ids.length) { // 此时为当前icon对应的最后一条线
+      } else if (this.curIconLine >= icon.positionWithId.length) { // 此时为当前icon对应的最后一条线
         this.changeIconShow(icon.icon_id, -1)
         this.curActiveIcon = ''
       }
@@ -830,10 +842,10 @@ export default {
       if (this.curActiveIcon) {
         // 传入正常对象 并 进行连线
         obj = {
-          id: icon.comment_ids[this.curIconLine],
+          id: icon.positionWithId[this.curIconLine]?.commentId,
           files: icon.files,
           icon_id: icon.icon_id,
-          position: [icon.position[this.curIconLine]],
+          position: [icon.positionWithId[this.curIconLine]?.pos],
           str: icon.str,
           selectText: icon.selectText,
           words: icon.words
@@ -841,30 +853,55 @@ export default {
       } else {
         // 传入上一次的对象 且 取消连线
         obj = {
-          id: icon.comment_ids[this.curIconLine - 1],
+          id: icon.positionWithId[(this.curIconLine - 1) ? this.curIconLine - 1 : 0]?.commentId,
           files: icon.files,
           icon_id: icon.icon_id,
-          position: [icon.position[this.curIconLine - 1]],
+          position: [icon.positionWithId[(this.curIconLine - 1) ? this.curIconLine - 1 : 0]?.pos],
           str: icon.str,
           selectText: icon.selectText,
           words: icon.words
         }
       }
       this.showCommentLine(obj)
-      this.$forceUpdate()
       this.curIconLine += 1
     },
     // 修改 icon 激活状态 showIndex 为 1 为激活 -1 为不激活
     changeIconShow(id, showIndex) {
+      if (!id) return
       this.icons?.map((icon) => {
         if (id === icon.icon_id) {
           icon.showIndex = showIndex
         }
       })
+      this.$forceUpdate()
     },
     // ocr 点击批注进行连线
-    showOcrCommentLine(ocr) {
-      console.log(ocr)
+    showOcrCommentLine(ocrPosition) {
+      this.$refs.editorial.changeType(2)
+      let findComment = {}
+      this.comments.map((comment) => {
+        comment.position.map((pos) => {
+          if (this.objIsSame(pos, ocrPosition)) {
+            findComment = comment
+            findComment.position = [pos]
+          }
+        })
+      })
+      this.showCommentLine(findComment)
+    },
+    // 比较对象是否相等
+    objIsSame(first, second) {
+      const arr1 = Object.keys(first)
+      const arr2 = Object.keys(second)
+      if (arr1.length !== arr2.length) {
+        return false
+      }
+      for (const k in first) {
+        if (first[k] !== second[k]) {
+          return false
+        }
+      }
+      return true
     }
   },
 };

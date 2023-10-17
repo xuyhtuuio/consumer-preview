@@ -97,7 +97,7 @@
             <orcTxtNew ref="ocrTxt" v-show="curMode === 0" :approval="approval" @addWord="addWord"
               @lineRemove="lineRemove"
               v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
-              @showLine="showLine" :lineWordItem="lineWordItem" :styleProp="styleProp">
+              @showLine="showLine" @showOcrCommentLine="showOcrCommentLine" :lineWordItem="lineWordItem" :styleProp="styleProp">
             </orcTxtNew>
             <el-popover class="postil-popover" v-model="popoverShow" id="popover" placement="right"
               trigger="manual">
@@ -149,25 +149,25 @@
             <p class="content-cont-icons" v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr">
               <span v-for="(item,index) in icons" :key="index" @click="showIconLine(item)">
                 <!-- 单一评论 - 未激活 -->
-                <span :data-icon="index" v-if="item.comment_ids?.length === 1 && item.showIndex === -1">
+                <span :data-icon="index" v-if="item.positionWithId?.length === 1 && item.showIndex === -1">
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Component13"></use>
                   </svg>
                 </span>
                 <!-- 多评论 - 未激活 -->
-                <span :data-icon="index" v-else-if="item.comment_ids?.length > 1 && item.showIndex === -1">
+                <span :data-icon="index" v-else-if="item.positionWithId?.length > 1 && item.showIndex === -1">
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Component132"></use>
                   </svg>
                 </span>
                 <!-- 多评论 - 激活 -->
-                <span :data-icon="index" v-else-if="item.comment_ids?.length > 1 && item.showIndex === 1">
+                <span :data-icon="index" v-else-if="item.positionWithId?.length > 1 && item.showIndex === 1">
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Component131"></use>
                   </svg>
                 </span>
                 <!-- 单一评论 - 激活 -->
-                <span :data-icon="index" v-else-if="item.comment_ids?.length === 1 && item.showIndex === 1">
+                <span :data-icon="index" v-else-if="item.positionWithId?.length === 1 && item.showIndex === 1">
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Component133"></use>
                   </svg>
@@ -317,6 +317,7 @@ export default {
   },
   created() {
     this.getElHeight();
+    this.findIconPosition()
   },
   computed: {
     getfileType() {
@@ -334,8 +335,7 @@ export default {
     comments: {
       handler(val) {
         if (val) {
-          this.findIconPosition()
-          console.log(this.icons)
+          this.dealIconWithComment()
         }
       },
       deep: true
