@@ -53,6 +53,7 @@
     "vue": "^2.5.2",
     "vue-contextmenu": "^1.5.11",
     "vue-cookies": "^1.7.4",
+    "vue-cropper": "^0.6.4",
     "vue-fullcalendar": "^1.0.9",
     "vue-router": "^3.5.3",
     "vuedraggable": "^2.24.3",

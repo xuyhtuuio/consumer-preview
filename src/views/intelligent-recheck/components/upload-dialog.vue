@@ -62,6 +62,8 @@ export default {
                 item: res.data.data
               }
             })
+            this.$emit('changeImgFun', res.data.data);
+            this.turnDialog = false;
           } else {
             this.$message.error(res.data.msg)
             this.uploading = false

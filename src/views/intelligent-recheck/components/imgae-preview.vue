@@ -1,13 +1,45 @@
 <template>
-  <div class="preview" ref="contentDom" v-loading="!loaded">
-    <img id="picture" :src="url" @load="handleImageLoaded" ref="imgDom" />
-    <div class="light" ref="light" v-if="lineWordItem?.word" :style="this.BoundingClientRect">
-      <div class="light" id="imgLight" :style="this.highLightBoundingClientRect"></div>
+  <div class="preview" v-loading="!loaded">
+    <div class="preview" v-show="!editImg" ref="contentDom">
+      <img id="picture" @click="fullImage" :src="url" @load="handleImageLoaded" ref="imgDom" />
+    </div>
+    <vueCropper
+      v-if="editImg"
+      ref="cropper"
+      :img="url"
+      @realTime="imgLoad"
+      :outputSize="option.outputSize"
+      :outputType="option.outputType"
+      :info="option.info"
+      :canScale="option.canScale"
+      :autoCrop="option.autoCrop"
+      :autoCropWidth="option.autoCropWidth"
+      :autoCropHeight="option.autoCropHeight"
+      :fixedBox="option.fixedBox"
+      :canMove="option.canMove"
+      :canMoveBox="option.canMoveBox"
+      :original="option.original"
+      :centerBox="option.centerBox"
+      :infoTrue="option.infoTrue"
+      :full="option.full"
+      :enlarge="option.enlarge"
+      :mode="option.mode"
+    ></vueCropper>
+    <div class="edit-btn" @click="changeEdit">
+      <img v-if="!editImg" src="@/assets/image/intelligent-recheck/edit-no.png" alt="" />
+      <img v-else src="@/assets/image/intelligent-recheck/edit-yes.png" alt="" />
+    </div>
+    <div class="edit-success" v-if="editImg" @click="changeEditImg">
+      <img class="blur" src="@/assets/image/intelligent-recheck/edit-show.png" alt="" />
+      <img class="focus" src="@/assets/image/intelligent-recheck/edit-success.png" alt="" />
+      <div class="tip-edit">完成</div>
     </div>
   </div>
 </template>
 
 <script>
+import { VueCropper } from 'vue-cropper'
+import { getFormGroups } from '@/api/front'
 const paramsInit = Object.freeze({
   zoomVal: 1,
   left: 0,
@@ -23,49 +55,91 @@ const paramsInit = Object.freeze({
 })
 export default {
   props: {
-    lineWordItem: {
-      type: Object,
-      default: () => ({})
-    },
     url: {
       type: String,
       default: ''
     }
   },
+  components: {
+    VueCropper
+  },
   data() {
     return {
       loaded: false,
-      params: {},
-      naturalHeight: 0,
-      naturalWidth: 0,
-      scale: 1,
-      BoundingClientRect: {},
-      highLightBoundingClientRect: {},
-      wordDomStyle: {
-        width: 0,
-        height: 0,
-        scale: 1,
+      editImg: false,
+      option: {
+        // 裁剪图片的地址 url 地址, base64, blob
+        outputSize: 1, // 裁剪生成图片的质量
+        outputType: 'png', // 裁剪生成图片的格式 jpeg, png, webp
+        info: true, // 裁剪框的大小信息
+        canScale: true, // 图片是否允许滚轮缩放
+        autoCrop: true, // 是否默认生成截图框
+        autoCropWidth: 0, // 默认生成截图框宽度
+        autoCropHeight: 0, // 默认生成截图框高度
+        fixedBox: false, // 固定截图框大小 不允许改变
+        canMove: true, // 上传图片是否可以移动
+        canMoveBox: true, // 截图框能否拖动
+        original: false, // 上传图片按照原始比例渲染
+        centerBox: true, // 截图框是否被限制在图片里面
+        infoTrue: true, // true 为展示真实输出图片宽高 false 展示看到的截图框宽高
+        full: true, // 是否输出原图比例的截图
+        enlarge: '1', // 图片根据截图框输出比例倍数
+        mode: 'contain' // 图片默认渲染方式 contain , cover, 100px, 100% auto
       }
     }
   },
   watch: {
-    lineWordItem: {
-      handler(val) {
-        this.setBoundingClientRect(val)
-      },
-      // deep: true
-    },
     url() {
-      this.loaded = false;
-      const target = this.$refs.imgDom
-      target.style.left = '0px';
-      target.style.top = '0px';
+      this.loaded = false
     }
   },
   mounted() {
     window.addEventListener('resize', this.handleImageLoaded)
   },
   methods: {
+    fullImage() {
+      this.$emit('fullImage');
+    },
+    changeEdit() {
+      this.editImg = !this.editImg;
+    },
+    imgLoad(res) {
+      this.option.autoCropHeight = res.img.height.replace('px', '')
+      this.option.autoCropWidth = res.img.width.replace('px', '')
+    },
+    changeEditImg() {
+      this.$refs.cropper.getCropBlob(data => {
+        const file = new File([data], '截图检索' + new Date().getTime() + '.png');
+        this.uploadFile(file);
+      })
+    },
+    uploadFile(param) {
+      const formData = new FormData()
+      this.uploading = true;
+      this.$message.info('上传中，请稍等！')
+      formData.append('mf', param) // 传入bpmn文件
+      getFormGroups(formData)
+        .then((res) => {
+          if (res.data.success) {
+            this.uploading = false
+            this.$router.push({
+              name: 'recheck-detail',
+              params: {
+                item: res.data.data
+              }
+            })
+            this.editImg = false;
+            this.$emit('changeImgFun', res.data.data);
+          } else {
+            this.$message.error(res.data.msg)
+            this.uploading = false
+          }
+        })
+        .catch(() => {
+          this.uploading = false
+          this.$message.error('上传失败')
+        })
+    },
     linePosition() {
       this.setBoundingClientRect(this.lineWordItem)
       this.$nextTick(() => {
@@ -82,13 +156,43 @@ export default {
           top: parseInt(this.params.top, 10) + 'px',
           transform: `scale(${this.params.zoomVal})`
         }
-        this.highLightBoundingClientRect = {
-          width: val?.location.w * this.scale + 'px',
-          height: val?.location.h * this.scale + 'px',
-          left: val?.location.x * this.scale + 'px',
-          top: val?.location.y * this.scale + 'px',
+        if (val.isComment) {
+          this.highLightBoundingClientRect = {
+            width: val?.location.w + 'px',
+            height: val?.location.h + 'px',
+            left: val?.location.x + 'px',
+            top: val?.location.y + 'px',
+          }
+        } else {
+          this.highLightBoundingClientRect = {
+            width: val?.location.w * this.scale + 'px',
+            height: val?.location.h * this.scale + 'px',
+            left: val?.location.x * this.scale + 'px',
+            top: val?.location.y * this.scale + 'px',
+          }
         }
       }
+    },
+    // 当高亮为多个时
+    setBoundingClientRectArr(val) {
+      const highLightStyles = []
+      this.BoundingClientRect = {
+        width: this.$refs.imgDom.clientWidth + 'px',
+        height: this.$refs.imgDom.clientHeight + 'px',
+        left: parseInt(this.params.left, 10) + 'px',
+        top: parseInt(this.params.top, 10) + 'px',
+        transform: `scale(${this.params.zoomVal})`
+      }
+      val.map((hls) => {
+        const h = {
+          width: hls?.location.w + 'px',
+          height: hls?.location.h + 'px',
+          left: hls?.location.x + 'px',
+          top: hls?.location.y + 'px',
+        }
+        highLightStyles.push(h)
+      })
+      this.highLightStyles = highLightStyles
     },
     // 图片加载完后,初始化
     handleImageLoaded() {
@@ -99,18 +203,8 @@ export default {
       this.naturalWidth = this.$refs.imgDom.naturalWidth;
       this.naturalHeight = this.$refs.imgDom.naturalHeight;
       this.scale = this.$refs.imgDom.clientWidth / this.$refs.imgDom.naturalWidth;
-      const imgDomElement = document.getElementById('picture');
-      this.wordDomStyle.width = imgDomElement.clientWidth;
-      this.wordDomStyle.height = imgDomElement.clientHeight;
-      this.wordDomStyle.scale = (imgDomElement.naturalWidth / imgDomElement.clientWidth).toFixed(2);
       this.getMaxPosition()
       this.initCenter()
-      // 绑定缩放事件
-      const content = this.$refs.contentDom
-      content.removeEventListener('wheel', this.handleWheel)
-      content.addEventListener('wheel', this.handleWheel)
-      // 绑定拖拽
-      this.startDrag()
     },
     // 计算出允许拖拽的最大偏移量
     getMaxPosition() {
@@ -163,134 +257,6 @@ export default {
         ? o.currentStyle[key]
         : document.defaultView.getComputedStyle(o, false)[key];
     },
-    // 滚轮缩放事件
-    handleWheel(event) {
-      this.getMaxPosition()
-      const { params } = this;
-      this.params.zoomVal += -event.deltaY / 1200;
-      if (params.zoomVal >= 0.2) {
-        this.$refs.imgDom.style.transform = 'scale(' + params.zoomVal + ')';
-      } else {
-        params.zoomVal = 0.2;
-        this.$refs.imgDom.style.transform = 'scale(' + params.zoomVal + ')';
-      }
-      this.getMaxPosition();
-      const target = this.$refs.imgDom;
-      let left = parseInt(this.getCss(target, 'left'), 10);
-      let top = parseInt(this.getCss(target, 'top'), 10);
-      if (left > params.borderLeft) {
-        left = params.borderLeft
-      } else if (left < params.borderRight) {
-        left = params.borderRight
-      }
-
-      if (top > params.borderTop) {
-        top = params.borderTop
-      } else if (top < params.borderBottom) {
-        top = params.borderBottom
-      }
-
-      target.style.left = left + 'px';
-      target.style.top = top + 'px';
-
-      if (this.getCss(target, 'left') !== 'auto') {
-        this.params.left = this.getCss(target, 'left');
-      }
-      if (this.getCss(target, 'top') !== 'auto') {
-        this.params.top = this.getCss(target, 'top');
-      }
-      this.linePosition()
-      // this.changeHightPos()
-      return false;
-    },
-    // 实现图片拖拽功能
-    startDrag() {
-      const bar = this.$refs.contentDom
-      const target = this.$refs.imgDom
-      const { params } = this;
-      if (this.getCss(target, 'left') !== 'auto') {
-        this.params.left = this.getCss(target, 'left');
-      }
-      if (this.getCss(target, 'top') !== 'auto') {
-        this.params.top = this.getCss(target, 'top');
-      }
-      // o是移动对象
-      bar.onmousedown = event => {
-        this.getMaxPosition()
-        this.params.flag = true;
-        if (!event) {
-          event = window.event;
-          // 防止IE文字选中
-          bar.onselectstart = () => {
-            return false;
-          };
-        }
-        const e = event;
-        this.params.currentX = e.clientX;
-        this.params.currentY = e.clientY;
-      };
-
-      document.onmouseup = () => {
-        if (this.params.flag) {
-          this.params.flag = false;
-          if (this.getCss(target, 'left') !== 'auto') {
-            this.params.left = this.getCss(target, 'left');
-          }
-          if (this.getCss(target, 'top') !== 'auto') {
-            this.params.top = this.getCss(target, 'top');
-          }
-          this.linePosition()
-        }
-        // 限制图片拖拽不能超出  范围内
-        // var e = event ? event : window.event;
-        // if (params.flag && params.moved) {
-        //   var nowX = e.clientX,
-        //     nowY = e.clientY;
-        //   var disX = nowX - params.currentX,
-        //     disY = nowY - params.currentY;
-
-        //   let left = parseInt(params.left, 10) + disX;
-        //   let top = parseInt(params.top, 10) + disY;
-
-        //   left = left > params.borderLeft ? params.borderLeft : left < (params.borderRight) ? params.borderRight : left;
-        //   top = top > params.borderTop ? params.borderTop : top < params.borderBottom ? params.borderBottom : top;
-        //   target.style.left = left + "px";
-        //   target.style.top = top + "px";
-        //   this.params.moved = false;
-        // }
-        // this.params.flag = false;
-        // if (this.getCss(target, "left") !== "auto") {
-        //   this.params.left = this.getCss(target, "left");
-        // }
-        // if (this.getCss(target, "top") !== "auto") {
-        //   this.params.top = this.getCss(target, "top");
-        // }
-        // this.changeHightPos()
-      };
-
-      document.onmousemove = event => {
-        const e = event || window.event;
-        if (params.flag) {
-          const nowX = e.clientX;
-          const nowY = e.clientY;
-          const disX = nowX - params.currentX;
-          const disY = nowY - params.currentY;
-          const left = parseInt(params.left, 10) + disX;
-          const top = parseInt(params.top, 10) + disY;
-
-          target.style.left = left + 'px';
-          target.style.top = top + 'px';
-          // this.changeHightPos()
-          this.params.moved = true;
-
-          if (event.preventDefault) {
-            event.preventDefault();
-          }
-          this.linePosition()
-          return false;
-        }
-      };
-    }
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleImageLoaded)
@@ -301,12 +267,9 @@ export default {
 .preview {
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow: scroll;
   position: relative;
-  -webkit-user-select: none;
-  user-select: none;
-  cursor: move;
-
+  cursor: zoom-in;
   img {
     position: absolute;
     left: 0;
@@ -314,21 +277,72 @@ export default {
     max-width: 100%;
     // max-height: 100%;
   }
+  /deep/.vue-cropper {
+    background: #fff;
+  }
 }
 
-.light {
+.edit-btn {
   position: absolute;
-  box-shadow: 0 0 0px 100vh rgba(51, 51, 51, 0.4);
-  z-index: 1;
-
-  &::before {
-    content: ' ';
+  bottom: 10px;
+  left: 10px;
+  z-index: 100;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #f2f3f5;
+  background: #fff;
+  box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.1);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  img {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+}
+.edit-success {
+  padding: 6px;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid #E5E6EB;
+  background: #FFF;
+  box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.10);
+  cursor: pointer;
+  z-index: 10;
+  img {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
+  }
+  .tip-edit {
+    color: #505968;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+  }
+  .blur {
     display: block;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
+  }
+  .focus {
+    display: none;
+  }
+}
+.edit-success:hover {
+  .blur {
+    display: none;
+  }
+  .focus {
+    display: block;
   }
 }
 </style>

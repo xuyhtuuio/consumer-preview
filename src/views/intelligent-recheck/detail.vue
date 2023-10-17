@@ -4,7 +4,10 @@
       <div class="detail-top">
         <div class="detail-input">
           <div class="input-icon">
-            <img src="@/assets/image/intelligent-recheck/recheck-icon.png" alt="">
+            <img
+              src="@/assets/image/intelligent-recheck/recheck-icon.png"
+              alt=""
+            />
           </div>
           <div class="input-left" :class="{ 'input-left-focus': inputFocus }">
             <el-input
@@ -15,22 +18,38 @@
               @blur="inputBlurFun"
               clearable
             >
-              <el-select v-model="select" slot="prepend" placeholder="请选择" popper-class="content-select">
+              <el-select
+                v-model="select"
+                slot="prepend"
+                placeholder="请选择"
+                popper-class="content-select"
+              >
                 <el-option label="按文件名称" value="1"></el-option>
                 <el-option label="按文本内容" value="2"></el-option>
               </el-select>
               <div slot="append">
                 <div class="append-set">
-                  <div class="upload" :style="{ 'padding-right': !inputFocus ? '0' : '4px', 'margin-right': !inputFocus ? '16px' : '0'}">
+                  <div
+                    class="upload"
+                    :style="{
+                      'padding-right': !inputFocus ? '0' : '4px',
+                      'margin-right': !inputFocus ? '16px' : '0'
+                    }"
+                  >
                     <i class="el-icon-camera" @click="showUpload"></i>
                   </div>
-                  <div v-show="inputFocus" class="append-btn"><i class="el-icon-search"></i>搜索</div>
+                  <div v-show="inputFocus" class="append-btn">
+                    <i class="el-icon-search"></i>搜索
+                  </div>
                 </div>
               </div>
             </el-input>
           </div>
           <div class="input-right">
-            <img src="@/assets/image/intelligent-recheck/show-more.png" alt="" />
+            <img
+              src="@/assets/image/intelligent-recheck/show-more.png"
+              alt=""
+            />
             <div class="right-tip">回检记录</div>
           </div>
         </div>
@@ -111,9 +130,7 @@
               </el-popover>
             </div>
             <div class="select-item select-time" style="width: 92px">
-              <el-switch
-                v-model="searchForm.recheck"
-                active-text="已回检">
+              <el-switch v-model="searchForm.recheck" active-text="已回检">
               </el-switch>
             </div>
           </div>
@@ -150,18 +167,7 @@
             </span>
           </div> -->
           <div class="img-show">
-            <div class="preview" :class="{ fullScreen: showFullScreen }">
-              <!-- 全屏关闭按钮 -->
-              <i
-                class="el-icon-circle-close"
-                v-show="showFullScreen"
-                @click="fullScreen()"
-              ></i>
-              <!-- 图片 -->
-              <div class="perview-div">
-                <ImagePreview :url="item.url" ref="imgPreview"></ImagePreview>
-              </div>
-            </div>
+            <ImagePreview :url="item.url" ref="imgPreview" @fullImage="fullScreen" @changeImgFun="changeImgFun"></ImagePreview>
           </div>
         </div>
         <div class="bottom-right" v-loading="loading">
@@ -198,21 +204,61 @@
         </div>
       </div>
     </div>
-    <UploadDialog ref="uploadDia"></UploadDialog>
-    <ImgDialog ref="imgDia" :url="listItemActive.fileUrl" :item="listItemActive"></ImgDialog>
+    <div class="preview" :class="{ fullScreen: showFullScreen }">
+      <!-- 全屏关闭按钮 -->
+      <i
+        class="el-icon-circle-close"
+        v-show="showFullScreen"
+        @click="fullScreen"
+      ></i>
+      <!-- 图片 -->
+      <FullImage
+        ref="imgPreview1"
+        :url="item.url"
+      ></FullImage>
+      <!-- 其他类型文件 -->
+      <div
+        class="tool"
+        v-if="showFullScreen"
+      >
+        <span @click="saveFile">
+          <i
+            ><img src="@/assets/image/intelligent-recheck/download.png" alt=""
+          /></i>
+          下载</span
+        >
+        <span @click="changeSize(1)">
+          <i><img src="@/assets/image/intelligent-recheck/zoom-in.png" alt="" /></i>
+          放大</span
+        >
+        <span @click="changeSize(0)">
+          <i><img src="@/assets/image/intelligent-recheck/zoom-out.png" alt="" /></i>
+          缩小</span
+        >
+      </div>
+    </div>
+    <UploadDialog ref="uploadDia" @changeImgFun="changeImgFun"></UploadDialog>
+    <!-- <ImgDialog
+      ref="imgDia"
+      :url="listItemActive.fileUrl"
+      :item="listItemActive"
+    ></ImgDialog> -->
   </div>
 </template>
 
 <script>
 import { getSimilarityComparisonList } from '@/api/intelligent-recheck'
+import { downloadAllFiles } from '@/api/applyCenter'
 import UploadDialog from './components/upload-dialog'
-import ImgDialog from './components/img-dialog'
+// import ImgDialog from './components/img-dialog'
 import ImagePreview from './components/imgae-preview'
+import FullImage from './components/full-image'
 export default {
   components: {
     UploadDialog,
-    ImgDialog,
-    ImagePreview
+    // ImgDialog,
+    ImagePreview,
+    FullImage
   },
   data: () => ({
     recheckInput: '',
@@ -255,7 +301,7 @@ export default {
     listItemActive: {
       fileUrl: ''
     },
-    inputFocus: false
+    inputFocus: false,
   }),
   created() {
     if (this.$route.params.item) {
@@ -266,12 +312,35 @@ export default {
     }
   },
   methods: {
+    saveFile() {
+      const params = {
+        key: this.item.key
+      }
+      this.$message.info('下载中，请稍等！')
+      downloadAllFiles(params).then((res) => {
+        const disposition = res.headers['content-disposition']
+        const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
+        const link = document.createElement('a');
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      })
+    },
+    fullScreen() {
+      this.showFullScreen = !this.showFullScreen;
+      this.$nextTick(() => {
+        this.$refs.imgPreview1.handleImageLoaded()
+      })
+    },
     inputFocusFun() {
-      this.inputFocus = true;
+      this.inputFocus = true
     },
     inputBlurFun() {
       if (!this.recheckInput) {
-        this.inputFocus = false;
+        this.inputFocus = false
       }
     },
     showUpload() {
@@ -298,19 +367,23 @@ export default {
       this.pageNum = 1
       this.getSimilarityComparisonList()
     },
-    fullScreen() {
-      this.showFullScreen = !this.showFullScreen
-      this.$nextTick(() => {
-        this.$refs.imgPreview.handleImageLoaded()
-      })
-    },
     handleCurrentChange(val) {
       this.pageNum = val
       this.getSimilarityComparisonList()
     },
     showScreen(item) {
-      this.listItemActive = item;
+      this.listItemActive = item
       this.$refs.imgDia.imgDialog = true
+    },
+    changeImgFun(item) {
+      this.item = item;
+      this.pageNum = 1;
+      this.activeSort = {
+        label: '按相似度',
+        val: 1,
+        sort: 'desc'
+      };
+      this.getSimilarityComparisonList()
     },
     getSimilarityComparisonList() {
       this.loading = true
@@ -346,6 +419,9 @@ export default {
     },
     handlePopoverShow() {
       this.$refs['my-date-picker'].handleFocus()
+    },
+    changeSize(type) {
+      this.$refs.imgPreview1.changeSize(type)
     },
   }
 }
@@ -454,12 +530,12 @@ export default {
               height: 32px;
               padding: 0 12px;
               border-radius: 40px;
-              background: #2D5CF6;
+              background: #2d5cf6;
               font-size: 12px;
               font-style: normal;
               font-weight: 400;
               line-height: 32px;
-              color: #FFF;
+              color: #fff;
               cursor: pointer;
               .el-icon-search {
                 font-size: 14px;
@@ -471,16 +547,16 @@ export default {
       }
     }
     .input-left-focus {
-      border: 2px solid  #A8C5FF;
-      background: #F9FBFF;
+      border: 2px solid #a8c5ff;
+      background: #f9fbff;
       /deep/ .el-input {
         .el-input__inner {
-          background: #F9FBFF;
+          background: #f9fbff;
         }
         .el-input-group__append {
-          background: #F9FBFF;
+          background: #f9fbff;
           .upload {
-            background: #F9FBFF!important;
+            background: #f9fbff !important;
           }
         }
       }
@@ -492,10 +568,10 @@ export default {
       cursor: pointer;
       border-radius: 6px;
       padding: 6px;
-      background: linear-gradient(90deg, #F0F6FF 0%, #D1E4FF 100%);
+      background: linear-gradient(90deg, #f0f6ff 0%, #d1e4ff 100%);
       .right-tip {
         display: none;
-        color: #2D5CF6;
+        color: #2d5cf6;
         font-size: 12px;
         font-style: normal;
         font-weight: 700;
@@ -535,7 +611,7 @@ export default {
           display: flex;
           align-items: center;
           .tip-style {
-            color: var(--gray-gray-9, #1D2128);
+            color: var(--gray-gray-9, #1d2128);
             font-size: 14px;
             font-style: normal;
             font-weight: 400;
@@ -571,7 +647,7 @@ export default {
           cursor: pointer;
         }
         /deep/.is-active {
-          color: #2D5CF6;
+          color: #2d5cf6;
         }
       }
       .select-org {
@@ -737,7 +813,7 @@ export default {
 .fullScreen {
   display: block;
   position: fixed;
-  z-index: 10;
+  z-index: 100;
   width: 100vw;
   height: 100vh;
   top: 0;
@@ -774,6 +850,35 @@ export default {
   width: 100%;
   height: 100%;
 }
+.tool{
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%);
+  z-index: 1;
+  width: 248px;
+  box-shadow: 0px 0px 10px 0px #4343431A;
+  height: 38px;
+  border-radius: 8px;
+  background-color: #1D2128BF;
+  span{
+    i{
+      margin-right: 2px;
+      img{
+        width: 16px;
+        height: 16px;
+      }
+    }
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: #FFFFFF;
+  }
+}
 </style>
 <style lang="less">
 .content-select {
@@ -784,19 +889,19 @@ export default {
   }
   .el-select-dropdown__item {
     padding: 6px 16px;
-    color: #1D2128;
+    color: #1d2128;
     font-size: 14px;
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
   }
   .popper__arrow::after {
-    border-bottom-color: transparent!important;
+    border-bottom-color: transparent !important;
   }
 }
 .date-style {
   .el-input__inner {
-    width: 100%!important;
+    width: 100% !important;
   }
 }
 </style>
