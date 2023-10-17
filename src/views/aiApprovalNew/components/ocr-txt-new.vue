@@ -428,6 +428,7 @@ export default {
     .div-position {
       position: absolute;
       transform-origin: 0 0;
+      z-index: 1;
     }
   }
 
@@ -451,6 +452,7 @@ export default {
 .isAdd {
   position: fixed;
   padding: 16px 24px;
+  z-index: 2;
   border-radius: 4px;
   box-shadow: 0px 0px 10px 0px #4343431a;
   font-size: 14px;
