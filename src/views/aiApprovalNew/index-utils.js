@@ -880,14 +880,31 @@ export default {
       this.$refs.editorial.changeType(2)
       let findComment = {}
       this.comments.map((comment) => {
-        comment.position.map((pos) => {
+        comment.position?.map((pos) => {
           if (this.objIsSame(pos, ocrPosition)) {
             findComment = comment
             findComment.position = [pos]
           }
         })
       })
-      this.showCommentLine(findComment)
+      const findIcon = this.findIconPos(findComment)
+      this.showIconLine(findIcon)
+    },
+    // 点击ocr，获取对应 icon 最终走到意见，执行连线逻辑
+    findIconPos(findComment) {
+      let resIcon = {}
+      this.icons.map((icon) => {
+        const findIcon = icon.positionWithId?.map((ipos) => {
+          if (this.objIsSame(ipos.pos, findComment.position && findComment.position[0])) {
+            return ipos
+          }
+        })
+        resIcon = {
+          ...icon
+        }
+        resIcon.positionWithId = findIcon
+      })
+      return resIcon
     },
     // 比较对象是否相等
     objIsSame(first, second) {
