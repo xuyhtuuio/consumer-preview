@@ -5,6 +5,7 @@
       :key="item.name"
       :index="item.name"
       :class="{ 'is-active': name === item.name }">
+      <img :src="name === item.name ? item.icon1 : item.icon" alt="" style="position: relative; bottom: 2px;margin-right:10px;"/>
       {{ item.label }}
     </el-menu-item>
   </el-menu>
@@ -21,13 +22,19 @@ export default {
     list() {
       const pathNames = [{
         name: 'FollowKnowledge',
-        label: '关注'
+        label: '关注',
+        icon: require('@/assets/image/knowledge/关注.svg'),
+        icon1: require('@/assets/image/knowledge/关注1.svg')
       }, {
         name: 'RecommendKnowledge',
-        label: '推荐'
+        label: '推荐',
+        icon: require('@/assets/image/knowledge/推荐.svg'),
+        icon1: require('@/assets/image/knowledge/推荐1.svg')
       }, {
         name: 'MyKnowledge',
-        label: '我的'
+        label: '我的',
+        icon: require('@/assets/image/knowledge/我的.svg'),
+        icon1: require('@/assets/image/knowledge/我的1.svg')
       }]
       return pathNames
     }
@@ -51,6 +58,7 @@ export default {
     line-height: 40px;
     border-radius: 8px;
     margin-bottom: 8px;
+    font-size: 12px;
   }
   .el-menu-item.is-active {
     color: #306ef5;
