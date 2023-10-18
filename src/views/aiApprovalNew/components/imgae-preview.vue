@@ -130,6 +130,7 @@ export default {
       }
       val.map((hls) => {
         const h = {
+          // * this.wordDomStyle.scale * this.scale
           width: hls?.location.w + 'px',
           height: hls?.location.h + 'px',
           left: hls?.location.x + 'px',
@@ -344,11 +345,11 @@ export default {
     changeSize(type) {
       const size = 0.05
       if (type) {
-        this.zoomVal += size
-        this.$refs.imgDom.style.transform = 'scale(' + this.zoomVal + ')';
+        this.params.zoomVal += size
+        this.$refs.imgDom.style.transform = 'scale(' + this.params.zoomVal + ')';
       } else {
-        this.zoomVal -= size
-        this.$refs.imgDom.style.transform = 'scale(' + this.zoomVal + ')';
+        this.params.zoomVal -= size
+        this.$refs.imgDom.style.transform = 'scale(' + this.params.zoomVal + ')';
       }
     },
   },

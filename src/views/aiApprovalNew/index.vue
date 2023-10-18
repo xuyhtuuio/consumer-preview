@@ -91,6 +91,7 @@
             </div>
           </div>
           <div class="content-cont-body-bottom">
+            <fileChange :fileList="files" v-if="curMode === 1"></fileChange>
             <file-preview ref="filePreview" :files="files" :formId="formId" :activeIndex="activeIndex"
               @changeFile="changeFile" :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"
               @getProps="getProps" @findIconPosition="findIconPosition"></file-preview>
@@ -198,6 +199,7 @@ import orcTxt from './components/ocr-txt';
 import orcTxtNew from './components/ocr-txt-new';
 import ExaminePivot from './components/examine-pivot';
 import editorial from './components/editorial';
+import fileChange from './components/file-change'
 
 import utils from './index-utils'
 export default {
@@ -205,6 +207,7 @@ export default {
   mixins: [utils],
   components: {
     sidebar,
+    fileChange,
     filePreview,
     ExaminePivot,
     orcTxtNew,
