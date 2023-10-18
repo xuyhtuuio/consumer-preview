@@ -208,22 +208,33 @@ export default {
         node.classList.add('commentNode')
       })
     },
+    beforeAddComment() {
+      let preComment = {}
+      if (this.isEdit) {
+        preComment = this.findComment(this.domInfo?.position)
+        this.postil.textarea = preComment.str
+      }
+      this.preComment = preComment
+    },
     addCommentWithPosition() {
-      const timestamp = new Date().getTime()
-      const files = this.files.map((file) => {
+      const timestamp = this.preComment.id || new Date().getTime()
+      const files = this.preComment.files || this.files.map((file) => {
         return file.id
       })
+      const words = this.preComment || []
+
       const newComment = {
         id: timestamp,
         str: this.postil.textarea,
         files: [...files],
-        words: [],
+        words,
         position: [this.domInfo?.position],
         selectText: this.domInfo?.string
       }
       this.upDateComments('add', newComment)
       this.addBg(this.comments_nodes)
       this.popoverShow = false
+      this.postil.textarea = ''
       this.$refs.editorial.changeType(2)
     },
     // 展示连线
@@ -516,6 +527,9 @@ export default {
                 } else {
                   comment.position = [...comment.position, ...item.position]
                 }
+              } else if (comment.id === item.id) {
+                comment.str = item.str
+                comment.words = item.words
               } else {
                 num++
               }
@@ -890,6 +904,12 @@ export default {
     // ocr 点击批注进行连线
     showOcrCommentLine(ocrPosition) {
       this.$refs.editorial.changeType(2)
+      const findComment = this.findComment(ocrPosition)
+      const findIcon = this.findIconPos(findComment)
+      this.showIconLine(findIcon)
+    },
+    // 利用ocr定位 寻找对应 comment
+    findComment(ocrPosition) {
       let findComment = {}
       this.comments.map((comment) => {
         comment.position?.map((pos) => {
@@ -899,8 +919,7 @@ export default {
           }
         })
       })
-      const findIcon = this.findIconPos(findComment)
-      this.showIconLine(findIcon)
+      return findComment
     },
     // 点击ocr，获取对应 icon 最终走到意见，执行连线逻辑
     findIconPos(findComment) {
@@ -941,6 +960,7 @@ export default {
       if (boolean) {
         this.isEdit = true
       }
+      console.log('boolean', boolean, 'isEdit', this.isEdit)
     }
   },
 };
