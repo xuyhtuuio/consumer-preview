@@ -172,35 +172,39 @@
         </div>
         <div class="bottom-right" v-loading="loading">
           <div class="total-list">
-            <el-row :gutter="16">
-              <el-col
-                :span="6"
+            <Waterfall line="v" :line-gap="200"
+              :min-line-gap="100"
+              :max-line-gap="220"
+              :single-max-width="300"
+              :grow="[1, 1, 1, 1]"
+              :watch="totalList">
+              <!-- each component is wrapped by a waterfall slot -->
+              <WaterfallSlot
                 v-for="(item, index) in totalList"
-                :key="'list' + index"
+                :width="192"
+                :height="item.height"
+                :order="index"
+                :key="item.id"
               >
-                <div class="list-item" @click="showScreen(item)">
+                <div class="list-item">
                   <div class="num">
-                    {{ (item.distance * 100).toFixed(2) }}%{{
-                      item.formCategoryName
-                    }}
+                    {{ (item.distance * 100).toFixed(2) }}%
                   </div>
-                  <img :src="item.fileUrl" alt="" />
+                  <div class="img-model">
+                    <img :src="item.fileUrl" alt="" />
+                    <div class="img-up">
+                      <div class="recheck-num">回检3次</div>
+                      <div class="show-more">
+                        <img src="@/assets/image/intelligent-recheck/see.png" alt="">
+                        <div>查看详情</div>
+                      </div>
+                    </div>
+                  </div>
                   <div class="item-title">{{ item.fileName }}</div>
                 </div>
-              </el-col>
-            </el-row>
+              </WaterfallSlot>
+            </Waterfall>
           </div>
-          <TrsPagination
-            v-if="total"
-            class="trs-pagination"
-            :pageSize="pageSize"
-            :pageNow="pageNum"
-            :total="total"
-            @getList="handleCurrentChange"
-            scrollType="scrollCom"
-            scrollName="scrollCom"
-          >
-          </TrsPagination>
         </div>
       </div>
     </div>
@@ -247,6 +251,8 @@
 </template>
 
 <script>
+import Waterfall from 'vue-waterfall/lib/waterfall'
+import WaterfallSlot from 'vue-waterfall/lib/waterfall-slot'
 import { getSimilarityComparisonList } from '@/api/intelligent-recheck'
 import { downloadAllFiles } from '@/api/applyCenter'
 import UploadDialog from './components/upload-dialog'
@@ -258,7 +264,9 @@ export default {
     UploadDialog,
     // ImgDialog,
     ImagePreview,
-    FullImage
+    FullImage,
+    Waterfall,
+    WaterfallSlot
   },
   data: () => ({
     recheckInput: '',
@@ -302,6 +310,7 @@ export default {
       fileUrl: ''
     },
     inputFocus: false,
+    heightArr: [322, 262, 162],
   }),
   created() {
     if (this.$route.params.item) {
@@ -406,11 +415,13 @@ export default {
                   ...v.originator,
                   label: v.institutional && v.institutional[1]
                 },
-                taskStatus: v.nodeStatus
+                taskStatus: v.nodeStatus,
+                height: this.heightArr[Math.floor(Math.random() * 3)]
               }
             })
             this.total = res.data.data.totalCount
           }
+          this.totalList = this.totalList.concat(this.totalList)
           this.loading = false
         })
         .catch(() => {
@@ -712,7 +723,7 @@ export default {
       border-radius: 10px;
       border: 1px solid #f2f3f5;
       background: #f7f8fa;
-      margin-right: 16px;
+      margin-right: 8px;
       display: flex;
       flex-direction: column;
       .img-header {
@@ -746,55 +757,105 @@ export default {
       flex: 1;
       display: flex;
       flex-direction: column;
+      border-left: 1px solid #E5E6EB;
       .total-list {
+        position: relative;
         flex: 1;
         overflow: scroll;
-        /deep/.el-row {
-          height: 100%;
-          .el-col {
-            height: 50%;
-          }
-        }
         .list-item {
-          position: relative;
-          height: 95%;
-          margin-bottom: 24px;
+          position: absolute;
+          top: 0;
+          left: 8px;
+          right: 8px;
+          bottom: 28px;
           border-radius: 8px;
-          border: 1px solid #e5e6eb;
           background: #fff;
-          padding: 8px;
           display: flex;
           flex-direction: column;
           .num {
             position: absolute;
-            top: 8px;
-            left: 8px;
-            padding: 2px 10px;
-            border-radius: 6px 0px 8px 0px;
-            background: linear-gradient(90deg, #2f54eb 0%, #5196ff 100%);
-            color: #fff;
+            top: 7px;
+            left: 7px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: rgba(29, 33, 40, 0.40);
+            color: #FFF;
             font-size: 10px;
             font-style: normal;
-            font-weight: 400;
+            font-weight: 700;
             line-height: 18px;
+            z-index: 100;
           }
           img {
             width: 100%;
             flex: 1;
             object-fit: cover;
-            border-radius: 4px;
+            cursor: pointer;
+          }
+          .img-model {
+            position: relative;
+            width: 100%;
+            flex: 1;
+            border-radius: 12px;
+            border: 1.5px solid #E5E6EB;
             box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.1);
             overflow: hidden;
             cursor: pointer;
+            .img-up {
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              border-radius: 12px;
+              background: rgba(29, 33, 40, 0.30);
+              display: none;
+              .recheck-num {
+                position: absolute;
+                top: 7px;
+                right: 14px;
+                color: #FFF;
+                font-size: 12px;
+                font-style: normal;
+                font-weight: 700;
+                line-height: 20px;
+              }
+              .show-more {
+                position: absolute;
+                bottom: 16px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 86px;
+                height: 32px;
+                padding: 6px 8px;
+                border-radius: 4px;
+                background: #2D5CF6;
+                display: flex;
+                align-items: center;
+                color: #FFF;
+                font-size: 12px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 20px;
+                img {
+                  width: 20px;
+                  height: 20px;
+                  margin-right: 2px;
+                }
+              }
+            }
+          }
+          .img-model:hover {
+            .img-up {
+              display: block;
+            }
           }
           .item-title {
-            height: 22px;
-            margin-top: 10px;
-            color: #1d2128;
-            font-size: 14px;
+            color: #505968;
+            font-size: 12px;
             font-style: normal;
             font-weight: 400;
-            line-height: 22px;
+            line-height: 20px;
             word-break: break-all;
             overflow: hidden;
             display: -webkit-box;
