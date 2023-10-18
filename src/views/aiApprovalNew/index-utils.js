@@ -217,6 +217,7 @@ export default {
       this.preComment = preComment
     },
     addCommentWithPosition() {
+      this.beforeAddComment()
       const timestamp = this.preComment.id || new Date().getTime()
       const files = this.preComment.files || this.files.map((file) => {
         return file.id
@@ -842,9 +843,7 @@ export default {
             newIcon.positionWithId = newIcon?.positionWithId.filter((pwi) => {
               if (!this.objIsSame(pos, pwi.pos)) return pwi
             })
-            if (!newIcon.positionWithId.length) {
-              newIcon.positionWithId.push({ commentId, pos })
-            }
+            newIcon.positionWithId.push({ commentId, pos })
             this.icons[sort] = newIcon
           })
         }

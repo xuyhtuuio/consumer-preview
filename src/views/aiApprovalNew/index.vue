@@ -343,13 +343,6 @@ export default {
       },
       deep: true
     },
-    isEdit: {
-      handler(val) {
-        if (val) {
-          this.beforeAddComment()
-        }
-      }
-    },
   },
   methods: {
     // 三屏双屏切换 0 为三屏 1 为双屏
