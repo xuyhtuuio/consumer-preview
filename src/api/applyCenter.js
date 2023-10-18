@@ -130,6 +130,14 @@ export function downloadAllFiles(param) {
     params: param
   })
 }
+export function downloadStream(param) {
+  return request({
+    url: '/cpr/file/downloadStream',
+    method: 'get',
+    responseType: 'blob',
+    params: param
+  })
+}
 export function downloadAllFilesOther(param) {
   return request({
     url: '/cpr//onlineComparison/downloadAllFiles',

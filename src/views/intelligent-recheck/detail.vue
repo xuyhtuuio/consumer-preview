@@ -159,24 +159,18 @@
         </div>
       </div>
       <div class="detail-bottom">
-        <div class="bottom-left">
-          <!-- <div class="img-header">
-            <span class="header-btns">
-              <i class="iconfont">&#xe62e;</i>
-              <i class="iconfont" @click="fullScreen(1)">&#xe62f;</i>
-            </span>
-          </div> -->
+        <div class="bottom-left" v-if="select === '1'">
           <div class="img-show">
             <ImagePreview :url="item.url" ref="imgPreview" @fullImage="fullScreen" @changeImgFun="changeImgFun"></ImagePreview>
           </div>
         </div>
         <div class="bottom-right" v-loading="loading">
-          <div class="total-list">
+          <div class="total-list" v-if="totalList.length > 0" @scroll="scrollGet" ref="listBody">
             <Waterfall line="v" :line-gap="200"
               :min-line-gap="100"
               :max-line-gap="220"
               :single-max-width="300"
-              :grow="[1, 1, 1, 1]"
+              :grow="select === '1' ? [1, 1, 1, 1] : [1, 1, 1, 1, 1]"
               :watch="totalList">
               <!-- each component is wrapped by a waterfall slot -->
               <WaterfallSlot
@@ -185,6 +179,7 @@
                 :height="item.height"
                 :order="index"
                 :key="item.id"
+                move-class="item-move"
               >
                 <div class="list-item">
                   <div class="num">
@@ -204,7 +199,9 @@
                 </div>
               </WaterfallSlot>
             </Waterfall>
+            <Loading v-if="scrollLoading && !loading"></Loading>
           </div>
+          <empty v-else></empty>
         </div>
       </div>
     </div>
@@ -253,14 +250,19 @@
 <script>
 import Waterfall from 'vue-waterfall/lib/waterfall'
 import WaterfallSlot from 'vue-waterfall/lib/waterfall-slot'
+
 import { getSimilarityComparisonList } from '@/api/intelligent-recheck'
-import { downloadAllFiles } from '@/api/applyCenter'
+import { downloadStream } from '@/api/applyCenter'
+import Empty from '@/components/common/empty'
+import Loading from './components/loading'
 import UploadDialog from './components/upload-dialog'
 // import ImgDialog from './components/img-dialog'
 import ImagePreview from './components/imgae-preview'
 import FullImage from './components/full-image'
 export default {
   components: {
+    Empty,
+    Loading,
     UploadDialog,
     // ImgDialog,
     ImagePreview,
@@ -304,7 +306,8 @@ export default {
     pageSize: 8,
     pageNum: 1,
     item: {},
-    loading: false,
+    loading: true,
+    scrollLoading: false,
     totalList: [],
     listItemActive: {
       fileUrl: ''
@@ -326,7 +329,7 @@ export default {
         key: this.item.key
       }
       this.$message.info('下载中，请稍等！')
-      downloadAllFiles(params).then((res) => {
+      downloadStream(params).then((res) => {
         const disposition = res.headers['content-disposition']
         const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
         const link = document.createElement('a');
@@ -387,6 +390,8 @@ export default {
     changeImgFun(item) {
       this.item = item;
       this.pageNum = 1;
+      this.loading = true;
+      this.totalList = [];
       this.activeSort = {
         label: '按相似度',
         val: 1,
@@ -395,7 +400,8 @@ export default {
       this.getSimilarityComparisonList()
     },
     getSimilarityComparisonList() {
-      this.loading = true
+      // this.loading = true
+      this.scrollLoading = true;
       const data = {
         fileKey: this.item.key,
         pageNow: this.pageNum,
@@ -406,7 +412,7 @@ export default {
       getSimilarityComparisonList(data)
         .then((res) => {
           if (res.data.status === 200) {
-            this.totalList = res.data.data.list.map((v) => {
+            const totalList = res.data.data.list.map((v) => {
               return {
                 ...v,
                 taskNumber: v.formId + '',
@@ -419,14 +425,25 @@ export default {
                 height: this.heightArr[Math.floor(Math.random() * 3)]
               }
             })
-            this.total = res.data.data.totalCount
+            this.total = res.data.data.totalCount;
+            this.totalList = this.totalList.concat(totalList);
           }
-          this.totalList = this.totalList.concat(this.totalList)
-          this.loading = false
+          this.loading = false;
+          this.scrollLoading = false;
         })
         .catch(() => {
-          this.loading = false
+          this.loading = false;
+          this.scrollLoading = false;
         })
+    },
+    scrollGet() {
+      if (this.scrollLoading) {
+        return;
+      }
+      const { listBody } = this.$refs;
+      if (listBody.offsetHeight + listBody.scrollTop + 100 >= listBody.scrollHeight) {
+        this.getSimilarityComparisonList();
+      }
     },
     handlePopoverShow() {
       this.$refs['my-date-picker'].handleFocus()
@@ -793,6 +810,7 @@ export default {
             cursor: pointer;
           }
           .img-model {
+            display: flex;
             position: relative;
             width: 100%;
             flex: 1;
@@ -939,6 +957,10 @@ export default {
     font-size: 14px;
     color: #FFFFFF;
   }
+}
+.item-move {
+  transition: all .5s cubic-bezier(.55,0,.1,1);
+  -webkit-transition: all .5s cubic-bezier(.55,0,.1,1);
 }
 </style>
 <style lang="less">
