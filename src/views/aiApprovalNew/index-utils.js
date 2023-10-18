@@ -235,7 +235,6 @@ export default {
       // this.$refs.ocrTxt.
     },
     appendHighLightDom(obj, commenDom) {
-      console.log(obj)
       const data = obj.position
       const doms = []
       const location = []
@@ -353,6 +352,8 @@ export default {
             temp.recommends = [];
           });
       }
+      // 更新图标
+      this.findIconPosition()
       this.approval = temp;
       this.fileloading = false;
     },
@@ -772,19 +773,26 @@ export default {
     },
     // icon 数量计算
     findIconPosition() {
-      const container = document.querySelector('.content-cont-icons')
-      const containerHeight = container.offsetHeight
-      const iconNum = Math.floor(containerHeight / 50)
-      const icons = []
-      for (let i = 0; i < iconNum; i++) {
-        icons.push({
-          icon_id: new Date().getTime() + i,
-          handleArea: [i * 50, (i + 1) * 50],
-          showIndex: -1
-        })
-      }
-      this.icons = icons
-      this.dealIconWithComment()
+      this.$nextTick(() => {
+        const container = document.querySelector('.results')
+        // const containerHeight = container.offsetHeight
+        const iconContainer = document.querySelector('.icons')
+        const containScrollHeight = container.scrollHeight
+        if (iconContainer) {
+          iconContainer.style.height = iconContainer
+        }
+        const iconNum = Math.floor(containScrollHeight / 50)
+        const icons = []
+        for (let i = 0; i < iconNum; i++) {
+          icons.push({
+            icon_id: new Date().getTime() + i,
+            handleArea: [i * 50, (i + 1) * 50],
+            showIndex: -1
+          })
+        }
+        this.icons = icons
+        this.dealIconWithComment()
+      })
     },
     // icon 管理的意见计算
     dealIconWithComment() {
@@ -864,6 +872,7 @@ export default {
         }
       }
       this.showCommentLine(obj)
+      this.$forceUpdate()
       this.curIconLine += 1
     },
     // 修改 icon 激活状态 showIndex 为 1 为激活 -1 为不激活
@@ -871,10 +880,12 @@ export default {
       if (!id) return
       this.icons?.map((icon) => {
         if (id === icon.icon_id) {
+          // const newIcon = icon
+          // newIcon.showIndex = showIndex
+          // this.$set(this.icons, this.icons[index], newIcon)
           icon.showIndex = showIndex
         }
       })
-      this.$forceUpdate()
     },
     // ocr 点击批注进行连线
     showOcrCommentLine(ocrPosition) {

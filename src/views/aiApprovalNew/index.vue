@@ -147,7 +147,8 @@
               @showLine="showLine" :lineWordItem="lineWordItem">
             </orcTxt>
             <p class="content-cont-icons" v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr">
-              <span v-for="(item,index) in icons" :key="index" @click="showIconLine(item)">
+              <span class="icons">
+                <span v-for="(item,index) in icons" :style="{ position: 'absolute', top: ((index + 1) * 50) + 'px' }" :key="index" @click="showIconLine(item)">
                 <!-- 单一评论 - 未激活 -->
                 <span :data-icon="index" v-if="item.positionWithId?.length === 1 && item.showIndex === -1">
                   <svg class="icon" aria-hidden="true">
@@ -171,6 +172,7 @@
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-a-Component133"></use>
                   </svg>
+                </span>
                 </span>
               </span>
             </p>
@@ -546,14 +548,20 @@ export default {
       }
 
       .content-cont-icons {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
+        overflow: auto;
+        .icons {
+          width: 32px;
+          position: relative;
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          justify-content: space-around;
 
-        .icon {
-          width: 15px;
-          height: 15px;
-          cursor: pointer;
+          .icon {
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+          }
         }
       }
     }
