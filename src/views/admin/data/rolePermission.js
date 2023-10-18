@@ -105,6 +105,12 @@ export const permissionList = [
     props: { trueLabel: 'edit', falseLabel: '' },
   },
   {
+    code: 'knowledge',
+    title: '知识库',
+    type: '',
+    props: { trueLabel: 'edit', falseLabel: '' },
+  },
+  {
     code: 'peopleCenter',
     title: '人员中心',
     type: '',

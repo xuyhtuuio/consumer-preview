@@ -231,6 +231,12 @@ const router = new Router({
       meta: { title: '统计中心', viewport },
     },
     {
+      path: '/knowledge',
+      name: 'knowledge',
+      component: () => import('@/views/knowledge/index'),
+      meta: { title: '知识库', viewport }
+    },
+    {
       path: '/front',
       name: 'front',
       component: () => import('@/views/front/index'),

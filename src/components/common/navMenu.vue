@@ -90,7 +90,8 @@ export default {
           name: 'statistical-center',
           sign: 'statistical-center'
         },
-        { title: '人员中心', name: 'personCenter', sign: 'personcenter' }
+        { title: '人员中心', name: 'personCenter', sign: 'personcenter' },
+        { title: '知识库', name: 'knowledge', sign: 'knowledge' }
       ]
       return navList
         .map((item) => {
@@ -149,6 +150,9 @@ export default {
       }
       if (fullPath.indexOf('person-center') !== -1) {
         this.activeMenu = 'personcenter'
+      }
+      if (fullPath.indexOf('knowledge') !== -1) {
+        this.activeMenu = 'knowledge'
       }
     },
     logout() {
