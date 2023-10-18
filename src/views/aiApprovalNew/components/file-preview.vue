@@ -397,6 +397,7 @@ export default {
 }
 
 .preview {
+  overflow: auto;
   background: #ffffff;
   flex: 1;
   position: relative;

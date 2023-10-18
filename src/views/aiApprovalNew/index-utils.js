@@ -325,6 +325,9 @@ export default {
       document.querySelector('.content-cont-editor').addEventListener('scroll', () => {
         this.linePosition();
       });
+      document.querySelector('.file-preview .preview .preview').addEventListener('scroll', () => {
+        this.linePosition();
+      });
     },
 
     // 切换审批文件
@@ -960,7 +963,6 @@ export default {
       if (boolean) {
         this.isEdit = true
       }
-      console.log('boolean', boolean, 'isEdit', this.isEdit)
     }
   },
 };
