@@ -330,11 +330,14 @@ export default {
       this.$emit('addWord', obj, nodes)
     },
     showOcrCommentLine(event) {
+      const selectText = window.getSelection
+        ? window.getSelection().toString()
+        : document.selection.createRange().text
       const node = event.target.parentNode
-      const { childNodes } = node
-      const childNode = childNodes[0]
-      const classs = Array.from(childNode.classList)
-      if (!classs.includes('commentNode')) return
+      // 区分：点击事件和 鼠标滑动选中事件
+      if (selectText) {
+        return;
+      }
       const position = {
         left: Math.floor(node.offsetLeft),
         height: Math.floor((node.offsetHeight * (1 / this.styleProp.wordDomStyle.scale))),
