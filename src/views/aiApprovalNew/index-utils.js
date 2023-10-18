@@ -934,6 +934,13 @@ export default {
         }
       }
       return true
+    },
+    // 判断当前选中批注状态是否为修改
+    checkEdit(boolean) {
+      this.isEdit = false
+      if (boolean) {
+        this.isEdit = true
+      }
     }
   },
 };

@@ -121,6 +121,16 @@ export default {
         : document.selection.empty()
     },
     getSelection(event) {
+      const node = event.target.parentNode
+      const { childNodes } = node
+      const childNode = childNodes[0]
+      const classs = Array.from(childNode.classList)
+      // 如果二次选中高亮区域则判定为修改批注操作
+      if (classs.includes('commentNode')) {
+        this.$emit('checkEdit', true)
+      } else {
+        this.$emit('checkEdit', false)
+      }
       const selectText = window.getSelection
         ? window.getSelection().toString()
         : document.selection.createRange().text

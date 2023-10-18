@@ -95,7 +95,7 @@
               @changeFile="changeFile" :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"
               @getProps="getProps" @findIconPosition="findIconPosition"></file-preview>
             <orcTxtNew ref="ocrTxt" v-show="curMode === 0" :approval="approval" @addWord="addWord"
-              @lineRemove="lineRemove"
+              @lineRemove="lineRemove" @checkEdit="checkEdit"
               v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
               @showLine="showLine" @showOcrCommentLine="showOcrCommentLine" :lineWordItem="lineWordItem" :styleProp="styleProp">
             </orcTxtNew>
@@ -104,7 +104,7 @@
               <div class="postil-header">
                 <div>
                   <!-- <span><img src="@/assets/image/ai-approval/ocr-postil.png" alt=""></span> -->
-                  <span class="postil-text">{{ isEdit ? '添加批注' : '修改批注' }}</span>
+                  <span class="postil-text">{{ isEdit ? '修改批注' : '添加批注' }}</span>
                 </div>
               </div>
               <div class="line"></div>
