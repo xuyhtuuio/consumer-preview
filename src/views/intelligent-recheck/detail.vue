@@ -441,7 +441,7 @@ export default {
         return;
       }
       const { listBody } = this.$refs;
-      if (listBody.offsetHeight + listBody.scrollTop + 100 >= listBody.scrollHeight) {
+      if (listBody.offsetHeight + listBody.scrollTop + 200 >= listBody.scrollHeight) {
         this.getSimilarityComparisonList();
       }
     },

@@ -155,6 +155,14 @@ const router = new Router({
           meta: {
             title: '回检记录'
           }
+        },
+        {
+          path: 'recheck-compare',
+          name: 'recheck-compare',
+          component: () => import('@/views/intelligent-recheck/compare-detail'),
+          meta: {
+            title: '回检对比'
+          }
         }
       ]
     },
