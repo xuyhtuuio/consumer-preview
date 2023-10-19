@@ -219,9 +219,7 @@ export default {
     addCommentWithPosition() {
       this.beforeAddComment()
       const timestamp = this.preComment.id || new Date().getTime()
-      const files = this.preComment.files || this.files.map((file) => {
-        return file.id
-      })
+      const files = this.preComment.files || [this.files?.[this.activeIndex]?.id]
       const words = this.preComment || []
 
       const newComment = {
