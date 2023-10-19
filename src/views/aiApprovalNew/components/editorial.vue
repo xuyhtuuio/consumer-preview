@@ -4,7 +4,6 @@
       <span v-show="showRecommend && showOcr" :class="{ active: active === 1 }" @click="changeType(1)">推荐意见</span>
       <i v-show="showRecommend && showOcr">|</i>
       <span :class="{ active: active === 2 }" @click="changeType(2)">编辑意见</span>
-      <span>{{ active }}</span>
     </div>
     <div class="results" ref="results">
       <!-- 推荐意见 -->
