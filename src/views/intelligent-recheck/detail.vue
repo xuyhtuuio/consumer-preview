@@ -86,6 +86,7 @@
                   ref="my-date-picker"
                   align="right"
                   unlink-panels
+                  :picker-options="pickerOptions"
                   range-separator="至"
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
@@ -115,6 +116,7 @@
                   ref="my-date-picker"
                   align="right"
                   unlink-panels
+                  :picker-options="pickerOptions"
                   range-separator="至"
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
@@ -312,6 +314,11 @@ export default {
     },
     inputFocus: false,
     heightArr: [322, 262, 162],
+    pickerOptions: {
+      disabledDate(date) {
+        return date.getTime() > Date.now();
+      }
+    }
   }),
   created() {
     if (this.$route.params.item) {
