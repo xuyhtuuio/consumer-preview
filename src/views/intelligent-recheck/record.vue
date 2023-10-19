@@ -10,24 +10,22 @@
         <div class="left-area">
           <el-row>
             <el-col :span="6">
-              <el-dropdown trigger="click">
-                <span class="el-dropdown-link">
-                  选择机构
-                  <img
-                    src="../../assets/image/person-center/down.png"
-                    class="down"
-                    alt=""
-                  />
-                </span>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item>Action 1</el-dropdown-item>
-                    <el-dropdown-item> </el-dropdown-item>
-                    <el-dropdown-item>Action 3</el-dropdown-item>
-                    <el-dropdown-item>Action 4</el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
+              <div class="scrren-com" :class="search.mechanism ? 'active' : ''">
+                选择机构
+                <img
+                  src="../../assets/image/person-center/down.png"
+                  class="down"
+                  alt=""
+                />
+                <el-cascader
+                  class="my-hidden"
+                  v-model="search.mechanism"
+                  :options="organOptions"
+                  :props="{ checkStrictly: true }"
+                  @change="handleOrganChange"
+                  @visible-change="handleOrganChange"
+                ></el-cascader>
+              </div>
               <img
                 src="../../assets/image/why.png"
                 alt=""
@@ -35,44 +33,40 @@
               />
             </el-col>
             <el-col :span="6">
-              <el-dropdown trigger="click">
-                <span class="el-dropdown-link">
-                  上线时间
-                  <img
-                    src="../../assets/image/person-center/down.png"
-                    class="down"
-                    alt=""
-                  />
-                </span>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item>Action 1</el-dropdown-item>
-                    <el-dropdown-item> </el-dropdown-item>
-                    <el-dropdown-item>Action 3</el-dropdown-item>
-                    <el-dropdown-item>Action 4</el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
+              <div class="scrren-com" :class="search.onlineTime ? 'active' : ''">
+                上线时间
+                <img
+                  src="../../assets/image/person-center/down.png"
+                  class="down"
+                  alt=""
+                />
+                <el-cascader
+                  class="my-hidden"
+                  v-model="search.onlineTime"
+                  :options="organOptions"
+                  :props="{ checkStrictly: true }"
+                  @change="handleOrganChange"
+                  @visible-change="handleOrganChange"
+                ></el-cascader>
+              </div>
             </el-col>
             <el-col :span="6">
-              <el-dropdown trigger="click">
-                <span class="el-dropdown-link">
-                  提单时间
-                  <img
-                    src="../../assets/image/person-center/down.png"
-                    class="down"
-                    alt=""
-                  />
-                </span>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item>Action 1</el-dropdown-item>
-                    <el-dropdown-item> </el-dropdown-item>
-                    <el-dropdown-item>Action 3</el-dropdown-item>
-                    <el-dropdown-item>Action 4</el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
+              <div class="scrren-com" :class="search.billTime ? 'active' : ''">
+                提单时间
+                <img
+                  src="../../assets/image/person-center/down.png"
+                  class="down"
+                  alt=""
+                />
+                <el-cascader
+                  class="my-hidden"
+                  v-model="search.billTime"
+                  :options="organOptions"
+                  :props="{ checkStrictly: true }"
+                  @change="handleOrganChange"
+                  @visible-change="handleOrganChange"
+                ></el-cascader>
+              </div>
             </el-col>
             <el-col :span="6" justify="center">
               <el-switch size="small" style="margin-right: 4px" />
@@ -107,12 +101,22 @@ import recordTableVue from './components/record-table.vue'
 export default {
   name: 'Record',
   data() {
-    return {}
+    return {
+      search: {
+        mechanism: '',
+        onlineTime: '',
+        billTime: ''
+      }
+    }
   },
   components: {
     recordTableVue
   },
-  methods: {},
+  methods: {
+    handleChange() {
+      console.log(this.search.mechanism)
+    }
+  },
   created() {},
   mounted() {},
   watch: {}
@@ -163,21 +167,7 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    :deep(.el-dropdown-link) {
-      color: var(--gray-gray-9, #1d2128);
-      /* 正文/常规 */
-      font-family: Microsoft YaHei;
-      font-size: 2px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 22px;
 
-      img {
-        margin-left: 4px;
-        width: 8px;
-        height: 6px;
-      }
-    }
     .left-area {
       width: 525px;
     }
@@ -217,6 +207,49 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .scrren-com {
+    cursor: pointer;
+    color: #1d2128;
+    font-size: 16px;
+    line-height: 24px;
+    width: fit-content;
+    padding: 0 6px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    color: var(--gray-gray-9, #1d2128);
+    font-size: 2px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+
+    img {
+      margin-left: 4px;
+      width: 8px;
+      height: 6px;
+    }
+
+    &.active {
+      color: #2d5cf6;
+    }
+    .my-hidden {
+      position: absolute;
+      opacity: 0;
+    }
+
+    .el-select {
+      position: absolute;
+      opacity: 0;
+    }
+
+    .hintIcon {
+      width: 20px;
+      margin-left: 4px;
+    }
   }
 }
 </style>

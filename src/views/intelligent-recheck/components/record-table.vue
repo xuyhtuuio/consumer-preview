@@ -51,6 +51,7 @@
         >
           {{ item.backInspectionFrequency
           }}<span style="font-size: 12px">次</span>
+          <img src="../../../assets/image/notice.png" alt="" style="width: 16px; height: 16px;">
         </el-col>
         <el-col :span="8" align="center" class="my-col-new">
           {{ item.backInspectionOption }}
@@ -145,6 +146,11 @@ export default {
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
+
+    &:hover {
+      cursor: pointer;
+      color: var(--unnamed, #2d5cf6);
+    }
 
     .file-id {
       color: var(--gray-gray-8, #505968);
