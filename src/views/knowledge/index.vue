@@ -37,12 +37,5 @@ export default {
 <style lang="less" scoped>
 .manage {
   display: flex;
-  .view-content {
-    width: calc(100% - 140px - 16px);
-    // height: fit-content;
-    padding: 24px;
-    background: #ffffff;
-    border-radius: 4px;
-  }
 }
 </style>

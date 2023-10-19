@@ -51,8 +51,9 @@ export default {
 .el-menu {
   padding: 8px 12px 0;
   width: 200px;
-  margin-right: 16px;
+  margin-right: 12px;
   border-right: none;
+  border-radius: 10px;
   .el-menu-item {
     height: 40px;
     line-height: 40px;
