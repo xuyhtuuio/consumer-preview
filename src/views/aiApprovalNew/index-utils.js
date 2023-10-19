@@ -296,29 +296,45 @@ export default {
         timing: 'linear'
       };
       this.endDomId = endDomId
-      start.map((item, index) => {
-        rootDom.appendChild(item)
-        this.word_lines[index] = new LeaderLine(end, item, {
-          color: '#EB5D78',
-          size: 1,
-          startPlug: 'disc',
-          endPlug: 'disc'
-          // endSocket: 'auto'
-        });
-        const showEffectName = 'draw';
-        this.word_lines[index].show(showEffectName, animOptions);
-        this.$nextTick(() => {
-          const highLightDoms = Array.from(document.getElementsByClassName('imgLight'));
-          this.high_light_lines[index] = new LeaderLine(highLightDoms[index], item, {
+      const showEffectName = 'draw';
+      if (this.curMode === 0) {
+        start.map((item, index) => {
+          rootDom.appendChild(item)
+          this.word_lines[index] = new LeaderLine(end, item, {
             color: '#EB5D78',
             size: 1,
             startPlug: 'disc',
             endPlug: 'disc'
             // endSocket: 'auto'
           });
-          this.high_light_lines[index].show(showEffectName, animOptions);
+          this.word_lines[index].show(showEffectName, animOptions);
+          this.$nextTick(() => {
+            const highLightDoms = Array.from(document.getElementsByClassName('imgLight'));
+            this.high_light_lines[index] = new LeaderLine(highLightDoms[index], item, {
+              color: '#EB5D78',
+              size: 1,
+              startPlug: 'disc',
+              endPlug: 'disc'
+              // endSocket: 'auto'
+            });
+            this.high_light_lines[index].show(showEffectName, animOptions);
+          })
         })
-      })
+      } else if (this.curMode === 1) {
+        start.map((item, index) => {
+          this.$nextTick(() => {
+            const highLightDoms = Array.from(document.getElementsByClassName('imgLight'));
+            this.high_light_lines[index] = new LeaderLine(highLightDoms[index], end, {
+              color: '#EB5D78',
+              size: 1,
+              startPlug: 'disc',
+              endPlug: 'disc'
+              // endSocket: 'auto'
+            });
+            this.high_light_lines[index].show(showEffectName, animOptions);
+          })
+        })
+      }
       this.preDoms = start
       document.querySelector('.ocr-txt .results').addEventListener('scroll', () => {
         this.linePosition();
