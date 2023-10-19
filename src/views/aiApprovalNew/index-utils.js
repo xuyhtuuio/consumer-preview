@@ -251,8 +251,8 @@ export default {
       data.map((item) => {
         const newDom = document.createElement('div')
         newDom.style.position = 'absolute'
-        newDom.style.left = `${item.left}px`
-        newDom.style.top = `${item.top}px`
+        newDom.style.left = `${item.left / this.styleProp.wordDomStyle.scale}px`
+        newDom.style.top = `${item.top / this.styleProp.wordDomStyle.scale}px`
         newDom.style.width = `${(item.width / this.styleProp.wordDomStyle.scale)}px`
         newDom.style.height = `${(item.height / this.styleProp.wordDomStyle.scale)}px`
         const highlight = {
