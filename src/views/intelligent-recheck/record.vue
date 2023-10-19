@@ -3,7 +3,11 @@
     <div class="outer">
       <div class="search-area">
         <div class="search-title">智能回检</div>
-        <el-input placeholder="请输入关键词开始检索"></el-input>
+        <el-input
+          placeholder="请输入关键词开始检索"
+          @keyup.enter.native="handleSubmit"
+          v-model="searchInput"
+        ></el-input>
       </div>
 
       <div class="search-middle-area">
@@ -20,10 +24,7 @@
                 <el-cascader
                   class="my-hidden"
                   v-model="search.mechanism"
-                  :options="organOptions"
                   :props="{ checkStrictly: true }"
-                  @change="handleOrganChange"
-                  @visible-change="handleOrganChange"
                 ></el-cascader>
               </div>
               <img
@@ -33,47 +34,80 @@
               />
             </el-col>
             <el-col :span="6">
-              <div class="scrren-com" :class="search.onlineTime ? 'active' : ''">
-                上线时间
-                <img
-                  src="../../assets/image/person-center/down.png"
-                  class="down"
-                  alt=""
-                />
-                <el-cascader
-                  class="my-hidden"
-                  v-model="search.onlineTime"
-                  :options="organOptions"
-                  :props="{ checkStrictly: true }"
-                  @change="handleOrganChange"
-                  @visible-change="handleOrganChange"
-                ></el-cascader>
+              <div
+                class="scrren-com"
+                :class="search.datePickerOnline ? 'active' : ''"
+              >
+                <el-popover
+                  ref="ref-popover"
+                  width="400"
+                  placement="bottom-start"
+                  trigger="click"
+                >
+                  <el-date-picker
+                    class="my-date-picker"
+                    ref="my-date-picker"
+                    v-model="search.datePickerOnline"
+                    type="monthrange"
+                    align="right"
+                    range-separator="至"
+                    start-placeholder="开始月份"
+                    end-placeholder="结束月份"
+                    :picker-options="pickerOptions"
+                  >
+                  </el-date-picker>
+                  <div slot="reference">
+                    上线时间
+                    <img
+                      src="../../assets/image/person-center/down.png"
+                      class="down"
+                      alt=""
+                    />
+                  </div>
+                </el-popover>
               </div>
             </el-col>
             <el-col :span="6">
-              <div class="scrren-com" :class="search.billTime ? 'active' : ''">
-                提单时间
-                <img
-                  src="../../assets/image/person-center/down.png"
-                  class="down"
-                  alt=""
-                />
-                <el-cascader
-                  class="my-hidden"
-                  v-model="search.billTime"
-                  :options="organOptions"
-                  :props="{ checkStrictly: true }"
-                  @change="handleOrganChange"
-                  @visible-change="handleOrganChange"
-                ></el-cascader>
+              <div
+                class="scrren-com"
+                :class="search.datePickerBill ? 'active' : ''"
+              >
+                <el-popover
+                  ref="ref-popover"
+                  width="400"
+                  placement="bottom-start"
+                  trigger="click"
+                >
+                  <el-date-picker
+                    class="my-date-picker"
+                    ref="my-date-picker"
+                    v-model="search.datePickerBill"
+                    type="monthrange"
+                    align="right"
+                    range-separator="至"
+                    start-placeholder="开始月份"
+                    end-placeholder="结束月份"
+                    :picker-options="pickerOptions"
+                  >
+                  </el-date-picker>
+                  <div slot="reference">
+                    提单时间
+                    <img
+                      src="../../assets/image/person-center/down.png"
+                      class="down"
+                      alt=""
+                    />
+                  </div>
+                </el-popover>
               </div>
             </el-col>
             <el-col :span="6" justify="center">
-              <el-switch size="small" style="margin-right: 4px" />
+              <el-switch size="small" style="margin-right: 4px" v-model="isBackCheck"/>
               已回检
             </el-col>
           </el-row>
         </div>
+
         <div class="right-area">
           <el-row>
             <el-col :span="8"
@@ -90,12 +124,37 @@
           </el-row>
         </div>
       </div>
-      <recordTableVue />
+      <recordTableVue
+        @openOption="handleOpenOption"
+        @openRecord="handleOpenRecord"
+      />
     </div>
+
+    <el-dialog
+      title="回检意见"
+      :visible="optionDialogVisible"
+      width="50%"
+      align="left"
+      :before-close="handleClose"
+    >
+      <span>{{ optionValue }}</span>
+    </el-dialog>
+
+    <el-dialog
+      title="回检记录"
+      :visible="recordDialogVisible"
+      width="70%"
+      align="center"
+      :before-close="handleClose"
+    >
+      <record-dialog />
+    </el-dialog>
   </div>
 </template>
 
 <script>
+// eslint-disable-next-line import/extensions
+import RecordDialog from './components/record-dialog.vue'
 // eslint-disable-next-line import/extensions
 import recordTableVue from './components/record-table.vue'
 export default {
@@ -106,15 +165,67 @@ export default {
         mechanism: '',
         onlineTime: '',
         billTime: ''
-      }
+      },
+      searchInput: '',
+      optionDialogVisible: false,
+      recordDialogVisible: false,
+      optionValue: '',
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now()
+        },
+        shortcuts: [
+          {
+            text: '近一个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setMonth(start.getMonth() - 1)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '近一个季度',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setMonth(start.getMonth() - 3)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '近一年',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setMonth(start.getMonth() - 12)
+              picker.$emit('pick', [start, end])
+            }
+          }
+        ]
+      },
+      datePickerOnline: '',
+      dataPickerBill: '',
+      isBackCheck: '',
     }
   },
   components: {
-    recordTableVue
+    recordTableVue,
+    RecordDialog
   },
   methods: {
-    handleChange() {
-      console.log(this.search.mechanism)
+    handleChange() {},
+    handleSubmit() {},
+    handleClose() {
+      this.optionDialogVisible = false
+      this.recordDialogVisible = false
+    },
+    handleOpenOption(option) {
+      this.optionValue = option
+      this.optionDialogVisible = true
+    },
+    handleOpenRecord() {
+      this.recordDialogVisible = true
     }
   },
   created() {},
@@ -250,6 +361,18 @@ export default {
       width: 20px;
       margin-left: 4px;
     }
+  }
+}
+
+:deep(.el-dialog__header) {
+  display: flex;
+  justify-content: center;
+}
+
+.my-date-picker {
+  width: 100%;
+  :deep(.el-range-separator) {
+    width: 10%;
   }
 }
 </style>
