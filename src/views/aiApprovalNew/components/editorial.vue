@@ -60,9 +60,28 @@
             <div class="files" v-else>
               <el-tag closable
                 size="small" @close="removeFile(item, files.filter(file => item.files.includes(file.id))?.[0].id)">
-                <span>{{ files.filter(file => item.files.includes(file.id))?.[0].fileName }}</span>
+                <span @click="showCommentLine(item.id, tag.id)">{{ files.filter(file => item.files.includes(file.id))?.[0].fileName }}</span>
               </el-tag>
-              <span class="tagExtra" style="color: #306EF5;"> + {{ files.filter(file => item.files.includes(file.id))?.length - 1 }}</span>
+              <el-popover placement="bottom" popper-class="cont-top-popover" width="300" :offset="100" trigger="click"
+                :visible-arrow=false>
+                <div class="cont-top-fileList">
+                  <div class="fileList-list-item" @click="showCommentLine(item.id, file.id)"  v-for="(file, index) in files.filter(file => item.files.includes(file.id))" :key="index"
+                    :class="{
+                      'swiper-slide-img': ['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))
+                    }">
+                    <!-- <span class="">{{ index + 1 }}.</span>
+                    <el-image v-if="['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))"
+                      :src="file.url"></el-image> -->
+                    <!-- <file-type class="icon" v-else :fileName="file.fileName"></file-type> -->
+                    <span class="fileList-list-item-fileName">{{ getfileName(file.fileName) }}
+                      <i class="fileList-list-item-fileSuf">.{{ getfileType(file.fileName) }}</i>
+                    </span>
+                  </div>
+                </div>
+                <span slot="reference">
+                  <span class="tagExtra" style="color: #306EF5;"> + {{ files.filter(file => item.files.includes(file.id))?.length - 1 }}</span>
+                </span>
+              </el-popover>
             </div>
             <div class="icon-plus">
               <i class="el-icon-circle-plus" @click="showDialog(item)"></i>
@@ -160,6 +179,18 @@ export default {
         this.changeType(2)
       }
     }
+  },
+  computed: {
+    getfileType() {
+      return val => {
+        return val?.split('.')[val.split('.').length - 1]
+      }
+    },
+    getfileName() {
+      return val => {
+        return val?.split('.')[0]
+      }
+    },
   },
   methods: {
     init(val) {
@@ -595,4 +626,100 @@ export default {
     text-decoration: underline;
   }
 }
+.cont-top-popover {
+  .cont-top-fileList {
+    height: 112px;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      display: inline-block;
+    }
+  }
+
+  .fileList-search {
+    padding: 0px 16px;
+    padding-bottom: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /deep/ .el-input__inner {
+      padding: 2px 12px 2px 12px;
+      border: none;
+      background: #F2F3F5;
+      display: flex;
+      align-items: center;
+      height: 28px;
+      border-radius: 18px;
+    }
+  }
+
+  .fileList-tip {
+    padding: 0 16px;
+
+    .fileList-tip-text {
+      margin-left: 4px;
+      color: #86909C;
+      font-size: 12px;
+    }
+
+    /deep/.el-switch__core {
+      width: 28px !important;
+      height: 16px !important;
+
+      &::after {
+        width: 12px;
+        height: 12px;
+      }
+    }
+
+    /deep/ .el-switch.is-checked .el-switch__core::after {
+      margin-left: -13px;
+    }
+  }
+
+  .fileList-list-item {
+    border-bottom: 1px dashed #E5E6EB;
+    cursor: pointer;
+    padding: 10px 24px 10px 24px;
+    display: flex;
+
+    /deep/ .el-image {
+      width: 20px;
+      height: 20px;
+      margin: 0 10px;
+    }
+
+    .icon {
+      width: 20px;
+      height: 20px;
+      margin: 0 10px;
+    }
+
+    .fileList-list-item-fileName {
+      width: 170px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    &:hover {
+      .fileList-list-item-fileName {
+        font-weight: 700;
+        color: #1D2128;
+      }
+
+      .fileList-list-item-fileSuf {
+        font-weight: 400;
+        color: #1D2128;
+      }
+
+      background: #F2F3F5;
+    }
+  }
+}
 </style>
+
+<style lang="less">.cont-top-popover {
+  padding: 8px 0px;
+}</style>
