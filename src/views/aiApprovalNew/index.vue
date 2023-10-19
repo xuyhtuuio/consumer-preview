@@ -91,7 +91,7 @@
             </div>
           </div>
           <div class="content-cont-body-bottom">
-            <fileChange :fileList="files" v-if="curMode === 1"></fileChange>
+            <fileChange @changeFile="changeFile" :activeIndex="activeIndex" :fileList="files" v-if="curMode === 1"></fileChange>
             <file-preview ref="filePreview" :files="files" :formId="formId" :activeIndex="activeIndex"
               @changeFile="changeFile" :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"
               @getProps="getProps" @findIconPosition="findIconPosition"></file-preview>
@@ -544,7 +544,16 @@ export default {
           }
         }
       }
-
+      >.file-change{
+        flex: none !important;
+        width: 60px;
+      }
+      >.file-preview{
+        flex: 1;
+      }
+      >.ocr-txt{
+        flex: 1;
+      }
       >p {
         background: #ffffff;
         border-radius: 0px 0px 10px 10px;
