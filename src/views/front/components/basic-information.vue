@@ -285,7 +285,7 @@ export default {
         } else if (item.name === 'TimePicker' || item.name === 'Cascader') {
           return ['form-item']
         } else {
-          return []
+          return [!item.props.exclusiveRowOrNot && 'form-item']
         }
       }
     }
