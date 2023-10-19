@@ -204,6 +204,8 @@ export default {
       this.comments_nodes = Array.from(nodes)
     },
     addBg(nodes) {
+      const popover = this.$refs.postilPopover.$refs.popper
+      popover.classList.remove('positil-popover-left')
       nodes.forEach((node) => {
         node.classList.add('commentNode')
       })
@@ -988,6 +990,11 @@ export default {
       if (boolean) {
         this.isEdit = true
       }
+    },
+    addRelComment() {
+      const popover = this.$refs.postilPopover.$refs.popper
+      popover.classList.add('positil-popover-left')
+      this.$refs.editorial.changeType(2)
     }
   },
 };

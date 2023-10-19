@@ -100,7 +100,7 @@
               v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode === 0"
               @showLine="showLine" @showOcrCommentLine="showOcrCommentLine" :lineWordItem="lineWordItem" :styleProp="styleProp">
             </orcTxtNew>
-            <el-popover class="postil-popover" v-model="popoverShow" id="popover" placement="right"
+            <el-popover ref="postilPopover" class="postil-popover" v-model="popoverShow" popper-class="postil-popover" placement="right"
               trigger="manual">
               <div class="postil-header">
                 <div>
@@ -111,7 +111,7 @@
               <div class="line"></div>
               <div class="postil-tabs">
                 <span>批注意见</span>
-                <span>关联意见</span>
+                <span class="postil-tab-rel" @click="addRelComment">关联意见</span>
               </div>
               <div class="postil-input">
                 <el-input type="textarea" resize="none" placeholder="请输入批注意见描述" v-model="postil.textarea">
@@ -749,6 +749,11 @@ export default {
         margin-right: 8px;
       }
     }
+    .postil-tab-rel{
+      color: #2D5CF6;
+      text-decoration: underline;
+      cursor: pointer;
+    }
   }
   .postil-tipText {
     margin-top: 4px;
@@ -808,6 +813,9 @@ export default {
       color: #fff;
     }
   }
+}
+/deep/ .positil-popover-left {
+  left: 0 !important;
 }
 /deep/ .commentNode{
   background: #D1E2FF;
