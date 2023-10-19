@@ -2,14 +2,10 @@
   <div class="outter">
     <el-row class="table-head">
       <el-col :span="1" align="center"> 序号 </el-col>
-      <el-col :span="5" align="center"> 回检文件名称 </el-col>
+      <el-col :span="4" align="center"> 回检文件名称 </el-col>
       <el-col :span="4" align="center"> 回检人员 </el-col>
       <el-col :span="3" align="center"> 回检时间 </el-col>
-      <el-col :span="3" align="center"> 是否符合要求 </el-col>
-      <el-col :span="3" align="center"> 事项类型 </el-col>
-      <el-col :span="4" align="center"> 文件所在部门 </el-col>
-      <el-col :span="3" align="center"> 回检次数 </el-col>
-      <el-col :span="8" align="center"> 回检意见 </el-col>
+      <el-col :span="12" align="center"> 回检意见 </el-col>
     </el-row>
     <div class="table-content">
       <el-row
@@ -21,7 +17,7 @@
         <el-col :span="1" align="center" justify="center" class="my-col-1">
           {{ index + 1 }}
         </el-col>
-        <el-col :span="5" align="center" class="my-col-5">
+        <el-col :span="4" align="center" class="my-col-5">
           <p>{{ item.backInspectionFile.fileName }}</p>
           <p class="file-id">ID.{{ item.backInspectionFile.fileID }}</p>
         </el-col>
@@ -34,34 +30,8 @@
         <el-col :span="3" align="center" class="my-col-new">
           {{ item.backInspectionTime }}
         </el-col>
-        <el-col :span="3" align="center" class="my-col-new">
-          {{ item.isRight }}
-        </el-col>
-        <el-col :span="3" align="center" class="my-col-new">
-          {{ item.thingTpe }}
-        </el-col>
-        <el-col :span="4" align="center" class="my-col-new">
-          {{ item.department }}
-        </el-col>
-        <el-col
-          :span="3"
-          align="center"
-          class="my-col-new"
-          style="font-size: 16px"
-        >
-          {{ item.backInspectionFrequency
-          }}<span style="font-size: 12px">次</span>
-          <img
-            src="../../../assets/image/notice.png"
-            alt=""
-            style="width: 16px; height: 16px"
-            @click="handleOpenRecord"
-          />
-        </el-col>
-        <el-col :span="8" align="center" class="my-col-new">
-          <div @click="handleOpenOption(item.backInspectionOption)">
-            {{ item.backInspectionOption }}
-          </div>
+        <el-col :span="12" align="center" class="my-col-new">
+          {{ item.backInspectionOption }}
         </el-col>
       </el-row>
     </div>
@@ -82,7 +52,8 @@ export default {
   name: 'RecordTable',
   data() {
     return {
-      recordData
+      // 模拟只要前五个元素
+      recordData: recordData.slice(0, 5)
     }
   },
   methods: {
@@ -119,12 +90,11 @@ export default {
 
   .table-head-again {
     width: 100%;
-    padding: 30px 16px;
+    padding: 10px 16px;
     display: flex;
     align-items: center;
     gap: 10px;
     align-self: stretch;
-    height: 42px;
     border-radius: 4px;
     color: var(--gray-gray-9, #1d2128);
     text-align: center;
@@ -133,26 +103,8 @@ export default {
     line-height: 22px;
     border-bottom: 1px dashed var(--gray-gray-3, #f2f3f5);
 
-    &:nth-child(8) {
+    &:nth-child(5) {
       border-bottom: none;
-    }
-  }
-  .table-content {
-    :deep(.el-col) {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-
-      div {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      p {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
     }
   }
 
@@ -165,10 +117,19 @@ export default {
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
-    &:hover {
-      cursor: pointer;
-      color: var(--unnamed, #2d5cf6);
+    div {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    p {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .file-id {
@@ -180,7 +141,7 @@ export default {
 
   .my-col-4 {
     position: relative;
-    left: 22px;
+    left: 35px;
     text-align: start;
     color: var(--gray-gray-9, #1d2128);
     font-size: 14px;
@@ -210,6 +171,9 @@ export default {
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
+    text-align: left;
+    position: relative;
+    left: 15px;
   }
 
   .my-row {
