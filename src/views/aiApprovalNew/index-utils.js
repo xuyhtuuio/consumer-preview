@@ -995,6 +995,10 @@ export default {
       const popover = this.$refs.postilPopover.$refs.popper
       popover.classList.add('positil-popover-left')
       this.$refs.editorial.changeType(2)
+      this.isRel = true
+    },
+    changeRel(boolean) {
+      this.isRel = boolean
     }
   },
 };

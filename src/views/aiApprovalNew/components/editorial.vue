@@ -48,7 +48,10 @@
           <el-input v-else :ref="`input_${i}`" @blur="hideEdit_collection(i)" v-model.trim="input" placeholder="请输入意见"
             type="textarea" :rows="3" class="edit-input" resize="none"
             @keyup.enter.native="hideEdit_collection(i)"></el-input>
-          <i class="el-icon-close" @click="removeItem(item, i)"></i>
+          <i v-if="!isRel" class="el-icon-close" @click="removeItem(item, i)"></i>
+          <i v-else class="checkbox" @click="makeRel(item)" :class="{active:  item.selected}">
+            <i class="el-icon-check" v-if="item.selected"></i>
+          </i>
           <div class="item-files">
             <span>文件来源：</span>
             <div class="files" v-if="files.filter(file => item.files.includes(file.id))?.length <= 2">
@@ -106,6 +109,10 @@
             </div>
           </div>
         </div>
+        <div class="postil-btn-group" v-if="isRel">
+          <div class="postil-btn cancle" @click="this.$emit('changeRel', false)">取消</div>
+          <div class="postil-btn verify" @click="submitRel">完成</div>
+        </div>
       </div>
     </div>
     <add-file-source ref="addFileSource" :files="files" @updateFile="updateFile"></add-file-source>
@@ -153,6 +160,10 @@ export default {
       type: Number,
       default: 0
     },
+    isRel: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -358,8 +369,31 @@ export default {
       } else {
         this.$emit('changeFileById', fileId)
       }
+    },
+    makeRel(item) {
+      this.collection.map((col) => {
+        if (col.id === item.id) {
+          col.selected = !item.selected
+        }
+      })
+      this.$forceUpdate()
+    },
+    submitRel() {
+      const newFile = this.files[this.activeIndex]?.id
+      // 获取到 selected 的意见
+      const relComments = this.collection.filter((comment) => comment.selected)
+      relComments.map((relComment) => {
+        this.$emit('upDateComments', 'editFiles', relComment, [...relComment.files, newFile])
+      })
+      // 更新当前绑定的文件
+      this.collection.map((col) => {
+        if (col.selected) {
+          col.files = [...col.files, newFile]
+        }
+      })
+      this.$emit('changeRel', false)
+      this.$forceUpdate()
     }
-
   }
 }
 </script>
@@ -608,6 +642,42 @@ export default {
     cursor: pointer;
   }
 }
+
+.postil-btn-group{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: flex-end;
+    .postil-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      width: 108px;
+      height: 38px;
+      padding: 8px, 40px, 8px, 40px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: 0em;
+    }
+
+    .cancle {
+      border: 1px solid #CACDD3;
+      color: #1D2128;
+    }
+
+    .verify {
+      margin-left: 20px;
+      background: #2D5CF6;
+      color: #fff;
+    }
+  }
 
 .nodata {
   padding: 8px 0;

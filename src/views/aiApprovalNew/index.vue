@@ -183,7 +183,7 @@
           <editorial ref="editorial" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
             :lineWordItem="lineWordItem" @upDateComments="upDateComments" @showLine="showLine" :activeIndex="activeIndex"
             :activeWordType="activeWordType" @showCommentLine="showCommentLine" @changeEditorialType="changeEditorialType"
-            :showOcr="showOcr" :formBase="formBase" @changeFileById="changeFileById">
+            :showOcr="showOcr" :formBase="formBase" @changeFileById="changeFileById" :isRel="isRel" @changeRel="changeRel">
           </editorial>
         </div>
       </div>
@@ -217,6 +217,7 @@ export default {
   },
   data() {
     return {
+      isRel: false,
       preComment: {},
       keywordsInfo: {
         content: '',
@@ -583,6 +584,7 @@ export default {
   }
 
   &-editor {
+    position: relative;
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0px 0px 10px 0px #4343430d;
