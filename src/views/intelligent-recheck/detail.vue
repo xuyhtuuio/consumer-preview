@@ -187,9 +187,9 @@
                   </div>
                   <div class="img-model">
                     <img :src="item.fileUrl" alt="" />
-                    <div class="img-up">
+                    <div class="img-up" @click="toCompare">
                       <div class="recheck-num">回检3次</div>
-                      <div class="show-more">
+                      <div class="show-more" @click.stop="showDetail">
                         <img src="@/assets/image/intelligent-recheck/see.png" alt="">
                         <div>查看详情</div>
                       </div>
@@ -239,11 +239,7 @@
       </div>
     </div>
     <UploadDialog ref="uploadDia" @changeImgFun="changeImgFun"></UploadDialog>
-    <!-- <ImgDialog
-      ref="imgDia"
-      :url="listItemActive.fileUrl"
-      :item="listItemActive"
-    ></ImgDialog> -->
+    <DetailDialog ref="detailDia"></DetailDialog>
   </div>
 </template>
 
@@ -256,7 +252,7 @@ import { downloadStream } from '@/api/applyCenter'
 import Empty from '@/components/common/empty'
 import Loading from './components/loading'
 import UploadDialog from './components/upload-dialog'
-// import ImgDialog from './components/img-dialog'
+import DetailDialog from './components/detail-dialog'
 import ImagePreview from './components/imgae-preview'
 import FullImage from './components/full-image'
 export default {
@@ -268,7 +264,8 @@ export default {
     ImagePreview,
     FullImage,
     Waterfall,
-    WaterfallSlot
+    WaterfallSlot,
+    DetailDialog
   },
   data: () => ({
     recheckInput: '',
@@ -280,6 +277,7 @@ export default {
       recheck: false
     },
     showFullScreen: false,
+    detailDialogShow: false,
     sortList: [
       {
         label: '按相似度',
@@ -324,6 +322,18 @@ export default {
     }
   },
   methods: {
+    showDetail() {
+      this.$refs.detailDia.show = true;
+    },
+    toCompare() {
+      console.log('111');
+      this.$router.push({
+        name: 'recheck-compare',
+        // params: {
+        //   item
+        // }
+      })
+    },
     saveFile() {
       const params = {
         key: this.item.key
