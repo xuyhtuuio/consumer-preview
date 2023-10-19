@@ -25,7 +25,7 @@
       :enlarge="option.enlarge"
       :mode="option.mode"
     ></vueCropper>
-    <div class="edit-btn" @click="changeEdit">
+    <div class="edit-btn" @click="changeEdit" v-if="showEdit">
       <img v-if="!editImg" src="@/assets/image/intelligent-recheck/edit-no.png" alt="" />
       <img v-else src="@/assets/image/intelligent-recheck/edit-yes.png" alt="" />
     </div>
@@ -58,6 +58,10 @@ export default {
     url: {
       type: String,
       default: ''
+    },
+    showEdit: {
+      type: Boolean,
+      default: true
     }
   },
   components: {
@@ -267,6 +271,7 @@ export default {
 .preview {
   width: 100%;
   height: 100%;
+  border-radius: 10px;
   overflow: scroll;
   position: relative;
   cursor: zoom-in;
