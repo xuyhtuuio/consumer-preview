@@ -846,7 +846,7 @@ export default {
         // 如果该意见存在批注
         if (comment.position?.length) {
           comment.position.map((pos) => {
-            let sort = Math.floor(pos.top / 50)
+            let sort = Math.floor(pos.top / this.styleProp.wordDomStyle.scale / 50)
             if (sort >= iconTotal) {
               sort = (iconTotal - 1) >= 0 ? (iconTotal - 1) : 0
             }
