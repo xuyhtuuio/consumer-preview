@@ -520,21 +520,21 @@ export default {
         // 未关联word的 意见
         file?.comments && arr.push(...file?.comments);
       });
-      // 去重
-      // const setArr = [];
-      // arr.forEach(comment => {
-      //   if (comment) {
-      //     const exist = setArr.filter(a => a.str === comment.str);
-      //     if (exist.length === 0) {
-      //       setArr.push(comment);
-      //     } else if (exist.length) {
-      //       exist[0].files = [...new Set([...exist[0].files, ...comment.files])];
-      //       exist[0].words = [...new Set([...exist[0].words, ...comment.words])];
-      //       exist[0].id = exist[0].id || comment.id;
-      //     }
-      //   }
-      // });
-      this.comments = arr;
+      // id去重
+      const setArr = [];
+      arr.forEach(comment => {
+        if (comment) {
+          const exist = setArr.filter(a => a.id === comment.id);
+          if (exist.length === 0) {
+            setArr.push(comment);
+          } else if (exist.length) {
+            exist[0].files = [...new Set([...exist[0].files, ...comment.files])];
+            exist[0].words = [...new Set([...exist[0].words, ...comment.words])];
+            exist[0].id = exist[0].id || comment.id;
+          }
+        }
+      });
+      this.comments = setArr;
     },
     // 编辑意见后,同步更新  文件的推荐意见状态
     upDateComments(type, item, newVal) {
@@ -661,28 +661,21 @@ export default {
           });
           // 新增关联的文件
           const addIds = newVal.filter(id => !item.files.includes(id));
-          // addIds.map(id => {
-          //   const addFile = this.files.filter(file => file.id === id)?.[0];
-          //   const matchWord = addFile?.recommends?.filter(word => item.words.includes(word.id));
-          //   if (matchWord && matchWord?.length !== 0) {
-          //     matchWord.forEach(word => {
-          //       word.selected = word.list.filter(a => a.str === item.str)?.[0]?.id || null;
-          //     });
-          //   } else {
-          //     const newItem = {
-          //       ...item,
-          //       files: [id]
-          //     };
-          //     addFile.comments ? addFile.comments.push(newItem) : (addFile.comments = [newItem]);
-          //   }
-          // });
-          addIds.map((id) => {
-            this.comments.map((comment) => {
-              if (comment.files.includes(id)) {
-                comment.files = addIds
-              }
-            })
-          })
+          addIds.map(id => {
+            const addFile = this.files.filter(file => file.id === id)?.[0];
+            const matchWord = addFile?.recommends?.filter(word => item.words.includes(word.id));
+            if (matchWord && matchWord?.length !== 0) {
+              matchWord.forEach(word => {
+                word.selected = word.list.filter(a => a.str === item.str)?.[0]?.id || null;
+              });
+            } else {
+              const newItem = {
+                ...item,
+                files: [id]
+              };
+              addFile.comments ? addFile.comments.push(newItem) : (addFile.comments = [newItem]);
+            }
+          });
           break;
         // 新增意见 后执行意见同步操作: 查找新增意见所关联的文件，将意见绑定到对应的文件上
         case 'upd':
@@ -851,7 +844,7 @@ export default {
       const iconTotal = this.icons.length
       comments.map((comment) => {
         // 如果该意见存在批注
-        if (comment.position.length) {
+        if (comment.position?.length) {
           comment.position.map((pos) => {
             let sort = Math.floor(pos.top / 50)
             if (sort >= iconTotal) {
