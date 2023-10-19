@@ -220,12 +220,14 @@ export default {
       this.beforeAddComment()
       const timestamp = this.preComment.id || new Date().getTime()
       const files = this.preComment.files || [this.files?.[this.activeIndex]?.id]
-      const words = this.preComment || []
+      const words = this.preComment.words || []
+      const filesWithComment = this.preComment.filesWithComment || [this.files?.[this.activeIndex]?.id]
 
       const newComment = {
         id: timestamp,
         str: this.postil.textarea,
         files: [...files],
+        filesWithComment: [...filesWithComment],
         words,
         position: [this.domInfo?.position],
         selectText: this.domInfo?.string
@@ -236,13 +238,23 @@ export default {
       this.postil.textarea = ''
       this.$refs.editorial.changeType(2)
     },
+    changeFileById(fileId) {
+      const fileIndex = this.files.findIndex((file) => fileId === file.id)
+      this.changeFile(fileIndex)
+    },
     // 展示连线
-    showCommentLine(obj) {
+    showCommentLine(obj, fileId) {
+      if (fileId) {
+        this.changeFileById(fileId)
+      }
+      if (!obj?.position?.length) {
+        return;
+      }
       this.lineRemoveOnly();
-      const commenDom = document.querySelector(`div[data-commenid=c${obj.id}]`)
-      this.appendHighLightDom(obj, commenDom)
-      // this.showLine(obj.string)
-      // this.$refs.ocrTxt.
+      this.$nextTick(() => {
+        const commenDom = document.querySelector(`div[data-commenid=c${obj.id}]`)
+        this.appendHighLightDom(obj, commenDom)
+      })
     },
     appendHighLightDom(obj, commenDom) {
       const data = obj.position
@@ -649,21 +661,28 @@ export default {
           });
           // 新增关联的文件
           const addIds = newVal.filter(id => !item.files.includes(id));
-          addIds.map(id => {
-            const addFile = this.files.filter(file => file.id === id)?.[0];
-            const matchWord = addFile?.recommends?.filter(word => item.words.includes(word.id));
-            if (matchWord && matchWord?.length !== 0) {
-              matchWord.forEach(word => {
-                word.selected = word.list.filter(a => a.str === item.str)?.[0]?.id || null;
-              });
-            } else {
-              const newItem = {
-                ...item,
-                files: [id]
-              };
-              addFile.comments ? addFile.comments.push(newItem) : (addFile.comments = [newItem]);
-            }
-          });
+          // addIds.map(id => {
+          //   const addFile = this.files.filter(file => file.id === id)?.[0];
+          //   const matchWord = addFile?.recommends?.filter(word => item.words.includes(word.id));
+          //   if (matchWord && matchWord?.length !== 0) {
+          //     matchWord.forEach(word => {
+          //       word.selected = word.list.filter(a => a.str === item.str)?.[0]?.id || null;
+          //     });
+          //   } else {
+          //     const newItem = {
+          //       ...item,
+          //       files: [id]
+          //     };
+          //     addFile.comments ? addFile.comments.push(newItem) : (addFile.comments = [newItem]);
+          //   }
+          // });
+          addIds.map((id) => {
+            this.comments.map((comment) => {
+              if (comment.files.includes(id)) {
+                comment.files = addIds
+              }
+            })
+          })
           break;
         // 新增意见 后执行意见同步操作: 查找新增意见所关联的文件，将意见绑定到对应的文件上
         case 'upd':

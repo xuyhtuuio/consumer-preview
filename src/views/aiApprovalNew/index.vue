@@ -181,9 +181,9 @@
         </div>
         <div class="content-cont-editor">
           <editorial ref="editorial" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
-            :lineWordItem="lineWordItem" @upDateComments="upDateComments" @showLine="showLine"
+            :lineWordItem="lineWordItem" @upDateComments="upDateComments" @showLine="showLine" :activeIndex="activeIndex"
             :activeWordType="activeWordType" @showCommentLine="showCommentLine" @changeEditorialType="changeEditorialType"
-            :showOcr="showOcr" :formBase="formBase">
+            :showOcr="showOcr" :formBase="formBase" @changeFileById="changeFileById">
           </editorial>
         </div>
       </div>

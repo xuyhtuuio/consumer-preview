@@ -4,6 +4,7 @@
       <span v-show="showRecommend && showOcr" :class="{ active: active === 1 }" @click="changeType(1)">推荐意见</span>
       <i v-show="showRecommend && showOcr">|</i>
       <span :class="{ active: active === 2 }" @click="changeType(2)">编辑意见</span>
+      <span>{{ active }}</span>
     </div>
     <div class="results" ref="results">
       <!-- 推荐意见 -->
@@ -43,7 +44,7 @@
       </template>
       <!-- 编辑意见 -->
       <div v-else class="recommend">
-        <div class="list-item list-item2" :data-commenid="`c${item.id}`" @click="showCommentLine(item.id)" v-for="(item, i) in collection" :key="i" :class="{ edit: item.showEdit }">
+        <div class="list-item list-item2" :data-commenid="`c${item.id}`" v-for="(item, i) in collection" :key="i" :class="{ edit: item.showEdit }">
           <p style="cursor: pointer;" @dblclick="showEdit_collection(i)" v-if="!item.showEdit">{{ item.str }}</p>
           <el-input v-else :ref="`input_${i}`" @blur="hideEdit_collection(i)" v-model.trim="input" placeholder="请输入意见"
             type="textarea" :rows="3" class="edit-input" resize="none"
@@ -51,11 +52,18 @@
           <i class="el-icon-close" @click="removeItem(item, i)"></i>
           <div class="item-files">
             <span>文件来源：</span>
-            <div class="files">
-              <el-tag v-for="(tag) in files.filter(file => item.files.includes(file.id))" :key="tag.id" closable
+            <div class="files" v-if="files.filter(file => item.files.includes(file.id))?.length <= 2">
+              <el-tag v-for="(tag, index) in files.filter(file => item.files.includes(file.id))" :key="tag.id + index" closable
                 size="small" @close="removeFile(item, tag.id)">
-                <span>{{ tag.fileName }}</span>
+                <span @click="showCommentLine(item.id, tag.id)">{{ tag.fileName }}</span>
               </el-tag>
+            </div>
+            <div class="files" v-else>
+              <el-tag closable
+                size="small" @close="removeFile(item, files.filter(file => item.files.includes(file.id))?.[0].id)">
+                <span>{{ files.filter(file => item.files.includes(file.id))?.[0].fileName }}</span>
+              </el-tag>
+              <span class="tagExtra" style="color: #306EF5;"> + {{ files.filter(file => item.files.includes(file.id))?.length - 1 }}</span>
             </div>
             <div class="icon-plus">
               <i class="el-icon-circle-plus" @click="showDialog(item)"></i>
@@ -120,6 +128,10 @@ export default {
       default: () => ({})
     },
     activeWordType: {
+      type: Number,
+      default: 0
+    },
+    activeIndex: {
       type: Number,
       default: 0
     },
@@ -307,11 +319,15 @@ export default {
       this.$emit('changeEditorialType', val)
     },
     // 连线
-    showCommentLine(id) {
+    showCommentLine(id, fileId) {
       const commenId = this.collection.filter((item) => {
         return item.id === id
       })
-      this.$emit('showCommentLine', commenId[0])
+      if (commenId[0]?.filesWithComment?.includes(fileId) && fileId === this.files[this.activeIndex].id) {
+        this.$emit('showCommentLine', commenId[0], fileId)
+      } else {
+        this.$emit('changeFileById', fileId)
+      }
     }
 
   }
@@ -519,8 +535,12 @@ export default {
     flex-wrap: wrap;
     align-items: center;
   }
-
+  .tagExtra{
+    cursor: pointer;
+    font-size: 12px;
+  }
   .el-tag {
+    cursor: pointer;
     word-break: keep-all;
     border: none;
     background: #F0F6FF;
