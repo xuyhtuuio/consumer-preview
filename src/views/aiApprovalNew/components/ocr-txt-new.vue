@@ -291,7 +291,6 @@ export default {
       if (!this.approval.ocr || !this.styleProp.wordDomStyle) {
         return {}
       }
-      // console.log(this.styleProp.wordDomStyle.scale);
       return {
         left: `${this.approval.ocr[i].location.x / this.styleProp.wordDomStyle.scale}px`,
         top: `${this.approval.ocr[i].location.y / this.styleProp.wordDomStyle.scale}px`,
@@ -313,9 +312,9 @@ export default {
         const item = node.parentNode
         left.push(item.offsetLeft)
         // right.push(item.offsetLeft + (item.offsetWidth) * (1 / this.wordDomStyle.scale))
-        right.push(item.offsetLeft + (item.offsetWidth) * (1 / this.styleProp.wordDomStyle.scale))
+        right.push(item.offsetLeft + (item.offsetWidth))
         top.push(item.offsetTop)
-        bottom.push(item.offsetTop + (item.offsetHeight * (1 / this.styleProp.wordDomStyle.scale)))
+        bottom.push(item.offsetTop + (item.offsetHeight))
         // bottom.push(item.offsetTop + item.offsetHeight * (1 / this.wordDomStyle.scale))
       })
       const l = left.sort((a, b) => a - b)[0]
@@ -327,10 +326,10 @@ export default {
     // 添加覆盖 dom
     addRectOverDom(l, t, r, b, nodes) {
       const position = {
-        left: Math.floor(l),
-        top: Math.floor(t),
-        height: Math.floor(b - t),
-        width: Math.floor(r - l)
+        left: Math.floor(l * this.styleProp.wordDomStyle.scale),
+        top: Math.floor(t * this.styleProp.wordDomStyle.scale),
+        height: Math.floor((b - t)),
+        width: Math.floor((r - l))
       }
       const string = this.selectText
       const obj = {
@@ -349,11 +348,11 @@ export default {
         return;
       }
       const position = {
-        left: Math.floor(node.offsetLeft),
-        height: Math.floor((node.offsetHeight * (1 / this.styleProp.wordDomStyle.scale))),
+        left: Math.floor(node.offsetLeft * this.styleProp.wordDomStyle.scale),
+        height: Math.floor((node.offsetHeight)),
         // right.push(item.offsetLeft + (item.offsetWidth) * (1 / this.wordDomStyle.scale))
-        top: Math.floor(node.offsetTop),
-        width: Math.floor((node.offsetWidth) * (1 / this.styleProp.wordDomStyle.scale)),
+        top: Math.floor(node.offsetTop * this.styleProp.wordDomStyle.scale),
+        width: Math.floor((node.offsetWidth)),
       }
       this.$emit('showOcrCommentLine', position)
     }

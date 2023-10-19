@@ -255,8 +255,8 @@ export default {
         newDom.style.position = 'absolute'
         newDom.style.left = `${item.left}px`
         newDom.style.top = `${item.top}px`
-        newDom.style.width = `${(item.width)}px`
-        newDom.style.height = `${(item.height)}px`
+        newDom.style.width = `${(item.width / this.styleProp.wordDomStyle.scale)}px`
+        newDom.style.height = `${(item.height / this.styleProp.wordDomStyle.scale)}px`
         const highlight = {
           word: obj.str,
           // 证明为点击意见连线

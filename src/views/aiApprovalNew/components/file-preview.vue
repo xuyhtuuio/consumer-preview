@@ -127,6 +127,7 @@ export default {
   },
   mounted() {
     // this.init();
+    // this.imgLoad()
   },
   watch: {
 
@@ -205,6 +206,9 @@ export default {
     },
     findIconPosition() {
       this.$emit('findIconPosition')
+    },
+    imgLoad() {
+      this.$refs.imgPreview.handleImageLoaded()
     },
   }
 }

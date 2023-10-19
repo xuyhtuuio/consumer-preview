@@ -131,10 +131,11 @@ export default {
       val.map((hls) => {
         const h = {
           // * this.wordDomStyle.scale * this.scale
-          width: hls?.location.w + 'px',
-          height: hls?.location.h + 'px',
-          left: hls?.location.x + 'px',
-          top: hls?.location.y + 'px',
+          width: hls?.location.w * this.scale + 'px',
+          height: hls?.location.h * this.scale + 'px',
+          left: hls?.location.x * this.scale + 'px',
+          top: hls?.location.y * this.scale + 'px',
+          // transform: `scale(${this.scale * this.wordDomStyle.scale})`
         }
         highLightStyles.push(h)
       })

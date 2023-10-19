@@ -95,9 +95,9 @@
             <file-preview ref="filePreview" :files="files" :formId="formId" :activeIndex="activeIndex"
               @changeFile="changeFile" :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"
               @getProps="getProps" @findIconPosition="findIconPosition"></file-preview>
-            <orcTxtNew ref="ocrTxt" v-show="curMode === 0" :approval="approval" @addWord="addWord"
+            <orcTxtNew ref="ocrTxt" :approval="approval" @addWord="addWord"
               @lineRemove="lineRemove" @checkEdit="checkEdit"
-              v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
+              v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode === 0"
               @showLine="showLine" @showOcrCommentLine="showOcrCommentLine" :lineWordItem="lineWordItem" :styleProp="styleProp">
             </orcTxtNew>
             <el-popover class="postil-popover" v-model="popoverShow" id="popover" placement="right"
@@ -143,8 +143,8 @@
                 <span class="postil-btn verify" @click="addCommentWithPosition">确认</span>
               </div>
             </el-popover>
-            <orcTxt ref="ocrTxt" v-show="curMode === 0" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
-              v-if="specialFileType2.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr"
+            <orcTxt ref="ocrTxt" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
+              v-if="specialFileType2.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode === 0"
               @showLine="showLine" :lineWordItem="lineWordItem">
             </orcTxt>
             <p class="content-cont-icons" v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr">
@@ -351,6 +351,9 @@ export default {
     // 三屏双屏切换 0 为三屏 1 为双屏
     toggleMode() {
       this.curMode = this.curMode === 0 ? 1 : 0
+      this.$nextTick(() => {
+        this.$refs.filePreview.imgLoad()
+      })
     },
     search() {
       if (this.keyWords) {
