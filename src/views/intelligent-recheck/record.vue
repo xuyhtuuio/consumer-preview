@@ -36,27 +36,24 @@
             <el-col :span="6">
               <div
                 class="scrren-com"
-                :class="search.datePicker ? 'active' : ''"
+                :class="search.datePickerOnline ? 'active' : ''"
               >
                 <el-popover
                   ref="ref-popover"
                   width="400"
                   placement="bottom-start"
                   trigger="click"
-                  @show="handlePopoverShow"
-                  @hide="handlePopoverHide"
                 >
                   <el-date-picker
                     class="my-date-picker"
                     ref="my-date-picker"
-                    v-model="search.datePicker"
+                    v-model="search.datePickerOnline"
                     type="monthrange"
                     align="right"
                     range-separator="至"
                     start-placeholder="开始月份"
                     end-placeholder="结束月份"
                     :picker-options="pickerOptions"
-                    @change="handleDatePicker"
                   >
                   </el-date-picker>
                   <div slot="reference">
@@ -73,27 +70,24 @@
             <el-col :span="6">
               <div
                 class="scrren-com"
-                :class="search.datePicker ? 'active' : ''"
+                :class="search.datePickerBill ? 'active' : ''"
               >
                 <el-popover
                   ref="ref-popover"
                   width="400"
                   placement="bottom-start"
                   trigger="click"
-                  @show="handlePopoverShow"
-                  @hide="handlePopoverHide"
                 >
                   <el-date-picker
                     class="my-date-picker"
                     ref="my-date-picker"
-                    v-model="search.datePicker"
+                    v-model="search.datePickerBill"
                     type="monthrange"
                     align="right"
                     range-separator="至"
                     start-placeholder="开始月份"
                     end-placeholder="结束月份"
                     :picker-options="pickerOptions"
-                    @change="handleDatePicker"
                   >
                   </el-date-picker>
                   <div slot="reference">
@@ -108,7 +102,7 @@
               </div>
             </el-col>
             <el-col :span="6" justify="center">
-              <el-switch size="small" style="margin-right: 4px" />
+              <el-switch size="small" style="margin-right: 4px" v-model="isBackCheck"/>
               已回检
             </el-col>
           </el-row>
@@ -209,7 +203,10 @@ export default {
             }
           }
         ]
-      }
+      },
+      datePickerOnline: '',
+      dataPickerBill: '',
+      isBackCheck: '',
     }
   },
   components: {
