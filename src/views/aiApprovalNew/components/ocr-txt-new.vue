@@ -27,7 +27,7 @@
         <div v-for="(ocr, i) in html" class="div-position" :key="i" :style="returnStyle(i)">
           <template v-for="(item, j) in ocr">
             <!-- <template  v-if="typeof item === 'string'">{{ item }}</template> -->
-            <div v-if="(typeof item === 'string')" :key="i + '_' + j + '_'" @click="showOcrCommentLine">{{ item }}</div>
+            <div :class="{ commentNode:item.hasBg}" v-if="!item.wordType" :key="i + '_' + j + '_'" @click="showOcrCommentLine">{{ item.text }}</div>
             <span v-else :key="i + '_' + j" :wordType="item.wordType" :id="`word_${i}_${j}`" :class="{
               active:
                 activeWordType === item.wordType || activeWordType === 0,
@@ -161,6 +161,15 @@ export default {
         }, 300)
       }
     },
+    getSelectDomIndex(dom) {
+      let newDom = dom
+      let index = 0;
+      while (newDom !== null) {
+        newDom = newDom.previousSibling
+        index++;
+      }
+      return index - 1
+    },
     // 点击命中词,显示连线
     showLine(item, ocrWordId) {
       this.$emit('showLine', { ...item, ocrWordId })
@@ -174,34 +183,67 @@ export default {
     getInitContent(approval) {
       // console.log(approval)
       const html = []
-      approval?.ocr?.forEach((ocr) => {
+      // 遍历接口返回的 ocr 结果
+      approval?.ocr?.forEach((ocr, j) => {
+        // console.log(ocr)
         const { text, location } = ocr
-        let newOcr = [text]
+        let newOcr = [{ text }]
+        // 遍历推荐意见 获取关键字、关键字类型
         approval?.recommends?.forEach((recommend, i) => {
           const { word, wordType } = recommend
-          if (newOcr.join().includes(word)) {
+          // console.log(newOcr)
+          // 判断当前 ocr 结果字符串中是否包含关键字
+          if (text.includes(word)) {
             const temp = []
+            // 如果包含 切割字符串 做高亮处理操作
             for (let index = 0; index < newOcr.length; index++) {
-              if (typeof newOcr[index] === 'string' && newOcr[index].includes(word)) {
-                const a = newOcr[index].split(word)
+              if (typeof newOcr[index].text === 'string' && newOcr[index].text.includes(word)) {
+                const a = newOcr[index].text.split(word)
                 a.splice(1, 0, {
+                  text: word,
                   word,
                   wordType,
                   location,
                   recommendI: i
                 })
-                temp.push(...a.filter((b) => b !== ''))
+                const c = [...a.filter((b) => b !== '')]
+                const d = c.map((e) => {
+                  if (!e.word) {
+                    return { text: e }
+                  } else {
+                    return e
+                  }
+                })
+                temp.push({ ...d })
               } else {
-                temp.push(newOcr[index])
+                temp.push({ text: newOcr[index].text })
               }
             }
-            newOcr = temp
+            newOcr = [...Object.values(...temp)]
           }
+          // 判断当前结果中是否含有批注内容 ---> 如果有进行高亮操作
+          function reValue(val) {
+            if (val) {
+            // console.log(itHasBg)
+              newOcr.map((no) => {
+                no.hasBg = val
+              })
+            }
+          }
+          newOcr.map((no, o) => {
+            if (typeof (no) !== 'object') {
+              newOcr[o] = { no }
+              newOcr[o].hasBg = false
+            } else {
+              no.hasBg = false
+            }
+          })
+          this.$emit('hasBg', j, reValue)
         })
         html.push(newOcr)
       })
-      // console.log(html)
       this.html = html
+      this.$forceUpdate()
     },
     // 高亮检索的关键词
     search(keyWords) {
@@ -311,8 +353,10 @@ export default {
       const right = []
       const top = []
       const bottom = []
+      const indexs = []
       nodes.forEach((node) => {
         const item = node.parentNode
+        indexs.push(this.getSelectDomIndex(item))
         left.push(item.offsetLeft)
         // right.push(item.offsetLeft + (item.offsetWidth) * (1 / this.wordDomStyle.scale))
         right.push(item.offsetLeft + (item.offsetWidth))
@@ -324,10 +368,10 @@ export default {
       const t = top.sort((a, b) => a - b)[0]
       const r = right.sort((a, b) => a - b)[right.length - 1]
       const b = bottom.sort((c, d) => c - d)[bottom.length - 1]
-      this.addRectOverDom(l, t, r, b, nodes)
+      this.addRectOverDom(l, t, r, b, nodes, indexs)
     },
     // 添加覆盖 dom
-    addRectOverDom(l, t, r, b, nodes) {
+    addRectOverDom(l, t, r, b, nodes, indexs) {
       const position = {
         left: Math.floor(l * this.styleProp.wordDomStyle.scale),
         top: Math.floor(t * this.styleProp.wordDomStyle.scale),
@@ -337,8 +381,10 @@ export default {
       const string = this.selectText
       const obj = {
         position,
-        string
+        string,
+        domIndexs: indexs
       }
+      console.log(obj.domIndexs)
       this.$emit('addWord', obj, nodes)
     },
     showOcrCommentLine(event) {

@@ -214,6 +214,21 @@ export default {
         node.classList.add('commentNode')
       })
     },
+    hasBg(i, reValue) {
+      let isHas = false
+      // 遍历意见 寻找当前文件
+      this.comments.map((comment) => {
+        if (comment?.files.includes(this.files[this.activeIndex].id)) {
+          // 遍历文件与批注的关系，判断是否包含 第 i 条
+          comment?.filesWithBg.map((fwb) => {
+            if (fwb.fileId === this.files?.[this.activeIndex]?.id) {
+              isHas = fwb.fileBgs.includes(i)
+            }
+          })
+        }
+      })
+      reValue(isHas)
+    },
     beforeAddComment() {
       let preComment = {}
       if (this.isEdit) {
@@ -228,7 +243,17 @@ export default {
       const files = this.preComment.files || [this.files?.[this.activeIndex]?.id]
       const words = this.preComment.words || []
       const filesWithComment = this.preComment.filesWithComment || [this.files?.[this.activeIndex]?.id]
-
+      if (this.preComment?.filesWithBg) {
+        this.preComment.filesWithBg.map((fwb) => {
+          if (fwb.fileId === this.files?.[this.activeIndex]?.id) {
+            fwb.fileBgs = [...fwb.fileBgs, ...this.domInfo.domIndexs]
+          }
+        })
+      }
+      const filesWithBg = [{
+        fileId: this.files?.[this.activeIndex]?.id,
+        fileBgs: this.domInfo.domIndexs
+      }]
       const newComment = {
         id: timestamp,
         str: this.postil.textarea,
@@ -236,7 +261,8 @@ export default {
         filesWithComment: [...filesWithComment],
         words,
         position: [this.domInfo?.position],
-        selectText: this.domInfo?.string
+        selectText: this.domInfo?.string,
+        filesWithBg: this.preComment?.filesWithBg || filesWithBg
       }
       if (!newComment.str) {
         return;
@@ -252,7 +278,9 @@ export default {
 
       if (this.postil.isKeyWord === '0' || validGoOn) {
         this.upDateComments('add', newComment)
-        this.addBg(this.comments_nodes)
+        // this.addBg(this.comments_nodes)
+        this.getComments()
+        this.$refs.ocrTxt.getInitContent(this.approval)
         this.changeRel(false)
         this.postil.textarea = ''
         this.$refs.editorial.changeType(2)

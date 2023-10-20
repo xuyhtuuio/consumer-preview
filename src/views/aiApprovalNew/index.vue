@@ -98,7 +98,7 @@
             <orcTxtNew ref="ocrTxt" :approval="approval" @addWord="addWord"
               @lineRemove="lineRemove" @checkEdit="checkEdit"
               v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode !== 1"
-              @showLine="showLine" @showOcrCommentLine="showOcrCommentLine" :lineWordItem="lineWordItem" :styleProp="styleProp">
+              @showLine="showLine" @showOcrCommentLine="showOcrCommentLine" :lineWordItem="lineWordItem" :styleProp="styleProp" @hasBg="hasBg">
             </orcTxtNew>
             <el-popover ref="postilPopover" class="postil-popover" v-model="popoverShow" popper-class="postil-popover" placement="right"
               trigger="manual">
