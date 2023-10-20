@@ -349,17 +349,33 @@ export default {
             this.high_light_lines[index].show(showEffectName, animOptions);
           })
         })
+      } else if (this.curMode === 2) {
+        start.map((item, index) => {
+          rootDom.appendChild(item)
+          this.word_lines[index] = new LeaderLine(end, item, {
+            color: '#EB5D78',
+            size: 1,
+            startPlug: 'disc',
+            endPlug: 'disc'
+            // endSocket: 'auto'
+          });
+          this.word_lines[index].show(showEffectName, animOptions);
+        })
       }
       this.preDoms = start
-      document.querySelector('.ocr-txt .results').addEventListener('scroll', () => {
-        this.linePosition();
-      });
+      if (this.curMode !== 1) {
+        document.querySelector('.ocr-txt .results').addEventListener('scroll', () => {
+          this.linePosition();
+        });
+      }
       document.querySelector('.content-cont-editor').addEventListener('scroll', () => {
         this.linePosition();
       });
-      document.querySelector('.file-preview .preview .preview').addEventListener('scroll', () => {
-        this.linePosition();
-      });
+      if (this.curMode !== 2) {
+        document.querySelector('.file-preview .preview .preview').addEventListener('scroll', () => {
+          this.linePosition();
+        });
+      }
     },
 
     // 切换审批文件
