@@ -333,7 +333,7 @@ export default {
     gap: 4px;
     position: relative;
     color: var(--gray-gray-9, #1d2128);
-    font-size: 2px;
+    font-size: 12px;
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
