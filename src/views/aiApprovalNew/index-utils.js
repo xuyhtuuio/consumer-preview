@@ -204,6 +204,7 @@ export default {
       this.changeRel(false)
       this.popoverShow = true
       this.domInfo = obj
+      this.keywordsInfo.content = obj.string
       this.comments_nodes = Array.from(nodes)
     },
     addBg(nodes) {
@@ -240,11 +241,22 @@ export default {
       if (!newComment.str) {
         return;
       }
-      this.upDateComments('add', newComment)
-      this.addBg(this.comments_nodes)
-      this.changeRel(false)
-      this.postil.textarea = ''
-      this.$refs.editorial.changeType(2)
+      let validGoOn = false
+      if (this.postil.isKeyWord === '1') {
+        this.$refs.keywordsFrom.validate((valid) => {
+          if (valid) {
+            validGoOn = true
+          }
+        });
+      }
+
+      if (this.postil.isKeyWord === '0' || validGoOn) {
+        this.upDateComments('add', newComment)
+        this.addBg(this.comments_nodes)
+        this.changeRel(false)
+        this.postil.textarea = ''
+        this.$refs.editorial.changeType(2)
+      }
     },
     changeFileById(fileId) {
       const fileIndex = this.files.findIndex((file) => fileId === file.id)

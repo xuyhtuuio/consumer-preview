@@ -111,7 +111,7 @@
               <div class="line"></div>
               <div class="postil-tabs">
                 <span>批注意见</span>
-                <span class="postil-tab-rel" @click="addRelComment">关联意见</span>
+                <span class="postil-tab-rel" v-if="this.comments.length" @click="addRelComment">关联意见</span>
               </div>
               <div class="postil-input">
                 <el-input type="textarea" resize="none" placeholder="请输入批注意见描述" v-model="postil.textarea">
@@ -123,7 +123,7 @@
                 <el-radio v-model="postil.isKeyWord" label="1">是</el-radio>
                 <el-radio v-model="postil.isKeyWord" label="0">否</el-radio>
               </div>
-              <el-form v-show="postil.isKeyWord==='1'" :rules="keywordsRules" v-model="keywordsInfo" class="postil-keyword-form">
+              <el-form ref="keywordsFrom" v-show="postil.isKeyWord==='1'" :rules="keywordsRules" :model="keywordsInfo" class="postil-keyword-form">
                 <el-form-item label="关键词内容" prop="content" class="postil-keyword-item">
                   <el-input v-model="keywordsInfo.content" placeholder="请输入关键词"></el-input>
                 </el-form-item>
@@ -224,7 +224,10 @@ export default {
         content: '',
         type: ''
       },
-      keywordsOptions: [],
+      keywordsOptions: [
+        { label: '禁用词', value: '禁用词' },
+        { label: '敏感词', value: '敏感词' }
+      ],
       keywordsRules: {
         content: [
           { required: true, message: '请填写关键词内容', trigger: 'blur' },

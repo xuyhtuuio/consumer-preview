@@ -38,7 +38,7 @@
       </div>
       <Empty v-if="html.length === 0"></Empty>
     </div>
-    <div class="isAdd" ref="isAdd" v-if="selectText" :style="askIsAddPosition">
+    <div class="isAdd" ref="isAdd" v-if="selectText && showIsAdd" :style="askIsAddPosition">
       <p>针对该词添加审查意见</p>
       <el-button size="small" @click="addWord">添加</el-button>
     </div>
@@ -64,6 +64,7 @@ export default {
   },
   data() {
     return {
+      showIsAdd: false,
       keyWords: '',
       contentShow: '',
       html: [],
@@ -107,6 +108,7 @@ export default {
       // this.$emit('addWord', this.selectText.trim())
       // this.selectText = ''
       this.getRectOverDom(this.selectNodes)
+      this.showIsAdd = false;
     },
     hideAdd(e) {
       e = e || window.event
@@ -135,6 +137,7 @@ export default {
         ? window.getSelection().toString()
         : document.selection.createRange().text
       if (selectText) {
+        this.showIsAdd = true
         const select = window.getSelection()
         const range = select?.getRangeAt(0)
         const allNodes = Array.from(range.commonAncestorContainer.childNodes)
