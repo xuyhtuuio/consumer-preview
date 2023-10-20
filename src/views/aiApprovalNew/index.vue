@@ -37,7 +37,7 @@
                   <use xlink:href="#icon-Frame2"></use>
                 </svg>
                 更多材料</span> -->
-              <el-popover placement="bottom" popper-class="cont-top-popover" width="300" :offset="100" trigger="click"
+              <el-popover placement="bottom" popper-class="cont-top-popover" v-model="filePopoverShow" width="300" :offset="100" trigger="click"
                 :visible-arrow=false>
                 <div class="cont-top-fileList">
                   <div class="fileList-search">
@@ -139,7 +139,7 @@
                 </el-form-item>
               </el-form>
               <div class="postil-btn-group">
-                <span class="postil-btn cancle" @click="popoverShow = false">取消</span>
+                <span class="postil-btn cancle" @click="changeRel(false)">取消</span>
                 <span class="postil-btn verify" @click="addCommentWithPosition">确认</span>
               </div>
             </el-popover>
@@ -217,6 +217,7 @@ export default {
   },
   data() {
     return {
+      filePopoverShow: false,
       isRel: false,
       preComment: {},
       keywordsInfo: {

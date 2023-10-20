@@ -110,7 +110,7 @@
           </div>
         </div>
         <div class="postil-btn-group" v-if="isRel">
-          <div class="postil-btn cancle" @click="this.$emit('changeRel', false)">取消</div>
+          <div class="postil-btn cancle" @click="cancleRel">取消</div>
           <div class="postil-btn verify" @click="submitRel">完成</div>
         </div>
       </div>
@@ -393,6 +393,9 @@ export default {
       })
       this.$emit('changeRel', false)
       this.$forceUpdate()
+    },
+    cancleRel() {
+      this.$emit('changeRel', false)
     }
   }
 }

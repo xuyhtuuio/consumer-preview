@@ -239,7 +239,7 @@ export default {
       }
       this.upDateComments('add', newComment)
       this.addBg(this.comments_nodes)
-      this.popoverShow = false
+      this.changeRel(false)
       this.postil.textarea = ''
       this.$refs.editorial.changeType(2)
     },
@@ -418,6 +418,7 @@ export default {
       this.findIconPosition()
       this.approval = temp;
       this.fileloading = false;
+      this.filePopoverShow = false
     },
     async getOcr(temp) {
       const ocr = [];
