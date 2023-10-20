@@ -115,7 +115,7 @@ export default {
     },
     swiperTo(i) {
       if (i >= 0 && i <= this.fileList.length - 1) {
-        this.swiper.slideTo(i);
+        // this.swiper.slideTo(i);
         this.changeFile(i)
       }
     },
