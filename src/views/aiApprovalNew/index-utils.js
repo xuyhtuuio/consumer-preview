@@ -234,6 +234,9 @@ export default {
         position: [this.domInfo?.position],
         selectText: this.domInfo?.string
       }
+      if (!newComment.str) {
+        return;
+      }
       this.upDateComments('add', newComment)
       this.addBg(this.comments_nodes)
       this.popoverShow = false
@@ -999,6 +1002,7 @@ export default {
     },
     changeRel(boolean) {
       this.isRel = boolean
+      this.popoverShow = false
     }
   },
 };
