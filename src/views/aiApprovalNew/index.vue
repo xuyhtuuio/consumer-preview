@@ -225,8 +225,8 @@ export default {
         type: ''
       },
       keywordsOptions: [
-        { label: '禁用词', value: '禁用词' },
-        { label: '敏感词', value: '敏感词' }
+        { label: '禁用词', value: 1 },
+        { label: '敏感词', value: 2 }
       ],
       keywordsRules: {
         content: [

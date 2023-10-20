@@ -14,6 +14,7 @@ import {
 } from '@/api/aiApproval';
 import { downloadAllFiles } from '@/api/applyCenter'
 import { getApplyForm } from '@/api/front';
+import { add } from '@/api/admin-label';
 
 export default {
   methods: {
@@ -237,6 +238,19 @@ export default {
       }
       this.preComment = preComment
     },
+    async addKeyWord() {
+      const res = await add({
+        keywordContent: this.keywordsInfo.content,
+        type: this.keywordsInfo.type
+      });
+      // data
+      const { success, msg } = res.data;
+      if (success) {
+        return success
+      } else {
+        this.$message.error(msg)
+      }
+    },
     addCommentWithPosition() {
       this.beforeAddComment()
       const timestamp = this.preComment.id || new Date().getTime()
@@ -272,6 +286,10 @@ export default {
         this.$refs.keywordsFrom.validate((valid) => {
           if (valid) {
             validGoOn = true
+            const status = this.addKeyWord()
+            if (!status) {
+              validGoOn = false
+            }
           }
         });
       }

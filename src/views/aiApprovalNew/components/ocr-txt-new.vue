@@ -384,7 +384,6 @@ export default {
         string,
         domIndexs: indexs
       }
-      console.log(obj.domIndexs)
       this.$emit('addWord', obj, nodes)
     },
     showOcrCommentLine(event) {
