@@ -47,6 +47,7 @@
               <span v-show="tag === serach || hoverText === tag" style="color:#2D5CF6;" @click="addTags(tag)">创建新标签</span>
             </li>
           </ul>
+          <el-empty v-if="serach && tagsList.length === 0" description="暂无数据"></el-empty>
         </div>
         <template #reference>
           <span class="button pointer tags">
@@ -85,26 +86,26 @@ export default {
       serach: '',
       hoverText: '',
       tagsList: [
-        '案范围分为',
-        'afws wefwef文',
-        'wefwae问的人违反文档威风威风为',
-        '阿尔法违法未',
-        '案范围分为1',
-        'afws wefwef文1',
-        'wefwae问的人违反',
-        '阿尔法违法未1',
-        '案范围分为2',
-        'afws wefwef文2',
-        'wefwae问的人违反2',
-        '阿尔法违法未2',
-        '案范围分为3',
-        'afws wefwef文3',
-        'wefwae问的人违反3',
-        '阿尔法违法未3',
-        '案范围分为4',
-        'afws wefwef文4',
-        'wefwae问的人违反4',
-        '阿尔法违法未4'
+        // '案范围分为',
+        // 'afws wefwef文',
+        // 'wefwae问的人违反文档威风威风为',
+        // '阿尔法违法未',
+        // '案范围分为1',
+        // 'afws wefwef文1',
+        // 'wefwae问的人违反',
+        // '阿尔法违法未1',
+        // '案范围分为2',
+        // 'afws wefwef文2',
+        // 'wefwae问的人违反2',
+        // '阿尔法违法未2',
+        // '案范围分为3',
+        // 'afws wefwef文3',
+        // 'wefwae问的人违反3',
+        // '阿尔法违法未3',
+        // '案范围分为4',
+        // 'afws wefwef文4',
+        // 'wefwae问的人违反4',
+        // '阿尔法违法未4'
       ],
       tags: [], // 添加的标签池
       tagConfig: {
