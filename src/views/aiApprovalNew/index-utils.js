@@ -199,6 +199,9 @@ export default {
     },
     // 鼠标选中 添加新批注
     addWord(obj, nodes) {
+      const popover = this.$refs.postilPopover.$refs.popper
+      popover.classList.remove('positil-popover-left')
+      this.changeRel(false)
       this.popoverShow = true
       this.domInfo = obj
       this.comments_nodes = Array.from(nodes)
