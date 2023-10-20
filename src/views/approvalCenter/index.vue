@@ -277,6 +277,9 @@ export default {
       }
       getDataStatistics(param).then((res) => {
         const { data } = res.data
+        let total = 0
+        total = data['toPending']
+        this.tipsMsg = total > 0 ? `您有 ${total} 笔【消保审查】任务待审核哦，请尽快审核!` : '您当前无待审核任务'
         for (const i in data) {
           this.dataStatistics.forEach((v) => {
             if (v.value === i) {
