@@ -207,6 +207,7 @@ export default {
       datePickerOnline: '',
       dataPickerBill: '',
       isBackCheck: '',
+
     }
   },
   components: {
@@ -278,7 +279,7 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
+    margin-bottom: 15px;
     .left-area {
       width: 525px;
     }
