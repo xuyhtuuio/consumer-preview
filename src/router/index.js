@@ -124,6 +124,48 @@ const router = new Router({
         }
       ]
     },
+    // 智能回检
+    {
+      path: '/recheck',
+      name: 'recheck',
+      component: () => import('@/views/intelligent-recheck/home'),
+      meta: { title: '智能回检', viewport },
+      redirect: '/recheck/recheck-index',
+      children: [
+        {
+          path: 'recheck-index',
+          name: 'recheck-index',
+          component: () => import('@/views/intelligent-recheck/index'),
+          meta: {
+            title: '智能回检'
+          }
+        },
+        {
+          path: 'recheck-detail',
+          name: 'recheck-detail',
+          component: () => import('@/views/intelligent-recheck/detail'),
+          meta: {
+            title: '回检列表'
+          }
+        },
+        {
+          path: 'recheck-record',
+          name: 'recheck-record',
+          component: () => import('@/views/intelligent-recheck/record'),
+          meta: {
+            title: '回检记录'
+          }
+        },
+        {
+          path: 'recheck-compare',
+          name: 'recheck-compare',
+          component: () => import('@/views/intelligent-recheck/compare-detail'),
+          meta: {
+            title: '回检对比'
+          }
+        }
+      ]
+    },
     {
       path: '/applycenter',
       name: 'applycenter',

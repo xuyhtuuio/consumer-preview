@@ -1,0 +1,378 @@
+<template>
+  <div>
+    <div class="outer">
+      <div class="search-area">
+        <div class="search-title">智能回检</div>
+        <el-input
+          placeholder="请输入关键词开始检索"
+          @keyup.enter.native="handleSubmit"
+          v-model="searchInput"
+        ></el-input>
+      </div>
+
+      <div class="search-middle-area">
+        <div class="left-area">
+          <el-row>
+            <el-col :span="6">
+              <div class="scrren-com" :class="search.mechanism ? 'active' : ''">
+                选择机构
+                <img
+                  src="../../assets/image/person-center/down.png"
+                  class="down"
+                  alt=""
+                />
+                <el-cascader
+                  class="my-hidden"
+                  v-model="search.mechanism"
+                  :props="{ checkStrictly: true }"
+                ></el-cascader>
+              </div>
+              <img
+                src="../../assets/image/why.png"
+                alt=""
+                style="width: 20px; height: 20px; margin-left: 4px"
+              />
+            </el-col>
+            <el-col :span="6">
+              <div
+                class="scrren-com"
+                :class="search.datePickerOnline ? 'active' : ''"
+              >
+                <el-popover
+                  ref="ref-popover"
+                  width="400"
+                  placement="bottom-start"
+                  trigger="click"
+                >
+                  <el-date-picker
+                    class="my-date-picker"
+                    ref="my-date-picker"
+                    v-model="search.datePickerOnline"
+                    type="monthrange"
+                    align="right"
+                    range-separator="至"
+                    start-placeholder="开始月份"
+                    end-placeholder="结束月份"
+                    :picker-options="pickerOptions"
+                  >
+                  </el-date-picker>
+                  <div slot="reference">
+                    上线时间
+                    <img
+                      src="../../assets/image/person-center/down.png"
+                      class="down"
+                      alt=""
+                    />
+                  </div>
+                </el-popover>
+              </div>
+            </el-col>
+            <el-col :span="6">
+              <div
+                class="scrren-com"
+                :class="search.datePickerBill ? 'active' : ''"
+              >
+                <el-popover
+                  ref="ref-popover"
+                  width="400"
+                  placement="bottom-start"
+                  trigger="click"
+                >
+                  <el-date-picker
+                    class="my-date-picker"
+                    ref="my-date-picker"
+                    v-model="search.datePickerBill"
+                    type="monthrange"
+                    align="right"
+                    range-separator="至"
+                    start-placeholder="开始月份"
+                    end-placeholder="结束月份"
+                    :picker-options="pickerOptions"
+                  >
+                  </el-date-picker>
+                  <div slot="reference">
+                    提单时间
+                    <img
+                      src="../../assets/image/person-center/down.png"
+                      class="down"
+                      alt=""
+                    />
+                  </div>
+                </el-popover>
+              </div>
+            </el-col>
+            <el-col :span="6" justify="center">
+              <el-switch size="small" style="margin-right: 4px" v-model="isBackCheck"/>
+              已回检
+            </el-col>
+          </el-row>
+        </div>
+
+        <div class="right-area">
+          <el-row>
+            <el-col :span="8"
+              ><p class="tot-num">共<span class="num">3216</span>条</p></el-col
+            >
+            <el-col :span="8" justify="center">
+              <p class="sort">
+                按上线时间<img src="../../assets/image/upup.png" alt="" /></p
+            ></el-col>
+            <el-col :span="8" justify="center">
+              <p class="sort">
+                按提单时间<img src="../../assets/image/upup.png" alt="" /></p
+            ></el-col>
+          </el-row>
+        </div>
+      </div>
+      <recordTableVue
+        @openOption="handleOpenOption"
+        @openRecord="handleOpenRecord"
+      />
+    </div>
+
+    <el-dialog
+      title="回检意见"
+      :visible="optionDialogVisible"
+      width="50%"
+      align="left"
+      :before-close="handleClose"
+    >
+      <span>{{ optionValue }}</span>
+    </el-dialog>
+
+    <el-dialog
+      title="回检记录"
+      :visible="recordDialogVisible"
+      width="70%"
+      align="center"
+      :before-close="handleClose"
+    >
+      <record-dialog />
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+// eslint-disable-next-line import/extensions
+import RecordDialog from './components/record-dialog.vue'
+// eslint-disable-next-line import/extensions
+import recordTableVue from './components/record-table.vue'
+export default {
+  name: 'Record',
+  data() {
+    return {
+      search: {
+        mechanism: '',
+        onlineTime: '',
+        billTime: ''
+      },
+      searchInput: '',
+      optionDialogVisible: false,
+      recordDialogVisible: false,
+      optionValue: '',
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now()
+        },
+        shortcuts: [
+          {
+            text: '近一个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setMonth(start.getMonth() - 1)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '近一个季度',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setMonth(start.getMonth() - 3)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '近一年',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setMonth(start.getMonth() - 12)
+              picker.$emit('pick', [start, end])
+            }
+          }
+        ]
+      },
+      datePickerOnline: '',
+      dataPickerBill: '',
+      isBackCheck: '',
+    }
+  },
+  components: {
+    recordTableVue,
+    RecordDialog
+  },
+  methods: {
+    handleChange() {},
+    handleSubmit() {},
+    handleClose() {
+      this.optionDialogVisible = false
+      this.recordDialogVisible = false
+    },
+    handleOpenOption(option) {
+      this.optionValue = option
+      this.optionDialogVisible = true
+    },
+    handleOpenRecord() {
+      this.recordDialogVisible = true
+    }
+  },
+  created() {},
+  mounted() {},
+  watch: {}
+}
+</script>
+
+<style scoped lang="less">
+.outer {
+  border-radius: 10px;
+  background: #fff;
+  padding: 24px;
+  .search-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 19px;
+
+    .search-title {
+      background: var(--2, linear-gradient(90deg, #2f54eb 0%, #5196ff 100%));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 18px;
+      font-style: normal;
+      font-weight: 900;
+      font-style: italic;
+      width: 81px;
+      margin-left: 5px;
+    }
+    .el-input {
+      margin-left: 5px;
+      :deep(.el-input__inner) {
+        display: flex;
+        padding: 8px 20px;
+        align-items: center;
+        gap: 16px;
+        flex: 1 0 0;
+        border-radius: 32px;
+        background: var(--gray-gray-3, #f2f3f5);
+        border: none;
+        width: 100%;
+      }
+    }
+  }
+
+  .search-middle-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .left-area {
+      width: 525px;
+    }
+
+    .right-area {
+      width: 300px;
+      .tot-num {
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 22px;
+
+        .num {
+          color: var(--unnamed, #2d5cf6);
+          font-size: 14px;
+          font-weight: 700;
+          margin: 0px 4px;
+        }
+      }
+
+      img {
+        width: 12px;
+        height: 12px;
+      }
+
+      .sort {
+        color: var(--gray-gray-8, #505968);
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 20px;
+      }
+    }
+  }
+
+  :deep(.el-col-6) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .scrren-com {
+    cursor: pointer;
+    color: #1d2128;
+    font-size: 16px;
+    line-height: 24px;
+    width: fit-content;
+    padding: 0 6px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    color: var(--gray-gray-9, #1d2128);
+    font-size: 2px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+
+    img {
+      margin-left: 4px;
+      width: 8px;
+      height: 6px;
+    }
+
+    &.active {
+      color: #2d5cf6;
+    }
+    .my-hidden {
+      position: absolute;
+      opacity: 0;
+    }
+
+    .el-select {
+      position: absolute;
+      opacity: 0;
+    }
+
+    .hintIcon {
+      width: 20px;
+      margin-left: 4px;
+    }
+  }
+}
+
+:deep(.el-dialog__header) {
+  display: flex;
+  justify-content: center;
+}
+
+.my-date-picker {
+  width: 100%;
+  :deep(.el-range-separator) {
+    width: 10%;
+  }
+}
+</style>
