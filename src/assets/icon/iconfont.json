@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "37723278",
+      "name": "Frame",
+      "font_class": "Frame3",
+      "unicode": "e663",
+      "unicode_decimal": 58979
+    },
+    {
       "icon_id": "37597237",
       "name": "Component 13",
       "font_class": "a-Component133",

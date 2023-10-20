@@ -91,13 +91,13 @@
             </div>
           </div>
           <div class="content-cont-body-bottom">
-            <fileChange @changeFile="changeFile" :activeIndex="activeIndex" :fileList="files" v-if="curMode === 1"></fileChange>
-            <file-preview ref="filePreview" :files="files" :formId="formId" :activeIndex="activeIndex"
+            <fileChange :curMode="curMode" @toggleMode="toggleMode" @changeFile="changeFile" :activeIndex="activeIndex" :fileList="files" v-if="curMode !== 0"></fileChange>
+            <file-preview ref="filePreview" :files="files" :formId="formId" :activeIndex="activeIndex" v-if="curMode !== 2"
               @changeFile="changeFile" :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"
               @getProps="getProps" @findIconPosition="findIconPosition"></file-preview>
             <orcTxtNew ref="ocrTxt" :approval="approval" @addWord="addWord"
               @lineRemove="lineRemove" @checkEdit="checkEdit"
-              v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode === 0"
+              v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode !== 1"
               @showLine="showLine" @showOcrCommentLine="showOcrCommentLine" :lineWordItem="lineWordItem" :styleProp="styleProp">
             </orcTxtNew>
             <el-popover ref="postilPopover" class="postil-popover" v-model="popoverShow" popper-class="postil-popover" placement="right"
@@ -144,7 +144,7 @@
               </div>
             </el-popover>
             <orcTxt ref="ocrTxt" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
-              v-if="specialFileType2.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode === 0"
+              v-if="specialFileType2.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode !== 1"
               @showLine="showLine" :lineWordItem="lineWordItem">
             </orcTxt>
             <p class="content-cont-icons" v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr">
@@ -349,10 +349,18 @@ export default {
     },
   },
   methods: {
-    // 三屏双屏切换 0 为三屏 1 为双屏
-    toggleMode() {
-      this.curMode = this.curMode === 0 ? 1 : 0
+    // 三屏双屏切换 0 为三屏 1 为双屏原图 2 为双屏 0CR
+    toggleMode(val) {
+      if (val && typeof (val) === 'number') {
+        this.curMode = val
+      } else {
+        this.curMode = this.curMode === 0 ? 1 : 0
+      }
+      const curFileType = this.getfileType(this.files[this.activeIndex].fileName)
       this.$nextTick(() => {
+        if (!this.specialFileType1.includes(curFileType) || this.curMode === 2) {
+          return;
+        }
         this.$refs.filePreview.imgLoad()
       })
     },

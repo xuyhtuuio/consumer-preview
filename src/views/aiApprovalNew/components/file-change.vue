@@ -1,5 +1,12 @@
 <template>
   <div class="file-change">
+    <div @click="toggleOCR" class="btn-change">
+      <svg class="icon" aria-hidden="true">
+        <use xlink:href="#icon-Frame3"></use>
+      </svg>
+      <div v-if="curMode===2">OCR</div>
+      <div v-else>原图</div>
+    </div>
     <div class="file-header-swiper">
       <div class="swiper-button-prev" :class="{ 'disabled': activeIndex === 0 }" @click="swiperTo(activeIndex - 1)">
       </div>
@@ -50,6 +57,10 @@ export default {
       type: Number,
       default: 0
     },
+    curMode: {
+      type: Number,
+      default: 0
+    }
   },
   data() {
     return {
@@ -108,6 +119,10 @@ export default {
         this.changeFile(i)
       }
     },
+    toggleOCR() {
+      const val = this.curMode === 1 ? 2 : 1
+      this.$emit('toggleMode', val)
+    }
   },
 }
 </script>
@@ -116,9 +131,24 @@ export default {
 .file-change {
   display: flex;
   width: 60px;
+  padding-top: 8px;
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
+  .btn-change{
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    .icon{
+      width: 24px;
+      height: 24px;
+    }
+    div{
+      color: #505968;
+      font-size: 12px;
+      font-weight: 400;
+    }
+  }
   /deep/ .file-header-swiper {
       position: relative;
       padding: 0 8px;
