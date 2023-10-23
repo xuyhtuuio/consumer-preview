@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="record-body">
     <div class="outer">
       <div class="search-area">
         <div class="search-title">智能回检</div>
@@ -14,7 +14,11 @@
         <div class="left-area">
           <el-row>
             <el-col :span="6">
-              <div class="scrren-com" :class="search.mechanism ? 'active' : ''">
+              <div
+                class="scrren-com"
+                :class="search.mechanism ? 'active' : ''"
+                style="font-size: 16px"
+              >
                 选择机构
                 <img
                   src="../../assets/image/person-center/down.png"
@@ -37,6 +41,7 @@
               <div
                 class="scrren-com"
                 :class="search.datePickerOnline ? 'active' : ''"
+                style="font-size: 16px"
               >
                 <el-popover
                   ref="ref-popover"
@@ -71,6 +76,7 @@
               <div
                 class="scrren-com"
                 :class="search.datePickerBill ? 'active' : ''"
+                style="font-size: 16px"
               >
                 <el-popover
                   ref="ref-popover"
@@ -102,7 +108,11 @@
               </div>
             </el-col>
             <el-col :span="6" justify="center">
-              <el-switch size="small" style="margin-right: 4px" v-model="isBackCheck"/>
+              <el-switch
+                size="small"
+                style="margin-right: 4px"
+                v-model="isBackCheck"
+              />
               已回检
             </el-col>
           </el-row>
@@ -113,11 +123,11 @@
             <el-col :span="8"
               ><p class="tot-num">共<span class="num">3216</span>条</p></el-col
             >
-            <el-col :span="8" justify="center">
+            <el-col :span="8" justify="center" style="cursor: pointer;">
               <p class="sort">
                 按上线时间<img src="../../assets/image/upup.png" alt="" /></p
             ></el-col>
-            <el-col :span="8" justify="center">
+            <el-col :span="8" justify="center" style="cursor: pointer;">
               <p class="sort">
                 按提单时间<img src="../../assets/image/upup.png" alt="" /></p
             ></el-col>
@@ -127,6 +137,7 @@
       <recordTableVue
         @openOption="handleOpenOption"
         @openRecord="handleOpenRecord"
+        @openFilePreview="fullScreen"
       />
     </div>
 
@@ -149,6 +160,20 @@
     >
       <record-dialog />
     </el-dialog>
+
+    <div class="preview" :class="{ fullScreen: showFullScreen }">
+      <!-- 全屏关闭按钮 -->
+      <i
+        class="el-icon-circle-close"
+        v-show="showFullScreen"
+        @click="fullScreen"
+      ></i>
+      <!-- 图片 -->
+      <fullImage
+        ref="imgPreview1"
+        url="http://192.168.210.51:9090/cpr/cpr_1697708778477_微信图片_20230906141828.jpg"
+      ></fullImage>
+    </div>
   </div>
 </template>
 
@@ -157,6 +182,9 @@
 import RecordDialog from './components/record-dialog.vue'
 // eslint-disable-next-line import/extensions
 import recordTableVue from './components/record-table.vue'
+// eslint-disable-next-line import/extensions
+import fullImage from './components/full-image.vue'
+
 export default {
   name: 'Record',
   data() {
@@ -207,12 +235,13 @@ export default {
       datePickerOnline: '',
       dataPickerBill: '',
       isBackCheck: '',
-
+      showFullScreen: false
     }
   },
   components: {
     recordTableVue,
-    RecordDialog
+    RecordDialog,
+    fullImage
   },
   methods: {
     handleChange() {},
@@ -227,6 +256,12 @@ export default {
     },
     handleOpenRecord() {
       this.recordDialogVisible = true
+    },
+    fullScreen() {
+      this.showFullScreen = !this.showFullScreen
+      this.$nextTick(() => {
+        this.$refs.imgPreview1.handleImageLoaded()
+      })
     }
   },
   created() {},
@@ -341,8 +376,8 @@ export default {
 
     img {
       margin-left: 4px;
-      width: 8px;
-      height: 6px;
+      width: 9px;
+      height: 5px;
     }
 
     &.active {
@@ -364,7 +399,38 @@ export default {
     }
   }
 }
+.preview {
+  flex: 1;
+}
+.fullScreen {
+  display: block;
+  position: fixed;
+  z-index: 100;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background: rgb(0 0 0 / 23%);
 
+  .preview {
+    background: rgb(0 0 0 / 23%);
+  }
+
+  .el-icon-circle-close {
+    position: absolute;
+    font-size: 30px;
+    color: #ffffff;
+    right: 20px;
+    top: 20px;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  iframe {
+    width: calc(100% - 80px);
+    margin-left: 40px;
+  }
+}
 :deep(.el-dialog__header) {
   display: flex;
   justify-content: center;
