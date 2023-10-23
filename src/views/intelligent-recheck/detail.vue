@@ -11,7 +11,7 @@
           </div>
           <div class="input-left" :class="{ 'input-left-focus': inputFocus }">
             <el-input
-              placeholder="请输入关键词或上传图片进行回检"
+              :placeholder="placeholder"
               v-model="recheckInput"
               class="input-with-select"
               @focus="inputFocusFun"
@@ -23,6 +23,7 @@
                 slot="prepend"
                 placeholder="请选择"
                 popper-class="content-select"
+                @change="changeSearch"
               >
                 <el-option label="按文件名称" value="1"></el-option>
                 <el-option label="按文本内容" value="2"></el-option>
@@ -57,7 +58,7 @@
           <div class="select-left">
             <div class="select-item select-org">
               <div class="select-set">
-                <div class="tip-style">选择机构</div>
+                <div class="tip-style" :class="{ 'tip-style-active': searchForm.org }">选择机构</div>
                 <i class="el-icon-caret-bottom"></i>
               </div>
               <el-select
@@ -78,7 +79,7 @@
                 width="400"
                 placement="bottom-start"
                 trigger="click"
-                @show="handlePopoverShow"
+                @show="handlePopoverShow1"
               >
                 <el-date-picker
                   v-model="searchForm.setTime"
@@ -95,7 +96,7 @@
                 </el-date-picker>
                 <div slot="reference">
                   <div class="select-set">
-                    <div class="tip-style">上线时间</div>
+                    <div class="tip-style" :class="{ 'tip-style-active': searchForm.setTime }">上线时间</div>
                     <i class="el-icon-caret-bottom"></i>
                   </div>
                 </div>
@@ -108,12 +109,12 @@
                 popper-class="date-style"
                 placement="bottom-start"
                 trigger="click"
-                @show="handlePopoverShow"
+                @show="handlePopoverShow2"
               >
                 <el-date-picker
                   v-model="searchForm.getTime"
                   type="daterange"
-                  ref="my-date-picker"
+                  ref="my-date-picker2"
                   align="right"
                   unlink-panels
                   :picker-options="pickerOptions"
@@ -125,7 +126,7 @@
                 </el-date-picker>
                 <div slot="reference">
                   <div class="select-set">
-                    <div class="tip-style">提单时间</div>
+                    <div class="tip-style" :class="{ 'tip-style-active': searchForm.getTime }">提单时间</div>
                     <i class="el-icon-caret-bottom"></i>
                   </div>
                 </div>
@@ -318,7 +319,8 @@ export default {
       disabledDate(date) {
         return date.getTime() > Date.now();
       }
-    }
+    },
+    placeholder: '请输入文件名或上传图片进行回检'
   }),
   created() {
     if (this.$route.params.item) {
@@ -329,11 +331,17 @@ export default {
     }
   },
   methods: {
+    changeSearch(val) {
+      if (val === '1') {
+        this.placeholder = '请输入文件名或上传图片进行回检'
+      } else {
+        this.placeholder = '请输入关键词或上传图片进行回检'
+      }
+    },
     showDetail() {
       this.$refs.detailDia.show = true;
     },
     toCompare() {
-      console.log('111');
       this.$router.push({
         name: 'recheck-compare',
         // params: {
@@ -462,8 +470,11 @@ export default {
         this.getSimilarityComparisonList();
       }
     },
-    handlePopoverShow() {
+    handlePopoverShow1() {
       this.$refs['my-date-picker'].handleFocus()
+    },
+    handlePopoverShow2() {
+      this.$refs['my-date-picker2'].handleFocus()
     },
     changeSize(type) {
       this.$refs.imgPreview1.changeSize(type)
@@ -655,12 +666,19 @@ export default {
         .select-set {
           display: flex;
           align-items: center;
+          cursor: pointer;
           .tip-style {
-            color: var(--gray-gray-9, #1d2128);
+            color: #1d2128;
             font-size: 14px;
             font-style: normal;
             font-weight: 400;
             line-height: 22px;
+          }
+          .el-icon-caret-bottom {
+            color: #88909B;
+          }
+          .tip-style-active {
+            color: #2D5CF6;
           }
         }
         /deep/.el-select {
