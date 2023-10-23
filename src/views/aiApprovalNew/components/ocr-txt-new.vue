@@ -149,10 +149,19 @@ export default {
           }
           // 存在 allNodes ，代表选中的文本是由多个 dom 拼接
           if (allNodes.length) {
-            const selectNodes = allNodes.filter((item) => {
-              return selectText.includes(item.innerText)
+            const allWithinRangeParent = range.commonAncestorContainer.getElementsByTagName('*');
+            let allSelected = [];
+            Array.from(allWithinRangeParent).map((el) => {
+              if (select.containsNode(el, true)) {
+                allSelected.push(el);
+              }
             })
-            this.selectNodes = selectNodes
+            allSelected = allSelected.filter((secNode) => {
+              if (!Array.from(secNode.classList).includes('div-position')) {
+                return secNode
+              }
+            })
+            this.selectNodes = allSelected
           } else {
             // 不存在 allNodes，证明选中文本仅为一个 dom
             const selectNodes = [range.commonAncestorContainer.parentNode]
@@ -349,6 +358,7 @@ export default {
     },
     // 获取计算后的覆盖在选中文字上的 dom 的宽高
     getRectOverDom(nodes) {
+      console.log(nodes)
       const left = []
       const right = []
       const top = []
