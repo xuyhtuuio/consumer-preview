@@ -21,12 +21,28 @@
           <span>{{ scope.row.ladingBillTimeLimit ? `上线前${scope.row.ladingBillTimeLimit}天` : '--' }}</span>
         </template>
         <template #operate="scope">
-          <el-button type="text" v-if="editAuth" @click="copyForm(scope.row)">复制</el-button>
           <el-button type="text" v-if="scope.row.run === '1'" @click="viewForm(scope.row)">查看</el-button>
           <el-button type="text" v-if="editAuth && scope.row.run === '0'" @click="editForm(scope.row)">编辑</el-button>
-          <el-button type="text" v-if="editAuth && scope.row.run === '0'" @click="editSelfForm(scope.row)">修改时限</el-button>
-          <el-button type="text" v-if="editAuth && scope.row.run === '1'" class="red" @click="stopApllay(scope.row)">停用</el-button>
-          <el-button type="text" v-else-if="editAuth" @click="enableApllay(scope.row)">恢复</el-button>
+          <el-dropdown v-if="editAuth">
+            <el-button type="text" >更多</el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item v-if="scope.row.run === '0'" >
+                <el-button type="text" @click="enableApllay(scope.row)">发布</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button type="text" @click="copyForm(scope.row)">复制并创建</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button type="text" v-if="scope.row.run === '0'" @click="editSelfForm(scope.row)">修改时限</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button type="text" v-if="scope.row.run === '1'" class="red" @click="stopApllay(scope.row)">停用</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button type="text" v-if="scope.row.run === '1'" class="red" @click="delApllay(scope.row)">删除</el-button>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </TrsTable>
       <!-- 表单管理二级表格 -->
@@ -124,7 +140,9 @@ import {
   modifyOrder,
   deletedFormItem,
   switchFormItemState,
-  getItemType
+  getItemType,
+  deleteForm,
+  formListChangeSort
 } from '@/api/manage'
 import FormManageCustomField from './formManageCustomField'
 export default {
@@ -143,6 +161,14 @@ export default {
       loadingList: false,
       data: [],
       colConfig: [
+        {
+          label: '序号',
+          prop: 'sort',
+          edit: true,
+          bind: {
+            width: 110
+          }
+        },
         {
           label: '审查事项类型',
           prop: 'examineTypesName',
@@ -171,7 +197,7 @@ export default {
           label: '操作',
           prop: 'operate',
           bind: {
-            width: 250,
+            width: 120,
             align: 'left'
           }
         },
@@ -450,15 +476,22 @@ export default {
       })
     }, 500),
     // 编辑单元格
-    async submitEdit(row) {
+    async submitEdit(row, oldRow, prop) {
       let res;
       let resData;
       if (this.level === 1) {
-        res = await modifyNameFormCategory({
-          name: row.examineTypesName,
-          formCategoryId: row.recordId
-        })
-        resData = this.resData
+        if (prop === 'sort') {
+          res = await formListChangeSort({
+            oldSort: oldRow.sort,
+            newSort: row.sort
+          })
+        } else {
+          res = await modifyNameFormCategory({
+            name: row.examineTypesName,
+            formCategoryId: row.recordId
+          })
+          resData = this.resData
+        }
       } else {
         // 修改字段序号
         res = await modifyOrder({
@@ -469,6 +502,11 @@ export default {
       }
       if (res?.data?.success) {
         this.$message.success('修改成功!')
+        if (this.level === 1 && prop === 'sort') {
+          this.getObtainExamineTypeList({
+            pageNow: this.page1.pageNow
+          })
+        }
       } else {
         if (resData && this.level === 1) {
           const findRow = resData.find(item => item.recordId === row.recordId)
@@ -486,6 +524,22 @@ export default {
       this.limitTime = item.ladingBillTimeLimit
       this.limitTimeVisible = true
     },
+    // 删除
+    delApllay: debounce(async function (row) {
+      const res = await deleteForm({
+        recordId: row.recordId,
+        sort: row.sort
+      })
+      if (res?.data?.data?.success) {
+        this.$message.success('删除成功! ')
+        const pageNow = this.resData.length === 1 ? this.page1.pageNow - 1 : this.page1.pageNow;
+        this.getObtainExamineTypeList({
+          pageNow: pageNow || 1
+        })
+      } else {
+        this.$message.error(res.data?.data?.msg || '操作失败，请稍后再试！')
+      }
+    }, 500),
     // 停用
     stopApllay: debounce(function (row) {
       this.confirmOption = {
