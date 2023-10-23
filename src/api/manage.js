@@ -51,6 +51,22 @@ export function copyFormCategory(formCategoryId) {
     }
   })
 }
+// 删除表单
+export function deleteForm(params) {
+  return request({
+    url: '/cpr/FormManagement/deleteForm',
+    method: 'get',
+    params
+  })
+}
+// 修改表单排序
+export function formListChangeSort(params) {
+  return request({
+    url: '/cpr/FormManagement/formListChangeSort',
+    method: 'get',
+    params
+  })
+}
 // 表单管理-表单字段类型
 export function getItemType() {
   return request({
