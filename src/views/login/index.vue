@@ -4,20 +4,25 @@
       <!-- 登录 -->
       <div
         :class="
-          crtOp !== 'register' ? 'container-noregister container' : 'container-normal container'
+          crtOp !== 'register'
+            ? 'container-noregister container'
+            : 'container-normal container'
         "
       >
-        <div class="container-top" :class="crtOp === 'register' ? 'pt52' : 'pt80'">
+        <div
+          class="container-top"
+          :class="crtOp === 'register' ? 'pt52' : 'pt80'"
+        >
           <div class="left">
             <swiperContent></swiperContent>
           </div>
           <div class="right" v-if="crtOp === 'inputPhone'">
-            <div class="register_btn" @click="register">注册</div>
+            <!-- <div class="register_btn" @click="register">注册</div> -->
             <div class="sub-header">
               <div class="circle"></div>
               <div class="welcome">
                 欢迎使用
-                <span>消保管控平台</span>
+                <span>消保智能管控平台</span>
               </div>
             </div>
             <div class="login-way">
@@ -41,20 +46,26 @@
                     onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"
                     style="height: 50px"
                   >
-                    <el-select v-model="areaCode" slot="prepend" placeholder="请选择">
+                    <el-select
+                      v-model="areaCode"
+                      slot="prepend"
+                      placeholder="请选择"
+                    >
                       <el-option
                         v-for="(item, index) in areaCodes"
                         :key="index"
                         :value="item.value"
                       >
-                        <span style="float: left">{{ item.value }} {{ item.label }}</span>
+                        <span style="float: left"
+                          >{{ item.value }} {{ item.label }}</span
+                        >
                       </el-option>
                     </el-select>
                   </el-input>
                 </el-form-item>
               </el-form>
               <!-- 服务协议 -->
-              <div class="service-agreement">
+              <div class="service-agreement-num">
                 <el-checkbox v-model="checked">
                   <span style="color: rgb(80, 89, 104)">我已阅读并同意</span>
                   <span class @click="toUserAgreement">用户协议</span>
@@ -63,19 +74,20 @@
                 </el-checkbox>
               </div>
               <!-- 下一步 -->
-              <el-button type="text" class="next" @click="next">下一步</el-button>
+              <el-button type="text" class="next" @click="next"
+                >下一步</el-button
+              >
               <!-- <p class="no-account">没有账号，去 <span class="register">免费注册</span></p> -->
             </div>
           </div>
 
           <!-- 密码登录 -->
           <div class="right" v-if="crtOp === 'inputPsw'">
-            <div class="register_btn" @click="register">注册</div>
+            <!-- <div class="register_btn" @click="register">注册</div> -->
             <div class="sub-header">
-              <div class="circle"></div>
               <div class="welcome">
                 欢迎使用
-                <span>消保管控平台</span>
+                <span>消保智能管控平台</span>
               </div>
             </div>
             <div class="login-way">
@@ -115,7 +127,10 @@
                   </el-input>
                 </el-form-item>
                 <el-form-item prop="verify" v-if="firstVerCode">
-                  <el-input v-model="form.verify" placeholder="点击输入验证码"></el-input>
+                  <el-input
+                    v-model="form.verify"
+                    placeholder="点击输入验证码"
+                  ></el-input>
                   <div class="verify_code">
                     <img v-if="verCode" :src="verCode" @click="verCodeChange" />
                   </div>
@@ -135,7 +150,7 @@
                 <el-checkbox v-model="rememberPsd">记住密码</el-checkbox>
                 <span @click="forgetPsw">忘记密码?</span>
               </div>
-              <div class="service-agreement">
+              <div class="service-agreement-pwd">
                 <el-checkbox v-model="checked">
                   <span style="color: rgb(80, 89, 104)">我已阅读并同意</span>
                   <span class @click="toUserAgreement">用户协议</span>
@@ -147,7 +162,15 @@
               <!-- <p class="no-account">没有账号，去 <span class="register" @click="register">免费注册</span></p> -->
             </div>
             <div class="pwd-login">
-              <el-button type="text" class="nextPwd" @click="next" :loading="loading" :disabled="loading" v-once-click>登录</el-button>
+              <el-button
+                type="text"
+                class="nextPwd"
+                @click="next"
+                :loading="loading"
+                :disabled="loading"
+                v-once-click
+                >登录</el-button
+              >
               <!-- 服务协议 -->
             </div>
           </div>
@@ -157,10 +180,16 @@
             <p class="input-code">输入手机号验证码</p>
             <p class="input-code-warn">
               请输入发送至
-              <span>{{ form.phone | phoneFormat }}</span> 的 <span>6</span> 位验证码， 有效期 5 分钟
+              <span>{{ form.phone | phoneFormat }}</span> 的
+              <span>6</span> 位验证码， 有效期 5 分钟
             </p>
             <div class="code-container">
-              <div v-for="(item, index) in captchas" :key="index" class :id="'captcha0' + index">
+              <div
+                v-for="(item, index) in captchas"
+                :key="index"
+                class
+                :id="'captcha0' + index"
+              >
                 <input
                   v-model="item.num"
                   :id="'captcha' + index"
@@ -177,11 +206,21 @@
                 />
               </div>
             </div>
-            <div class="regain" v-if="regainShow">{{ CodeMibleTime }} 秒后可重新获取验证码</div>
-            <div class="regain-code" @click="regainCode" v-if="!regainShow">重新获取验证码</div>
+            <div class="regain" v-if="regainShow">
+              {{ CodeMibleTime }} 秒后可重新获取验证码
+            </div>
+            <div class="regain-code" @click="regainCode" v-if="!regainShow">
+              重新获取验证码
+            </div>
             <div
               class="regain-code"
-              @click="changeLoginWays({ name: '账号密码', key: '1', type: 'inputPsw' })"
+              @click="
+                changeLoginWays({
+                  name: '账号密码',
+                  key: '1',
+                  type: 'inputPsw'
+                })
+              "
             >
               密码登录
             </div>
@@ -193,7 +232,10 @@
             <el-button @click="login" class="login" type="text">登录</el-button>
           </div>
           <div class="register-box" v-if="crtOp === 'register'">
-            <register @showAgreeDialog="showAgreeDialog" @tologin="tologin"></register>
+            <register
+              @showAgreeDialog="showAgreeDialog"
+              @tologin="tologin"
+            ></register>
           </div>
           <!-- 找回密码 -->
           <div class="right" v-if="crtOp === 'forget-pwd'">
@@ -214,7 +256,10 @@
                 class="login_form"
               >
                 <el-form-item label="手机" prop="phone" class="phone_input2">
-                  <el-input v-model.trim="changePwdform.phone" placeholder="请输入你的手机号">
+                  <el-input
+                    v-model.trim="changePwdform.phone"
+                    placeholder="请输入你的手机号"
+                  >
                     <el-select
                       v-model="areaCode"
                       slot="prepend"
@@ -227,7 +272,9 @@
                         :key="index"
                         :value="item.value"
                       >
-                        <span style="float: left">{{ item.value }} {{ item.label }}</span>
+                        <span style="float: left"
+                          >{{ item.value }} {{ item.label }}</span
+                        >
                       </el-option>
                     </el-select>
                   </el-input>
@@ -249,7 +296,11 @@
                     show-password
                   ></el-input>
                 </el-form-item>
-                <el-form-item label="确认密码" prop="confirmPwd" class="pwd-eye">
+                <el-form-item
+                  label="确认密码"
+                  prop="confirmPwd"
+                  class="pwd-eye"
+                >
                   <el-input
                     v-model.trim="changePwdform.confirmPwd"
                     placeholder="请输入确认密码"
@@ -258,13 +309,21 @@
                   ></el-input>
                 </el-form-item>
               </el-form>
-              <el-button type="text" @click="submit" class="next edit_pwd">提交</el-button>
+              <el-button type="text" @click="submit" class="next edit_pwd"
+                >提交</el-button
+              >
             </div>
           </div>
         </div>
-        <div :class="crtOp === 'register' ? 'container-bottom-left' : 'container-bottom'">
-          <img src="@/assets/image/trs_logo.png" alt />@2022拓尔思信息技术股份有限公司 版权所有
-          京ICP备11022871号-7
+        <div
+          :class="
+            crtOp === 'register' ? 'container-bottom-left' : 'container-bottom'
+          "
+        >
+          <img
+            src="@/assets/image/trs_logo.png"
+            alt
+          />@2022拓尔思信息技术股份有限公司 版权所有 京ICP备11022871号-7
         </div>
       </div>
       <!-- 协议弹窗 -->
@@ -274,15 +333,22 @@
         width="500px"
         custom-class="agreeDialog"
       >
-        <div slot="title" class="title"><img src="@/assets/image/tips.png" />提示</div>
+        <div slot="title" class="title">
+          <img src="@/assets/image/tips.png" />提示
+        </div>
         <div class="tips">
           请先同意
           <span>用户协议</span> 和
           <span>隐私政策</span>
         </div>
         <span slot="footer" class="dialog-footer">
-          <el-button type="text" class="cancel" @click="checkAgreement = false">取 消</el-button>
-          <el-button type="text" class="submitCheck" @click="checkAgreement = false"
+          <el-button type="text" class="cancel" @click="checkAgreement = false"
+            >取 消</el-button
+          >
+          <el-button
+            type="text"
+            class="submitCheck"
+            @click="checkAgreement = false"
             >确 定</el-button
           >
         </span>
@@ -293,14 +359,20 @@
         width="500px"
         custom-class="agreeDialog"
       >
-        <div slot="title" class="title"><img src="@/assets/image/tips.png" />提示</div>
+        <div slot="title" class="title">
+          <img src="@/assets/image/tips.png" />提示
+        </div>
         <div class="tips">
           本系统暂不支持主动找回账号，请
           <span style="font-wight: 700; color: #1d2128">联系管理员</span>
         </div>
         <span slot="footer" class="dialog-footer">
-          <el-button type="text" class="cancel" @click="findPwd = false">取 消</el-button>
-          <el-button type="text" class="submitCheck" @click="findPwd = false">确 定</el-button>
+          <el-button type="text" class="cancel" @click="findPwd = false"
+            >取 消</el-button
+          >
+          <el-button type="text" class="submitCheck" @click="findPwd = false"
+            >确 定</el-button
+          >
         </span>
       </el-dialog>
       <el-dialog
@@ -315,13 +387,21 @@
             账号已到期
           </div>
           <p>可提交申请延期，待管理员审核！</p>
-          <el-input v-model="appeal" placeholder="请输入您的诉求" class="appeal-input"></el-input>
+          <el-input
+            v-model="appeal"
+            placeholder="请输入您的诉求"
+            class="appeal-input"
+          ></el-input>
           <!-- 于 {{ expirytime }}  -->
         </div>
 
         <span slot="footer" class="dialog-footer">
-          <el-button type="text" class="cancel" @click="applicationCancel">取消</el-button>
-          <el-button type="text" class="submitCheck" @click="applicationExpiry">申请延期</el-button>
+          <el-button type="text" class="cancel" @click="applicationCancel"
+            >取消</el-button
+          >
+          <el-button type="text" class="submitCheck" @click="applicationExpiry"
+            >申请延期</el-button
+          >
         </span>
       </el-dialog>
       <!-- 提交申请成功 -->
@@ -348,7 +428,9 @@
         <div class="expiry-content">
           <img src="@/assets/image/expiry-tips.png" />
           <p class="register-status">待审核</p>
-          <p class="register-msg">请耐心等待，账号审核通过后将发送账号信息至您的邮箱和短信</p>
+          <p class="register-msg">
+            请耐心等待，账号审核通过后将发送账号信息至您的邮箱和短信
+          </p>
           <p class="to-trs">
             <span>{{ downTime }}</span> 秒后自动跳转至
             <span>TRS数星云服务平台</span>
@@ -360,43 +442,43 @@
 </template>
 
 <script>
-import { toCode, fromCode } from '@/utils/utils';
+import { toCode, fromCode } from '@/utils/utils'
 import { editThePermissionsPage } from '@/api/admin/role'
-import md5 from 'js-md5';
+import md5 from 'js-md5'
 // eslint-disable-next-line
 import * as dayjs from 'dayjs'
 // eslint-disable-next-line
-import register from './register';
-import swiperContent from './swiper';
+import register from './register'
+import swiperContent from './swiper'
 export default {
   name: 'loginTest',
   components: { swiperContent, register },
   data() {
     // eslint-disable-next-line
     var handlePasswordCheck = (rule, value, callback) => {
-      const password = this.changePwdform.newPwd;
+      const password = this.changePwdform.newPwd
       if (value === undefined || value === '') {
-        callback(new Error('请输入确认密码'));
+        callback(new Error('请输入确认密码'))
       }
       if (value && password && value.trim() !== password.trim()) {
-        callback(new Error('两次输入密码不相同，请重新输入'));
+        callback(new Error('两次输入密码不相同，请重新输入'))
       }
-      callback();
-    };
+      callback()
+    }
     // eslint-disable-next-line
     var handleNewPasswordCheck = (rule, value, callback) => {
       if (value.length > 0 && value.length < 8) {
-        callback(new Error('密码必须为8-20位包含大小写字母及数字！'));
+        callback(new Error('密码必须为8-20位包含大小写字母及数字！'))
       } else if (
         !value.match(
           /^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z\W_]+$)(?![a-z0-9]+$)(?![a-z\W_]+$)(?![0-9\W_]+$)[a-zA-Z0-9\W_]{8,}$/
         )
       ) {
-        callback(new Error('密码必须为8-20位包含大小写字母及数字！'));
+        callback(new Error('密码必须为8-20位包含大小写字母及数字！'))
       } else {
-        callback();
+        callback()
       }
-    };
+    }
     return {
       loginWay: [
         { name: '手机号', key: '0', type: 'inputPhone' },
@@ -423,16 +505,18 @@ export default {
           {
             validator: (rule, value, callback) => {
               if (/^1\d{10}$/i.test(value) === false) {
-                callback(new Error('请输入正确的手机号'));
+                callback(new Error('请输入正确的手机号'))
               } else {
-                callback();
+                callback()
               }
             },
             trigger: 'blur'
           }
         ],
         verify: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
-        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' }
+        ],
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
         newPwd: [
           { required: true, message: '请输入新密码', trigger: 'blur' },
@@ -466,7 +550,14 @@ export default {
       regainShow: true,
       applyInfo: {},
       appeal: '',
-      captchas: [{ num: '' }, { num: '' }, { num: '' }, { num: '' }, { num: '' }, { num: '' }],
+      captchas: [
+        { num: '' },
+        { num: '' },
+        { num: '' },
+        { num: '' },
+        { num: '' },
+        { num: '' }
+      ],
       code: '',
       confirmWords: '拖动滑块验证',
       beginClientX: 0,
@@ -493,69 +584,71 @@ export default {
       iframeSrc: [],
       iframeType: 'develop',
       gohistory: false,
-      loading: false,
-    };
+      loading: false
+    }
   },
   watch: {
     checked(val) {
       if (val) {
-        window.localStorage.setItem('trsUserAgree', '1');
+        window.localStorage.setItem('trsUserAgree', '1')
       } else {
-        window.localStorage.removeItem('trsUserAgree');
+        window.localStorage.removeItem('trsUserAgree')
       }
     }
   },
   created() {
-    this.env = process.env.NODE_ENV;
-    const userName = window.localStorage.getItem('AI_name');
-    const pwd = window.localStorage.getItem('AI_pwd');
-    this.crtOp = this.$route.query.type || 'inputPsw';
-    const trsUserAgree = window.localStorage.getItem('trsUserAgree');
-    this.checked = trsUserAgree === '1';
-    this.form.username = userName || '';
+    this.env = process.env.NODE_ENV
+    const userName = window.localStorage.getItem('AI_name')
+    const pwd = window.localStorage.getItem('AI_pwd')
+    this.crtOp = this.$route.query.type || 'inputPsw'
+    const trsUserAgree = window.localStorage.getItem('trsUserAgree')
+    this.checked = trsUserAgree === '1'
+    this.form.username = userName || ''
     if (pwd) {
-      this.form.password = fromCode(pwd) || '';
-      this.rememberPsd = true;
+      this.form.password = fromCode(pwd) || ''
+      this.rememberPsd = true
     }
     // 判断当前系统为生产或测试
     if (this.hostArr.indexOf(window.location.host) !== -1) {
-      this.iframeType = 'prod';
+      this.iframeType = 'prod'
     }
     if (this.$route.query.from && this.$route.query.from !== 'trs') {
-      this.checkToken();
+      this.checkToken()
     }
   },
   methods: {
     findMyPwd() {
-      this.findPwd = true;
+      this.findPwd = true
     },
     tologin(val) {
       if (val) {
-        const type = this.loginWay.filter(item => item.name === this.activeName);
-        this.crtOp = type[0].type;
+        const type = this.loginWay.filter(
+          (item) => item.name === this.activeName
+        )
+        this.crtOp = type[0].type
         // this.crtOp = 'inputPhone'
       }
     },
     showAgreeDialog(val) {
-      this.checkAgreement = val;
+      this.checkAgreement = val
     },
     register() {
-      this.crtOp = 'register';
+      this.crtOp = 'register'
     },
     // 点击改变验证码
     verCodeChange() {
-      this.codeFun();
+      this.codeFun()
     },
     changeLoginWays(item) {
-      if (item.name === this.activeName) return;
-      this.activeName = item.name;
-      this.crtOp = item.name === '手机号' ? 'inputPhone' : 'inputPsw';
-      this.$refs['form'].clearValidate();
+      if (item.name === this.activeName) return
+      this.activeName = item.name
+      this.crtOp = item.name === '手机号' ? 'inputPhone' : 'inputPsw'
+      this.$refs['form'].clearValidate()
     },
     // 隐私政策
     toPrivacypolicy() {
-      const page2 = this.$router.resolve({ name: 'privacy-policy' });
-      window.open(page2.href, '_blank');
+      const page2 = this.$router.resolve({ name: 'privacy-policy' })
+      window.open(page2.href, '_blank')
     },
     // 用户协议
     toUserAgreement() {
@@ -564,21 +657,28 @@ export default {
     },
     next() {
       if (this.activeName === '手机号') {
-        this.$message.success('当前只能用账号密码登录');
-        /*  this.$refs['form'].validate(async valid => {
+        this.$refs['form'].validate(async (valid) => {
           if (valid) {
             if (!this.checked) {
-              this.checkAgreement = true;
-              return;
+              this.checkAgreement = true
+              return
             }
-            const res = await this.getCodeMible();
+            const res = await this.getCodeMible()
+
+            /**
+             * res.success不存在，设为true即可通行
+             *
+             */
+
             if (res.success) {
-              this.crtOp = 'inputSms';
+              this.crtOp = 'inputSms'
               this.$nextTick(() => {
-                const dom = document.getElementById('captcha' + this.activeInput);
-                dom.focus();
-              });
-              this.activeInput = 0;
+                const dom = document.getElementById(
+                  'captcha' + this.activeInput
+                )
+                dom.focus()
+              })
+              this.activeInput = 0
               // 获取短信验证码
               this.captchas = [
                 { num: '' },
@@ -587,44 +687,50 @@ export default {
                 { num: '' },
                 { num: '' },
                 { num: '' }
-              ];
+              ]
             }
           }
-        }); */
+        })
       } else if (this.activeName === '账号密码') {
-        this.$refs['form'].validate(async valid => {
+        this.$refs['form'].validate(async (valid) => {
           if (valid) {
-            const _this = this;
+            const _this = this
             // 滑动滑块
             if (!this.checked) {
-              this.checkAgreement = true;
-              return;
+              this.checkAgreement = true
+              return
             }
             this.loading = true
             try {
-              const res = await this.loginByPwd();
+              const res = await this.loginByPwd()
               this.loading = false
               if (!res.access_token) {
-                this.$message.error(res?.error_description);
-                this.codeFun();
-                return;
+                this.$message.error(res?.error_description)
+                this.codeFun()
+                return
               }
               if (res.access_token) {
-                window.localStorage.setItem('AI_name', this.form.username);
+                window.localStorage.setItem('AI_name', this.form.username)
                 if (this.rememberPsd === true) {
-                  window.localStorage.setItem('AI_pwd', toCode(this.form.password));
+                  window.localStorage.setItem(
+                    'AI_pwd',
+                    toCode(this.form.password)
+                  )
                 } else {
-                  window.localStorage.removeItem('AI_pwd');
+                  window.localStorage.removeItem('AI_pwd')
                 }
-                window.localStorage.setItem('AI_token', res.access_token);
-                const userPermis = await this.getUserRole();
-                window.localStorage.setItem('userPermis', JSON.stringify(userPermis));
+                window.localStorage.setItem('AI_token', res.access_token)
+                const userPermis = await this.getUserRole()
+                window.localStorage.setItem(
+                  'userPermis',
+                  JSON.stringify(userPermis)
+                )
                 await this.getPermissionsPage()
-                this.$message.success('登录成功');
+                this.$message.success('登录成功')
                 if (this.gohistory && this.gohistory !== '404') {
-                  this.$router.go(-1);
+                  this.$router.go(-1)
                 } else {
-                  this.$router.push({ name: 'home' });
+                  this.$router.push({ name: 'home' })
                 }
                 // this.sendMessage = {
                 //   uni__teis_Token: res.access_token,
@@ -635,19 +741,19 @@ export default {
             } catch (err) {
               this.loading = false
               if (err.data.error_description === '用户帐号已过期') {
-                _this.expirydialog = true;
-                return;
+                _this.expirydialog = true
+                return
               }
               if (err && err.data && err.data.error === 'invalid_grant') {
-                _this.$message.error(err.data.error_description);
+                _this.$message.error(err.data.error_description)
               } else {
-                _this.$message.error(err.data.error);
+                _this.$message.error(err.data.error)
               }
-              _this.form.verify = '';
-              _this.codeFun();
+              _this.form.verify = ''
+              _this.codeFun()
             }
           }
-        });
+        })
       }
     },
     async getUserRole() {
@@ -659,31 +765,35 @@ export default {
           token: window.localStorage.getItem('AI_token')
         },
         msg: false
-      });
+      })
       window.localStorage.setItem('user_name', res.data.user_name)
-      const role = JSON.parse(res.data.user_name).roles.filter(item => {
-        return item.clientId === 'teisdata';
-      });
-      return role;
+      const role = JSON.parse(res.data.user_name).roles.filter((item) => {
+        return item.clientId === 'teisdata'
+      })
+      return role
     },
     async getPermissionsPage() {
       // const user = JSON.parse(window.localStorage.getItem('user_name'))
-      const res = await editThePermissionsPage();
+      const res = await editThePermissionsPage()
       const data = res.data.data || {}
-      data.funPerms = data.funPerms.filter(item => item.type)
-      data.defaultPerm = data.defaultPerm.filter(item => item.type)
+      data.funPerms = data.funPerms.filter((item) => item.type)
+      data.defaultPerm = data.defaultPerm.filter((item) => item.type)
       this.$store.state.permissionsPage = data
       window.localStorage.setItem('permissionsPage', JSON.stringify(data))
     },
     // 判断账号是否过期
     async checkToken() {
       // 登录成功后本地存一个AI_token
-      if (window.localStorage.getItem('AI_token') == null && !this.sendMessage.uni__teis_Token) {
-        return;
+      if (
+        window.localStorage.getItem('AI_token') == null
+        && !this.sendMessage.uni__teis_Token
+      ) {
+        return
       }
-      this.sendMessage.uni__teis_Token && localStorage.setItem('AI_token', this.sendMessage.uni__teis_Token);
-      this.platlistBack = [];
-      this.platlist = [];
+      this.sendMessage.uni__teis_Token
+        && localStorage.setItem('AI_token', this.sendMessage.uni__teis_Token)
+      this.platlistBack = []
+      this.platlist = []
       const res = await this.$http({
         method: 'post',
         url: this.$GLOBAL.uaa + 'oauth/check_token',
@@ -691,59 +801,64 @@ export default {
         data: {
           token: window.localStorage.getItem('AI_token')
         }
-      });
+      })
       if (res && !res.error && res.user_name) {
-        this.sendMessage.uni__user_name = res.user_name;
+        this.sendMessage.uni__user_name = res.user_name
         // 判断过期时间
-        const userinfo = JSON.parse(res.user_name);
-        this.userinfo = userinfo;
+        const userinfo = JSON.parse(res.user_name)
+        this.userinfo = userinfo
         // 权限申请
-        const { platform, expiryTime } = userinfo;
-        const routeFrom = this.$route.query.from;
-        const startTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
-        const diff = dayjs(expiryTime).diff(dayjs(startTime), 'second');
-        this.platlistBack = platform ? platform.split(',') : [];
-        localStorage.setItem('platlistBack', JSON.stringify(this.platlistBack));
-        this.platlist = platform ? platform.split(',') : [];
+        const { platform, expiryTime } = userinfo
+        const routeFrom = this.$route.query.from
+        const startTime = dayjs().format('YYYY-MM-DD HH:mm:ss')
+        const diff = dayjs(expiryTime).diff(dayjs(startTime), 'second')
+        this.platlistBack = platform ? platform.split(',') : []
+        localStorage.setItem('platlistBack', JSON.stringify(this.platlistBack))
+        this.platlist = platform ? platform.split(',') : []
         // 判断下一步是否跳转
         if (routeFrom === 'trs') {
           this.$router.push({
             name: 'homePage'
-          });
+          })
         } else if (
           routeFrom
           && routeFrom !== 'trs'
           && this.platlistBack.indexOf(routeFrom) === -1
         ) {
           // 没有对应权限，需申请
-          this.platlist.push(routeFrom);
-          this.platDialog = true;
+          this.platlist.push(routeFrom)
+          this.platDialog = true
         } else if (expiryTime && diff <= 0) {
           // 说明过期
-          this.expirydialog = true;
+          this.expirydialog = true
           // this.expirytime = expiryTime || dayjs().format('YYYY-MM-DD HH:mm:ss')
         } else if (
-          routeFrom && !this.platDialog && !this.expirydialog && routeFrom && routeFrom !== 'trs'
+          routeFrom
+          && !this.platDialog
+          && !this.expirydialog
+          && routeFrom
+          && routeFrom !== 'trs'
         ) {
           // 未到期 & 有权限
-          const plat = this.iframeSrc.filter(item => item.value === routeFrom);
+          const plat = this.iframeSrc.filter((item) => item.value === routeFrom)
           // 来源为存在平台
           if (plat.length) {
-            window.opener = null;
+            window.opener = null
             window.open(
-              plat[0][this.iframeType].replace(plat[0].route, '') + `?id=
+              plat[0][this.iframeType].replace(plat[0].route, '')
+                + `?id=
               ${md5.hex(window.localStorage.getItem('AI_token'))}`,
               '_self'
-            );
+            )
           } else {
             this.$router.push({
               name: 'homePage'
-            });
+            })
           }
         } else {
           this.$router.push({
             name: 'homePage'
-          });
+          })
         }
       }
     },
@@ -751,220 +866,220 @@ export default {
     async codeFun() {
       const res = await this.$http({
         url: '/cpr/captcha'
-      });
+      })
       if (res.data === undefined) {
-        this.$message.error('网络错误，请稍后再试');
-        return;
+        this.$message.error('网络错误，请稍后再试')
+        return
       }
-      this.verCode = res.data.data.image;
-      this.firstVerCode = true;
-      this.form.verKey = res.data.data.key;
+      this.verCode = res.data.data.image
+      this.firstVerCode = true
+      this.form.verKey = res.data.data.key
     },
     // 系统内部手机号验证码
     async getCodeMible() {
-      return this.$message.success('当前只能用账号密码登录');
-      // if (this.crtOp === 'forget-pwd') {
-      //   if (!this.changePwdform.phone) {
-      //     return this.$message.error('请输入手机号');
-      //   }
-      // }
-      // if (this.crtOp === 'inputPhone') {
-      //   if (this.CodeMibleTime > 0 && this.CodeMibleTime < 60) {
-      //     this.regainShow = true;
-      //     this.crtOp = 'inputSms';
-      //     // 获取短信验证码
-      //     this.captchas = [
-      //       { num: '' },
-      //       { num: '' },
-      //       { num: '' },
-      //       { num: '' },
-      //       { num: '' },
-      //       { num: '' }
-      //     ];
-      //     return;
-      //   }
-      // }
+      if (this.crtOp === 'forget-pwd') {
+        if (!this.changePwdform.phone) {
+          return this.$message.error('请输入手机号')
+        }
+      }
+      if (this.crtOp === 'inputPhone') {
+        if (this.CodeMibleTime > 0 && this.CodeMibleTime < 60) {
+          this.regainShow = true
+          this.crtOp = 'inputSms'
+          // 获取短信验证码
+          this.captchas = [
+            { num: '' },
+            { num: '' },
+            { num: '' },
+            { num: '' },
+            { num: '' },
+            { num: '' }
+          ]
+          return
+        }
+      }
 
-      // clearInterval(this.CodeMibleTimer);
-      // const data = {
-      //   phone: this.crtOp === 'forget-pwd' ? this.changePwdform.phone : this.form.phone
-      // };
-      // let res;
-      // try {
-      //   res = await this.$http({
-      //     method: 'post',
-      //     contentType: 'application/x-www-form-urlencoded',
-      //     url: this.$GLOBAL.uaa + 'validCodeSms',
-      //     data
-      //   });
-      //   if (res.success) {
-      //     this.regainShow = true;
-      //     this.CodeMibleTime = 60;
-      //     if (this.crtOp === 'inputPhone') {
-      //       this.crtOp = 'inputSms';
-      //       this.activeInput = 0;
-      //       // 获取短信验证码
-      //       this.captchas = [
-      //         { num: '' },
-      //         { num: '' },
-      //         { num: '' },
-      //         { num: '' },
-      //         { num: '' },
-      //         { num: '' }
-      //       ];
-      //     }
+      clearInterval(this.CodeMibleTimer)
+      const data = {
+        phone:
+          this.crtOp === 'forget-pwd'
+            ? this.changePwdform.phone
+            : this.form.phone
+      }
+      let res
+      try {
+        res = await this.$http({
+          method: 'post',
+          contentType: 'application/x-www-form-urlencoded',
+          url: this.$GLOBAL.uaa + 'validCodeSms',
+          data
+        })
+        if (res.success) {
+          this.regainShow = true
+          this.CodeMibleTime = 60
+          if (this.crtOp === 'inputPhone') {
+            this.crtOp = 'inputSms'
+            this.activeInput = 0
+            // 获取短信验证码
+            this.captchas = [
+              { num: '' },
+              { num: '' },
+              { num: '' },
+              { num: '' },
+              { num: '' },
+              { num: '' }
+            ]
+          }
 
-      //     this.CodeMibleTimer = setInterval(() => {
-      //       // eslint-disable-next-line
-      //       if (this.CodeMibleTime <= 0) {
-      //         // this.CodeMibleTime=60
-      //         clearInterval(this.CodeMibleTimer);
-      //         if (this.crtOp === 'forget-pwd') {
-      //           this.CodeMibleTxt = '点击发送验证码';
-      //         }
-      //         this.regainShow = false;
-      //       } else {
-      //         this.CodeMibleTime--;
-      //         this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
-      //       }
-      //     }, 1000);
-      //   } else if (this.crtOp === 'forget-pwd') {
-      //     this.CodeMibleTxt = '点击发送验证码';
-      //     this.regainShow = true;
-      //     this.CodeMibleTime = 60;
-      //     // this.crtOp = 'inputSms';
-      //     // this.activeInput = 0;
-      //     // 获取短信验证码
-      //     // this.captchas = [
-      //     //   { num: '' },
-      //     //   { num: '' },
-      //     //   { num: '' },
-      //     //   { num: '' },
-      //     //   { num: '' },
-      //     //   { num: '' },
-      //     // ]
-      //   } else if (['验证码有效，请勿频繁发送'].includes(res.msg)) {
-      //     this.regainShow = true;
-      //     this.CodeMibleTime = 60;
-      //     if (this.crtOp === 'inputPhone') {
-      //       this.crtOp = 'inputSms';
-      //       this.activeInput = 0;
-      //       // 获取短信验证码
-      //       this.captchas = [
-      //         { num: '' },
-      //         { num: '' },
-      //         { num: '' },
-      //         { num: '' },
-      //         { num: '' },
-      //         { num: '' }
-      //       ];
-      //     }
-      //     this.CodeMibleTimer = setInterval(() => {
-      //       // eslint-disable-next-line
-      //       if (this.CodeMibleTime <= 0) {
-      //         this.regainShow = false;
-      //         clearInterval(this.CodeMibleTimer);
-      //         if (this.crtOp === 'forget-pwd') {
-      //           this.CodeMibleTxt = '点击发送验证码';
-      //         }
-      //       } else {
-      //         this.CodeMibleTime--;
-      //         this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
-      //       }
-      //     }, 1000);
-      //   } else if (['超出单日可使用上限'].includes(res.msg)) {
-      //     this.regainShow = true;
-      //     this.CodeMibleTime = 60;
-      //     if (this.crtOp === 'inputPhone') {
-      //       this.crtOp = 'inputSms';
-      //       this.activeInput = 0;
-      //       // 获取短信验证码
-      //       this.captchas = [
-      //         { num: '' },
-      //         { num: '' },
-      //         { num: '' },
-      //         { num: '' },
-      //         { num: '' },
-      //         { num: '' }
-      //       ];
-      //     }
-      //     this.CodeMibleTimer = setInterval(() => {
-      //       // eslint-disable-next-line
-      //       if (this.CodeMibleTime <= 0) {
-      //         this.regainShow = false;
-      //         clearInterval(this.CodeMibleTimer);
-      //         if (this.crtOp === 'forget-pwd') {
-      //           this.CodeMibleTxt = '点击发送验证码';
-      //         }
-      //       } else {
-      //         this.CodeMibleTime--;
-      //         this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
-      //       }
-      //     }, 1000);
-      //   }
-      // } catch {
-      //   if (['验证码有效，请勿频繁发送'].includes(res.msg)) {
-      //     this.CodeMibleTimer = setInterval(() => {
-      //       // eslint-disable-next-line
-      //       if (this.CodeMibleTime <= 0) {
-      //         this.regainShow = false;
-      //         clearInterval(this.CodeMibleTimer);
-      //         if (this.crtOp === 'forget-pwd') {
-      //           this.CodeMibleTxt = '点击发送验证码';
-      //         }
-      //       } else {
-      //         this.CodeMibleTime--;
-      //         this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`;
-      //       }
-      //     }, 1000);
-      //   }
-      // }
+          this.CodeMibleTimer = setInterval(() => {
+            // eslint-disable-next-line
+            if (this.CodeMibleTime <= 0) {
+              // this.CodeMibleTime=60
+              clearInterval(this.CodeMibleTimer)
+              if (this.crtOp === 'forget-pwd') {
+                this.CodeMibleTxt = '点击发送验证码'
+              }
+              this.regainShow = false
+            } else {
+              this.CodeMibleTime--
+              this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`
+            }
+          }, 1000)
+        } else if (this.crtOp === 'forget-pwd') {
+          this.CodeMibleTxt = '点击发送验证码'
+          this.regainShow = true
+          this.CodeMibleTime = 60
+          // this.crtOp = 'inputSms';
+          // this.activeInput = 0;
+          // 获取短信验证码
+          // this.captchas = [
+          //   { num: '' },
+          //   { num: '' },
+          //   { num: '' },
+          //   { num: '' },
+          //   { num: '' },
+          //   { num: '' },
+          // ]
+        } else if (['验证码有效，请勿频繁发送'].includes(res.msg)) {
+          this.regainShow = true
+          this.CodeMibleTime = 60
+          if (this.crtOp === 'inputPhone') {
+            this.crtOp = 'inputSms'
+            this.activeInput = 0
+            // 获取短信验证码
+            this.captchas = [
+              { num: '' },
+              { num: '' },
+              { num: '' },
+              { num: '' },
+              { num: '' },
+              { num: '' }
+            ]
+          }
+          this.CodeMibleTimer = setInterval(() => {
+            // eslint-disable-next-line
+            if (this.CodeMibleTime <= 0) {
+              this.regainShow = false
+              clearInterval(this.CodeMibleTimer)
+              if (this.crtOp === 'forget-pwd') {
+                this.CodeMibleTxt = '点击发送验证码'
+              }
+            } else {
+              this.CodeMibleTime--
+              this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`
+            }
+          }, 1000)
+        } else if (['超出单日可使用上限'].includes(res.msg)) {
+          this.regainShow = true
+          this.CodeMibleTime = 60
+          if (this.crtOp === 'inputPhone') {
+            this.crtOp = 'inputSms'
+            this.activeInput = 0
+            // 获取短信验证码
+            this.captchas = [
+              { num: '' },
+              { num: '' },
+              { num: '' },
+              { num: '' },
+              { num: '' },
+              { num: '' }
+            ]
+          }
+          this.CodeMibleTimer = setInterval(() => {
+            // eslint-disable-next-line
+            if (this.CodeMibleTime <= 0) {
+              this.regainShow = false
+              clearInterval(this.CodeMibleTimer)
+              if (this.crtOp === 'forget-pwd') {
+                this.CodeMibleTxt = '点击发送验证码'
+              }
+            } else {
+              this.CodeMibleTime--
+              this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`
+            }
+          }, 1000)
+        }
+      } catch {
+        if (['验证码有效，请勿频繁发送'].includes(res.msg)) {
+          this.CodeMibleTimer = setInterval(() => {
+            // eslint-disable-next-line
+            if (this.CodeMibleTime <= 0) {
+              this.regainShow = false
+              clearInterval(this.CodeMibleTimer)
+              if (this.crtOp === 'forget-pwd') {
+                this.CodeMibleTxt = '点击发送验证码'
+              }
+            } else {
+              this.CodeMibleTime--
+              this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`
+            }
+          }, 1000)
+        }
+      }
     },
     smsBack() {
-      this.activeName = '手机号';
-      this.crtOp = 'inputPhone';
+      this.activeName = '手机号'
+      this.crtOp = 'inputPhone'
     },
     pwdBack() {
-      this.$refs['changePwdform'].resetFields();
-      this.$refs['changePwdform'].clearValidate();
-      this.crtOp = 'inputPsw';
-      this.activeName = '账号密码';
+      this.$refs['changePwdform'].resetFields()
+      this.$refs['changePwdform'].clearValidate()
+      this.crtOp = 'inputPsw'
+      this.activeName = '账号密码'
     },
     // 忘记密码提交
     submit() {
-      this.$message.success('当前只能用账号密码登录');
-      this.$refs['changePwdform'].validate(async () => {
-        // return
-        // if (valid) {
-        //   const data = {
-        //     code: this.changePwdform.code,
-        //     password: this.changePwdform.newPwd,
-        //     phone: this.changePwdform.phone,
-        //     mobile: this.changePwdform.phone
-        //   };
-        //   const res = await this.$http({
-        //     method: 'post',
-        //     url: this.$GLOBAL.uaa + 'user/update',
-        //     headers: {
-        //       'Content-Type': 'application/json'
-        //     },
-        //     data
-        //   });
-        //   if (res.success) {
-        //     this.$message.success('密码修改成功');
-        //     this.pwdBack();
-        //   }
-        // }
-      });
+      this.$refs['changePwdform'].validate(async (valid) => {
+        if (valid) {
+          const data = {
+            code: this.changePwdform.code,
+            password: this.changePwdform.newPwd,
+            phone: this.changePwdform.phone,
+            mobile: this.changePwdform.phone
+          }
+          const res = await this.$http({
+            method: 'post',
+            url: this.$GLOBAL.uaa + 'user/update',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            data
+          })
+          if (res.success) {
+            this.$message.success('密码修改成功')
+            this.pwdBack()
+          }
+        }
+      })
     },
     login() {
-      const code = this.captchas.map(x => x.num).join('');
-      this.code = code;
-      if (this.code.length !== 6) return this.$message.error('请输入短信验证码');
-      this.loginByMible();
+      const code = this.captchas.map((x) => x.num).join('')
+      this.code = code
+      if (this.code.length !== 6) return this.$message.error('请输入短信验证码')
+      this.loginByMible()
     },
     async loginByMible() {
-      const _this = this;
+      const _this = this
       try {
         const res = await this.$http({
           method: 'post',
@@ -978,29 +1093,29 @@ export default {
             client_secret: 'secret'
           },
           msg: false
-        });
+        })
         if (res.access_token) {
-          this.$message.success('登录成功');
+          this.$message.success('登录成功')
           this.sendMessage = {
             uni__teis_Token: res.access_token,
             uni__expires_in: res.expires_in
-          };
+          }
           // this.checkToken()
         } else {
-          return this.$message.error(res.error_description);
+          return this.$message.error(res.error_description)
         }
       } catch (err) {
         if (
           err.data.error_description
           === '账号已到期\n可输入您的诉求并申请延期，提交后需管理员审核！'
         ) {
-          _this.expirydialog = true;
-          return;
+          _this.expirydialog = true
+          return
         }
         if (err && err.data && err.data.error === 'invalid_grant') {
-          _this.$message.error(err.data.error_description);
+          _this.$message.error(err.data.error_description)
         } else {
-          _this.$message.error(err.data.error);
+          _this.$message.error(err.data.error)
         }
       }
     },
@@ -1021,104 +1136,110 @@ export default {
           client_secret: 'secret'
         },
         msg: false
-      });
-      return res.data;
+      })
+      return res.data
     },
     adjust(index) {
-      const dom = document.getElementById('captcha' + this.activeInput);
+      const dom = document.getElementById('captcha' + this.activeInput)
       if (index !== this.activeInput && dom) {
-        dom.focus();
+        dom.focus()
       }
     },
     // 控制前后方向
     inputDirection(index) {
-      const val = this.captchas[index].num;
+      const val = this.captchas[index].num
       // 回退键处理
       // eslint-disable-next-line
       if (event.keyCode == 8 && val == '') {
         // 重新校准
-        const dom = document.getElementById('captcha' + (index - 1));
-        this.activeInput = index - 1;
-        if (dom) dom.focus();
+        const dom = document.getElementById('captcha' + (index - 1))
+        this.activeInput = index - 1
+        if (dom) dom.focus()
       }
       // eslint-disable-next-line
       if (event.keyCode != 8 && val != '') {
-        const dom = document.getElementById('captcha' + (index + 1));
-        this.activeInput = index + 1;
-        if (dom) dom.focus();
+        const dom = document.getElementById('captcha' + (index + 1))
+        this.activeInput = index + 1
+        if (dom) dom.focus()
       }
     },
     // 输入框相互联动
     inputFinash(index) {
-      const val = this.captchas[index].num;
-      this.activeInput = val ? index + 1 : index - 1;
-      const dom = document.getElementById('captcha' + this.activeInput);
-      if (dom) dom.focus();
+      const val = this.captchas[index].num
+      this.activeInput = val ? index + 1 : index - 1
+      const dom = document.getElementById('captcha' + this.activeInput)
+      if (dom) dom.focus()
       if (index === this.captchas.length - 1) {
-        const code = this.captchas.map(x => x.num).join('');
+        const code = this.captchas.map((x) => x.num).join('')
         if (code.length === 6) {
-          this.code = code;
+          this.code = code
           // this.$emit('finish', code);
         }
       }
     },
     regainCode() {
-      this.getCodeMible();
+      this.getCodeMible()
     },
     forgetPsw() {
-      this.CodeMibleTimer = null;
-      this.CodeMibleTime = 60;
-      this.CodeMibleTxt = '点击发送验证码';
-      this.crtOp = 'forget-pwd';
+      this.CodeMibleTimer = null
+      this.CodeMibleTime = 60
+      this.CodeMibleTxt = '点击发送验证码'
+      this.crtOp = 'forget-pwd'
     },
     mousedownFn(e) {
       if (!this.confirmSuccess) {
-        e.preventDefault && e.preventDefault(); // 阻止文字选中等 浏览器默认事件
-        this.mouseMoveStata = true;
-        this.beginClientX = e.clientX;
+        e.preventDefault && e.preventDefault() // 阻止文字选中等 浏览器默认事件
+        this.mouseMoveStata = true
+        this.beginClientX = e.clientX
       }
     }, // mousedoen 事件
     successFunction() {
-      this.confirmSuccess = true;
-      this.confirmWords = '验证通过';
+      this.confirmSuccess = true
+      this.confirmWords = '验证通过'
       if (window.addEventListener) {
-        document.getElementsByTagName('html')[0].removeEventListener('mousemove', this.mouseMoveFn);
-        document.getElementsByTagName('html')[0].removeEventListener('mouseup', this.moseUpFn);
+        document
+          .getElementsByTagName('html')[0]
+          .removeEventListener('mousemove', this.mouseMoveFn)
+        document
+          .getElementsByTagName('html')[0]
+          .removeEventListener('mouseup', this.moseUpFn)
       } else {
-        document.getElementsByTagName('html')[0].removeEventListener('mouseup', () => {});
+        document
+          .getElementsByTagName('html')[0]
+          .removeEventListener('mouseup', () => {})
       }
-      document.getElementsByClassName('drag_text')[0].style.color = '#fff';
-      document.getElementsByClassName('handler')[0].style.left = this.maxwidth + 'px';
-      document.getElementsByClassName('drag_bg')[0].style.width = this.maxwidth + 'px';
+      document.getElementsByClassName('drag_text')[0].style.color = '#fff'
+      document.getElementsByClassName('handler')[0].style.left = this.maxwidth + 'px'
+      document.getElementsByClassName('drag_bg')[0].style.width = this.maxwidth + 'px'
     }, // 验证成功函数
     mouseMoveFn(e) {
       if (this.mouseMoveStata) {
-        const width = e.clientX - this.beginClientX;
+        const width = e.clientX - this.beginClientX
         if (width > 0 && width <= this.maxwidth) {
-          document.getElementsByClassName('handler')[0].style.left = width + 'px';
-          document.getElementsByClassName('drag_bg')[0].style.width = width + 'px';
+          document.getElementsByClassName('handler')[0].style.left = width + 'px'
+          document.getElementsByClassName('drag_bg')[0].style.width = width + 'px'
         } else if (width > this.maxwidth) {
-          this.successFunction();
+          this.successFunction()
         }
       }
     }, // mousemove事件
     moseUpFn(e) {
-      this.mouseMoveStata = false;
-      const width = e.clientX - this.beginClientX;
+      this.mouseMoveStata = false
+      const width = e.clientX - this.beginClientX
       if (width < this.maxwidth) {
-        document.getElementsByClassName('handler')[0].style.left = 0 + 'px';
-        document.getElementsByClassName('drag_bg')[0].style.width = 0 + 'px';
+        document.getElementsByClassName('handler')[0].style.left = 0 + 'px'
+        document.getElementsByClassName('drag_bg')[0].style.width = 0 + 'px'
       }
     }, // mouseup事件
     handleClose() {
-      this.checkAgreement = false;
-      this.expirydialog = false;
-      this.platDialog = false;
-      this.applySuccessdialog = false;
-      this.findPwd = false;
-      this.registerSuccessdialog = false;
-      this.appeal = '';
-      clearInterval(this.timer);
+      this.checkAgreement = false
+      this.expirydialog = false
+      this.platDialog = false
+      this.applySuccessdialog = false
+      this.findPwd = false
+      this.registerSuccessdialog = false
+      this.appeal = ''
+      clearInterval(this.timer)
     },
     // 老用户申请延期
     async applicationUser() {
@@ -1127,99 +1248,99 @@ export default {
         platform: this.platlist.join(),
         delay: true,
         description: this.applyInfo.desc
-      };
+      }
       // if (this.crtOp === 'inputPsw') {}
       const res = await this.$http({
         method: 'post',
         url: this.$GLOBAL.uaa + 'user/requestAuth',
         contentType: 'application/x-www-form-urlencoded',
         data
-      });
+      })
       // 申请成功
       if (res.success) {
-        this.platDialog = false;
-        this.expirydialog = false;
+        this.platDialog = false
+        this.expirydialog = false
         // 提交申请弹窗
-        this.applySuccessdialog = true;
-        this.downtimer();
+        this.applySuccessdialog = true
+        this.downtimer()
       }
     },
     applicationCancel() {
-      this.expirydialog = false;
-      this.appeal = '';
+      this.expirydialog = false
+      this.appeal = ''
     },
     async applicationExpiry() {
       const data = {
         description: this.appeal
-      };
+      }
       if (this.crtOp === 'inputPsw') {
-        data.username = this.form.username;
+        data.username = this.form.username
       } else {
-        data.mobile = this.form.phone;
+        data.mobile = this.form.phone
       }
       const res = await this.$http({
         method: 'post',
         url: this.$GLOBAL.uaa + 'user/requestDelay',
         contentType: 'application/x-www-form-urlencoded',
         data
-      });
+      })
       if (res.status) {
-        this.expirydialog = false;
-        this.applySuccessdialog = true;
-        this.downtimer();
+        this.expirydialog = false
+        this.applySuccessdialog = true
+        this.downtimer()
       }
     },
     downtimer() {
-      this.downTime = 5;
-      const that = this;
+      this.downTime = 5
+      const that = this
       this.timer = setInterval(() => {
         if (this.downTime > 0) {
-          this.downTime--;
+          this.downTime--
         } else if (this.downTime === 0) {
-          that.applySuccessdialog = false;
-          that.registerSuccessdialog = false;
-          window.open('https://dataelite.trs.com.cn/#/home-page', '_self');
-          clearInterval(this.timer);
+          that.applySuccessdialog = false
+          that.registerSuccessdialog = false
+          window.open('https://dataelite.trs.com.cn/#/home-page', '_self')
+          clearInterval(this.timer)
         }
-      }, 1000);
+      }, 1000)
     },
     keepPsd() {
       if (this.rememberPsd) {
         const data = {
           username: this.form.username,
           password: this.form.password
-        };
-        window.localStorage.setItem('trs_key', JSON.stringify(data));
+        }
+        window.localStorage.setItem('trs_key', JSON.stringify(data))
       } else {
-        window.localStorage.removeItem('trs_key');
+        window.localStorage.removeItem('trs_key')
       }
     },
     changeAreaCode(val) {
-      this.areaCode = val;
+      this.areaCode = val
     }
   },
   filters: {
     phoneFormat(val) {
-      return val ? val.substring(0, 3) + '****' + val.substring(7) : '';
+      return val ? val.substring(0, 3) + '****' + val.substring(7) : ''
     }
   },
   beforeRouteEnter(to, from, next) {
-    next(vm => {
+    next((vm) => {
       if (
         from
         && !['login', 'loginAuto', 'microLogin'].includes(from.name)
         && from.fullPath !== '/'
       ) {
-        vm.gohistory = from.name || true;
+        vm.gohistory = from.name || true
       }
-    });
+    })
   }
-};
+}
 </script>
 <style lang='less' scoped>
 .unity-login {
   position: relative;
-  background-image: url(../../assets/image/login_bgc.png);
+  background-image: url(../../assets/image/autobackground.png);
   background-size: 100% 100%;
   background-repeat: no-repeat;
   overflow: auto;
@@ -1247,13 +1368,18 @@ export default {
   min-height: 720px;
 
   .container-top {
+    border-radius: 20px;
     height: 100%;
     display: flex;
     flex-direction: row;
 
     .left {
       flex: 1;
-      width: 300px;
+      width: 450px;
+      display: flex;
+      position: relative;
+      left: 200px;
+      border-radius: 4px;
 
       .swiper-container {
         width: 800px;
@@ -1262,16 +1388,18 @@ export default {
     }
 
     .right {
-      height: 614px;
-      width: 488px;
+      height: 580px;
+      width: 450px;
       background: #fff;
       margin-right: 160px;
       margin-left: 10px;
       box-shadow: 0px 0px 10px rgba(67, 67, 67, 0.1);
-      border-radius: 16px;
-      padding: 32px;
+      padding: 56px;
       text-align: left;
-      position: relative;
+      position: absolute;
+      left: 725px;
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
 
       .register_btn {
         position: absolute;
@@ -1300,17 +1428,17 @@ export default {
         height: 32px;
       }
 
-      .circle {
-        position: absolute;
-        background: linear-gradient(
-          90deg,
-          rgba(123, 97, 255, 0.2) 0%,
-          rgba(97, 160, 255, 0.2) 107.5%
-        );
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-      }
+      // .circle {
+      //   position: absolute;
+      //   background: linear-gradient(
+      //     90deg,
+      //     rgba(123, 97, 255, 0.2) 0%,
+      //     rgba(97, 160, 255, 0.2) 107.5%
+      //   );
+      //   width: 16px;
+      //   height: 16px;
+      //   border-radius: 50%;
+      // }
 
       .welcome {
         position: absolute;
@@ -1377,13 +1505,17 @@ export default {
 
       .next {
         width: 100%;
-        background: linear-gradient(90deg, #7b61ff 0%, #61a0ff 107.5%);
+        background: rgba(39, 122, 251, 1);
         border-radius: 6px;
         font-weight: 700;
         font-size: 16px;
         line-height: 24px;
         color: #ffffff;
-        margin: 24px 0 12px;
+        margin: 10px 0 12px;
+        width: 338px;
+        height: 48px;
+        // bottom: 40px;
+        margin-top: 212px;
       }
 
       .nextPwd {
@@ -1392,10 +1524,11 @@ export default {
         // transform: translateX(-50%);
         // bottom:208px;
         width: 100%;
-        background: linear-gradient(90deg, #7b61ff 0%, #61a0ff 107.5%);
+        background: rgba(39, 122, 251, 1);
         border-radius: 6px;
         font-weight: 700;
         font-size: 16px;
+        height: 48px;
         line-height: 24px;
         color: #ffffff;
         margin: 10px 0 12px;
@@ -1404,13 +1537,25 @@ export default {
 
       .pwd-login {
         // position: absolute;
-        width: 424px;
+        width: 338px;
+        height: 48px;
         // bottom: 40px;
-        margin-top: 42px;
+        margin-top: 95px;
       }
 
       .edit_pwd {
-        margin-top: 180px;
+        width: 100%;
+        background: rgba(39, 122, 251, 1);
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 16px;
+        line-height: 24px;
+        color: #ffffff;
+        margin: 10px 0 12px;
+        width: 338px;
+        height: 48px;
+        // bottom: 40px;
+        margin-top: 100px;
       }
 
       .phone_input {
@@ -1446,6 +1591,10 @@ export default {
 
           .el-form-item__content {
             position: relative;
+            line-height: 40px;
+            position: relative;
+            font-size: 14px;
+            width: 245px;
 
             .verify_code {
               cursor: pointer;
@@ -1549,7 +1698,7 @@ export default {
 
             .el-input {
               .el-input__inner {
-                width: 331px;
+                width: 100%;
               }
             }
           }
@@ -1558,15 +1707,12 @@ export default {
 
       .login_form {
         .phone_input2 {
+          width: 30px;
           /deep/ .el-input-group__prepend {
             background: #fff;
           }
 
           /deep/ .el-form-item__content {
-            .el-input .el-input__inner {
-              width: 247px !important;
-            }
-
             .el-select .el-input .el-input__inner {
               width: 87px !important;
             }
@@ -1605,7 +1751,7 @@ export default {
         border-bottom: 1px dashed #e5e6eb;
       }
 
-      .service-agreement {
+      .service-agreement-pwd {
         text-align: left;
         font-weight: 400;
         font-size: 14px;
@@ -1613,6 +1759,35 @@ export default {
         color: #505968;
         cursor: default;
         margin-top: 12px;
+        position: relative;
+        top: 90px;
+
+        /deep/ .el-checkbox {
+          margin-right: 12px;
+        }
+
+        /deep/ .is-checked {
+          .el-checkbox__inner {
+            background: #2d5cf6;
+            border-color: #2d5cf6;
+          }
+        }
+
+        span {
+          color: #2d5cf6;
+          cursor: pointer;
+        }
+      }
+      .service-agreement-num {
+        text-align: left;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 22px;
+        color: #505968;
+        cursor: default;
+        margin-top: 12px;
+        position: relative;
+        top: 196px;
 
         /deep/ .el-checkbox {
           margin-right: 12px;
@@ -1678,9 +1853,9 @@ export default {
       }
 
       .captcha_input_box {
-        width: 50px;
-        height: 50px;
-        margin-right: 18px;
+        width: 45px;
+        height: 45px;
+        margin-right: 6px;
         background: rgba(255, 255, 255, 1);
         border-radius: 6px;
         border: 1px solid #cacdd3;
@@ -1753,14 +1928,17 @@ export default {
       }
 
       .login {
-        margin-top: 114px;
-        background: linear-gradient(90deg, #7b61ff 0%, #61a0ff 107.5%);
+        background: rgba(39, 122, 251, 1);
         border-radius: 6px;
-        width: 424px;
-        height: 48px;
         font-weight: 700;
         font-size: 16px;
-        line-height: 48px;
+        line-height: 24px;
+        color: #ffffff;
+        margin: 10px 0 12px;
+        width: 338px;
+        height: 48px;
+        // bottom: 40px;
+        margin-top: 80px;
 
         .el-button {
           color: #ffffff;
@@ -1809,7 +1987,11 @@ export default {
         height: 50px;
         border-radius: 0px 6px 6px 0px;
         cursor: move;
-        background: linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)),
+        background: linear-gradient(
+            0deg,
+            rgba(255, 255, 255, 0.2),
+            rgba(255, 255, 255, 0.2)
+          ),
           linear-gradient(90deg, #7b61ff 0%, #61a0ff 107.5%);
 
         img {
@@ -1819,7 +2001,11 @@ export default {
       }
 
       .drag_bg {
-        background: linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)),
+        background: linear-gradient(
+            0deg,
+            rgba(255, 255, 255, 0.2),
+            rgba(255, 255, 255, 0.2)
+          ),
           linear-gradient(90deg, #7b61ff 0%, #61a0ff 107.5%);
         height: 50px;
         width: 0px;
