@@ -237,6 +237,12 @@ const router = new Router({
       meta: { title: '知识库', viewport }
     },
     {
+      path: '/rules-base',
+      name: 'rules-base',
+      component: () => import('@/views/rules-base/index'),
+      meta: { title: '知识库', viewport }
+    },
+    {
       path: '/front',
       name: 'front',
       component: () => import('@/views/front/index'),
