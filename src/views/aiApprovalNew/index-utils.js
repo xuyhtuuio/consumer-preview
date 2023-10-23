@@ -954,7 +954,7 @@ export default {
               ]
             }
             newIcon.positionWithId = newIcon?.positionWithId.filter((pwi) => {
-              if (!this.objIsSame(pos, pwi.pos)) return pwi
+              if (!this.positionIsSame(pos, pwi.pos)) return pwi
             })
             newIcon.positionWithId.push({ commentId, pos })
             this.icons[sort] = newIcon
@@ -1028,7 +1028,7 @@ export default {
       let findComment = {}
       this.comments.map((comment) => {
         comment.position?.map((pos) => {
-          if (this.objIsSame(pos, ocrPosition)) {
+          if (this.positionIsSame(pos, ocrPosition)) {
             findComment = comment
             findComment.position = [pos]
           }
@@ -1041,7 +1041,7 @@ export default {
       let resIcon = {}
       this.icons.map((icon) => {
         let findIcon = icon.positionWithId?.map((ipos) => {
-          if (this.objIsSame(ipos.pos, findComment.position && findComment.position[0])) {
+          if (this.positionIsSame(ipos.pos, findComment.position && findComment.position[0])) {
             return ipos
           }
         })
@@ -1068,6 +1068,20 @@ export default {
         }
       }
       return true
+    },
+    // 位置比对 - 针对多行批注连线做了模糊处理
+    positionIsSame(first, second) {
+      const pos1 = Object.keys(first)
+      const pos2 = Object.keys(second)
+      if (pos1.length !== pos2.length) {
+        return false
+      }
+      for (const k in first) {
+        if ((String(first[k])?.split('.')[0] === String(second[k])?.split('.')[0]) || (first[k] === second[k])) {
+          return true
+        }
+      }
+      return false
     },
     // 判断当前选中批注状态是否为修改
     checkEdit(boolean) {

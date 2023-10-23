@@ -358,7 +358,6 @@ export default {
     },
     // 获取计算后的覆盖在选中文字上的 dom 的宽高
     getRectOverDom(nodes) {
-      console.log(nodes)
       const left = []
       const right = []
       const top = []
