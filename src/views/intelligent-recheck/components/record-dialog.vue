@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="outter">
     <TrsTable
       theme="TRS-table-gray"
       :data="data"
@@ -32,8 +32,7 @@
         </div>
       </template>
       <template #backInspectionOption="scope">
-        <div style="padding: 15px 0px;"
-        >
+        <div style="padding: 15px 0px">
           {{ scope.row.backInspectionOption }}
         </div>
       </template>
@@ -129,7 +128,32 @@ export default {
         backInspectionOption:
           '活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；'
       },
-
+      {
+        fileName: '景顺长城七月报告七月七月',
+        fileID: '202308090023',
+        people: '谭新宇',
+        peopleID: '34279811',
+        backInspectionTime: '2023-8-31',
+        isRight: '是',
+        thingTpe: '产品类',
+        department: '财富平台部',
+        backInspectionFrequency: '8',
+        backInspectionOption:
+          '活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；'
+      },
+      {
+        fileName: '景顺长城七月报告七月七月',
+        fileID: '202308090023',
+        people: '谭新宇',
+        peopleID: '34279811',
+        backInspectionTime: '2023-8-31',
+        isRight: '是',
+        thingTpe: '产品类',
+        department: '财富平台部',
+        backInspectionFrequency: '8',
+        backInspectionOption:
+          '活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；'
+      }
     ],
     colConfig: [
       {
@@ -206,8 +230,7 @@ export default {
     handleOpenRecord(option) {
       this.$emit('openRecord', option)
     },
-    handleCurrentChange() {
-    }
+    handleCurrentChange() {}
   }
 }
 </script>
@@ -243,4 +266,18 @@ export default {
     color: var(--unnamed, #2d5cf6);
   }
 }
+
+// :deep(.el-dialog) {
+//   background-color: red;
+//   position: absolute;
+//   top: 50%;
+//   left: 50%;
+//   margin: 0 !important;
+//   transform: translate(-50%, -50%);
+//   max-height: calc(100% - 30px);
+//   max-width: calc(100% - 30px);
+//   display: flex;
+//   flex-direction: column;
+// }
+
 </style>

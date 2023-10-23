@@ -442,4 +442,22 @@ export default {
     width: 10%;
   }
 }
+
+:deep(.el-dialog__body) {
+    padding: 30px 20px;
+    color: #606266;
+    font-size: 14px;
+    word-break: break-all;
+    overflow-y: auto;
+    height: 730px;
+  }
+
+  :deep(.el-dialog__wrapper) {
+    position: fixed;
+    right: 0;
+    left: 0;
+    top: -80px;
+    margin: 0;
+    overflow: visible;
+  }
 </style>
