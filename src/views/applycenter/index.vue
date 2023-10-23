@@ -1,6 +1,6 @@
 <template>
   <div class="apply-center" v-cloak ref="apply-center">
-    <p class="welcoming">欢迎来到消保管控平台！</p>
+    <p class="welcoming">欢迎来到消保智能审查平台！</p>
     <p class="tips" v-if="tipsMsg">
       <i class="iconfont icon-xiaoxi-tongzhi"></i>{{ tipsMsg }}
     </p>
