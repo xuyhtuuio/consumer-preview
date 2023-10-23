@@ -369,6 +369,9 @@ export default {
           return;
         }
         this.$refs.filePreview.imgLoad()
+        if (val !== 1) {
+          this.lisScroll()
+        }
       })
     },
     search() {
@@ -378,6 +381,19 @@ export default {
     },
     getProps(val) {
       this.styleProp = val;
+    },
+    // 同步滚动
+    lisScroll() {
+      this.$nextTick(() => {
+        const scrollContainer1 = document.querySelector('.ocr-txt .results');
+        const scrollContainer2 = document.querySelector('.content-cont-icons');
+        scrollContainer1.addEventListener('scroll', () => {
+          scrollContainer2.scrollTop = scrollContainer1.scrollTop;
+        });
+        scrollContainer2.addEventListener('scroll', () => {
+          scrollContainer1.scrollTop = scrollContainer2.scrollTop;
+        });
+      })
     }
   },
   mounted() {
@@ -391,7 +407,16 @@ export default {
     this.getOpinionApprovalLetter();
     this.getNodeHandleUserApi();
     this.findIconPosition()
+    this.$nextTick(() => {
+      const curFileType = this.getfileType(this.files[this.activeIndex].fileName)
+      if (this.specialFileType1.includes(curFileType)) {
+        this.lisScroll()
+      }
+    })
   },
+  beforeDestroy() {
+    this.lineRemove()
+  }
 }
 </script>
 

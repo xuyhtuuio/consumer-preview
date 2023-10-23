@@ -479,7 +479,13 @@ export default {
           });
       }
       // 更新图标
-      this.findIconPosition()
+      const curFileType = this.getfileType(this.files[this.activeIndex].fileName)
+      this.$nextTick(() => {
+        this.findIconPosition()
+        if (this.specialFileType1.includes(curFileType)) {
+          this.lisScroll()
+        }
+      })
       this.approval = temp;
       this.fileloading = false;
       this.filePopoverShow = false
@@ -904,24 +910,29 @@ export default {
     // icon 数量计算
     findIconPosition() {
       this.$nextTick(() => {
-        const container = document.querySelector('.results')
-        // const containerHeight = container.offsetHeight
-        const iconContainer = document.querySelector('.icons')
-        const containScrollHeight = container.scrollHeight
-        if (iconContainer) {
-          iconContainer.style.height = iconContainer
-        }
-        const iconNum = Math.floor(containScrollHeight / 50)
-        const icons = []
-        for (let i = 0; i < iconNum; i++) {
-          icons.push({
-            icon_id: new Date().getTime() + i,
-            handleArea: [i * 50, (i + 1) * 50],
-            showIndex: -1
+        const allNodes = document.querySelectorAll('.div-position')
+        let max = 0
+        setTimeout(() => {
+          Array.from(allNodes).map((node) => {
+            max = Math.max(max, (node.offsetTop + node.offsetHeight))
           })
-        }
-        this.icons = icons
-        this.dealIconWithComment()
+          const realHeight = max
+          const iconContainer = document.querySelector('.icons')
+          if (iconContainer) {
+            iconContainer.style.height = realHeight
+          }
+          const iconNum = Math.floor(realHeight / 50)
+          const icons = []
+          for (let i = 0; i < iconNum; i++) {
+            icons.push({
+              icon_id: new Date().getTime() + i,
+              handleArea: [i * 50, (i + 1) * 50],
+              showIndex: -1
+            })
+          }
+          this.icons = icons
+          this.dealIconWithComment()
+        })
       })
     },
     // icon 管理的意见计算
