@@ -346,8 +346,8 @@ export default {
         return {}
       }
       return {
-        left: `${this.approval.ocr[i].location.x / this.styleProp.wordDomStyle.scale}px`,
-        top: `${this.approval.ocr[i].location.y / this.styleProp.wordDomStyle.scale}px`,
+        left: `${Math.floor(this.approval.ocr[i].location.x / this.styleProp.wordDomStyle.scale)}px`,
+        top: `${Math.floor(this.approval.ocr[i].location.y / this.styleProp.wordDomStyle.scale)}px`,
         fontSize: `${this.approval.ocr[i].location.w / this.approval.ocr[i].text.length
         }px`,
         transform: `scale(${1 / this.styleProp.wordDomStyle.scale})`,

@@ -306,7 +306,6 @@ export default {
         this.postil.textarea = ''
         this.$refs.editorial.changeType(2)
       }
-      console.log(this.comments)
     },
     changeFileById(fileId) {
       const fileIndex = this.files.findIndex((file) => fileId === file.id)
