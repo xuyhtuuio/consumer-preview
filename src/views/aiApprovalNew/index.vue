@@ -351,6 +351,9 @@ export default {
       },
       deep: true
     },
+    curMode() {
+      this.findIconPosition()
+    }
   },
   methods: {
     // 三屏双屏切换 0 为三屏 1 为双屏原图 2 为双屏 0CR
