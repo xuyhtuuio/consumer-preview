@@ -221,25 +221,25 @@ export default {
             }
             newOcr = [...Object.values(...temp)]
           }
-          // 判断当前结果中是否含有批注内容 ---> 如果有进行高亮操作
-          function reValue(val) {
-            if (val) {
-            // console.log(itHasBg)
-              newOcr.map((no) => {
-                no.hasBg = val
-              })
-            }
-          }
-          newOcr.map((no, o) => {
-            if (typeof (no) !== 'object') {
-              newOcr[o] = { no }
-              newOcr[o].hasBg = false
-            } else {
-              no.hasBg = false
-            }
-          })
-          this.$emit('hasBg', j, reValue)
         })
+        // 判断当前结果中是否含有批注内容 ---> 如果有进行高亮操作
+        function reValue(val) {
+          if (val) {
+            // console.log(itHasBg)
+            newOcr.map((no) => {
+              no.hasBg = val
+            })
+          }
+        }
+        newOcr.map((no, o) => {
+          if (typeof (no) !== 'object') {
+            newOcr[o] = { no }
+            newOcr[o].hasBg = false
+          } else {
+            no.hasBg = false
+          }
+        })
+        this.$emit('hasBg', j, reValue)
         html.push(newOcr)
       })
       this.html = html

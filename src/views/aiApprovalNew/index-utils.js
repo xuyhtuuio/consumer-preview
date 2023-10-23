@@ -224,6 +224,9 @@ export default {
           comment?.filesWithBg.map((fwb) => {
             if (fwb.fileId === this.files?.[this.activeIndex]?.id) {
               isHas = fwb.fileBgs.includes(i)
+              if (isHas) {
+                reValue(isHas)
+              }
             }
           })
         }
@@ -303,6 +306,7 @@ export default {
         this.postil.textarea = ''
         this.$refs.editorial.changeType(2)
       }
+      console.log(this.comments)
     },
     changeFileById(fileId) {
       const fileIndex = this.files.findIndex((file) => fileId === file.id)
