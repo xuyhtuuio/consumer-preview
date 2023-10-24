@@ -188,11 +188,32 @@
         </div>
       </div>
     </div>
+    <add-review ref="addReview" @addRecommend="addRecommend"></add-review>
+    <submit-review ref="submitReview" :formId="formId" :formBase="formBase" :refuseOpiton="refuseOpiton" :approvalLetter="approvalLetter" :applyFormWithPermissions="applyFormWithPermissions" :nextStepObj="nextStepObj" :rejectOption="rejectOption" @submit="submit">
+    </submit-review>
+    <reject-dialog ref="rejectDialog" :refuseDisabled="refuseDisabled" :refuseOpiton="refuseOpiton" :formBase="formBase" :nextStepObj="nextStepObj"  :rejectOption="rejectOption" @submit="submit"></reject-dialog>
+    <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
+      <applyFormFilePreview :url="previewfileUrl"></applyFormFilePreview>
+    </el-dialog>
+    <secondary-confirmation
+      :option="saveOption"
+      ref="confirmation"
+      @handleClose="goBack"
+      @handleConfirm="save"
+    ></secondary-confirmation>
+    <TurnDialog ref="turnDialog" :formBase="formBase" :nextStepObj="nextStepObj"></TurnDialog>
   </div>
 </template>
 
 <script>
+import applyFormFilePreview from '@/components/filePreview';
+import secondaryConfirmation from '@/components/common/secondaryConfirmation';
+import TurnDialog from '@/components/common/turn-dialog'
 import fileType from '@/components/common/file-type'
+import addReview from './dialogs/add-review';
+import submitReview from './dialogs/submit-review';
+import rejectDialog from './dialogs/reject-dialog';
+
 import sidebar from './sidebar/sidebar';
 import filePreview from './components/file-preview';
 import orcTxt from './components/ocr-txt';
@@ -207,6 +228,12 @@ export default {
   mixins: [utils],
   components: {
     sidebar,
+    TurnDialog,
+    addReview,
+    secondaryConfirmation,
+    applyFormFilePreview,
+    submitReview,
+    rejectDialog,
     fileChange,
     filePreview,
     ExaminePivot,
