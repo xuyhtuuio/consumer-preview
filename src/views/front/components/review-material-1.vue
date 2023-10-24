@@ -97,9 +97,16 @@
 </template>
 
 <script>
-import Queue from 'promise-queue-plus';
+import Queue from 'promise-queue-plus'
 import FileType from '@/components/common/file-type'
-import { getFormGroups, deleteFormGroups, taskInfo, initTask, preSignUrl, merge } from '@/api/front'
+import {
+  getFormGroups,
+  deleteFormGroups,
+  taskInfo,
+  initTask,
+  preSignUrl,
+  merge
+} from '@/api/front'
 
 import md5 from '@/utils/md5'
 import WarnInfo from './warn-info'
@@ -195,7 +202,7 @@ export default {
         this.$message.error(msg)
       }
     },
-    async  handleBefore(file) {
+    async handleBefore(file) {
       // 上传文件之前钩子
       const type = file.name.replace(/.+\./, '')
       const judgeArr = this.judgment.split('/')
@@ -217,16 +224,17 @@ export default {
         percentage: 0
       }
       this.fileList.push(item)
+      if (type === 'zip') {
+        return true
+      }
       const res = await this.getFileInfo(file, (val) => {
         item.percentage = Number(val)
         // item.percentage = Number(val) > 100 ? 100 : val
       })
 
       if (Object.keys(res).length > 0) {
-        console.log(res)
         this.handleSuccess(res, file.uid)
       }
-      return false
     },
 
     async getFileInfo(file, callback) {
@@ -242,11 +250,13 @@ export default {
           if (errorList.length > 0) {
             const message = '部分分片上次失败，请尝试重新上传文件'
             this.handleError(file.uid, message)
-            return;
+            return
           }
-          const { data: { code, data: res, msg } } = await merge(identifier)
+          const {
+            data: { code, data: res, msg }
+          } = await merge(identifier, file.name)
           if (code === '00') {
-            return { url: res.path, key: res.key };
+            return { url: res.url, key: res.key }
           } else {
             this.handleError(file.uid, msg)
           }
@@ -257,12 +267,16 @@ export default {
     },
 
     /**
- * 获取一个上传任务，没有则初始化一个
- */
+     * 获取一个上传任务，没有则初始化一个
+     */
     async getTaskInfo(file) {
-      let task;
+      let task
       const identifier = await md5(file)
-      const { data: { code, data } } = await taskInfo(identifier)
+      const {
+        data: { code, data }
+      } = await taskInfo(identifier, file.name).catch(() => {
+        this.handleError(file.uid, '文件上传失败')
+      })
       if (code === '00') {
         task = data
         if (!task) {
@@ -272,7 +286,11 @@ export default {
             totalSize: file.size,
             chunkSize: 5 * 1024 * 1024
           }
-          const { data: { code: code1, data: data1 } } = await initTask(initTaskData)
+          const {
+            data: { code: code1, data: data1 }
+          } = await initTask(initTaskData).catch(() => {
+            this.handleError(file.uid, '文件上传失败')
+          })
           if (code1 === '00') {
             task = data1
           }
@@ -282,13 +300,13 @@ export default {
     },
 
     /**
- * 上传逻辑处理，如果文件已经上传完成（完成分块合并操作），则不会进入到此方法中
- */
+     * 上传逻辑处理，如果文件已经上传完成（完成分块合并操作），则不会进入到此方法中
+     */
     handleUpload(file, taskRecord, callback) {
-      let lastUploadedSize = 0; // 上次断点续传时上传的总大小
+      let lastUploadedSize = 0 // 上次断点续传时上传的总大小
       let uploadedSize = 0 // 已上传的大小
       const totalSize = file.size || 0 // 文件总大小
-      const startMs = new Date().getTime(); // 开始上传的时间
+      const startMs = new Date().getTime() // 开始上传的时间
       const { exitPartList, chunkSize, chunkNum, fileIdentifier } = taskRecord
 
       // 获取从开始上传到现在的平均速度（byte/s）
@@ -305,7 +323,16 @@ export default {
         const start = Number(chunkSize) * (partNumber - 1)
         const end = start + Number(chunkSize)
         const blob = file.slice(start, end)
-        const { data: { code, data } } = await preSignUrl({ identifier: fileIdentifier, partNumber })
+        const {
+          data: { code, data }
+        } = await preSignUrl({
+          identifier: fileIdentifier,
+          partNumber,
+          fileName: file.name,
+          task: taskRecord
+        }).catch(() => {
+          this.handleError(file.uid, '部分上传失败')
+        })
         if (code === '00' && data) {
           await this.$http({
             url: data,
@@ -315,35 +342,41 @@ export default {
           })
           return Promise.resolve({ partNumber, uploadedSize: blob.size })
         } else {
-          return Promise.reject(new Error(`分片${partNumber}， 获取上传地址失败`))
+          return Promise.reject(
+            new Error(`分片${partNumber}， 获取上传地址失败`)
+          )
         }
       }
       /**
        * 更新上传进度
        * @param increment 为已上传的进度增加的字节量
-      */
+       */
       const updateProcess = (increment) => {
         increment = Number(increment)
-        const factor = 1000; // 每次增加1000 byte
-        let from = 0;
+        const factor = 1000 // 每次增加1000 byte
+        let from = 0
         // 通过循环一点一点的增加进度
         while (from <= increment) {
           from += factor
           uploadedSize += factor
-          console.log(uploadedSize, totalSize)
-          const percent = Math.round((uploadedSize / totalSize) * 100).toFixed(2);
+          const percent = Math.round((uploadedSize / totalSize) * 100).toFixed(
+            2
+          )
           callback && percent < 100 && callback(percent)
         }
 
-        const speed = getSpeed();
-        const remainingTime = speed !== 0 ? Math.ceil((totalSize - uploadedSize) / speed) + 's' : '未知'
-        console.log('剩余大小：', (totalSize - uploadedSize) / 1024 / 1024, 'mb');
-        console.log('当前速度：', (speed / 1024 / 1024).toFixed(2), 'mbps');
-        console.log('预计完成：', remainingTime);
+        const speed = getSpeed()
+        const remainingTime = speed !== 0
+          ? Math.ceil((totalSize - uploadedSize) / speed) + 's'
+          : '未知'
+        // console.log('剩余大小：', (totalSize - uploadedSize) / 1024 / 1024, 'mb');
+        // console.log('当前速度：', (speed / 1024 / 1024).toFixed(2), 'mbps');
+        // console.log('预计完成：', remainingTime);
+        this.remainingTime1 = remainingTime
       }
 
-      return new Promise(resolve => {
-        const failArr = [];
+      return new Promise((resolve) => {
+        const failArr = []
         const queue = Queue(5, {
           retry: 3, // Number of retries
           retryIsJump: false, // retry now?
@@ -351,27 +384,29 @@ export default {
             failArr.push(reason)
           },
           queueEnd() {
-            resolve(failArr);
+            resolve(failArr)
           }
         })
         this.fileUploadChunkQueue[file.uid] = queue
         for (let partNumber = 1; partNumber <= chunkNum; partNumber++) {
-          const exitPart = (exitPartList || []).find(exitPartItem => exitPartItem.partNumber === partNumber)
+          const exitPart = (exitPartList || []).find(
+            (exitPartItem) => exitPartItem.partNumber === partNumber
+          )
           if (exitPart) {
             // 分片已上传完成，累计到上传完成的总额中,同时记录一下上次断点上传的大小，用于计算上传速度
             lastUploadedSize += Number(exitPart.size)
             updateProcess(exitPart.size)
           } else {
-            queue.push(() => uploadNext(partNumber).then(res => {
+            queue.push(() => uploadNext(partNumber).then((res) => {
               // 单片文件上传完成再更新上传进度
               updateProcess(res.uploadedSize)
             }))
           }
         }
         if (queue.getLength() === 0) {
-        // 所有分片都上传完，但未合并，直接return出去，进行合并操作
-          resolve(failArr);
-          return;
+          // 所有分片都上传完，但未合并，直接return出去，进行合并操作
+          resolve(failArr)
+          return
         }
         queue.start()
         // this.queue = queue
@@ -379,6 +414,8 @@ export default {
     },
     // 上传文件
     uploadBpmn(param) {
+      const type = param.file.name.replace(/.+\./, '')
+      if (type !== 'zip') { return }
       const formData = new FormData()
       formData.append('mf', param.file) // 传入bpmn文件
       getFormGroups(formData)

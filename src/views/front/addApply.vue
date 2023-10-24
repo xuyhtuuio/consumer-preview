@@ -100,7 +100,7 @@ import ReviewMatters from './components/review-matters';
 import BasicInformation from './components/basic-information';
 import PublicityChannels from './components/publicity-channels';
 import ReconciliationPoint from './components/reconciliation-point';
-import ReviewMaterial from './components/review-material';
+import ReviewMaterial from './components/review-material-1';
 
 export default {
   components: {
