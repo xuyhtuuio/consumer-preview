@@ -905,7 +905,13 @@ export default {
           url: this.$GLOBAL.uaa + 'validCodeSms',
           data
         })
+        console.log(res)
         if (res.status === 200) {
+          if (res.data.error) {
+            this.$message.error(res.data.error_description)
+            this.smsBack();
+            console.log(this.crtOp)
+          }
           this.regainShow = true
           this.CodeMibleTime = 60
           if (this.crtOp === 'inputPhone') {
@@ -1031,6 +1037,8 @@ export default {
     smsBack() {
       this.activeName = '手机号'
       this.crtOp = 'inputPhone'
+      clearInterval(this.CodeMibleTimer)
+      this.CodeMibleTime = 60
     },
     pwdBack() {
       this.$refs['changePwdform'].resetFields()
