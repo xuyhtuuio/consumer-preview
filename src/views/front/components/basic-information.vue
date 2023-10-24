@@ -284,8 +284,13 @@ export default {
           return ['form-item']
         } else if (item.name === 'TimePicker' || item.name === 'Cascader') {
           return ['form-item']
+        } else if (
+          Object.keys(item.props).includes('exclusiveRowOrNot')
+            && !item.props.exclusiveRowOrNot
+        ) {
+          return ['form-item']
         } else {
-          return [!item.props.exclusiveRowOrNot && 'form-item']
+          return []
         }
       }
     }
@@ -499,7 +504,7 @@ export default {
         } else if (item.props.required) {
           if (item.value == null) return false
           else if (item.props.numberOfWords && item.value.length !== 0) {
-            return item.value.length < item.props.numberOfWords
+            return item.value.length <= item.props.numberOfWords
           } else return item.value.length !== 0
         } else if (item.props.numberOfWords && item.value.length !== 0) {
           return false
