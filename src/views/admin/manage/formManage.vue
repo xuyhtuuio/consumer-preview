@@ -39,7 +39,7 @@
                 <el-button type="text" v-if="scope.row.run === '1'" class="red" @click="stopApllay(scope.row)">停用</el-button>
               </el-dropdown-item>
               <el-dropdown-item>
-                <el-button type="text" v-if="scope.row.run === '1'" class="red" @click="delApllay(scope.row)">删除</el-button>
+                <el-button type="text" v-if="scope.row.run === '0'" class="red" @click="delApllay(scope.row)">删除</el-button>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -166,7 +166,8 @@ export default {
           prop: 'sort',
           edit: true,
           bind: {
-            width: 110
+            width: 110,
+            sortable: 'custom'
           }
         },
         {
@@ -276,6 +277,8 @@ export default {
       limitTime: null,
       imageUrl: '',
       isView: false,
+      orderColumn: 'updateTime',
+      orderType: 'desc'
     }
   },
   computed: {
@@ -292,6 +295,7 @@ export default {
     this.colConfig[0].edit = this.editAuth
     this.colConfig1[0].edit = this.editAuth
     this.getItemType()
+    this.getObtainExamineTypeList()
   },
   methods: {
     uploadBpmn(param) {
@@ -314,7 +318,6 @@ export default {
       if (res.data.data) {
         this.feildTypes = res.data.data || []
       }
-      this.getObtainExamineTypeList()
     },
     async getObtainExamineTypeList(params) {
       this.loadingList = true
@@ -323,6 +326,7 @@ export default {
         pageSize: 10,
         orderColumn: 'updateTime',
         orderType: 'desc',
+        ...this.order,
         ...params
       })
       const resData = res.data.data
@@ -336,25 +340,12 @@ export default {
       this.loadingList = false
     },
     changeSort(sort) {
-      if (sort.order.startsWith('desc')) {
-        this.getObtainExamineTypeList({
-          orderColumn: sort.prop,
-          orderType: 'desc'
-        })
-        this.order = {
-          orderColumn: sort.prop,
-          orderType: 'desc'
-        }
-      } else {
-        this.getObtainExamineTypeList({
-          orderColumn: sort.prop,
-          orderType: 'asc'
-        })
-        this.order = {
-          orderColumn: sort.prop,
-          orderType: 'asc'
-        }
+      const orderType = sort?.order?.startsWith('asc') ? 'asc' : 'desc';
+      this.order = {
+        orderColumn: sort.prop,
+        orderType
       }
+      this.getObtainExamineTypeList()
     },
     changeSort1() {
       // let data = {
@@ -479,11 +470,14 @@ export default {
     async submitEdit(row, oldRow, prop) {
       let res;
       let resData;
+      if (this.level === 1 && prop === 'sort' && oldRow.sort.toString() === row.sort.toString()) {
+        return
+      }
       if (this.level === 1) {
         if (prop === 'sort') {
           res = await formListChangeSort({
             oldSort: oldRow.sort,
-            newSort: row.sort
+            newSort: row.sort > this.page1.total ? this.page1.total : row.sort
           })
         } else {
           res = await modifyNameFormCategory({

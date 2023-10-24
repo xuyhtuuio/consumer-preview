@@ -4,13 +4,13 @@
       <img src="@/assets/image/intelligent-recheck/bgc.png" alt="" />
       <div class="recheck-input" :class="{ 'recheck-input-focus': focus }">
         <el-input
-          placeholder="请输入关键词或上传图片进行回检"
+          :placeholder="placeholder"
           v-model="recheckInput"
           @focus="focusInput"
           @blur="blurInput"
           class="input-with-select"
         >
-          <el-select v-model="select" slot="prepend" placeholder="请选择" popper-class="content-select">
+          <el-select v-model="select" slot="prepend" @change="changeSearch" placeholder="请选择" popper-class="content-select">
             <el-option label="按文件名称" value="1"></el-option>
             <el-option label="按文本内容" value="2"></el-option>
           </el-select>
@@ -81,6 +81,7 @@ export default {
     select: '1',
     swiper: null,
     focus: false,
+    placeholder: '请输入文件名或上传图片进行回检'
   }),
   mounted() {
     const swiper = new Swiper('.swiper-container', {
@@ -96,6 +97,13 @@ export default {
     this.swiper = swiper
   },
   methods: {
+    changeSearch(val) {
+      if (val === '1') {
+        this.placeholder = '请输入文件名或上传图片进行回检'
+      } else {
+        this.placeholder = '请输入关键词或上传图片进行回检'
+      }
+    },
     showUpload() {
       this.$refs.uploadDia.turnDialog = true
     },
