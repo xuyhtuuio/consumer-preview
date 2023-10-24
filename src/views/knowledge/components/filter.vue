@@ -13,7 +13,7 @@
       >
         <div class="content">
           <el-input v-model.trim="serach" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
-          <div style="position: relative; top: 12px;">
+          <div style="position: relative; top: 12px;font-size: 12px;">
             <el-switch v-model="isFollow" size="mini" style="position: relative; bottom: 2px;"></el-switch>
             仅看我关注的
           </div>
@@ -125,7 +125,8 @@ export default {
   padding: 16px 20px;
   width: calc(100vw - 372px);
   background: #FFFFFF;
-  border-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
   .main {
     .total {
       font-size: 14px;
@@ -138,6 +139,9 @@ export default {
       & > span {
         margin-right: 16px;
         cursor: pointer;
+      }
+      .sort4 {
+        margin-right: 0;
       }
       .active {
         color: #2D5CF6;
