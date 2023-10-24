@@ -328,7 +328,6 @@ export default {
   },
   created() {
     this.getElHeight();
-    this.findIconPosition()
   },
   computed: {
     getfileType() {
@@ -406,13 +405,6 @@ export default {
     // 获取前面的审批意见
     this.getOpinionApprovalLetter();
     this.getNodeHandleUserApi();
-    this.findIconPosition()
-    this.$nextTick(() => {
-      const curFileType = this.getfileType(this.files[this.activeIndex].fileName)
-      if (this.specialFileType1.includes(curFileType)) {
-        this.lisScroll()
-      }
-    })
   },
   beforeDestroy() {
     this.lineRemove()
