@@ -381,9 +381,6 @@ export default {
     },
     // 添加覆盖 dom
     addRectOverDom(l, t, r, b, nodes, indexs) {
-      console.log(t)
-      console.log(this.styleProp.wordDomStyle.scale)
-      console.log(t * this.styleProp.wordDomStyle.scale)
       const position = {
         left: Math.floor(l * this.styleProp.wordDomStyle.scale),
         top: Math.floor(t * this.styleProp.wordDomStyle.scale),

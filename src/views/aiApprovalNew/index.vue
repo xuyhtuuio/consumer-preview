@@ -387,28 +387,19 @@ export default {
       this.$nextTick(() => {
         const scrollContainer1 = document.querySelector('.ocr-txt .results');
         const scrollContainer2 = document.querySelector('.content-cont-icons');
+        const scrollContainer3 = document.querySelector('.file-preview .preview .preview');
         scrollContainer1.addEventListener('scroll', () => {
           scrollContainer2.scrollTop = scrollContainer1.scrollTop;
+          scrollContainer3.scrollTop = scrollContainer1.scrollTop;
         });
         scrollContainer2.addEventListener('scroll', () => {
           scrollContainer1.scrollTop = scrollContainer2.scrollTop;
+        });
+        scrollContainer3.addEventListener('scroll', () => {
+          scrollContainer1.scrollTop = scrollContainer3.scrollTop;
         });
       })
     },
-    // OCR 与原图 滚动
-    lisImgScroll() {
-      this.$nextTick(() => {
-        const scrollContainer1 = document.querySelector('.ocr-txt .results');
-        const scrollContainer2 = document.querySelector('.file-preview .preview');
-        console.log(scrollContainer1, scrollContainer2)
-        scrollContainer1.addEventListener('scroll', () => {
-          scrollContainer2.scrollTop = scrollContainer1.scrollTop;
-        });
-        scrollContainer2.addEventListener('scroll', () => {
-          scrollContainer1.scrollTop = scrollContainer2.scrollTop;
-        });
-      })
-    }
   },
   mounted() {
     const { item } = this.$route.params;
