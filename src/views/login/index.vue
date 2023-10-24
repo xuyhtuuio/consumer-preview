@@ -212,7 +212,7 @@
             <div class="regain-code" @click="regainCode" v-if="!regainShow">
               重新获取验证码
             </div>
-            <div
+            <!-- <div
               class="regain-code"
               @click="
                 changeLoginWays({
@@ -223,7 +223,7 @@
               "
             >
               密码登录
-            </div>
+            </div> -->
             <div class="forget-phone">
               手机号已停用?
               <span @click="findMyPwd">找回帐号</span>
@@ -663,33 +663,23 @@ export default {
               this.checkAgreement = true
               return
             }
-            const res = await this.getCodeMible()
-            console.log(res)
+            await this.getCodeMible()
 
-            /**
-             * res.success不存在，设为true即可通行
-             *
-             */
-
-            if (1) {
-              this.crtOp = 'inputSms'
-              this.$nextTick(() => {
-                const dom = document.getElementById(
-                  'captcha' + this.activeInput
-                )
-                dom.focus()
-              })
-              this.activeInput = 0
-              // 获取短信验证码
-              this.captchas = [
-                { num: '' },
-                { num: '' },
-                { num: '' },
-                { num: '' },
-                { num: '' },
-                { num: '' }
-              ]
-            }
+            this.crtOp = 'inputSms'
+            this.$nextTick(() => {
+              const dom = document.getElementById('captcha' + this.activeInput)
+              dom.focus()
+            })
+            this.activeInput = 0
+            // 获取短信验证码
+            this.captchas = [
+              { num: '' },
+              { num: '' },
+              { num: '' },
+              { num: '' },
+              { num: '' },
+              { num: '' }
+            ]
           }
         })
       } else if (this.activeName === '账号密码') {
@@ -915,7 +905,7 @@ export default {
           url: this.$GLOBAL.uaa + 'validCodeSms',
           data
         })
-        if (res.success) {
+        if (res.status === 200) {
           this.regainShow = true
           this.CodeMibleTime = 60
           if (this.crtOp === 'inputPhone') {
@@ -933,7 +923,6 @@ export default {
           }
 
           this.CodeMibleTimer = setInterval(() => {
-            console.log('outter')
             // eslint-disable-next-line
             if (this.CodeMibleTime <= 0) {
               // this.CodeMibleTime=60
@@ -943,8 +932,6 @@ export default {
               }
               this.regainShow = false
             } else {
-              console.log(32132)
-
               this.CodeMibleTime--
               this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`
             }
@@ -1106,7 +1093,7 @@ export default {
           }
           // this.checkToken()
         } else {
-          return this.$message.error(res.error_description)
+          return this.$message.error(res.data.error_description)
         }
       } catch (err) {
         if (
@@ -2178,6 +2165,7 @@ export default {
       line-height: 24px;
       color: #1d2128;
       padding: 6px 16px;
+      width: 68px;
     }
 
     .submitCheck {
