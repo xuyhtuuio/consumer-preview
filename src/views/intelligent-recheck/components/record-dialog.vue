@@ -1,6 +1,7 @@
 <template>
   <div class="outter">
-    <TrsTable
+    <div class="top-tabble">
+      <TrsTable
       theme="TRS-table-gray"
       :data="data"
       :colConfig="colConfig"
@@ -48,6 +49,9 @@
         <div class="center">{{ scope.row.department }}</div>
       </template>
     </TrsTable>
+
+    </div>
+
     <TrsPagination
       :pageSize="10"
       :pageNow="page.pageNow"
@@ -56,6 +60,7 @@
     >
     </TrsPagination>
   </div>
+
 </template>
 <script>
 export default {
@@ -128,32 +133,7 @@ export default {
         backInspectionOption:
           '活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；'
       },
-      {
-        fileName: '景顺长城七月报告七月七月',
-        fileID: '202308090023',
-        people: '谭新宇',
-        peopleID: '34279811',
-        backInspectionTime: '2023-8-31',
-        isRight: '是',
-        thingTpe: '产品类',
-        department: '财富平台部',
-        backInspectionFrequency: '8',
-        backInspectionOption:
-          '活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；'
-      },
-      {
-        fileName: '景顺长城七月报告七月七月',
-        fileID: '202308090023',
-        people: '谭新宇',
-        peopleID: '34279811',
-        backInspectionTime: '2023-8-31',
-        isRight: '是',
-        thingTpe: '产品类',
-        department: '财富平台部',
-        backInspectionFrequency: '8',
-        backInspectionOption:
-          '活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；'
-      }
+
     ],
     colConfig: [
       {
@@ -235,6 +215,11 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+
+.top-tabble {
+  height: 530px;
+  overflow-y: auto;
+}
 .short {
   overflow: hidden;
   text-overflow: ellipsis;

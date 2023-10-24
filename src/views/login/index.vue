@@ -442,9 +442,9 @@
 </template>
 
 <script>
+import md5 from 'js-md5'
 import { toCode, fromCode } from '@/utils/utils'
 import { editThePermissionsPage } from '@/api/admin/role'
-import md5 from 'js-md5'
 // eslint-disable-next-line
 import * as dayjs from 'dayjs'
 // eslint-disable-next-line
@@ -655,7 +655,7 @@ export default {
       // const page2 = this.$router.resolve({ name: 'user-agreement' })
       // window.open(page2.href, '_blank')
     },
-    next() {
+    async next() {
       if (this.activeName === '手机号') {
         this.$refs['form'].validate(async (valid) => {
           if (valid) {
@@ -664,13 +664,14 @@ export default {
               return
             }
             const res = await this.getCodeMible()
+            console.log(res)
 
             /**
              * res.success不存在，设为true即可通行
              *
              */
 
-            if (res.success) {
+            if (1) {
               this.crtOp = 'inputSms'
               this.$nextTick(() => {
                 const dom = document.getElementById(
@@ -932,6 +933,7 @@ export default {
           }
 
           this.CodeMibleTimer = setInterval(() => {
+            console.log('outter')
             // eslint-disable-next-line
             if (this.CodeMibleTime <= 0) {
               // this.CodeMibleTime=60
@@ -941,6 +943,8 @@ export default {
               }
               this.regainShow = false
             } else {
+              console.log(32132)
+
               this.CodeMibleTime--
               this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`
             }
@@ -1337,7 +1341,7 @@ export default {
   }
 }
 </script>
-<style lang='less' scoped>
+<style lang="less" scoped>
 .unity-login {
   position: relative;
   background-image: url(../../assets/image/autobackground.png);
