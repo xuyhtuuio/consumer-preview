@@ -520,7 +520,6 @@ export default {
   color: #606266;
   font-size: 14px;
   word-break: break-all;
-  height: 630px;
 }
 
 :deep(.el-dialog__wrapper) {

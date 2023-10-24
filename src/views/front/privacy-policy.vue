@@ -1,12 +1,10 @@
 <template>
   <div class="show-review">
     ewqeqw
-    <file-preview :url="url"></file-preview>
   </div>
 </template>
 
 <script>
-import FilePreview from '@/components/filePreview';
 export default {
   props: {},
   data() {
@@ -17,7 +15,6 @@ export default {
   created() {
   },
   components: {
-    FilePreview
   }
 };
 </script>
