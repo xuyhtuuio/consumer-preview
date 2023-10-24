@@ -914,7 +914,7 @@ export default {
         const realHeight = imgNode.scrollHeight
         const iconContainer = document.querySelector('.icons')
         if (iconContainer) {
-          iconContainer.style.height = realHeight
+          iconContainer.style.height = realHeight + 'px'
         }
         const iconNum = Math.floor(realHeight / 50)
         const icons = []
