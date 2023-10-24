@@ -647,13 +647,13 @@ export default {
     },
     // 隐私政策
     toPrivacypolicy() {
-      const page2 = this.$router.resolve({ name: 'privacy-policy' })
-      window.open(page2.href, '_blank')
+      const page1 = this.$router.resolve({ name: 'privacy-policy' })
+      window.open(page1.href, '_blank')
     },
     // 用户协议
     toUserAgreement() {
-      // const page2 = this.$router.resolve({ name: 'user-agreement' })
-      // window.open(page2.href, '_blank')
+      const page2 = this.$router.resolve({ name: 'user-agreement' })
+      window.open(page2.href, '_blank')
     },
     async next() {
       if (this.activeName === '手机号') {
@@ -905,12 +905,9 @@ export default {
           url: this.$GLOBAL.uaa + 'validCodeSms',
           data
         })
-        console.log(res)
         if (res.status === 200) {
           if (res.data.error) {
             this.$message.error(res.data.error_description)
-            this.smsBack();
-            console.log(this.crtOp)
           }
           this.regainShow = true
           this.CodeMibleTime = 60
