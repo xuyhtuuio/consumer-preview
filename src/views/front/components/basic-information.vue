@@ -5,7 +5,7 @@
         <div class="cardInfo">
           <!-- <g-icon class="right-icon" stylePx="20" href="#icon-guanzhu1"/> -->
           <img class="img" src="@/assets/image/apply-center/focus.svg" alt="" />
-          {{ cardInfo }}
+          提醒：产品类内容审查，需于在产品上线/宣传前{{limitTime}}天进行提交。
         </div>
       </template>
       <template v-slot:content>
@@ -260,6 +260,10 @@ export default {
     list: {
       typeof: Array,
       default: () => []
+    },
+    limitTime: {
+      typeof: String | Number,
+      default: ''
     }
   },
   created() {
@@ -269,7 +273,6 @@ export default {
     return {
       flag: 9999,
       title: '基本信息',
-      cardInfo: '提醒：产品类内容审查，需于在产品上线/宣传前14天进行提交。',
       checkBox: {},
       isAddPickerFoot: false,
       lastProps: {}
@@ -441,7 +444,6 @@ export default {
       }
     },
     handleInput(val, item) {
-      // this.checkBox[item.id]= val
       this.$set(this.checkBox, item.id, val)
     },
     handlePickerMouse(item, action, refEl) {
