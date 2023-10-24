@@ -123,11 +123,11 @@
             <el-col :span="8"
               ><p class="tot-num">共<span class="num">3216</span>条</p></el-col
             >
-            <el-col :span="8" justify="center" style="cursor: pointer;">
+            <el-col :span="8" justify="center" style="cursor: pointer">
               <p class="sort">
                 按上线时间<img src="../../assets/image/upup.png" alt="" /></p
             ></el-col>
-            <el-col :span="8" justify="center" style="cursor: pointer;">
+            <el-col :span="8" justify="center" style="cursor: pointer">
               <p class="sort">
                 按提单时间<img src="../../assets/image/upup.png" alt="" /></p
             ></el-col>
@@ -173,11 +173,33 @@
         ref="imgPreview1"
         url="http://192.168.210.51:9090/cpr/cpr_1697708778477_微信图片_20230906141828.jpg"
       ></fullImage>
+      <div class="tool" v-if="showFullScreen">
+        <span @click="saveFile">
+          <i
+            ><img src="@/assets/image/intelligent-recheck/download.png" alt=""
+          /></i>
+          下载</span
+        >
+        <span @click="changeSize(1)">
+          <i
+            ><img src="@/assets/image/intelligent-recheck/zoom-in.png" alt=""
+          /></i>
+          放大</span
+        >
+        <span @click="changeSize(0)">
+          <i
+            ><img src="@/assets/image/intelligent-recheck/zoom-out.png" alt=""
+          /></i>
+          缩小</span
+        >
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+// eslint-disable-next-line import/extensions
+import { downloadStream } from '@/api/applyCenter'
 // eslint-disable-next-line import/extensions
 import RecordDialog from './components/record-dialog.vue'
 // eslint-disable-next-line import/extensions
@@ -262,7 +284,27 @@ export default {
       this.$nextTick(() => {
         this.$refs.imgPreview1.handleImageLoaded()
       })
-    }
+    },
+    changeSize(type) {
+      this.$refs.imgPreview1.changeSize(type)
+    },
+    saveFile() {
+      const params = {
+        key: this.item.key
+      }
+      this.$message.info('下载中，请稍等！')
+      downloadStream(params).then((res) => {
+        const disposition = res.headers['content-disposition']
+        const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
+        const link = document.createElement('a');
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      })
+    },
   },
   created() {},
   mounted() {},
@@ -443,21 +485,50 @@ export default {
   }
 }
 
-:deep(.el-dialog__body) {
-    padding: 30px 20px;
-    color: #606266;
+.tool{
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%);
+  z-index: 1;
+  width: 248px;
+  box-shadow: 0px 0px 10px 0px #4343431A;
+  height: 38px;
+  border-radius: 8px;
+  background-color: #1D2128BF;
+  span{
+    i{
+      margin-right: 2px;
+      img{
+        width: 16px;
+        height: 16px;
+      }
+    }
+    display: flex;
+    align-items: center;
+    cursor: pointer;
     font-size: 14px;
-    word-break: break-all;
-    overflow-y: auto;
-    height: 730px;
+    color: #FFFFFF;
   }
+}
 
-  :deep(.el-dialog__wrapper) {
-    position: fixed;
-    right: 0;
-    left: 0;
-    top: -80px;
-    margin: 0;
-    overflow: visible;
-  }
+:deep(.el-dialog__body) {
+  padding: 30px 20px;
+  color: #606266;
+  font-size: 14px;
+  word-break: break-all;
+  height: 630px;
+}
+
+:deep(.el-dialog__wrapper) {
+  position: fixed;
+  right: 0;
+  left: 0;
+  top: -80px;
+  margin: 0;
+  overflow: visible;
+}
 </style>
