@@ -149,7 +149,7 @@
             </orcTxt>
             <p class="content-cont-icons" v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr">
               <span class="icons">
-                <span v-for="(item,index) in icons" :style="{ position: 'absolute', top: ((index + 1) * 50) + 'px' }" :key="index" @click="showIconLine(item)">
+                <span v-for="(item,index) in icons" :style="{ position: 'absolute', top: (item.iconTop) + 'px' }" :key="index" @click="showIconLine(item)">
                 <!-- 单一评论 - 未激活 -->
                 <span :data-icon="index" v-if="item.positionWithId?.length === 1 && item.showIndex === -1">
                   <svg class="icon" aria-hidden="true">
@@ -345,7 +345,8 @@ export default {
     comments: {
       handler(val) {
         if (val) {
-          this.dealIconWithComment()
+          // debugger
+          // this.dealIconWithComment()
         }
       },
       deep: true
@@ -381,11 +382,25 @@ export default {
     getProps(val) {
       this.styleProp = val;
     },
-    // 同步滚动
+    // OCR 与 icon 同步滚动
     lisScroll() {
       this.$nextTick(() => {
         const scrollContainer1 = document.querySelector('.ocr-txt .results');
         const scrollContainer2 = document.querySelector('.content-cont-icons');
+        scrollContainer1.addEventListener('scroll', () => {
+          scrollContainer2.scrollTop = scrollContainer1.scrollTop;
+        });
+        scrollContainer2.addEventListener('scroll', () => {
+          scrollContainer1.scrollTop = scrollContainer2.scrollTop;
+        });
+      })
+    },
+    // OCR 与原图 滚动
+    lisImgScroll() {
+      this.$nextTick(() => {
+        const scrollContainer1 = document.querySelector('.ocr-txt .results');
+        const scrollContainer2 = document.querySelector('.file-preview .preview');
+        console.log(scrollContainer1, scrollContainer2)
         scrollContainer1.addEventListener('scroll', () => {
           scrollContainer2.scrollTop = scrollContainer1.scrollTop;
         });

@@ -158,7 +158,7 @@ export default {
       const imgDomElement = document.getElementById('picture');
       this.wordDomStyle.width = imgDomElement.clientWidth;
       this.wordDomStyle.height = imgDomElement.clientHeight;
-      this.wordDomStyle.scale = (imgDomElement.naturalWidth / imgDomElement.clientWidth).toFixed(2);
+      this.wordDomStyle.scale = (imgDomElement.naturalWidth / imgDomElement.clientWidth);
       this.getMaxPosition()
       this.initCenter()
       // 绑定缩放事件
