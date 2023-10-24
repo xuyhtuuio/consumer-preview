@@ -86,7 +86,12 @@ export default {
   },
   methods: {
     linePosition() {
-      this.setBoundingClientRect(this.lineWordItem)
+      if (Array.isArray(this.lineWordItem)) {
+        this.setBoundingClientRectArr(this.lineWordItem)
+      } else {
+        this.setBoundingClientRect(this.lineWordItem)
+      }
+      // this.setBoundingClientRect(this.lineWordItem)
       this.$nextTick(() => {
         this.$emit('linePosition')
       })
