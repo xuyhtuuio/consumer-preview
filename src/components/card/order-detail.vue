@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-08 15:31:53
+ * @LastEditTime: 2023-10-25 11:23:39
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -653,8 +653,8 @@ export default {
         // 驳回保存的话，还用之前的接口
         if (editOpinionForm.isAccept === '0') {
           params.reason = editOpinionForm.reason
-          params.targetNodeId = editOpinionForm.targetNodeId
-          params.targetUser = editOpinionForm.id
+          params.targetNodeId = editOpinionForm.targetNodeId_userId?.split('-')[0]
+          params.targetUser = editOpinionForm.targetNodeId_userId?.split('-')[1]
         }
         // eslint-disable-next-line
         const end_submit = {
@@ -740,9 +740,9 @@ export default {
         }
       }
       updateRuleRes = await updateRuleCode({
-        rollbackId: editOpinionForm.targetNodeId,
+        rollbackId: editOpinionForm.targetNodeId_userId?.split('-')[0],
         nextUserInfo: [{
-          id: editOpinionForm.refuseWay === 'TO_BEFORE' ? editOpinionForm.id : ''
+          id: editOpinionForm.refuseWay === 'TO_BEFORE' ? editOpinionForm.targetNodeId_userId?.split('-')[1] : ''
         }],
         templateId: this.item.processTemplateId,
         processInstanceId: this.item.processInstanceId,
@@ -758,7 +758,7 @@ export default {
           name: user.name
         },
         processInstanceId: this.item.processInstanceId,
-        rollbackId: editOpinionForm.refuseWay === 'TO_BEFORE' ? editOpinionForm.targetNodeId : '',
+        rollbackId: editOpinionForm.refuseWay === 'TO_BEFORE' ? editOpinionForm.targetNodeId_userId?.split('-')[0] : '',
         nodeId: this.item.nodeId,
         taskId: this.item.taskId,
         templateId: this.item.processTemplateId

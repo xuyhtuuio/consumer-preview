@@ -23,13 +23,13 @@
           v-model="form.crtDisavower"
           placeholder="请选择驳回节点/驳回人"
           popper-class="approver-select"
-          value-key="id"
+          value-key="targetNodeId_userId"
         >
           <el-option
             v-for="(item, index) in disavower"
             :key="index"
             :label="item.name + '/' + item.label + ' 【' + item.nodeName + '】'"
-            :value="item"
+            :value="item.targetNodeId_userId"
           >
             <div class="flex">
               <div class="item ellipsis ellipsis_1">{{ item.name }}</div>
@@ -492,7 +492,12 @@ export default {
       const { taskId, processInstanceId } = data
       this.getEditById(taskId, processInstanceId)
       this.externalData = data
-      this.disavower = data.disavower
+      this.disavower = data.disavower.map((m) => {
+        return {
+          ...m,
+          targetNodeId_userId: m.targetNodeId + '-' + m.id
+        }
+      })
       this.approver = data.approver
       this.refuseWay = data.refuseWay
       this.assignedType = data.assignedType
@@ -512,13 +517,13 @@ export default {
             this.$refs['form'].resetFields()
           } else {
             // 区分通过与驳回
-            const { success, msg, targetUser, reason } = data
+            const { success, msg, targetUser, reason, targetNodeId } = data
             this.form.isAccept = success ? '1' : '0'
             this.form.content = msg
             if (success) {
               this.form.crtApprover = targetUser || ''
             } else {
-              this.form.crtDisavower = targetUser || ''
+              this.form.crtDisavower = targetNodeId + '-' + targetUser || ''
               this.form.reason = reason
             }
           }
@@ -550,7 +555,7 @@ export default {
       if (this.form.isAccept === '0') {
         params = {
           ...params,
-          ...this.form.crtDisavower
+          targetNodeId_userId: this.form.crtDisavower
         }
       }
       const customFlag = this.judgeWarnSave()
@@ -561,7 +566,7 @@ export default {
     },
     judgeWarnSave() {
       // eslint-disable-next-line
-        for(let i in this.filledInByApprover) {
+      for (let i in this.filledInByApprover) {
         const { props } = this.filledInByApprover[i]
         if (
           (this.filledInByApprover[i].value.length === 0 || this.filledInByApprover[i].value.length > this.filledInByApprover[i].props.numberOfWords) && props.required
@@ -570,7 +575,7 @@ export default {
         }
       }
       let flag = true
-      flag = !this.filledInByApprover.some(m => {
+      flag = !this.filledInByApprover.some((m) => {
         return m.isWarning
       })
       return flag
