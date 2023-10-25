@@ -968,7 +968,7 @@ export default {
             })
             // 与生成的icon产生堆叠影响的icons
             const findNewIcon = findIconLive.filter((icon) => {
-              if (Math.abs(findIcon[0].iconTop - icon.iconTop) < 7.5) {
+              if (Math.abs(findIcon[0]?.iconTop - icon.iconTop) < 7.5) {
                 return icon
               }
             })
@@ -986,6 +986,9 @@ export default {
                 ]
               }
             } else {
+              if (!findIcon.length) {
+                return
+              }
               if (!findIcon[0]?.positionWithId) {
                 findIcon[0].positionWithId = []
               }
