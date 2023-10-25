@@ -233,15 +233,19 @@ const router = new Router({
     {
       path: '/knowledge',
       name: 'knowledge',
-      component: () => import('@/views/knowledge/index'),
-      meta: { title: '知识库', viewport }
-    },
-    {
-      path: '/rules-base',
-      name: 'rules-base',
       component: () => import('@/views/rules-base/index'),
-      meta: { title: '知识库', viewport }
+      meta: { title: '知识库', viewport },
+      children: [
+        {
+          path: '/rules-base',
+          name: 'rules-base',
+          component: () => import('@/views/rules-base/index'),
+          meta: { title: '知识库', viewport },
+
+        },
+      ]
     },
+
     {
       path: '/front',
       name: 'front',
