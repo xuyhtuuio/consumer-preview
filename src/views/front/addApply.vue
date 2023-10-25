@@ -374,7 +374,8 @@ export default {
         reviewMaterialsData.value.push({
           fileName: item.name,
           key: item.key,
-          url: item.url
+          url: item.url,
+          child: item.child
         });
       });
       formItemDataList.push(reviewMaterialsData);
