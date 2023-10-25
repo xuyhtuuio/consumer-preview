@@ -1,6 +1,6 @@
 <template>
   <div class="approval-center" ref="box">
-    <p class="welcoming">欢迎来到消保管控平台！</p>
+    <p class="welcoming">欢迎来到消保智能审查平台！</p>
     <p class="tips" v-if="tipsMsg">
       <i class="iconfont icon-xiaoxi-tongzhi"></i>{{ tipsMsg }}
     </p>
@@ -277,6 +277,9 @@ export default {
       }
       getDataStatistics(param).then((res) => {
         const { data } = res.data
+        let total = 0
+        total = data['toPending']
+        this.tipsMsg = total > 0 ? `您有 ${total} 笔【消保审查】任务待审核哦，请尽快审核!` : '您当前无待审核任务'
         for (const i in data) {
           this.dataStatistics.forEach((v) => {
             if (v.value === i) {

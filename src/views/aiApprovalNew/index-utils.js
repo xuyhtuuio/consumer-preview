@@ -1018,6 +1018,7 @@ export default {
           })
         }
       })
+      console.log(this.comments, this.icons)
     },
     // 展示 icon 的连线
     showIconLine(icon) {

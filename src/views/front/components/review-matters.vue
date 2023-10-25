@@ -10,7 +10,7 @@
             v-for="(item, index) in list"
             :key="index"
             :type="currentId === item.recordId ? 'primary-active' : 'normal'"
-            @click.native="handleClick(item.recordId)"
+            @click.native="handleClick(item)"
           >
             <!-- <g-icon
               v-show="currentId !== item.recordId"
@@ -53,15 +53,19 @@ export default {
   data() {
     return {
       title: '审查事项类型',
-      currentId: -1
+      currentId: -1,
+      urgentTimeLimit: 0,
     };
   },
   created() {},
   watch: {
     list: {
       handler(val) {
-        this.currentId = Number(this.currentId === -1 ? val[0].recordId : this.currentId);
-        this.$emit('handleTo', this.currentId);
+        if (this.currentId === -1) {
+          this.currentId = Number(val[0].recordId);
+          this.urgentTimeLimit = val[0].urgentTimeLimit
+        }
+        this.$emit('handleTo', this.currentId, this.urgentTimeLimit, val[0].examineTypesName);
       },
       deep: true
     },
@@ -73,10 +77,11 @@ export default {
     clearData() {
       this.currentId = -1;
     },
-    handleClick(id) {
+    handleClick({ recordId: id, urgentTimeLimit, examineTypesName }) {
       if (id === this.currentId || !this.allawChange) return;
       this.currentId = id;
-      this.$emit('handleTo', id);
+      this.urgentTimeLimit = urgentTimeLimit
+      this.$emit('handleTo', id, urgentTimeLimit, examineTypesName);
     }
   }
 };

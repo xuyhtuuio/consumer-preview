@@ -1,34 +1,62 @@
 <template>
   <div class="nav">
     <div class="left flex" @click="returnHome">
-      <img src="@/assets/image/logo.png" alt="" class="logo">
+      <img src="@/assets/image/logo.png" alt="" class="logo" />
       消保管控平台
     </div>
     <div class="center flex">
       <template v-if="$route.name !== 'home'">
-        <div class="nav-item" v-for="item, index in list" :key="index" @click="handleItem(item)">
-          <span :class="[activeMenu == item.sign ? 'active-menu' : '']">{{ item.title }}</span>
+        <div
+          class="nav-item"
+          v-for="(item, index) in list"
+          :key="index"
+          @click="handleItem(item)"
+        >
+          <span :class="[activeMenu == item.sign ? 'active-menu' : '']">{{
+            item.title
+          }}</span>
         </div>
       </template>
     </div>
     <div class="right flex">
-      <i v-for="(item, index) in iconList" :key="index" @click="toManagePage(item)"
-        :class="['iconfont', item.href, `icon${index + 1}`]"></i>
+      <i
+        v-for="(item, index) in iconList"
+        :key="index"
+        @click="toManagePage(item)"
+        :class="['iconfont', item.href, `icon${index + 1}`]"
+      ></i>
       <!-- 个人中心 -->
-      <el-popover placement="bottom" trigger="click" @show="updateInfo" width="320">
+      <el-popover
+        placement="bottom"
+        trigger="click"
+        @show="updateInfo"
+        width="320"
+      >
         <div class="userInfo">
-          <img class="ocr-avatar" src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
+          <img
+            class="ocr-avatar"
+            src="@/assets/image/ai-approval/ocr-avatar.png"
+            alt=""
+          />
           <p>
-            <span class="nickname"> {{ userInfo && userInfo.fullname }}{{ userInfo && ` / ${userInfo.id}` }} </span>
+            <span class="nickname">
+              {{ userInfo && userInfo.fullname
+              }}{{ userInfo && ` / ${userInfo.id}` }}
+            </span>
             <span class="role" v-if="userInfo.role">{{ userInfo.role }}</span>
           </p>
           <p class="orgs" v-if="userInfo?.org">
             <i class="iconfont icon-dept"></i>
             {{ userInfo?.org?.join('/') }}
           </p>
-          <el-button class="logout" @click="logout"><i class="iconfont icon-tuichudenglu"></i> 退出登录</el-button>
+          <el-button class="logout" @click="logout"
+            ><i class="iconfont icon-tuichudenglu"></i> 退出登录</el-button
+          >
         </div>
-        <i slot="reference" :class="['iconfont', 'icon-gerenyonghutouxiang2']"></i>
+        <i
+          slot="reference"
+          :class="['iconfont', 'icon-gerenyonghutouxiang2']"
+        ></i>
       </el-popover>
     </div>
   </div>
@@ -45,30 +73,41 @@ export default {
   computed: {
     manageAuth() {
       const { permissionsPage = {} } = this.$store.state
-      return [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.name === '后台管理' && item.type)
+      return [
+        ...permissionsPage.funPerms,
+        ...permissionsPage.defaultPerm
+      ]?.find((item) => item.name === '后台管理' && item.type)
     },
     list() {
       const { permissionsPage = {} } = this.$store.state
       const navList = [
         { title: '申请中心', name: 'apply-list', sign: 'applycenter' },
         { title: '审批中心', name: 'approval-list', sign: 'approvalcenter' },
+        { title: '智能回检', name: 'recheck-index', sign: 'recheckIndex' },
         { title: '产品图谱', name: 'productmap', sign: 'productmap' },
-        { title: '统计中心', name: 'statistical-center', sign: 'statistical-center' },
-        { title: '人员中心', name: 'personCenter', sign: 'personcenter' },
+        {
+          title: '统计中心',
+          name: 'statistical-center',
+          sign: 'statistical-center'
+        },
+        { title: '人员中心', name: 'personCenter', sign: 'personcenter' }
       ]
-      return navList.map(item => {
-        const exist = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(f => f.pathName === item.name)
-        if (exist?.type) {
-          return item;
-        }
-        return false;
-      }).filter(e => e)
+      return navList
+        .map((item) => {
+          const exist = [
+            ...permissionsPage.funPerms,
+            ...permissionsPage.defaultPerm
+          ]?.find((f) => f.pathName === item.name)
+          if (exist?.type) {
+            return item
+          }
+          return false
+        })
+        .filter((e) => e)
     },
     iconList() {
       if (this.manageAuth) {
-        return [
-          { href: 'icon-tongyongtubiao5', name: 'manage' }
-        ]
+        return [{ href: 'icon-tongyongtubiao5', name: 'manage' }]
       }
       return []
     }
@@ -82,9 +121,7 @@ export default {
       deep: true
     }
   },
-  activated() {
-
-  },
+  activated() {},
   mounted() {
     this.routeActived(this.$route)
   },
@@ -97,6 +134,9 @@ export default {
       }
       if (fullPath.indexOf('applycenter') !== -1) {
         this.activeMenu = 'applycenter'
+      }
+      if (fullPath.indexOf('recheck') !== -1) {
+        this.activeMenu = 'recheckIndex'
       }
       if (fullPath.indexOf('approvalcenter') !== -1) {
         this.activeMenu = 'approvalcenter'
@@ -112,9 +152,18 @@ export default {
       }
     },
     logout() {
-      this.$router.push({
-        name: 'login'
-      })
+      window.localStorage.clear()
+      const newWindow = window.open('', '_self')
+      if (window.location.host === '192.168.210.57:31603') {
+        newWindow.location = 'http://192.168.210.57:31963'
+      } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
+        newWindow.location = 'https://dataelite.trs.com.cn/'
+      } else {
+        const name = window.self === window.top ? 'login' : 'loginAuto'
+        this.$router.push({
+          name
+        })
+      }
     },
     returnHome() {
       this.$router.push('/home')
@@ -122,7 +171,7 @@ export default {
     updateInfo() {
       const user = JSON.parse(window.localStorage.getItem('user_name'))
       const org = user.orgs?.[0] ? this.getOrgs(user.orgs[0], []) : ''
-      const role = user.roles.filter(item => item.clientId === 'cpr')
+      const role = user.roles.filter((item) => item.clientId === 'cpr')
       this.userInfo = {
         ...user,
         org,
@@ -134,7 +183,7 @@ export default {
       if (item?.child?.name) {
         return this.getOrgs(item.child, org)
       } else {
-        return org;
+        return org
       }
     },
     handleItem(item) {
@@ -145,7 +194,11 @@ export default {
     },
     toManagePage(item) {
       const { funPerms } = this.$store.state.permissionsPage
-      const rout = funPerms.filter(item1 => item1.path?.indexOf('/admin/') !== -1 && item1.pathName !== 'manage').find(i => i.type)
+      const rout = funPerms
+        .filter(
+          (item1) => item1.path?.indexOf('/admin/') !== -1 && item1.pathName !== 'manage'
+        )
+        .find((i) => i.type)
       if (item.name && rout) {
         this.$router.push({
           name: rout.pathName
@@ -209,7 +262,6 @@ export default {
       position: relative;
       width: 100%;
       font-weight: 700;
-
     }
 
     .active-menu::after {
@@ -217,7 +269,7 @@ export default {
       width: 100%;
       height: 2px;
       border-radius: 10px;
-      background: var(--unnamed, #FFF);
+      background: var(--unnamed, #fff);
       position: absolute;
       left: 0;
       bottom: -14px;
@@ -253,14 +305,18 @@ export default {
     font-size: 16px;
     font-weight: 700;
     line-height: 24px;
-    color: #1D2128;
+    color: #1d2128;
   }
 
   .role {
     margin-left: 8px;
     padding: 4px 12px;
-    background: linear-gradient(180deg, #FFF7E6 0%, rgba(255, 247, 230, 0) 100%);
-    color: #FA8C16;
+    background: linear-gradient(
+      180deg,
+      #fff7e6 0%,
+      rgba(255, 247, 230, 0) 100%
+    );
+    color: #fa8c16;
     font-size: 13px;
     font-weight: 700;
     line-height: 20px;
@@ -268,7 +324,11 @@ export default {
 
   .orgs {
     display: flex;
-    background: linear-gradient(180deg, #F7F8FA 0%, rgba(247, 248, 250, 0) 100%);
+    background: linear-gradient(
+      180deg,
+      #f7f8fa 0%,
+      rgba(247, 248, 250, 0) 100%
+    );
     padding: 8px;
     border-radius: 4px;
     color: #505968;
@@ -278,7 +338,7 @@ export default {
     gap: 10px;
 
     .icon-dept {
-      color: #2D5CF6;
+      color: #2d5cf6;
       font-size: 22px;
     }
   }
@@ -286,15 +346,15 @@ export default {
   .logout {
     width: 100%;
     border: none;
-    background: #F7F8FA;
-    color: #1D2128;
+    background: #f7f8fa;
+    color: #1d2128;
     font-size: 14px;
     font-weight: 400;
     line-height: 30px;
 
     &:hover {
-      background: #F7F8FA;
-      color: #1D2128;
+      background: #f7f8fa;
+      color: #1d2128;
     }
 
     /deep/ span {
@@ -304,7 +364,7 @@ export default {
     }
 
     .icon-tuichudenglu {
-      color: #2D5CF6;
+      color: #2d5cf6;
       margin-right: 8px;
       font-size: 18px;
     }

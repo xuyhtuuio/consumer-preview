@@ -1,22 +1,34 @@
 <template>
   <div id="app">
-    <NavMenu v-if="$route.name !== 'login'&& $route.name !== 'showReview'"></NavMenu>
-    <transition name="router-fade" mode="out-in" >
-      <router-view v-if="!$route.meta.keepAlive" class="view-box" :style="{
-        padding: noPaddingRoute.indexOf($route.name) !== -1 ? '0':'16px 80px',
-        'overflow-y': noBodyScroll.includes($route.name) ? 'hidden' : 'auto'
-      }"/>
+    <NavMenu
+      v-if="
+        $route.name !== 'login' &&
+        $route.name !== 'showReview' &&
+        $route.name !== 'privacy-policy' &&
+        $route.name !== 'user-agreement'
+      "
+    ></NavMenu>
+    <transition name="router-fade" mode="out-in">
+      <router-view
+        v-if="!$route.meta.keepAlive"
+        class="view-box"
+        :style="{
+          padding:
+            noPaddingRoute.indexOf($route.name) !== -1 ? '0' : '16px 80px',
+          'overflow-y': noBodyScroll.includes($route.name) ? 'hidden' : 'auto'
+        }"
+      />
     </transition>
   </div>
 </template>
 
 <script>
-import NavMenu from '@/components/common/navMenu';
+import NavMenu from '@/components/common/navMenu'
 export default {
   components: { NavMenu },
   data() {
     return {
-      noPaddingRoute: ['aiApproval', 'approval-aiApproval', 'compare'],
+      noPaddingRoute: ['aiApproval', 'approval-aiApproval', 'compare', 'user-agreement', 'privacy-policy'],
       noBodyScroll: ['baseSetting', 'processDesign', 'proSetting']
     }
   },
@@ -24,7 +36,7 @@ export default {
 }
 </script>
 <style lang="less">
-@import "@/assets/global";
+@import '@/assets/global';
 
 :focus {
   outline: -webkit-focus-ring-color auto 0px;
@@ -37,7 +49,7 @@ export default {
 
 body {
   margin: 0;
-  min-width: 500px;
+  min-width: 1060px;
   background-color: #f5f6f6;
 }
 
@@ -46,7 +58,7 @@ html {
   margin: 0;
   height: 100%;
 }
-.nav-menu{
+.nav-menu {
   position: sticky;
   width: 100%;
   z-index: 10;

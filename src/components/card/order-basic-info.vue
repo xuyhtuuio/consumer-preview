@@ -452,7 +452,7 @@ export default {
     }
 
     .label::before {
-      content: '·';
+      content: '\00b7';
       font-size: 20px;
       padding-right: 4px;
       line-height: 20px;

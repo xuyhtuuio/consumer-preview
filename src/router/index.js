@@ -1,21 +1,32 @@
-import Vue from 'vue';
-import Router from 'vue-router';
+import Vue from 'vue'
+import Router from 'vue-router'
+import Qs from 'qs'
 import store from '@/store/index'
 import request from '@/api/request'
-Vue.use(Router);
+import { editThePermissionsPage } from '@/api/admin/role'
+Vue.use(Router)
 
 const viewport = {
   content: 'width=device-width, initial-scale=1.0, user-scalable=no'
 }
-
 // meta: { title: '新增详情' ,viewport: viewport ,pTitle: "首页",pPath: "/home"}
 const router = new Router({
   // mode: 'history',
+  mode: 'history',
   base: __dirname,
   routes: [
+    // {
+    //   path: '/',
+    //   redirect: '/applycenter'
+    // },
     {
       path: '/',
-      redirect: '/applycenter'
+      name: 'homePage',
+      meta: {
+        title: ''
+      },
+      redirect: '/front',
+      component: () => import('@/views/front/home')
     },
     {
       path: '/login',
@@ -26,7 +37,23 @@ const router = new Router({
     {
       path: '/show-review',
       name: 'showReview',
-      component: () => import('@/views/front/show-review'),
+      component: () => import('@/views/front/show-review')
+    },
+    {
+      path: '/privacy-policy',
+      name: 'privacy-policy',
+      component: () => import('@/views/front/privacy-policy'),
+      meta: {
+        title: '隐私政策'
+      }
+    },
+    {
+      path: '/user-agreement',
+      name: 'user-agreement',
+      component: () => import('@/views/front/user-agreement'),
+      meta: {
+        title: '用户协议'
+      }
     },
     // 后台管理
     {
@@ -105,11 +132,54 @@ const router = new Router({
           name: 'processDesign',
           component: () => import('@/views/admin/layout/ProcessDesign'),
           meta: { title: '审批流程' }
-        }, {
+        },
+        {
           path: 'proSetting',
           name: 'proSetting',
           component: () => import('@/views/admin/layout/FormProSetting'),
           meta: { title: '扩展设置' }
+        }
+      ]
+    },
+    // 智能回检
+    {
+      path: '/recheck',
+      name: 'recheck',
+      component: () => import('@/views/intelligent-recheck/home'),
+      meta: { title: '智能回检', viewport },
+      redirect: '/recheck/recheck-index',
+      children: [
+        {
+          path: 'recheck-index',
+          name: 'recheck-index',
+          component: () => import('@/views/intelligent-recheck/index'),
+          meta: {
+            title: '智能回检'
+          }
+        },
+        {
+          path: 'recheck-detail',
+          name: 'recheck-detail',
+          component: () => import('@/views/intelligent-recheck/detail'),
+          meta: {
+            title: '回检列表'
+          }
+        },
+        {
+          path: 'recheck-record',
+          name: 'recheck-record',
+          component: () => import('@/views/intelligent-recheck/record'),
+          meta: {
+            title: '回检记录'
+          }
+        },
+        {
+          path: 'recheck-compare',
+          name: 'recheck-compare',
+          component: () => import('@/views/intelligent-recheck/compare-detail'),
+          meta: {
+            title: '回检对比'
+          }
         }
       ]
     },
@@ -124,13 +194,13 @@ const router = new Router({
           path: 'apply-list',
           name: 'apply-list',
           component: () => import('@/views/applycenter/index'),
-          meta: { title: '申请中心', }
+          meta: { title: '申请中心' }
         },
         {
           path: 'details',
           name: 'details',
           component: () => import('@/views/applycenter/details'),
-          meta: { title: '申请单详情', }
+          meta: { title: '申请单详情' }
         },
         {
           path: 'addApply',
@@ -159,7 +229,7 @@ const router = new Router({
           path: 'approval-list',
           name: 'approval-list',
           component: () => import('@/views/approvalCenter/index'),
-          meta: { title: '审批中心', }
+          meta: { title: '审批中心' }
         },
         {
           path: 'approval-details',
@@ -185,14 +255,14 @@ const router = new Router({
           name: 'compare',
           component: () => import('@/views/approvalCenter/text-compare'),
           meta: { title: '线上对比', viewport }
-        },
+        }
       ]
     },
     {
       path: '/statistical-center',
       name: 'statistical-center',
       component: () => import('@/views/statistical-center/index'),
-      meta: { title: '统计中心', viewport },
+      meta: { title: '统计中心', viewport }
     },
     {
       path: '/front',
@@ -204,39 +274,43 @@ const router = new Router({
           path: '/home',
           name: 'home',
           component: () => import('@/views/front/home'),
-          meta: { title: '首页', viewport },
-        },
+          meta: { title: '首页', viewport }
+        }
       ]
     },
     {
       path: '/productmap',
       name: 'productmap',
       component: () => import('@/views/product-map/index'),
-      meta: { title: '产品图谱', viewport },
+      meta: { title: '产品图谱', viewport }
     },
     {
       path: '/person-center',
       name: 'personCenter',
       component: () => import('@/views/personCenter/index'),
-      meta: { title: '人员中心', viewport },
+      meta: { title: '人员中心', viewport }
     },
     {
       path: '/404',
       name: '404',
       component: () => import('@/views/404'),
       meta: { title: '404', viewport }
-    },
+    }
   ]
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  await getToken()
   const auth = handleAuth(to)
   if (!auth) {
     getUserRole()
-    return;
+    return
   }
   if (to.path.split('/').length > 1) {
-    const data = [{ name: to.path.split('/')[1], title: to.meta.pTitle }, { name: to.path.split('/')[2], title: to.meta.title }]
+    const data = [
+      { name: to.path.split('/')[1], title: to.meta.pTitle },
+      { name: to.path.split('/')[2], title: to.meta.title }
+    ]
     store.commit('setBreadcrumbList', data)
   }
 
@@ -250,7 +324,7 @@ router.beforeEach((to, from, next) => {
     meta.content = 'width=device-width, initial-scale=1.0, user-scalable=no'
     head[0].appendChild(meta)
   }
-  next();
+  next()
   sessionStorage.setItem('router-path', to.path)
 })
 // 解决报错
@@ -258,18 +332,20 @@ const originalPush = Router.prototype.push
 const originalReplace = Router.prototype.replace
 Router.prototype.push = function push(location, onResolve, onReject) {
   if (onResolve || onReject) return originalPush.call(this, location, onResolve, onReject)
-  return originalPush.call(this, location).catch(err => err)
+  return originalPush.call(this, location).catch((err) => err)
 }
 // replace
 Router.prototype.replace = function push(location, onResolve, onReject) {
   if (onResolve || onReject) return originalReplace.call(this, location, onResolve, onReject)
-  return originalReplace.call(this, location).catch(err => err)
+  return originalReplace.call(this, location).catch((err) => err)
 }
 // 权限处理
 function handleAuth(to) {
   // 本地化持久存储
   if (!store.state?.permissionsPage?.funPerms?.length) {
-    const permissionsPage = JSON.parse(window.localStorage.getItem('permissionsPage'))
+    const permissionsPage = JSON.parse(
+      window.localStorage.getItem('permissionsPage')
+    )
     if (permissionsPage) {
       store.state.permissionsPage = permissionsPage
     }
@@ -291,29 +367,89 @@ function handleAuth(to) {
 async function getUserRole() {
   const token = window.localStorage.getItem('AI_token')
   if (!token) {
-    router.push({ name: 'login' })
-    return false
-  }
-  try {
-    const res = await request({
-      method: 'post',
-      url: '/cpr/oauth/check_token',
-      contentType: 'application/x-www-form-urlencoded',
-      data: {
-        token
-      },
-      msg: false
-    });
-    const role = (res.data.client_id === 'cpr')
-    if (!role) {
-      router.push({ name: 'login' })
+    const newWindow = window.open('', '_self')
+    if (window.location.host === '192.168.210.57:31603') {
+      newWindow.location = 'http://192.168.210.57:31963/#/login?from=cpr'
+    } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
+      newWindow.location = 'https://dataelite.trs.com.cn/#/login?from=cpr'
     } else {
-      router.push({ name: '404' })
+      const name = window.self === window.top ? 'login' : 'loginAuto'
+      router.push({
+        name
+      })
     }
-    return role;
+    return false
+  } else {
+    await getPermissionsPage()
+  }
+  // try {
+  //   const res = await request({
+  //     method: 'post',
+  //     url: '/cpr/oauth/check_token',
+  //     contentType: 'application/x-www-form-urlencoded',
+  //     data: {
+  //       token
+  //     },
+  //     msg: false
+  //   });
+  //   const role = (res.data.client_id === 'cpr')
+  //   console.log('role', role)
+  //   if (!role) {
+  // const newWindow = window.open('', '_self');
+  // if (window.location.host === '192.168.210.57:31603') {
+  //   newWindow.location = 'http://192.168.210.57:31963/#/login?from=cpr';
+  // } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
+  //   newWindow.location = 'https://dataelite.trs.com.cn/#/login?from=cpr';
+  // } else {
+  //   const name = window.self === window.top ? 'login' : 'loginAuto';
+  //   router.push({
+  //     name,
+  //   });
+  // }
+  //     return
+  //   }
+  //   return role;
+  // } catch {
+  //   // router.push({ name: '404' })
+  // }
+}
+// 根据传递过来的id 解析token
+async function getToken() {
+  // let hasToken = false
+  try {
+    // hasToken = false
+    const searchObj = Qs.parse(window.location.search.slice(1))
+    if (searchObj && searchObj.id) {
+      const res = await request({
+        method: 'post',
+        url: `uaa/user/getToken?key=${searchObj.id}`,
+        showErrorMsg: false
+      })
+      if (res.data.data.scope.includes('cpr')) {
+        window.localStorage.setItem('AI_token', res.data.data.value)
+        window.localStorage.setItem('user_name', res.data.data.user_name)
+        await getPermissionsPage()
+        window.location.href = window.location.href.replace(
+          `id=${searchObj.id}`,
+          ''
+        )
+      } else {
+        // hasToken = true
+      }
+    } else {
+      // hasToken = true
+    }
   } catch {
-    router.push({ name: '404' })
+    // hasToken = true
   }
 }
+async function getPermissionsPage() {
+  const res = await editThePermissionsPage()
+  const data = res.data.data || {}
+  data.funPerms = data.funPerms.filter((item) => item.type)
+  data.defaultPerm = data.defaultPerm.filter((item) => item.type)
+  store.state.permissionsPage = data
+  window.localStorage.setItem('permissionsPage', JSON.stringify(data))
+}
 
-export default router;
+export default router

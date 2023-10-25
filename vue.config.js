@@ -1,11 +1,12 @@
+// eslint-disable-next-line
 const path = require('path');
-
+// eslint-disable-next-line
 const resolve = (dir) => path.join(__dirname, dir);
 const isProduction = process.env.NODE_ENV === 'production';
 module.exports = {
   lintOnSave: !isProduction,
   runtimeCompiler: true,
-  outputDir: "dist",
+  outputDir: 'dist',
   // 开发环境显示报错位置 生产环境设置为false减少打包体积
   productionSourceMap: false,
   chainWebpack: (config) => {
@@ -56,7 +57,7 @@ module.exports = {
         ws: true,
         pathRewrite: {
           '^/uaa/': '/uaa/',
-        }
+        },
       },
       '/cpr': {
         target: 'http://192.168.210.57:31602',
