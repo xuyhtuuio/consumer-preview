@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4165130 */
-  src: url('iconfont.woff2?t=1698131889428') format('woff2'),
-       url('iconfont.woff?t=1698131889428') format('woff'),
-       url('iconfont.ttf?t=1698131889428') format('truetype');
+  src: url('iconfont.woff2?t=1698215082039') format('woff2'),
+       url('iconfont.woff?t=1698215082039') format('woff'),
+       url('iconfont.ttf?t=1698215082039') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,18 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-calendar:before {
+  content: "\e66e";
+}
+
+.icon-add-law:before {
+  content: "\e665";
+}
+
+.icon-quanburenwu-gengduocaozuo:before {
+  content: "\e66d";
 }
 
 .icon-law-pdf:before {
@@ -47,10 +59,6 @@
 
 .icon-neibuzhidu:before {
   content: "\e668";
-}
-
-.icon-Frame4:before {
-  content: "\e665";
 }
 
 .icon-fagui:before {

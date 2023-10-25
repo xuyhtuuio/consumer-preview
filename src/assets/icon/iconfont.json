@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "37813355",
+      "name": "calendar",
+      "font_class": "calendar",
+      "unicode": "e66e",
+      "unicode_decimal": 58990
+    },
+    {
+      "icon_id": "37806379",
+      "name": "add-law",
+      "font_class": "add-law",
+      "unicode": "e665",
+      "unicode_decimal": 58981
+    },
+    {
+      "icon_id": "37805891",
+      "name": "更多操作",
+      "font_class": "quanburenwu-gengduocaozuo",
+      "unicode": "e66d",
+      "unicode_decimal": 58989
+    },
+    {
       "icon_id": "37805330",
       "name": "law-pdf",
       "font_class": "law-pdf",
@@ -67,13 +88,6 @@
       "font_class": "neibuzhidu",
       "unicode": "e668",
       "unicode_decimal": 58984
-    },
-    {
-      "icon_id": "37801789",
-      "name": "新增法规",
-      "font_class": "Frame4",
-      "unicode": "e665",
-      "unicode_decimal": 58981
     },
     {
       "icon_id": "37801327",

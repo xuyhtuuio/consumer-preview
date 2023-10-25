@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-25 10:24:48
+ * @LastEditTime: 2023-10-25 14:56:12
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -19,7 +19,7 @@
           <div class="file-info">
             <p class="name">
               {{ item.fileName }}
-              <i class="more iconfont icon-gengduo2"></i>
+              <i class="more iconfont icon-quanburenwu-gengduocaozuo"></i>
             </p>
             <p class="tags">
               <span class="effective">有效</span>
@@ -221,9 +221,7 @@
         <span type="default" @click="dialogVisible = false" class="cancel"
           >取消</span
         >
-        <span type="primary" @click="dialogVisible = false" class="issue"
-          >发布</span
-        >
+        <span type="primary" @click="submit" class="issue">发布</span>
       </span>
     </el-dialog>
   </div>
@@ -235,12 +233,13 @@ export default {
   components: { Filters, fileType },
   data() {
     // eslint-disable-next-line
-    var checkIdInputName = (rule, value, cb) => {
+    var checkIdInputName = (rule, value, callback) => {
       if (!value?.length || value.length > 50) {
         this.validatorForm.nameError = true
-        return cb()
+        return callback()
       } else {
         this.validatorForm.nameError = false
+        callback()
       }
     }
     // eslint-disable-next-line
@@ -250,6 +249,7 @@ export default {
         return cb()
       } else {
         this.validatorForm.unitError = false
+        return cb()
       }
     }
     // eslint-disable-next-line
@@ -259,6 +259,27 @@ export default {
         return cb()
       } else {
         this.validatorForm.documentNumberError = false
+        return cb()
+      }
+    }
+    // eslint-disable-next-line
+    var checkDate = (rule, value, cb) => {
+      if (!value?.length || value.length > 50) {
+        this.validatorForm.dateError = true
+        return cb()
+      } else {
+        this.validatorForm.dateError = false
+        return cb()
+      }
+    }
+    // eslint-disable-next-line
+    var checkFile = (rule, value, cb) => {
+      if ((this.form.uploadFile?.length || 0) < 1) {
+        this.validatorForm.uploadFileError = true
+        return cb()
+      } else {
+        this.validatorForm.uploadFileError = false
+        return cb()
       }
     }
     return {
@@ -289,42 +310,13 @@ export default {
         relatedFile: []
       },
       rules: {
-        name: [
-          {
-            required: true,
-            trigger: ['change']
-          },
-          { validator: checkIdInputName, trigger: ['change'] }
-        ],
+        name: [{ validator: checkIdInputName, trigger: ['change', 'blur'] }],
         documentNumber: [
-          {
-            required: true,
-            trigger: ['change']
-          },
           { validator: checkIdDocumentNumber, trigger: ['change'] }
         ],
-        unit: [
-          {
-            required: true,
-            message: '',
-            trigger: ['change']
-          },
-          { validator: checkIdInputUnit, trigger: ['change'] }
-        ],
-        date: [
-          {
-            required: true,
-            message: '',
-            trigger: ['change']
-          }
-        ],
-        uploadFile: [
-          {
-            required: true,
-            message: '',
-            trigger: ['change']
-          }
-        ]
+        unit: [{ validator: checkIdInputUnit, trigger: ['change'] }],
+        date: [{ validator: checkDate, trigger: ['change'] }],
+        uploadFile: [{ validator: checkFile, trigger: ['change'] }]
       },
       search: {
         pageNow: 1,
@@ -415,7 +407,16 @@ export default {
      * @description: 移除关联附件
      * @return {*}
      */
-    removeRelatedFile() {}
+    removeRelatedFile() {},
+    /**
+     * @description: 提交
+     * @return {*}
+     */
+    submit() {
+      // this.$refs['form'].validate((valid) => {
+      //   if (valid) return
+      // })
+    }
   }
 }
 </script>
@@ -590,6 +591,10 @@ export default {
           }
           .el-input__prefix {
             left: 80%;
+            .el-icon-date::before {
+              font-family: 'iconfont' !important;
+              content: '\e66e';
+            }
           }
         }
       }

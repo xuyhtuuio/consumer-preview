@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:21:09
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-24 15:36:32
+ * @LastEditTime: 2023-10-25 14:36:53
  * @FilePath: /consumer-preview/src/views/rules-base/components/filters.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -26,7 +26,8 @@
         </li>
       </ul>
       <el-button class="new-add" @click="addRule">
-        <i class="icon icon-Frame3"></i>新增</el-button
+        <span class="flex"><i class="iconfont icon-add-law"></i>新增</span>
+        </el-button
       >
     </div>
   </div>
@@ -86,7 +87,17 @@ export default {
     line-height: 22px;
     font-size: 12px;
     color: #fff;
+    display: flex;
+    align-items: center;
+    span {
+      display: flex;
+      align-items: center;
+    }
+    .iconfont {
+      font-size: 22px;
+    }
   }
+
   .sort,
   .column {
     display: flex;
