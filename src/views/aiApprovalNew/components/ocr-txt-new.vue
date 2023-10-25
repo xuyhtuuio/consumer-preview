@@ -400,6 +400,9 @@ export default {
         ? window.getSelection().toString()
         : document.selection.createRange().text
       const node = event.target.parentNode
+      if (!Array.from(event.target.classList).includes('commentNode')) {
+        return;
+      }
       // 区分：点击事件和 鼠标滑动选中事件
       if (selectText) {
         return;
