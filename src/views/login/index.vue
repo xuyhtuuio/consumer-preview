@@ -66,12 +66,11 @@
               </el-form>
               <!-- 服务协议 -->
               <div class="service-agreement-num">
-                <el-checkbox v-model="checked">
-                  <span style="color: rgb(80, 89, 104)">我已阅读并同意</span>
-                  <span class @click="toUserAgreement">用户协议</span>
-                  <span style="color: rgb(80, 89, 104)">和</span>
-                  <span @click="toPrivacypolicy">隐私政策</span>
-                </el-checkbox>
+                <el-checkbox v-model="checked"> </el-checkbox>
+                <span style="color: rgb(80, 89, 104)">我已阅读并同意</span>
+                <span class @click="toUserAgreement">用户协议</span>
+                <span style="color: rgb(80, 89, 104)">和</span>
+                <span @click="toPrivacypolicy">隐私政策</span>
               </div>
               <!-- 下一步 -->
               <el-button type="text" class="next" @click="next"
@@ -151,12 +150,11 @@
                 <span @click="forgetPsw">忘记密码?</span>
               </div>
               <div class="service-agreement-pwd">
-                <el-checkbox v-model="checked">
-                  <span style="color: rgb(80, 89, 104)">我已阅读并同意</span>
-                  <span class @click="toUserAgreement">用户协议</span>
-                  <span style="color: rgb(80, 89, 104)">和</span>
-                  <span @click="toPrivacypolicy">隐私政策</span>
-                </el-checkbox>
+                <el-checkbox v-model="checked"> </el-checkbox>
+                <span style="color: rgb(80, 89, 104)">我已阅读并同意</span>
+                <span class @click="toUserAgreement">用户协议</span>
+                <span style="color: rgb(80, 89, 104)">和</span>
+                <span @click="toPrivacypolicy">隐私政策</span>
               </div>
               <!-- 下一步 -->
               <!-- <p class="no-account">没有账号，去 <span class="register" @click="register">免费注册</span></p> -->
@@ -546,7 +544,7 @@ export default {
       CodeMibleTime: 60,
       activeInput: 0,
       downTime: 5,
-      checked: true,
+      checked: false,
       regainShow: true,
       applyInfo: {},
       appeal: '',
@@ -584,7 +582,8 @@ export default {
       iframeSrc: [],
       iframeType: 'develop',
       gohistory: false,
-      loading: false
+      loading: false,
+      openNew: false
     }
   },
   watch: {
@@ -594,6 +593,13 @@ export default {
       } else {
         window.localStorage.removeItem('trsUserAgree')
       }
+    },
+    rememberPsd(val) {
+      if (val) {
+        window.localStorage.setItem('trsPsw', '1')
+      } else {
+        window.localStorage.removeItem('trsPsw')
+      }
     }
   },
   created() {
@@ -602,7 +608,9 @@ export default {
     const pwd = window.localStorage.getItem('AI_pwd')
     this.crtOp = this.$route.query.type || 'inputPsw'
     const trsUserAgree = window.localStorage.getItem('trsUserAgree')
+    const trsPsw = window.localStorage.getItem('trsPsw')
     this.checked = trsUserAgree === '1'
+    this.rememberPsd = trsPsw === '1'
     this.form.username = userName || ''
     if (pwd) {
       this.form.password = fromCode(pwd) || ''
@@ -649,11 +657,13 @@ export default {
     toPrivacypolicy() {
       const page1 = this.$router.resolve({ name: 'privacy-policy' })
       window.open(page1.href, '_blank')
+      this.openNew = true
     },
     // 用户协议
     toUserAgreement() {
       const page2 = this.$router.resolve({ name: 'user-agreement' })
       window.open(page2.href, '_blank')
+      this.openNew = true
     },
     async next() {
       if (this.activeName === '手机号') {
@@ -830,6 +840,7 @@ export default {
           && routeFrom
           && routeFrom !== 'trs'
         ) {
+          console.log(this.iframeSrc, 'this.iframeSrc')
           // 未到期 & 有权限
           const plat = this.iframeSrc.filter((item) => item.value === routeFrom)
           // 来源为存在平台
