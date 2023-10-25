@@ -184,6 +184,7 @@ export default {
           item.percentage = 100
           item.key = data.key
           item.url = data.url
+          item.child = data.child || null
           setTimeout(() => {
             item.status = 1
           }, 1000)
