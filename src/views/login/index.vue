@@ -983,7 +983,7 @@ export default {
               this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`
             }
           }, 1000)
-        } else if (['超出单日可使用上限'].includes(res.msg)) {
+        } else if (['验证码发送超当日上限'].includes(res.data.msg)) {
           this.regainShow = true
           this.CodeMibleTime = 60
           if (this.crtOp === 'inputPhone') {
@@ -1014,7 +1014,7 @@ export default {
           }, 1000)
         }
       } catch {
-        if (['验证码有效，请勿频繁发送'].includes(res.msg)) {
+        if (['验证码有效，请勿频繁发送'].includes(res.data.msg)) {
           this.CodeMibleTimer = setInterval(() => {
             // eslint-disable-next-line
             if (this.CodeMibleTime <= 0) {
@@ -1090,13 +1090,19 @@ export default {
           },
           msg: false
         })
-        if (res.access_token) {
+        if (res.data.access_token) {
           this.$message.success('登录成功')
           this.sendMessage = {
-            uni__teis_Token: res.access_token,
-            uni__expires_in: res.expires_in
+            uni__teis_Token: res.data.access_token,
+            uni__expires_in: res.data.expires_in
           }
-          // this.checkToken()
+          this.sendMessage.uni__teis_Token
+            && localStorage.setItem('AI_token', this.sendMessage.uni__teis_Token)
+          // 先判断有没有过期
+          this.checkToken()
+          this.$router.push({
+            name: 'homePage'
+          })
         } else {
           return this.$message.error(res.data.error_description)
         }
