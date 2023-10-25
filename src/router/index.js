@@ -42,12 +42,18 @@ const router = new Router({
     {
       path: '/privacy-policy',
       name: 'privacy-policy',
-      component: () => import('@/views/front/privacy-policy')
+      component: () => import('@/views/front/privacy-policy'),
+      meta: {
+        title: '隐私政策'
+      }
     },
     {
       path: '/user-agreement',
       name: 'user-agreement',
-      component: () => import('@/views/front/user-agreement')
+      component: () => import('@/views/front/user-agreement'),
+      meta: {
+        title: '用户协议'
+      }
     },
     // 后台管理
     {
