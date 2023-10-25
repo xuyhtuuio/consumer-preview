@@ -25,7 +25,7 @@ export default {
     return {
       kCardList: [
         {
-          extends: 1,
+          extends: 0,
           canSelected: 1,
           canDeleted: 1
         }

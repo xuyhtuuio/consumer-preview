@@ -57,7 +57,7 @@ export default {
           id: 1,
           isLiked: 1,
           isSelected: 1,
-          extends: 1,
+          extends: 0,
           lowCommentList: [
             {
               canDeleted: 1,
@@ -114,7 +114,7 @@ export default {
           id: 2,
           isLiked: 1,
           isSelected: 1,
-          extends: 1,
+          extends: 0,
           lowCommentList: [
             {
               canDeleted: 1,

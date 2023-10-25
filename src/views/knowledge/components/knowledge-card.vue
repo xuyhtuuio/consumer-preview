@@ -160,7 +160,6 @@ export default {
   },
   data() {
     return {
-      isRended: false,
       colors: [
         ['#E5E6EB', '#86909c'],
         ['#FFF7E6', '#F9CC45'],

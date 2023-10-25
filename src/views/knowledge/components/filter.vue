@@ -89,7 +89,7 @@ export default {
       sortObject: {
         sort1: 'desc',
         sort2: 'desc',
-        sort3: 'aec',
+        sort3: 'asc',
         sort4: false,
       },
       currentSort: 'sort1'
@@ -107,7 +107,7 @@ export default {
     changeSortType(type) {
       if (this.currentSort === type) {
         if (this.sortObject[type] === 'desc') {
-          this.sortObject[type] = 'aec'
+          this.sortObject[type] = 'asc'
         } else {
           this.sortObject[type] = 'desc'
         }

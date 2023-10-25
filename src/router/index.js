@@ -233,8 +233,9 @@ const router = new Router({
     {
       path: '/knowledge',
       name: 'knowledge',
-      component: () => import('@/views/rules-base/index'),
+      component: () => import('@/views/knowledge/index'),
       meta: { title: '知识库', viewport },
+      redirect: '/knowledge/collectKnowledge',
       children: [
         {
           path: '/rules-base',
@@ -243,6 +244,11 @@ const router = new Router({
           meta: { title: '知识库', viewport },
 
         },
+        {
+          path: 'collectKnowledge',
+          name: 'CollectKnowledge',
+          component: () => import('@/views/knowledge/collectKnowledge'),
+        }
       ]
     },
 
