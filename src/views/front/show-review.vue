@@ -1,5 +1,6 @@
 <template>
   <div class="show-review">
+    ewqeqw
     <file-preview :url="url"></file-preview>
   </div>
 </template>

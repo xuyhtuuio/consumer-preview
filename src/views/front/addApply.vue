@@ -20,7 +20,7 @@
           <img src="@/assets/image/noData.png" alt="" />
           <p>抱歉，您暂无可申请的审查事项</p>
         </div>
-        <basic-information class="cnt-item" ref="basicInformationRef" :list="basicInformation" />
+        <basic-information class="cnt-item" ref="basicInformationRef" :list="basicInformation" :limitTime="limitTime"/>
         <publicity-channels class="cnt-item" ref="publicityChannelsRef" :list="promotionChannels" />
         <reconciliation-point
           class="cnt-item"
@@ -64,6 +64,16 @@
     >
       <process-design from="flowManage" ref="processDesign" style="background: #f5f6f6" />
     </w-dialog>
+
+    <secondary-confirmation
+      :option="{
+      message: `当前申请发起时间小于[${showInfoDialogTitle}]最短审批时限要求，判断为加急单，请知悉`,
+      cancelBtn: '返回',
+      confirmBtn: '提交'
+    }"
+      ref="Refconfirmation"
+      @handleConfirm="editStatus"
+    ></secondary-confirmation>
   </div>
 </template>
 
@@ -90,7 +100,7 @@ import ReviewMatters from './components/review-matters';
 import BasicInformation from './components/basic-information';
 import PublicityChannels from './components/publicity-channels';
 import ReconciliationPoint from './components/reconciliation-point';
-import ReviewMaterial from './components/review-material';
+import ReviewMaterial from './components/review-material-1';
 
 export default {
   components: {
@@ -108,6 +118,7 @@ export default {
     cardInfo: '提醒：产品类内容审查，需于在产品上线/宣传前14天进行提交。',
     isLoading: true,
     isCntLoading: false,
+    limitTime: 0, // 限制时间
     isGLoading: false,
     submitDialogVisible: false,
     processDialogVisible: false,
@@ -129,7 +140,9 @@ export default {
     currentRow: null,
     currentRowInfo: '',
     nodeSelectUserList: null,
-    formBasicInfo: {} // 编辑表单时，从路由处获取的基础信息
+    formBasicInfo: {}, // 编辑表单时，从路由处获取的基础信息
+    showInfoDialog: false,
+    showInfoDialogTitle: '',
   }),
   created() {
     this.initialData();
@@ -197,8 +210,10 @@ export default {
       this.reviewMaterials = [];
     },
     // 审查事项类型
-    async handleReviewClick(id) {
+    async handleReviewClick(id, limitTime, title) {
       this.isCntLoading = true;
+      this.limitTime = limitTime
+      this.showInfoDialogTitle = title
       this.clearForm();
       await this.handleAllListprefix(id);
       const { data: result } = await getNextUserOption({ nodeId: 'root', templateId: this.templateId })
@@ -366,57 +381,14 @@ export default {
       result.formItemDataList = formItemDataList;
       if (flag) {
         if (this.submitDialogVisible) return;
-        this.submitDialogVisible = true;
-        const { userId: id, fullname: name } = this.$refs['refAddTag'];
-        const user = JSON.parse(window.localStorage.getItem('user_name'))
-        let res = {};
-        const postData = {
-          submitDto: result,
-          ocessInstanceId: this.formBasicInfo.processInstanceId,
-          taskId: this.formBasicInfo.taskId,
-          templateId: this.templateId,
-          nodeId: this.formBasicInfo.nodeId,
-          currentUserInfo: {
-            id: user.id,
-            name: user.fullname
-          }
-        }
-        if (this.formBasicInfo.submitted === 1) {
-          res = await ocrApprovalSubmission(postData).catch(() => {
-            this.submitDialogVisible = false;
-          });
+        const limitTime = +new Date(result.uptime) - +new Date()
+        const limitTime1 = this.limitTime * 24 * 60 * 60 * 1000
+        if (limitTime < limitTime1) {
+          this.showInfoDialog = true
+          this.$refs.Refconfirmation.dialogVisible = true
+          this.submitResult = result
         } else {
-          const data = this.nodeSelectUserList
-          if (data) {
-            const dataObj = []
-            data.value.forEach(item => dataObj.push({ id: item }))
-            await updateRuleCode({
-              nextNodeId: data.nextNodeId || '',
-              nextUserInfo: dataObj || [],
-              templateId: this.templateId,
-              nodeId: 'root'
-            })
-          }
-          res = await processStart({
-            templateId: this.templateId,
-            processDefinitionId: this.processDefinitionId,
-            startUserInfo: {
-              id,
-              name
-            },
-            submitDto: result
-          }).catch(() => {
-            this.submitDialogVisible = false;
-          });
-        }
-        const { success: sus, msg: message } = res.data;
-        if (sus) {
-          this.submitDialogVisible = false;
-          this.$message({ type: 'success', message: '提交成功' });
-          this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
-        } else {
-          this.$message({ type: 'error', message });
-          this.submitDialogVisible = false;
+          this.submitTrue1(result)
         }
       } else {
         if (this.isGLoading) return;
@@ -428,6 +400,60 @@ export default {
           this.isGLoading = false;
           typeof success === 'function' && success();
         });
+      }
+    },
+    async submitTrue1(result) {
+      this.submitDialogVisible = true;
+      const { userId: id, fullname: name } = this.$refs['refAddTag'];
+      const user = JSON.parse(window.localStorage.getItem('user_name'))
+      let res = {};
+      const postData = {
+        submitDto: result,
+        ocessInstanceId: this.formBasicInfo.processInstanceId,
+        taskId: this.formBasicInfo.taskId,
+        templateId: this.templateId,
+        nodeId: this.formBasicInfo.nodeId,
+        currentUserInfo: {
+          id: user.id,
+          name: user.fullname
+        }
+      }
+      if (this.formBasicInfo.submitted === 1) {
+        res = await ocrApprovalSubmission(postData).catch(() => {
+          this.submitDialogVisible = false;
+        });
+      } else {
+        const data = this.nodeSelectUserList
+        if (data) {
+          const dataObj = []
+          data.value.forEach(item => dataObj.push({ id: item }))
+          await updateRuleCode({
+            nextNodeId: data.nextNodeId || '',
+            nextUserInfo: dataObj || [],
+            templateId: this.templateId,
+            nodeId: 'root'
+          })
+        }
+        res = await processStart({
+          templateId: this.templateId,
+          processDefinitionId: this.processDefinitionId,
+          startUserInfo: {
+            id,
+            name
+          },
+          submitDto: result
+        }).catch(() => {
+          this.submitDialogVisible = false;
+        });
+      }
+      const { success: sus, msg: message } = res.data;
+      if (sus) {
+        this.submitDialogVisible = false;
+        this.$message({ type: 'success', message: '提交成功' });
+        this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
+      } else {
+        this.$message({ type: 'error', message });
+        this.submitDialogVisible = false;
       }
     },
     rollTo(offsetTop) {
@@ -448,6 +474,9 @@ export default {
       if (result2) {
         return this.submitTrue(false, success);
       }
+    },
+    editStatus() {
+      this.submitTrue1(this.submitResult)
     },
     //
     previewFlow() {
