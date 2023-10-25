@@ -848,6 +848,17 @@ export default {
     /deep/ .el-form-item__label{
       color: #1D2128;
     }
+    /deep/ .el-form-item__error {
+      display: inline-flex;
+      align-items: center;
+      &::before {
+        content: url(../../assets/image/ai-approval/error.svg);
+        width: 15px;
+        display: inline-block;
+        margin-right: 2.5px;
+        height: 15px;
+      }
+    }
   }
   .postil-btn-group{
     display: flex;
