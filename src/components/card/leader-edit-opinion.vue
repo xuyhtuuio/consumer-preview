@@ -498,13 +498,13 @@ export default {
       const { taskId, processInstanceId } = data
       this.getEditById(taskId, processInstanceId)
       this.externalData = data
-      this.disavower = data.disavower.map((m) => {
+      this.disavower = data.disavower?.map((m) => {
         return {
           ...m,
           targetNodeId_userId: m.targetNodeId + '-' + m.id
         }
       })
-      this.approver = data.approver.map((m) => {
+      this.approver = data.approver?.map((m) => {
         return {
           ...m,
           approval_targetNodeId_userId: m.targetNodeId + '-' + m.id
