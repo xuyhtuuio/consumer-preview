@@ -2,14 +2,14 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-25 14:56:12
+ * @LastEditTime: 2023-10-25 16:50:21
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
   <div class="laws" v-loading="search.loading">
     <Filters @addRule="addRule"></Filters>
-    <div v-if="list.length">
+    <div v-if="list.length" class="list-content">
       <div class="list" v-for="(item, index) in list" :key="index">
         <div class="cards pointer">
           <fileType
@@ -19,7 +19,25 @@
           <div class="file-info">
             <p class="name">
               {{ item.fileName }}
-              <i class="more iconfont icon-quanburenwu-gengduocaozuo"></i>
+
+              <el-popover
+                placement="bottom"
+                width="108"
+                popper-class="user-edit-popover"
+                trigger="click"
+                content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。"
+                v-model="lawEditPopover"
+              >
+                <ul>
+                  <li @click="editRule">编辑</li>
+                  <li @click="updateRule">更新</li>
+                  <li @click="delRule">删除</li>
+                </ul>
+                <i
+                  class="more iconfont icon-quanburenwu-gengduocaozuo"
+                  slot="reference"
+                ></i>
+              </el-popover>
             </p>
             <p class="tags">
               <span class="effective">有效</span>
@@ -64,6 +82,7 @@
       width="800px"
       center
       custom-class="add-rule"
+      :before-close="closeDialog"
     >
       <el-form label-width="70px" :model="form" :rules="rules" ref="form">
         <el-form-item label="法规名称" prop="name">
@@ -192,6 +211,9 @@
             list-type="picture-card"
             accept=".pdf, .doc, .docx"
             multiple
+            :class="['upload-box', uploadRelatedDisabled]"
+            :on-change="handleRelatedChange"
+            :file-list="form.relatedFile"
           >
             <i slot="default" class="el-icon-plus"></i>
             <div slot="file" slot-scope="{ file }" class="upload-preview">
@@ -218,9 +240,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <span type="default" @click="dialogVisible = false" class="cancel"
-          >取消</span
-        >
+        <span type="default" @click="cancel" class="cancel">取消</span>
         <span type="primary" @click="submit" class="issue">发布</span>
       </span>
     </el-dialog>
@@ -283,7 +303,7 @@ export default {
       }
     }
     return {
-      dialogVisible: true,
+      dialogVisible: false,
       list: [
         {
           fileName: '《中国银行保险监督管理委员会[2021年第8号]》.doc',
@@ -293,6 +313,8 @@ export default {
         }
       ],
       uploadDisabled: '',
+      uploadRelatedDisabled: '',
+      lawEditPopover: false,
       validatorForm: {
         nameError: false,
         unitError: false,
@@ -310,13 +332,27 @@ export default {
         relatedFile: []
       },
       rules: {
-        name: [{ validator: checkIdInputName, trigger: ['change', 'blur'] }],
+        name: [
+          { required: true },
+          { required: true, validator: checkIdInputName, trigger: ['change'] }
+        ],
         documentNumber: [
+          { required: true },
           { validator: checkIdDocumentNumber, trigger: ['change'] }
         ],
-        unit: [{ validator: checkIdInputUnit, trigger: ['change'] }],
-        date: [{ validator: checkDate, trigger: ['change'] }],
-        uploadFile: [{ validator: checkFile, trigger: ['change'] }]
+        unit: [
+          { required: true },
+          { validator: checkIdInputUnit, trigger: ['change'] }
+        ],
+        date: [
+          { required: true },
+
+          { validator: checkDate, trigger: ['change'] }
+        ],
+        uploadFile: [
+          { required: true },
+          { validator: checkFile, trigger: ['change'] }
+        ]
       },
       search: {
         pageNow: 1,
@@ -337,10 +373,11 @@ export default {
     },
     'form.date': function (val) {
       this.validatorForm.dateError = !val
-    },
-    'form.uploadFile': function (val) {
-      this.validatorForm.uploadFileError = !val?.length > 0
     }
+    // 'form.uploadFile': function (val) {
+    //   this.validatorForm.uploadFileError = !val?.length > 0
+    //   console.log('gg3',this.validatorForm)
+    // }
   },
   mounted() {},
   computed: {},
@@ -365,7 +402,18 @@ export default {
      * @return {*}
      */
     addRule() {
+      this.$refs.form.resetFields()
+      this.$refs.form.clearValidate()
+      this.uploadDisabled = ''
+      this.uploadRelatedDisabled = ''
+      const keys = Object.keys(this.validatorForm)
+      for (const i in keys) {
+        this.validatorForm[keys[i]] = false
+      }
       this.dialogVisible = true
+    },
+    closeDialog() {
+      this.cancel()
     },
     /**
      * @description: 上传法律文件
@@ -402,26 +450,98 @@ export default {
      * @description: 上传关联附件
      * @return {*}
      */
-    uploadRelatedFile() {},
+    uploadRelatedFile() {
+      if (this.form.relatedFile.length >= 8) {
+        this.uploadRelatedDisabled = 'disabled'
+      }
+    },
+    /**
+     * @description: 关联附件change
+     * @return {*}
+     */
+    handleRelatedChange(file, fileList) {
+      this.form.relatedFile = fileList
+    },
     /**
      * @description: 移除关联附件
      * @return {*}
      */
-    removeRelatedFile() {},
+    removeRelatedFile(file) {
+      const index = this.form.relatedFile.findIndex((m) => m.uid === file.uid)
+      this.form.relatedFile.splice(index, 1)
+      this.uploadRelatedDisabled = ''
+    },
+    /**
+     * @description: 取消
+     * @return {*}
+     */
+    cancel() {
+      this.$refs.form.resetFields()
+      this.$refs.form.clearValidate()
+      this.uploadDisabled = ''
+      this.uploadRelatedDisabled = ''
+      const keys = Object.keys(this.validatorForm)
+      for (const i in keys) {
+        this.validatorForm[keys[i]] = false
+      }
+      this.dialogVisible = false
+    },
+    /**
+     * @description: 校验必填项
+     * @return {*}
+     */
+    checkMustValue() {
+      this.validatorForm.nameError = !this.form.name?.length > 0 || this.form.name?.length > 50
+      this.validatorForm.unitError = !this.form.unit?.length > 0 || this.form.unit?.length > 50
+      this.validatorForm.documentNumberError = !this.form.documentNumber?.length > 0 || this.form.documentNumber?.length > 50
+      this.validatorForm.dateError = !this.form.date?.length
+      this.validatorForm.uploadFileError = !this.form.uploadFile?.length
+    },
     /**
      * @description: 提交
      * @return {*}
      */
     submit() {
-      // this.$refs['form'].validate((valid) => {
-      //   if (valid) return
-      // })
+      this.$refs.form.validate(() => {
+        this.checkMustValue()
+        // if (valid) {}
+      })
+    },
+    /**
+     * @description: 编辑法律
+     * @return {*}
+     */
+    editRule() {
+      this.lawEditPopover = false
+    },
+    /**
+     * @description: 更新法律
+     * @return {*}
+     */
+    updateRule() {
+      this.lawEditPopover = false
+    },
+    /**
+     * @description: 删除法规
+     * @return {*}
+     */
+    delRule() {
+      this.lawEditPopover = false
+      this.$confirm('一旦删除该法规内容不可恢复，请确认是否删除', '', {
+        customClass: 'confirmBox',
+        confirmButtonText: '取消',
+        cancelButtonText: '删除',
+        type: 'warning'
+      }).then(() => {})
     }
   }
 }
 </script>
 <style scoped lang="less">
 .laws {
+.list-content{
+  margin-top: 20px;
+}
   .list {
     .cards {
       padding: 20px 16px;
@@ -673,3 +793,29 @@ export default {
   }
 }
 </style>
+<style lang="less">
+.user-edit-popover {
+  width: 108px;
+  min-width: 108px;
+  padding: 12px 8px;
+  border-radius: 6px;
+  background: #fff;
+
+  /* 阴影/大 */
+  box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.1);
+  ul li {
+    text-align: center;
+
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+    color: #1d2128;
+    height: 34px;
+    line-height: 34px;
+    cursor: pointer;
+  }
+  ul li:hover {
+    background: #f7f8fa;
+  }
+}</style>

@@ -2,12 +2,13 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-23 21:17:11
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-24 15:25:29
+ * @LastEditTime: 2023-10-25 16:49:05
  * @FilePath: /consumer-preview/src/views/rules-base/index.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
   <div class="rules-base">
+    <el-input v-model="keyword" class="keyword-input"></el-input>
     <ul class="left-menu">
       <li
         v-for="(item, index) in menu"
@@ -22,7 +23,9 @@
         <i
           :class="[
             'iconfont',
-            item.id == activeMenuId ? `${item.activeIcon} active-icon`: item.icon
+            item.id == activeMenuId
+              ? `${item.activeIcon} active-icon`
+              : item.icon
           ]"
         ></i>
         {{ item.name }}
@@ -48,6 +51,7 @@ export default {
     return {
       activeMenuId: 0,
       component: 'laws',
+      keyword: '',
       menu: [
         {
           name: '法律法规',
@@ -78,12 +82,28 @@ export default {
 <style lang="less" scoped>
 .rules-base {
   display: flex;
+  height: calc(100% - 58px);
+  position: relative;
+  .keyword-input {
+    position: absolute;
+    width: 376px;
+    top: -51px;
+    right: 0;
+    height: 28px;
+    /deep/ .el-input__inner {
+      height: 28px;
+      border-radius: 4px;
+      border: 1px solid #e5e6eb;
+      background: #f7f8fa;
+    }
+  }
   .left-menu {
     width: 200px;
     padding: 8px 12px;
     border-radius: 10px;
     background: #fff;
     margin-right: 8px;
+    height: calc(100% - 58px);
     li {
       padding: 8px 12px;
       margin-bottom: 8px;
@@ -98,10 +118,10 @@ export default {
       font-size: 20px;
       line-height: 22px;
       margin-right: 12px;
-      color: #ACB1B9;
+      color: #acb1b9;
     }
-    .active-icon{
-      color: #2D5CF6;
+    .active-icon {
+      color: #2d5cf6;
     }
     .active-menu {
       border-radius: 8px;

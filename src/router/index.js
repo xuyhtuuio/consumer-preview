@@ -238,15 +238,15 @@ const router = new Router({
       redirect: '/knowledge/collectKnowledge',
       children: [
         {
-          path: '/rules-base',
-          name: 'rules-base',
+          path: 'rulesBase',
+          name: 'RulesBase',
           component: () => import('@/views/rules-base/index'),
-          meta: { title: '知识库', viewport },
-
+          meta: { title: '法规库', viewport },
         },
         {
           path: 'collectKnowledge',
           name: 'CollectKnowledge',
+          meta: { title: '法规库', viewport },
           component: () => import('@/views/knowledge/collectKnowledge'),
         }
       ]
