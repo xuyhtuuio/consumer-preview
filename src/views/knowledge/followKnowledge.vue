@@ -28,10 +28,11 @@
       </div>
     </div>
     <template v-if="active === '知识'">
-      <FilterKnowledge style="margin-top: 0; border-top-left-radius: 0; border-top-right-radius: 0;"/>
-      <div v-for="(k, i) in kCardList" :key="i">
+      <FilterKnowledge v-loading="loadingList" :total="page.total" @changeSort="changeSort" @changeTags="changeCheckedTags"  style="margin-top: 0; border-top-left-radius: 0; border-top-right-radius: 0;"/>
+      <div v-for="(k, i) in kCardList" :key="i" v-loading="loadingList">
         <KnowledgeCard :data="k"/>
       </div>
+      <el-empty description="暂无数据" v-if="kCardList.length === 0 && loadingList === false"></el-empty>
     </template>
     <template v-else>
       <TagList @toTagDetail="toTagDetail"/>
@@ -42,6 +43,7 @@
   </div>
 </template>
 <script>
+import { getRecommendList } from '@/api/knowledge/knowledgeCollect'
 import FilterKnowledge from './components/filter'
 import KnowledgeCard from './components/knowledge-card'
 import TagList from './components/tag-list'
@@ -54,30 +56,80 @@ export default {
   },
   data() {
     return {
+      loadingList: false,
       active: '知识',
-      kCardList: [
-        {
-          extends: 0,
-          canSelected: 1,
-          canDeleted: 1
-        }
-      ],
+      kCardList: [],
       page: {
         pageNow: 1,
-        total: 10
+        total: 0
       },
       showTagDetail: false,
-      currentTag: {}
+      currentTag: {},
+      paramsDefalut: {
+        keyword: '',
+        justSelected: 0,
+        listType: 2,
+        orderType: 'desc',
+        orderValue: 1,
+        pageNum: 1,
+        pageSize: 10,
+        tagIds: []
+      }
     }
   },
+  created() {
+    this.getRecommendList(this.paramsDefalut)
+  },
   methods: {
+    async getRecommendList(data) {
+      this.loadingList = true
+      const res = await getRecommendList(data)
+      if (res.data.success) {
+        this.kCardList = (res.data.data.list || []).map(item => {
+          item.extends = 0
+          return item;
+        })
+        this.page.total = res.data.data.totalCount
+      } else {
+        this.kCardList = []
+        this.page.total = 0
+      }
+      this.loadingList = false
+    },
+    changeSort(params) {
+      this.page.total = 0
+      this.paramsDefalut = {
+        ...this.paramsDefalut,
+        ...params
+      }
+      this.getRecommendList({
+        ...this.paramsDefalut,
+      })
+    },
+    changeCheckedTags(tagIds) {
+      this.paramsDefalut = {
+        ...this.paramsDefalut,
+        tagIds,
+      }
+      this.getRecommendList({
+        ...this.paramsDefalut
+      })
+    },
     handleCurrentChange(val) {
       this.page.pageNow = val
+      this.getRecommendList({
+        ...this.paramsDefalut,
+        pageNum: val
+      })
     },
     changeTab(val) {
+      this.paramsDefalut = this.$options.data().paramsDefalut
       if (val !== this.active) {
         this.page.pageNow = 1
         this.active = val
+      }
+      if (val === '知识') {
+        this.getRecommendList(this.paramsDefalut)
       }
     },
     toTagDetail(tag) {

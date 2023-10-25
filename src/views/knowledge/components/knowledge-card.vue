@@ -1,12 +1,12 @@
 <template>
   <div class="kCard">
     <div class="card">
-      <div class="avatar" :style="getStyle()">wx</div>
+      <div class="avatar" :style="getStyle()">{{ data.pinYinHeader }}</div>
       <div class="content">
         <div class="title">
-          <img src="@/assets/image/knowledge/精选.svg" style="margin-right:4px;"/>
-          <b class="title-tag">反</b>
-          <b class="title-text">这里是标题这里是标题，这里是标题这里是标题这里是标题这里是标题这里是标题，这里是标题这里是标题这里是标题这里是标题这里是标题，这里是标题这里是标题这里是标题</b>
+          <img v-if="data.isSelected" src="@/assets/image/knowledge/精选.svg" style="margin-right:4px;"/>
+          <b class="title-tag" :class="{ green: data.type === 1 }" v-if="data.type > 0">{{ data.type === 1 ? '正' : '反' }}</b>
+          <b class="title-text">{{ data.title }}</b>
           <el-popover
             placement="bottom-start"
             :width="100"
@@ -23,11 +23,10 @@
           </el-popover>
         </div>
         <div class="desc ellipsis ellipsis_2">
-          关于兴业银行侵害消费者权益情况的通报：近日，中国银保监会消费者权益保护局发布2021年第12号通报《关于兴业银行侵害消费者权益情况的通情的情况的
-          近日，中国银保监会消费者权益保护局发布2021年第12号但是，关于兴业银行侵害但是，关于兴业银行侵害消费者权益情况的通报。关于兴业银行侵害但是，关于兴业银行侵害消费者权益情况的通报
+          {{ data.content }}
         </div>
 
-        <template v-for="(tag, index) in tags">
+        <template v-for="(tag, index) in data.tags">
           <el-popover
             placement="bottom-start"
             :width="260"
@@ -40,15 +39,15 @@
               <div class="info">
                 <div class="left">
                   <p class="title">讨论量</p>
-                  <p class="num">41567</p>
+                  <p class="num">{{ tag.discussNum }}</p>
                 </div>
                 <div class="middle">
                   <p class="title">精选量</p>
-                  <p class="num">467</p>
+                  <p class="num">{{ tag.selectedNum }}</p>
                 </div>
                 <div class="middle">
                   <p class="title">关注量</p>
-                  <p class="num">567</p>
+                  <p class="num">{{ tag.attentionCount }}</p>
                 </div>
               </div>
               <div style="text-align:center;margin:16px;">
@@ -66,13 +65,13 @@
 
         <div class="meta-info">
           <div class="meta-left">
-            <span class="time">08:23</span>来自:
-            <span class="dept">消费者权益保护(客户服务)中心</span>
+            <span class="time">{{ data.releaseTime }}</span>来自:
+            <span class="dept">{{ data.orgName }}</span>
           </div>
           <div class="meta-right">
-            <span class="item" v-if="data.canSelected > 0" @click="handleCollect(data)">
-              <img v-if="data.isSelected > 0" src="@/assets/image/knowledge/精选1.svg" />
-              <img v-else src="@/assets/image/knowledge/精选.svg" />
+            <span class="item" v-if="data.canSelected > 0" @click="handleSelected(data)">
+              <img v-if="data.isSelected > 0" src="@/assets/image/knowledge/精选.svg" />
+              <img v-else src="@/assets/image/knowledge/精选1.svg" />
               <span>{{ data.isSelected > 0 ? '取消' : '精选' }}</span>
             </span>
             <span class="item" v-if="data.canDeleted > 0">
@@ -81,12 +80,12 @@
             <span class="item" @click="handleZan">
               <img v-if="data.isLiked > 0" src="@/assets/image/knowledge/赞1.svg" />
               <img v-else src="@/assets/image/knowledge/赞.svg" />
-              <span>123</span>
+              <span>{{ data.upvoteCount }}</span>
             </span>
             <span class="item" @click="openComment">
               <img v-if="data.extends > 0" src="@/assets/image/knowledge/评论1.svg" />
               <img v-else src="@/assets/image/knowledge/评论.svg" />
-              <span>{{ data.extends > 0 ? '收起评论' : '23条评论' }}</span>
+              <span>{{ data.extends > 0 ? '收起评论' : `${data.commentCount}条评论` }}</span>
             </span>
             <el-popover
               placement="bottom-start"
@@ -119,7 +118,7 @@
           </div>
         </div>
         <div class="picture">
-          <span v-for="(item) in fileList" :key="item.key">
+          <span v-for="(item) in data.fileList" :key="item.key">
             <el-popover
             placement="bottom-start"
             :width="260"
@@ -167,7 +166,6 @@ export default {
         ['#F9F0FF', '#B37FEB'],
         ['#E6FFFB', '#5EDFD6'],
       ],
-      tags: ['#安抚', '#阿尔冯', '#阿尔法威锋网人个人'],
       tagConfig: {
         background: '#f0f6ff',
         color: '#2d5cf6',
@@ -176,18 +174,6 @@ export default {
         closable: false,
         size: 'mini'
       },
-      fileList: [
-        {
-          url: 'http://192.168.210.51:9090/cpr/cpr_1698044630677_监管转来投诉数据-演示用.pdf',
-          key: 'cpr_1698044630677_监管转来投诉数据-演示用.pdf',
-          fileName: '监管转来投诉数据-演示用.pdf'
-        },
-        {
-          url: 'http://192.168.210.51:9090/cpr/cpr_1698044651461_1.jpg',
-          key: 'cpr_1698044651461_1.jpg',
-          fileName: '1.jpg'
-        }
-      ],
       index: Math.floor(Math.random() * 5),
     }
   },
@@ -225,6 +211,14 @@ export default {
       }
       this.data.extends = 1;
       this.$set(this.data, 'extends', 1)
+    },
+    handleSelected() {
+      if (this.data.isSelected) {
+        this.data.isSelected = 0;
+        return;
+      }
+      this.data.isSelected = 1;
+      this.$set(this.data, 'isSelected', 1)
     },
     handleCollect() {
       if (this.data.isAttention) {
@@ -296,6 +290,9 @@ export default {
         background: #EB5757;
         border-radius: 2px;
       }
+      .green {
+        background: #14C9C9;
+      }
       &-menu {
         display: inline;
         position: absolute;
@@ -311,6 +308,7 @@ export default {
     justify-content: space-between;
     color: #86909C;
     font-weight: 400;
+    margin-top: 10px;
     .time {
       margin-right: 6px;
     }

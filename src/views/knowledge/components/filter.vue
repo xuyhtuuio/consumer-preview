@@ -3,7 +3,7 @@
     <div class="main">
       <span class="total">
         共
-        <span class="num">32045</span>
+        <span class="num">{{ total }}</span>
         条
       </span>
       <el-popover
@@ -14,12 +14,12 @@
         <div class="content">
           <el-input v-model.trim="serach" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
           <div style="position: relative; top: 12px;font-size: 12px;">
-            <el-switch v-model="isFollow" size="mini" style="position: relative; bottom: 2px;"></el-switch>
+            <el-switch v-model="justCare" @change="changeJustCare" size="mini" style="position: relative; bottom: 2px;"></el-switch>
             仅看我关注的
           </div>
-          <ul class="tags-list trs-scroll">
-            <li class="tag-li pointer" v-for="(tag, index) in tagsList" :class="{ active: checkedTags.includes(tag) }" :key="index" @click="changeCheckedTags(tag)">
-              <span class="tag-text ellipsis">#{{ tag }}</span>
+          <ul class="tags-list trs-scroll" v-loading="loadingTag">
+            <li class="tag-li pointer" v-for="(tag, index) in tagsList" :class="{ active: checkedTags.includes(tag.id) }" :key="index" @click="changeCheckedTags(tag.id)">
+              <span class="tag-text ellipsis">#{{ tag.name }}</span>
             </li>
           </ul>
           <el-empty v-if="serach && tagsList.length === 0" description="暂无数据"></el-empty>
@@ -30,7 +30,7 @@
             <img v-if="!checkedTags.length" src="@/assets/image/person-center/down.png" style="width: 10px;"/>
             <template v-else>
               <span class="num">{{ checkedTags.length }}</span>
-              <i class="el-icon-error" @click="checkedTags = []"></i>
+              <i class="el-icon-error" @click="deleteTags"></i>
             </template>
           </span>
         </template>
@@ -49,7 +49,7 @@
           <i :class="sortObject.sort3 === 'desc' ? 'el-icon-bottom' : 'el-icon-top'"></i>
         </span>
         <span class="sort4">
-          <el-switch v-model="sortObject.sort4" size="mini" style="position: relative; bottom: 2px;"></el-switch>
+          <el-switch v-model="sortObject.justSelected" @change="changeJustSelected" size="mini" style="position: relative; bottom: 2px;"></el-switch>
           仅看精选
         </span>
       </span>
@@ -57,52 +57,65 @@
   </div>
 </template>
 <script>
+import { getTagInfoList } from '@/api/knowledge/knowledgeCollect'
 export default {
   name: 'knowledge-filter',
+  props: {
+    total: {
+      type: Number
+    }
+  },
   data() {
     return {
+      loadingTag: false,
       serach: '',
-      tagsList: [
-        '案',
-        'afws wefwef文',
-        'wefwae问的人违反文档威风威风为',
-        '阿尔法违法未',
-        '案范围分为1',
-        'afws wefwef文1',
-        'wefwae问的人违反',
-        '阿尔法违法未1',
-        '案范围分为2',
-        'afws wefwef文2',
-        'wefwae问的人违反2',
-        '阿尔法违法未2',
-        '案范围分为3',
-        'afws wefwef文3',
-        'wefwae问的人违反3',
-        '阿尔法违法未3',
-        '案范围分为4',
-        'afws wefwef文4',
-        'wefwae问的人违反4',
-        '阿尔法违法未4'
-      ],
+      tagsList: [],
       checkedTags: [],
-      isFollow: false, // 仅看我关注的
+      justCare: false, // 仅看我关注的
       sortObject: {
         sort1: 'desc',
         sort2: 'desc',
         sort3: 'asc',
-        sort4: false,
+        justSelected: false,
       },
       currentSort: 'sort1'
     }
   },
+  created() {
+    this.getTagInfoList({
+      justCare: 0,
+      keyword: ''
+    })
+  },
   methods: {
-    changeCheckedTags(tag) {
-      const index = this.checkedTags.findIndex(item => item === tag);
+    async getTagInfoList(data) {
+      this.loadingTag = true
+      const res = await getTagInfoList(data)
+      if (res.data.success) {
+        this.tagsList = res.data.data
+      } else {
+        this.tagsList = []
+      }
+      this.loadingTag = false
+    },
+    changeJustCare() {
+      this.getTagInfoList({
+        justCare: this.justCare ? 1 : 0,
+        keyword: this.serach
+      })
+    },
+    changeCheckedTags(tagId) {
+      const index = this.checkedTags.findIndex(item => item === tagId);
       if (index === -1) {
-        this.checkedTags.push(tag)
+        this.checkedTags.push(tagId)
       } else {
         this.checkedTags.splice(index, 1)
       }
+      this.$emit('changeTags', JSON.parse(JSON.stringify(this.checkedTags)))
+    },
+    deleteTags() {
+      this.checkedTags = []
+      this.$emit('changeTags', [])
     },
     changeSortType(type) {
       if (this.currentSort === type) {
@@ -114,6 +127,18 @@ export default {
       } else {
         this.currentSort = type
       }
+      this.$emit('changeSort', {
+        orderValue: +type.slice(-1),
+        orderType: this.sortObject[type],
+        justSelected: this.sortObject.justSelected ? 1 : 0
+      })
+    },
+    changeJustSelected() {
+      this.$emit('changeSort', {
+        orderValue: +this.currentSort.slice(-1),
+        orderType: this.sortObject[this.currentSort],
+        justSelected: this.sortObject.justSelected ? 1 : 0
+      })
     }
   }
 }
