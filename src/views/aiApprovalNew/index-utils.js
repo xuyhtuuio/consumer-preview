@@ -663,7 +663,7 @@ export default {
             if (recommend.selected) {
               const selected = recommend.list.filter(a => a.id === recommend.selected);
               const isRepeat = file.comments?.filter(f => f.id === selected?.[0].id)
-              if (!isRepeat) {
+              if (!isRepeat?.length) {
                 arr.push({
                   id: selected?.[0].id,
                   str: selected?.[0].str,
