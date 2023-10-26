@@ -505,6 +505,7 @@ export default {
       if (this.files?.[this.activeIndex].type === 'pdf') {
         this.pdfInfo.pageNow = 1
         this.changePdfPageNow(1)
+        return;
       } else if (!temp.ocr && !temp.recommends && suffer) {
         temp.ocr = await this.getOcr(temp);
         await getOcrExamineShow({
@@ -521,8 +522,8 @@ export default {
           .catch(() => {
             temp.recommends = [];
           });
-        this.approval = temp;
       }
+      console.log(temp)
       // 更新图标
       const curFileType = this.getfileType(this.files[this.activeIndex].fileName)
       this.$nextTick(() => {
@@ -531,6 +532,7 @@ export default {
           this.lisScroll()
         }
       })
+      this.approval = temp;
       this.fileloading = false;
       this.filePopoverShow = false
     },
