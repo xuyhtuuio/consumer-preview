@@ -91,13 +91,14 @@
             </div>
           </div>
           <div class="content-cont-body-bottom">
-            <fileChange :curMode="curMode" @toggleMode="toggleMode" @changeFile="changeFile" :activeIndex="activeIndex" :fileList="files" v-if="curMode !== 0"></fileChange>
+            <fileChange :curMode="curMode" @toggleMode="toggleMode" @changeFile="changeFile" :activeIndex="activeIndex" :fileList="files" v-if="curMode !== 0 && files[activeIndex]?.type !== 'pdf'"></fileChange>
+            <pdfChange @changePdfPageNow="changePdfPageNow" @changePdfPage="changePdfPage" :pdfPageSize="pdfInfo.pageSize" :pdfPageNow="pdfInfo.pageNow" :pdfTotalPage="pdfInfo.pdfTotalPage" :activeIndex="activePdfIndex" :fileList="pdfInfo.list" v-if="files[activeIndex]?.type === 'pdf'"></pdfChange>
             <file-preview ref="filePreview" :files="files" :formId="formId" :activeIndex="activeIndex" v-if="curMode !== 2"
               @changeFile="changeFile" :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"
               @getProps="getProps" @findIconPosition="findIconPosition"></file-preview>
             <orcTxtNew ref="ocrTxt" :approval="approval" @addWord="addWord"
               @lineRemove="lineRemove" @checkEdit="checkEdit"
-              v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode !== 1"
+              v-if="specialFileType.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode !== 1"
               @showLine="showLine" @showOcrCommentLine="showOcrCommentLine" :lineWordItem="lineWordItem" :styleProp="styleProp" @hasBg="hasBg">
             </orcTxtNew>
             <el-popover ref="postilPopover" class="postil-popover" v-model="popoverShow" popper-class="postil-popover" placement="right"
@@ -143,10 +144,10 @@
                 <span class="postil-btn verify" @click="addCommentWithPosition">确认</span>
               </div>
             </el-popover>
-            <orcTxt ref="ocrTxt" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
+            <!-- <orcTxt ref="ocrTxt" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
               v-if="specialFileType2.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode !== 1"
               @showLine="showLine" :lineWordItem="lineWordItem">
-            </orcTxt>
+            </orcTxt> -->
             <p class="content-cont-icons" v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr">
               <span class="icons">
                 <span v-for="(item,index) in icons" :style="{ position: 'absolute', top: (item.iconTop) + 'px' }" :key="index" @click="showIconLine(item)">
@@ -216,17 +217,19 @@ import rejectDialog from './dialogs/reject-dialog';
 
 import sidebar from './sidebar/sidebar';
 import filePreview from './components/file-preview';
-import orcTxt from './components/ocr-txt';
+// import orcTxt from './components/ocr-txt';
 import orcTxtNew from './components/ocr-txt-new';
 import ExaminePivot from './components/examine-pivot';
 import editorial from './components/editorial';
 import fileChange from './components/file-change'
+import pdfChange from './components/pdf-change'
 
 import utils from './index-utils'
 export default {
   name: 'aiApprovalNew',
   mixins: [utils],
   components: {
+    pdfChange,
     sidebar,
     TurnDialog,
     addReview,
@@ -238,7 +241,7 @@ export default {
     filePreview,
     ExaminePivot,
     orcTxtNew,
-    orcTxt,
+    // orcTxt,
     editorial,
     fileType,
   },
@@ -247,6 +250,11 @@ export default {
       filePopoverShow: false,
       isRel: false,
       preComment: {},
+      activePdfIndex: 0,
+      pdfInfo: {
+        pageSize: 10,
+        pageNow: 1,
+      },
       keywordsInfo: {
         content: '',
         type: ''
@@ -615,6 +623,10 @@ export default {
       >.file-change{
         flex: none !important;
         width: 60px;
+      }
+      >.pdf-change{
+        flex: none !important;
+        width: 116px;
       }
       >.file-preview{
         flex: 1;

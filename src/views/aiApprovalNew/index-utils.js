@@ -11,6 +11,7 @@ import {
   rollback,
   getNodeHandleUser,
   updateRuleCode,
+  getPdfPage
 } from '@/api/aiApproval';
 import { downloadAllFiles } from '@/api/applyCenter'
 import { getApplyForm } from '@/api/front';
@@ -462,7 +463,11 @@ export default {
       // 更新对应文件的ocr和推荐意见
       const temp = this.files[i];
       const suffer = ['jpeg', 'jpg', 'png', 'pdf'].includes(temp?.fileName?.split('.')[temp?.fileName?.split('.').length - 1]);
-      if (!temp.ocr && !temp.recommends && suffer) {
+      // 当前文件为 pdf 处理
+      if (this.files?.[this.activeIndex].type === 'pdf') {
+        this.pdfInfo.pageNow = 1
+        this.changePdfPageNow(1)
+      } else if (!temp.ocr && !temp.recommends && suffer) {
         temp.ocr = await this.getOcr(temp);
         await getOcrExamineShow({
           formId: this.formId,
@@ -478,6 +483,7 @@ export default {
           .catch(() => {
             temp.recommends = [];
           });
+        this.approval = temp;
       }
       // 更新图标
       const curFileType = this.getfileType(this.files[this.activeIndex].fileName)
@@ -487,7 +493,6 @@ export default {
           this.lisScroll()
         }
       })
-      this.approval = temp;
       this.fileloading = false;
       this.filePopoverShow = false
     },
@@ -498,6 +503,10 @@ export default {
       }).then(res => {
         const { data, status } = res.data;
         if (status === 200) {
+          if (Array.isArray(data.results)) {
+            ocr.push(...data.results);
+            return;
+          }
           for (const key in data.results) {
             ocr.push(...data.results[key]);
           }
@@ -1018,7 +1027,6 @@ export default {
           })
         }
       })
-      console.log(this.comments, this.icons)
     },
     // 展示 icon 的连线
     showIconLine(icon) {
@@ -1162,6 +1170,86 @@ export default {
     changeRel(boolean) {
       this.isRel = boolean
       this.popoverShow = false
+    },
+    // pdf 相关操作处理
+    // pdf 切换页码
+    async changePdfPage(i) {
+      console.log('当前index', i)
+      this.fileloading = true;
+      this.filePopoverShow = true;
+      this.activePdfIndex = i
+      const temp = this.files[this.activeIndex].child[this.activePdfIndex]
+      if (!temp.ocr) {
+        temp.ocr = await this.getOcr(temp);
+      }
+      if (!temp.recommends) {
+        const { data } = await getOcrExamineShow({
+          formId: this.formId,
+          fileId: temp.id,
+          processInstanceId: this.formBase.processInstanceId
+        })
+        const ocrRes = data.data;
+        if (data.status === 200) {
+          temp.recommends = ocrRes.recommends || [];
+        } else {
+          temp.recommends = []
+        }
+      }
+      this.approval = temp;
+      this.fileloading = false;
+      this.filePopoverShow = false;
+    },
+    async changePdfPageNow(pageNow) {
+      console.log('当前页数', pageNow)
+      this.fileloading = true;
+      this.filePopoverShow = true;
+      const params = {
+        formId: this.formId,
+        key: this.files?.[this.activeIndex].key,
+        pageNow: pageNow || this.pdfInfo.pageNow,
+        pageSize: this.pdfInfo.pageSize,
+      }
+      const pdfRes = await getPdfPage(params)
+      const { data } = pdfRes.data
+      if (data) {
+        this.pdfInfo.pageNow = pageNow
+        this.pdfInfo.pdfTotal = data.totalCount
+        this.pdfInfo.pdfTotalPage = data.totalPage
+        const { list } = data
+        this.pdfInfo.list = list?.map((pdf) => {
+          pdf.id = pdf.key
+          return pdf
+        })
+        // 当前为第一页
+        if (!this.files[this.activeIndex].child) {
+          this.files[this.activeIndex].child = this.pdfInfo.list
+          // 不是第一页
+        } else {
+          this.files[this.activeIndex].child.push(...this.pdfInfo.list)
+        }
+        this.activePdfIndex = 0 + this.pdfInfo.pageSize * (pageNow - 1)
+        this.pdfInfo.list = this.files[this.activeIndex].child.slice(this.activePdfIndex, this.activePdfIndex + 10)
+        const temp = this.files[this.activeIndex].child[this.activePdfIndex]
+        if (!temp.ocr) {
+          temp.ocr = await this.getOcr(temp);
+        }
+        if (!temp.recommends) {
+          const ocrERes = await getOcrExamineShow({
+            formId: this.formId,
+            fileId: temp.id,
+            processInstanceId: this.formBase.processInstanceId
+          })
+          const ocrRes = ocrERes.data.data;
+          if (ocrERes.data.status === 200) {
+            temp.recommends = ocrRes.recommends || [];
+          } else {
+            temp.recommends = []
+          }
+        }
+        this.approval = temp
+        this.fileloading = false;
+        this.filePopoverShow = false;
+      }
     }
   },
 };

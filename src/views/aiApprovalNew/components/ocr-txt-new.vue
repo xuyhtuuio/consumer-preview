@@ -190,11 +190,9 @@ export default {
     },
     // 标记命中关键词(敏感词,禁用词)
     getInitContent(approval) {
-      // console.log(approval)
       const html = []
       // 遍历接口返回的 ocr 结果
       approval?.ocr?.forEach((ocr, j) => {
-        // console.log(ocr)
         const { text, location } = ocr
         let newOcr = [{ text }]
         // 遍历推荐意见 获取关键字、关键字类型

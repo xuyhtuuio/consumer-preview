@@ -183,7 +183,7 @@ export default {
       handler(val) {
         this.init(val)
       },
-      // deep: true
+      deep: true
     },
     showOcr(val) {
       if (val === false && this.showRecommend) {
