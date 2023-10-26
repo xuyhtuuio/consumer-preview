@@ -840,7 +840,6 @@ export default {
           && routeFrom
           && routeFrom !== 'trs'
         ) {
-          console.log(this.iframeSrc, 'this.iframeSrc')
           // 未到期 & 有权限
           const plat = this.iframeSrc.filter((item) => item.value === routeFrom)
           // 来源为存在平台
@@ -913,7 +912,7 @@ export default {
         res = await this.$http({
           method: 'post',
           contentType: 'application/x-www-form-urlencoded',
-          url: this.$GLOBAL.cpr + 'validCodeSms',
+          url: this.$GLOBAL.uaa + 'validCodeSms',
           data
         })
         if (res.status === 200) {
@@ -1101,7 +1100,6 @@ export default {
           },
           msg: false
         })
-        console.log(res)
         if (res.data.access_token) {
           this.$message.success('登录成功')
           this.sendMessage = {

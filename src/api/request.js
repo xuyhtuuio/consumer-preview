@@ -9,7 +9,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 
 Vue.prototype.$axios = axios;
 // 字体图标
-const noToken = ['uaa/oauth/token', 'uaa/captcha', 'uaa/loginByPwd', 'uaa/validCodeSms', 'cpr/user/getToken'];
+const noToken = ['uaa/oauth/token', 'uaa/captcha', 'uaa/loginByPwd', 'uaa/validCodeSms', 'cpr/user/getToken', '/uaa/validCodeSms'];
 let newPage = false;
 const service = axios.create({
   baseURL: process.env.BASE_API,
@@ -23,6 +23,7 @@ service.interceptors.request.use(
     const {
       url,
     } = config;
+    console.log(url)
     // config.headers.Cookie = document.cookie
     if (
       config.contentType === 'application/x-www-form-urlencoded;charset=utf-8'
