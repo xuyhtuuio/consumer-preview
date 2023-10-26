@@ -2,13 +2,13 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-25 16:50:21
+ * @LastEditTime: 2023-10-26 13:51:22
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
   <div class="laws" v-loading="search.loading">
-    <Filters @addRule="addRule"></Filters>
+    <Filters @addRule="addRule" @sortChange="sortChange"></Filters>
     <div v-if="list.length" class="list-content">
       <div class="list" v-for="(item, index) in list" :key="index">
         <div class="cards pointer">
@@ -77,14 +77,25 @@
     </div>
     <Empty v-else v-loading="search.loading" class="list"></Empty>
     <el-dialog
-      title="新增法规"
+      :title="dialogTitle[crtBehavior]"
       :visible.sync="dialogVisible"
       width="800px"
       center
       custom-class="add-rule"
       :before-close="closeDialog"
     >
-      <el-form label-width="70px" :model="form" :rules="rules" ref="form">
+      <el-form :model="form" :rules="rules" ref="form">
+        <el-form-item
+          label="是否废止当前法规文件"
+          prop="isRepeal"
+          v-if="crtBehavior == 'update'"
+          class="flex"
+        >
+          <el-radio-group v-model="form.isRepeal" style="margin-left: 8px">
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="法规名称" prop="name">
           <el-input
             v-model="form.name"
@@ -154,12 +165,40 @@
             </div>
           </el-form-item>
         </div>
-        <el-form-item label="添加标签"> </el-form-item>
-        <el-form-item label="相关权益"> </el-form-item>
+        <el-form-item label="添加标签" class="tag-item">
+          <span
+            v-for="(item, index) in tagsList"
+            :key="index"
+            class="add-relevancy-tag relevancy-tag"
+            >{{ item }}
+            <i class="el-icon-close" @click="delTag(item)"></i>
+          </span>
+          <relevancyTag
+            class="add-relevancy-tag"
+            :handlerTag="tagsList"
+            @passTag="addTag"
+          ></relevancyTag>
+        </el-form-item>
+        <el-form-item label="相关权益" class="tag-item">
+          <span
+            v-for="(item, index) in relevancyTags"
+            :key="index"
+            class="add-relevancy-tag relevancy-tag"
+            >{{ item }}
+            <i class="el-icon-close" @click="delRelevancyTag(item)"></i>
+          </span>
+          <relevancyTag
+            class="add-relevancy-tag"
+            @passTag="passTag"
+            :handlerTag="relevancyTags"
+            ref="relevancyTagRef"
+          ></relevancyTag>
+        </el-form-item>
         <el-form-item label="" class="upload-item" prop="uploadFile">
+          <div class="upload-box">
           <el-upload
             action="#"
-            :class="['upload-box', uploadDisabled]"
+            :class="[uploadDisabled]"
             :http-request="uploadContent"
             list-type="picture-card"
             :limit="uploadLimit"
@@ -179,6 +218,17 @@
               ></i>
             </div>
           </el-upload>
+          <i
+            style="
+              font-weight: 400;
+              line-height: 20px;
+              color: #86909c;
+              font-size: 12px;
+              margin-left: 12px;
+            "
+            >点击上传内容，仅可上传1个文件（word、pdf）</i
+          >
+        </div>
           <div class="" slot="label">
             上传内容
             <div class="error-tip" v-if="validatorForm.uploadFileError">
@@ -191,57 +241,76 @@
               </el-popover>
             </div>
           </div>
-
-          <i
-            style="
-              font-weight: 400;
-              line-height: 20px;
-              color: #86909c;
-              font-size: 12px;
-              margin-left: 12px;
-            "
-            >点击上传内容，仅可上传1个文件（word、pdf）</i
-          >
-        </el-form-item>
-        <el-form-item label="相关附件" class="upload-item upload-related-item">
-          <el-upload
-            action="#"
-            class="upload-box"
-            :http-request="uploadRelatedFile"
-            list-type="picture-card"
-            accept=".pdf, .doc, .docx"
-            multiple
-            :class="['upload-box', uploadRelatedDisabled]"
-            :on-change="handleRelatedChange"
-            :file-list="form.relatedFile"
-          >
-            <i slot="default" class="el-icon-plus"></i>
-            <div slot="file" slot-scope="{ file }" class="upload-preview">
+          <ul class="file-list">
+            <li v-for="file in form.uploadFile" :key="file.uid">
               <fileType
                 :fileName="file.name || item.fileName"
                 class="file-icon"
               ></fileType>
+              {{ file.name }}
               <i
-                class="iconfont icon-baocuo1 el-upload-list__item-del pointer"
+                class="el-icon-error"
+                style="color: rgba(29, 33, 40, 0.4); cursor: pointer"
+                @click="handleRemoveUploadFile(file)"
+              ></i>
+            </li>
+          </ul>
+
+        </el-form-item>
+        <el-form-item label="相关附件" class="upload-item upload-related-item">
+          <div class="upload-box">
+            <el-upload
+              action="#"
+              :http-request="uploadRelatedFile"
+              list-type="picture-card"
+              accept=".pdf, .doc, .docx"
+              multiple
+              :class="[uploadRelatedDisabled]"
+              :on-change="handleRelatedChange"
+              :file-list="form.relatedFile"
+            >
+              <i slot="default" class="el-icon-plus"></i>
+              <div slot="file" slot-scope="{ file }" class="upload-preview">
+                <fileType
+                  :fileName="file.name || item.fileName"
+                  class="file-icon"
+                ></fileType>
+                <i
+                  class="iconfont icon-baocuo1 el-upload-list__item-del pointer"
+                  @click="removeRelatedFile(file)"
+                ></i>
+              </div>
+            </el-upload>
+            <i
+              style="
+                font-weight: 400;
+                line-height: 20px;
+                color: #86909c;
+                font-size: 12px;
+                margin-left: 12px;
+              "
+              >点击上传相关附件，支持上传8个文件（word、pdf）</i
+            >
+          </div>
+          <ul class="file-list">
+            <li v-for="file in form.relatedFile" :key="file.uid">
+              <fileType
+                :fileName="file.name || item.fileName"
+                class="file-icon"
+              ></fileType>
+              {{ file.name }}
+              <i
+                class="el-icon-error"
+                style="color: rgba(29, 33, 40, 0.4); cursor: pointer"
                 @click="removeRelatedFile(file)"
               ></i>
-            </div>
-          </el-upload>
-          <i
-            style="
-              font-weight: 400;
-              line-height: 20px;
-              color: #86909c;
-              font-size: 12px;
-              margin-left: 12px;
-            "
-            >点击上传相关附件，支持上传8个文件（word、pdf）</i
-          >
+            </li>
+          </ul>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <span type="default" @click="cancel" class="cancel">取消</span>
-        <span type="primary" @click="submit" class="issue">发布</span>
+        <span type="primary" @click="submit" class="issue">{{ finishBtns[crtBehavior] }}</span>
       </span>
     </el-dialog>
   </div>
@@ -249,8 +318,9 @@
 <script>
 import fileType from './file-type'
 import Filters from './filters'
+import relevancyTag from './relevancy-tag'
 export default {
-  components: { Filters, fileType },
+  components: { Filters, fileType, relevancyTag },
   data() {
     // eslint-disable-next-line
     var checkIdInputName = (rule, value, callback) => {
@@ -329,28 +399,29 @@ export default {
         documentNumber: '',
         date: '',
         uploadFile: [],
-        relatedFile: []
+        relatedFile: [],
+        isRepeal: 0
       },
       rules: {
+        isRepeal: [{ required: true, trigger: ['change'] }],
         name: [
-          { required: true },
-          { required: true, validator: checkIdInputName, trigger: ['change'] }
+          { required: true, trigger: ['change'] },
+          { validator: checkIdInputName, trigger: ['change'] }
         ],
         documentNumber: [
-          { required: true },
+          { required: true, trigger: ['change'] },
           { validator: checkIdDocumentNumber, trigger: ['change'] }
         ],
         unit: [
-          { required: true },
+          { required: true, trigger: ['change'] },
           { validator: checkIdInputUnit, trigger: ['change'] }
         ],
         date: [
-          { required: true },
-
+          { required: true, trigger: ['change'] },
           { validator: checkDate, trigger: ['change'] }
         ],
         uploadFile: [
-          { required: true },
+          { required: true, trigger: ['change'] },
           { validator: checkFile, trigger: ['change'] }
         ]
       },
@@ -358,6 +429,19 @@ export default {
         pageNow: 1,
         total: 0,
         loading: false
+      },
+      relevancyTags: [],
+      tagsList: [],
+      crtBehavior: 'increase',
+      dialogTitle: {
+        increase: '新增法规',
+        edit: '编辑法规',
+        update: '更新法规'
+      },
+      finishBtns: {
+        increase: '发布',
+        edit: '完成',
+        update: '更新'
       }
     }
   },
@@ -379,13 +463,52 @@ export default {
     //   console.log('gg3',this.validatorForm)
     // }
   },
-  mounted() {},
+  mounted() {
+    // this.$nextTick(() => {
+    //   this.$refs.relevancyTagRef.initData(this.relevancyTags)
+    // })
+  },
   computed: {},
   methods: {
+    /**
+     * @description: 获取列表接口
+     * @return {*}
+     */
+    sortChange() {},
     nextPage() {},
     wordEllipsis(str, len) {
       if (!str.length) return false
       return str.length > len ? str.substr(0, len) + '...' : str
+      /**
+       * @description: 获取相关权益的标签
+       * @return {*}
+       */
+    },
+    passTag(tags) {
+      this.relevancyTags = tags
+    },
+    /**
+     * @description: 获取当前的添加标签
+     * @return {*}
+     */
+    addTag(tags) {
+      this.tagsList = tags
+    },
+    /**
+     * @description: 删除当前的添加标签
+     * @return {*}
+     */
+    delTag(tag) {
+      const index = this.tagsList.findIndex((v) => v === tag)
+      this.tagsList.splice(index, 1)
+    },
+    /**
+     * @description: 删除当前的权益标签
+     * @return {*}
+     */
+    delRelevancyTag(tag) {
+      const index = this.relevancyTags.findIndex((v) => v === tag)
+      this.relevancyTags.splice(index, 1)
     },
     copyLink() {
       const link = 'https://www.example.com'
@@ -402,15 +525,16 @@ export default {
      * @return {*}
      */
     addRule() {
-      this.$refs.form.resetFields()
-      this.$refs.form.clearValidate()
-      this.uploadDisabled = ''
-      this.uploadRelatedDisabled = ''
-      const keys = Object.keys(this.validatorForm)
-      for (const i in keys) {
-        this.validatorForm[keys[i]] = false
-      }
       this.dialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.form.clearValidate()
+        this.uploadDisabled = ''
+        this.uploadRelatedDisabled = ''
+        const keys = Object.keys(this.validatorForm)
+        for (const i in keys) {
+          this.validatorForm[keys[i]] = false
+        }
+      })
     },
     closeDialog() {
       this.cancel()
@@ -454,6 +578,7 @@ export default {
       if (this.form.relatedFile.length >= 8) {
         this.uploadRelatedDisabled = 'disabled'
       }
+      console.log('gg', this.form.relatedFile)
     },
     /**
      * @description: 关联附件change
@@ -491,9 +616,17 @@ export default {
      * @return {*}
      */
     checkMustValue() {
-      this.validatorForm.nameError = !this.form.name?.length > 0 || this.form.name?.length > 50
-      this.validatorForm.unitError = !this.form.unit?.length > 0 || this.form.unit?.length > 50
-      this.validatorForm.documentNumberError = !this.form.documentNumber?.length > 0 || this.form.documentNumber?.length > 50
+      // eslint-disable-next-line
+      this.validatorForm.nameError =
+        !this.form.name?.length > 0 || this.form.name?.length > 50
+      // eslint-disable-next-line
+      this.validatorForm.unitError =
+        !this.form.unit?.length > 0 || this.form.unit?.length > 50
+      // eslint-disable-next-line
+      this.validatorForm.documentNumberError =
+        // eslint-disable-next-line
+        !this.form.documentNumber?.length > 0 ||
+        this.form.documentNumber?.length > 50
       this.validatorForm.dateError = !this.form.date?.length
       this.validatorForm.uploadFileError = !this.form.uploadFile?.length
     },
@@ -513,6 +646,8 @@ export default {
      */
     editRule() {
       this.lawEditPopover = false
+      this.crtBehavior = 'edit'
+      this.addRule()
     },
     /**
      * @description: 更新法律
@@ -520,6 +655,8 @@ export default {
      */
     updateRule() {
       this.lawEditPopover = false
+      this.crtBehavior = 'update'
+      this.addRule()
     },
     /**
      * @description: 删除法规
@@ -539,9 +676,9 @@ export default {
 </script>
 <style scoped lang="less">
 .laws {
-.list-content{
-  margin-top: 20px;
-}
+  .list-content {
+    margin-top: 20px;
+  }
   .list {
     .cards {
       padding: 20px 16px;
@@ -709,6 +846,11 @@ export default {
             color: #f76560;
             font-size: 20px;
           }
+          .el-radio-group {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 22px;
+          }
           .el-input__prefix {
             left: 80%;
             .el-icon-date::before {
@@ -721,10 +863,12 @@ export default {
       .upload-item {
         display: flex;
         flex-direction: column;
+        align-items: flex-start;
         .el-form-item__content {
           margin-left: 0 !important;
           flex-wrap: wrap;
-
+          display: block;
+          line-height: 0;
           .el-upload {
             border-radius: 4px;
             border: 0.8px dashed #cacdd3;
@@ -734,7 +878,8 @@ export default {
             line-height: 60px;
           }
           .upload-box {
-            height: 60px;
+            display: flex;
+            align-items: center;
             .el-upload-list {
               .el-upload-list__item {
                 border: 0.8px dashed #cacdd3;
@@ -772,6 +917,30 @@ export default {
             right: -18px;
           }
         }
+        .file-list {
+          li {
+            margin-bottom: 8px;
+            width: fit-content;
+            border-radius: 4px;
+            background: #f7f8fa;
+            padding: 8px;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 22px;
+            color: #1d2128;
+            .file-icon{
+              font-size: 24px;
+              vertical-align: bottom;
+            }
+          }
+        }
+      }
+      .tag-item {
+        .el-form-item__content {
+          min-height: 40px;
+          flex-wrap: wrap;
+        }
       }
       .el-form-item__label:before {
         position: absolute;
@@ -790,6 +959,33 @@ export default {
   }
   /deep/ .disabled .el-upload--picture-card {
     display: none !important;
+  }
+  .add-relevancy-tag {
+    display: flex;
+    align-items: center;
+    padding: 2px 16px;
+    border-radius: 4px;
+    border: 1px dashed #cacdd3;
+    background: #f7f8fa;
+    height: 28px;
+    margin-bottom: 4px;
+  }
+  .relevancy-tag {
+    border-radius: 3px;
+    border: 1px solid #a8c5ff;
+    background: #f0f6ff;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #2d5cf6;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    .el-icon-close {
+      margin-left: 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
   }
 }
 </style>
@@ -818,4 +1014,5 @@ export default {
   ul li:hover {
     background: #f7f8fa;
   }
-}</style>
+}
+</style>
