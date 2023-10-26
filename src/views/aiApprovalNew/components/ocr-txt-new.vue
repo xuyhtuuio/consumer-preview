@@ -24,10 +24,10 @@
     <div class="results" ref="results" :key="resultKey" :class="{ light: lineWordItem?.word }"
       @mousedown="statrGetSelection" @mouseup="getSelection">
       <div class="results-div" :style="styleSet">
-        <div v-for="(ocr, i) in html" class="div-position" :key="i" :style="returnStyle(i)">
+        <div v-for="(ocr, i) in html" class="div-position" :data-ocrItem="ocr.ocrId" :key="i" :style="returnStyle(i)">
           <template v-for="(item, j) in ocr">
             <!-- <template  v-if="typeof item === 'string'">{{ item }}</template> -->
-            <div :class="{ commentNode:item.hasBg}" v-if="!item.wordType" :key="i + '_' + j + '_'" @click="showOcrCommentLine">{{ item.text }}</div>
+            <div :class="{ commentNode:item.hasBg}" v-if="!item.wordType" :key="i + '_' + j + '_'" @click="showOcrCommentLine($event,ocr)">{{ item.text }}</div>
             <span v-else :key="i + '_' + j" :wordType="item.wordType" :id="`word_${i}_${j}`" :class="{
               active:
                 activeWordType === item.wordType || activeWordType === 0,
@@ -76,7 +76,8 @@ export default {
         left: '',
         right: ''
       },
-      styleSet: {}
+      styleSet: {},
+      selectOcr: {}
     }
   },
   watch: {
@@ -124,6 +125,8 @@ export default {
     },
     getSelection(event) {
       const node = event.target.parentNode
+      console.log(node)
+      console.log(node.getAttribute('data-ocrItem'))
       const { childNodes } = node
       const childNode = childNodes[0]
       const classs = Array.from(childNode.classList)
@@ -193,8 +196,8 @@ export default {
       const html = []
       // 遍历接口返回的 ocr 结果
       approval?.ocr?.forEach((ocr, j) => {
-        const { text, location } = ocr
-        let newOcr = [{ text }]
+        const { text, location, ocrId } = ocr
+        let newOcr = [{ text, ocrId }]
         // 遍历推荐意见 获取关键字、关键字类型
         approval?.recommends?.forEach((recommend, i) => {
           const { word, wordType } = recommend
@@ -387,13 +390,14 @@ export default {
       }
       const string = this.selectText
       const obj = {
+        ocrId: this.selectOcr.ocrId,
         position,
         string,
         domIndexs: indexs
       }
       this.$emit('addWord', obj, nodes)
     },
-    showOcrCommentLine(event) {
+    showOcrCommentLine(event, item) {
       const selectText = window.getSelection
         ? window.getSelection().toString()
         : document.selection.createRange().text
@@ -412,7 +416,7 @@ export default {
         top: Math.floor(node.offsetTop * this.styleProp.wordDomStyle.scale),
         width: Math.floor((node.offsetWidth)),
       }
-      this.$emit('showOcrCommentLine', position)
+      this.$emit('showOcrCommentLine', position, item)
     }
   }
 }

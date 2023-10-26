@@ -218,20 +218,37 @@ export default {
     },
     hasBg(i, reValue) {
       let isHas = false
+      const fileType = this.files[this.activeIndex].type
       // 遍历意见 寻找当前文件
-      this.comments.map((comment) => {
-        if (comment?.files.includes(this.files[this.activeIndex].id)) {
-          // 遍历文件与批注的关系，判断是否包含 第 i 条
-          comment?.filesWithBg.map((fwb) => {
-            if (fwb.fileId === this.files?.[this.activeIndex]?.id) {
-              isHas = fwb.fileBgs.includes(i)
-              if (isHas) {
-                reValue(isHas)
+      if (fileType !== 'pdf') {
+        this.comments.map((comment) => {
+          if (comment?.files.includes(this.files[this.activeIndex].id)) {
+            // 遍历文件与批注的关系，判断是否包含 第 i 条
+            comment?.filesWithBg.map((fwb) => {
+              if (fwb.fileId === this.files?.[this.activeIndex]?.id) {
+                isHas = fwb.fileBgs.includes(i)
+                if (isHas) {
+                  reValue(isHas)
+                }
               }
-            }
-          })
-        }
-      })
+            })
+          }
+        })
+      } else {
+        this.comments.map((comment) => {
+          if (comment?.files.includes(this.files[this.activeIndex].id)) {
+            // 遍历文件与批注的关系，判断是否包含 第 i 条
+            comment?.filesWithBg.map((fwb) => {
+              if (fwb.fileId === this.files[this.activeIndex].child[this.activePdfIndex].id) {
+                isHas = fwb.fileBgs.includes(i)
+                if (isHas) {
+                  reValue(isHas)
+                }
+              }
+            })
+          }
+        })
+      }
       reValue(isHas)
     },
     beforeAddComment() {
@@ -258,26 +275,46 @@ export default {
     addCommentWithPosition() {
       this.beforeAddComment()
       const timestamp = this.preComment.id || new Date().getTime()
-      const files = this.preComment.files || [this.files?.[this.activeIndex]?.id]
+      let files = []
       const words = this.preComment.words || []
-      const filesWithComment = this.preComment.filesWithComment || [this.files?.[this.activeIndex]?.id]
-      if (this.preComment?.filesWithBg) {
-        this.preComment.filesWithBg.map((fwb) => {
-          if (fwb.fileId === this.files?.[this.activeIndex]?.id) {
-            fwb.fileBgs = [...fwb.fileBgs, ...this.domInfo.domIndexs]
-          }
-        })
+      let filesWithComment = []
+      let filesWithBg = []
+      if (this.files?.[this.activeIndex].type === 'pdf') {
+        files = this.preComment.files || [this.files?.[this.activeIndex].id]
+        filesWithComment = this.preComment.filesWithComment || [this.files?.[this.activeIndex].id]
+        if (this.preComment?.filesWithBg) {
+          this.preComment.filesWithBg.map((fwb) => {
+            if (fwb.fileId === this.files?.[this.activeIndex]?.child[this.activePdfIndex]?.id) {
+              fwb.fileBgs = [...fwb.fileBgs, ...this.domInfo.domIndexs]
+            }
+          })
+        }
+        filesWithBg = [{
+          fileId: this.files?.[this.activeIndex]?.child[this.activePdfIndex]?.id,
+          fileBgs: this.domInfo.domIndexs
+        }]
+      } else {
+        if (this.preComment?.filesWithBg) {
+          this.preComment.filesWithBg.map((fwb) => {
+            if (fwb.fileId === this.files?.[this.activeIndex]?.id) {
+              fwb.fileBgs = [...fwb.fileBgs, ...this.domInfo.domIndexs]
+            }
+          })
+        }
+        filesWithBg = [{
+          fileId: this.files?.[this.activeIndex]?.id,
+          fileBgs: this.domInfo.domIndexs
+        }]
+        files = this.preComment.files || [this.files?.[this.activeIndex]?.id]
+        filesWithComment = this.preComment.filesWithComment || [this.files?.[this.activeIndex]?.id]
       }
-      const filesWithBg = [{
-        fileId: this.files?.[this.activeIndex]?.id,
-        fileBgs: this.domInfo.domIndexs
-      }]
       const newComment = {
         id: timestamp,
         str: this.postil.textarea,
         files: [...files],
         filesWithComment: [...filesWithComment],
         words,
+        icons: [this.domInfo?.ocrId],
         position: [this.domInfo?.position],
         selectText: this.domInfo?.string,
         filesWithBg: this.preComment?.filesWithBg || filesWithBg
@@ -307,6 +344,7 @@ export default {
         this.postil.textarea = ''
         this.$refs.editorial.changeType(2)
         this.dealIconWithComment()
+        console.log('增加后', this.approval)
       }
     },
     changeFileById(fileId) {
@@ -497,7 +535,7 @@ export default {
       this.filePopoverShow = false
     },
     async getOcr(temp) {
-      const ocr = [];
+      let ocr = [];
       await getOCRAnalysisResults({
         fileId: temp.id
       }).then(res => {
@@ -512,6 +550,11 @@ export default {
           }
         }
       });
+      ocr = ocr.map((o, i) => {
+        const id = '' + new Date().getTime() + i
+        o.ocrId = id
+        return o
+      })
       return ocr;
     },
     changeOcrView() {
@@ -594,35 +637,65 @@ export default {
     changeEditorialType(val) {
       this.lineRemove();
       // 整合编辑意见
-      if (val === 2) {
+      if (val === 2 && this.files[this.activeIndex].type !== 'pdf') {
         this.files[this.activeIndex] = this.approval;
         this.getComments(this.files[this.activeIndex]);
+        this.$refs.editorial.collection = this.comments;
+      }
+      if (val === 2 && this.files[this.activeIndex].type === 'pdf') {
+        this.files[this.activeIndex].child[this.activePdfIndex] = this.approval;
+        this.getComments(this.files[this.activeIndex].child[this.activePdfIndex]);
         this.$refs.editorial.collection = this.comments;
       }
     },
     getComments() {
       const arr = [];
-      this.files.forEach(file => {
-        // 存在推荐意见
-        file?.recommends?.map(recommend => {
+      const fileType = this.files[this.activeIndex].type
+      if (fileType !== 'pdf') {
+        this.files.forEach(file => {
+          // 存在推荐意见
+          file?.recommends?.map(recommend => {
           // 存在选择意见
-          if (recommend.selected) {
-            const selected = recommend.list.filter(a => a.id === recommend.selected);
-            const isRepeat = file.comments?.filter(f => f.id === selected?.[0].id)
-            if (!isRepeat) {
-              arr.push({
-                id: selected?.[0].id,
-                str: selected?.[0].str,
-                files: [file.id],
-                words: [recommend.id]
-              });
+            if (recommend.selected) {
+              const selected = recommend.list.filter(a => a.id === recommend.selected);
+              const isRepeat = file.comments?.filter(f => f.id === selected?.[0].id)
+              if (!isRepeat) {
+                arr.push({
+                  id: selected?.[0].id,
+                  str: selected?.[0].str,
+                  files: [file.id],
+                  words: [recommend.id]
+                });
+              }
             }
-          }
+          })
+          // 未关联word的 意见
+          file?.comments && arr.push(...file?.comments);
+        });
+      } else {
+        const pdfs = this.files[this.activeIndex].child
+        pdfs.forEach((pdf) => {
+          // 存在推荐意见
+          pdf?.recommends?.map(recommend => {
+            // 存在选择意见
+            if (recommend.selected) {
+              const selected = recommend.list.filter(a => a.id === recommend.selected);
+              const isRepeat = pdf.comments?.filter(f => f.id === selected?.[0].id)
+              if (!isRepeat) {
+                arr.push({
+                  id: selected?.[0].id,
+                  str: selected?.[0].str,
+                  files: [pdf.id],
+                  words: [recommend.id]
+                });
+              }
+            }
+          })
+          // 未关联word的 意见
+          pdf?.comments && arr.push(...pdf?.comments);
         })
-        // 未关联word的 意见
-        file?.comments && arr.push(...file?.comments);
-      });
-      // id去重
+      }
+      // comment id去重
       const setArr = [];
       arr.forEach(comment => {
         if (comment) {
@@ -637,6 +710,7 @@ export default {
         }
       });
       this.comments = setArr;
+      console.log('getComments', this.files[this.activeIndex])
     },
     // 编辑意见后,同步更新  文件的推荐意见状态
     upDateComments(type, item, newVal) {
@@ -644,30 +718,58 @@ export default {
       if (type !== 'upd') {
         filterFiles = this.files.filter(file => item.files.includes(file.id))
       }
+      const fileType = this.files[this.activeIndex].type
       switch (type) {
         // 新增意见,至少找到一个 关联文件,将新增意见插入即可
         case 'add':
-          if (!filterFiles[0]?.comments) {
-            filterFiles[0].comments = [];
-            filterFiles[0].comments.push(item);
-          } else {
-            let num = 0
-            filterFiles?.[0]?.comments.map((comment) => {
-              if (comment.str === item.str) {
-                if (!comment.position) {
-                  comment.position = item.position
-                } else {
-                  comment.position = [...comment.position, ...item.position]
-                }
-              } else if (comment.id === item.id) {
-                comment.str = item.str
-                comment.words = item.words
-              } else {
-                num++
-              }
-            })
-            if (num === filterFiles?.[0]?.comments.length) {
+          if (fileType !== 'pdf') {
+            if (!filterFiles[0]?.comments) {
+              filterFiles[0].comments = [];
               filterFiles[0].comments.push(item);
+            } else {
+              let num = 0
+              filterFiles?.[0]?.comments.map((comment) => {
+                if (comment.str === item.str) {
+                  if (!comment.position) {
+                    comment.position = item.position
+                  } else {
+                    comment.position = [...comment.position, ...item.position]
+                  }
+                } else if (comment.id === item.id) {
+                  comment.str = item.str
+                  comment.words = item.words
+                } else {
+                  num++
+                }
+              })
+              if (num === filterFiles?.[0]?.comments.length) {
+                filterFiles[0].comments.push(item);
+              }
+            }
+          } else {
+            const pdf = this.files[this.activeIndex].child[this.activePdfIndex]
+            if (!pdf?.comments) {
+              pdf.comments = [];
+              pdf.comments.push(item);
+            } else {
+              let num = 0
+              pdf?.comments.map((comment) => {
+                if (comment.str === item.str) {
+                  if (!comment.position) {
+                    comment.position = item.position
+                  } else {
+                    comment.position = [...comment.position, ...item.position]
+                  }
+                } else if (comment.id === item.id) {
+                  comment.str = item.str
+                  comment.words = item.words
+                } else {
+                  num++
+                }
+              })
+              if (num === pdf?.comments.length) {
+                pdf.comments.push(item);
+              }
             }
           }
           break;
@@ -781,15 +883,29 @@ export default {
           break;
         // 新增意见 后执行意见同步操作: 查找新增意见所关联的文件，将意见绑定到对应的文件上
         case 'upd':
-          this.files.filter(file => item?.some((f) => {
-            if (f.files.includes(file.id)) {
-              if (!file.comments) {
-                file.comments = []
+          if (fileType !== 'pdf') {
+            this.files.filter(file => item?.some((f) => {
+              if (f.files.includes(file.id)) {
+                if (!file.comments) {
+                  file.comments = []
+                }
+                // file.comments = [...new Set([...file.comments, f])]
+                file.comments.push(f)
               }
-              // file.comments = [...new Set([...file.comments, f])]
-              file.comments.push(f)
-            }
-          }))
+            }))
+          } else {
+            const pdf = this.files[this.activeIndex].child[this.activePdfIndex]
+            console.log(pdf)
+            pdf.files.filter(file => item?.some((f) => {
+              if (f.files.includes(file.id)) {
+                if (!file.comments) {
+                  file.comments = []
+                }
+                // file.comments = [...new Set([...file.comments, f])]
+                file.comments.push(f)
+              }
+            }))
+          }
           break;
         default:
           break;
@@ -924,11 +1040,13 @@ export default {
         const realHeight = img.scrollHeight
         const iconTops = []
         const ocrLocation = []
+        const ocrIds = []
         const scale = img.naturalWidth / img.clientWidth;
         this.approval.ocr.map((ocr) => {
           // icon 高度 等于 ocr 的 top + ocr 高度的一半 乘以缩放 - 图标自身高度的一半
           const newTop = (ocr.location.y + ocr.location.h / 2) / scale - 7.5
           iconTops.push(Math.floor(newTop))
+          ocrIds.push(ocr.ocrId)
           ocrLocation.push({
             left: ocr.location.x,
             top: ocr.location.y,
@@ -945,6 +1063,7 @@ export default {
         for (let i = 0; i < iconNum; i++) {
           icons.push({
             icon_id: '' + new Date().getTime() + i,
+            ocrId: ocrIds[i],
             iconTop: iconTops[i],
             ocrLocation: ocrLocation[i],
             showIndex: -1
@@ -964,6 +1083,7 @@ export default {
         // 如果该意见存在批注
         if (comment.position?.length) {
           comment.position.map((pos) => {
+            // if(comment.icons.includes())
             const commentId = comment.id
             // 现有的icons
             const findIconLive = this.icons.filter((icon) => {
@@ -971,16 +1091,19 @@ export default {
             })
             // 要生成的icon
             const findIcon = this.icons.filter((icon) => {
+              // console.log(icon.ocrLocation, pos, this.positionIsSame(icon.ocrLocation, pos))
               if (this.positionIsSame(icon.ocrLocation, pos)) {
                 return icon
               }
             })
+            console.log('要生成的icon', findIcon)
             // 与生成的icon产生堆叠影响的icons
             const findNewIcon = findIconLive.filter((icon) => {
               if (Math.abs(findIcon[0]?.iconTop - icon.iconTop) < 7.5) {
                 return icon
               }
             })
+            console.log('要影响的icon', findNewIcon)
             let newIcon = {}
             if (findNewIcon.length) {
               newIcon = {
@@ -1027,6 +1150,8 @@ export default {
           })
         }
       })
+      console.log('comments', this.comments)
+      console.log('icons', this.icons)
     },
     // 展示 icon 的连线
     showIconLine(icon) {
@@ -1083,10 +1208,10 @@ export default {
       })
     },
     // ocr 点击批注进行连线
-    showOcrCommentLine(ocrPosition) {
+    showOcrCommentLine(ocrPosition, ocrItem) {
       this.$refs.editorial.changeType(2)
       const findComment = this.findComment(ocrPosition)
-      const findIcon = this.findIconPos(findComment)
+      const findIcon = this.findIconPos(findComment, ocrItem)
       this.showIconLine(findIcon)
     },
     // 利用ocr定位 寻找对应 comment
@@ -1103,8 +1228,10 @@ export default {
       return findComment
     },
     // 点击ocr，获取对应 icon 最终走到意见，执行连线逻辑
-    findIconPos(findComment) {
+    findIconPos(findComment, ocrItem) {
       let resIcon = {}
+      const { ocrId } = ocrItem
+      console.log(ocrId)
       this.icons.map((icon) => {
         let findIcon = icon.positionWithId?.map((ipos) => {
           if (this.positionIsSame(ipos.pos, findComment.position && findComment.position[0])) {
@@ -1135,10 +1262,11 @@ export default {
       }
       return true
     },
-    // 位置比对 - 针对多行批注连线做了模糊处理
+    // 位置比对 - 做了相似度 log 显示
     positionIsSame(first, second) {
       const pos1 = Object.keys(first)
       const pos2 = Object.keys(second)
+      let numTure = 0
       if (pos1.length !== pos2.length) {
         return false
       }
@@ -1146,9 +1274,15 @@ export default {
         if (first[k] === second[k]) {
           // 完全匹配
         } else if (Math.abs(first[k] - second[k]) <= 2) {
+          numTure++;
           // 误差处理
         } else {
           // 不匹配
+          if (numTure >= 3) {
+            console.log('----------相似度输出ing------------------')
+            console.log(first, second)
+            console.log('----------相似度输出结束------------------')
+          }
           return false
         }
       }
@@ -1195,6 +1329,10 @@ export default {
           temp.recommends = []
         }
       }
+      this.$nextTick(() => {
+        this.findIconPosition()
+        this.lisScroll()
+      })
       this.approval = temp;
       this.fileloading = false;
       this.filePopoverShow = false;
@@ -1247,6 +1385,10 @@ export default {
           }
         }
         this.approval = temp
+        this.$nextTick(() => {
+          this.findIconPosition()
+          this.lisScroll()
+        })
         this.fileloading = false;
         this.filePopoverShow = false;
       }
