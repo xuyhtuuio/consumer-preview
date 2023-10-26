@@ -35,7 +35,7 @@ module.exports = {
       });
   },
   devServer: {
-    host: 'localhost',
+    host: '192.168.161.28',
     port: '8082',
     headers: {
       'Access-Control-Allow-Origin': '*',
@@ -61,7 +61,7 @@ module.exports = {
       },
       '/cpr': {
         target: 'http://192.168.210.57:31602',
-        // target: 'http://192.168.43.219:8324', // 吕强后台
+        // target: 'http://192.168.161.113:8324', // 吕强后台
         // target: 'http://10.8.0.57:8324', // 王意杨后台
         changeOrigin: true,
         ws: true,

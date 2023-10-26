@@ -653,6 +653,7 @@ export default {
     getComments() {
       const arr = [];
       const fileType = this.files[this.activeIndex].type
+      console.log('fileType', fileType)
       if (fileType !== 'pdf') {
         this.files.forEach(file => {
           // 存在推荐意见
@@ -677,24 +678,29 @@ export default {
       } else {
         const pdfs = this.files[this.activeIndex].child
         pdfs.forEach((pdf) => {
+          console.log('pdf', pdf)
           // 存在推荐意见
           pdf?.recommends?.map(recommend => {
             // 存在选择意见
             if (recommend.selected) {
               const selected = recommend.list.filter(a => a.id === recommend.selected);
+              console.log('selected', selected)
               const isRepeat = pdf.comments?.filter(f => f.id === selected?.[0].id)
-              if (!isRepeat) {
+              console.log('isRepeat', isRepeat)
+              if (!isRepeat?.length) {
                 arr.push({
                   id: selected?.[0].id,
                   str: selected?.[0].str,
-                  files: [pdf.id],
+                  files: [this.files[this.activeIndex].id],
                   words: [recommend.id]
                 });
               }
             }
           })
+          console.log(arr)
           // 未关联word的 意见
           pdf?.comments && arr.push(...pdf?.comments);
+          console.log(arr)
         })
       }
       // comment id去重
@@ -780,51 +786,90 @@ export default {
         // 删除意见,找到意见关联的所有文件, 如果意见存在关联 关键词,则取消关键词 选择 的 意见,如果 comments下包含,则移除 该意见
         // eslint-disable-next-line
         case 'remove':
-          filterFiles.map(file => {
-            // const matchWord = file?.recommends?.filter(word => item.words.includes(word.id));
-            // matchWord
-            //   && matchWord.forEach(word => {
-            //     if (type === 'remove') {
-            //       word.selected = null;
-            //     } else if (type === 'editStr') {
-            //       const recommend = word.list.filter(a => a.id === word.selected);
-            //       recommend[0].str = newVal;
-            //     }
-            //   });
-            // 对于推荐意见处理
-            file?.recommends?.map((word) => {
-              if (item.words.includes(word.id)) {
-                if (type === 'remove') {
-                  word.selected = null;
-                } else if (type === 'editStr') {
-                  const recommend = word.list.filter(a => a.id === word.selected);
-                  recommend[0].str = newVal;
+          if (fileType !== 'pdf') {
+            filterFiles.map(file => {
+              // const matchWord = file?.recommends?.filter(word => item.words.includes(word.id));
+              // matchWord
+              //   && matchWord.forEach(word => {
+              //     if (type === 'remove') {
+              //       word.selected = null;
+              //     } else if (type === 'editStr') {
+              //       const recommend = word.list.filter(a => a.id === word.selected);
+              //       recommend[0].str = newVal;
+              //     }
+              //   });
+              // 对于推荐意见处理
+              file?.recommends?.map((word) => {
+                if (item.words.includes(word.id)) {
+                  if (type === 'remove') {
+                    word.selected = null;
+                  } else if (type === 'editStr') {
+                    const recommend = word.list.filter(a => a.id === word.selected);
+                    recommend[0].str = newVal;
+                  }
                 }
-              }
-            })
-            file?.comments
-              && file?.comments.map((comment, i) => {
-                if (item.str === comment.str) {
+              })
+              file?.comments
+                && file?.comments.map((comment, i) => {
+                  if (item.str === comment.str) {
+                    if (type === 'remove') {
+                      file.comments.splice(i, 1);
+                    } else if (type === 'editStr') {
+                      file.comments[i] = newVal;
+                    }
+                  }
+                });
+            });
+            // 意见存在于文件其他的  comments里,不在filterFiles
+            this.files.forEach(file => {
+              file?.comments?.forEach((comment, i) => {
+                if (comment.str === item.str) {
                   if (type === 'remove') {
                     file.comments.splice(i, 1);
                   } else if (type === 'editStr') {
-                    file.comments[i] = newVal;
+                    file.comments[i].str = newVal;
                   }
                 }
               });
-          });
-          // 意见存在于文件其他的  comments里,不在filterFiles
-          this.files.forEach(file => {
-            file?.comments?.forEach((comment, i) => {
-              if (comment.str === item.str) {
-                if (type === 'remove') {
-                  file.comments.splice(i, 1);
-                } else if (type === 'editStr') {
-                  file.comments[i].str = newVal;
-                }
-              }
             });
-          });
+          } else {
+            filterFiles = filterFiles[0].child
+            filterFiles.map(file => {
+              // 对于推荐意见处理
+              file?.recommends?.map((word) => {
+                if (item.words.includes(word.id)) {
+                  if (type === 'remove') {
+                    word.selected = null;
+                  } else if (type === 'editStr') {
+                    const recommend = word.list.filter(a => a.id === word.selected);
+                    recommend[0].str = newVal;
+                  }
+                }
+              })
+              file?.comments
+                && file?.comments.map((comment, i) => {
+                  if (item.str === comment.str) {
+                    if (type === 'remove') {
+                      file.comments.splice(i, 1);
+                    } else if (type === 'editStr') {
+                      file.comments[i] = newVal;
+                    }
+                  }
+                });
+            });
+            // 意见存在于文件其他的  comments里,不在filterFiles
+            filterFiles.forEach(file => {
+              file?.comments?.forEach((comment, i) => {
+                if (comment.str === item.str) {
+                  if (type === 'remove') {
+                    file.comments.splice(i, 1);
+                  } else if (type === 'editStr') {
+                    file.comments[i].str = newVal;
+                  }
+                }
+              });
+            });
+          }
           break;
         // 修改类型为修改关联文件: 查找 意见对应关联文件与 更新的关联文件的新增或移除的 文件id,进入文件修改 对应的selectd,  comment内的内容,可不用处理
         case 'editFiles':
@@ -1044,6 +1089,8 @@ export default {
         const ocrLocation = []
         const ocrIds = []
         const scale = img.naturalWidth / img.clientWidth;
+        // console.log('width', img.clientWidth - img.naturalWidth / scale)
+        // console.log('height', img.clientHeight - img.naturalHeight / scale)
         this.approval.ocr.map((ocr) => {
           // icon 高度 等于 ocr 的 top + ocr 高度的一半 乘以缩放 - 图标自身高度的一半
           const newTop = (ocr.location.y + ocr.location.h / 2) / scale - 7.5
