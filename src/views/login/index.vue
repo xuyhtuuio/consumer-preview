@@ -797,7 +797,7 @@ export default {
       this.platlist = []
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.uaa + 'oauth/check_token',
+        url: this.$GLOBAL.cpr + 'oauth/check_token',
         contentType: 'application/x-www-form-urlencoded',
         data: {
           token: window.localStorage.getItem('AI_token')
@@ -913,7 +913,7 @@ export default {
         res = await this.$http({
           method: 'post',
           contentType: 'application/x-www-form-urlencoded',
-          url: this.$GLOBAL.uaa + 'validCodeSms',
+          url: this.$GLOBAL.cpr + 'validCodeSms',
           data
         })
         if (res.status === 200) {
@@ -1066,7 +1066,7 @@ export default {
           }
           const res = await this.$http({
             method: 'post',
-            url: this.$GLOBAL.uaa + 'user/update',
+            url: this.$GLOBAL.cpr + 'user/update',
             headers: {
               'Content-Type': 'application/json'
             },
@@ -1091,16 +1091,17 @@ export default {
         const res = await this.$http({
           method: 'post',
           contentType: 'application/x-www-form-urlencoded',
-          url: this.$GLOBAL.uaa + 'oauth/token',
+          url: this.$GLOBAL.cpr + 'oauth/token',
           data: {
             username: this.form.phone,
             smscode: this.code,
             grant_type: 'sms_code',
-            client_id: 'uaa',
+            client_id: 'cpr',
             client_secret: 'secret'
           },
           msg: false
         })
+        console.log(res)
         if (res.data.access_token) {
           this.$message.success('登录成功')
           this.sendMessage = {
@@ -1265,7 +1266,7 @@ export default {
       // if (this.crtOp === 'inputPsw') {}
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.uaa + 'user/requestAuth',
+        url: this.$GLOBAL.cpr + 'user/requestAuth',
         contentType: 'application/x-www-form-urlencoded',
         data
       })
@@ -1293,7 +1294,7 @@ export default {
       }
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.uaa + 'user/requestDelay',
+        url: this.$GLOBAL.cpr + 'user/requestDelay',
         contentType: 'application/x-www-form-urlencoded',
         data
       })
@@ -1385,13 +1386,14 @@ export default {
     height: 100%;
     display: flex;
     flex-direction: row;
+    position: relative;
 
     .left {
       flex: 1;
       width: 450px;
       display: flex;
-      position: relative;
-      left: 200px;
+      position: absolute;
+      right: 50%;
       border-radius: 4px;
 
       .swiper-container {
@@ -1405,12 +1407,11 @@ export default {
       width: 450px;
       background: #fff;
       margin-right: 160px;
-      margin-left: 10px;
       box-shadow: 0px 0px 10px rgba(67, 67, 67, 0.1);
       padding: 56px;
       text-align: left;
       position: absolute;
-      left: 725px;
+      left: 50%;
       border-top-right-radius: 4px;
       border-bottom-right-radius: 4px;
 
