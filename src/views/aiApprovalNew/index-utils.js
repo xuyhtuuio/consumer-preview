@@ -503,6 +503,7 @@ export default {
       const suffer = ['jpeg', 'jpg', 'png', 'pdf'].includes(temp?.fileName?.split('.')[temp?.fileName?.split('.').length - 1]);
       // 当前文件为 pdf 处理
       if (this.files?.[this.activeIndex].type === 'pdf') {
+        console.log(this.files?.[this.activeIndex])
         this.pdfInfo.pageNow = 1
         this.changePdfPageNow(1)
         return;

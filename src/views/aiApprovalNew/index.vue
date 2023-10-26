@@ -54,10 +54,13 @@
                     :class="{
                       'swiper-slide-img': ['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))
                     }">
-                    <span class="">{{ index + 1 }}.</span>
+                    <span class="file-index">{{ index + 1 }}.</span>
                     <el-image v-if="['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))"
-                      :src="file.url"></el-image>
-                    <file-type class="icon" v-else :fileName="file.fileName"></file-type>
+                      :src="file.url">
+                    </el-image>
+                    <file-type class="icon" v-else :fileName="file.fileName">
+                    </file-type>
+                    <img class="file-zip" v-if="file.zip" src="@/assets/image/ai-approval/zip.svg" alt="">
                     <span class="fileList-list-item-fileName">{{ getfileName(file.fileName) }}
                       <i class="fileList-list-item-fileSuf">.{{ getfileType(file.fileName) }}</i>
                     </span>
@@ -732,11 +735,18 @@ export default {
   }
 
   .fileList-list-item {
+    position: relative;
     border-bottom: 1px dashed #E5E6EB;
     cursor: pointer;
     padding: 10px 24px 10px 24px;
     display: flex;
-
+    .file-index{
+      width: 20px;
+    }
+    .file-zip{
+      position: absolute;
+      left: 54px;
+    }
     /deep/ .el-image {
       width: 20px;
       height: 20px;
