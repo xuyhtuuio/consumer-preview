@@ -23,7 +23,6 @@ service.interceptors.request.use(
     const {
       url,
     } = config;
-    console.log(url)
     // config.headers.Cookie = document.cookie
     if (
       config.contentType === 'application/x-www-form-urlencoded;charset=utf-8'
