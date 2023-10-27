@@ -309,6 +309,7 @@ export default {
         files = this.preComment.files || [this.files?.[this.activeIndex]?.id]
         filesWithComment = this.preComment.filesWithComment || [this.files?.[this.activeIndex]?.id]
       }
+      const ocrId = this.domInfo?.ocrId
       if (Array.isArray(relComments) && relComments?.length !== 0) {
         console.log(relComments)
         // 关联意见执行开始
@@ -319,10 +320,9 @@ export default {
         relComments?.map((relComment) => {
           relComment.filesWithBg = [...filesWithBg, ...relComment.filesWithBg]
           relComment.icons = [this.domInfo?.ocrId, ...relComment.icons]
-          relComment.position = [this.domInfo?.position, ...relComment.position]
           relComment.filesWithComment = [...filesWithComment, ...relComment.filesWithComment]
+          relComment.iconsWithPos[ocrId] = [this.domInfo?.position]
           console.log('relComment', relComment)
-          this.upDateComments('add', relComment)
         })
         this.getComments()
         this.$refs.ocrTxt.getInitContent(this.approval)
@@ -330,7 +330,6 @@ export default {
         console.log('增加后', this.approval)
         // 关联意见执行结尾
       }
-      const ocrId = this.domInfo?.ocrId
       const newComment = {
         id: timestamp,
         str: this.postil.textarea,
@@ -343,7 +342,7 @@ export default {
         selectText: this.domInfo?.string,
         filesWithBg: this.preComment?.filesWithBg || filesWithBg
       }
-      newComment.iconsWithPos[ocrId] = this.domInfo?.position;
+      newComment.iconsWithPos[ocrId] = [this.domInfo?.position];
       if (!newComment.str) {
         return;
       }
@@ -770,48 +769,20 @@ export default {
                   if (Object.keys(comment.iconsWithPos)?.length === 0) {
                     comment.iconsWithPos = item.iconsWithPos
                   } else {
+                    const key = Object.keys(item.iconsWithPos)[0]
                     const ids = Object.keys(comment.iconsWithPos)
-                    if (!ids.includes(Object.keys(item.iconsWithPos)[0])) {
+                    if (!ids.includes(key)) {
                       comment.iconsWithPos = {
                         ...comment.iconsWithPos,
                         ...item.iconsWithPos
                       }
                     } else {
-                      let repeat = false
-                      comment.iconsWithPos[Object.keys(item.iconsWithPos)[0]].map((pos) => {
-                        if (this.objIsSame(pos, item.iconsWithPos[Object.keys(item.iconsWithPos)[0]])) {
-                          repeat = true
-                        }
-                      })
-                      if (!repeat) {
-                        comment.iconsWithPos[Object.keys(item.iconsWithPos)[0]].push(item.iconsWithPos[Object.keys(item.iconsWithPos)[0]])
-                      }
+                      comment.iconsWithPos[key].push(item.iconsWithPos[key])
                     }
                   }
                 } else if (comment.id === item.id) {
                   comment.str = item.str
                   comment.words = item.words
-                  if (Object.keys(comment.iconsWithPos)?.length === 0) {
-                    comment.iconsWithPos = item.iconsWithPos
-                  } else {
-                    const ids = Object.keys(comment.iconsWithPos)
-                    if (!ids.includes(Object.keys(item.iconsWithPos)[0])) {
-                      comment.iconsWithPos = {
-                        ...comment.iconsWithPos,
-                        ...item.iconsWithPos
-                      }
-                    } else {
-                      let repeat = false
-                      comment.iconsWithPos[Object.keys(item.iconsWithPos)[0]].map((pos) => {
-                        if (this.objIsSame(pos, item.iconsWithPos[Object.keys(item.iconsWithPos)[0]])) {
-                          repeat = true
-                        }
-                      })
-                      if (!repeat) {
-                        comment.iconsWithPos[Object.keys(item.iconsWithPos)[0]].push(item.iconsWithPos[Object.keys(item.iconsWithPos)[0]])
-                      }
-                    }
-                  }
                 } else {
                   num++
                 }
@@ -1225,7 +1196,7 @@ export default {
         id: secComment?.id,
         files: secComment?.files,
         // icon_id: icon.icon_id,
-        position: [secComment?.iconsWithPos[icon.ocrId[this.curIconLine]]],
+        position: secComment?.iconsWithPos[icon.ocrId[this.curIconLine]],
         str: secComment?.str,
         selectText: secComment?.selectText,
         words: secComment?.words
