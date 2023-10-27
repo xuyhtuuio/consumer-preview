@@ -38,7 +38,7 @@
               <div class="middle-1">{{ item.feedBack }}</div>
               <div class="middle-2">{{ item.isPass === 1 ? '已通过回检' : '未通过回检' }}</div>
               <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
-              <div class="middle-2">{{ item.fullName }}/{{ item.userId }}</div>
+              <div class="middle-2">{{ item.fullname }}/{{ item.userId }}</div>
               <div class="middle-2">{{ item.org }}</div>
               <div class="middle-2">{{ returnTime(new Date(item.createTime)) }}更新一条回检记录</div>
             </div>
@@ -53,7 +53,7 @@
 <script>
 import 'swiper/css/swiper.css'
 import Swiper from 'swiper'
-import { checkBackList } from '@/api/intelligent-recheck'
+import { getRecheckList } from '@/api/intelligent-recheck'
 import { formatterTime } from '@/utils/utils'
 import UploadDialog from './components/upload-dialog'
 export default {
@@ -84,7 +84,7 @@ export default {
         sort: 1,
         sortType: 2
       }
-      checkBackList(dataConfig).then(res => {
+      getRecheckList(dataConfig).then(res => {
         const { data } = res.data;
         if (data) {
           this.recheckList = data.list;
