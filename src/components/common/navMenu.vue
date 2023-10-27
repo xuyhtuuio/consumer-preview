@@ -158,6 +158,8 @@ export default {
         newWindow.location = 'http://192.168.210.57:31963'
       } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
         newWindow.location = 'https://dataelite.trs.com.cn/'
+      } else if (window.location.host === 'cwo.dataelite.trs.com.cn') {
+        newWindow.location = 'https://cwo.dataelite.trs.com.cn/#/login?from=cwo';
       } else {
         const name = window.self === window.top ? 'login' : 'loginAuto'
         this.$router.push({

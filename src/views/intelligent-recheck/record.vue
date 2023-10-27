@@ -141,6 +141,7 @@
               @change="changeArrrovalType"
               clearable
             >
+
               <el-option
                 v-for="(item, index) in transactionTypes"
                 :key="index"

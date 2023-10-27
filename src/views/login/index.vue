@@ -441,6 +441,8 @@
 
 <script>
 import md5 from 'js-md5'
+import request from '@/api/request'
+import Qs from 'qs'
 import { toCode, fromCode } from '@/utils/utils'
 import { editThePermissionsPage } from '@/api/admin/role'
 // eslint-disable-next-line
@@ -1329,6 +1331,22 @@ export default {
     },
     changeAreaCode(val) {
       this.areaCode = val
+    },
+    async getTokenById() {
+      try {
+        const query = Qs.parse(window.location.search.slice(1))
+        if (query && query.id) {
+          const res = await request({
+            method: 'post',
+            url: `uaa/user/getToken?key=${query.id}`,
+            showErrorMsg: false
+          })
+          window.localStorage.setItem('AI_token', res.data.data.value)
+          window.localStorage.setItem('user_name', res.data.data.user_name)
+        }
+      // eslint-disable-next-line no-empty
+      } catch {
+      }
     }
   },
   filters: {
@@ -1336,14 +1354,29 @@ export default {
       return val ? val.substring(0, 3) + '****' + val.substring(7) : ''
     }
   },
+
   beforeRouteEnter(to, from, next) {
-    next((vm) => {
+    next(async (vm) => {
       if (
         from
         && !['login', 'loginAuto', 'microLogin'].includes(from.name)
         && from.fullPath !== '/'
       ) {
         vm.gohistory = from.name || true
+      } else if (from && from.query && from.query.from === 'cpr') {
+        vm.getTokenById()
+        window.open(window.location.host + '/applycenter/apply-list', '_self')
+      } else if (from && from.query && from.query.from === 'cwo') {
+        vm.getTokenById()
+        // cwo.dataelite.trs.com.cn/#/?id=×××××××××
+        window.open(
+          'http://cwo.dataelite.trs.com.cn/#/'
+            + `?id= ${md5.hex(window.localStorage.getItem('AI_token'))}`
+        )
+      } else {
+        this.$router.push({
+          name: 'homePage'
+        })
       }
     })
   }
