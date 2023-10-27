@@ -56,7 +56,9 @@ export default new Vuex.Store({
       defaultPerm: [],
       funPerms: [],
       dataPerm: [],
-    }
+    },
+    windowHeight: 0,
+    setDefalutTagsList: [] // 知识集市-默认标签列表
   },
   mutations: {
     selectedNode(state, val) {
@@ -111,6 +113,9 @@ export default new Vuex.Store({
       state.checkApprovedForm.editOpinionForm = {}
       state.checkApprovedForm.editOpinionRequired = false
       state.checkApprovedForm.uploadFileRadio = 1
+    },
+    setWindowHeight(state) {
+      state.windowHeight = document.documentElement.clientHeight * 1.5;
     }
   },
   getters: {

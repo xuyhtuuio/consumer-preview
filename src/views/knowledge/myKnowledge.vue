@@ -1,8 +1,8 @@
 <template>
   <div class="my" v-loading="loadingList">
-    <FilterKnowledge  :total="page.total" @changeSort="changeSort" @changeTags="changeCheckedTags" style="margin-top: 0; border-top-left-radius: 0; border-top-right-radius: 0;"/>
+    <FilterKnowledge ref="filterKnowledge"  :total="page.total" @changeSort="changeSort" @changeTags="changeCheckedTags" style="margin-top: 0; border-top-left-radius: 0; border-top-right-radius: 0;"/>
     <div v-for="(k, i) in kCardList" :key="i">
-      <KnowledgeCard :data="k"/>
+      <KnowledgeCard :data="k" @fetchList="getRecommendList(paramsDefalut)"/>
     </div>
     <el-empty description="暂无数据" v-if="kCardList.length === 0 && loadingList === false"></el-empty>
     <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
@@ -44,6 +44,14 @@ export default {
     this.getRecommendList(this.paramsDefalut)
   },
   methods: {
+    getSearchList(params) {
+      this.paramsDefalut = this.$options.data().paramsDefalut
+      this.$refs['filterKnowledge'].resetForm()
+      this.getRecommendList({
+        ...this.paramsDefalut,
+        ...params
+      })
+    },
     async getRecommendList(data) {
       this.loadingList = true
       const res = await getRecommendList(data)

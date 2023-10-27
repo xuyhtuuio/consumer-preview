@@ -1,5 +1,5 @@
 <template>
-  <div class="tCard">
+  <div class="tCard" v-loading="loadingList">
     <div class="sort">
       <span class="sort1" @click="changeSortType('sort1')" :class="{ active: currentSort === 'sort1' }">
         按讨论量排序
@@ -35,12 +35,14 @@
         </div>
       </div>
       <div style="width: 92px;">
-        <el-switch v-model="tag.isAttention"></el-switch> 已关注
+        <el-switch v-model="tag.isAttention" @change="changeAttention(tag)"></el-switch> 已关注
       </div>
     </div>
+    <el-empty description="暂无数据" v-if="list.length === 0 && loadingList === false" style="background: #fff;"></el-empty>
   </div>
 </template>
 <script>
+import { getAttentionTagList, setAttention } from '@/api/knowledge/knowledgeCollect'
 export default {
   name: 'tag-list',
   data() {
@@ -53,25 +55,20 @@ export default {
         ['#E6FFFB', '#5EDFD6'],
       ],
       index: new Array(10).fill(1).map(() => Math.floor(Math.random() * 5)),
-      list: [
-        {
-          attentionCount: 100,
-          discussNum: 10,
-          id: 1,
-          isAttention: 1,
-          isNewAdd: 1,
-          knowledgeContent: '近日，中国银保监会消费者权益保护局发布2021年第12号但是，关于兴业银行侵害但是，关于兴业银行侵害消费者权益情况的通报。关于兴业银行侵害但是，关于兴业银行侵害消费者权益情况的通报',
-          name: '阿斯顿发顺丰',
-          selectedNum: '1001',
-          orderNum: 1,
-          userId: 123
-        }
-      ],
+      list: [],
       sortObject: {
         sort1: 'desc',
         sort2: 'asc',
       },
-      currentSort: 'sort1'
+      currentSort: 'sort1',
+      defalutParams: {
+        keyword: '',
+        orderType: 'desc',
+        orderValue: 1,
+        pageNum: 1,
+        pageSize: 10
+      },
+      loadingList: false
     }
   },
   computed: {
@@ -84,7 +81,28 @@ export default {
       }
     },
   },
+  created() {
+    this.getAttentionTagList()
+  },
   methods: {
+    async getAttentionTagList(params) {
+      this.loadingList = true
+      const res = await getAttentionTagList({
+        ...this.defalutParams,
+        ...params
+      })
+      if (res.data.success) {
+        this.list = (res.data.data.list || []).map(item => {
+          item.isAttention = Boolean(item.isAttention)
+          return item;
+        })
+        this.$emit('updateTagList', {
+          total: res.data.data.totalCount,
+          pageNow: res.data.data.pageNow
+        })
+      }
+      this.loadingList = false
+    },
     changeSortType(type) {
       if (this.currentSort === type) {
         if (this.sortObject[type] === 'desc') {
@@ -95,6 +113,24 @@ export default {
       } else {
         this.currentSort = type
       }
+      this.getAttentionTagList({
+        orderValue: +type.slice(-1),
+        orderType: this.sortObject[type]
+      })
+    },
+    async changeAttention(tag) {
+      const res = await setAttention({
+        type: 2,
+        isAttention: tag.isAttention ? 1 : 0,
+        id: tag.id
+      })
+      if (res.data.success) {
+        if (tag.isAttention) {
+          this.$message.success('关注成功')
+          return;
+        }
+        this.$message.success('取消关注成功')
+      }
     },
     toTagDetail(tag) {
       this.$emit('toTagDetail', tag)
@@ -103,6 +139,9 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+.tCard {
+  width: calc(100vw - 372px);
+}
 .card {
   width: calc(100vw - 372px);
   display: flex;
@@ -125,7 +164,7 @@ export default {
   }
   .content {
     position: relative;
-    width: calc(100% - 88px);
+    width: calc(100% - 217px);
     margin-right: 16px;
     font-size: 12px;
     line-height: 20px;
@@ -161,6 +200,10 @@ export default {
         margin-right: 20px;
       }
     }
+  }
+  &:hover {
+    border-radius: 8px;
+    background: #F7F8FA;
   }
 }
 .sort {

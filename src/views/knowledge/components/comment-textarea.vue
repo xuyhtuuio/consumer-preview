@@ -20,8 +20,8 @@
       </div>
       <TrsTag
         v-for="(tag, index) in tags"
-        :key="tag"
-        :tag="{ label: tag, ...tagConfig }"
+        :key="tag.id"
+        :tag="{ label: tag.name, ...tagConfig }"
         @handleClose="removeTag(index)"
       />
     </div>
@@ -42,9 +42,13 @@
         <div class="content">
           <el-input v-model.trim="serach" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
           <ul class="tags-list trs-scroll">
-            <li class="tag-li pointer" v-for="(tag, index) in tagsList" :key="index" @mouseover="hoverText = tag"  @mouseout="hoverText = ''">
-              <span class="tag-text ellipsis">#{{ tag }}</span>
-              <span v-show="tag === serach || hoverText === tag" style="color:#2D5CF6;" @click="addTags(tag)">创建新标签</span>
+            <li class="tag-li pointer" v-if="showNewTag">
+              <span class="tag-text ellipsis">#{{ serach }}</span>
+              <span style="color:#2D5CF6;" @click="addTags()">创建新标签</span>
+            </li>
+            <li class="tag-li pointer" v-for="(tag) in tagsList" :class="{ active: checkedTags.includes(tag.id) }" :key="tag.id" @click="changeCheckedTags(tag)">
+              <span class="tag-text ellipsis">#{{ tag.name }}</span>
+              <!-- <span v-show="tag === serach || hoverText === tag" style="color:#2D5CF6;" @click="addTags(tag)">创建新标签</span> -->
             </li>
           </ul>
           <el-empty v-if="serach && tagsList.length === 0" description="暂无数据"></el-empty>
@@ -70,6 +74,8 @@
 </template>
 <script>
 import { getFormGroups } from '@/api/front';
+import { mapState } from 'vuex'
+import { addTag } from '@/api/knowledge/knowledgeCollect'
 import fileType from '@/components/common/file-type'
 import CommentTextareaDialog from './comment-textarea-dialog'
 export default {
@@ -84,29 +90,7 @@ export default {
       content: '',
       type: '',
       serach: '',
-      hoverText: '',
-      tagsList: [
-        // '案范围分为',
-        // 'afws wefwef文',
-        // 'wefwae问的人违反文档威风威风为',
-        // '阿尔法违法未',
-        // '案范围分为1',
-        // 'afws wefwef文1',
-        // 'wefwae问的人违反',
-        // '阿尔法违法未1',
-        // '案范围分为2',
-        // 'afws wefwef文2',
-        // 'wefwae问的人违反2',
-        // '阿尔法违法未2',
-        // '案范围分为3',
-        // 'afws wefwef文3',
-        // 'wefwae问的人违反3',
-        // '阿尔法违法未3',
-        // '案范围分为4',
-        // 'afws wefwef文4',
-        // 'wefwae问的人违反4',
-        // '阿尔法违法未4'
-      ],
+      tagsList: [],
       tags: [], // 添加的标签池
       tagConfig: {
         background: '#f0f6ff',
@@ -120,15 +104,46 @@ export default {
     }
   },
   computed: {
+    showNewTag() {
+      return this.serach && this.tagsList.findIndex(item => item.name === this.serach) === -1
+    },
+    checkedTags() {
+      return this.tags.map(item => item.id)
+    },
     getfileType() {
       return val => {
         return val?.split('.')[val.split('.').length - 1]
       }
     },
+    ...mapState(['setDefalutTagsList'])
+  },
+  watch: {
+    setDefalutTagsList(val) {
+      this.tagsList = val || []
+    }
+  },
+  created() {
   },
   methods: {
-    addTags(tag) {
-      this.tags.push(tag)
+    async addTags() {
+      const res = await addTag({ tagName: this.serach })
+      if (res.data.success) {
+        const { id } = res.data.data
+        this.tags.push({
+          name: this.serach,
+          id
+        })
+        this.serach = ''
+        this.$message.success('新建标签成功')
+      }
+    },
+    changeCheckedTags(tag) {
+      const index = this.tags.findIndex(item => item.id === tag.id);
+      if (index === -1) {
+        this.tags.push(tag)
+      } else {
+        this.tags.splice(index, 1)
+      }
     },
     removeTag(index) {
       this.tags.splice(index, 1)
@@ -297,5 +312,8 @@ export default {
       width: 150px;
     }
   }
+}
+.active {
+  color: #2D5CF6;
 }
 </style>

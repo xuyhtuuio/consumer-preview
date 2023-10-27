@@ -1,11 +1,11 @@
 <template>
   <div class="collect-knowledge">
-    <el-input placeholder="请输入标题、正文、标签等关键词查询" v-model.trim="searchText" size="mini">
-      <el-button slot="append" icon="el-icon-search" size="mini" type="primary"></el-button>
+    <el-input placeholder="请输入标题、正文、标签等关键词查询" v-model.trim="searchText" @keypress.native.enter="changeSearch" size="mini">
+      <el-button slot="append" icon="el-icon-search" size="mini" type="primary" @click="changeSearch"></el-button>
     </el-input>
     <div class="manage">
       <LeftMenu @changeLeftMenu="changeLeftMenu"/>
-      <component :is="componentId"></component>
+      <component :is="componentId" ref="kCompnent"></component>
     </div>
   </div>
 </template>
@@ -33,6 +33,9 @@ export default {
   methods: {
     changeLeftMenu(name) {
       this.componentId = name
+    },
+    changeSearch() {
+      this.$refs['kCompnent'].getSearchList({ keyword: this.searchText })
     }
   }
 }

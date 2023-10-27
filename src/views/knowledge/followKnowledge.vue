@@ -22,20 +22,20 @@
           </div>
         </div>
         <div class="right" style="text-align:center;margin:16px;">
-          <el-button type="primary" v-if="currentTag.isAttention === 1">已关注</el-button>
+          <el-button type="primary" v-if="currentTag.isAttention">已关注</el-button>
           <el-button type="primary" v-else plain icon="el-icon-plus">加关注</el-button>
         </div>
       </div>
     </div>
     <template v-if="active === '知识'">
-      <FilterKnowledge v-loading="loadingList" :total="page.total" @changeSort="changeSort" @changeTags="changeCheckedTags"  style="margin-top: 0; border-top-left-radius: 0; border-top-right-radius: 0;"/>
+      <FilterKnowledge ref="filterKnowledge" v-loading="loadingList" :total="page.total" @changeSort="changeSort" @changeTags="changeCheckedTags"  style="margin-top: 0; border-top-left-radius: 0; border-top-right-radius: 0;"/>
       <div v-for="(k, i) in kCardList" :key="i" v-loading="loadingList">
-        <KnowledgeCard :data="k"/>
+        <KnowledgeCard :data="k" @fetchList="getRecommendList(paramsDefalut)"/>
       </div>
       <el-empty description="暂无数据" v-if="kCardList.length === 0 && loadingList === false"></el-empty>
     </template>
     <template v-else>
-      <TagList @toTagDetail="toTagDetail"/>
+      <TagList @toTagDetail="toTagDetail" @updateTagList="updateTagList"/>
     </template>
     <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
       v-if="page.total">
@@ -81,6 +81,14 @@ export default {
     this.getRecommendList(this.paramsDefalut)
   },
   methods: {
+    getSearchList(params) {
+      this.paramsDefalut = this.$options.data().paramsDefalut
+      this.$refs['filterKnowledge'].resetForm()
+      this.getRecommendList({
+        ...this.paramsDefalut,
+        ...params
+      })
+    },
     async getRecommendList(data) {
       this.loadingList = true
       const res = await getRecommendList(data)
@@ -137,12 +145,23 @@ export default {
       this.page.pageNow = 1
       this.active = '知识'
       this.showTagDetail = true
+      this.$nextTick(() => {
+        this.getSearchList({
+          tagIds: [tag.id]
+        })
+      })
+    },
+    updateTagList(page) {
+      this.page.pageNow = page.pageNow
+      this.page.total = page.total
     }
   }
 }
 </script>
 <style lang="less" scoped>
 .follow {
+  padding: 0 8px 8px;
+  background: #FFFFFF;
   .tabs {
     display: flex;
     padding: 16px 24px 0;

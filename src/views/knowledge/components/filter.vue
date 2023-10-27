@@ -88,6 +88,11 @@ export default {
     })
   },
   methods: {
+    resetForm() {
+      this.currentSort = 'sort1'
+      this.checkedTags = []
+      this.sortObject.justSelected = false
+    },
     async getTagInfoList(data) {
       this.loadingTag = true
       const res = await getTagInfoList(data)
@@ -96,6 +101,7 @@ export default {
       } else {
         this.tagsList = []
       }
+      this.$store.state.setDefalutTagsList = this.tagsList
       this.loadingTag = false
     },
     changeJustCare() {
