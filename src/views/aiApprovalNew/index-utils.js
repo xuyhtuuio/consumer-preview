@@ -379,8 +379,31 @@ export default {
     },
     // 展示连线
     showCommentLine(obj, fileId) {
+      console.log('obj', obj)
       if (fileId) {
         this.changeFileById(fileId)
+        console.log('非图标')
+        const iconOcrIds = Object.keys(obj.iconsWithPos).flat(1)
+        const resIcon = []
+        iconOcrIds.map((ioid) => {
+          const relIcons = this.icons.filter((i) => {
+            if (i.ocrId.includes(ioid)) {
+              return i
+            }
+          })
+          resIcon.push(...relIcons)
+        })
+        const iconIds = resIcon.map((i) => {
+          return i.icon_id
+        })
+        const positions = Object.values(obj.iconsWithPos).flat(1)
+        iconIds.map((icon) => {
+          this.changeIconShow(icon)
+        })
+        if (!positions?.length) {
+          return;
+        }
+        obj.position = positions
       }
       if (!obj?.position?.length) {
         return;
@@ -1213,7 +1236,15 @@ export default {
           // const newIcon = icon
           // newIcon.showIndex = showIndex
           // this.$set(this.icons, this.icons[index], newIcon)
-          icon.showIndex = showIndex
+          if (showIndex) {
+            icon.showIndex = showIndex
+            return;
+          }
+          if (icon.showIndex === 1) {
+            icon.showIndex = -1
+          } else {
+            icon.showIndex = 1
+          }
         }
       })
     },
