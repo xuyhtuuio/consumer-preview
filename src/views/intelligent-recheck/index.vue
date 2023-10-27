@@ -141,9 +141,9 @@ export default {
           item: {
             key: '',
             name: this.select === '1' ? this.recheckInput : '',
-            text: this.select === '2' ? this.recheckInput : ''
+            text: this.select === '2' ? this.recheckInput : '',
+            searchType: 1,
           },
-          searchType: 1,
         }
       })
     }

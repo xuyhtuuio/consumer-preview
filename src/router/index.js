@@ -162,7 +162,8 @@ const router = new Router({
           name: 'recheck-detail',
           component: () => import('@/views/intelligent-recheck/detail'),
           meta: {
-            title: '回检列表'
+            title: '回检列表',
+            // keepAlive: true
           }
         },
         {

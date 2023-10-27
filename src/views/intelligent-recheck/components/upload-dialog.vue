@@ -62,15 +62,16 @@ export default {
                 item: {
                   ...res.data.data,
                   name: '',
-                  text: ''
+                  text: '',
+                  searchType: 2,
                 },
-                searchType: 2,
               }
             })
             this.$emit('changeImgFun', {
               ...res.data.data,
               name: '',
-              text: ''
+              text: '',
+              searchType: 2,
             });
             this.turnDialog = false;
           } else {

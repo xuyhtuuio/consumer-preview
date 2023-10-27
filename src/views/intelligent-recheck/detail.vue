@@ -70,6 +70,7 @@
                   v-model="searchForm.org"
                   ref="org-cascader"
                   :options="agenciesList"
+                  @change="changeSearchForm"
                   :props="{
                     emitPath: false,
                     checkStrictly: true,
@@ -107,11 +108,13 @@
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
                   popper-class="date-style"
+                  @change="changeSearchForm"
+                  value-format="yyyy-MM-dd"
                 >
                 </el-date-picker>
                 <div slot="reference">
                   <div class="select-set">
-                    <div class="tip-style" :class="{ 'tip-style-active': searchForm.setTime }">上线时间</div>
+                    <div class="tip-style" :class="{ 'tip-style-active': searchForm.setTime.length > 0 }">上线时间</div>
                     <i class="el-icon-caret-bottom"></i>
                   </div>
                 </div>
@@ -137,11 +140,13 @@
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
                   popper-class="date-style"
+                  @change="changeSearchForm"
+                  value-format="yyyy-MM-dd"
                 >
                 </el-date-picker>
                 <div slot="reference">
                   <div class="select-set">
-                    <div class="tip-style" :class="{ 'tip-style-active': searchForm.getTime }">提单时间</div>
+                    <div class="tip-style" :class="{ 'tip-style-active': searchForm.getTime.length > 0 }">提单时间</div>
                     <i class="el-icon-caret-bottom"></i>
                   </div>
                 </div>
@@ -156,13 +161,14 @@
                 popper-class="content-select op-select"
                 v-model="searchForm.type"
                 slot="prepend"
+                @change="changeSearchForm"
                 placeholder="事项类型"
               >
                 <el-option v-for="(item, index) in transactionTypes" :key="'type' + index" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </div>
             <div class="select-item select-time" style="width: 92px">
-              <el-switch v-model="searchForm.recheck" active-text="已回检">
+              <el-switch v-model="searchForm.recheck" active-text="已回检" @change="changeSearchForm">
               </el-switch>
             </div>
           </div>
@@ -206,19 +212,19 @@
               :watch="totalList">
               <!-- each component is wrapped by a waterfall slot -->
               <WaterfallSlot
-                v-for="(item, index) in totalList"
+                v-for="(ite, index) in totalList"
                 :width="192"
-                :height="item.height"
+                :height="ite.height"
                 :order="index"
-                :key="item.id"
+                :key="ite.id"
                 move-class="item-move"
               >
                 <div class="list-item">
                   <div class="num">
-                    {{ (item.distance * 100).toFixed(2) }}%
+                    {{ (ite.distance * 100).toFixed(2) }}%
                   </div>
                   <div class="img-model">
-                    <img :src="item.fileUrl" alt="" />
+                    <img :src="ite.fileUrl" alt="" />
                     <div class="img-up" @click="toCompare">
                       <div class="recheck-num">回检3次</div>
                       <div class="show-more" @click.stop="showDetail">
@@ -227,7 +233,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="item-title">{{ item.fileName }}</div>
+                  <div class="item-title">{{ ite.fileName }}</div>
                 </div>
               </WaterfallSlot>
             </Waterfall>
@@ -334,8 +340,8 @@ export default {
     searchType: 2,
     searchForm: {
       org: '',
-      setTime: '',
-      getTime: '',
+      setTime: [],
+      getTime: [],
       type: '',
       recheck: false
     },
@@ -387,9 +393,11 @@ export default {
   created() {
     this.getOrgTree();
     this.getApprovalType();
-    if (this.$route.params.item && this.$route.params.searchType) {
-      this.item = this.$route.params.item;
-      this.searchType = this.$route.params.searchType;
+    const item = JSON.parse(localStorage.getItem('recheckItem'));
+    if (this.$route.params.item || item) {
+      this.item = this.$route.params.item || item;
+      localStorage.setItem('recheckItem', JSON.stringify(this.item));
+      this.searchType = this.item.searchType;
       let activeSort = {};
       if (this.searchType === 1) {
         this.sortList = sortListType1;
@@ -538,10 +546,16 @@ export default {
     },
     changeImgFun(item) {
       this.item = item;
-      console.log(item);
+      localStorage.setItem('recheckItem', JSON.stringify(this.item));
       this.searchType = 2;
       this.sortList = sortListType2;
       this.resetSearch();
+      this.getSimilarityComparisonList()
+    },
+    changeSearchForm() {
+      this.pageNum = 1;
+      this.loading = true;
+      this.totalList = [];
       this.getSimilarityComparisonList()
     },
     searchRecheck() {
@@ -552,8 +566,10 @@ export default {
       this.item = {
         key: '',
         name: this.select === '1' ? this.recheckInput : '',
-        text: this.select === '2' ? this.recheckInput : ''
+        text: this.select === '2' ? this.recheckInput : '',
+        searchType: 1
       };
+      localStorage.setItem('recheckItem', JSON.stringify(this.item));
       this.searchType = 1;
       this.sortList = sortListType1;
       this.resetSearch();
@@ -567,9 +583,16 @@ export default {
         name: this.item.name,
         text: this.item.text,
         pageNow: this.pageNum,
-        pageSize: this.pageSize,
+        pageSize: this.searchType === 1 ? 40 : 20,
         sort: this.activeSort.val,
-        sortType: this.activeSort.sort === 'desc' ? 1 : 2
+        sortType: this.activeSort.sort === 'desc' ? 1 : 2,
+        cstartTime: this.searchForm.getTime.length > 0 ? this.searchForm.getTime[0] : '',
+        cendTime: this.searchForm.getTime.length > 0 ? this.searchForm.getTime[1] : '',
+        startTime: this.searchForm.setTime.length > 0 ? this.searchForm.setTime[0] : '',
+        endTime: this.searchForm.setTime.length > 0 ? this.searchForm.setTime[1] : '',
+        orgId: this.searchForm.org,
+        isRecheck: this.searchForm.recheck ? 1 : 0,
+        formCategory: this.searchForm.type
       }
       getSimilarityComparisonList(data)
         .then((res) => {
