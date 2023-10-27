@@ -27,7 +27,7 @@
         <div v-for="(ocr, i) in html" class="div-position"  :key="i" :style="returnStyle(i)">
           <template v-for="(item, j) in ocr">
             <!-- <template  v-if="typeof item === 'string'">{{ item }}</template> -->
-            <div :data-ocrItem="item.ocrId" :class="{ commentNode:item.hasBg}" v-if="!item.wordType" :key="i + '_' + j + '_'" @click="showOcrCommentLine($event,item.ocrId)">{{ item.text }}</div>
+            <div :class="{ commentNode:item.hasBg}" v-if="!item.wordType" :key="i + '_' + j + '_'" @click="showOcrCommentLine">{{ item.text }}</div>
             <span v-else :key="i + '_' + j" :wordType="item.wordType" :id="`word_${i}_${j}`" :class="{
               active:
                 activeWordType === item.wordType || activeWordType === 0,
@@ -168,7 +168,11 @@ export default {
             const selectNodes = [range.commonAncestorContainer.parentNode]
             this.selectNodes = selectNodes
           }
-          this.selectOcr.ocrId = this.selectNodes[0].getAttribute('data-ocrItem')
+          const ocrId = '' + new Date().getTime()
+          this.selectNodes.map((secNodes) => {
+            secNodes.setAttribute('data-ocrItem', ocrId)
+          })
+          this.selectOcr.ocrId = ocrId
         }, 300)
       }
     },
@@ -397,11 +401,12 @@ export default {
       }
       this.$emit('addWord', obj, nodes)
     },
-    showOcrCommentLine(event, item) {
+    showOcrCommentLine(event) {
       const selectText = window.getSelection
         ? window.getSelection().toString()
         : document.selection.createRange().text
       const node = event.target.parentNode
+      const ocrId = event.target.getAttribute('data-ocrItem')
       if (!Array.from(event.target.classList).includes('commentNode')) {
         return;
       }
@@ -416,7 +421,7 @@ export default {
         top: Math.floor(node.offsetTop * this.styleProp.wordDomStyle.scale),
         width: Math.floor((node.offsetWidth)),
       }
-      this.$emit('showOcrCommentLine', position, item)
+      this.$emit('showOcrCommentLine', position, ocrId)
     }
   }
 }

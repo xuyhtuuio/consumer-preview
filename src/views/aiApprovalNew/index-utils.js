@@ -313,15 +313,12 @@ export default {
       if (Array.isArray(relComments) && relComments?.length !== 0) {
         console.log(relComments)
         // 关联意见执行开始
-        filesWithBg = [{
-          fileId: this.files?.[this.activeIndex]?.id,
-          fileBgs: this.domInfo.domIndexs
-        }]
         relComments?.map((relComment) => {
           relComment.filesWithBg = [...filesWithBg, ...relComment.filesWithBg]
           relComment.icons = [this.domInfo?.ocrId, ...relComment.icons]
           relComment.filesWithComment = [...filesWithComment, ...relComment.filesWithComment]
           relComment.iconsWithPos[ocrId] = [this.domInfo?.position]
+          relComment.iconsWithOcrIndex[ocrId] = [this.domInfo?.domIndexs[0]]
           console.log('relComment', relComment)
         })
         this.getComments()
@@ -338,11 +335,12 @@ export default {
         words,
         icons: [this.domInfo?.ocrId],
         iconsWithPos: {},
-        position: [this.domInfo?.position],
+        iconsWithOcrIndex: {},
         selectText: this.domInfo?.string,
         filesWithBg: this.preComment?.filesWithBg || filesWithBg
       }
       newComment.iconsWithPos[ocrId] = [this.domInfo?.position];
+      newComment.iconsWithOcrIndex[ocrId] = [this.domInfo?.domIndexs[0]]
       if (!newComment.str) {
         return;
       }
@@ -588,7 +586,7 @@ export default {
       this.filePopoverShow = false
     },
     async getOcr(temp) {
-      let ocr = [];
+      const ocr = [];
       await getOCRAnalysisResults({
         fileId: temp.id
       }).then(res => {
@@ -603,11 +601,11 @@ export default {
           }
         }
       });
-      ocr = ocr.map((o, i) => {
-        const id = '' + new Date().getTime() + i
-        o.ocrId = id
-        return o
-      })
+      // ocr = ocr.map((o, i) => {
+      //   const id = '' + new Date().getTime() + i
+      //   o.ocrId = id
+      //   return o
+      // })
       return ocr;
     },
     changeOcrView() {
@@ -791,6 +789,7 @@ export default {
                 if (comment.str === item.str) {
                   if (Object.keys(comment.iconsWithPos)?.length === 0) {
                     comment.iconsWithPos = item.iconsWithPos
+                    comment.iconsWithOcrIndex = item.iconsWithOcrIndex
                   } else {
                     const key = Object.keys(item.iconsWithPos)[0]
                     const ids = Object.keys(comment.iconsWithPos)
@@ -799,8 +798,13 @@ export default {
                         ...comment.iconsWithPos,
                         ...item.iconsWithPos
                       }
+                      comment.iconsWithOcrIndex = {
+                        ...comment.iconsWithOcrIndex,
+                        ...item.iconsWithOcrIndex
+                      }
                     } else {
                       comment.iconsWithPos[key].push(item.iconsWithPos[key])
+                      comment.iconsWithOcrIndex[key].push(item.iconsWithOcrIndex[key])
                     }
                   }
                 } else if (comment.id === item.id) {
@@ -1152,19 +1156,22 @@ export default {
         const scale = img.naturalWidth / img.clientWidth;
         this.comments.map((comment) => {
           const commentIcons = Object.keys(comment.iconsWithPos)
+          console.log(commentIcons)
           if (commentIcons?.length) {
             commentIcons.map((icon) => {
-              const iconOcr = this.approval.ocr.filter((ocr) => {
-                return ocr.ocrId === icon
-              })
+              // const iconOcr = this.approval.ocr.filter((ocr) => {
+              //   return ocr.ocrId === icon
+              // })
+              const ocrIndex = comment.iconsWithOcrIndex[icon][0]
+              console.log(comment)
               // icon 高度 等于 ocr 的 top + ocr 高度的一半 乘以缩放 - 图标自身高度的一半
-              const iconTop = (iconOcr[0]?.location?.y + iconOcr[0]?.location?.h / 2) / scale - 7.5
+              const iconTop = (this.approval.ocr[ocrIndex]?.location?.y + this.approval.ocr[ocrIndex]?.location?.h / 2) / scale - 7.5
               if (!this.icons.length) {
                 const newIcon = {
                   icon_id: '' + new Date().getTime() + icon,
                   ocrId: [icon],
                   iconTop,
-                  ocrLocation: iconOcr[0].location,
+                  ocrLocation: this.approval.ocr[ocrIndex].location,
                   showIndex: -1
                 }
                 this.icons.push(newIcon)
@@ -1182,7 +1189,7 @@ export default {
                     icon_id: '' + new Date().getTime() + icon,
                     ocrId: [icon],
                     iconTop,
-                    ocrLocation: iconOcr[0]?.location,
+                    ocrLocation: this.approval.ocr[ocrIndex]?.location,
                     showIndex: -1
                   }
                   this.icons.push(newIcon)
@@ -1270,6 +1277,7 @@ export default {
     },
     // 点击ocr，获取对应 icon 最终走到意见，执行连线逻辑
     findIconPos(ocrId) {
+      console.log(ocrId)
       let resIcon = {}
       this.icons.map((icon) => {
         if (icon.ocrId.includes(ocrId)) {
