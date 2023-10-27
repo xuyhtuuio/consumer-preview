@@ -6,116 +6,164 @@
         <el-input
           placeholder="请输入关键词开始检索"
           @keyup.enter.native="handleSubmit"
-          v-model="searchInput"
+          v-model="search.searchInput"
         ></el-input>
       </div>
 
       <div class="search-middle-area">
         <div class="left-area">
-          <el-row>
-            <el-col :span="6">
-              <div
-                class="scrren-com"
-                :class="search.mechanism ? 'active' : ''"
-                style="font-size: 16px"
+          <div
+            class="scrren-com"
+            :class="search.mechanism ? 'active' : ''"
+            style="font-size: 14px"
+          >
+            {{ search.orgIds ? search.orgName : '选择机构' }}
+            <img
+              src="../../assets/image/person-center/down.png"
+              class="down"
+              alt=""
+            />
+            <el-cascader
+              class="my-hidden"
+              :options="agenciesList"
+              :show-all-levels="false"
+              :props="{
+                emitPath: false,
+                checkStrictly: true,
+                label: 'name',
+                value: 'id',
+                children: 'children'
+              }"
+              @change="changeAgencies"
+              v-model="search.orgIds"
+              ref="agencies"
+              clearable
+            ></el-cascader>
+
+            <img
+              src="../../assets/image/why.png"
+              alt=""
+              style="width: 20px; height: 20px; margin-left: 4px"
+            />
+          </div>
+
+          <div
+            class="scrren-com"
+            :class="search.datePickerOnline ? 'active' : ''"
+            style="font-size: 14px"
+          >
+            <el-popover
+              ref="ref-popover"
+              width="400"
+              placement="bottom-start"
+              trigger="click"
+            >
+              <el-date-picker
+                class="my-date-picker"
+                ref="my-date-picker"
+                v-model="search.datePickerOnline"
+                type="monthrange"
+                align="right"
+                range-separator="至"
+                start-placeholder="开始月份"
+                end-placeholder="结束月份"
+                :picker-options="pickerOptions"
+                @change="changeOnlineDate"
               >
-                选择机构
+              </el-date-picker>
+              <div slot="reference">
+                上线时间
                 <img
                   src="../../assets/image/person-center/down.png"
                   class="down"
                   alt=""
                 />
-                <el-cascader
-                  class="my-hidden"
-                  v-model="search.mechanism"
-                  :props="{ checkStrictly: true }"
-                ></el-cascader>
               </div>
-              <img
-                src="../../assets/image/why.png"
-                alt=""
-                style="width: 20px; height: 20px; margin-left: 4px"
-              />
-            </el-col>
-            <el-col :span="6">
-              <div
-                class="scrren-com"
-                :class="search.datePickerOnline ? 'active' : ''"
-                style="font-size: 16px"
+            </el-popover>
+          </div>
+          <div
+            class="scrren-com"
+            :class="search.datePickerBill ? 'active' : ''"
+            style="font-size: 14px"
+          >
+            <el-popover
+              ref="ref-popover"
+              width="400"
+              placement="bottom-start"
+              trigger="click"
+            >
+              <el-date-picker
+                class="my-date-picker"
+                ref="my-date-picker"
+                v-model="search.datePickerBill"
+                type="monthrange"
+                align="right"
+                range-separator="至"
+                start-placeholder="开始月份"
+                end-placeholder="结束月份"
+                :picker-options="pickerOptions"
               >
-                <el-popover
-                  ref="ref-popover"
-                  width="400"
-                  placement="bottom-start"
-                  trigger="click"
-                >
-                  <el-date-picker
-                    class="my-date-picker"
-                    ref="my-date-picker"
-                    v-model="search.datePickerOnline"
-                    type="monthrange"
-                    align="right"
-                    range-separator="至"
-                    start-placeholder="开始月份"
-                    end-placeholder="结束月份"
-                    :picker-options="pickerOptions"
-                  >
-                  </el-date-picker>
-                  <div slot="reference">
-                    上线时间
-                    <img
-                      src="../../assets/image/person-center/down.png"
-                      class="down"
-                      alt=""
-                    />
-                  </div>
-                </el-popover>
+              </el-date-picker>
+              <div slot="reference">
+                提单时间
+                <img
+                  src="../../assets/image/person-center/down.png"
+                  class="down"
+                  alt=""
+                />
               </div>
-            </el-col>
-            <el-col :span="6">
-              <div
-                class="scrren-com"
-                :class="search.datePickerBill ? 'active' : ''"
-                style="font-size: 16px"
-              >
-                <el-popover
-                  ref="ref-popover"
-                  width="400"
-                  placement="bottom-start"
-                  trigger="click"
-                >
-                  <el-date-picker
-                    class="my-date-picker"
-                    ref="my-date-picker"
-                    v-model="search.datePickerBill"
-                    type="monthrange"
-                    align="right"
-                    range-separator="至"
-                    start-placeholder="开始月份"
-                    end-placeholder="结束月份"
-                    :picker-options="pickerOptions"
-                  >
-                  </el-date-picker>
-                  <div slot="reference">
-                    提单时间
-                    <img
-                      src="../../assets/image/person-center/down.png"
-                      class="down"
-                      alt=""
-                    />
-                  </div>
-                </el-popover>
-              </div>
-            </el-col>
-            <el-col :span="6" justify="center">
-              <el-switch
-                size="small"
-                style="margin-right: 4px"
-                v-model="isBackCheck"
-              />
-              已回检
-            </el-col>
-          </el-row>
+            </el-popover>
+          </div>
+          <!-- <div
+            class="scrren-com"
+            :class="search.datePickerBill ? 'active' : ''"
+            style="font-size: 14px"
+          >
+
+          </div> -->
+          <div
+            class="scrren-com"
+            :class="search.mechanism ? 'active' : ''"
+            style="font-size: 14px"
+          >
+            {{
+              search.approvalType
+                ? this.getTransationName(search.approvalType)
+                : '事项类型'
+            }}
+            <img
+              src="../../assets/image/person-center/down.png"
+              class="down"
+              alt=""
+            />
+            <el-select
+              v-model="search.approvalType"
+              @change="changeArrrovalType"
+              clearable
+            >
+              <el-option
+                v-for="(item, index) in transactionTypes"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </div>
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              font-size: 14px;
+              font-weight: 400;
+            "
+          >
+            <el-switch
+              size="small"
+              style="margin-right: 4px"
+              v-model="isBackCheck"
+            />
+            已回检
+          </div>
         </div>
 
         <div class="right-area">
@@ -124,21 +172,32 @@
               ><p class="tot-num">共<span class="num">3216</span>条</p></el-col
             >
             <el-col :span="8" justify="center" style="cursor: pointer">
-              <p class="sort">
+              <p class="sort" @click="onlineClick">
                 按上线时间<img src="../../assets/image/upup.png" alt="" /></p
             ></el-col>
             <el-col :span="8" justify="center" style="cursor: pointer">
-              <p class="sort">
+              <p class="sort" @click="billClick">
                 按提单时间<img src="../../assets/image/upup.png" alt="" /></p
             ></el-col>
           </el-row>
         </div>
       </div>
-      <recordTableVue
-        @openOption="handleOpenOption"
-        @openRecord="handleOpenRecord"
-        @openFilePreview="fullScreen"
-      />
+      <div v-loading="search.loading">
+        <recordTableVue
+          @openOption="handleOpenOption"
+          @openRecord="handleOpenRecord"
+          @openFilePreview="fullScreen"
+          :recordList="recordList"
+        />
+      </div>
+
+      <TrsPagination
+        :pageSize="page.pageSize"
+        :pageNow="page.pageNow"
+        :total="page.totalCount"
+        @getList="handleCurrentChange"
+      >
+      </TrsPagination>
     </div>
 
     <el-dialog
@@ -198,25 +257,22 @@
 </template>
 
 <script>
+import { getOrgTree, getApprovalType } from '@/api/approvalCenter'
 // eslint-disable-next-line import/extensions
 import { downloadStream } from '@/api/applyCenter'
+// eslint-disable-next-line import/extensions
+import * as dayjs from 'dayjs'
 // eslint-disable-next-line import/extensions
 import RecordDialog from './components/record-dialog.vue'
 // eslint-disable-next-line import/extensions
 import recordTableVue from './components/record-table.vue'
 // eslint-disable-next-line import/extensions
 import fullImage from './components/full-image.vue'
-
+import { getRecheckList } from '../../api/intelligent-recheck'
 export default {
   name: 'Record',
   data() {
     return {
-      search: {
-        mechanism: '',
-        onlineTime: '',
-        billTime: ''
-      },
-      searchInput: '',
       optionDialogVisible: false,
       recordDialogVisible: false,
       optionValue: '',
@@ -254,10 +310,31 @@ export default {
           }
         ]
       },
-      datePickerOnline: '',
       dataPickerBill: '',
       isBackCheck: '',
-      showFullScreen: false
+      showFullScreen: false,
+      agenciesList: [],
+      searchParm: {},
+      search: {
+        orgIds: '',
+        searchInput: '',
+        datePickerOnline: '',
+        datePickerBill: '',
+        loading: true,
+        orgName: '',
+        approvalType: ''
+      },
+      //  1-回检时间 2-提单时间 3-上线时间
+      sort: 1,
+      // 1-降序 2-升序
+      sortType: 2,
+      recordList: [],
+      page: {
+        pageNow: 1,
+        pageSize: 8,
+        totalCount: 10
+      },
+      transactionTypes: []
     }
   },
   components: {
@@ -266,7 +343,13 @@ export default {
     fullImage
   },
   methods: {
+    changeOnlineDate() {
+      console.log(
+        this.search.datePickerOnline.map((item) => this.timeFormat(item))
+      )
+    },
     handleChange() {},
+    changeArrrovalType() {},
     handleSubmit() {},
     handleClose() {
       this.optionDialogVisible = false
@@ -295,19 +378,148 @@ export default {
       this.$message.info('下载中，请稍等！')
       downloadStream(params).then((res) => {
         const disposition = res.headers['content-disposition']
-        const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
-        const link = document.createElement('a');
+        const url = window.URL.createObjectURL(
+          new Blob([res.data], { type: 'application/pdf;charset=utf-8' })
+        )
+        const link = document.createElement('a')
         link.style.display = 'none'
         link.href = url
-        link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
+        link.setAttribute(
+          'download',
+          decodeURI(disposition.replace('attachment;filename=', ''))
+        )
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
       })
     },
+    getOrgTreeMeo() {
+      getOrgTree().then((res) => {
+        if (res.data.status === 200) {
+          const { data } = res.data
+          if (data) {
+            const value = this.formatOrg(data.children)
+            this.agenciesList = [
+              {
+                ...data,
+                children: value
+              }
+            ]
+          }
+        }
+      })
+    },
+    getApprovalTypeMeo() {
+      getApprovalType().then((res) => {
+        this.transactionTypes = res.data.data.map((v) => {
+          return {
+            label: v.examineTypesName,
+            value: v.recordId
+          }
+        })
+      })
+    },
+    formatOrg(data) {
+      data.forEach((m) => {
+        if (m.children && m.children.length) {
+          this.formatOrg(m.children)
+        } else {
+          m.children = null
+        }
+      })
+      return data
+    },
+    timeFormat(val) {
+      return val ? dayjs(val).format('YYYY-MM-DD ') : '--'
+    },
+    changeAgencies() {
+      this.$refs['agencies'].dropDownVisible = false
+      if (this.agenciesList.length) {
+        this.search.orgName = this.queryTreeName(
+          this.search.orgIds,
+          this.agenciesList
+        )
+        this.searchParm.orgId = this.search.orgIds
+      }
+      this.searchList()
+    },
+
+    // 在树里根据id查找name
+    queryTreeName(id, tree) {
+      let result
+      // eslint-disable-next-line no-shadow
+      const fn = function (id, tree) {
+        for (let index = 0; index < tree.length; index++) {
+          const element = tree[index]
+          if (element.id === id) {
+            result = element.name
+            break
+          } else if (
+            element.id !== id
+            && element.children
+            && element.children.length > 0
+          ) {
+            fn(id, element.children)
+          }
+        }
+      }
+      fn(id, tree)
+      return result
+    },
+
+    // 根据id获取事项类型
+    getTransationName(id) {
+      const item = this.transactionTypes.find((v) => v.value === id)
+      return item ? item.label : ''
+    },
+
+    async searchList() {
+      //    //  1-回检时间 2-提单时间 3-上线时间
+      //    sort: 1,
+      // // 1-降序 2-升序
+      // sortType: 2,
+      this.search.loading = true
+      const mustParm = {
+        pageNow: this.page.pageNow,
+        pageSize: this.page.pageSize,
+        sort: this.sort,
+        sortType: this.sortType
+      }
+      const parm = {
+        ...mustParm,
+        ...this.searchParm
+      }
+      const res = await getRecheckList(parm)
+      const { data } = res
+      if (data.status === 200) {
+        const { list, totalCount } = data.data
+        this.page.totalCount = totalCount
+        this.recordList = list
+        this.search.loading = false
+      }
+    },
+
+    handleCurrentChange() {},
+
+    onlineClick() {
+      this.searchParm.sort = 3
+      this.searchParm.sortType = 1
+      this.searchList()
+    },
+    billClick() {
+      this.searchParm.sort = 2
+      this.searchParm.sortType = 1
+      this.searchList()
+    }
   },
-  created() {},
-  mounted() {},
+
+  created() {
+    this.searchList()
+  },
+  mounted() {
+    this.getOrgTreeMeo()
+    this.getApprovalTypeMeo()
+  },
   watch: {}
 }
 </script>
@@ -358,7 +570,9 @@ export default {
     align-items: center;
     margin-bottom: 15px;
     .left-area {
-      width: 525px;
+      // width: 525px;
+      display: flex;
+      gap: 20px;
     }
 
     .right-area {
@@ -485,7 +699,7 @@ export default {
   }
 }
 
-.tool{
+.tool {
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -495,23 +709,23 @@ export default {
   transform: translate(-50%);
   z-index: 1;
   width: 248px;
-  box-shadow: 0px 0px 10px 0px #4343431A;
+  box-shadow: 0px 0px 10px 0px #4343431a;
   height: 38px;
   border-radius: 8px;
-  background-color: #1D2128BF;
-  span{
-    i{
+  background-color: #1d2128bf;
+  span {
+    i {
       margin-right: 2px;
-      img{
-        width: 16px;
-        height: 16px;
+      img {
+        width: 14px;
+        height: 14px;
       }
     }
     display: flex;
     align-items: center;
     cursor: pointer;
     font-size: 14px;
-    color: #FFFFFF;
+    color: #ffffff;
   }
 }
 

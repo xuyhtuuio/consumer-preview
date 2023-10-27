@@ -6,3 +6,11 @@ export function getSimilarityComparisonList(data) {
     data
   })
 }
+
+export function getRecheckList(data) {
+  return request({
+    url: '/cpr/recheck/checkBackList',
+    method: 'post',
+    data
+  })
+}
