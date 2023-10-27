@@ -24,10 +24,10 @@
     <div class="results" ref="results" :key="resultKey" :class="{ light: lineWordItem?.word }"
       @mousedown="statrGetSelection" @mouseup="getSelection">
       <div class="results-div" :style="styleSet">
-        <div v-for="(ocr, i) in html" class="div-position" :data-ocrItem="ocr.ocrId" :key="i" :style="returnStyle(i)">
+        <div v-for="(ocr, i) in html" class="div-position"  :key="i" :style="returnStyle(i)">
           <template v-for="(item, j) in ocr">
             <!-- <template  v-if="typeof item === 'string'">{{ item }}</template> -->
-            <div :class="{ commentNode:item.hasBg}" v-if="!item.wordType" :key="i + '_' + j + '_'" @click="showOcrCommentLine($event,ocr)">{{ item.text }}</div>
+            <div :data-ocrItem="item.ocrId" :class="{ commentNode:item.hasBg}" v-if="!item.wordType" :key="i + '_' + j + '_'" @click="showOcrCommentLine($event,item.ocrId)">{{ item.text }}</div>
             <span v-else :key="i + '_' + j" :wordType="item.wordType" :id="`word_${i}_${j}`" :class="{
               active:
                 activeWordType === item.wordType || activeWordType === 0,
@@ -125,8 +125,6 @@ export default {
     },
     getSelection(event) {
       const node = event.target.parentNode
-      console.log(node)
-      console.log(node.getAttribute('data-ocrItem'))
       const { childNodes } = node
       const childNode = childNodes[0]
       const classs = Array.from(childNode.classList)
@@ -170,6 +168,7 @@ export default {
             const selectNodes = [range.commonAncestorContainer.parentNode]
             this.selectNodes = selectNodes
           }
+          this.selectOcr.ocrId = this.selectNodes[0].getAttribute('data-ocrItem')
         }, 300)
       }
     },
@@ -212,6 +211,7 @@ export default {
                 a.splice(1, 0, {
                   text: word,
                   word,
+                  ocrId,
                   wordType,
                   location,
                   recommendI: i
@@ -219,14 +219,14 @@ export default {
                 const c = [...a.filter((b) => b !== '')]
                 const d = c.map((e) => {
                   if (!e.word) {
-                    return { text: e }
+                    return { text: e, ocrId }
                   } else {
                     return e
                   }
                 })
                 temp.push({ ...d })
               } else {
-                temp.push({ text: newOcr[index].text })
+                temp.push({ text: newOcr[index].text, ocrId })
               }
             }
             newOcr = [...Object.values(...temp)]

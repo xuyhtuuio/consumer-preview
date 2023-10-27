@@ -343,7 +343,8 @@ export default {
         this.changeRel(false)
         this.postil.textarea = ''
         this.$refs.editorial.changeType(2)
-        this.dealIconWithComment()
+        // this.dealIconWithComment()
+        this.generateIcons()
         console.log('增加后', this.approval)
       }
     },
@@ -524,12 +525,13 @@ export default {
             temp.recommends = [];
           });
       }
-      console.log(temp)
       // 更新图标
       const curFileType = this.getfileType(this.files[this.activeIndex].fileName)
       this.$nextTick(() => {
         if (this.specialFileType1.includes(curFileType)) {
-          this.findIconPosition()
+          // this.findIconPosition()
+          this.icons = []
+          this.generateIcons()
           this.lisScroll()
         }
       })
@@ -659,7 +661,7 @@ export default {
         this.files.forEach(file => {
           // 存在推荐意见
           file?.recommends?.map(recommend => {
-          // 存在选择意见
+            // 存在选择意见
             if (recommend.selected) {
               const selected = recommend.list.filter(a => a.id === recommend.selected);
               const isRepeat = file.comments?.filter(f => f.id === selected?.[0].id)
@@ -1081,129 +1083,58 @@ export default {
         }
       })
     },
-    // icon 数量计算
-    findIconPosition() {
+    // 生成icon - 重构版本
+    generateIcons() {
       this.$nextTick(() => {
         const img = document.getElementById('picture')
         const realHeight = img.scrollHeight
-        const iconTops = []
-        const ocrLocation = []
-        const ocrIds = []
-        const scale = img.naturalWidth / img.clientWidth;
-        // console.log('width', img.clientWidth - img.naturalWidth / scale)
-        // console.log('height', img.clientHeight - img.naturalHeight / scale)
-        this.approval.ocr.map((ocr) => {
-          // icon 高度 等于 ocr 的 top + ocr 高度的一半 乘以缩放 - 图标自身高度的一半
-          const newTop = (ocr.location.y + ocr.location.h / 2) / scale - 7.5
-          iconTops.push(Math.floor(newTop))
-          ocrIds.push(ocr.ocrId)
-          ocrLocation.push({
-            left: ocr.location.x,
-            top: ocr.location.y,
-            height: ocr.location.h,
-            width: ocr.location.w,
-          })
-        })
         const iconContainer = document.querySelector('.icons')
         if (iconContainer) {
           iconContainer.style.height = realHeight + 'px'
         }
-        const iconNum = iconTops.length
-        const icons = []
-        for (let i = 0; i < iconNum; i++) {
-          icons.push({
-            icon_id: '' + new Date().getTime() + i,
-            ocrId: ocrIds[i],
-            iconTop: iconTops[i],
-            ocrLocation: ocrLocation[i],
-            showIndex: -1
-          })
-        }
-        this.icons = icons
-        this.dealIconWithComment()
+        const scale = img.naturalWidth / img.clientWidth;
+        this.comments.map((comment) => {
+          if (comment.position?.length) {
+            comment.icons.map((icon) => {
+              const iconOcr = this.approval.ocr.filter((ocr) => {
+                return ocr.ocrId === icon
+              })
+              // icon 高度 等于 ocr 的 top + ocr 高度的一半 乘以缩放 - 图标自身高度的一半
+              const iconTop = (iconOcr[0]?.location?.y + iconOcr[0]?.location?.h / 2) / scale - 7.5
+              if (!this.icons.length) {
+                const newIcon = {
+                  icon_id: '' + new Date().getTime() + icon,
+                  ocrId: [icon],
+                  iconTop,
+                  ocrLocation: iconOcr[0].location,
+                  showIndex: -1
+                }
+                this.icons.push(newIcon)
+              } else {
+                let conflict = false
+                this.icons.map((i) => {
+                  if (Math.abs(i.iconTop - iconTop) < 7.5) {
+                    i.ocrId.push(icon)
+                    conflict = true
+                  }
+                })
+                if (!conflict) {
+                  const newIcon = {
+                    icon_id: '' + new Date().getTime() + icon,
+                    ocrId: [icon],
+                    iconTop,
+                    ocrLocation: iconOcr[0]?.location,
+                    showIndex: -1
+                  }
+                  this.icons.push(newIcon)
+                }
+              }
+            })
+          }
+        })
       })
     },
-    // icon 管理的意见计算
-    dealIconWithComment() {
-      // const img = document.getElementById('picture')
-      // const scale = img.naturalWidth / img.clientWidth;
-      const { comments } = this
-      // const iconTotal = this.icons.length
-      comments.map((comment) => {
-        // 如果该意见存在批注
-        if (comment.position?.length) {
-          comment.position.map((pos) => {
-            // if(comment.icons.includes())
-            const commentId = comment.id
-            // 现有的icons
-            const findIconLive = this.icons.filter((icon) => {
-              return icon.positionWithId?.length > 0
-            })
-            // 要生成的icon
-            const findIcon = this.icons.filter((icon) => {
-              // console.log(icon.ocrLocation, pos, this.positionIsSame(icon.ocrLocation, pos))
-              if (this.positionIsSame(icon.ocrLocation, pos)) {
-                return icon
-              }
-            })
-            console.log('要生成的icon', findIcon)
-            // 与生成的icon产生堆叠影响的icons
-            const findNewIcon = findIconLive.filter((icon) => {
-              if (Math.abs(findIcon[0]?.iconTop - icon.iconTop) < 7.5) {
-                return icon
-              }
-            })
-            console.log('要影响的icon', findNewIcon)
-            let newIcon = {}
-            if (findNewIcon.length) {
-              newIcon = {
-                ...findNewIcon[0],
-                files: comment.files,
-                selectText: comment.selectText,
-                str: comment.str,
-                words: comment.words,
-                positionWithId: [
-                  ...findNewIcon[0].positionWithId,
-                  { commentId, pos },
-                ]
-              }
-            } else {
-              if (!findIcon.length) {
-                return
-              }
-              if (!findIcon[0]?.positionWithId) {
-                findIcon[0].positionWithId = []
-              }
-              newIcon = {
-                ...findIcon[0],
-                files: comment.files,
-                selectText: comment.selectText,
-                str: comment.str,
-                words: comment.words,
-                positionWithId: [
-                  ...findIcon[0].positionWithId,
-                  { commentId, pos },
-                ]
-              }
-            }
-            let newIconIndex = 0
-            this.icons.map((icon, i) => {
-              if (icon.icon_id === newIcon.icon_id) {
-                newIconIndex = i
-              }
-            })
-            newIcon.positionWithId = newIcon?.positionWithId.filter((pwi) => {
-              if (!this.positionIsSame(pos, pwi.pos)) return pwi
-            })
-            newIcon.positionWithId.push({ commentId, pos })
-            this.$set(this.icons, newIconIndex, newIcon)
-          })
-        }
-      })
-      console.log('comments', this.comments)
-      console.log('icons', this.icons)
-    },
-    // 展示 icon 的连线
+    // 展示 icon 的连线 - 重构版本
     showIconLine(icon) {
       this.$refs.editorial.changeType(2)
       this.lineRemove()
@@ -1212,34 +1143,25 @@ export default {
         this.changeIconShow(this.curActiveIcon, -1)
         this.changeIconShow(icon.icon_id, 1)
         this.curActiveIcon = icon.icon_id
-      } else if (this.curIconLine >= icon.positionWithId.length) { // 此时为当前icon对应的最后一条线
+      } else if (this.curIconLine >= icon.ocrId.length) { // 此时为当前icon对应的最后一条线
         this.changeIconShow(icon.icon_id, -1)
         this.curActiveIcon = ''
+        this.curIconLine -= 1
       }
-      let obj = {}
-      // 存在当前激活的 icon 即代表可执行连线操作
-      if (this.curActiveIcon) {
-        // 传入正常对象 并 进行连线
-        obj = {
-          id: icon.positionWithId[this.curIconLine]?.commentId,
-          files: icon.files,
-          icon_id: icon.icon_id,
-          position: [icon.positionWithId[this.curIconLine]?.pos],
-          str: icon.str,
-          selectText: icon.selectText,
-          words: icon.words
+      const secComment = this.comments.map((comment) => {
+        console.log(comment)
+        if (comment.icons.includes(icon.ocrId[this.curIconLine])) {
+          return comment
         }
-      } else {
-        // 传入上一次的对象 且 取消连线
-        obj = {
-          id: icon.positionWithId[(this.curIconLine - 1) >= 0 ? this.curIconLine - 1 : 0]?.commentId,
-          files: icon.files,
-          icon_id: icon.icon_id,
-          position: [icon.positionWithId[(this.curIconLine - 1) >= 0 ? this.curIconLine - 1 : 0]?.pos],
-          str: icon.str,
-          selectText: icon.selectText,
-          words: icon.words
-        }
+      })
+      const obj = {
+        id: secComment[0].id,
+        files: secComment[0].files,
+        // icon_id: icon.icon_id,
+        position: secComment[0].position,
+        str: secComment[0].str,
+        selectText: secComment[0].selectText,
+        words: secComment[0].words
       }
       this.showCommentLine(obj)
       // this.$forceUpdate()
@@ -1258,10 +1180,9 @@ export default {
       })
     },
     // ocr 点击批注进行连线
-    showOcrCommentLine(ocrPosition, ocrItem) {
+    showOcrCommentLine(ocrLocation, ocrId) {
       this.$refs.editorial.changeType(2)
-      const findComment = this.findComment(ocrPosition)
-      const findIcon = this.findIconPos(findComment, ocrItem)
+      const findIcon = this.findIconPos(ocrId)
       this.showIconLine(findIcon)
     },
     // 利用ocr定位 寻找对应 comment
@@ -1278,22 +1199,11 @@ export default {
       return findComment
     },
     // 点击ocr，获取对应 icon 最终走到意见，执行连线逻辑
-    findIconPos(findComment, ocrItem) {
+    findIconPos(ocrId) {
       let resIcon = {}
-      const { ocrId } = ocrItem
-      console.log(ocrId)
       this.icons.map((icon) => {
-        let findIcon = icon.positionWithId?.map((ipos) => {
-          if (this.positionIsSame(ipos.pos, findComment.position && findComment.position[0])) {
-            return ipos
-          }
-        })
-        findIcon = findIcon?.filter((fi) => fi !== undefined)
-        if (Array.isArray(findIcon) && findIcon.length) {
-          resIcon = {
-            ...icon
-          }
-          resIcon.positionWithId = findIcon
+        if (icon.ocrId.includes(ocrId)) {
+          resIcon = icon
         }
       })
       return resIcon
@@ -1380,7 +1290,9 @@ export default {
         }
       }
       this.$nextTick(() => {
-        this.findIconPosition()
+        // this.findIconPosition()
+        this.icons = []
+        this.generateIcons()
         this.lisScroll()
       })
       this.approval = temp;
@@ -1436,7 +1348,9 @@ export default {
         }
         this.approval = temp
         this.$nextTick(() => {
-          this.findIconPosition()
+          // this.findIconPosition()
+          this.icons = []
+          this.generateIcons()
           this.lisScroll()
         })
         this.fileloading = false;
