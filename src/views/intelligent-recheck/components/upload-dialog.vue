@@ -59,10 +59,19 @@ export default {
             this.$router.push({
               name: 'recheck-detail',
               params: {
-                item: res.data.data
+                item: {
+                  ...res.data.data,
+                  name: '',
+                  text: ''
+                },
+                searchType: 2,
               }
             })
-            this.$emit('changeImgFun', res.data.data);
+            this.$emit('changeImgFun', {
+              ...res.data.data,
+              name: '',
+              text: ''
+            });
             this.turnDialog = false;
           } else {
             this.$message.error(res.data.msg)

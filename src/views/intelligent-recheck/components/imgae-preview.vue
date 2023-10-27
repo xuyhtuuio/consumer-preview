@@ -129,11 +129,17 @@ export default {
             this.$router.push({
               name: 'recheck-detail',
               params: {
-                item: res.data.data
-              }
+                ...res.data.data,
+                name: '',
+                text: ''
+              },
             })
             this.editImg = false;
-            this.$emit('changeImgFun', res.data.data);
+            this.$emit('changeImgFun', {
+              ...res.data.data,
+              name: '',
+              text: ''
+            });
           } else {
             this.$message.error(res.data.msg)
             this.uploading = false

@@ -60,8 +60,8 @@ module.exports = {
         },
       },
       '/cpr': {
-        target: 'http://192.168.210.57:31602',
-        // target: 'http://10.8.0.60:8324', // 吕强后台
+        // target: 'http://192.168.210.57:31602',
+        target: 'http://192.168.162.144:8324', // 吕强后台
         // target: 'http://10.8.0.57:8324', // 王意杨后台
         changeOrigin: true,
         ws: true,
