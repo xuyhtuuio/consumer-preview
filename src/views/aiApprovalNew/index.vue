@@ -98,7 +98,7 @@
             <pdfChange @changePdfPageNow="changePdfPageNow" @changePdfPage="changePdfPage" :pdfPageSize="pdfInfo.pageSize" :pdfPageNow="pdfInfo.pageNow" :pdfTotalPage="pdfInfo.pdfTotalPage" :activeIndex="activePdfIndex" :fileList="pdfInfo.list" v-if="files[activeIndex]?.type === 'pdf'"></pdfChange>
             <file-preview ref="filePreview" :files="files" :formId="formId" :activeIndex="activeIndex" v-if="curMode !== 2"
               @changeFile="changeFile" :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"
-              @getProps="getProps" @findIconPosition="findIconPosition"></file-preview>
+              @getProps="getProps" @findIconPosition="generateIcons"></file-preview>
             <orcTxtNew ref="ocrTxt" :approval="approval" @addWord="addWord"
               @lineRemove="lineRemove" @checkEdit="checkEdit"
               v-if="specialFileType.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode !== 1"
@@ -186,7 +186,7 @@
         <div class="content-cont-editor">
           <editorial ref="editorial" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
             :lineWordItem="lineWordItem" @upDateComments="upDateComments" @showLine="showLine" :activeIndex="activeIndex"
-            :activeWordType="activeWordType" @showCommentLine="showCommentLine" @changeEditorialType="changeEditorialType"
+            :activeWordType="activeWordType" @addCommentWithPosition="addCommentWithPosition" @showCommentLine="showCommentLine" @changeEditorialType="changeEditorialType"
             :showOcr="showOcr" :formBase="formBase" @changeFileById="changeFileById" :isRel="isRel" @changeRel="changeRel">
           </editorial>
         </div>

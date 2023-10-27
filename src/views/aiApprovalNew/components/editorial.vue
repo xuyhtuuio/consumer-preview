@@ -392,6 +392,7 @@ export default {
         }
       })
       this.$emit('changeRel', false)
+      this.$emit('addCommentWithPosition', relComments)
       this.$forceUpdate()
     },
     cancleRel() {

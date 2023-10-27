@@ -206,7 +206,7 @@ export default {
     },
     findIconPosition() {
       // this.$emit('findIconPosition')
-      this.$emit('generateIcons')
+      this.$emit('findIconPosition')
     },
     imgLoad() {
       this.$refs.imgPreview.handleImageLoaded()

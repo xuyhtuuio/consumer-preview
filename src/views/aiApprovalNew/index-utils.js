@@ -201,9 +201,6 @@ export default {
     },
     // 鼠标选中 添加新批注
     addWord(obj, nodes) {
-      const popover = this.$refs.postilPopover.$refs.popper
-      popover.classList.remove('positil-popover-left')
-      this.changeRel(false)
       this.popoverShow = true
       this.domInfo = obj
       this.keywordsInfo.content = obj.string
@@ -272,7 +269,11 @@ export default {
         this.$message.error(msg)
       }
     },
-    addCommentWithPosition() {
+    addCommentWithPosition(relComments) {
+      console.log('domInfo', this.domInfo)
+      const popover = this.$refs.postilPopover.$refs.popper
+      popover.classList.remove('positil-popover-left')
+      this.changeRel(false)
       this.beforeAddComment()
       const timestamp = this.preComment.id || new Date().getTime()
       let files = []
@@ -308,6 +309,25 @@ export default {
         files = this.preComment.files || [this.files?.[this.activeIndex]?.id]
         filesWithComment = this.preComment.filesWithComment || [this.files?.[this.activeIndex]?.id]
       }
+      if (Array.isArray(relComments) && relComments?.length !== 0) {
+        // 关联意见执行开始
+        filesWithBg = [{
+          fileId: this.files?.[this.activeIndex]?.id,
+          fileBgs: this.domInfo.domIndexs
+        }]
+        relComments?.map((relComment) => {
+          relComment.filesWithBg = [...filesWithBg, ...relComment.filesWithBg]
+          relComment.icons = [this.domInfo?.ocrId, ...relComment.icons]
+          relComment.position = [this.domInfo?.position, ...relComment.position]
+          relComment.filesWithComment = [...filesWithComment, ...relComment.filesWithComment]
+          this.upDateComments('add', relComment)
+        })
+        this.getComments()
+        this.$refs.ocrTxt.getInitContent(this.approval)
+        this.generateIcons()
+        console.log('增加后', this.approval)
+        // 关联意见执行结尾
+      }
       const newComment = {
         id: timestamp,
         str: this.postil.textarea,
@@ -339,6 +359,7 @@ export default {
         this.upDateComments('add', newComment)
         // this.addBg(this.comments_nodes)
         this.getComments()
+        console.log(this.comments)
         this.$refs.ocrTxt.getInitContent(this.approval)
         this.changeRel(false)
         this.postil.textarea = ''
@@ -1115,6 +1136,7 @@ export default {
                 this.icons.map((i) => {
                   if (Math.abs(i.iconTop - iconTop) < 7.5) {
                     i.ocrId.push(icon)
+                    i.ocrId = Array.from(new Set(i.ocrId))
                     conflict = true
                   }
                 })
@@ -1143,29 +1165,31 @@ export default {
         this.changeIconShow(this.curActiveIcon, -1)
         this.changeIconShow(icon.icon_id, 1)
         this.curActiveIcon = icon.icon_id
-      } else if (this.curIconLine >= icon.ocrId.length) { // 此时为当前icon对应的最后一条线
+      } else if (this.curIconLine >= icon.ocrId?.length) { // 此时为当前icon对应的最后一条线
         this.changeIconShow(icon.icon_id, -1)
         this.curActiveIcon = ''
         this.curIconLine -= 1
       }
-      const secComment = this.comments.map((comment) => {
-        console.log(comment)
+      console.log(icon)
+      let secComment = {}
+      this.comments.map((comment) => {
         if (comment.icons.includes(icon.ocrId[this.curIconLine])) {
-          return comment
+          secComment = comment
         }
       })
+      this.curIconLine += 1
+      console.log('secComment', secComment)
       const obj = {
-        id: secComment[0].id,
-        files: secComment[0].files,
+        id: secComment?.id,
+        files: secComment?.files,
         // icon_id: icon.icon_id,
-        position: secComment[0].position,
-        str: secComment[0].str,
-        selectText: secComment[0].selectText,
-        words: secComment[0].words
+        position: secComment?.position,
+        str: secComment?.str,
+        selectText: secComment?.selectText,
+        words: secComment?.words
       }
       this.showCommentLine(obj)
       // this.$forceUpdate()
-      this.curIconLine += 1
     },
     // 修改 icon 激活状态 showIndex 为 1 为激活 -1 为不激活
     changeIconShow(id, showIndex) {
@@ -1183,6 +1207,7 @@ export default {
     showOcrCommentLine(ocrLocation, ocrId) {
       this.$refs.editorial.changeType(2)
       const findIcon = this.findIconPos(ocrId)
+      console.log('findIcon', findIcon)
       this.showIconLine(findIcon)
     },
     // 利用ocr定位 寻找对应 comment
@@ -1203,7 +1228,8 @@ export default {
       let resIcon = {}
       this.icons.map((icon) => {
         if (icon.ocrId.includes(ocrId)) {
-          resIcon = icon
+          resIcon = JSON.parse(JSON.stringify(icon))
+          resIcon.ocrId = [ocrId]
         }
       })
       return resIcon
@@ -1258,6 +1284,7 @@ export default {
     addRelComment() {
       const popover = this.$refs.postilPopover.$refs.popper
       popover.classList.add('positil-popover-left')
+      this.$refs.ocrTxt.addWord()
       this.$refs.editorial.changeType(2)
       this.isRel = true
     },
