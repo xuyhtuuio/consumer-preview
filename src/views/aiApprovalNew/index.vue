@@ -87,7 +87,7 @@
             </div>
             <div class="cont-top-infos">
               <span>提醒：共发现 4 处风险信息，请认真核对</span>
-              <el-input v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search"
+              <el-input v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search" clearable @clear="search"
                 size="medium">
                 <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
               </el-input>
@@ -416,6 +416,8 @@ export default {
     search() {
       if (this.keyWords) {
         this.$refs.ocrTxt.search(this.keyWords)
+      } else {
+        // this.$refs.ocrTxt.getInitContent(this.approval)
       }
     },
     getProps(val) {

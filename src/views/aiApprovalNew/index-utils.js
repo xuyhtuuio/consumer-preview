@@ -310,6 +310,7 @@ export default {
         filesWithComment = this.preComment.filesWithComment || [this.files?.[this.activeIndex]?.id]
       }
       if (Array.isArray(relComments) && relComments?.length !== 0) {
+        console.log(relComments)
         // 关联意见执行开始
         filesWithBg = [{
           fileId: this.files?.[this.activeIndex]?.id,
@@ -320,6 +321,7 @@ export default {
           relComment.icons = [this.domInfo?.ocrId, ...relComment.icons]
           relComment.position = [this.domInfo?.position, ...relComment.position]
           relComment.filesWithComment = [...filesWithComment, ...relComment.filesWithComment]
+          console.log('relComment', relComment)
           this.upDateComments('add', relComment)
         })
         this.getComments()
@@ -328,6 +330,7 @@ export default {
         console.log('增加后', this.approval)
         // 关联意见执行结尾
       }
+      const ocrId = this.domInfo?.ocrId
       const newComment = {
         id: timestamp,
         str: this.postil.textarea,
@@ -335,10 +338,12 @@ export default {
         filesWithComment: [...filesWithComment],
         words,
         icons: [this.domInfo?.ocrId],
+        iconsWithPos: {},
         position: [this.domInfo?.position],
         selectText: this.domInfo?.string,
         filesWithBg: this.preComment?.filesWithBg || filesWithBg
       }
+      newComment.iconsWithPos[ocrId] = this.domInfo?.position;
       if (!newComment.str) {
         return;
       }
@@ -359,7 +364,7 @@ export default {
         this.upDateComments('add', newComment)
         // this.addBg(this.comments_nodes)
         this.getComments()
-        console.log(this.comments)
+        console.log('0', this.comments)
         this.$refs.ocrTxt.getInitContent(this.approval)
         this.changeRel(false)
         this.postil.textarea = ''
@@ -762,14 +767,51 @@ export default {
               let num = 0
               filterFiles?.[0]?.comments.map((comment) => {
                 if (comment.str === item.str) {
-                  if (!comment.position) {
-                    comment.position = item.position
+                  if (Object.keys(comment.iconsWithPos)?.length === 0) {
+                    comment.iconsWithPos = item.iconsWithPos
                   } else {
-                    comment.position = [...comment.position, ...item.position]
+                    const ids = Object.keys(comment.iconsWithPos)
+                    if (!ids.includes(Object.keys(item.iconsWithPos)[0])) {
+                      comment.iconsWithPos = {
+                        ...comment.iconsWithPos,
+                        ...item.iconsWithPos
+                      }
+                    } else {
+                      let repeat = false
+                      comment.iconsWithPos[Object.keys(item.iconsWithPos)[0]].map((pos) => {
+                        if (this.objIsSame(pos, item.iconsWithPos[Object.keys(item.iconsWithPos)[0]])) {
+                          repeat = true
+                        }
+                      })
+                      if (!repeat) {
+                        comment.iconsWithPos[Object.keys(item.iconsWithPos)[0]].push(item.iconsWithPos[Object.keys(item.iconsWithPos)[0]])
+                      }
+                    }
                   }
                 } else if (comment.id === item.id) {
                   comment.str = item.str
                   comment.words = item.words
+                  if (Object.keys(comment.iconsWithPos)?.length === 0) {
+                    comment.iconsWithPos = item.iconsWithPos
+                  } else {
+                    const ids = Object.keys(comment.iconsWithPos)
+                    if (!ids.includes(Object.keys(item.iconsWithPos)[0])) {
+                      comment.iconsWithPos = {
+                        ...comment.iconsWithPos,
+                        ...item.iconsWithPos
+                      }
+                    } else {
+                      let repeat = false
+                      comment.iconsWithPos[Object.keys(item.iconsWithPos)[0]].map((pos) => {
+                        if (this.objIsSame(pos, item.iconsWithPos[Object.keys(item.iconsWithPos)[0]])) {
+                          repeat = true
+                        }
+                      })
+                      if (!repeat) {
+                        comment.iconsWithPos[Object.keys(item.iconsWithPos)[0]].push(item.iconsWithPos[Object.keys(item.iconsWithPos)[0]])
+                      }
+                    }
+                  }
                 } else {
                   num++
                 }
@@ -1115,8 +1157,9 @@ export default {
         }
         const scale = img.naturalWidth / img.clientWidth;
         this.comments.map((comment) => {
-          if (comment.position?.length) {
-            comment.icons.map((icon) => {
+          const commentIcons = Object.keys(comment.iconsWithPos)
+          if (commentIcons?.length) {
+            commentIcons.map((icon) => {
               const iconOcr = this.approval.ocr.filter((ocr) => {
                 return ocr.ocrId === icon
               })
@@ -1177,18 +1220,18 @@ export default {
           secComment = comment
         }
       })
-      this.curIconLine += 1
-      console.log('secComment', secComment)
+      console.log('secComment', secComment, secComment?.iconsWithPos[icon.ocrId[this.curIconLine]])
       const obj = {
         id: secComment?.id,
         files: secComment?.files,
         // icon_id: icon.icon_id,
-        position: secComment?.position,
+        position: [secComment?.iconsWithPos[icon.ocrId[this.curIconLine]]],
         str: secComment?.str,
         selectText: secComment?.selectText,
         words: secComment?.words
       }
       this.showCommentLine(obj)
+      this.curIconLine += 1
       // this.$forceUpdate()
     },
     // 修改 icon 激活状态 showIndex 为 1 为激活 -1 为不激活

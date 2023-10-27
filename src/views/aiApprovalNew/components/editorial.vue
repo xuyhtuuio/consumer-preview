@@ -371,20 +371,23 @@ export default {
       }
     },
     makeRel(item) {
+      console.log('勾选前', this.collection)
       this.collection.map((col) => {
         if (col.id === item.id) {
           col.selected = !item.selected
         }
       })
+      console.log('勾选后', this.collection)
       this.$forceUpdate()
     },
     submitRel() {
       const newFile = this.files[this.activeIndex]?.id
       // 获取到 selected 的意见
+
       const relComments = this.collection.filter((comment) => comment.selected)
-      relComments.map((relComment) => {
-        this.$emit('upDateComments', 'editFiles', relComment, [...relComment.files, newFile])
-      })
+      // relComments.map((relComment) => {
+      // this.$emit('upDateComments', 'editFiles', relComment, [...relComment.files, newFile])
+      // })
       // 更新当前绑定的文件
       this.collection.map((col) => {
         if (col.selected) {
