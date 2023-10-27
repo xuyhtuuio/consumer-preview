@@ -12,7 +12,7 @@
         trigger="hover"
       >
         <div class="content">
-          <el-input v-model.trim="serach" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
+          <el-input v-model.trim="serach" @keypress.native.enter="changeJustCare" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
           <div style="position: relative; top: 12px;font-size: 12px;">
             <el-switch v-model="justCare" @change="changeJustCare" size="mini" style="position: relative; bottom: 2px;"></el-switch>
             仅看我关注的
@@ -36,10 +36,10 @@
         </template>
       </el-popover>
       <span class="sort">
-        <span class="sort1" @click="changeSortType('sort1')" :class="{ active: currentSort === 'sort1' }">
+        <!-- <span class="sort1" @click="changeSortType('sort1')" :class="{ active: currentSort === 'sort1' }">
           按点赞数排序
           <i :class="sortObject.sort1 === 'desc' ? 'el-icon-bottom' : 'el-icon-top'"></i>
-        </span>
+        </span> -->
         <span class="sort2" @click="changeSortType('sort2')" :class="{ active: currentSort === 'sort2' }">
           按更新时间排序
           <i :class="sortObject.sort2 === 'desc' ? 'el-icon-bottom' : 'el-icon-top'"></i>
@@ -78,18 +78,19 @@ export default {
         sort3: 'asc',
         justSelected: false,
       },
-      currentSort: 'sort1'
+      currentSort: 'sort2'
     }
   },
-  created() {
-    this.getTagInfoList({
+  async created() {
+    const data = await this.getTagInfoList({
       justCare: 0,
       keyword: ''
     })
+    this.$store.state.setDefalutTagsList = data
   },
   methods: {
     resetForm() {
-      this.currentSort = 'sort1'
+      this.currentSort = 'sort2'
       this.checkedTags = []
       this.sortObject.justSelected = false
     },
@@ -101,8 +102,8 @@ export default {
       } else {
         this.tagsList = []
       }
-      this.$store.state.setDefalutTagsList = this.tagsList
       this.loadingTag = false
+      return this.tagsList
     },
     changeJustCare() {
       this.getTagInfoList({

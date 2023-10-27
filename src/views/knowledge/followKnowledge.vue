@@ -30,7 +30,7 @@
     <template v-if="active === '知识'">
       <FilterKnowledge ref="filterKnowledge" v-loading="loadingList" :total="page.total" @changeSort="changeSort" @changeTags="changeCheckedTags"  style="margin-top: 0; border-top-left-radius: 0; border-top-right-radius: 0;"/>
       <div v-for="(k, i) in kCardList" :key="i" v-loading="loadingList">
-        <KnowledgeCard :data="k" @fetchList="getRecommendList(paramsDefalut)"/>
+        <KnowledgeCard :data="k" @fetchList="getRecommendList(paramsDefalut)" @setLoading="loadingList=true"/>
       </div>
       <el-empty description="暂无数据" v-if="kCardList.length === 0 && loadingList === false"></el-empty>
     </template>
@@ -70,7 +70,7 @@ export default {
         justSelected: 0,
         listType: 2,
         orderType: 'desc',
-        orderValue: 1,
+        orderValue: 2,
         pageNum: 1,
         pageSize: 10,
         tagIds: []
@@ -160,6 +160,8 @@ export default {
 </script>
 <style lang="less" scoped>
 .follow {
+  padding-bottom: 16px;
+  border-radius: 10px;
   padding: 0 8px 8px;
   background: #FFFFFF;
   .tabs {

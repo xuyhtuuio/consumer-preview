@@ -20,13 +20,12 @@
       </el-popover>
     </div>
     <div class="desc ellipsis ellipsis_2" style="color:#434343;margin: 4px 0;">
-      关于兴业银行侵害消费者权益情况的通报：近日，中国银保监会消费者权益保护局发布2021年第12号通报《关于兴业银行侵害消费者权益情况的通情的情况的
-      近日，中国银保监会消费者权益保护局发布2021年第12号但是，关于兴业银行侵害但是，关于兴业银行侵害消费者权益情况的通报。关于兴业银行侵害但是，关于兴业银行侵害消费者权益情况的通报
+      {{ item.content }}
     </div>
     <div class="meta-info">
       <div class="meta-left">
-        <span class="time">08:23</span>来自:
-        <span class="dept">消费者权益保护(客户服务)中心</span>
+        <span class="time">{{ item.commentTime }}</span>来自:
+        <span class="dept">{{ item.orgName }}</span>
       </div>
       <div class="meta-right">
         <span class="item" @click="handleCollect(item)">
@@ -40,11 +39,11 @@
         <span class="item" @click="handleZan(item)">
           <img v-if="item.isLiked > 0" src="@/assets/image/knowledge/赞1.svg" />
           <img v-else src="@/assets/image/knowledge/赞.svg" />
-          <span>123</span>
+          <span>{{ item.upvoteCount }}</span>
         </span>
       </div>
     </div>
-    <InputTextarea ref="textareaCommon" :defaultShow="defaultShow" @hiddenInput="defaultShow=false" prevUser="王建国"/>
+    <InputTextarea ref="textareaCommon" :defaultShow="defaultShow" @hiddenInput="defaultShow=false" :prevUser="item.userName"/>
     <!-- 二级评论 -->
     <CommentCardSecond ref="CommentCardSecond" :item="item" :showLimit="showLimit"/>
     <div class="second-count" v-if="showLimit <= 2 && item.lowCommentNum > 2" @click="handleSecondCommitExtend(item)">
@@ -96,6 +95,14 @@ export default {
     },
     deleteKnowledge() {
 
+    },
+    handleCollect(item) {
+      if (item.isSelected) {
+        item.isSelected = 0;
+        return;
+      }
+      item.isSelected = 1;
+      this.$set(item, 'isSelected', 1)
     },
     handleSecondCommitExtend(item) {
       this.$emit('showSecondCommentDialog', {

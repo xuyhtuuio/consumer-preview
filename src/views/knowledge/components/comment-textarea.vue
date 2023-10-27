@@ -38,6 +38,7 @@
         placement="bottom-start"
         :width="260"
         trigger="hover"
+        @show="showTagPopover"
       >
         <div class="content">
           <el-input v-model.trim="serach" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
@@ -62,20 +63,21 @@
       </el-popover>
       <span class="button pointer">
         <el-select v-model="type" placeholder="选择正反面" clearable>
-          <el-option label="正面案例" value="正面案例"></el-option>
-          <el-option label="反面案例" value="反面案例"></el-option>
+          <el-option label="正面案例" :value="1"></el-option>
+          <el-option label="反面案例" :value="0"></el-option>
         </el-select>
       </span>
-      <el-button type="primary" style="width:88px;float: right;" :disabled="!content" @click="handleConfirm">发 布</el-button>
+      <el-button :loading="publishLoading" type="primary" style="width:88px;float: right;" :disabled="!content || publishLoading" @click="handleConfirm">发 布</el-button>
     </div>
     <!-- 输入评论的弹框 -->
-    <CommentTextareaDialog ref="CommentTextareaDialog" @handleConfirm="handleConfirm"/>
+    <CommentTextareaDialog ref="CommentTextareaDialog" v-on="$listeners"/>
   </div>
 </template>
 <script>
+import { debounce } from 'lodash';
 import { getFormGroups } from '@/api/front';
 import { mapState } from 'vuex'
-import { addTag } from '@/api/knowledge/knowledgeCollect'
+import { addTag, addKnowledge } from '@/api/knowledge/knowledgeCollect'
 import fileType from '@/components/common/file-type'
 import CommentTextareaDialog from './comment-textarea-dialog'
 export default {
@@ -86,6 +88,7 @@ export default {
   },
   data() {
     return {
+      publishLoading: false,
       title: '',
       content: '',
       type: '',
@@ -119,12 +122,17 @@ export default {
   },
   watch: {
     setDefalutTagsList(val) {
-      this.tagsList = val || []
+      this.tagsList = JSON.parse(JSON.stringify(val || []))
     }
   },
   created() {
   },
   methods: {
+    showTagPopover() {
+      if (!this.serach && this.tagsList.length === 0) {
+        this.tagsList = JSON.parse(JSON.stringify(this.setDefalutTagsList))
+      }
+    },
     async addTags() {
       const res = await addTag({ tagName: this.serach })
       if (res.data.success) {
@@ -156,14 +164,42 @@ export default {
           content: this.content,
           type: this.type,
           serach: this.serach,
-          tags: this.tags,
-          fileList: this.fileList
+          tags: [...this.tags],
+          fileList: [...this.fileList]
         })
       })
     },
-    handleConfirm() {
-
+    resetForm() {
+      this.title = ''
+      this.content = ''
+      this.fileList = []
+      this.tags = []
+      this.type = ''
     },
+    handleConfirm: debounce(async function () {
+      if (!this.content) {
+        this.$message.warning('请填写内容后再发布')
+        return;
+      }
+      this.publishLoading = true
+      try {
+        const res = await addKnowledge({
+          title: this.title,
+          content: this.content,
+          fileKeys: this.fileList.map(item => item.key) || [],
+          tagIds: this.tags.map(item => item.id) || [],
+          type: this.type
+        })
+        if (res.data.success) {
+          this.$message.success('发布成功')
+          this.resetForm()
+          this.$emit('updateList')
+        }
+        this.publishLoading = false
+      } catch {
+        this.publishLoading = false
+      }
+    }, 500),
     uploadBpmn(param) {
       const formData = new FormData();
       formData.append('mf', param.file); // 传入bpmn文件

@@ -58,6 +58,7 @@ export function deleteKnowledge(data) {
 export function getAttentionTagList(data) {
   return request({
     url: '/cpr/KnowledgeMarket/attentionTagList',
+    contentType: 'application/x-www-form-urlencoded;charset=utf-8',
     method: 'get',
     params: data
   })
@@ -77,5 +78,42 @@ export function getTagBaseInformation(data) {
     url: '/cpr/KnowledgeMarket/tagBaseInformation',
     method: 'get',
     params: data
+  })
+}
+
+// 发布知识
+export function addKnowledge(data) {
+  return request({
+    url: '/cpr/KnowledgeMarket/addKnowledge',
+    method: 'post',
+    data
+  })
+}
+
+// 发布评论
+export function addComment(data) {
+  return request({
+    url: '/cpr/KnowledgeMarket/addComment',
+    method: 'post',
+    data
+  })
+}
+
+// 知识评论列表
+export function getCommentList(data) {
+  return request({
+    url: '/cpr/KnowledgeMarket/commentList',
+    method: 'get',
+    contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+    params: data
+  })
+}
+
+// 获取登陆人的拼音缩写
+export function getPinYin() {
+  return request({
+    url: '/cpr/KnowledgeMarket/getPinYin',
+    method: 'get',
+    contentType: 'application/x-www-form-urlencoded;charset=utf-8'
   })
 }

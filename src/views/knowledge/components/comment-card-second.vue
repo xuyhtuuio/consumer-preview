@@ -1,6 +1,6 @@
 <template>
   <div :class="{ 'comment-second-dialog trs-scroll' : showLimit > 2 }">
-    <div class="second-comment" v-for="(s, index) in item.lowCommentList.slice(0, showLimit)" :key="s.id">
+    <div class="second-comment" v-for="(s, index) in (item.lowCommentList || []).slice(0, showLimit)" :key="s.id">
       <div class="content">
         {{ s.userName }} {{ showLimit }}
         <div class="desc ellipsis ellipsis_2" style="color:#434343;margin: 4px 0;">
@@ -66,14 +66,6 @@ export default {
       }
       item.isLiked = 1;
       this.$set(item, 'isLiked', 1)
-    },
-    handleCollect(item) {
-      if (item.isSelected) {
-        item.isSelected = 0;
-        return;
-      }
-      item.isSelected = 1;
-      this.$set(item, 'isSelected', 1)
     },
   }
 }

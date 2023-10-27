@@ -64,7 +64,7 @@ export default {
       defalutParams: {
         keyword: '',
         orderType: 'desc',
-        orderValue: 1,
+        orderValue: 2,
         pageNum: 1,
         pageSize: 10
       },

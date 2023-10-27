@@ -1,13 +1,15 @@
 <template>
   <div class="my" v-loading="loadingList">
-    <FilterKnowledge ref="filterKnowledge"  :total="page.total" @changeSort="changeSort" @changeTags="changeCheckedTags" style="margin-top: 0; border-top-left-radius: 0; border-top-right-radius: 0;"/>
-    <div v-for="(k, i) in kCardList" :key="i">
-      <KnowledgeCard :data="k" @fetchList="getRecommendList(paramsDefalut)"/>
+    <FilterKnowledge ref="filterKnowledge"  :total="page.total" @changeSort="changeSort" @changeTags="changeCheckedTags" style="margin-top: 0; border-top-left-radius: 10px; border-top-right-radius: 10px;"/>
+    <div class="list">
+      <div v-for="(k, i) in kCardList" :key="i">
+        <KnowledgeCard :data="k" @fetchList="getRecommendList(paramsDefalut)" @setLoading="loadingList=true"/>
+      </div>
+      <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
+        v-if="page.total">
+      </TrsPagination>
     </div>
     <el-empty description="暂无数据" v-if="kCardList.length === 0 && loadingList === false"></el-empty>
-    <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
-      v-if="page.total">
-    </TrsPagination>
   </div>
 </template>
 <script>
@@ -33,7 +35,7 @@ export default {
         justSelected: 0,
         listType: 3,
         orderType: 'desc',
-        orderValue: 1,
+        orderValue: 2,
         pageNum: 1,
         pageSize: 10,
         tagIds: []
@@ -97,4 +99,9 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+.list {
+  background: #FFFFFF;
+  border-radius: 10px;
+  padding-bottom: 16px;
+}
 </style>

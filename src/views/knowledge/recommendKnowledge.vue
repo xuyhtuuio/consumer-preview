@@ -1,14 +1,16 @@
 <template>
   <div class="recommend">
-    <CommentTextarea/>
+    <CommentTextarea @updateList="getSearchList"/>
     <FilterKnowledge ref="filterKnowledge" v-loading="loadingList" :total="page.total" @changeSort="changeSort" @changeTags="changeCheckedTags"/>
-    <div v-for="(k, i) in kCardList" :key="i" v-loading="loadingList">
-      <KnowledgeCard :data="k" @fetchList="getRecommendList(paramsDefalut)"/>
+    <div class="list">
+      <div v-for="(k, i) in kCardList" :key="i" v-loading="loadingList">
+        <KnowledgeCard :data="k" @fetchList="getRecommendList(paramsDefalut)" @setLoading="loadingList=true"/>
+      </div>
+      <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
+        v-if="page.total">
+      </TrsPagination>
     </div>
     <el-empty description="暂无数据" v-if="kCardList.length === 0 && loadingList === false"></el-empty>
-    <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
-      v-if="page.total">
-    </TrsPagination>
   </div>
 </template>
 <script>
@@ -36,7 +38,7 @@ export default {
         justSelected: 0,
         listType: 1,
         orderType: 'desc',
-        orderValue: 1,
+        orderValue: 2,
         pageNum: 1,
         pageSize: 10,
         tagIds: []
@@ -102,4 +104,10 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+.list {
+  background: #FFFFFF;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  padding-bottom: 16px;
+}
 </style>

@@ -32,8 +32,12 @@
     </div>
     <div class="buttons">
       <span class="button pointer" style="margin-right: 16px;">
-        <img src="@/assets/image/knowledge/文件.svg" alt=""/>
-        <span class="text">文件</span>
+        <el-upload class="avatar-uploader" action="/cpr/file/upload" :http-request="uploadBpmn" :show-file-list="false">
+          <span>
+            <img src="@/assets/image/knowledge/文件.svg" alt=""/>
+            <span class="text">文件</span>
+          </span>
+        </el-upload>
       </span>
       <el-popover
         placement="bottom-start"
@@ -61,18 +65,19 @@
       </el-popover>
       <span class="button pointer">
         <el-select v-model="type" placeholder="选择正反面" clearable>
-          <el-option label="正面案例" value="正面案例"></el-option>
-          <el-option label="反面案例" value="反面案例"></el-option>
+          <el-option label="正面案例" :value="1"></el-option>
+          <el-option label="反面案例" :value="0"></el-option>
         </el-select>
       </span>
-      <el-button type="primary" style="width:88px;float: right;" :disabled="!content" @click="handleConfirm">发 布</el-button>
+      <el-button :loading="publishLoading" type="primary" style="width:88px;float: right;" :disabled="!content || publishLoading" @click="handleConfirm">发 布</el-button>
     </div>
   </div>
   </el-dialog>
 </template>
 <script>
+import { debounce } from 'lodash';
 import { mapState } from 'vuex'
-import { addTag } from '@/api/knowledge/knowledgeCollect'
+import { addTag, addKnowledge } from '@/api/knowledge/knowledgeCollect'
 import fileType from '@/components/common/file-type'
 import { getFormGroups } from '@/api/front';
 export default {
@@ -82,6 +87,7 @@ export default {
   },
   data() {
     return {
+      publishLoading: false,
       title: '',
       content: '',
       type: '',
@@ -117,7 +123,7 @@ export default {
   },
   watch: {
     setDefalutTagsList(val) {
-      this.tagsList = val || []
+      this.tagsList = JSON.parse(JSON.stringify(val || []))
     }
   },
   methods: {
@@ -147,9 +153,38 @@ export default {
     openDialog() {
       this.showDialog = true
     },
-    handleConfirm() {
-      this.$emit('handleConfirm')
+    resetForm() {
+      this.title = ''
+      this.content = ''
+      this.fileList = []
+      this.tags = []
+      this.type = ''
     },
+    handleConfirm: debounce(async function () {
+      if (!this.content) {
+        this.$message.warning('请填写内容后再发布')
+        return;
+      }
+      this.publishLoading = true
+      try {
+        const res = await addKnowledge({
+          title: this.title,
+          content: this.content,
+          fileKeys: this.fileList.map(item => item.key) || [],
+          tagIds: this.tags.map(item => item.id) || [],
+          type: this.type
+        })
+        if (res.data.success) {
+          this.showDialog = false
+          this.$message.success('发布成功')
+          this.resetForm()
+          this.$emit('updateList')
+        }
+        this.publishLoading = false
+      } catch {
+        this.publishLoading = false
+      }
+    }, 500),
     initForm(form) {
       Object.keys(form).forEach(key => {
         this[key] = form[key]

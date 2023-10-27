@@ -22,8 +22,15 @@
             </template>
           </el-popover>
         </div>
-        <div class="desc ellipsis ellipsis_2">
-          {{ data.content }}
+        <div class="desc" style="position: relative;">
+          <span :id="`computedtextheight_${data.id}`" :class="{ 'ellipsis ellipsis_2': !(data.isCollaplse && data.showCollaplse === false) }">
+            {{ data.content }}
+            <span class="pointer" v-if="data.isCollaplse && data.showCollaplse === false" style="font-size:14px;color:#2D5CF6;" @click="changeCollaplse(true)">收起 <i class="el-icon-arrow-up"></i></span>
+          </span>
+          <span v-if="data.showCollaplse" class="pointer" style="position: absolute;right:0;bottom: 0;display:inline-block;background:#fff;">
+            ...
+            <span style="font-size:14px;color:#2D5CF6;" @click="changeCollaplse(false)">展开全部 <i class="el-icon-arrow-down"></i></span>
+          </span>
         </div>
 
         <template v-for="(tag, index) in data.tagList">
@@ -72,14 +79,6 @@
             <span class="dept">{{ data.orgName }}</span>
           </div>
           <div class="meta-right">
-            <!-- <span class="item" v-if="data.canSelected > 0" @click="handleSelected(data)">
-              <img v-if="data.isSelected > 0" src="@/assets/image/knowledge/精选.svg" />
-              <img v-else src="@/assets/image/knowledge/精选1.svg" />
-              <span>{{ data.isSelected > 0 ? '取消' : '精选' }}</span>
-            </span>
-            <span class="item" v-if="data.canDeleted > 0">
-              <img src="@/assets/image/knowledge/删除.svg" />删除
-            </span> -->
             <span class="item" @click="handleZan">
               <img v-if="data.isLiked > 0" src="@/assets/image/knowledge/赞1.svg" />
               <img v-else src="@/assets/image/knowledge/赞.svg" />
@@ -140,7 +139,7 @@
         </div>
       </div>
     </div>
-    <CommentCard v-if="data.extends > 0"></CommentCard>
+    <CommentCard v-if="data.extends > 0" :id="data.id" :fullName="data.fullName"></CommentCard>
     <div style="height: 16px;border-top: 1px dotted #E5E6EB;"></div>
   </div>
 </template>
@@ -197,9 +196,26 @@ export default {
       }
     },
   },
+  mounted() {
+    this.computedTextHeight(`computedtextheight_${this.data.id}`)
+  },
   methods: {
     newPageOpen(url) {
       window.open(url)
+    },
+    computedTextHeight(id) {
+      this.$nextTick(() => {
+        const text = document.getElementById(id)
+        if (text.scrollHeight !== text.clientHeight) {
+          this.data.isCollaplse = true
+          this.$set(this.data, 'showCollaplse', true)
+          return;
+        }
+        this.$set(this.data, 'showCollaplse', false)
+      })
+    },
+    changeCollaplse(val) {
+      this.$set(this.data, 'showCollaplse', val)
     },
     async showTagEvent(tag) {
       this.loadingTag = true
@@ -280,12 +296,13 @@ export default {
       }
     },
     async deleteKnowledge() {
+      this.$emit('setLoading')
       const res = await deleteKnowledge({
         deleteType: 1,
         id: this.data.id
       })
       if (res.data.success) {
-        this.$set('fetchList')
+        this.$emit('fetchList')
         this.$message.success('删除成功')
       }
     },
@@ -311,7 +328,6 @@ export default {
 </script>
 <style lang="less" scoped>
 .kCard {
-  margin-bottom: 20px;
   background: #FFFFFF;
 }
 .card {
