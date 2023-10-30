@@ -4,10 +4,11 @@
       <el-input v-if="textarea" v-model.trim="textarea" ref="textareaCommon" @focus="handleFocus" type="textarea" @blur="handleBlur" :placeholder="placeholder" :rows="3" :maxlength="500" :minlength="1"></el-input>
       <el-input v-else v-model.trim="textarea" :ref="`inputCommon${id}`" :id="`inputCommon${id}`" @focus="handleFocus" @blur="handleBlur" :placeholder="placeholder"></el-input>
     </div>
-    <el-button type="primary" style="width:88px; margin-top: 10px;float: right;" :disabled="!textarea" @click="handleConfirm">发 布</el-button>
+    <el-button :loading="loading" type="primary" style="width:88px; margin-top: 10px;float: right;" :disabled="!textarea || loading" @click="handleConfirm">发 布</el-button>
   </div>
 </template>
 <script>
+import { debounce } from 'lodash';
 export default {
   name: 'input-textarea',
   props: {
@@ -25,6 +26,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       textarea: '',
       focus: false
     }
@@ -46,21 +48,30 @@ export default {
       }
     }
   },
+  created() {
+    this.bus.$on('setPublishLoading', (val) => {
+      this.loading = val
+      if (!val) {
+        this.$emit('hiddenInput')
+      }
+    })
+  },
   methods: {
     handleFocus() {
       this.focus = true
     },
-    handleConfirm() {
-    },
+    handleConfirm: debounce(function () {
+      this.$emit('publishComment', this.textarea)
+    }, 500),
     selectFocus() {
       this.$nextTick(() => {
-        document.querySelector('#inputCommon' + this.id).focus()
+        document.querySelector('#inputCommon' + this.id)?.focus()
       })
     },
     handleBlur() {
-      setTimeout(() => {
-        this.$emit('hiddenInput')
-      }, 500)
+      // setTimeout(() => {
+      //   this.$emit('hiddenInput')
+      // }, 500)
     }
   }
 }

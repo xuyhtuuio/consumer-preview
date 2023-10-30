@@ -252,7 +252,7 @@ const router = new Router({
         {
           path: 'collectKnowledge',
           name: 'CollectKnowledge',
-          meta: { title: '知识库', viewport },
+          meta: { title: '知识集市', viewport },
           component: () => import('@/views/knowledge/collectKnowledge'),
         }
       ]

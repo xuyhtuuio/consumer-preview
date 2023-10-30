@@ -1,16 +1,15 @@
 <template>
   <div :class="{ 'comment-second-dialog trs-scroll' : showLimit > 2 }">
-    <div class="second-comment" v-for="(s, index) in item.lowCommentList.slice(0, showLimit)" :key="s.id">
+    <div class="second-comment" v-for="(s, index) in (item.lowCommentList || []).slice(0, showLimit)" :key="s.id">
       <div class="content">
         {{ s.userName }} {{ showLimit }}
         <div class="desc ellipsis ellipsis_2" style="color:#434343;margin: 4px 0;">
-          关于兴业银行侵害消费者权益情况的通报：近日，中国银保监会消费者权益保护局发布2021年第12号通报《关于兴业银行侵害消费者权益情况的通情的情况的
-          近日，中国银保监会消费者权益保护局发布2021年第12号但是，关于兴业银行侵害但是，关于兴业银行侵害消费者权益情况的通报。关于兴业银行侵害但是，关于兴业银行侵害消费者权益情况的通报
+          {{ s.content }}
         </div>
         <div class="meta-info">
           <div class="meta-left">
-            <span class="time">08:23</span>来自:
-            <span class="dept">消费者权益保护(客户服务)中心</span>
+            <span class="time">{{ s.commentTime }}</span>来自:
+            <span class="dept">{{ s.orgName }}</span>
           </div>
           <div class="meta-right">
             <span class="item" @click="openComment(s, index)">
@@ -23,12 +22,13 @@
             </span>
           </div>
         </div>
-        <InputTextarea :ref="`textareaCommon${index}`" :id="s.id" :defaultShow="!!s.defaultShow" @hiddenInput="hiddenInput($event, s)" prevUser="王建国"/>
+        <InputTextarea :ref="`textareaCommon${index}`" :id="s.id" :defaultShow="!!s.defaultShow" @hiddenInput="hiddenInput($event, s)" :prevUser="item.userName"  v-on="$listeners"/>
       </div>
     </div>
   </div>
 </template>
 <script>
+import { setLike } from '@/api/knowledge/knowledgeCollect'
 import InputTextarea from './input-textarea'
 export default {
   name: 'comment-card-second',
@@ -53,27 +53,31 @@ export default {
     openComment(s, index) {
       this.$set(s, 'defaultShow', true)
       this.$nextTick(() => {
+        // debugger
         this.$refs[`textareaCommon${index}`][0].selectFocus()
       })
     },
     hiddenInput(e, s) {
       this.$set(s, 'defaultShow', false)
     },
-    handleZan(item) {
-      if (item.isLiked) {
-        item.isLiked = 0;
-        return;
+    async handleZan(item) {
+      const res = await setLike({
+        type: 2,
+        isLike: item.isLiked ? 0 : 1,
+        id: item.id
+      })
+      if (res.data.success) {
+        if (item.isLiked) {
+          this.$message.success('取消点赞成功')
+          item.isLiked = 0;
+          item.upvoteCount -= 1
+          return;
+        }
+        this.$message.success('点赞成功')
+        item.isLiked = 1;
+        item.upvoteCount += 1
+        this.$set(item, 'isLiked', 1)
       }
-      item.isLiked = 1;
-      this.$set(item, 'isLiked', 1)
-    },
-    handleCollect(item) {
-      if (item.isSelected) {
-        item.isSelected = 0;
-        return;
-      }
-      item.isSelected = 1;
-      this.$set(item, 'isSelected', 1)
     },
   }
 }

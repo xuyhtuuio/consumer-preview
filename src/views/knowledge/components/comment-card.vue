@@ -1,32 +1,37 @@
 <template>
   <div class="cCard">
     <div class="card-top">
-      <div class="avatar" :style="getStyle(4)">jz</div>
+      <div class="avatar" :style="getStyle(4)">{{ pinyin }}</div>
       <div class="content">
-        <InputTextarea prevUser="王建国"/>
+        <InputTextarea ref="inputTextarea" :id="id" :prevUser="fullName" @publishComment="publishComment"/>
       </div>
     </div>
-    <div class="card-content">
+    <div class="card-content" v-if="totalCount">
       <div class="card-content-header">
         <span class="left">共 <b>{{ totalCount }}</b> 条评论</span>
         <div class="right">
-          <span class="time" @click="changeSort(1)" :class="{ active: orderValue === 1 }">时间</span>
-          <span class="zan" @click="changeSort(2)" :class="{ active: orderValue === 2 }">点赞</span>
+          <span class="time" @click="changeSort(1)" :class="{ active: paramsDefualt.orderValue === 1 }">时间</span>
+          <span class="zan" @click="changeSort(2)" :class="{ active: paramsDefualt.orderValue === 2 }">点赞</span>
         </div>
       </div>
       <!-- 一级评论 -->
+      <div v-loading="loadingList">
       <div class="card-item" v-for="(item, i) in commentList" :key="item.id">
-        <CommentCardFirst :item="item" :colorStyle="getStyle(i)" @showSecondCommentDialog="showSecondComment"/>
+        <CommentCardFirst :kId="id" :item="item" :colorStyle="getStyle(i)" @showSecondCommentDialog="showSecondComment" @fetchList="handleCurrentChange(1)"/>
+      </div>
+      <TrsPagination :pageSize="5" :pageNow="paramsDefualt.pageNum" :total="totalCount" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
+        v-if="totalCount">
+      </TrsPagination>
       </div>
     </div>
     <!-- 二级评论弹框 -->
     <w-dialog :showFooter="false" v-model="showSecondCommentDialog" :title="`共${showSecondCommentData.lowCommentNum}条回复`" width="70%" class="second-comment-dialog">
-      <CommentCardFirst :item="showSecondCommentData" :colorStyle="colorStyle" @showSecondCommentDialog="showSecondComment" :showLimit="showSecondCommentData.lowCommentNum"/>
-      <!-- <comment-card-second :item="showSecondCommentData" :showLimit="showSecondCommentData.lowCommentNum"/> -->
+      <CommentCardFirst :kId="id" :showSecondCommentDialog="showSecondCommentDialog" :item="showSecondCommentData" :colorStyle="colorStyle" @showSecondCommentDialog="showSecondComment" :showLimit="showSecondCommentData.lowCommentNum"/>
     </w-dialog>
   </div>
 </template>
 <script>
+import { addComment, getCommentList, getPinYin } from '@/api/knowledge/knowledgeCollect'
 import InputTextarea from './input-textarea'
 import CommentCardFirst from './comment-card-first'
 export default {
@@ -36,9 +41,17 @@ export default {
     CommentCardFirst
   },
   props: {
+    id: {
+      type: [String, Number]
+    },
+    fullName: {
+      type: String
+    },
   },
   data() {
     return {
+      loadingList: false,
+      pinyin: '',
       colors: [
         ['#E5E6EB', '#86909c'],
         ['#FFF7E6', '#F9CC45'],
@@ -47,105 +60,17 @@ export default {
         ['#E6FFFB', '#5EDFD6'],
       ],
       index: new Array(5).fill(1).map(() => Math.floor(Math.random() * 5)),
-      orderValue: 1,
-      commentList: [
-        {
-          canDeleted: 1,
-          canSelected: 1,
-          commentTime: '2021-08-11',
-          content: 'cpr_1698044630677_监管转来投诉数据,监管转来投诉数据监管转来投诉数据监管转来投诉数据监管转来投诉数据',
-          id: 1,
-          isLiked: 1,
-          isSelected: 1,
-          extends: 0,
-          lowCommentList: [
-            {
-              canDeleted: 1,
-              canSelected: 1,
-              commentTime: '2021-08-12',
-              content: '111cpr1_1698044630677_监管转来投诉数据,监管转来投诉数据监管转来投诉数据监管转来投诉数据监管转来投诉数据',
-              id: 101,
-              isLiked: 1,
-              isSelected: 1,
-              pinYinHeader: 'XY1',
-              upvoteCount: 1231,
-              userName: '张三1',
-              orgName: '发布机构2',
-            },
-            {
-              canDeleted: 1,
-              canSelected: 1,
-              commentTime: '2021-08-12',
-              content: '111cpr1_1698044630677_监管转来投诉数据,监管转来投诉数据监管转来投诉数据监管转来投诉数据监管转来投诉数据',
-              id: 103,
-              isLiked: 1,
-              isSelected: 1,
-              pinYinHeader: 'XY1',
-              upvoteCount: 1231,
-              userName: '张三1',
-              orgName: '发布机构2',
-            },
-            {
-              canDeleted: 1,
-              canSelected: 1,
-              commentTime: '2021-08-12',
-              content: '111cpr1_1698044630677_监管转来投诉数据,监管转来投诉数据监管转来投诉数据监管转来投诉数据监管转来投诉数据',
-              id: 104,
-              isLiked: 1,
-              isSelected: 1,
-              pinYinHeader: 'XY1',
-              upvoteCount: 1231,
-              userName: '张三1',
-              orgName: '发布机构2',
-            }
-          ],
-          lowCommentNum: 3,
-          pinYinHeader: 'XY',
-          upvoteCount: 123,
-          userName: '张三',
-          orgName: '发布机构1',
-          oneId: -1
-        },
-        {
-          canDeleted: 1,
-          canSelected: 1,
-          commentTime: '2021-08-11',
-          content: 'cpr_1698044630677_监管转来投诉数据,监管转来投诉数据监管转来投诉数据监管转来投诉数据监管转来投诉数据',
-          id: 2,
-          isLiked: 1,
-          isSelected: 1,
-          extends: 0,
-          lowCommentList: [
-            {
-              canDeleted: 1,
-              canSelected: 1,
-              commentTime: '2021-08-12',
-              content: '111cpr1_1698044630677_监管转来投诉数据,监管转来投诉数据监管转来投诉数据监管转来投诉数据监管转来投诉数据',
-              id: 102,
-              isLiked: 1,
-              isSelected: 1,
-              pinYinHeader: 'XY1',
-              upvoteCount: 1231,
-              userName: '张三1',
-              orgName: '发布机构2',
-            }
-          ],
-          lowCommentNum: 2,
-          pinYinHeader: 'RT',
-          upvoteCount: 123,
-          userName: '张三',
-          orgName: '发布机构1',
-          oneId: -1
-        }
-      ],
-      totalCount: 1121,
-      data: {
-        isLiked: 0,
-        isAttention: 0
-      },
+      commentList: [],
+      totalCount: 0,
       showSecondCommentDialog: false,
       showSecondCommentData: {},
-      colorStyle: {}
+      colorStyle: {},
+      paramsDefualt: {
+        orderType: 'desc',
+        orderValue: 1,
+        pageNum: 1,
+        pageSize: 5
+      }
     }
   },
   computed: {
@@ -158,9 +83,60 @@ export default {
       }
     },
   },
+  created() {
+    this.getPinYin()
+    this.getCommentList()
+  },
   methods: {
+    async getPinYin() {
+      const res = await getPinYin()
+      if (res.data.success) {
+        this.pinyin = res.data.data
+      }
+    },
+    async publishComment(content, pid) {
+      this.$refs['inputTextarea'].loading = true
+      const res = await addComment({
+        knowledgeId: this.id,
+        content,
+        pid
+      })
+      if (res.data.success) {
+        this.commentList.unshift({
+          ...res.data.data
+        })
+        this.totalCount += 1
+      } else {
+        this.$message.error('发布失败')
+      }
+      this.$refs['inputTextarea'].textarea = ''
+      this.$refs['inputTextarea'].loading = false
+    },
+    async getCommentList() {
+      this.loadingList = true
+      const res = await getCommentList({
+        ...this.paramsDefualt,
+        knowledgeId: this.id,
+      })
+      if (res.data.success) {
+        this.commentList = (res.data.data.list || []).map(item => {
+          item.extends = 0
+          return item;
+        })
+        this.totalCount = res.data.data.totalCount
+      }
+      this.loadingList = false
+    },
     changeSort(value) {
-      this.orderValue = value
+      if (this.paramsDefualt.orderValue !== value) {
+        this.paramsDefualt.orderValue = value
+        this.paramsDefualt.pageNum = 1
+        this.getCommentList()
+      }
+    },
+    handleCurrentChange(val) {
+      this.paramsDefualt.pageNum = val
+      this.getCommentList()
     },
     showSecondComment({ showSecondCommentData, colorStyle }) {
       this.showSecondCommentData = showSecondCommentData

@@ -26,14 +26,18 @@
       <TrsTag
         v-for="(tag, index) in tags"
         :key="tag"
-        :tag="{ label: tag, ...tagConfig }"
+        :tag="{ label: tag.name, ...tagConfig }"
         @handleClose="removeTag(index)"
       />
     </div>
     <div class="buttons">
       <span class="button pointer" style="margin-right: 16px;">
-        <img src="@/assets/image/knowledge/文件.svg" alt=""/>
-        <span class="text">文件</span>
+        <el-upload class="avatar-uploader" action="/cpr/file/upload" :http-request="uploadBpmn" :show-file-list="false">
+          <span>
+            <img src="@/assets/image/knowledge/文件.svg" alt=""/>
+            <span class="text">文件</span>
+          </span>
+        </el-upload>
       </span>
       <el-popover
         placement="bottom-start"
@@ -43,9 +47,12 @@
         <div class="content">
           <el-input v-model.trim="serach" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
           <ul class="tags-list trs-scroll">
-            <li class="tag-li pointer" v-for="(tag, index) in tagsList" :key="index" @mouseover="hoverText = tag"  @mouseout="hoverText = ''">
-              <span class="tag-text ellipsis">#{{ tag }}</span>
-              <span v-show="tag === serach || hoverText === tag" style="color:#2D5CF6;" @click="addTags(tag)">创建新标签</span>
+            <li class="tag-li pointer" v-if="showNewTag">
+              <span class="tag-text ellipsis">#{{ serach }}</span>
+              <span style="color:#2D5CF6;" @click="addTags()">创建新标签</span>
+            </li>
+            <li class="tag-li pointer" v-for="(tag) in tagsList" :key="tag.id" @click="changeCheckedTags(tag)" :class="{ active: checkedTags.includes(tag.id) }">
+              <span class="tag-text ellipsis">#{{ tag.name }}</span>
             </li>
           </ul>
         </div>
@@ -58,16 +65,19 @@
       </el-popover>
       <span class="button pointer">
         <el-select v-model="type" placeholder="选择正反面" clearable>
-          <el-option label="正面案例" value="正面案例"></el-option>
-          <el-option label="反面案例" value="反面案例"></el-option>
+          <el-option label="正面案例" :value="1"></el-option>
+          <el-option label="反面案例" :value="0"></el-option>
         </el-select>
       </span>
-      <el-button type="primary" style="width:88px;float: right;" :disabled="!content" @click="handleConfirm">发 布</el-button>
+      <el-button :loading="publishLoading" type="primary" style="width:88px;float: right;" :disabled="!content || publishLoading" @click="handleConfirm">发 布</el-button>
     </div>
   </div>
   </el-dialog>
 </template>
 <script>
+import { debounce } from 'lodash';
+import { mapState } from 'vuex'
+import { addTag, addKnowledge } from '@/api/knowledge/knowledgeCollect'
 import fileType from '@/components/common/file-type'
 import { getFormGroups } from '@/api/front';
 export default {
@@ -77,33 +87,13 @@ export default {
   },
   data() {
     return {
+      publishLoading: false,
       title: '',
       content: '',
       type: '',
       serach: '',
       hoverText: '',
-      tagsList: [
-        '案范围分为',
-        'afws wefwef文',
-        'wefwae问的人违反文档威风威风为',
-        '阿尔法违法未',
-        '案范围分为1',
-        'afws wefwef文1',
-        'wefwae问的人违反',
-        '阿尔法违法未1',
-        '案范围分为2',
-        'afws wefwef文2',
-        'wefwae问的人违反2',
-        '阿尔法违法未2',
-        '案范围分为3',
-        'afws wefwef文3',
-        'wefwae问的人违反3',
-        '阿尔法违法未3',
-        '案范围分为4',
-        'afws wefwef文4',
-        'wefwae问的人违反4',
-        '阿尔法违法未4'
-      ],
+      tagsList: [],
       tags: [], // 添加的标签池
       tagConfig: {
         background: '#f0f6ff',
@@ -118,15 +108,44 @@ export default {
     }
   },
   computed: {
+    showNewTag() {
+      return this.serach && this.tagsList.findIndex(item => item.name === this.serach) === -1
+    },
+    checkedTags() {
+      return this.tags.map(item => item.id)
+    },
     getfileType() {
       return val => {
         return val?.split('.')[val.split('.').length - 1]
       }
     },
+    ...mapState(['setDefalutTagsList'])
+  },
+  watch: {
+    setDefalutTagsList(val) {
+      this.tagsList = JSON.parse(JSON.stringify(val || []))
+    }
   },
   methods: {
-    addTags(tag) {
-      this.tags.push(tag)
+    async addTags() {
+      const res = await addTag({ tagName: this.serach })
+      if (res.data.success) {
+        const { id } = res.data.data
+        this.tags.push({
+          name: this.serach,
+          id
+        })
+        this.serach = ''
+        this.$message.success('新建标签成功')
+      }
+    },
+    changeCheckedTags(tag) {
+      const index = this.tags.findIndex(item => item.id === tag.id);
+      if (index === -1) {
+        this.tags.push(tag)
+      } else {
+        this.tags.splice(index, 1)
+      }
     },
     removeTag(index) {
       this.tags.splice(index, 1)
@@ -134,9 +153,38 @@ export default {
     openDialog() {
       this.showDialog = true
     },
-    handleConfirm() {
-      this.$emit('handleConfirm')
+    resetForm() {
+      this.title = ''
+      this.content = ''
+      this.fileList = []
+      this.tags = []
+      this.type = ''
     },
+    handleConfirm: debounce(async function () {
+      if (!this.content) {
+        this.$message.warning('请填写内容后再发布')
+        return;
+      }
+      this.publishLoading = true
+      try {
+        const res = await addKnowledge({
+          title: this.title,
+          content: this.content,
+          fileKeys: this.fileList.map(item => item.key) || [],
+          tagIds: this.tags.map(item => item.id) || [],
+          type: this.type
+        })
+        if (res.data.success) {
+          this.showDialog = false
+          this.$message.success('发布成功')
+          this.resetForm()
+          this.$emit('updateList')
+        }
+        this.publishLoading = false
+      } catch {
+        this.publishLoading = false
+      }
+    }, 500),
     initForm(form) {
       Object.keys(form).forEach(key => {
         this[key] = form[key]
@@ -306,5 +354,8 @@ export default {
   &__body {
     padding: 0;
   }
+}
+.active {
+  color: #2D5CF6;
 }
 </style>

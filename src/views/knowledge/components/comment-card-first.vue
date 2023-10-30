@@ -10,7 +10,7 @@
         trigger="hover"
         popper-class="k-card">
         <ul class="content">
-          <li @click="setWinnow">设为精选</li>
+          <li @click="handleSelected">{{ item.isSelected > 0 ? '取消' : '设为' }}精选</li>
           <li @click="copyClipboard(item.content)">复制</li>
           <li @click="deleteKnowledge">删除</li>
         </ul>
@@ -20,16 +20,15 @@
       </el-popover>
     </div>
     <div class="desc ellipsis ellipsis_2" style="color:#434343;margin: 4px 0;">
-      关于兴业银行侵害消费者权益情况的通报：近日，中国银保监会消费者权益保护局发布2021年第12号通报《关于兴业银行侵害消费者权益情况的通情的情况的
-      近日，中国银保监会消费者权益保护局发布2021年第12号但是，关于兴业银行侵害但是，关于兴业银行侵害消费者权益情况的通报。关于兴业银行侵害但是，关于兴业银行侵害消费者权益情况的通报
+      {{ item.content }}
     </div>
     <div class="meta-info">
       <div class="meta-left">
-        <span class="time">08:23</span>来自:
-        <span class="dept">消费者权益保护(客户服务)中心</span>
+        <span class="time">{{ item.commentTime }}</span>来自:
+        <span class="dept">{{ item.orgName }}</span>
       </div>
       <div class="meta-right">
-        <span class="item" @click="handleCollect(item)">
+        <span class="item">
           <img v-if="item.isSelected > 0" src="@/assets/image/knowledge/精选.svg" style="width:20px;" />
           <img v-else src="@/assets/image/knowledge/精选1.svg" style="width:20px;" />
         </span>
@@ -40,13 +39,13 @@
         <span class="item" @click="handleZan(item)">
           <img v-if="item.isLiked > 0" src="@/assets/image/knowledge/赞1.svg" />
           <img v-else src="@/assets/image/knowledge/赞.svg" />
-          <span>123</span>
+          <span>{{ item.upvoteCount }}</span>
         </span>
       </div>
     </div>
-    <InputTextarea ref="textareaCommon" :defaultShow="defaultShow" @hiddenInput="defaultShow=false" prevUser="王建国"/>
+    <InputTextarea ref="textareaCommon" @publishComment="publishComment" :id="item.id" :defaultShow="defaultShow" @hiddenInput="defaultShow=false" :prevUser="item.userName"/>
     <!-- 二级评论 -->
-    <CommentCardSecond ref="CommentCardSecond" :item="item" :showLimit="showLimit"/>
+    <CommentCardSecond ref="CommentCardSecond" @publishComment="publishComment" :item="item" :showLimit="showLimit"/>
     <div class="second-count" v-if="showLimit <= 2 && item.lowCommentNum > 2" @click="handleSecondCommitExtend(item)">
       共 {{ item.lowCommentNum }} 条回复
       <i class="el-icon-caret-bottom"></i>
@@ -56,6 +55,7 @@
 </template>
 <script>
 import { copyText } from '@/utils/Clipboard';
+import { setSelected, setLike, addComment, deleteKnowledge } from '@/api/knowledge/knowledgeCollect'
 import InputTextarea from './input-textarea'
 import CommentCardSecond from './comment-card-second'
 export default {
@@ -65,6 +65,9 @@ export default {
     CommentCardSecond
   },
   props: {
+    kId: {
+      type: [String, Number]
+    },
     item: {
       type: Object,
       default: () => ({})
@@ -77,6 +80,9 @@ export default {
     colorStyle: {
       type: Object,
       default: () => ({})
+    },
+    showSecondCommentDialog: {
+      type: Boolean
     }
   },
   data() {
@@ -91,17 +97,90 @@ export default {
         this.$refs['textareaCommon'].selectFocus()
       })
     },
-    setWinnow() {
-
+    async handleSelected() {
+      const res = await setSelected({
+        type: 2,
+        isSelected: this.item.isSelected ? 0 : 1,
+        id: this.item.id
+      })
+      if (res.data.success) {
+        if (this.item.isSelected) {
+          this.$message.success('取消精选成功')
+          this.item.isSelected = 0;
+          return;
+        }
+        this.$message.success('精选成功')
+        this.item.isSelected = 1;
+        this.$set(this.item, 'isSelected', 1)
+      }
     },
-    deleteKnowledge() {
-
+    async handleZan() {
+      const res = await setLike({
+        type: 2,
+        isLike: this.item.isLiked ? 0 : 1,
+        id: this.item.id
+      })
+      if (res.data.success) {
+        if (this.item.isLiked) {
+          this.$message.success('取消点赞成功')
+          this.item.isLiked = 0;
+          this.item.upvoteCount -= 1
+          return;
+        }
+        this.$message.success('点赞成功')
+        this.item.isLiked = 1;
+        this.item.upvoteCount += 1
+        this.$set(this.item, 'isLiked', 1)
+      }
+    },
+    async deleteKnowledge() {
+      this.$emit('setLoading')
+      const res = await deleteKnowledge({
+        deleteType: 2,
+        id: this.item.id
+      })
+      if (res.data.success) {
+        this.$emit('fetchList')
+        this.$message.success('删除成功')
+      }
+    },
+    handleCollect(item) {
+      if (item.isSelected) {
+        item.isSelected = 0;
+        return;
+      }
+      item.isSelected = 1;
+      this.$set(item, 'isSelected', 1)
     },
     handleSecondCommitExtend(item) {
       this.$emit('showSecondCommentDialog', {
         showSecondCommentData: item,
         colorStyle: this.colorStyle
       })
+    },
+    async publishComment(content) {
+      this.$refs['textareaCommon'].loading = true
+      this.bus.$emit('setPublishLoading', true)
+      const res = await addComment({
+        knowledgeId: this.kId,
+        content,
+        pid: this.item.id
+      })
+      if (res.data.success) {
+        if (!this.item.lowCommentList) {
+          this.item.lowCommentList = []
+        }
+        this.item.lowCommentList.unshift({
+          ...res.data.data
+        })
+        this.defaultShow = false
+        this.item.lowCommentNum += 1
+      } else {
+        this.$message.error('发布失败')
+      }
+      this.$refs['textareaCommon'].textarea = ''
+      this.$refs['textareaCommon'].loading = false
+      this.bus.$emit('setPublishLoading', false)
     },
     copyClipboard(val) {
       copyText(
