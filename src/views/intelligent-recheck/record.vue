@@ -205,8 +205,8 @@
                   src="../../assets/image/bluedown.png"
                   alt=""
                   v-else-if="this.isSortBill"
-                /></p
-            ></el-col>
+                /></p>
+              </el-col>
           </el-row>
         </div>
       </div>
@@ -394,11 +394,11 @@ export default {
     handleChange() {},
     changeArrrovalType() {
       this.searchParm.formCategory = this.search.approvalType
-      this.searchList()
+      this.searchOnePage()
     },
     handleSubmit() {
       this.searchParm.text = this.search.searchInput
-      this.searchList()
+      this.searchOnePage()
     },
 
     handleClose() {
@@ -491,7 +491,7 @@ export default {
         )
         this.searchParm.orgId = this.search.orgIds
       }
-      this.searchList()
+      this.searchOnePage()
     },
     changeOnlineDate() {
       this.search.datePickerOnline = this.search.datePickerOnline.map((item) => this.timeFormat(item))
@@ -499,7 +499,7 @@ export default {
       this.searchParm.startTime = this.search.datePickerOnline[0] + ' 00:00:00'
       // eslint-disable-next-line prefer-destructuring
       this.searchParm.endTime = this.search.datePickerOnline[1] + ' 23:59:59'
-      this.searchList()
+      this.searchOnePage()
     },
     changeBillDate() {
       this.search.datePickerBill = this.search.datePickerBill.map((item) => this.timeFormat(item))
@@ -507,7 +507,7 @@ export default {
       this.searchParm.cStartTime = this.search.datePickerBill[0] + ' 00:00:00'
       // eslint-disable-next-line prefer-destructuring
       this.searchParm.cEndTime = this.search.datePickerBill[1] + ' 23:59:59'
-      this.searchList()
+      this.searchOnePage()
     },
 
     handleBackCheck() {
@@ -519,7 +519,7 @@ export default {
       } else {
         this.searchParm.isPass = this.PASSENU.pass
       }
-      this.searchList()
+      this.searchOnePage()
     },
     /**
      *
@@ -558,14 +558,14 @@ export default {
       return item ? item.label : ''
     },
 
-    async searchList() {
+    async searchList(pageNow) {
       //    //  1-回检时间 2-提单时间 3-上线时间
       //    sort: 1,
       // // 1-降序 2-升序
       // sortType: 2,
       this.search.loading = true
       const mustParm = {
-        pageNow: this.page.pageNow,
+        pageNow: pageNow || this.page.pageNow,
         pageSize: this.page.pageSize,
         sort: this.sort,
         sortType: this.sortType
@@ -584,8 +584,13 @@ export default {
       }
     },
 
-    handleCurrentChange(opt) {
-      console.log(opt)
+    handleCurrentChange(pageNow) {
+      this.page.pageNow = pageNow
+      this.searchList()
+    },
+
+    searchOnePage() {
+      this.searchList(1)
     },
 
     onlineClick() {
@@ -601,7 +606,7 @@ export default {
         this.searchParm.sort = this.SORTENU.backcheckTime
         this.searchParm.sortType = this.SORTTYPEENU.asc
       }
-      this.searchList()
+      this.searchOnePage()
     },
     billClick() {
       this.isSortBill = !this.isSortBill
@@ -615,12 +620,12 @@ export default {
         this.searchParm.sort = this.SORTENU.backcheckTime
         this.searchParm.sortType = this.SORTTYPEENU.asc
       }
-      this.searchList()
+      this.searchOnePage()
     }
   },
 
   created() {
-    this.searchList()
+    this.searchOnePage()
   },
   mounted() {
     this.getOrgTreeMeo()
