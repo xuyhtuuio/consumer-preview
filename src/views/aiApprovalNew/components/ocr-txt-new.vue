@@ -411,25 +411,31 @@ export default {
         indexs.push(this.getSelectDomIndex(item))
         left.push(item.offsetLeft)
         // right.push(item.offsetLeft + (item.offsetWidth) * (1 / this.wordDomStyle.scale))
-        right.push(item.offsetLeft + (item.offsetWidth))
+        right.push(item.offsetLeft * this.styleProp.wordDomStyle.scale + (item.offsetWidth))
         top.push(item.offsetTop)
-        bottom.push(item.offsetTop + (item.offsetHeight))
+        bottom.push(item.offsetTop * this.styleProp.wordDomStyle.scale + (item.offsetHeight))
         // bottom.push(item.offsetTop + item.offsetHeight * (1 / this.wordDomStyle.scale))
       })
       const l = left.sort((a, b) => a - b)[0]
       const t = top.sort((a, b) => a - b)[0]
       const r = right.sort((a, b) => a - b)[right.length - 1]
       const b = bottom.sort((c, d) => c - d)[bottom.length - 1]
+      console.log('left', left)
+      console.log('right', right)
+      console.log('top', top)
+      console.log('bottom', bottom)
+      console.log(l, t, r, b)
       this.addRectOverDom(l, t, r, b, nodes, indexs)
     },
     // 添加覆盖 dom
     addRectOverDom(l, t, r, b, nodes, indexs) {
       const position = {
-        left: Math.floor(l * this.styleProp.wordDomStyle.scale),
+        left: Math.floor(l),
         top: Math.floor(t * this.styleProp.wordDomStyle.scale),
         height: Math.floor((b - t)),
         width: Math.floor((r - l))
       }
+      console.log(position)
       const string = this.selectText
       const obj = {
         ocrId: this.selectOcr.ocrId,
