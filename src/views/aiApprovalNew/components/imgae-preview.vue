@@ -79,7 +79,6 @@ export default {
     }
   },
   created() {
-    this.$emit('findIconPosition')
   },
   mounted() {
     window.addEventListener('resize', this.handleImageLoaded)

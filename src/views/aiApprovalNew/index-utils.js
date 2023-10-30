@@ -1156,7 +1156,7 @@ export default {
     generateIcons() {
       this.$nextTick(() => {
         const img = document.getElementById('picture')
-        const realHeight = img.scrollHeight
+        const realHeight = (img.scrollHeight || img.offsetHeight) || img.clientHeight
         const iconContainer = document.querySelector('.icons')
         if (iconContainer) {
           iconContainer.style.height = realHeight + 'px'
