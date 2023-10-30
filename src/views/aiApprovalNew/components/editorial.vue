@@ -160,6 +160,10 @@ export default {
       type: Number,
       default: 0
     },
+    activePdfIndex: {
+      type: Number,
+      default: 0
+    },
     isRel: {
       type: Boolean,
       default: false
@@ -183,7 +187,6 @@ export default {
       handler(val) {
         this.init(val)
       },
-      deep: true
     },
     showOcr(val) {
       if (val === false && this.showRecommend) {
@@ -364,7 +367,8 @@ export default {
       const commenId = this.collection.filter((item) => {
         return item.id === id
       })
-      if (commenId[0]?.filesWithComment?.includes(fileId) && fileId === this.files[this.activeIndex].id) {
+      if ((commenId[0]?.filesWithComment?.includes(fileId) && fileId === this.files[this.activeIndex].id)
+      || (commenId[0]?.filesWithComment?.includes(fileId) && fileId === this.files[this.activeIndex].child[this.activePdfIndex].id)) {
         this.$emit('showCommentLine', commenId[0], fileId)
       } else {
         this.$emit('changeFileById', fileId)

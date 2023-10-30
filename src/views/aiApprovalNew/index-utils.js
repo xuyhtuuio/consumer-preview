@@ -219,7 +219,7 @@ export default {
       const fileType = this.files[this.activeIndex].type
       // 遍历意见 寻找当前文件
       if (fileType !== 'pdf') {
-        this.comments.map((comment) => {
+        this.approval.comments.map((comment) => {
           if (comment?.files.includes(this.files[this.activeIndex].id)) {
             // 遍历文件与批注的关系，判断是否包含 第 i 条
             comment?.filesWithBg.map((fwb) => {
@@ -325,7 +325,7 @@ export default {
         this.getComments()
         this.$refs.ocrTxt.getInitContent(this.approval)
         this.generateIcons()
-        console.log('增加后', this.approval)
+        console.log('增加后approval', this.approval)
         // 关联意见执行结尾
       }
       const newComment = {
@@ -378,7 +378,7 @@ export default {
     },
     // 展示连线
     showCommentLine(obj, fileId) {
-      console.log('obj', obj)
+      console.log('obj', obj, fileId)
       if (fileId) {
         this.changeFileById(fileId)
         console.log('非图标')
@@ -408,9 +408,14 @@ export default {
         return;
       }
       this.lineRemoveOnly();
+      const commenDom1 = document.querySelector(`div[data-commenid=c${obj.id}]`)
+      if (commenDom1) {
+        this.appendHighLightDom(obj, commenDom1)
+        return;
+      }
       this.$nextTick(() => {
-        const commenDom = document.querySelector(`div[data-commenid=c${obj.id}]`)
-        this.appendHighLightDom(obj, commenDom)
+        const commenDom2 = document.querySelector(`div[data-commenid=c${obj.id}]`)
+        this.appendHighLightDom(obj, commenDom2)
       })
     },
     appendHighLightDom(obj, commenDom) {
@@ -441,6 +446,7 @@ export default {
       // 获取高亮元素 dom
       // this.$refs.filePreview.setHighLight(location)
       this.lineWordItem = location
+      console.log(this.lineWordItem)
       this.drawCommentLine(doms, commenDom)
     },
     drawCommentLine(start, end) {
@@ -476,6 +482,7 @@ export default {
           });
           this.word_lines[index].show(showEffectName, animOptions);
           this.$nextTick(() => {
+            // bug in this
             const highLightDoms = Array.from(document.getElementsByClassName('imgLight'));
             this.high_light_lines[index] = new LeaderLine(highLightDoms[index], item, {
               color: '#EB5D78',
@@ -1154,8 +1161,9 @@ export default {
         if (iconContainer) {
           iconContainer.style.height = realHeight + 'px'
         }
+        console.log('realHeight', realHeight)
         const scale = img.naturalWidth / img.clientWidth;
-        this.comments.map((comment) => {
+        this.approval.comments.map((comment) => {
           const commentIcons = Object.keys(comment.iconsWithPos)
           console.log(commentIcons)
           if (commentIcons?.length) {
@@ -1164,7 +1172,6 @@ export default {
               //   return ocr.ocrId === icon
               // })
               const ocrIndex = comment.iconsWithOcrIndex[icon][0]
-              console.log(comment)
               // icon 高度 等于 ocr 的 top + ocr 高度的一半 乘以缩放 - 图标自身高度的一半
               const iconTop = (this.approval.ocr[ocrIndex]?.location?.y + this.approval.ocr[ocrIndex]?.location?.h / 2) / scale - 7.5
               if (!this.icons.length) {

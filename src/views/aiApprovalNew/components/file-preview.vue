@@ -123,7 +123,6 @@ export default {
     },
   },
   created() {
-    // this.newLineWordItem = this.lineWordItem;
   },
   mounted() {
     // this.init();

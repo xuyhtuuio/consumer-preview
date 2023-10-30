@@ -27,7 +27,7 @@
         <div v-for="(ocr, i) in html" class="div-position"  :key="i" :style="returnStyle(i)">
           <template v-for="(item, j) in ocr">
             <!-- <template  v-if="typeof item === 'string'">{{ item }}</template> -->
-            <div :class="{ commentNode:item.hasBg}" v-if="!item.wordType" :key="i + '_' + j + '_'" @click="showOcrCommentLine">{{ item.text }}</div>
+            <div :data-ocrItem="item.hasComment" :class="{ commentNode:item.hasBg}" v-if="!item.wordType" :key="i + '_' + j + '_'" @click="showOcrCommentLine">{{ item.text }}</div>
             <span v-else :key="i + '_' + j" :wordType="item.wordType" :id="`word_${i}_${j}`" :class="{
               active:
                 activeWordType === item.wordType || activeWordType === 0,
@@ -82,8 +82,8 @@ export default {
   },
   watch: {
     approval: {
-      handler(val) {
-        this.getInitContent(val)
+      handler() {
+        this.getCommentHtml()
       },
       deep: true
     },
@@ -102,7 +102,7 @@ export default {
   },
   mounted() {
     document.addEventListener('click', this.hideAdd)
-    this.getInitContent(this.approval)
+    this.getCommentHtml()
   },
   methods: {
     addWord() {
@@ -199,8 +199,8 @@ export default {
       const html = []
       // 遍历接口返回的 ocr 结果
       approval?.ocr?.forEach((ocr, j) => {
-        const { text, location, ocrId } = ocr
-        let newOcr = [{ text, ocrId }]
+        const { text, location, ocrId, hasComment } = ocr
+        let newOcr = [{ text, ocrId, hasComment }]
         // 遍历推荐意见 获取关键字、关键字类型
         approval?.recommends?.forEach((recommend, i) => {
           const { word, wordType } = recommend
@@ -215,6 +215,7 @@ export default {
                 a.splice(1, 0, {
                   text: word,
                   word,
+                  hasComment,
                   ocrId,
                   wordType,
                   location,
@@ -223,14 +224,14 @@ export default {
                 const c = [...a.filter((b) => b !== '')]
                 const d = c.map((e) => {
                   if (!e.word) {
-                    return { text: e, ocrId }
+                    return { text: e, ocrId, hasComment }
                   } else {
                     return e
                   }
                 })
                 temp.push({ ...d })
               } else {
-                temp.push({ text: newOcr[index].text, ocrId })
+                temp.push({ text: newOcr[index].text, ocrId, hasComment })
               }
             }
             newOcr = [...Object.values(...temp)]
@@ -256,8 +257,38 @@ export default {
         this.$emit('hasBg', j, reValue)
         html.push(newOcr)
       })
+      let preTimeStramp = ''
+      html.map((ocr) => {
+        ocr.map((item) => {
+          if (item.hasComment && item.hasBg) {
+            preTimeStramp = item.hasComment
+          }
+          if (!item.hasComment && item.hasBg) {
+            item.hasComment = preTimeStramp
+          }
+        })
+      })
       this.html = html
       this.$forceUpdate()
+    },
+    // 标记批注文本
+    getCommentHtml() {
+      const ocrWithIndex = {}
+      this.approval.comments.map((comment) => {
+        for (const key in comment.iconsWithOcrIndex) {
+          comment.iconsWithOcrIndex[key].map((index) => {
+            ocrWithIndex[index] = key
+          })
+        }
+      })
+      let indexs = Object.keys(ocrWithIndex)
+      indexs = indexs.map((i) => Number(i))
+      this.approval.ocr.map((ocr, i) => {
+        if (indexs.includes(i)) {
+          ocr.hasComment = ocrWithIndex[i]
+        }
+      })
+      this.getInitContent(this.approval)
     },
     // 高亮检索的关键词
     search(keyWords) {

@@ -185,7 +185,7 @@
           </div>
         </div>
         <div class="content-cont-editor">
-          <editorial ref="editorial" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
+          <editorial ref="editorial" :activePdfIndex="activePdfIndex" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
             :lineWordItem="lineWordItem" @upDateComments="upDateComments" @showLine="showLine" :activeIndex="activeIndex"
             :activeWordType="activeWordType" @addCommentWithPosition="addCommentWithPosition" @showCommentLine="showCommentLine" @changeEditorialType="changeEditorialType"
             :showOcr="showOcr" :formBase="formBase" @changeFileById="changeFileById" :isRel="isRel" @changeRel="changeRel">
