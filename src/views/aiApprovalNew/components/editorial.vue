@@ -367,8 +367,7 @@ export default {
       const commenId = this.collection.filter((item) => {
         return item.id === id
       })
-      if ((commenId[0]?.filesWithComment?.includes(fileId) && fileId === this.files[this.activeIndex].id)
-      || (commenId[0]?.filesWithComment?.includes(fileId) && fileId === this.files[this.activeIndex].child[this.activePdfIndex].id)) {
+      if ((commenId[0]?.filesWithComment?.includes(fileId) && fileId === this.files[this.activeIndex].id)) {
         this.$emit('showCommentLine', commenId[0], fileId)
       } else {
         this.$emit('changeFileById', fileId)
