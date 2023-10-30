@@ -127,11 +127,7 @@
             :class="search.mechanism ? 'active' : ''"
             style="font-size: 14px"
           >
-            {{
-              search.approvalType
-                ? this.getTransationName(search.approvalType)
-                : '事项类型'
-            }}
+            {{ search.approvalType ? search.approvalType : '事项类型' }}
             <img
               src="../../assets/image/person-center/down.png"
               class="down"
@@ -146,7 +142,7 @@
                 v-for="(item, index) in transactionTypes"
                 :key="index"
                 :label="item.label"
-                :value="item.value"
+                :value="item.label"
               ></el-option>
             </el-select>
           </div>
@@ -395,10 +391,15 @@ export default {
     fullImage
   },
   methods: {
-
     handleChange() {},
-    changeArrrovalType() {},
-    handleSubmit() {},
+    changeArrrovalType() {
+      this.searchParm.formCategory = this.search.approvalType
+      this.searchList()
+    },
+    handleSubmit() {
+      this.searchParm.text = this.search.searchInput
+      this.searchList()
+    },
 
     handleClose() {
       this.optionDialogVisible = false
@@ -493,14 +494,20 @@ export default {
       this.searchList()
     },
     changeOnlineDate() {
-      console.log(
-        this.search.datePickerOnline.map((item) => this.timeFormat(item))
-      )
+      this.search.datePickerOnline = this.search.datePickerOnline.map((item) => this.timeFormat(item))
+      // eslint-disable-next-line prefer-destructuring
+      this.searchParm.startTime = this.search.datePickerOnline[0] + ' 00:00:00'
+      // eslint-disable-next-line prefer-destructuring
+      this.searchParm.endTime = this.search.datePickerOnline[1] + ' 23:59:59'
+      this.searchList()
     },
     changeBillDate() {
-      console.log(
-        this.search.datePickerBill.map((item) => this.timeFormat(item))
-      )
+      this.search.datePickerBill = this.search.datePickerBill.map((item) => this.timeFormat(item))
+      // eslint-disable-next-line prefer-destructuring
+      this.searchParm.cStartTime = this.search.datePickerBill[0] + ' 00:00:00'
+      // eslint-disable-next-line prefer-destructuring
+      this.searchParm.cEndTime = this.search.datePickerBill[1] + ' 23:59:59'
+      this.searchList()
     },
 
     handleBackCheck() {
