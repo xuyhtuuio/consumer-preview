@@ -85,7 +85,6 @@ export default {
       handler() {
         this.getCommentHtml()
       },
-      deep: true
     },
     styleProp: {
       handler(val) {
@@ -269,13 +268,14 @@ export default {
         })
       })
       this.html = html
+      console.log(html)
       this.$forceUpdate()
     },
     // 标记批注文本
     getCommentHtml() {
       if (!this.approval?.comments) {
         this.getInitContent(this.approval)
-        return
+        return;
       }
       const ocrWithIndex = {}
 

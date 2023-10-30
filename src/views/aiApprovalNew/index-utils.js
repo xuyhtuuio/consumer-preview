@@ -323,7 +323,7 @@ export default {
           console.log('relComment', relComment)
         })
         this.getComments()
-        this.$refs.ocrTxt.getInitContent(this.approval)
+        this.$refs.ocrTxt.getCommentHtml(this.approval)
         this.generateIcons()
         console.log('增加后approval', this.approval)
         // 关联意见执行结尾
@@ -363,7 +363,7 @@ export default {
         // this.addBg(this.comments_nodes)
         this.getComments()
         console.log('0', this.comments)
-        this.$refs.ocrTxt.getInitContent(this.approval)
+        this.$refs.ocrTxt.getCommentHtml(this.approval)
         this.changeRel(false)
         this.postil.textarea = ''
         this.$refs.editorial.changeType(2)
@@ -944,6 +944,7 @@ export default {
               });
             });
           }
+          this.$refs.ocrTxt.getCommentHtml(this.approval);
           this.generateIcons()
           this.lineRemove()
           break;
@@ -1033,6 +1034,7 @@ export default {
         default:
           break;
       }
+      this.getComments()
     },
     // 新增的关键词和新增的话术
     addRecommend(recommend, wordId, strId) {
