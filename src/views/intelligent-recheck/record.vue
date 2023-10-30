@@ -102,6 +102,7 @@
                 start-placeholder="开始月份"
                 end-placeholder="结束月份"
                 :picker-options="pickerOptions"
+                @change="changeBillDate"
               >
               </el-date-picker>
               <div slot="reference">
@@ -141,7 +142,6 @@
               @change="changeArrrovalType"
               clearable
             >
-
               <el-option
                 v-for="(item, index) in transactionTypes"
                 :key="index"
@@ -161,7 +161,8 @@
             <el-switch
               size="small"
               style="margin-right: 4px"
-              v-model="isBackCheck"
+              v-model="search.isBackCheck"
+              @change="handleBackCheck"
             />
             已回检
           </div>
@@ -170,15 +171,45 @@
         <div class="right-area">
           <el-row>
             <el-col :span="8"
-              ><p class="tot-num">共<span class="num">3216</span>条</p></el-col
+              ><p class="tot-num">
+                共<span class="num">{{ page.totalCount }}</span
+                >条
+              </p></el-col
             >
             <el-col :span="8" justify="center" style="cursor: pointer">
-              <p class="sort" @click="onlineClick">
-                按上线时间<img src="../../assets/image/upup.png" alt="" /></p
-            ></el-col>
+              <p
+                class="sort"
+                @click="onlineClick"
+                :class="{ active: this.isSortOl }"
+              >
+                按上线时间<img
+                  src="../../assets/image/upup.png"
+                  alt=""
+                  v-if="!this.isSortOl"
+                />
+                <img
+                  src="../../assets/image/bluedown.png"
+                  alt=""
+                  v-else-if="this.isSortOl"
+                />
+              </p>
+            </el-col>
             <el-col :span="8" justify="center" style="cursor: pointer">
-              <p class="sort" @click="billClick">
-                按提单时间<img src="../../assets/image/upup.png" alt="" /></p
+              <p
+                class="sort"
+                @click="billClick"
+                :class="{ active: this.isSortBill }"
+              >
+                按提单时间<img
+                  src="../../assets/image/upup.png"
+                  alt=""
+                  v-if="!this.isSortBill"
+                />
+                <img
+                  src="../../assets/image/bluedown.png"
+                  alt=""
+                  v-else-if="this.isSortBill"
+                /></p
             ></el-col>
           </el-row>
         </div>
@@ -312,10 +343,13 @@ export default {
         ]
       },
       dataPickerBill: '',
-      isBackCheck: '',
+
       showFullScreen: false,
       agenciesList: [],
-      searchParm: {},
+      searchParm: {
+        // 默认回检通过
+        isPass: 1
+      },
       search: {
         orgIds: '',
         searchInput: '',
@@ -323,7 +357,8 @@ export default {
         datePickerBill: '',
         loading: true,
         orgName: '',
-        approvalType: ''
+        approvalType: '',
+        isBackCheck: true
       },
       //  1-回检时间 2-提单时间 3-上线时间
       sort: 1,
@@ -333,9 +368,25 @@ export default {
       page: {
         pageNow: 1,
         pageSize: 8,
-        totalCount: 10
+        totalCount: 0
       },
-      transactionTypes: []
+      transactionTypes: [],
+      isSortOl: false,
+      isSortBill: false,
+
+      SORTENU: {
+        backcheckTime: 1,
+        billTime: 2,
+        onlineTime: 3
+      },
+      SORTTYPEENU: {
+        desc: 1,
+        asc: 2
+      },
+      PASSENU: {
+        pass: 1,
+        unpass: 2
+      }
     }
   },
   components: {
@@ -344,14 +395,11 @@ export default {
     fullImage
   },
   methods: {
-    changeOnlineDate() {
-      console.log(
-        this.search.datePickerOnline.map((item) => this.timeFormat(item))
-      )
-    },
+
     handleChange() {},
     changeArrrovalType() {},
     handleSubmit() {},
+
     handleClose() {
       this.optionDialogVisible = false
       this.recordDialogVisible = false
@@ -444,8 +492,34 @@ export default {
       }
       this.searchList()
     },
+    changeOnlineDate() {
+      console.log(
+        this.search.datePickerOnline.map((item) => this.timeFormat(item))
+      )
+    },
+    changeBillDate() {
+      console.log(
+        this.search.datePickerBill.map((item) => this.timeFormat(item))
+      )
+    },
 
-    // 在树里根据id查找name
+    handleBackCheck() {
+      if (
+        this.searchParm.isPass
+        && this.searchParm.isPass === this.PASSENU.pass
+      ) {
+        this.searchParm.isPass = this.PASSENU.unpass
+      } else {
+        this.searchParm.isPass = this.PASSENU.pass
+      }
+      this.searchList()
+    },
+    /**
+     *
+     * @param {*} id
+     * @param {*} tree
+     * @description 在树里根据ID获取Name, 深度优先
+     */
     queryTreeName(id, tree) {
       let result
       // eslint-disable-next-line no-shadow
@@ -468,7 +542,10 @@ export default {
       return result
     },
 
-    // 根据id获取事项类型
+    /**
+     * @param {*} id
+     * @description 根据id获取事项类型
+     */
     getTransationName(id) {
       const item = this.transactionTypes.find((v) => v.value === id)
       return item ? item.label : ''
@@ -500,16 +577,37 @@ export default {
       }
     },
 
-    handleCurrentChange() {},
+    handleCurrentChange(opt) {
+      console.log(opt)
+    },
 
     onlineClick() {
-      this.searchParm.sort = 3
-      this.searchParm.sortType = 1
+      this.isSortOl = !this.isSortOl
+      if (this.isSortBill) {
+        this.isSortBill = false
+        this.searchParm.sort = this.SORTENU.onlineTime
+      } else if (this.isSortOl) {
+        this.searchParm.sort = this.SORTENU.onlineTime
+        this.searchParm.sortType = this.SORTTYPEENU.desc
+      } else {
+        // 复原
+        this.searchParm.sort = this.SORTENU.backcheckTime
+        this.searchParm.sortType = this.SORTTYPEENU.asc
+      }
       this.searchList()
     },
     billClick() {
-      this.searchParm.sort = 2
-      this.searchParm.sortType = 1
+      this.isSortBill = !this.isSortBill
+      if (this.isSortOl) {
+        this.isSortOl = false
+        this.searchParm.sort = this.SORTENU.billTime
+      } else if (this.isSortBill) {
+        this.searchParm.sort = this.SORTENU.billTime
+        this.searchParm.sortType = this.SORTTYPEENU.desc
+      } else {
+        this.searchParm.sort = this.SORTENU.backcheckTime
+        this.searchParm.sortType = this.SORTTYPEENU.asc
+      }
       this.searchList()
     }
   },
@@ -520,8 +618,7 @@ export default {
   mounted() {
     this.getOrgTreeMeo()
     this.getApprovalTypeMeo()
-  },
-  watch: {}
+  }
 }
 </script>
 
@@ -603,6 +700,12 @@ export default {
         font-style: normal;
         font-weight: 400;
         line-height: 20px;
+        display: flex;
+        align-items: center;
+
+        &.active {
+          color: var(--unnamed, #2d5cf6);
+        }
       }
     }
   }
