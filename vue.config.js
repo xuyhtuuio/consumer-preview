@@ -35,7 +35,7 @@ module.exports = {
       });
   },
   devServer: {
-    host: 'localhost',
+    host: '192.168.161.40',
     port: '8082',
     headers: {
       'Access-Control-Allow-Origin': '*',

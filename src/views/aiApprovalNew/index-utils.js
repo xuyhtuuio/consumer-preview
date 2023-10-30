@@ -944,6 +944,8 @@ export default {
               });
             });
           }
+          this.generateIcons()
+          this.lineRemove()
           break;
         // 修改类型为修改关联文件: 查找 意见对应关联文件与 更新的关联文件的新增或移除的 文件id,进入文件修改 对应的selectd,  comment内的内容,可不用处理
         case 'editFiles':
