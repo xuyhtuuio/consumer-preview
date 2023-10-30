@@ -1158,12 +1158,14 @@ export default {
     generateIcons() {
       this.$nextTick(() => {
         const img = document.getElementById('picture')
-        const realHeight = (img.scrollHeight || img.offsetHeight) || img.clientHeight
-        const iconContainer = document.querySelector('.icons')
-        if (iconContainer) {
-          iconContainer.style.height = realHeight + 'px'
+        img.onload = function () {
+          const realHeight = (img.scrollHeight || img.offsetHeight) || img.clientHeight
+          const iconContainer = document.querySelector('.icons')
+          if (iconContainer) {
+            iconContainer.style.height = realHeight + 'px'
+          }
+          console.log('realHeight', realHeight)
         }
-        console.log('realHeight', realHeight)
         const scale = img.naturalWidth / img.clientWidth;
         this.approval.comments.map((comment) => {
           const commentIcons = Object.keys(comment.iconsWithPos)
