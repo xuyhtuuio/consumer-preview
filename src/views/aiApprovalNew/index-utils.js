@@ -168,6 +168,7 @@ export default {
       if (this.files.length) {
         this.$nextTick(() => {
           this.$refs.filePreview.init();
+          this.filterFiles = this.files
           this.changeFile(0);
         });
       }

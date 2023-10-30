@@ -41,8 +41,8 @@
                 :visible-arrow=false>
                 <div class="cont-top-fileList">
                   <div class="fileList-search">
-                    <el-input v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search">
-                      <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
+                    <el-input v-model.trim="fileKeyWords" placeholder="请输入关键字" @change="fileSearch" @keyup.enter.native="fileSearch" @blur="fileSearch">
+                      <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="fileSearch"></i>
                     </el-input>
                   </div>
                   <div class="fileList-tip">
@@ -50,7 +50,7 @@
                     </el-switch>
                     <span class="fileList-tip-text">仅看问题文件</span>
                   </div>
-                  <div class="fileList-list-item" @click="changeFile(index)" v-for="(file, index) in files" :key="index"
+                  <div class="fileList-list-item" @click="changeFile(index)" v-for="(file, index) in filterFiles" :key="index"
                     :class="{
                       'swiper-slide-img': ['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))
                     }">
@@ -64,6 +64,7 @@
                     <span class="fileList-list-item-fileName">{{ getfileName(file.fileName) }}
                       <i class="fileList-list-item-fileSuf">.{{ getfileType(file.fileName) }}</i>
                     </span>
+                    <img class="file-risk" v-if="file.numberOfRiskInfo" src="@/assets/image/ai-approval/abnormal.svg" alt="">
                   </div>
                 </div>
                 <span slot="reference">
@@ -86,7 +87,7 @@
                 切换模式</span>
             </div>
             <div class="cont-top-infos">
-              <span>提醒：共发现 4 处风险信息，请认真核对</span>
+              <span>提醒：共发现 {{ approval.numberOfRiskInfo }} 处风险信息，请认真核对</span>
               <el-input v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search" clearable @clear="search"
                 size="medium">
                 <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
@@ -286,6 +287,7 @@ export default {
         isKeyWord: '0',
         textarea: ''
       },
+      fileKeyWords: '',
       keyWords: '',
       filterFocus: false,
       formBase: {},
@@ -308,6 +310,7 @@ export default {
         words: [],
         strIds: []
       },
+      filterFiles: [],
       showOcr: true,
       formId: '',
       inDraft: false, // 判断当前单子是否有 已存的审批意见
@@ -419,6 +422,18 @@ export default {
       } else {
         // this.$refs.ocrTxt.getInitContent(this.approval)
       }
+    },
+    fileSearch() {
+      this.filterFiles = []
+      if (!this.fileKeyWords) {
+        this.filterFiles = this.files
+        return;
+      }
+      this.files.map(item => {
+        if (item.fileName.indexOf(this.fileKeyWords) !== -1) {
+          this.filterFiles.push(item);
+        }
+      });
     },
     getProps(val) {
       this.styleProp = val;
@@ -749,6 +764,9 @@ export default {
     .file-zip{
       position: absolute;
       left: 54px;
+    }
+    .file-risk{
+      margin-left: 4px;
     }
     /deep/ .el-image {
       width: 20px;
