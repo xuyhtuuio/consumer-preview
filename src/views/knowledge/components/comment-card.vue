@@ -3,21 +3,21 @@
     <div class="card-top">
       <div class="avatar" :style="getStyle(4)">{{ pinyin }}</div>
       <div class="content">
-        <InputTextarea ref="inputTextarea" :prevUser="fullName" @publishComment="publishComment"/>
+        <InputTextarea ref="inputTextarea" :id="id" :prevUser="fullName" @publishComment="publishComment"/>
       </div>
     </div>
     <div class="card-content" v-if="totalCount">
       <div class="card-content-header">
         <span class="left">共 <b>{{ totalCount }}</b> 条评论</span>
         <div class="right">
-          <span class="time" @click="changeSort(1)" :class="{ active: orderValue === 1 }">时间</span>
-          <span class="zan" @click="changeSort(2)" :class="{ active: orderValue === 2 }">点赞</span>
+          <span class="time" @click="changeSort(1)" :class="{ active: paramsDefualt.orderValue === 1 }">时间</span>
+          <span class="zan" @click="changeSort(2)" :class="{ active: paramsDefualt.orderValue === 2 }">点赞</span>
         </div>
       </div>
       <!-- 一级评论 -->
       <div v-loading="loadingList">
       <div class="card-item" v-for="(item, i) in commentList" :key="item.id">
-        <CommentCardFirst :item="item" :colorStyle="getStyle(i)" @showSecondCommentDialog="showSecondComment"/>
+        <CommentCardFirst :kId="id" :item="item" :colorStyle="getStyle(i)" @showSecondCommentDialog="showSecondComment" @fetchList="handleCurrentChange(1)"/>
       </div>
       <TrsPagination :pageSize="5" :pageNow="paramsDefualt.pageNum" :total="totalCount" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
         v-if="totalCount">
@@ -26,7 +26,7 @@
     </div>
     <!-- 二级评论弹框 -->
     <w-dialog :showFooter="false" v-model="showSecondCommentDialog" :title="`共${showSecondCommentData.lowCommentNum}条回复`" width="70%" class="second-comment-dialog">
-      <CommentCardFirst :item="showSecondCommentData" :colorStyle="colorStyle" @showSecondCommentDialog="showSecondComment" :showLimit="showSecondCommentData.lowCommentNum"/>
+      <CommentCardFirst :kId="id" :showSecondCommentDialog="showSecondCommentDialog" :item="showSecondCommentData" :colorStyle="colorStyle" @showSecondCommentDialog="showSecondComment" :showLimit="showSecondCommentData.lowCommentNum"/>
     </w-dialog>
   </div>
 </template>
@@ -46,7 +46,7 @@ export default {
     },
     fullName: {
       type: String
-    }
+    },
   },
   data() {
     return {
@@ -60,7 +60,6 @@ export default {
         ['#E6FFFB', '#5EDFD6'],
       ],
       index: new Array(5).fill(1).map(() => Math.floor(Math.random() * 5)),
-      orderValue: 1,
       commentList: [],
       totalCount: 0,
       showSecondCommentDialog: false,
@@ -129,8 +128,8 @@ export default {
       this.loadingList = false
     },
     changeSort(value) {
-      if (this.orderValue !== value) {
-        this.orderValue = value
+      if (this.paramsDefualt.orderValue !== value) {
+        this.paramsDefualt.orderValue = value
         this.paramsDefualt.pageNum = 1
         this.getCommentList()
       }

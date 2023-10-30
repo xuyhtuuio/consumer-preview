@@ -48,6 +48,14 @@ export default {
       }
     }
   },
+  created() {
+    this.bus.$on('setPublishLoading', (val) => {
+      this.loading = val
+      if (!val) {
+        this.$emit('hiddenInput')
+      }
+    })
+  },
   methods: {
     handleFocus() {
       this.focus = true
@@ -57,13 +65,13 @@ export default {
     }, 500),
     selectFocus() {
       this.$nextTick(() => {
-        document.querySelector('#inputCommon' + this.id).focus()
+        document.querySelector('#inputCommon' + this.id)?.focus()
       })
     },
     handleBlur() {
-      setTimeout(() => {
-        this.$emit('hiddenInput')
-      }, 500)
+      // setTimeout(() => {
+      //   this.$emit('hiddenInput')
+      // }, 500)
     }
   }
 }
