@@ -368,6 +368,7 @@ export default {
         this.postil.textarea = ''
         this.$refs.editorial.changeType(2)
         // this.dealIconWithComment()
+        this.getComments()
         this.generateIcons()
         console.log('增加后', this.approval)
       }
@@ -585,6 +586,7 @@ export default {
         if (this.specialFileType1.includes(curFileType)) {
           // this.findIconPosition()
           this.icons = []
+          this.getComments()
           this.generateIcons()
           this.lisScroll()
         }
@@ -1380,6 +1382,7 @@ export default {
       this.$nextTick(() => {
         // this.findIconPosition()
         this.icons = []
+        this.getComments()
         this.generateIcons()
         this.lisScroll()
       })
@@ -1438,6 +1441,7 @@ export default {
         this.$nextTick(() => {
           // this.findIconPosition()
           this.icons = []
+          this.getComments()
           this.generateIcons()
           this.lisScroll()
         })

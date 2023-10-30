@@ -273,11 +273,18 @@ export default {
     },
     // 标记批注文本
     getCommentHtml() {
+      if (!this.approval?.comments) {
+        this.getInitContent(this.approval)
+        return
+      }
       const ocrWithIndex = {}
+
       this.approval.comments.map((comment) => {
         for (const key in comment.iconsWithOcrIndex) {
           comment.iconsWithOcrIndex[key].map((index) => {
-            ocrWithIndex[index] = key
+            if (comment.filesWithComment.includes(this.approval.id)) {
+              ocrWithIndex[index] = key
+            }
           })
         }
       })
