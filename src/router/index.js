@@ -240,20 +240,19 @@ const router = new Router({
         {
           path: 'rulesBase',
           name: 'RulesBase',
-          // component: () => import('@/views/rules-base/index'),
-          component: () => import('@/views/rules-base/detail'),
+          component: () => import('@/views/rules-base/index'),
           meta: { title: '法规库', viewport },
         },
         {
-          path: 'ruleDetail',
-          name: 'RuleDetail',
+          path: 'rulesDetail',
+          name: 'RulesDetail',
           meta: { title: '法规详情页', viewport },
           component: () => import('@/views/rules-base/detail'),
         },
         {
           path: 'collectKnowledge',
           name: 'CollectKnowledge',
-          meta: { title: '法规库', viewport },
+          meta: { title: '知识库', viewport },
           component: () => import('@/views/knowledge/collectKnowledge'),
         }
       ]

@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-26 13:51:55
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-26 18:17:13
+ * @LastEditTime: 2023-10-30 15:21:53
  * @FilePath: /consumer-preview/src/views/rules-base/detail.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -38,6 +38,7 @@
             width="450"
             trigger="click"
             popper-class="history-change"
+            v-if="['law','syatem'.includes(type)]"
           >
             <div>
               <el-timeline>
@@ -69,10 +70,40 @@
               </el-timeline>
             </div>
 
-            <span slot="reference" class="no-line">历史沿革</span>
+            <span slot="reference" class="no-line pointer">历史沿革</span>
           </el-popover>
-          <span>发文单位：北京证券交易所有限责任公司</span>
-          <span>发文字号：北证公告〔2023〕76号</span>
+          <span v-if="type == 'law'"
+            >发文单位：
+            <el-popover placement="bottom" trigger="hover">
+              <p>北京证券交易所有限责任公司</p>
+              <i slot="reference" class="pointer">
+                {{ wordEllipsis('北京证券交易所有限责任公司', 5) }}
+              </i>
+            </el-popover>
+          </span
+          >
+          <span v-if="type == 'law'">发文字号：北证公告〔2023〕76号</span>
+          <span v-if="type == 'system'"
+            >拟稿部门：
+            <el-popover placement="bottom" trigger="hover">
+              <p>北京证券交易所有限责任公司</p>
+              <i slot="reference" class="pointer">
+                {{ wordEllipsis('北京证券交易所有限责任公司', 5) }}
+              </i>
+            </el-popover>
+          </span
+          >
+          <span v-if="type == 'system'">制度文号：北证公告〔2023〕76号</span>
+          <span v-if="type == 'notification'"
+            >发文单位：
+            <el-popover placement="bottom" trigger="hover">
+              <p>北京证券交易所有限责任公司</p>
+              <i slot="reference" class="pointer">
+                {{ wordEllipsis('北京证券交易所有限责任公司', 5) }}
+              </i>
+            </el-popover>
+          </span
+          >
           <span class="no-line" style="margin-right: 32px"
             >发布时间：2023-11-23</span
           >
@@ -109,16 +140,12 @@
           v-for="(item, index) in menu"
           :key="index"
           :class="activeMuneId == item.id ? 'active-menu' : ''"
-          @click="
-            () => {
-              activeMuneId = item.id
-            }
-          "
+          @click="changeMenu(item)"
           >{{ item.name }}</span
         >
       </p>
-      <div class="content trs-scroll">
-        <ul>
+      <div class="content trs-scroll" v-loading="rightLoading">
+        <ul v-if="overviewFileList.length">
           <li
             v-for="(item, index) in overviewFileList"
             :key="index"
@@ -141,6 +168,7 @@
             </div>
           </li>
         </ul>
+        <el-empty v-else></el-empty>
       </div>
     </div>
   </div>
@@ -165,6 +193,8 @@ export default {
       currentIdx: 0,
       matchCount: 0,
       content: text,
+      rightLoading: false,
+      type: '',
       activities: [
         {
           fileName: '(本文)招商银行客户满意程度测评管理方法（第二版）',
@@ -193,6 +223,15 @@ export default {
       ]
     }
   },
+  watch: {
+    $route: {
+      handler(val) {
+        this.type = val?.query?.type
+      },
+      immediate: true,
+      deep: true
+    }
+  },
   mounted() {},
   methods: {
     closeSearch() {
@@ -207,8 +246,18 @@ export default {
     matchCountChange(count) {
       this.matchCount = count
     },
+    changeMenu() {
+      this.rightLoading = true
+      setTimeout(() => {
+        this.rightLoading = false
+      }, 1000)
+    },
     currentChange(idx) {
       this.currentIdx = idx
+    },
+    wordEllipsis(str, len) {
+      if (!str.length) return false
+      return str.length > len ? str.substr(0, len) + '...' : str
     },
     copyLink() {
       const link = 'https://www.example.com'
@@ -219,7 +268,7 @@ export default {
       document.execCommand('copy')
       document.body.removeChild(textarea)
       this.$message.success('复制链接成功')
-    },
+    }
   }
 }
 </script>
@@ -252,14 +301,17 @@ export default {
       /deep/ .el-input__inner {
         border: none;
         height: 20px;
-        width: 183px;
+        max-width: 183px;
         background: inherit;
         padding: 0;
+        padding-right: 4px;
       }
       .position {
         position: relative;
         padding-right: 8px;
         white-space: nowrap;
+        display: block;
+        width: 40px;
       }
       .position::after {
         position: absolute;

@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-23 21:17:11
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-25 17:49:03
+ * @LastEditTime: 2023-10-30 15:01:50
  * @FilePath: /consumer-preview/src/views/rules-base/index.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -14,7 +14,7 @@
       placeholder="请输入标题、正文、发文字号等关键词查询"
       clearable
       prefix-icon="el-icon-search"
-      @keyup.enter="keywordSearch"
+      @keyup.enter.native="keywordSearch"
       @clear="keywordSearch"
     >
       <el-select
@@ -33,11 +33,7 @@
         v-for="(item, index) in menu"
         :key="index"
         :class="item.id == activeMenuId ? 'active-menu pointer' : 'pointer'"
-        @click="
-          () => {
-            ;(activeMenuId = item.id), (component = item.component)
-          }
-        "
+        @click="changeMenu(item)"
       >
         <i
           :class="[
@@ -97,13 +93,20 @@ export default {
       ]
     }
   },
+  mounted() {
+  },
   methods: {
+    changeMenu(item) {
+      if (item.id === this.activeMenuId) return
+      this.activeMenuId = item.id
+      this.keywordSearch()
+    },
     keywordSearch() {
       this.$refs['component'].initData({
         keyword: this.keyword,
         effectiveValue: this.effectiveValue
       })
-    }
+    },
   }
 }
 </script>
@@ -239,4 +242,5 @@ export default {
     background: #fff;
   }
 }
+
 </style>

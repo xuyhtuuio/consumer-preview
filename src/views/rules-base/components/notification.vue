@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-26 13:51:20
+ * @LastEditTime: 2023-10-30 15:25:15
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -10,16 +10,21 @@
   <div class="laws" v-loading="search.loading">
     <Filters @addRule="addRule" @sortChange="sortChange"></Filters>
     <div v-if="list.length" class="list-content">
-      <div class="list" v-for="(item, index) in list" :key="index">
+      <div
+        class="list"
+        v-for="(item, index) in list"
+        :key="index"
+        @click="toDetail(item)"
+      >
         <div class="cards pointer">
           <fileType
             :fileName="item.name || item.fileName"
             class="file-icon"
           ></fileType>
           <div class="file-info">
-            <p class="name">
+            <div class="name">
               {{ item.fileName }}
-
+              <div @click.stop>
               <el-popover
                 placement="bottom"
                 width="108"
@@ -38,9 +43,10 @@
                   slot="reference"
                 ></i>
               </el-popover>
-            </p>
+            </div>
+            </div>
             <p class="tags">
-              <span class="effective">有效</span>
+
               <span class="prod-type">产品类型-理财产品</span>
               <span class="prod-type">事项类型-广告宣传</span>
               <span class="word-type">消费者自主选择权</span>
@@ -290,7 +296,9 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <span type="default" @click="cancel" class="cancel">取消</span>
-        <span type="primary" @click="submit" class="issue">{{ finishBtns[crtBehavior] }}</span>
+        <span type="primary" @click="submit" class="issue">{{
+          finishBtns[crtBehavior]
+        }}</span>
       </span>
     </el-dialog>
   </div>
@@ -450,6 +458,19 @@ export default {
   },
   computed: {},
   methods: {
+    /**
+     * @description: 去详情页
+     * @param {*}
+     * @return {*}
+     */
+    toDetail() {
+      this.$router.push({
+        name: 'RulesDetail',
+        query: {
+          type: 'notification'
+        }
+      })
+    },
     /**
      * @description: 获取列表接口
      * @return {*}
@@ -993,4 +1014,5 @@ export default {
   ul li:hover {
     background: #f7f8fa;
   }
-}</style>
+}
+</style>

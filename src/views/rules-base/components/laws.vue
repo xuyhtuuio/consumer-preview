@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-26 13:51:22
+ * @LastEditTime: 2023-10-30 15:56:33
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -10,35 +10,40 @@
   <div class="laws" v-loading="search.loading">
     <Filters @addRule="addRule" @sortChange="sortChange"></Filters>
     <div v-if="list.length" class="list-content">
-      <div class="list" v-for="(item, index) in list" :key="index">
+      <div
+        class="list"
+        v-for="(item, index) in list"
+        :key="index"
+        @click="toDetail(item)"
+      >
         <div class="cards pointer">
           <fileType
             :fileName="item.name || item.fileName"
             class="file-icon"
           ></fileType>
           <div class="file-info">
-            <p class="name">
+            <div class="name">
               {{ item.fileName }}
-
-              <el-popover
-                placement="bottom"
-                width="108"
-                popper-class="user-edit-popover"
-                trigger="click"
-                content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。"
-                v-model="lawEditPopover"
-              >
-                <ul>
-                  <li @click="editRule">编辑</li>
-                  <li @click="updateRule">更新</li>
-                  <li @click="delRule">删除</li>
-                </ul>
-                <i
-                  class="more iconfont icon-quanburenwu-gengduocaozuo"
-                  slot="reference"
-                ></i>
-              </el-popover>
-            </p>
+              <div @click.stop>
+                <el-popover
+                  placement="bottom"
+                  width="108"
+                  popper-class="user-edit-popover"
+                  trigger="click"
+                  v-model="lawEditPopover"
+                >
+                  <ul>
+                    <li @click="editRule">编辑</li>
+                    <li @click="updateRule">更新</li>
+                    <li @click="delRule">删除</li>
+                  </ul>
+                  <i
+                    class="more iconfont icon-quanburenwu-gengduocaozuo"
+                    slot="reference"
+                  ></i>
+                </el-popover>
+              </div>
+            </div>
             <p class="tags">
               <span class="effective">有效</span>
               <span class="prod-type">产品类型-理财产品</span>
@@ -196,39 +201,39 @@
         </el-form-item>
         <el-form-item label="" class="upload-item" prop="uploadFile">
           <div class="upload-box">
-          <el-upload
-            action="#"
-            :class="[uploadDisabled]"
-            :http-request="uploadContent"
-            list-type="picture-card"
-            :limit="uploadLimit"
-            accept=".pdf, .doc, .docx"
-            :file-list="form.uploadFile"
-            :on-change="handleUploadChange"
-          >
-            <i slot="default" class="el-icon-plus"></i>
-            <div slot="file" slot-scope="{ file }" class="upload-preview">
-              <fileType
-                :fileName="file.name || item.fileName"
-                class="file-icon"
-              ></fileType>
-              <i
-                class="iconfont icon-baocuo1 el-upload-list__item-del pointer"
-                @click="handleRemoveUploadFile(file)"
-              ></i>
-            </div>
-          </el-upload>
-          <i
-            style="
-              font-weight: 400;
-              line-height: 20px;
-              color: #86909c;
-              font-size: 12px;
-              margin-left: 12px;
-            "
-            >点击上传内容，仅可上传1个文件（word、pdf）</i
-          >
-        </div>
+            <el-upload
+              action="#"
+              :class="[uploadDisabled]"
+              :http-request="uploadContent"
+              list-type="picture-card"
+              :limit="uploadLimit"
+              accept=".pdf, .doc, .docx"
+              :file-list="form.uploadFile"
+              :on-change="handleUploadChange"
+            >
+              <i slot="default" class="el-icon-plus"></i>
+              <div slot="file" slot-scope="{ file }" class="upload-preview">
+                <fileType
+                  :fileName="file.name || item.fileName"
+                  class="file-icon"
+                ></fileType>
+                <i
+                  class="iconfont icon-baocuo1 el-upload-list__item-del pointer"
+                  @click="handleRemoveUploadFile(file)"
+                ></i>
+              </div>
+            </el-upload>
+            <i
+              style="
+                font-weight: 400;
+                line-height: 20px;
+                color: #86909c;
+                font-size: 12px;
+                margin-left: 12px;
+              "
+              >点击上传内容，仅可上传1个文件（word、pdf）</i
+            >
+          </div>
           <div class="" slot="label">
             上传内容
             <div class="error-tip" v-if="validatorForm.uploadFileError">
@@ -255,7 +260,6 @@
               ></i>
             </li>
           </ul>
-
         </el-form-item>
         <el-form-item label="相关附件" class="upload-item upload-related-item">
           <div class="upload-box">
@@ -309,8 +313,16 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <span type="default" @click="cancel" class="cancel">取消</span>
-        <span type="primary" @click="submit" class="issue">{{ finishBtns[crtBehavior] }}</span>
+        <el-button type="default" @click="cancel" class="cancel"
+          >取消</el-button
+        >
+        <el-button
+          type="primary"
+          @click="submit"
+          class="issue"
+          :loading="form.loading"
+          >{{ finishBtns[crtBehavior] }}</el-button
+        >
       </span>
     </el-dialog>
   </div>
@@ -400,7 +412,8 @@ export default {
         date: '',
         uploadFile: [],
         relatedFile: [],
-        isRepeal: 0
+        isRepeal: 0,
+        loading: true
       },
       rules: {
         isRepeal: [{ required: true, trigger: ['change'] }],
@@ -428,7 +441,9 @@ export default {
       search: {
         pageNow: 1,
         total: 0,
-        loading: false
+        loading: true,
+        keyword: '',
+        effective: ''
       },
       relevancyTags: [],
       tagsList: [],
@@ -467,15 +482,44 @@ export default {
     // this.$nextTick(() => {
     //   this.$refs.relevancyTagRef.initData(this.relevancyTags)
     // })
+    this.nextPage(1)
   },
   computed: {},
   methods: {
+    // 右上角关键词搜搜
+    initData(keywords) {
+      const { keyword, effectiveValue } = keywords
+      this.search.keyword = keyword
+      this.search.effectiveValue = effectiveValue
+      this.nextPage(1)
+    },
     /**
      * @description: 获取列表接口
      * @return {*}
      */
-    sortChange() {},
-    nextPage() {},
+    sortChange() {
+      this.nextPage(1)
+    },
+    /**
+     * @description: 去详情页
+     * @param {*}
+     * @return {*}
+     */
+    toDetail() {
+      this.$router.push({
+        name: 'RulesDetail',
+        query: {
+          type: 'law'
+        }
+      })
+    },
+    nextPage(val) {
+      this.search.pageNow = val || 1
+      this.search.loading = true
+      setTimeout(() => {
+        this.search.loading = false
+      }, 1000)
+    },
     wordEllipsis(str, len) {
       if (!str.length) return false
       return str.length > len ? str.substr(0, len) + '...' : str
@@ -578,7 +622,6 @@ export default {
       if (this.form.relatedFile.length >= 8) {
         this.uploadRelatedDisabled = 'disabled'
       }
-      console.log('gg', this.form.relatedFile)
     },
     /**
      * @description: 关联附件change
@@ -787,7 +830,7 @@ export default {
       }
     }
     .dialog-footer {
-      span {
+      .el-button {
         display: inline-block;
         padding: 8px 40px;
         font-size: 14px;
@@ -929,7 +972,7 @@ export default {
             font-weight: 400;
             line-height: 22px;
             color: #1d2128;
-            .file-icon{
+            .file-icon {
               font-size: 24px;
               vertical-align: bottom;
             }
