@@ -388,6 +388,7 @@ export default {
         if (val) {
           // debugger
           // this.dealIconWithComment()
+          this.generateIcons()
         }
       },
       deep: true

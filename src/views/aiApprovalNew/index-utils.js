@@ -1156,6 +1156,7 @@ export default {
     },
     // 生成icon - 重构版本
     generateIcons() {
+      this.icons = []
       this.$nextTick(() => {
         const img = document.getElementById('picture')
         img.onload = function () {
@@ -1169,7 +1170,7 @@ export default {
         const scale = img.naturalWidth / img.clientWidth;
         this.approval.comments.map((comment) => {
           const commentIcons = Object.keys(comment.iconsWithPos)
-          console.log(commentIcons)
+          console.log('commentIcons', commentIcons)
           if (commentIcons?.length) {
             commentIcons.map((icon) => {
               // const iconOcr = this.approval.ocr.filter((ocr) => {
