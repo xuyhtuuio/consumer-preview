@@ -219,7 +219,7 @@ export default {
       const fileType = this.files[this.activeIndex].type
       // 遍历意见 寻找当前文件
       if (fileType !== 'pdf') {
-        this.approval.comments?.map((comment) => {
+        this.comments?.map((comment) => {
           if (comment?.files.includes(this.files[this.activeIndex].id)) {
             // 遍历文件与批注的关系，判断是否包含 第 i 条
             comment?.filesWithBg.map((fwb) => {
@@ -320,7 +320,7 @@ export default {
           relComment.iconsWithOcrIndex[ocrId] = [this.domInfo?.domIndexs[0]]
         })
         this.getComments()
-        this.$refs.ocrTxt.getCommentHtml(this.approval)
+        this.$refs.ocrTxt.getCommentHtml()
         this.generateIcons()
         // 关联意见执行结尾
       }
