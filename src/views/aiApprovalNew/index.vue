@@ -676,6 +676,9 @@ export default {
 
       .content-cont-icons {
         overflow: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
         .icons {
           width: 32px;
           position: relative;
