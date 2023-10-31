@@ -46,7 +46,7 @@
                     </el-input>
                   </div>
                   <div class="fileList-tip">
-                    <el-switch v-model="filterFocus" active-color="#165DFF" inactive-color="#C9CDD4">
+                    <el-switch v-model="filterFocus" @change="fileFilter" active-color="#165DFF" inactive-color="#C9CDD4">
                     </el-switch>
                     <span class="fileList-tip-text">仅看问题文件</span>
                   </div>
@@ -432,6 +432,18 @@ export default {
       }
       this.files.map(item => {
         if (item.fileName.indexOf(this.fileKeyWords) !== -1) {
+          this.filterFiles.push(item);
+        }
+      });
+    },
+    fileFilter(val) {
+      this.filterFiles = []
+      if (!val) {
+        this.filterFiles = this.files
+        return;
+      }
+      this.files.map(item => {
+        if (item.numberOfRiskInfo) {
           this.filterFiles.push(item);
         }
       });
