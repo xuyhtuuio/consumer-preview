@@ -172,6 +172,7 @@ export default {
             secNodes.setAttribute('data-ocrItem', ocrId)
           })
           this.selectOcr.ocrId = ocrId
+          console.log(this.selectNodes, this.selectOcr)
         }, 300)
       }
     },
@@ -420,11 +421,6 @@ export default {
       const t = top.sort((a, b) => a - b)[0]
       const r = right.sort((a, b) => a - b)[right.length - 1]
       const b = bottom.sort((c, d) => c - d)[bottom.length - 1]
-      console.log('left', left)
-      console.log('right', right)
-      console.log('top', top)
-      console.log('bottom', bottom)
-      console.log(l, t, r, b)
       this.addRectOverDom(l, t, r, b, nodes, indexs)
     },
     // 添加覆盖 dom
@@ -435,7 +431,6 @@ export default {
         height: Math.floor((b - t)),
         width: Math.floor((r - l))
       }
-      console.log(position)
       const string = this.selectText
       const obj = {
         ocrId: this.selectOcr.ocrId,
@@ -451,6 +446,7 @@ export default {
         : document.selection.createRange().text
       const node = event.target.parentNode
       const ocrId = event.target.getAttribute('data-ocrItem')
+      console.log(ocrId)
       if (!Array.from(event.target.classList).includes('commentNode')) {
         return;
       }

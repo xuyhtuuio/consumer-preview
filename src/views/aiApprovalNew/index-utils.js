@@ -283,7 +283,7 @@ export default {
       let filesWithBg = []
       if (this.files?.[this.activeIndex].type === 'pdf') {
         files = this.preComment.files || [this.files?.[this.activeIndex].id]
-        filesWithComment = this.preComment.filesWithComment || [this.files?.[this.activeIndex].id]
+        filesWithComment = this.preComment.filesWithComment || [this.approval.id]
         if (this.preComment?.filesWithBg) {
           this.preComment.filesWithBg.map((fwb) => {
             if (fwb.fileId === this.files?.[this.activeIndex]?.child[this.activePdfIndex]?.id) {
@@ -362,13 +362,12 @@ export default {
         this.upDateComments('add', newComment)
         // this.addBg(this.comments_nodes)
         this.getComments()
-        console.log('0', this.comments)
+        console.log('this.comments', this.comments)
         this.$refs.ocrTxt.getCommentHtml(this.approval)
         this.changeRel(false)
         this.postil.textarea = ''
         this.$refs.editorial.changeType(2)
         // this.dealIconWithComment()
-        this.getComments()
         this.generateIcons()
         console.log('增加后', this.approval)
       }
@@ -760,7 +759,7 @@ export default {
           // console.log(arr)
           // 未关联word的 意见
           pdf?.comments && arr.push(...pdf?.comments);
-          console.log(arr)
+          // console.log(arr)
         })
       }
       // comment id去重
@@ -838,10 +837,25 @@ export default {
               let num = 0
               pdf?.comments.map((comment) => {
                 if (comment.str === item.str) {
-                  if (!comment.position) {
-                    comment.position = item.position
+                  if (Object.keys(comment.iconsWithPos)?.length === 0) {
+                    comment.iconsWithPos = item.iconsWithPos
+                    comment.iconsWithOcrIndex = item.iconsWithOcrIndex
                   } else {
-                    comment.position = [...comment.position, ...item.position]
+                    const key = Object.keys(item.iconsWithPos)[0]
+                    const ids = Object.keys(comment.iconsWithPos)
+                    if (!ids.includes(key)) {
+                      comment.iconsWithPos = {
+                        ...comment.iconsWithPos,
+                        ...item.iconsWithPos
+                      }
+                      comment.iconsWithOcrIndex = {
+                        ...comment.iconsWithOcrIndex,
+                        ...item.iconsWithOcrIndex
+                      }
+                    } else {
+                      comment.iconsWithPos[key].push(item.iconsWithPos[key])
+                      comment.iconsWithOcrIndex[key].push(item.iconsWithOcrIndex[key])
+                    }
                   }
                 } else if (comment.id === item.id) {
                   comment.str = item.str
@@ -1273,6 +1287,7 @@ export default {
     },
     // ocr 点击批注进行连线
     showOcrCommentLine(ocrLocation, ocrId) {
+      console.log('ocrIdOcrId', ocrId)
       this.$refs.editorial.changeType(2)
       const findIcon = this.findIconPos(ocrId)
       console.log('findIcon', findIcon)
