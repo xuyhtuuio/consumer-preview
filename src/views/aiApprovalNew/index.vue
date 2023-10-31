@@ -457,14 +457,14 @@ export default {
         const scrollContainer1 = document.querySelector('.ocr-txt .results');
         const scrollContainer2 = document.querySelector('.content-cont-icons');
         const scrollContainer3 = document.querySelector('.file-preview .preview .preview');
-        scrollContainer1.addEventListener('scroll', () => {
+        scrollContainer1 && scrollContainer1.addEventListener('scroll', () => {
           scrollContainer2.scrollTop = scrollContainer1.scrollTop;
           scrollContainer3.scrollTop = scrollContainer1.scrollTop;
         });
-        scrollContainer2.addEventListener('scroll', () => {
+        scrollContainer2 && scrollContainer2.addEventListener('scroll', () => {
           scrollContainer1.scrollTop = scrollContainer2.scrollTop;
         });
-        scrollContainer3.addEventListener('scroll', () => {
+        scrollContainer3 && scrollContainer3.addEventListener('scroll', () => {
           scrollContainer1.scrollTop = scrollContainer3.scrollTop;
         });
       })

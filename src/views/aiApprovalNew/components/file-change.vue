@@ -19,12 +19,14 @@
             <div class="slide" @click="changeFile(i)" :class="{ active: i === activeIndex }">
               <el-tooltip placement="bottom-start">
                 <div slot="content">{{ file.fileName }}</div>
-                <el-image v-if="['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))" :src="file.url"></el-image>
-                <file-type v-else :fileName="file.fileName"></file-type>
-                <!-- 是否为压缩包 -->
-                <svg class="icon icon-zip" aria-hidden="true" v-if="file.zip">
-                  <use xlink:href="#icon-zip"></use>
-                </svg>
+                <div>
+                  <el-image v-if="['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))" :src="file.url"></el-image>
+                  <file-type v-else :fileName="file.fileName"></file-type>
+                  <!-- 是否为压缩包 -->
+                  <svg class="icon icon-zip" aria-hidden="true" v-show="file.zip">
+                    <use xlink:href="#icon-zip"></use>
+                  </svg>
+                </div>
               </el-tooltip>
             </div>
             <!-- 是否显示分割线 -->
@@ -68,6 +70,7 @@ export default {
   },
   created() {
     this.init()
+    console.log('fileList', this.fileList)
   },
   computed: {
     getfileType() {
@@ -251,6 +254,10 @@ export default {
           position: relative;
           text-align: center;
           display: inline-block;
+          .el-tooltip{
+            height: 100%;
+            width: 100%;
+          }
         }
 
         i {
