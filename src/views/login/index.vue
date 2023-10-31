@@ -1347,6 +1347,9 @@ export default {
       // eslint-disable-next-line no-empty
       } catch {
       }
+    },
+    toHome() {
+
     }
   },
   filters: {
@@ -1357,6 +1360,7 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     next(async (vm) => {
+      console.log(to)
       if (
         from
         && !['login', 'loginAuto', 'microLogin'].includes(from.name)
@@ -1373,13 +1377,12 @@ export default {
           'http://cwo.dataelite.trs.com.cn/#/'
             + `?id= ${md5.hex(window.localStorage.getItem('AI_token'))}`
         )
-      } else {
-        this.$router.push({
-          name: 'homePage'
-        })
+      } else if (from && from.query) {
+        window.open(window.location.host + '/home', '_self')
       }
     })
-  }
+  },
+
 }
 </script>
 <style lang="less" scoped>

@@ -14,3 +14,11 @@ export function getRecheckList(data) {
     data
   })
 }
+
+export function getRecheckDetailList(data) {
+  return request({
+    url: '/cpr/recheck/oneReCheck',
+    method: 'post',
+    data
+  })
+}
