@@ -52,7 +52,6 @@
         <div class="center">{{ scope.row.department }}</div>
       </template>
     </TrsTable>
-
     </div>
 
     <TrsPagination
@@ -107,7 +106,6 @@ export default {
         header: 'people-header',
         bind: {
           align: 'center',
-          width: 150
         }
       },
       {
@@ -180,7 +178,6 @@ export default {
     }
   },
   async mounted() {
-    console.log('mounted', this.ocrId)
     this.getList()
   },
   created() {
@@ -191,7 +188,6 @@ export default {
 <style lang="less" scoped>
 
 .top-tabble {
-  height: 530px;
   overflow-y: auto;
 }
 .short {

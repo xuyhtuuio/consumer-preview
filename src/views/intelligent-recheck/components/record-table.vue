@@ -173,7 +173,6 @@ export default {
       this.$emit('openOption', option)
     },
     handleOpenRecord(ocrId) {
-      console.log(ocrId)
       this.$emit('openRecord', ocrId)
     },
 
@@ -188,7 +187,6 @@ export default {
     this.dataList = this.recordList
   },
   mounted() {
-    console.log(this.recordList)
   }
 }
 </script>

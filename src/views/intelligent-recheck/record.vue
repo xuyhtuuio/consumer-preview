@@ -297,9 +297,7 @@ import RecordDialog from './components/record-dialog.vue'
 import recordTableVue from './components/record-table.vue'
 // eslint-disable-next-line import/extensions
 import fullImage from './components/full-image.vue'
-import {
-  getRecheckList,
-} from '../../api/intelligent-recheck'
+import { getRecheckList } from '../../api/intelligent-recheck'
 
 export default {
   name: 'Record',
@@ -872,5 +870,23 @@ export default {
   top: -80px;
   margin: 0;
   overflow: visible;
+}
+
+:deep(.el-dialog__title) {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: 0em;
+  text-align: center;
+}
+
+:deep(.el-dialog__headerbtn .el-dialog__close) {
+  width: 22px;
+  height: 22px;
+  color:rgba(80, 89, 104, 1);
+}
+
+:deep(.el-icon-close:before) {
+  font-size: 22px;
 }
 </style>
