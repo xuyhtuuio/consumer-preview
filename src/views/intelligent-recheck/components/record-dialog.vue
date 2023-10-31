@@ -196,10 +196,7 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-.outter {
-  max-height: 450px;
-  overflow-y: auto;
-}
+
 .top-tabble {
   max-height: 450px;
   overflow-y: auto;
