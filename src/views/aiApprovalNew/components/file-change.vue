@@ -70,7 +70,6 @@ export default {
   },
   created() {
     this.init()
-    console.log('fileList', this.fileList)
   },
   computed: {
     getfileType() {

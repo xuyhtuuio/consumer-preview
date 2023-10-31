@@ -377,13 +377,11 @@ export default {
       }
     },
     makeRel(item) {
-      console.log('勾选前', this.collection)
       this.collection.map((col) => {
         if (col.id === item.id) {
           col.selected = !item.selected
         }
       })
-      console.log('勾选后', this.collection)
       this.$forceUpdate()
     },
     submitRel() {

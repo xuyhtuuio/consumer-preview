@@ -271,7 +271,6 @@ export default {
       }
     },
     addCommentWithPosition(relComments) {
-      console.log('domInfo', this.domInfo)
       const popover = this.$refs.postilPopover.$refs.popper
       popover.classList.remove('positil-popover-left')
       this.changeRel(false)
@@ -312,7 +311,6 @@ export default {
       }
       const ocrId = this.domInfo?.ocrId
       if (Array.isArray(relComments) && relComments?.length !== 0) {
-        console.log(relComments)
         // 关联意见执行开始
         relComments?.map((relComment) => {
           relComment.filesWithBg = [...filesWithBg, ...relComment.filesWithBg]
@@ -320,12 +318,10 @@ export default {
           relComment.filesWithComment = [...filesWithComment, ...relComment.filesWithComment]
           relComment.iconsWithPos[ocrId] = [this.domInfo?.position]
           relComment.iconsWithOcrIndex[ocrId] = [this.domInfo?.domIndexs[0]]
-          console.log('relComment', relComment)
         })
         this.getComments()
         this.$refs.ocrTxt.getCommentHtml(this.approval)
         this.generateIcons()
-        console.log('增加后approval', this.approval)
         // 关联意见执行结尾
       }
       const newComment = {
@@ -362,14 +358,12 @@ export default {
         this.upDateComments('add', newComment)
         // this.addBg(this.comments_nodes)
         this.getComments()
-        console.log('this.comments', this.comments)
         this.$refs.ocrTxt.getCommentHtml(this.approval)
         this.changeRel(false)
         this.postil.textarea = ''
         this.$refs.editorial.changeType(2)
         // this.dealIconWithComment()
         this.generateIcons()
-        console.log('增加后', this.approval)
       }
     },
     changeFileById(fileId) {
@@ -378,10 +372,8 @@ export default {
     },
     // 展示连线
     showCommentLine(obj, fileId) {
-      console.log('obj', obj, fileId)
       if (fileId) {
         this.changeFileById(fileId)
-        console.log('非图标')
         const iconOcrIds = Object.keys(obj.iconsWithPos).flat(1)
         const resIcon = []
         iconOcrIds.map((ioid) => {
@@ -399,7 +391,6 @@ export default {
         iconIds.map((icon) => {
           this.changeIconShow(icon)
         })
-        console.log('iconIds', iconIds)
         if (!positions?.length) {
           return;
         }
@@ -447,7 +438,6 @@ export default {
       // 获取高亮元素 dom
       // this.$refs.filePreview.setHighLight(location)
       this.lineWordItem = location
-      console.log(this.lineWordItem)
       this.drawCommentLine(doms, commenDom)
     },
     drawCommentLine(start, end) {
@@ -559,7 +549,6 @@ export default {
       const suffer = ['jpeg', 'jpg', 'png', 'pdf'].includes(temp?.fileName?.split('.')[temp?.fileName?.split('.').length - 1]);
       // 当前文件为 pdf 处理
       if (this.files?.[this.activeIndex].type === 'pdf') {
-        console.log(this.files?.[this.activeIndex])
         this.pdfInfo.pageNow = 1
         this.changePdfPageNow(1)
         return;
@@ -712,7 +701,6 @@ export default {
     getComments() {
       const arr = [];
       const fileType = this.files[this.activeIndex].type
-      console.log('fileType', fileType)
       if (fileType !== 'pdf') {
         this.files.forEach(file => {
           // 存在推荐意见
@@ -737,15 +725,12 @@ export default {
       } else {
         const pdfs = this.files[this.activeIndex].child
         pdfs.forEach((pdf) => {
-          // console.log('pdf', pdf)
           // 存在推荐意见
           pdf?.recommends?.map(recommend => {
             // 存在选择意见
             if (recommend.selected) {
               const selected = recommend.list.filter(a => a.id === recommend.selected);
-              console.log('selected', selected)
               const isRepeat = pdf.comments?.filter(f => f.id === selected?.[0].id)
-              console.log('isRepeat', isRepeat)
               if (!isRepeat?.length) {
                 arr.push({
                   id: selected?.[0].id,
@@ -756,10 +741,8 @@ export default {
               }
             }
           })
-          // console.log(arr)
           // 未关联word的 意见
           pdf?.comments && arr.push(...pdf?.comments);
-          // console.log(arr)
         })
       }
       // comment id去重
@@ -777,7 +760,6 @@ export default {
         }
       });
       this.comments = setArr;
-      console.log('getComments', this.files[this.activeIndex])
     },
     // 编辑意见后,同步更新  文件的推荐意见状态
     upDateComments(type, item, newVal) {
@@ -876,6 +858,8 @@ export default {
         // eslint-disable-next-line
         case 'remove':
           if (fileType !== 'pdf') {
+            console.log('newVal', newVal)
+            console.log('item', item)
             filterFiles.map(file => {
               // const matchWord = file?.recommends?.filter(word => item.words.includes(word.id));
               // matchWord
@@ -904,7 +888,7 @@ export default {
                     if (type === 'remove') {
                       file.comments.splice(i, 1);
                     } else if (type === 'editStr') {
-                      file.comments[i] = newVal;
+                      file.comments[i].str = newVal;
                     }
                   }
                 });
@@ -1034,7 +1018,6 @@ export default {
             }))
           } else {
             const pdf = this.files[this.activeIndex].child[this.activePdfIndex]
-            console.log(pdf)
             pdf.files.filter(file => item?.some((f) => {
               if (f.files.includes(file.id)) {
                 if (!file.comments) {
@@ -1184,12 +1167,10 @@ export default {
           if (iconContainer) {
             iconContainer.style.height = realHeight + 'px'
           }
-          console.log('realHeight', realHeight)
         }
         const scale = img.naturalWidth / img.clientWidth;
         this.approval.comments?.map((comment) => {
           const commentIcons = Object.keys(comment.iconsWithPos)
-          console.log('commentIcons', commentIcons)
           if (commentIcons?.length) {
             commentIcons.map((icon) => {
               // const iconOcr = this.approval.ocr.filter((ocr) => {
@@ -1246,14 +1227,12 @@ export default {
         this.curActiveIcon = ''
         this.curIconLine -= 1
       }
-      console.log(icon.ocrId)
       let secComment = {}
       this.comments.map((comment) => {
         if (comment.icons.includes(icon.ocrId[this.curIconLine])) {
           secComment = comment
         }
       })
-      console.log('secComment', secComment, secComment?.iconsWithPos[icon.ocrId[this.curIconLine]])
       const obj = {
         id: secComment?.id,
         files: secComment?.files,
@@ -1269,17 +1248,13 @@ export default {
     // 修改 icon 激活状态 showIndex 为 1 为激活 -1 为不激活
     changeIconShow(id) {
       if (!id) return;
-      console.log('iconId', id);
       this.icons.map((icon) => {
         if (id === icon.icon_id) {
           if (icon.showIndex === 1) {
-            console.log(this.icons)
             icon.showIndex = -1
           } else {
             icon.showIndex = 1
-            console.log(this.icons)
           }
-          // console.log(icon.showIndex);
         }
       })
       // this.icons = iconsNew
@@ -1287,10 +1262,8 @@ export default {
     },
     // ocr 点击批注进行连线
     showOcrCommentLine(ocrLocation, ocrId) {
-      console.log('ocrIdOcrId', ocrId)
       this.$refs.editorial.changeType(2)
       const findIcon = this.findIconPos(ocrId)
-      console.log('findIcon', findIcon)
       this.showIconLine(findIcon)
     },
     // 利用ocr定位 寻找对应 comment
@@ -1308,7 +1281,6 @@ export default {
     },
     // 点击ocr，获取对应 icon 最终走到意见，执行连线逻辑
     findIconPos(ocrId) {
-      console.log(ocrId)
       let resIcon = {}
       this.icons.map((icon) => {
         if (icon.ocrId.includes(ocrId)) {
@@ -1349,9 +1321,7 @@ export default {
         } else {
           // 不匹配
           if (numTure >= 3) {
-            console.log('----------相似度输出ing------------------')
-            console.log(first, second)
-            console.log('----------相似度输出结束------------------')
+            //
           }
           return false
         }
@@ -1379,7 +1349,6 @@ export default {
     // pdf 相关操作处理
     // pdf 切换页码
     async changePdfPage(i) {
-      console.log('当前index', i)
       this.fileloading = true;
       this.filePopoverShow = true;
       this.activePdfIndex = i
@@ -1412,7 +1381,6 @@ export default {
       this.filePopoverShow = false;
     },
     async changePdfPageNow(pageNow) {
-      console.log('当前页数', pageNow)
       this.fileloading = true;
       this.filePopoverShow = true;
       const params = {
