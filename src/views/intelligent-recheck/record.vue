@@ -2,7 +2,13 @@
   <div class="record-body">
     <div class="outer">
       <div class="search-area">
-        <div class="search-title">智能回检</div>
+        <div class="search-title">
+          <img
+            src="@/assets/image/intelligent-recheck/recheck-icon.png"
+            alt=""
+            style="width: 79px; height: 24px"
+          />
+        </div>
         <el-input
           placeholder="请输入关键词开始检索"
           @keyup.enter.native="handleSubmit"
@@ -47,36 +53,45 @@
             />
           </div> -->
           <div class="select-item select-org">
-              <el-popover
-                ref="ref-popover3"
-                popper-class="org-date-style"
-                placement="bottom-start"
-                trigger="click"
-                @show="handlePopoverShow3"
-              >
-                <el-cascader
-                  placeholder="选择机构"
-                  v-model="search.orgIds"
-                  ref="org-cascader"
-                  :options="agenciesList"
-                  @change="changeAgencies"
-                  :props="{
-                    emitPath: false,
-                    checkStrictly: true,
-                    label: 'name',
-                    value: 'id',
-                    children: 'children'
-                  }"
-                  filterable></el-cascader>
-                <div slot="reference">
-                  <div class="select-set">
-                    <div class="tip-style" :class="{ 'tip-style-active': search.orgIds }">选择机构</div>
-                    <i class="el-icon-caret-bottom"></i>
-                    <img src="@/assets/image/intelligent-recheck/tip.png" alt="" />
+            <el-popover
+              ref="ref-popover3"
+              popper-class="org-date-style"
+              placement="bottom-start"
+              trigger="click"
+              @show="handlePopoverShow3"
+            >
+              <el-cascader
+                placeholder="选择机构"
+                v-model="search.orgIds"
+                ref="org-cascader"
+                :options="agenciesList"
+                @change="changeAgencies"
+                :props="{
+                  emitPath: false,
+                  checkStrictly: true,
+                  label: 'name',
+                  value: 'id',
+                  children: 'children'
+                }"
+                filterable
+              ></el-cascader>
+              <div slot="reference">
+                <div class="select-set">
+                  <div
+                    class="tip-style"
+                    :class="{ 'tip-style-active': search.orgIds }"
+                  >
+                    选择机构
                   </div>
+                  <i class="el-icon-caret-bottom"></i>
+                  <img
+                    src="@/assets/image/intelligent-recheck/tip.png"
+                    alt=""
+                  />
                 </div>
-              </el-popover>
-            </div>
+              </div>
+            </el-popover>
+          </div>
 
           <div
             class="scrren-com"
@@ -278,7 +293,7 @@
       :before-close="handleClose"
       :destroy-on-close="true"
     >
-      <record-dialog :ocrId="ocrId" :recheckCount="recheckCount"/>
+      <record-dialog :ocrId="ocrId" :recheckCount="recheckCount" />
     </el-dialog>
 
     <div class="preview" :class="{ fullScreen: showFullScreen }">
@@ -725,72 +740,72 @@ export default {
   }
 
   .select-org {
-        width: 104px;
-        /deep/.el-select {
-          width: 78px;
-        }
-      }
+    width: 104px;
+    /deep/.el-select {
+      width: 78px;
+    }
+  }
   .select-item {
-        position: relative;
-        display: flex;
-        align-items: center;
-        // width: 104px;
-        left: 10px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    // width: 104px;
+    left: 10px;
+    color: #1d2128;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+    .select-set {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      .tip-style {
         color: #1d2128;
         font-size: 14px;
         font-style: normal;
         font-weight: 400;
         line-height: 22px;
-        .select-set {
-          display: flex;
-          align-items: center;
-          cursor: pointer;
-          .tip-style {
-            color: #1d2128;
-            font-size: 14px;
-            font-style: normal;
-            font-weight: 400;
-            line-height: 22px;
-          }
-          .el-icon-caret-bottom {
-            color: #88909B;
-          }
-          .tip-style-active {
-            color: #2D5CF6;
-          }
-        }
-        /deep/.el-select {
-          position: absolute;
-          height: 22px;
-          opacity: 0;
-          .el-input__inner {
-            height: 22px;
-            border: none;
-            padding: 0 20px 0 0;
-            color: #1d2128;
-            font-size: 14px;
-            font-style: normal;
-            font-weight: 400;
-            line-height: 22px;
-          }
-          .el-input__icon {
-            width: 16px;
-          }
-          .el-icon-arrow-up::before {
-            content: '\e78f';
-          }
-        }
-        img {
-          position: absolute;
-          right: 10px;
-          width: 20px;
-          height: 20px;
-          cursor: pointer;
-        }
-        /deep/.is-active {
-          color: #2d5cf6;
-        }
       }
+      .el-icon-caret-bottom {
+        color: #88909b;
+      }
+      .tip-style-active {
+        color: #2d5cf6;
+      }
+    }
+    /deep/.el-select {
+      position: absolute;
+      height: 22px;
+      opacity: 0;
+      .el-input__inner {
+        height: 22px;
+        border: none;
+        padding: 0 20px 0 0;
+        color: #1d2128;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 22px;
+      }
+      .el-input__icon {
+        width: 16px;
+      }
+      .el-icon-arrow-up::before {
+        content: '\e78f';
+      }
+    }
+    img {
+      position: absolute;
+      right: 10px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    /deep/.is-active {
+      color: #2d5cf6;
+    }
+  }
   .search-middle-area {
     display: flex;
     justify-content: space-between;
@@ -972,14 +987,14 @@ export default {
 
 :deep(.el-dialog__headerbtn) {
   position: absolute;
-     top: 36px;
-    right: 36px;
-    padding: 0;
-    background: 0 0;
-    border: none;
-    outline: 0;
-    cursor: pointer;
-    font-size: 16px;
+  top: 36px;
+  right: 36px;
+  padding: 0;
+  background: 0 0;
+  border: none;
+  outline: 0;
+  cursor: pointer;
+  font-size: 16px;
 }
 :deep(.el-dialog__wrapper) {
   position: fixed;
@@ -1001,7 +1016,7 @@ export default {
 :deep(.el-dialog__headerbtn .el-dialog__close) {
   width: 22px;
   height: 22px;
-  color:rgba(80, 89, 104, 1);
+  color: rgba(80, 89, 104, 1);
 }
 
 :deep(.el-icon-close:before) {
