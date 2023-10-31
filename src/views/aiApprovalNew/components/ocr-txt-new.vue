@@ -409,10 +409,10 @@ export default {
       nodes.forEach((node) => {
         const item = node.parentNode
         indexs.push(this.getSelectDomIndex(item))
-        left.push(item.offsetLeft)
+        left.push(item.offsetLeft * this.styleProp.wordDomStyle.scale)
         // right.push(item.offsetLeft + (item.offsetWidth) * (1 / this.wordDomStyle.scale))
         right.push(item.offsetLeft * this.styleProp.wordDomStyle.scale + (item.offsetWidth))
-        top.push(item.offsetTop)
+        top.push(item.offsetTop * this.styleProp.wordDomStyle.scale)
         bottom.push(item.offsetTop * this.styleProp.wordDomStyle.scale + (item.offsetHeight))
         // bottom.push(item.offsetTop + item.offsetHeight * (1 / this.wordDomStyle.scale))
       })
@@ -431,7 +431,7 @@ export default {
     addRectOverDom(l, t, r, b, nodes, indexs) {
       const position = {
         left: Math.floor(l),
-        top: Math.floor(t * this.styleProp.wordDomStyle.scale),
+        top: Math.floor(t),
         height: Math.floor((b - t)),
         width: Math.floor((r - l))
       }
