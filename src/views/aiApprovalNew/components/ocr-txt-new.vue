@@ -167,12 +167,6 @@ export default {
             const selectNodes = [range.commonAncestorContainer.parentNode]
             this.selectNodes = selectNodes
           }
-          const ocrId = '' + new Date().getTime()
-          this.selectNodes.map((secNodes) => {
-            secNodes.setAttribute('data-ocrItem', ocrId)
-          })
-          this.selectOcr.ocrId = ocrId
-          console.log(this.selectNodes, this.selectOcr)
         }, 300)
       }
     },
@@ -425,6 +419,12 @@ export default {
     },
     // 添加覆盖 dom
     addRectOverDom(l, t, r, b, nodes, indexs) {
+      const ocrId = '' + new Date().getTime()
+      this.selectNodes.map((secNodes) => {
+        secNodes.setAttribute('data-ocrItem', ocrId)
+      })
+      this.selectOcr.ocrId = ocrId
+      console.log(this.selectNodes, this.selectOcr)
       const position = {
         left: Math.floor(l),
         top: Math.floor(t),
