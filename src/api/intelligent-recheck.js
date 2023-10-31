@@ -31,3 +31,11 @@ export function getOne(data) {
     data
   })
 }
+
+export function getRecheckDetailList(data) {
+  return request({
+    url: '/cpr/recheck/oneReCheck',
+    method: 'post',
+    data
+  })
+}

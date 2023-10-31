@@ -33,7 +33,7 @@
             src="../../../assets/image/notice.png"
             alt=""
             style="width: 16px; height: 16px; cursor: pointer"
-            @click="handleOpenRecord"
+            @click="handleOpenRecord(scope.row.ocrId)"
           />
         </div>
       </template>
@@ -59,6 +59,7 @@
 </template>
 <script>
 import * as dayjs from 'dayjs'
+
 export default {
   name: 'TestTrsTable',
   props: {
@@ -171,8 +172,9 @@ export default {
     handleOpenOption(option) {
       this.$emit('openOption', option)
     },
-    handleOpenRecord(option) {
-      this.$emit('openRecord', option)
+    handleOpenRecord(ocrId) {
+      console.log(ocrId)
+      this.$emit('openRecord', ocrId)
     },
 
     openFilePreview() {
@@ -186,6 +188,7 @@ export default {
     this.dataList = this.recordList
   },
   mounted() {
+    console.log(this.recordList)
   }
 }
 </script>

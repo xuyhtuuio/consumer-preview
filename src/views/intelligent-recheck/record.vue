@@ -205,8 +205,9 @@
                   src="../../assets/image/bluedown.png"
                   alt=""
                   v-else-if="this.isSortBill"
-                /></p>
-              </el-col>
+                />
+              </p>
+            </el-col>
           </el-row>
         </div>
       </div>
@@ -245,7 +246,7 @@
       align="center"
       :before-close="handleClose"
     >
-      <record-dialog />
+      <record-dialog :ocrId="ocrId" />
     </el-dialog>
 
     <div class="preview" :class="{ fullScreen: showFullScreen }">
@@ -296,7 +297,10 @@ import RecordDialog from './components/record-dialog.vue'
 import recordTableVue from './components/record-table.vue'
 // eslint-disable-next-line import/extensions
 import fullImage from './components/full-image.vue'
-import { getRecheckList } from '../../api/intelligent-recheck'
+import {
+  getRecheckList,
+} from '../../api/intelligent-recheck'
+
 export default {
   name: 'Record',
   data() {
@@ -338,14 +342,16 @@ export default {
           }
         ]
       },
+      ocrId: '',
       dataPickerBill: '',
-
+      recordDetailList: [],
       showFullScreen: false,
       agenciesList: [],
       searchParm: {
         // 默认回检通过
         isPass: 1
       },
+      searchParmO: {},
       search: {
         orgIds: '',
         searchInput: '',
@@ -364,6 +370,11 @@ export default {
       page: {
         pageNow: 1,
         pageSize: 8,
+        totalCount: 0
+      },
+      pageO: {
+        pageNow: 1,
+        pageSize: 5,
         totalCount: 0
       },
       transactionTypes: [],
@@ -409,7 +420,8 @@ export default {
       this.optionValue = option
       this.optionDialogVisible = true
     },
-    handleOpenRecord() {
+    async handleOpenRecord(ocrId) {
+      this.ocrId = ocrId
       this.recordDialogVisible = true
     },
     fullScreen() {
@@ -590,6 +602,7 @@ export default {
     },
 
     searchOnePage() {
+      this.page.pageNow = 1
       this.searchList(1)
     },
 
