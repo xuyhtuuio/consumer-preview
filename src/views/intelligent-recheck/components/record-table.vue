@@ -33,7 +33,7 @@
             src="../../../assets/image/notice.png"
             alt=""
             style="width: 16px; height: 16px; cursor: pointer"
-            @click="handleOpenRecord(scope.row.ocrId)"
+            @click="handleOpenRecord(scope.row.ocrId, scope.row.recheckCount)"
           />
         </div>
       </template>
@@ -172,8 +172,9 @@ export default {
     handleOpenOption(option) {
       this.$emit('openOption', option)
     },
-    handleOpenRecord(ocrId) {
-      this.$emit('openRecord', ocrId)
+    handleOpenRecord(ocrId, recheckCount) {
+      console.log(ocrId, recheckCount)
+      this.$emit('openRecord', ocrId, recheckCount)
     },
 
     openFilePreview() {

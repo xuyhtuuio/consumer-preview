@@ -245,8 +245,9 @@
       width="70%"
       align="center"
       :before-close="handleClose"
+      :destroy-on-close="true"
     >
-      <record-dialog :ocrId="ocrId" />
+      <record-dialog :ocrId="ocrId" :recheckCount="recheckCount"/>
     </el-dialog>
 
     <div class="preview" :class="{ fullScreen: showFullScreen }">
@@ -306,6 +307,7 @@ export default {
       optionDialogVisible: false,
       recordDialogVisible: false,
       optionValue: '',
+      recheckCount: 0,
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now()
@@ -411,14 +413,17 @@ export default {
     },
 
     handleClose() {
+      // this.$destroy();
       this.optionDialogVisible = false
       this.recordDialogVisible = false
     },
+
     handleOpenOption(option) {
       this.optionValue = option
       this.optionDialogVisible = true
     },
-    async handleOpenRecord(ocrId) {
+    async handleOpenRecord(ocrId, recheckCount) {
+      this.recheckCount = recheckCount
       this.ocrId = ocrId
       this.recordDialogVisible = true
     },
@@ -816,6 +821,7 @@ export default {
 }
 :deep(.el-dialog__header) {
   display: flex;
+  padding: 36px 20px 10px;
   justify-content: center;
 }
 
@@ -857,12 +863,23 @@ export default {
 }
 
 :deep(.el-dialog__body) {
-  padding: 30px 20px;
+  padding: 30px 36px 36px 36px;
   color: #606266;
   font-size: 14px;
   word-break: break-all;
 }
 
+:deep(.el-dialog__headerbtn) {
+  position: absolute;
+    /* top: 20px; */
+    right: 36px;
+    padding: 0;
+    background: 0 0;
+    border: none;
+    outline: 0;
+    cursor: pointer;
+    font-size: 16px;
+}
 :deep(.el-dialog__wrapper) {
   position: fixed;
   right: 0;
