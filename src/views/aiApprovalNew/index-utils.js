@@ -1161,7 +1161,7 @@ export default {
     },
     // 生成icon - 重构版本
     generateIcons() {
-      this.icons = []
+      // this.icons = []
       this.$nextTick(() => {
         const img = document.getElementById('picture')
         img.onload = function () {
@@ -1232,6 +1232,7 @@ export default {
         this.curActiveIcon = ''
         this.curIconLine -= 1
       }
+      console.log(icon.ocrId)
       let secComment = {}
       this.comments.map((comment) => {
         if (comment.icons.includes(icon.ocrId[this.curIconLine])) {
@@ -1255,19 +1256,15 @@ export default {
     changeIconShow(id) {
       if (!id) return;
       console.log('iconId', id);
-      // const iconsNew = JSON.parse(JSON.stringify(this.icons));
       this.icons.map((icon) => {
         if (id === icon.icon_id) {
-          // if (icon.showIndex === 1) {
-          //   console.log(this.icons)
-          //   icon.showIndex = -1
-          //   debugger
-          // } else {
-          //   icon.showIndex = 1
-          //   console.log(this.icons)
-          //   debugger
-          // }
-          icon.showIndex = icon.showIndex === 1 ? -1 : 1;
+          if (icon.showIndex === 1) {
+            console.log(this.icons)
+            icon.showIndex = -1
+          } else {
+            icon.showIndex = 1
+            console.log(this.icons)
+          }
           // console.log(icon.showIndex);
         }
       })
