@@ -374,7 +374,22 @@ export default {
     showCommentLine(obj, fileId) {
       if (fileId) {
         this.changeFileById(fileId)
-        const iconOcrIds = Object.keys(obj.iconsWithPos).flat(1)
+        // 过滤其他文件
+        let curFileOcrIndex = []
+        obj.filesWithBg.map((fwb) => {
+          if (fwb.fileId === this.approval.id) {
+            curFileOcrIndex.push(...fwb.fileBgs)
+          }
+        })
+        curFileOcrIndex = curFileOcrIndex.flat()
+        const iconOcrIds = []
+        curFileOcrIndex.map((curIndex) => {
+          for (const key in obj.iconsWithOcrIndex) {
+            if (obj.iconsWithOcrIndex[key].includes(curIndex)) {
+              iconOcrIds.push(key)
+            }
+          }
+        })
         const resIcon = []
         iconOcrIds.map((ioid) => {
           const relIcons = this.icons.filter((i) => {
@@ -387,7 +402,16 @@ export default {
         const iconIds = resIcon.map((i) => {
           return i.icon_id
         })
-        const positions = Object.values(obj.iconsWithPos).flat(1)
+        let positions = []
+        // obj.iconsWithPos.map((iwp) => {
+        //   console.log(iwp)
+        // })
+        for (const key in obj.iconsWithPos) {
+          if (iconOcrIds.includes(key)) {
+            positions.push(obj.iconsWithPos[key])
+          }
+        }
+        positions = positions.flat()
         iconIds.map((icon) => {
           this.changeIconShow(icon)
         })
@@ -1168,13 +1192,27 @@ export default {
           }
         }
         const scale = img.naturalWidth / img.clientWidth;
-        this.approval.comments?.map((comment) => {
-          const commentIcons = Object.keys(comment.iconsWithPos)
+        // 过滤其他文件
+        let curFileOcrIndex = []
+        this.comments?.map((comment) => {
+          comment.filesWithBg.map((fwb) => {
+            if (fwb.fileId === this.approval.id) {
+              curFileOcrIndex.push(...fwb.fileBgs)
+            }
+          })
+        })
+        curFileOcrIndex = curFileOcrIndex.flat()
+        this.comments?.map((comment) => {
+          const commentIcons = []
+          curFileOcrIndex.map((curIndex) => {
+            for (const key in comment.iconsWithOcrIndex) {
+              if (comment.iconsWithOcrIndex[key].includes(curIndex)) {
+                commentIcons.push(key)
+              }
+            }
+          })
           if (commentIcons?.length) {
             commentIcons.map((icon) => {
-              // const iconOcr = this.approval.ocr.filter((ocr) => {
-              //   return ocr.ocrId === icon
-              // })
               const ocrIndex = comment.iconsWithOcrIndex[icon][0]
               // icon 高度 等于 ocr 的 top + ocr 高度的一半 乘以缩放 - 图标自身高度的一半
               const iconTop = (this.approval.ocr[ocrIndex]?.location?.y + this.approval.ocr[ocrIndex]?.location?.h / 2) / scale - 7.5
