@@ -1,57 +1,58 @@
 <template>
-  <div class="outter">
+  <div class="outter" v-loading="loading">
     <div class="top-tabble">
       <TrsTable
-      theme="TRS-table-gray"
-      :data="recordDetailList"
-      :colConfig="colConfig"
-      @sort-change="sortChange"
-      @submitEdit="submitEdit"
-      @rowDragSort="rowDragSort"
-    >
-      <template #fileName="scope">
-        <div class="short">{{ scope.row.fileName }}</div>
-      </template>
-      <template #userName="scope">
-        <div class="center">
-          {{ scope.row.userName }}
-        </div>
-      </template>
+        theme="TRS-table-gray"
+        :data="recordDetailList"
+        :colConfig="colConfig"
+        @sort-change="sortChange"
+        @submitEdit="submitEdit"
+        @rowDragSort="rowDragSort"
+      >
+        <template #fileName="scope">
+          <div class="short">{{ scope.row.fileName }}</div>
+        </template>
+        <template #userName="scope">
+          <div class="center">
+            {{ scope.row.userName }}
+          </div>
+        </template>
 
-      <template #createTime="scope">
-        <div class="short">
-          {{ timeFormat(scope.row.createTime) }}
-        </div>
-      </template>
-      <template #backInspectionFrequency="scope">
-        <div class="center">
-          {{ scope.row.backInspectionFrequency }}
-          <span style="font-size: 12px">次</span>
-          <img
-            src="../../../assets/image/notice.png"
-            alt=""
-            style="width: 16px; height: 16px"
-            @click="handleOpenRecord"
-          />
-        </div>
-      </template>
-      <template #feedBack="scope">
-        <div style="padding: 15px 0px" class="center">
-          {{ scope.row.feedBack }}
-        </div>
-      </template>
+        <template #createTime="scope">
+          <div class="short">
+            {{ timeFormat(scope.row.createTime) }}
+          </div>
+        </template>
+        <template #backInspectionFrequency="scope">
+          <div class="center">
+            {{ scope.row.backInspectionFrequency }}
+            <span style="font-size: 12px">次</span>
+            <img
+              src="../../../assets/image/notice.png"
+              alt=""
+              style="width: 16px; height: 16px"
+              @click="handleOpenRecord"
+            />
+          </div>
+        </template>
+        <template #feedBack="scope">
+          <div style="padding: 15px 0px" class="center">
+            {{ scope.row.feedBack }}
+          </div>
+        </template>
 
-      <template #isRight="scope">
-        <div>{{ scope.row.isRight }}</div>
-      </template>
+        <template #isRight="scope">
+          <div>{{ scope.row.isRight }}</div>
+        </template>
 
-      <template #thingTpe="scope">
-        <div class="center">{{ scope.row.thingTpe }}</div>
-      </template>
-      <template #department="scope">
-        <div class="center">{{ scope.row.department }}</div>
-      </template>
-    </TrsTable>
+        <template #thingTpe="scope">
+          <div class="center">{{ scope.row.thingTpe }}</div>
+        </template>
+        <template #department="scope">
+          <div class="center">{{ scope.row.department }}</div>
+        </template>
+      </TrsTable>
+
     </div>
 
     <TrsPagination
@@ -62,7 +63,6 @@
     >
     </TrsPagination>
   </div>
-
 </template>
 <script>
 import * as dayjs from 'dayjs'
@@ -73,9 +73,14 @@ export default {
     ocrId: {
       type: String,
       default: ''
+    },
+    recheckCount: {
+      type: Number,
+      default: 0
     }
   },
   data: () => ({
+    loading: false,
     search: '',
     recordDetailList: [],
     colConfig: [
@@ -105,7 +110,7 @@ export default {
         prop: 'userName',
         header: 'people-header',
         bind: {
-          align: 'center',
+          align: 'center'
         }
       },
       {
@@ -162,12 +167,15 @@ export default {
       this.getList()
     },
     async getList() {
+      this.loading = true
       this.searchParmO.ocrId = this.ocrId
+      this.searchParmO.recheckCount = this.recheckCount
       this.searchParmO.pageNow = this.page.pageNow
       this.searchParmO.pageSize = this.page.pageSize
       const res = await getRecheckDetailList(this.searchParmO)
       if (res.status === 200) {
         const { list, totalCount } = res.data.data
+        this.loading = false
         this.recordDetailList = list
         this.page.totalCount = totalCount
       }
@@ -177,17 +185,20 @@ export default {
       this.getList()
     }
   },
-  async mounted() {
-    this.getList()
-  },
   created() {
-
+    this.getOnePage()
   },
+  watch: {
+    ocrId() {
+      this.getOnePage()
+    }
+  }
 }
 </script>
 <style lang="less" scoped>
 
 .top-tabble {
+  max-height: 450px;
   overflow-y: auto;
 }
 .short {
@@ -234,5 +245,4 @@ export default {
 //   display: flex;
 //   flex-direction: column;
 // }
-
 </style>
