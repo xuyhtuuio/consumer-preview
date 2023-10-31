@@ -858,8 +858,6 @@ export default {
         // eslint-disable-next-line
         case 'remove':
           if (fileType !== 'pdf') {
-            console.log('newVal', newVal)
-            console.log('item', item)
             filterFiles.map(file => {
               // const matchWord = file?.recommends?.filter(word => item.words.includes(word.id));
               // matchWord

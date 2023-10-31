@@ -198,7 +198,6 @@ export default {
         // 遍历推荐意见 获取关键字、关键字类型
         approval?.recommends?.forEach((recommend, i) => {
           const { word, wordType } = recommend
-          // console.log(newOcr)
           // 判断当前 ocr 结果字符串中是否包含关键字
           if (text.includes(word)) {
             const temp = []
@@ -234,7 +233,6 @@ export default {
         // 判断当前结果中是否含有批注内容 ---> 如果有进行高亮操作
         function reValue(val) {
           if (val) {
-            // console.log(itHasBg)
             newOcr.map((no) => {
               no.hasBg = val
             })
@@ -263,7 +261,6 @@ export default {
         })
       })
       this.html = html
-      console.log(html)
       this.$forceUpdate()
     },
     // 标记批注文本
@@ -424,7 +421,6 @@ export default {
         secNodes.setAttribute('data-ocrItem', ocrId)
       })
       this.selectOcr.ocrId = ocrId
-      console.log(this.selectNodes, this.selectOcr)
       const position = {
         left: Math.floor(l),
         top: Math.floor(t),
@@ -446,7 +442,6 @@ export default {
         : document.selection.createRange().text
       const node = event.target.parentNode
       const ocrId = event.target.getAttribute('data-ocrItem')
-      console.log(ocrId)
       if (!Array.from(event.target.classList).includes('commentNode')) {
         return;
       }

@@ -85,6 +85,10 @@
                 }">{{ $msg('NodeStatus')[item.taskStatus] }}<i v-if="item.currentActivityName || item.nodeName">></i>{{
       item.currentActivityName || item.nodeName }}</i>
           </span>
+          <span class="check-detail">
+            <img src="@/assets/image/ai-approval/checkDetail.svg" alt="">
+            <span>查看审批详情</span>
+          </span>
         </div>
         <order-basic-info @preview="previewFile" :personInfo="item.initiator" :personOrg='item.institutional'
           @sendReviewMaterials="sendReviewMaterials" @sendFilledInByApprover="sendFilledInByApprover"></order-basic-info>
@@ -1111,6 +1115,8 @@ export default {
     overflow: auto;
 
     .order-name {
+      display: flex;
+      align-items: center;
       color: #1d2128;
       font-size: 14px;
       font-weight: 700;
@@ -1163,7 +1169,18 @@ export default {
         color: #eb5757;
       }
     }
-
+    .check-detail {
+      display: inline-block;
+      margin-left: auto;
+      cursor: pointer;
+      font-weight: 400;
+      font-size: 14px;
+      text-decoration: underline;
+      color: #306EF5;
+      img{
+        margin-right: 4px;
+      }
+    }
     .end {
       background: #ecfeec;
       color: #50b142;
