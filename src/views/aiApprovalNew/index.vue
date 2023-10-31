@@ -154,6 +154,7 @@
             </orcTxt> -->
             <p class="content-cont-icons" v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr">
               <span class="icons">
+                <span>{{ this.icons[0]?.showIndex?this.icons[0]?.showIndex:'' }}</span>
                 <span v-for="(item,index) in icons" :style="{ position: 'absolute', top: (item.iconTop) + 'px' }" :key="index" @click="showIconLine(item)">
                 <!-- 单一评论 - 未激活 -->
                 <span :data-icon="index" v-if="item.ocrId?.length === 1 && item.showIndex === -1">

@@ -400,6 +400,7 @@ export default {
         iconIds.map((icon) => {
           this.changeIconShow(icon)
         })
+        console.log('iconIds', iconIds)
         if (!positions?.length) {
           return;
         }
@@ -737,7 +738,7 @@ export default {
       } else {
         const pdfs = this.files[this.activeIndex].child
         pdfs.forEach((pdf) => {
-          console.log('pdf', pdf)
+          // console.log('pdf', pdf)
           // 存在推荐意见
           pdf?.recommends?.map(recommend => {
             // 存在选择意见
@@ -756,7 +757,7 @@ export default {
               }
             }
           })
-          console.log(arr)
+          // console.log(arr)
           // 未关联word的 意见
           pdf?.comments && arr.push(...pdf?.comments);
           console.log(arr)
@@ -1223,15 +1224,14 @@ export default {
       this.lineRemove()
       if (this.curActiveIcon !== icon.icon_id) { // 点击新icon
         this.curIconLine = 0
-        this.changeIconShow(this.curActiveIcon, -1)
-        this.changeIconShow(icon.icon_id, 1)
+        this.changeIconShow(this.curActiveIcon)
+        this.changeIconShow(icon.icon_id)
         this.curActiveIcon = icon.icon_id
       } else if (this.curIconLine >= icon.ocrId?.length) { // 此时为当前icon对应的最后一条线
-        this.changeIconShow(icon.icon_id, -1)
+        this.changeIconShow(icon.icon_id)
         this.curActiveIcon = ''
         this.curIconLine -= 1
       }
-      console.log(icon)
       let secComment = {}
       this.comments.map((comment) => {
         if (comment.icons.includes(icon.ocrId[this.curIconLine])) {
@@ -1250,27 +1250,29 @@ export default {
       }
       this.showCommentLine(obj)
       this.curIconLine += 1
-      // this.$forceUpdate()
     },
     // 修改 icon 激活状态 showIndex 为 1 为激活 -1 为不激活
-    changeIconShow(id, showIndex) {
-      if (!id) return
-      this.icons?.map((icon) => {
+    changeIconShow(id) {
+      if (!id) return;
+      console.log('iconId', id);
+      // const iconsNew = JSON.parse(JSON.stringify(this.icons));
+      this.icons.map((icon) => {
         if (id === icon.icon_id) {
-          // const newIcon = icon
-          // newIcon.showIndex = showIndex
-          // this.$set(this.icons, this.icons[index], newIcon)
-          if (showIndex) {
-            icon.showIndex = showIndex
-            return;
-          }
-          if (icon.showIndex === 1) {
-            icon.showIndex = -1
-          } else {
-            icon.showIndex = 1
-          }
+          // if (icon.showIndex === 1) {
+          //   console.log(this.icons)
+          //   icon.showIndex = -1
+          //   debugger
+          // } else {
+          //   icon.showIndex = 1
+          //   console.log(this.icons)
+          //   debugger
+          // }
+          icon.showIndex = icon.showIndex === 1 ? -1 : 1;
+          // console.log(icon.showIndex);
         }
       })
+      // this.icons = iconsNew
+      this.$forceUpdate()
     },
     // ocr 点击批注进行连线
     showOcrCommentLine(ocrLocation, ocrId) {
@@ -1428,7 +1430,7 @@ export default {
         this.activePdfIndex = 0 + this.pdfInfo.pageSize * (pageNow - 1)
         this.pdfInfo.list = this.files[this.activeIndex].child.slice(this.activePdfIndex, this.activePdfIndex + 10)
         const temp = this.files[this.activeIndex].child[this.activePdfIndex]
-        if (!temp.ocr) {
+        if (!temp?.ocr) {
           temp.ocr = await this.getOcr(temp);
         }
         if (!temp.recommends) {
