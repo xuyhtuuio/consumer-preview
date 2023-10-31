@@ -199,7 +199,7 @@
       <div class="detail-bottom">
         <div class="bottom-left" v-if="searchType === 2">
           <div class="img-show">
-            <ImagePreview :url="item.url" ref="imgPreview" @fullImage="fullScreen" @changeImgFun="changeImgFun"></ImagePreview>
+            <ImagePreview :url="item.url" ref="imgPreview" @fullImage="fullScreen()" @changeImgFun="changeImgFun"></ImagePreview>
           </div>
         </div>
         <div class="bottom-right" :class="{ 'bottom-right-border' : searchType === 1 }" v-loading="loading">
@@ -220,17 +220,17 @@
                 move-class="item-move"
               >
                 <div class="list-item">
-                  <div class="num">
+                  <div class="num" v-if="searchType === 2">
                     {{ (ite.distance * 100).toFixed(2) }}%
                   </div>
                   <div class="img-model">
                     <img :src="ite.fileUrl" alt="" />
-                    <div class="img-up" @click="toCompare">
-                      <div class="recheck-num">回检3次</div>
-                      <div class="show-more" @click.stop="showDetail">
-                        <img src="@/assets/image/intelligent-recheck/see.png" alt="">
-                        <div>查看详情</div>
-                      </div>
+                    <div class="img-up" @click="toCompare(ite, index, total)">
+                      <div class="recheck-num">回检{{ ite.recheckCount }}次</div>
+                    </div>
+                    <div class="show-more" @click="showDetail(ite)">
+                      <img src="@/assets/image/intelligent-recheck/see.png" alt="">
+                      <div>查看详情</div>
                     </div>
                   </div>
                   <div class="item-title">{{ ite.fileName }}</div>
@@ -238,6 +238,7 @@
               </WaterfallSlot>
             </Waterfall>
             <Loading v-if="scrollLoading && !loading"></Loading>
+            <div class="bottom-tip" v-if="!canScroll">已经到底啦 ~</div>
           </div>
           <empty v-else></empty>
         </div>
@@ -277,7 +278,7 @@
       </div>
     </div>
     <UploadDialog ref="uploadDia" @changeImgFun="changeImgFun"></UploadDialog>
-    <DetailDialog ref="detailDia"></DetailDialog>
+    <DetailDialog ref="detailDia" v-if="showDetailDia" :detailItem="detailItem" @handleClose="handleClose"></DetailDialog>
   </div>
 </template>
 
@@ -343,7 +344,7 @@ export default {
       setTime: [],
       getTime: [],
       type: '',
-      recheck: false
+      recheck: null
     },
     showFullScreen: false,
     detailDialogShow: false,
@@ -389,6 +390,9 @@ export default {
     placeholder: '请输入文件名或上传图片进行回检',
     agenciesList: [],
     transactionTypes: [],
+    canScroll: true,
+    detailItem: {},
+    showDetailDia: false
   }),
   created() {
     this.getOrgTree();
@@ -443,15 +447,27 @@ export default {
         })
       })
     },
-    showDetail() {
-      this.$refs.detailDia.show = true;
+    showDetail(ite) {
+      this.detailItem = ite;
+      this.showDetailDia = true;
     },
-    toCompare() {
+    handleClose() {
+      this.showDetailDia = false;
+    },
+    toCompare(ite, index, total) {
       this.$router.push({
         name: 'recheck-compare',
-        // params: {
-        //   item
-        // }
+        params: {
+          leftItem: {
+            ...this.item,
+            searchType: this.searchType
+          },
+          compareItem: {
+            ...ite,
+            itemIndex: index,
+            totalCount: total
+          }
+        }
       })
     },
     saveFile() {
@@ -506,7 +522,10 @@ export default {
           sort: 'desc'
         }
       }
-      this.pageNum = 1
+      this.pageNum = 1;
+      this.loading = true;
+      this.canScroll = true;
+      this.totalList = [];
       this.getSimilarityComparisonList()
     },
     handleCurrentChange(val) {
@@ -548,6 +567,7 @@ export default {
       this.item = item;
       localStorage.setItem('recheckItem', JSON.stringify(this.item));
       this.searchType = 2;
+      this.canScroll = true;
       this.sortList = sortListType2;
       this.resetSearch();
       this.getSimilarityComparisonList()
@@ -556,6 +576,7 @@ export default {
       this.pageNum = 1;
       this.loading = true;
       this.totalList = [];
+      this.canScroll = true;
       this.getSimilarityComparisonList()
     },
     searchRecheck() {
@@ -569,6 +590,7 @@ export default {
         text: this.select === '2' ? this.recheckInput : '',
         searchType: 1
       };
+      this.canScroll = true;
       localStorage.setItem('recheckItem', JSON.stringify(this.item));
       this.searchType = 1;
       this.sortList = sortListType1;
@@ -594,6 +616,7 @@ export default {
         isRecheck: this.searchForm.recheck ? 1 : 0,
         formCategory: this.searchForm.type
       }
+      // if (this.canScroll) {
       getSimilarityComparisonList(data)
         .then((res) => {
           if (res.data.status === 200) {
@@ -601,7 +624,8 @@ export default {
               return {
                 ...v,
                 taskNumber: v.formId + '',
-                taskName: v.entryName,
+                taskName: v.formName,
+                processTemplateId: v.templateId,
                 initiator: {
                   ...v.originator,
                   label: v.institutional && v.institutional[1]
@@ -615,6 +639,7 @@ export default {
           }
           this.loading = false;
           this.scrollLoading = false;
+          this.canScroll = !(this.totalList.length === this.total);
         })
         .catch(() => {
           this.loading = false;
@@ -622,11 +647,12 @@ export default {
         })
     },
     scrollGet() {
-      if (this.scrollLoading) {
+      if (this.scrollLoading || !this.canScroll) {
         return;
       }
       const { listBody } = this.$refs;
       if (listBody.offsetHeight + listBody.scrollTop + 200 >= listBody.scrollHeight) {
+        this.pageNum += 1;
         this.getSimilarityComparisonList();
       }
     },
@@ -1060,34 +1086,38 @@ export default {
                 font-weight: 700;
                 line-height: 20px;
               }
-              .show-more {
-                position: absolute;
-                bottom: 16px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 86px;
-                height: 32px;
-                padding: 6px 8px;
-                border-radius: 4px;
-                background: #2D5CF6;
-                display: flex;
-                align-items: center;
-                color: #FFF;
-                font-size: 12px;
-                font-style: normal;
-                font-weight: 400;
-                line-height: 20px;
-                img {
-                  width: 20px;
-                  height: 20px;
-                  margin-right: 2px;
-                }
+            }
+            .show-more {
+              display: none;
+              position: absolute;
+              bottom: 16px;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 86px;
+              height: 32px;
+              padding: 6px 8px;
+              border-radius: 4px;
+              background: #2D5CF6;
+              // display: flex;
+              align-items: center;
+              color: #FFF;
+              font-size: 12px;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 20px;
+              img {
+                width: 20px;
+                height: 20px;
+                margin-right: 2px;
               }
             }
           }
           .img-model:hover {
             .img-up {
               display: block;
+            }
+            .show-more {
+              display: flex;
             }
           }
           .item-title {
@@ -1186,6 +1216,11 @@ export default {
 .item-move {
   transition: all .5s cubic-bezier(.55,0,.1,1);
   -webkit-transition: all .5s cubic-bezier(.55,0,.1,1);
+}
+.bottom-tip {
+  margin-left: 10px;
+  font-size: 14px;
+  text-align: center;
 }
 </style>
 <style lang="less">

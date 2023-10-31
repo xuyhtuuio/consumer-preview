@@ -14,3 +14,20 @@ export function getRecheckList(data) {
     data
   })
 }
+
+export function AddRecheck(data) {
+  return request({
+    url: '/cpr/recheck/add',
+    method: 'post',
+    data
+  })
+}
+
+export function getOne(data) {
+  return request({
+    url: '/cpr/recheck/getOne',
+    contentType: 'application/x-www-form-urlencoded',
+    method: 'post',
+    data
+  })
+}

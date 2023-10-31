@@ -10,8 +10,12 @@
     <el-upload
       class="upload-demo"
       drag
+      ref="uploadPic"
       :multiple="false"
       action
+      :show-file-list="false"
+      :limit="1"
+      :disabled="uploading"
       :http-request="uploadFile"
     >
       <i class="el-icon-upload"></i>
@@ -51,7 +55,7 @@ export default {
     uploadFile(param) {
       const formData = new FormData()
       this.uploading = true
-      formData.append('mf', param.file) // 传入bpmn文件
+      formData.append('mf', param.file)
       getFormGroups(formData)
         .then((res) => {
           if (res.data.success) {
@@ -80,7 +84,7 @@ export default {
           }
         })
         .catch(() => {
-          this.uploading = false
+          this.uploading = false;
           this.$message.error('上传失败')
         })
     }
