@@ -871,7 +871,7 @@ export default {
 
 :deep(.el-dialog__headerbtn) {
   position: absolute;
-    /* top: 20px; */
+     top: 36px;
     right: 36px;
     padding: 0;
     background: 0 0;
