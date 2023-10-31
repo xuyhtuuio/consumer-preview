@@ -197,6 +197,11 @@ export default {
     },
   },
   mounted() {
+    const { knowledgeId } = this.$route.query
+    if (knowledgeId) {
+      this.$set(this.data, 'showCollaplse', false)
+      return;
+    }
     this.computedTextHeight(`computedtextheight_${this.data.id}`)
   },
   methods: {
@@ -307,10 +312,10 @@ export default {
       }
     },
     createImage() {
-
     },
-    copeLink() {
-
+    copeLink(data) {
+      const url = window.location.origin + window.location.pathname + '?knowledgeId=' + data.id + '&extend=1'
+      this.copyClipboard(url)
     },
     copyClipboard(val) {
       copyText(

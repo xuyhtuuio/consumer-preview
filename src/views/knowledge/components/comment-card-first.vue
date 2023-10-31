@@ -28,7 +28,7 @@
         <span class="dept">{{ item.orgName }}</span>
       </div>
       <div class="meta-right">
-        <span class="item">
+        <span>
           <img v-if="item.isSelected > 0" src="@/assets/image/knowledge/精选.svg" style="width:20px;" />
           <img v-else src="@/assets/image/knowledge/精选1.svg" style="width:20px;" />
         </span>
