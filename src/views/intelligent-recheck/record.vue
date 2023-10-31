@@ -12,7 +12,7 @@
 
       <div class="search-middle-area">
         <div class="left-area">
-          <div
+          <!-- <div
             class="scrren-com"
             :class="search.mechanism ? 'active' : ''"
             style="font-size: 14px"
@@ -45,7 +45,38 @@
               alt=""
               style="width: 20px; height: 20px; margin-left: 4px"
             />
-          </div>
+          </div> -->
+          <div class="select-item select-org">
+              <el-popover
+                ref="ref-popover3"
+                popper-class="org-date-style"
+                placement="bottom-start"
+                trigger="click"
+                @show="handlePopoverShow3"
+              >
+                <el-cascader
+                  placeholder="选择机构"
+                  v-model="search.orgIds"
+                  ref="org-cascader"
+                  :options="agenciesList"
+                  @change="changeAgencies"
+                  :props="{
+                    emitPath: false,
+                    checkStrictly: true,
+                    label: 'name',
+                    value: 'id',
+                    children: 'children'
+                  }"
+                  filterable></el-cascader>
+                <div slot="reference">
+                  <div class="select-set">
+                    <div class="tip-style" :class="{ 'tip-style-active': search.orgIds }">选择机构</div>
+                    <i class="el-icon-caret-bottom"></i>
+                    <img src="@/assets/image/intelligent-recheck/tip.png" alt="" />
+                  </div>
+                </div>
+              </el-popover>
+            </div>
 
           <div
             class="scrren-com"
@@ -407,6 +438,9 @@ export default {
       this.searchParm.formCategory = this.search.approvalType
       this.searchOnePage()
     },
+    handlePopoverShow3() {
+      this.$refs['org-cascader'].handleFocus()
+    },
     handleSubmit() {
       this.searchParm.text = this.search.searchInput
       this.searchOnePage()
@@ -498,7 +532,7 @@ export default {
       return val ? dayjs(val).format('YYYY-MM-DD ') : '--'
     },
     changeAgencies() {
-      this.$refs['agencies'].dropDownVisible = false
+      // this.$refs['agencies'].dropDownVisible = false
       if (this.agenciesList.length) {
         this.search.orgName = this.queryTreeName(
           this.search.orgIds,
@@ -690,6 +724,73 @@ export default {
     }
   }
 
+  .select-org {
+        width: 104px;
+        /deep/.el-select {
+          width: 78px;
+        }
+      }
+  .select-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        // width: 104px;
+        left: 10px;
+        color: #1d2128;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 22px;
+        .select-set {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          .tip-style {
+            color: #1d2128;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 22px;
+          }
+          .el-icon-caret-bottom {
+            color: #88909B;
+          }
+          .tip-style-active {
+            color: #2D5CF6;
+          }
+        }
+        /deep/.el-select {
+          position: absolute;
+          height: 22px;
+          opacity: 0;
+          .el-input__inner {
+            height: 22px;
+            border: none;
+            padding: 0 20px 0 0;
+            color: #1d2128;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 22px;
+          }
+          .el-input__icon {
+            width: 16px;
+          }
+          .el-icon-arrow-up::before {
+            content: '\e78f';
+          }
+        }
+        img {
+          position: absolute;
+          right: 10px;
+          width: 20px;
+          height: 20px;
+          cursor: pointer;
+        }
+        /deep/.is-active {
+          color: #2d5cf6;
+        }
+      }
   .search-middle-area {
     display: flex;
     justify-content: space-between;
