@@ -700,12 +700,13 @@ export default {
     },
     getComments() {
       const arr = [];
-      const fileType = this.files[this.activeIndex].type
-      if (fileType !== 'pdf') {
-        this.files.forEach(file => {
+      // const fileType = this.files[this.activeIndex].type
+      this.files.forEach(file => {
+        const fileType = file.type
+        if (fileType !== 'pdf') {
           // 存在推荐意见
           file?.recommends?.map(recommend => {
-            // 存在选择意见
+          // 存在选择意见
             if (recommend.selected) {
               const selected = recommend.list.filter(a => a.id === recommend.selected);
               const isRepeat = file.comments?.filter(f => f.id === selected?.[0].id)
@@ -721,30 +722,30 @@ export default {
           })
           // 未关联word的 意见
           file?.comments && arr.push(...file?.comments);
-        });
-      } else {
-        const pdfs = this.files[this.activeIndex].child
-        pdfs.forEach((pdf) => {
-          // 存在推荐意见
-          pdf?.recommends?.map(recommend => {
-            // 存在选择意见
-            if (recommend.selected) {
-              const selected = recommend.list.filter(a => a.id === recommend.selected);
-              const isRepeat = pdf.comments?.filter(f => f.id === selected?.[0].id)
-              if (!isRepeat?.length) {
-                arr.push({
-                  id: selected?.[0].id,
-                  str: selected?.[0].str,
-                  files: [this.files[this.activeIndex].id],
-                  words: [recommend.id]
-                });
+        } else {
+          const pdfs = file.child || []
+          pdfs?.forEach((pdf) => {
+            // 存在推荐意见
+            pdf?.recommends?.map(recommend => {
+              // 存在选择意见
+              if (recommend.selected) {
+                const selected = recommend.list.filter(a => a.id === recommend.selected);
+                const isRepeat = pdf.comments?.filter(f => f.id === selected?.[0].id)
+                if (!isRepeat?.length) {
+                  arr.push({
+                    id: selected?.[0].id,
+                    str: selected?.[0].str,
+                    files: [this.files[this.activeIndex].id],
+                    words: [recommend.id]
+                  });
+                }
               }
-            }
+            })
+            // 未关联word的 意见
+            pdf?.comments && arr.push(...pdf?.comments);
           })
-          // 未关联word的 意见
-          pdf?.comments && arr.push(...pdf?.comments);
-        })
-      }
+        }
+      });
       // comment id去重
       const setArr = [];
       arr.forEach(comment => {
