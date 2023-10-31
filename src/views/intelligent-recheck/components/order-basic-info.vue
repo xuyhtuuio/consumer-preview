@@ -77,7 +77,7 @@
       </div>
     </div>
     <!-- 审查材料 -->
-    <div class="line"></div>
+    <!-- <div class="line"></div>
     <p class="poppver-title">
       <span>
         <svg class="icon" aria-hidden="true">
@@ -95,7 +95,7 @@
         </span>
         <span class="preview" @click="preview(item.url)">预览</span>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -104,19 +104,23 @@ import { getApplyForm } from '@/api/front'
 import { downloadAllFiles } from '@/api/applyCenter'
 // eslint-disable-next-line
 import * as dayjs from 'dayjs'
-import FileType from '@/components/common/file-type'
+// import FileType from '@/components/common/file-type'
 export default {
   name: 'order-basic-info',
-  components: { FileType },
+  // components: { FileType },
   props: {
     sidebarParam: {
       type: Object,
       default: () => { }
     },
-    // personInfo: {
-    //   type: Object,
-    //   default: () => { }
-    // },
+    personInfo: {
+      type: Object,
+      default: () => { }
+    },
+    params: {
+      type: Object,
+      default: () => { }
+    },
     personOrg: {
       type: Array,
       default: () => []
@@ -133,24 +137,24 @@ export default {
         reviewPointer: [],
         fileList: []
       },
-      params: {
-        formId: 180,
-        taskName: '123123',
-        processInstanceId: '2b176fa3-6c9f-11ee-8bf8-b26473adf234',
-        formManagementId: 1,
-        nodeId: 'node_845932503923',
-        processTemplateId: '1701419093933596672'
-      },
-      personInfo: {
-        id: '798',
-        name: 'linchun',
-        type: null,
-        label: null,
-        roleRange: null,
-        sex: null,
-        selected: null,
-        org: null
-      }
+      // params: {
+      //   formId: 180,
+      //   taskName: '123123',
+      //   processInstanceId: '2b176fa3-6c9f-11ee-8bf8-b26473adf234',
+      //   formManagementId: 1,
+      //   nodeId: 'node_845932503923',
+      //   processTemplateId: '1701419093933596672'
+      // },
+      // personInfo: {
+      //   id: '798',
+      //   name: 'linchun',
+      //   type: null,
+      //   label: null,
+      //   roleRange: null,
+      //   sex: null,
+      //   selected: null,
+      //   org: null
+      // }
     }
   },
   mounted() {
@@ -162,6 +166,14 @@ export default {
       handler(val) {
         if (val && Object.keys(val)?.length > 2) {
           this.getBsicData(val, true)
+        }
+      },
+      immediate: true
+    },
+    params: {
+      handler(val) {
+        if (val) {
+          this.init();
         }
       },
       immediate: true

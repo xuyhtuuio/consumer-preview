@@ -35,7 +35,7 @@
           <div class="swiper-wrapper">
             <div class="swiper-slide list-item" v-for="(item, index) in recheckList" :key="'recheck' + index">
               <div>· {{ item.createTime.slice(0, 10) }}</div>
-              <div class="middle-1">{{ item.feedBack }}</div>
+              <div class="middle-1">{{ item.fileName }}</div>
               <div class="middle-2">{{ item.isPass === 1 ? '已通过回检' : '未通过回检' }}</div>
               <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
               <div class="middle-2">{{ item.fullname }}/{{ item.userId }}</div>
