@@ -7,7 +7,7 @@
       <i class="el-icon-close"></i>
     </div>
     <div class="compare-detail">
-      <div class="compare-left">
+      <div class="compare-left" v-if="leftItem.searchType === 2">
         <div class="include-img">
           <ImagePreview
             :url="leftItem.url"
@@ -102,7 +102,7 @@
       :before-close="editClose">
       <div class="show-num">
         <div class="num-left">该文件已被回检{{ compareItem.recheckCount }}次</div>
-        <div class="num-left num-right">查看回检内容</div>
+        <div class="num-left num-right" @click="seeAllRecheck">查看回检内容</div>
       </div>
       <div class="agree-change">
         <div class="agree-label">是否通过<span>*</span></div>
@@ -128,6 +128,18 @@
         <el-button type="primary" @click="agreeClick">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog
+      title="回检记录"
+      :visible="recordDialogVisible"
+      width="70%"
+      custom-class="record-list-dialog"
+      align="center"
+      :before-close="handleCloseReDia"
+    >
+      <div class="include-record">
+        <record-dialog v-if="recordDialogVisible" :ocrId="compareItem.ocrId" />
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -136,15 +148,18 @@ import { downloadStream } from '@/api/applyCenter'
 import { AddRecheck, getOne } from '@/api/intelligent-recheck'
 import { timestampToDateTime } from '@/utils/utils'
 import DetailDialog from './components/detail-dialog'
+import RecordDialog from './components/record-dialog'
 import ImagePreview from './components/imgae-preview'
 import FullImage from './components/full-image'
 export default {
   components: {
     ImagePreview,
     DetailDialog,
-    FullImage
+    FullImage,
+    RecordDialog
   },
   data: () => ({
+    recordDialogVisible: false,
     showFullScreen: false,
     editDialog: false,
     userAgree: '1',
@@ -202,8 +217,15 @@ export default {
         this.$message.error('回检意见提交失败');
       })
     },
+    handleCloseReDia() {
+      this.recordDialogVisible = false;
+    },
     showUserEdit() {
       this.editDialog = true;
+    },
+    seeAllRecheck() {
+      this.editDialog = false;
+      this.recordDialogVisible = true;
     },
     getItem(type) {
       if (type === 'prev') {
@@ -584,6 +606,30 @@ export default {
       color: #FFF;
       margin-left: 20px;
     }
+  }
+}
+.record-list-dialog {
+  .el-dialog__header {
+    padding: 36px 36px 16px;
+    text-align: center;
+    .el-dialog__title {
+      color:  #1D2128;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 24px;
+    }
+    .el-dialog__headerbtn {
+      top: 36px;
+      right: 36px;
+      .el-dialog__close {
+        font-size: 22px;
+        color: #505968;
+      }
+    }
+  }
+  .el-dialog__body {
+    padding: 0 36px 36px;
   }
 }
 </style>

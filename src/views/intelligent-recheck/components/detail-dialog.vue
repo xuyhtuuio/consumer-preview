@@ -73,6 +73,8 @@ export default {
 
 <style lang="less">
 .detail-dialog {
+  max-height: 70vh;
+  overflow: scroll;
   .el-dialog__header {
     padding: 12px 24px;
   }

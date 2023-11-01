@@ -335,6 +335,7 @@ export default {
     WaterfallSlot,
     DetailDialog
   },
+  name: 'recheck-detail',
   data: () => ({
     recheckInput: '',
     select: '1',

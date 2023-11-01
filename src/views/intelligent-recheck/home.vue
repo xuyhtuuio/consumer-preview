@@ -8,7 +8,7 @@
 -->
 <template>
      <transition name="router-fade" mode="out-in">
-          <keep-alive include="recheck">
+          <keep-alive include="recheck-detail">
             <router-view/>
           </keep-alive>
       </transition>
