@@ -92,7 +92,7 @@
         </div>
         <order-basic-info v-if="isOrderDetail" @preview="previewFile" :personInfo="item.initiator" :personOrg='item.institutional'
           @sendReviewMaterials="sendReviewMaterials" @sendFilledInByApprover="sendFilledInByApprover"></order-basic-info>
-        <OcrPreview v-else :isOrderDetail="isOrderDetail" @changeOcrView="changeOcrView"></OcrPreview>
+        <OcrPreview ref="aiApprovalNew" v-else :ocrViewItem="ocrViewItem" :isOrderDetail="isOrderDetail" @changeOcrView="changeOcrView"></OcrPreview>
         </div>
       <div class="right" v-loading="loadings.initLoading">
         <!-- 消保审查/详情页/审批中预览 -->
@@ -232,6 +232,7 @@ export default {
   },
   data() {
     return {
+      ocrViewItem: {},
       isOrderDetail: true,
       status: 0,
       crtComp: '',
@@ -291,6 +292,7 @@ export default {
     }
     this.clearStoreStatus()
     this.judgeStatus()
+    this.ocrViewItem = JSON.parse(window.localStorage.getItem('order-detail')).item
   },
   created() {
   },
@@ -1065,6 +1067,15 @@ export default {
     // 修改左侧OCR内容可视状态   false 为 可视  true 为 不可视
     changeOcrView(boolean) {
       this.isOrderDetail = boolean
+      if (!boolean) {
+        this.$nextTick(() => {
+          this.setOcrCurMode()
+        })
+      }
+    },
+    setOcrCurMode() {
+      console.log(this.$refs.aiApprovalNew.toggleMode())
+      this.$refs.ocrPre.toggleMode(1)
     }
   }
 }

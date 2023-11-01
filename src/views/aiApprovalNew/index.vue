@@ -256,6 +256,10 @@ export default {
     isOrderDetail: {
       type: Boolean,
       default: true
+    },
+    ocrViewItem: {
+      type: Object,
+      default: () => {}
     }
   },
   data() {
@@ -478,15 +482,19 @@ export default {
         });
       })
     },
+    // 修改ocr页面可见 - 详情页（order-detail）用
     changeItView() {
       this.$emit('changeOcrView', true)
     }
   },
   mounted() {
-    const { item } = this.$route.params;
-    this.formId = item.taskNumber;
+    let { item } = this.$route.params;
+    if (!item) {
+      item = this.ocrViewItem
+    }
+    this.formId = item.taskNumber
     this.inDraft = item.draftFlag === 1;
-    this.formCategoryId = item.formManagementId;
+    this.formCategoryId = item.formManagementId
     this.init(item);
     this.formBase = item;
     // 获取前面的审批意见
