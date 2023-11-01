@@ -1067,16 +1067,7 @@ export default {
     // 修改左侧OCR内容可视状态   false 为 可视  true 为 不可视
     changeOcrView(boolean) {
       this.isOrderDetail = boolean
-      if (!boolean) {
-        this.$nextTick(() => {
-          this.setOcrCurMode()
-        })
-      }
     },
-    setOcrCurMode() {
-      console.log(this.$refs.aiApprovalNew.toggleMode())
-      this.$refs.ocrPre.toggleMode(1)
-    }
   }
 }
 </script>

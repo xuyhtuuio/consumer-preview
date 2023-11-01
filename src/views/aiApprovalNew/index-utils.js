@@ -50,7 +50,7 @@ export default {
     getElHeight() {
       this.$nextTick(() => {
         const refContainer = this.$refs.refContainer.clientHeight;
-        const refHeader = this.$refs.refContentHeader.clientHeight;
+        const refHeader = this.$refs.refContentHeader?.clientHeight;
         const mainResult = refContainer - refHeader - 32; // 32 padding值
         this.myContStyle.height = mainResult + 'px';
       });
@@ -69,7 +69,9 @@ export default {
             item.opinion = Boolean(item.substantiveOpinions)
           })
           this.approvalLetter = data
-          this.$refs.sidebar.tools[3].show = (data.permissions === 'passAllow' && data.list.length !== 0)
+          if (this.$refs.sidebar?.tools.length) {
+            this.$refs.sidebar.tools[3].show = (data.permissions === 'passAllow' && data.list.length !== 0)
+          }
           this.$forceUpdate()
         }
       });
@@ -85,10 +87,12 @@ export default {
           this.applyForm = data;
           this.queryFormItemPermissions();
           this.getNextUserOption();
-          this.$refs.sidebar.tools[0].sidebarParam = {
-            ...data,
-            keyPointsForVerification: JSON.parse(JSON.stringify(data.keyPointsForVerification))
-          };
+          if (this.$refs.sidebar?.tools.length) {
+            this.$refs.sidebar.tools[0].sidebarParam = {
+              ...data,
+              keyPointsForVerification: JSON.parse(JSON.stringify(data.keyPointsForVerification))
+            };
+          }
         } else {
           this.$message.error({ offset: 40, title: '提醒', message });
         }

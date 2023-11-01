@@ -2,7 +2,7 @@
   <div class="container" ref="refContainer" v-loading="containLoading">
     <sidebar ref="sidebar" v-if="isOrderDetail"></sidebar>
     <div class="content">
-      <div class="content-header" ref="refContentHeader" v-if="isOrderDetail">
+      <div class="content-header" ref="refContentHeader" v-show="isOrderDetail">
         <span class="content-title">
           <i class="iconfont icon-shenpiyemiantubiao" v-if="formBase?.urgent === '1'"></i>{{ formBase?.entryName }}</span>
         <span class="content-btns">
@@ -408,7 +408,10 @@ export default {
     },
     curMode() {
       // this.findIconPosition()
-      this.generateIcons()
+      if (this.isOrderDetail) {
+        this.icons = []
+        this.generateIcons()
+      }
     }
   },
   methods: {
@@ -500,6 +503,9 @@ export default {
     // 获取前面的审批意见
     this.getOpinionApprovalLetter();
     this.getNodeHandleUserApi();
+    if (!this.isOrderDetail) {
+      this.curMode = 1
+    }
   },
   beforeDestroy() {
     this.lineRemove()
