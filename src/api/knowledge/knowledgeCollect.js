@@ -20,7 +20,7 @@ export function getTagInfoList(data) {
   return request({
     url: '/cpr/KnowledgeMarket/tagInfoList',
     method: 'get',
-    params: data
+    params: data,
   })
 }
 

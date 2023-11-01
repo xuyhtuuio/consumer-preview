@@ -35,7 +35,7 @@
       <el-empty description="暂无数据" v-if="kCardList.length === 0 && loadingList === false"></el-empty>
     </template>
     <template v-else>
-      <TagList @toTagDetail="toTagDetail" @updateTagList="updateTagList"/>
+      <TagList ref="tagList" @toTagDetail="toTagDetail" @updateTagList="updateTagList"/>
     </template>
     <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
       v-if="page.total">
@@ -82,12 +82,16 @@ export default {
   },
   methods: {
     getSearchList(params) {
-      this.paramsDefalut = this.$options.data().paramsDefalut
-      this.$refs['filterKnowledge'].resetForm()
-      this.getRecommendList({
-        ...this.paramsDefalut,
-        ...params
-      })
+      if (this.active === '知识') {
+        this.paramsDefalut = this.$options.data().paramsDefalut
+        this.$refs['filterKnowledge'].resetForm()
+        this.getRecommendList({
+          ...this.paramsDefalut,
+          ...params
+        })
+      } else {
+        this.$refs['tagList'].getSearchList(params)
+      }
     },
     async getRecommendList(data) {
       this.loadingList = true
