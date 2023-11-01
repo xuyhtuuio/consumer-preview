@@ -398,6 +398,7 @@ export default {
         display: flex;
         align-items: center;
         margin-left: 20px;
+        cursor: pointer;
         img {
           margin-right: 4px;
           cursor: pointer;
