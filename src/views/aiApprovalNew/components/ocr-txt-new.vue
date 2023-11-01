@@ -203,7 +203,10 @@ export default {
             const temp = []
             // 如果包含 切割字符串 做高亮处理操作
             for (let index = 0; index < newOcr.length; index++) {
-              if (typeof newOcr[index].text === 'string' && newOcr[index].text.includes(word)) {
+              // console.log(index, newOcr[index], text)
+              // bug in this
+              // newOcr [index] 的格式会在此发生变化  {} 或 '' 或 undefined
+              if (typeof newOcr[index]?.text === 'string' && newOcr[index]?.text.includes(word)) {
                 const a = newOcr[index].text.split(word)
                 a.splice(1, 0, {
                   text: word,
@@ -224,7 +227,7 @@ export default {
                 })
                 temp.push({ ...d })
               } else {
-                temp.push({ text: newOcr[index].text, ocrId, hasComment })
+                temp.push({ text: newOcr[index]?.text, ocrId, hasComment })
               }
             }
             newOcr = [...Object.values(...temp)]

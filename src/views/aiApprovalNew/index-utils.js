@@ -377,6 +377,7 @@ export default {
         // this.dealIconWithComment()
         this.generateIcons()
       }
+      // console.log('comments', this.comments)
     },
     changeFileById(fileId) {
       const fileIndex = this.files.findIndex((file) => fileId === file.id)
