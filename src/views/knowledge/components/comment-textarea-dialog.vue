@@ -7,8 +7,8 @@
     custom-class="relevant-dialog">
     <div class="comment">
     <div class="textarea">
-      <el-input v-model.trim="title" placeholder="请输入标题(选填)" :maxlength="50" :minlength="1"></el-input>
-      <el-input v-model.trim="content" type="textarea" placeholder="有什么新的案例分享给大家？" :rows="6" :maxlength="500" :minlength="1"></el-input>
+      <el-input v-model.trim="title" @focus="handleFocus" @blur="handleBlur" placeholder="请输入标题(选填)" :maxlength="50" :minlength="1"></el-input>
+      <el-input v-model.trim="content" @focus="handleFocus" @blur="handleBlur" type="textarea" placeholder="有什么新的案例分享给大家？" :rows="6" :maxlength="500" :minlength="1"></el-input>
     </div>
     <div class="option-area">
       <div class="picture">
@@ -24,6 +24,7 @@
         </el-upload>
       </div>
       <TrsTag
+        style="margin-bottom: 4px;"
         v-for="(tag, index) in tags"
         :key="tag"
         :tag="{ label: tag.name, ...tagConfig }"
@@ -45,8 +46,8 @@
         trigger="hover"
       >
         <div class="content">
-          <el-input v-model.trim="serach" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
-          <ul class="tags-list trs-scroll">
+          <el-input v-model.trim="serach" @keypress.native.enter="changeSearchTag" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
+          <ul class="tags-list trs-scroll" v-loading="loadingTag">
             <li class="tag-li pointer" v-if="showNewTag">
               <span class="tag-text ellipsis">#{{ serach }}</span>
               <span style="color:#2D5CF6;" @click="addTags()">创建新标签</span>
@@ -77,7 +78,7 @@
 <script>
 import { debounce } from 'lodash';
 import { mapState } from 'vuex'
-import { addTag, addKnowledge } from '@/api/knowledge/knowledgeCollect'
+import { addTag, addKnowledge, getTagInfoList } from '@/api/knowledge/knowledgeCollect'
 import fileType from '@/components/common/file-type'
 import { getFormGroups } from '@/api/front';
 export default {
@@ -88,6 +89,7 @@ export default {
   data() {
     return {
       publishLoading: false,
+      loadingTag: false,
       title: '',
       content: '',
       type: '',
@@ -214,7 +216,24 @@ export default {
     },
     deleteFile(index) {
       this.fileList.splice(index, 1)
-    }
+    },
+    async changeSearchTag() {
+      this.loadingTag = true
+      const res = await getTagInfoList({
+        justCare: 0,
+        keyword: this.serach
+      })
+      if (res.data.success) {
+        this.tagsList = res.data.data || []
+      }
+      this.loadingTag = false
+    },
+    handleFocus(e) {
+      e.target.parentNode.parentNode.style.border = '1px solid #2D5CF6'
+    },
+    handleBlur(e) {
+      e.target.parentNode.parentNode.style.border = '1px solid transparent'
+    },
   }
 }
 </script>
