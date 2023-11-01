@@ -573,7 +573,7 @@ export default {
       if (this.files?.[this.activeIndex]?.ocr) {
         this.files[this.activeIndex] = {
           ...this.approval,
-          recommends: this.$refs.editorial.recommends
+          recommends: this.$refs.editorial?.recommends
         };
       }
       this.activeIndex = i;
