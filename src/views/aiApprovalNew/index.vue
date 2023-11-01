@@ -1,8 +1,8 @@
 <template>
   <div class="container" ref="refContainer" v-loading="containLoading">
-    <sidebar ref="sidebar"></sidebar>
+    <sidebar ref="sidebar" v-if="isOrderDetail"></sidebar>
     <div class="content">
-      <div class="content-header" ref="refContentHeader">
+      <div class="content-header" ref="refContentHeader" v-if="isOrderDetail">
         <span class="content-title">
           <i class="iconfont icon-shenpiyemiantubiao" v-if="formBase?.urgent === '1'"></i>{{ formBase?.entryName }}</span>
         <span class="content-btns">
@@ -37,6 +37,9 @@
                   <use xlink:href="#icon-Frame2"></use>
                 </svg>
                 更多材料</span> -->
+                <span @click="changeItView" v-if="!isOrderDetail">
+                <i class="iconfont icon-close"></i>
+                退出预览</span>
               <el-popover placement="bottom" popper-class="cont-top-popover" v-model="filePopoverShow" width="300" :offset="100" trigger="click"
                 :visible-arrow=false>
                 <div class="cont-top-fileList">
@@ -74,13 +77,13 @@
                   更多材料
                 </span>
               </el-popover>
-              <span @click="saveFile">
+              <span @click="saveFile" v-if="isOrderDetail">
                 <!-- <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-xiazai"></use>
                 </svg> -->
                 <i class="iconfont icon-xiazai"></i>
                 下载</span>
-              <span @click="toggleMode">
+              <span @click="toggleMode" v-if="isOrderDetail">
                 <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-dianjitianjiapizhu"></use>
                 </svg>
@@ -88,7 +91,7 @@
             </div>
             <div class="cont-top-infos">
               <span>提醒：共发现 {{ approval.numberOfRiskInfo }} 处风险信息，请认真核对</span>
-              <el-input v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search" clearable @clear="search"
+              <el-input v-if="isOrderDetail" v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search" clearable @clear="search"
                 size="medium">
                 <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
               </el-input>
@@ -184,7 +187,7 @@
             </p>
           </div>
         </div>
-        <div class="content-cont-editor">
+        <div class="content-cont-editor" v-if="isOrderDetail">
           <editorial ref="editorial" :activePdfIndex="activePdfIndex" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
             :lineWordItem="lineWordItem" @upDateComments="upDateComments" @showLine="showLine" :activeIndex="activeIndex"
             :activeWordType="activeWordType" @addCommentWithPosition="addCommentWithPosition" @showCommentLine="showCommentLine" @changeEditorialType="changeEditorialType"
@@ -248,6 +251,12 @@ export default {
     // orcTxt,
     editorial,
     fileType,
+  },
+  props: {
+    isOrderDetail: {
+      type: Boolean,
+      default: true
+    }
   },
   data() {
     return {
@@ -469,6 +478,9 @@ export default {
         });
       })
     },
+    changeItView() {
+      this.$emit('changeOcrView', true)
+    }
   },
   mounted() {
     const { item } = this.$route.params;
@@ -619,7 +631,8 @@ export default {
             width: 16px;
             height: 16px;
           }
-
+          display: inline-flex;
+          align-items: center;
           cursor: pointer;
           color: #505968;
         }
@@ -627,8 +640,16 @@ export default {
         .icon-xiazai {
           display: inline-block;
           width: 14px;
+          margin-right: 5px;
           height: 14px;
           color: #86909C;
+        }
+        .icon-close {
+          margin-right: 5px;
+          display: inline-block;
+          width: 14px;
+          height: 14px;
+          color: #EB5757;
         }
       }
     }
