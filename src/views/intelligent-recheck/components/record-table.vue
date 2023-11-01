@@ -139,7 +139,6 @@ export default {
           prop: 'recheckCount',
           bind: {
             align: 'center',
-            width: 120
           }
         },
         {
