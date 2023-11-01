@@ -14,7 +14,6 @@
       :multiple="false"
       action
       :show-file-list="false"
-      :limit="1"
       :disabled="uploading"
       :http-request="uploadFile"
     >

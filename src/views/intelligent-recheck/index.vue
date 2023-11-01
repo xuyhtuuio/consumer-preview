@@ -132,7 +132,7 @@ export default {
     },
     searchRecheck() {
       if (this.recheckInput === '') {
-        this.$message.error(this.placeholder)
+        this.$message.warning(this.placeholder)
         return;
       }
       this.$router.push({
@@ -143,6 +143,8 @@ export default {
             name: this.select === '1' ? this.recheckInput : '',
             text: this.select === '2' ? this.recheckInput : '',
             searchType: 1,
+            select: this.select,
+            recheckInput: this.recheckInput
           },
         }
       })

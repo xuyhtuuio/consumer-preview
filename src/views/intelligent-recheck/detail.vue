@@ -9,6 +9,7 @@
               alt=""
             />
           </div>
+          <!-- <div class="input-left input-left-focus"> -->
           <div class="input-left" :class="{ 'input-left-focus': inputFocus }">
             <el-input
               :placeholder="placeholder"
@@ -71,6 +72,7 @@
                   ref="org-cascader"
                   :options="agenciesList"
                   @change="changeSearchForm"
+                  clearable
                   :props="{
                     emitPath: false,
                     checkStrictly: true,
@@ -108,13 +110,14 @@
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
                   popper-class="date-style"
+                  clearable
                   @change="changeSearchForm"
                   value-format="yyyy-MM-dd"
                 >
                 </el-date-picker>
                 <div slot="reference">
                   <div class="select-set">
-                    <div class="tip-style" :class="{ 'tip-style-active': searchForm.setTime.length > 0 }">上线时间</div>
+                    <div class="tip-style" :class="{ 'tip-style-active': searchForm.setTime && searchForm.setTime.length > 0 }">上线时间</div>
                     <i class="el-icon-caret-bottom"></i>
                   </div>
                 </div>
@@ -135,6 +138,7 @@
                   ref="my-date-picker2"
                   align="right"
                   unlink-panels
+                  clearable
                   :picker-options="pickerOptions"
                   range-separator="至"
                   start-placeholder="开始日期"
@@ -146,7 +150,7 @@
                 </el-date-picker>
                 <div slot="reference">
                   <div class="select-set">
-                    <div class="tip-style" :class="{ 'tip-style-active': searchForm.getTime.length > 0 }">提单时间</div>
+                    <div class="tip-style" :class="{ 'tip-style-active': searchForm.getTime && searchForm.getTime.length > 0 }">提单时间</div>
                     <i class="el-icon-caret-bottom"></i>
                   </div>
                 </div>
@@ -396,36 +400,54 @@ export default {
     showDetailDia: false
   }),
   created() {
-    this.getOrgTree();
-    this.getApprovalType();
-    const item = JSON.parse(localStorage.getItem('recheckItem'));
-    if (this.$route.params.item || item) {
-      this.item = this.$route.params.item || item;
-      localStorage.setItem('recheckItem', JSON.stringify(this.item));
-      this.searchType = this.item.searchType;
-      let activeSort = {};
-      if (this.searchType === 1) {
-        this.sortList = sortListType1;
-        activeSort = {
-          label: '按上线时间',
-          val: 3,
-          sort: 'desc'
-        };
-      } else {
-        this.sortList = sortListType2;
-        activeSort = {
-          label: '按相似度',
-          val: 1,
-          sort: 'desc'
-        };
-      }
-      this.activeSort = activeSort;
-      this.getSimilarityComparisonList()
-    } else {
-      this.$router.go(-1)
+    this.init();
+  },
+  watch: {
+    $route: {
+      handler(val) {
+        if (!val.params.item) {
+          return
+        }
+        this.init();
+      },
+      // 深度观察监听
+      deep: true
     }
   },
   methods: {
+    init() {
+      this.getOrgTree();
+      this.getApprovalType();
+      const item = JSON.parse(localStorage.getItem('recheckItem'));
+      if (this.$route.params.item || item) {
+        this.item = this.$route.params.item || item;
+        localStorage.setItem('recheckItem', JSON.stringify(this.item));
+        this.searchType = this.item.searchType;
+        this.recheckInput = this.item.recheckInput ? this.item.recheckInput : '';
+        this.select = this.item.select ? this.select : '';
+        let activeSort = {};
+        this.resetSearch();
+        if (this.searchType === 1) {
+          this.sortList = sortListType1;
+          activeSort = {
+            label: '按上线时间',
+            val: 3,
+            sort: 'desc'
+          };
+        } else {
+          this.sortList = sortListType2;
+          activeSort = {
+            label: '按相似度',
+            val: 1,
+            sort: 'desc'
+          };
+        }
+        this.activeSort = activeSort;
+        this.getSimilarityComparisonList()
+      } else {
+        this.$router.go(-1)
+      }
+    },
     changeSearch(val) {
       if (val === '1') {
         this.placeholder = '请输入文件名或上传图片进行回检'
@@ -582,7 +604,7 @@ export default {
     },
     searchRecheck() {
       if (this.recheckInput === '') {
-        this.$message.error(this.placeholder)
+        this.$message.warning(this.placeholder)
         return;
       }
       this.item = {
@@ -609,10 +631,10 @@ export default {
         pageSize: this.searchType === 1 ? 40 : 20,
         sort: this.activeSort.val,
         sortType: this.activeSort.sort === 'desc' ? 1 : 2,
-        cstartTime: this.searchForm.getTime.length > 0 ? this.searchForm.getTime[0] : '',
-        cendTime: this.searchForm.getTime.length > 0 ? this.searchForm.getTime[1] : '',
-        startTime: this.searchForm.setTime.length > 0 ? this.searchForm.setTime[0] : '',
-        endTime: this.searchForm.setTime.length > 0 ? this.searchForm.setTime[1] : '',
+        cstartTime: this.searchForm.getTime && this.searchForm.getTime.length > 0 ? this.searchForm.getTime[0] : '',
+        cendTime: this.searchForm.getTime && this.searchForm.getTime.length > 0 ? this.searchForm.getTime[1] : '',
+        startTime: this.searchForm.setTime && this.searchForm.setTime.length > 0 ? this.searchForm.setTime[0] : '',
+        endTime: this.searchForm.setTime && this.searchForm.setTime.length > 0 ? this.searchForm.setTime[1] : '',
         orgId: this.searchForm.org,
         isRecheck: this.searchForm.recheck ? 1 : 0,
         formCategory: this.searchForm.type
@@ -721,6 +743,10 @@ export default {
       }
     }
     .input-left {
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      height: 44px;
       flex: 1;
       border-radius: 20px;
       overflow: hidden;
@@ -761,7 +787,7 @@ export default {
           }
         }
         .el-input__suffix {
-          height: 44px;
+          height: 40px;
         }
         .el-input-group__append {
           padding: 0;
@@ -820,7 +846,9 @@ export default {
       border: 2px solid #a8c5ff;
       background: #f9fbff;
       /deep/ .el-input {
+        // height: 40px;
         .el-input__inner {
+          // height: 40px;
           background: #f9fbff;
         }
         .el-input-group__append {
@@ -829,6 +857,9 @@ export default {
             background: #f9fbff !important;
           }
         }
+        // .el-select__caret {
+        //   // height: 40px;
+        // }
       }
     }
     .input-right {
