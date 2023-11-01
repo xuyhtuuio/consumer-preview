@@ -20,9 +20,13 @@ import { add } from '@/api/admin-label';
 export default {
   methods: {
     saveFile() {
+      let { id } = this.approval
+      if (this.files[this.activeIndex].zip) {
+        id = this.files[this.activeIndex].zip
+      }
       const params = {
         formId: this.formId,
-        key: this.approval.id
+        key: id
       }
       this.$message.info('下载中，请稍等！')
       downloadAllFiles(params).then((res) => {
@@ -177,7 +181,7 @@ export default {
       data.forEach(file => {
         if (file.child) {
           const suffer = file.fileName.split('.')[file.fileName.split('.').length - 1];
-          this.getFiles(file.child, suffer === 'zip' ? file.fileName : zipName);
+          this.getFiles(file.child, suffer === 'zip' ? file.key : zipName);
         } else {
           file.id = file.key;
           file.zip = zipName;
@@ -319,6 +323,10 @@ export default {
           relComment.iconsWithPos[ocrId] = [this.domInfo?.position]
           relComment.iconsWithOcrIndex[ocrId] = [this.domInfo?.domIndexs[0]]
         })
+        if (!this.approval.comments?.length) {
+          this.approval.comments = []
+        }
+        this.approval.comments = [...this.approval.comments, ...relComments]
         this.getComments()
         this.$refs.ocrTxt.getCommentHtml()
         this.generateIcons()
@@ -403,9 +411,6 @@ export default {
           return i.icon_id
         })
         let positions = []
-        // obj.iconsWithPos.map((iwp) => {
-        //   console.log(iwp)
-        // })
         for (const key in obj.iconsWithPos) {
           if (iconOcrIds.includes(key)) {
             positions.push(obj.iconsWithPos[key])
