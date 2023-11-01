@@ -18,40 +18,6 @@
 
       <div class="search-middle-area">
         <div class="left-area">
-          <!-- <div
-            class="scrren-com"
-            :class="search.mechanism ? 'active' : ''"
-            style="font-size: 14px"
-          >
-            {{ search.orgIds ? search.orgName : '选择机构' }}
-            <img
-              src="../../assets/image/person-center/down.png"
-              class="down"
-              alt=""
-            />
-            <el-cascader
-              class="my-hidden"
-              :options="agenciesList"
-              :show-all-levels="false"
-              :props="{
-                emitPath: false,
-                checkStrictly: true,
-                label: 'name',
-                value: 'id',
-                children: 'children'
-              }"
-              @change="changeAgencies"
-              v-model="search.orgIds"
-              ref="agencies"
-              clearable
-            ></el-cascader>
-
-            <img
-              src="../../assets/image/why.png"
-              alt=""
-              style="width: 20px; height: 20px; margin-left: 4px"
-            />
-          </div> -->
           <div class="select-item select-org">
             <el-popover
               ref="ref-popover3"
