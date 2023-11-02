@@ -12,7 +12,7 @@
         <el-input
           placeholder="请输入关键词开始检索"
           @keyup.enter.native="handleSubmit"
-          v-model="search.searchInput"
+          v-model.trim="search.searchInput"
         ></el-input>
       </div>
 
@@ -272,7 +272,7 @@
       <!-- 图片 -->
       <fullImage
         ref="imgPreview1"
-        url="http://192.168.210.51:9090/cpr/cpr_1697708778477_微信图片_20230906141828.jpg"
+        :url="fileURL"
       ></fullImage>
       <div class="tool" v-if="showFullScreen">
         <span @click="saveFile">
@@ -374,6 +374,7 @@ export default {
         approvalType: '',
         isBackCheck: true
       },
+      fileURL: '',
       //  1-回检时间 2-提单时间 3-上线时间
       sort: 1,
       // 1-降序 2-升序
@@ -442,7 +443,8 @@ export default {
       this.ocrId = ocrId
       this.recordDialogVisible = true
     },
-    fullScreen() {
+    fullScreen(fileUrl) {
+      this.fileURL = fileUrl
       this.showFullScreen = !this.showFullScreen
       this.$nextTick(() => {
         this.$refs.imgPreview1.handleImageLoaded()
