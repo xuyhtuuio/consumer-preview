@@ -11,12 +11,12 @@ cpr-web-sonar:
   script:
     - $MAVEN_HOME/bin/mvn -e -X --batch-mode clean compile sonar:sonar
         -Dsonar.host.url=http://192.168.209.100:9000
-        -Dsonar.token=sqp_452dbbab2f56fbe9912708bf7634e4736f836cea
+        -Dsonar.token=sqp_ed94212ae899738f128d8a65459bd5adbebfaf07
         -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
         -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
         -Dsonar.gitlab.project_id=$CI_PROJECT_ID
         -Dsonar.issuesReport.html.enable=true
-        -Dsonar.projectKey=cpr_consumer-preview_AYuPGGJgpe17dlYiHJ_r
+        -Dsonar.projectKey=consumer-preview-cpr
         -Dsonar.sources=src
         -Dsonar.language=js,vue
         -Dsonar.javaScript.file.suffixes=.js,.vue
