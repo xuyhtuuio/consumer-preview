@@ -33,6 +33,10 @@ export default {
   methods: {
     changeLeftMenu(name) {
       this.componentId = name
+      this.$router.push({
+        name: this.$route.name,
+        query: {}
+      })
     },
     changeSearch() {
       this.$refs['kCompnent'].getSearchList({ keyword: this.searchText })

@@ -7,12 +7,20 @@ export function getRecommendList(data) {
     data
   })
 }
+// 查看单个知识数据
+export function getOneKnowledge(knowledgeId) {
+  return request({
+    url: '/cpr/KnowledgeMarket/oneKnowledge/' + knowledgeId,
+    method: 'get',
+    contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+  })
+}
 // 标签列表
 export function getTagInfoList(data) {
   return request({
     url: '/cpr/KnowledgeMarket/tagInfoList',
     method: 'get',
-    params: data
+    params: data,
   })
 }
 

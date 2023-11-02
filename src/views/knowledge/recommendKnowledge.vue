@@ -1,6 +1,6 @@
 <template>
   <div class="recommend">
-    <CommentTextarea @updateList="getSearchList"/>
+    <CommentTextarea v-if="!knowledgeId" @updateList="getSearchList"/>
     <FilterKnowledge ref="filterKnowledge" v-loading="loadingList" :total="page.total" @changeSort="changeSort" @changeTags="changeCheckedTags"/>
     <div class="list">
       <div v-for="(k, i) in kCardList" :key="i" v-loading="loadingList">
@@ -14,7 +14,7 @@
   </div>
 </template>
 <script>
-import { getRecommendList } from '@/api/knowledge/knowledgeCollect'
+import { getRecommendList, getOneKnowledge } from '@/api/knowledge/knowledgeCollect'
 import CommentTextarea from './components/comment-textarea'
 import FilterKnowledge from './components/filter'
 import KnowledgeCard from './components/knowledge-card'
@@ -42,13 +42,32 @@ export default {
         pageNum: 1,
         pageSize: 10,
         tagIds: []
-      }
+      },
+      knowledgeId: null
     }
   },
   created() {
+    const { knowledgeId, extend } = this.$route.query
+    if (knowledgeId) {
+      this.knowledgeId = knowledgeId
+      this.getOneKnowledge(knowledgeId, extend)
+      return;
+    }
     this.getRecommendList(this.paramsDefalut)
   },
   methods: {
+    // 通过ID获取数据
+    async getOneKnowledge(knowledgeId, extend) {
+      const res = await getOneKnowledge(knowledgeId)
+      if (res.data.success) {
+        const { data } = res.data
+        data.extends = extend ? 1 : 0
+        data.showCollaplse = false
+        data.isCollaplse = true
+        this.page.total = 1
+        this.kCardList = [data]
+      }
+    },
     // 搜索获取
     getSearchList(params) {
       this.paramsDefalut = this.$options.data().paramsDefalut

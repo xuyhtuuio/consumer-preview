@@ -12,6 +12,9 @@
             <span class="dept">{{ s.orgName }}</span>
           </div>
           <div class="meta-right">
+            <span v-if="!!s.canDeleted" class="item" @click="deleteKnowledge(s, index)">
+              <img src="@/assets/image/knowledge/删除.svg" />
+            </span>
             <span class="item" @click="openComment(s, index)">
               <img v-if="s.extends > 0" src="@/assets/image/knowledge/评论1.svg" />
               <img v-else src="@/assets/image/knowledge/评论.svg" />
@@ -28,7 +31,7 @@
   </div>
 </template>
 <script>
-import { setLike } from '@/api/knowledge/knowledgeCollect'
+import { setLike, deleteKnowledge } from '@/api/knowledge/knowledgeCollect'
 import InputTextarea from './input-textarea'
 export default {
   name: 'comment-card-second',
@@ -56,6 +59,16 @@ export default {
         // debugger
         this.$refs[`textareaCommon${index}`][0].selectFocus()
       })
+    },
+    async deleteKnowledge(s, index) {
+      const res = await deleteKnowledge({
+        deleteType: 2,
+        id: s.id
+      })
+      if (res.data.success) {
+        this.item.lowCommentList.splice(index, 1)
+        this.$message.success('删除成功')
+      }
     },
     hiddenInput(e, s) {
       this.$set(s, 'defaultShow', false)

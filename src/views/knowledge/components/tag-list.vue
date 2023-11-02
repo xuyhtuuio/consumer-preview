@@ -85,6 +85,15 @@ export default {
     this.getAttentionTagList()
   },
   methods: {
+    getSearchList(params) {
+      this.defalutParams = this.$options.data().defalutParams
+      this.sortObject = this.$options.data().sortObject
+      this.currentSort = 'sort1'
+      this.getAttentionTagList({
+        ...this.defalutParams,
+        ...params
+      })
+    },
     async getAttentionTagList(params) {
       this.loadingList = true
       const res = await getAttentionTagList({

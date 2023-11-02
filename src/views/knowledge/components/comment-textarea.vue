@@ -1,8 +1,8 @@
 <template>
   <div class="comment">
     <div class="textarea">
-      <el-input v-model.trim="title" placeholder="请输入标题(选填)" :maxlength="50" :minlength="1"></el-input>
-      <el-input v-model.trim="content" type="textarea" placeholder="有什么新的案例分享给大家？" :rows="3" :maxlength="500" :minlength="1"></el-input>
+      <el-input v-model.trim="title" @focus="handleFocus" @blur="handleBlur" placeholder="请输入标题(选填)" :maxlength="50" :minlength="1"></el-input>
+      <el-input v-model.trim="content" @focus="handleFocus" @blur="handleBlur" type="textarea" placeholder="有什么新的案例分享给大家？" :rows="3" :maxlength="500" :minlength="1"></el-input>
       <img class="entry-dialog pointer" src="@/assets/image/knowledge/输入框弹框.svg" @click="openDialog" alt=""/>
     </div>
     <div class="option-area">
@@ -19,6 +19,7 @@
         </el-upload>
       </div>
       <TrsTag
+        style="margin-bottom: 4px;"
         v-for="(tag, index) in tags"
         :key="tag.id"
         :tag="{ label: tag.name, ...tagConfig }"
@@ -37,12 +38,12 @@
       <el-popover
         placement="bottom-start"
         :width="260"
-        trigger="hover"
+        trigger="click"
         @show="showTagPopover"
       >
         <div class="content">
-          <el-input v-model.trim="serach" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
-          <ul class="tags-list trs-scroll">
+          <el-input v-model.trim="serach" @keypress.native.enter="changeSearchTag" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
+          <ul class="tags-list trs-scroll" v-loading="loadingTag">
             <li class="tag-li pointer" v-if="showNewTag">
               <span class="tag-text ellipsis">#{{ serach }}</span>
               <span style="color:#2D5CF6;" @click="addTags()">创建新标签</span>
@@ -77,7 +78,7 @@
 import { debounce } from 'lodash';
 import { getFormGroups } from '@/api/front';
 import { mapState } from 'vuex'
-import { addTag, addKnowledge } from '@/api/knowledge/knowledgeCollect'
+import { addTag, addKnowledge, getTagInfoList } from '@/api/knowledge/knowledgeCollect'
 import fileType from '@/components/common/file-type'
 import CommentTextareaDialog from './comment-textarea-dialog'
 export default {
@@ -89,6 +90,7 @@ export default {
   data() {
     return {
       publishLoading: false,
+      loadingTag: false,
       title: '',
       content: '',
       type: '',
@@ -128,6 +130,23 @@ export default {
   created() {
   },
   methods: {
+    handleFocus(e) {
+      e.target.parentNode.parentNode.style.border = '1px solid #2D5CF6'
+    },
+    handleBlur(e) {
+      e.target.parentNode.parentNode.style.border = '1px solid transparent'
+    },
+    async changeSearchTag() {
+      this.loadingTag = true
+      const res = await getTagInfoList({
+        justCare: 0,
+        keyword: this.serach
+      })
+      if (res.data.success) {
+        this.tagsList = res.data.data || []
+      }
+      this.loadingTag = false
+    },
     showTagPopover() {
       if (!this.serach && this.tagsList.length === 0) {
         this.tagsList = JSON.parse(JSON.stringify(this.setDefalutTagsList))
@@ -148,6 +167,10 @@ export default {
     changeCheckedTags(tag) {
       const index = this.tags.findIndex(item => item.id === tag.id);
       if (index === -1) {
+        if (this.tags.length >= 8) {
+          this.$message.warning('最多关联8个标签')
+          return;
+        }
         this.tags.push(tag)
       } else {
         this.tags.splice(index, 1)

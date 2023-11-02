@@ -395,7 +395,7 @@ export default {
         if (Number(key) === 0) {
           this.permissionList[key].type = funPerms[key].type
           this.permissionList[key].children[0].type = funPerms[key].child[0].type
-        } else if (Number(key) === 1) {
+        } else if (this.permissionList[key].children) {
           this.permissionList[key].type = funPerms[key].type
           const { children } = this.permissionList[key]
           children.forEach((item) => {
@@ -430,21 +430,23 @@ export default {
             })
           }
           funPerms[key].child[0].type = originVal.children[0].type
-        } else if (Number(key) === 1) {
+        } else if (this.permissionList[key].children) {
           funPerms[key].type = originVal.type
           const { children } = originVal
           children.forEach((item) => {
             const funItem = funPerms.find(
               (funPermsItem) => funPermsItem.code === item.code
             )
-            if (item.title === '流程管理') {
+            if (item.reflect) {
               if (item.type !== funItem.type) {
                 funItem.type = item.type
                 item.reflect.forEach((reflectItem) => {
-                  // defaultPerm.find(item => item.pathName === reflectItem).type = item.type;
-                  defaultPerm.find(
+                  defaultPerm.find((defaultItem) => defaultItem.pathName === reflectItem) && (defaultPerm.find((defaultItem) => defaultItem.pathName === reflectItem).type = item.type)
+                  funPerms.find(
                     (defaultItem) => defaultItem.pathName === reflectItem
-                  ).type = 'edit'
+                  ) && (funPerms.find(
+                    (defaultItem) => defaultItem.pathName === reflectItem
+                  ).type = item.type)
                 })
               }
             } else {

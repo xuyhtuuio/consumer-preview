@@ -141,9 +141,13 @@
     </div>
     <CommentCard v-if="data.extends > 0" :id="data.id" :fullName="data.fullName"></CommentCard>
     <div style="height: 16px;border-top: 1px dotted #E5E6EB;"></div>
+    <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog" :before-close="()=>{previewDialog=false;previewUrl=''}">
+        <filePreview :url="previewUrl" v-if="previewUrl"></filePreview>
+    </el-dialog>
   </div>
 </template>
 <script>
+import FilePreview from '@/components/filePreview'
 import fileType from '@/components/common/file-type'
 import { copyText } from '@/utils/Clipboard';
 import { setSelected, setLike, setAttention, deleteKnowledge, getTagBaseInformation } from '@/api/knowledge/knowledgeCollect'
@@ -151,6 +155,7 @@ import CommentCard from './comment-card'
 export default {
   name: 'knowledge-card',
   components: {
+    FilePreview,
     fileType,
     CommentCard
   },
@@ -179,6 +184,8 @@ export default {
         size: 'mini'
       },
       index: Math.floor(Math.random() * 5),
+      previewUrl: '',
+      previewDialog: false,
     }
   },
   computed: {
@@ -197,11 +204,18 @@ export default {
     },
   },
   mounted() {
+    const { knowledgeId } = this.$route.query
+    if (knowledgeId) {
+      this.$set(this.data, 'showCollaplse', false)
+      return;
+    }
     this.computedTextHeight(`computedtextheight_${this.data.id}`)
   },
   methods: {
     newPageOpen(url) {
-      window.open(url)
+      this.previewUrl = url
+      this.previewDialog = true
+      // window.open(url)
     },
     computedTextHeight(id) {
       this.$nextTick(() => {
@@ -307,10 +321,10 @@ export default {
       }
     },
     createImage() {
-
     },
-    copeLink() {
-
+    copeLink(data) {
+      const url = window.location.origin + window.location.pathname + '?knowledgeId=' + data.id + '&extend=1'
+      this.copyClipboard(url)
     },
     copyClipboard(val) {
       copyText(
@@ -393,6 +407,7 @@ export default {
         display: flex;
         align-items: center;
         margin-left: 20px;
+        cursor: pointer;
         img {
           margin-right: 4px;
           cursor: pointer;
@@ -472,6 +487,11 @@ export default {
   }
   li:hover {
     background: #eee;
+  }
+}
+.preview-dialog {
+  .el-dialog__body {
+    height: 76vh;
   }
 }
 </style>
