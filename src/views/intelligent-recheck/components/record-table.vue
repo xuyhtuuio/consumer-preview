@@ -9,7 +9,7 @@
       @rowDragSort="rowDragSort"
     >
       <template #fileName="scope">
-        <div class="short hover" @click="openFilePreview">
+        <div class="short hover" @click="openFilePreview(scope.row.fileUrl)">
           {{ scope.row.fileName }}
         </div>
       </template>
@@ -176,8 +176,8 @@ export default {
       this.$emit('openRecord', ocrId, recheckCount)
     },
 
-    openFilePreview() {
-      this.$emit('openFilePreview')
+    openFilePreview(fileUrl) {
+      this.$emit('openFilePreview', fileUrl)
     },
     timeFormat(val) {
       return val ? dayjs(val).format('YYYY-MM-DD ') : '--'
