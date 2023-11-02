@@ -9,7 +9,7 @@ cpr-web-sonar:
     - export JAVA_HOME=/etc/gitlab-runner/jdk-11.0.2
     - export LANG=C.UTF-8
   script:
-    - $MAVEN_HOME/bin/mvn -e -X --batch-mode compile sonar:sonar
+    - $MAVEN_HOME/bin/mvn -e -X --batch-mode clean compile sonar:sonar
         -Dsonar.host.url=http://192.168.209.100:9000
         -Dsonar.token=sqp_452dbbab2f56fbe9912708bf7634e4736f836cea
         -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
@@ -19,3 +19,4 @@ cpr-web-sonar:
         -Dsonar.projectKey=cpr_consumer-preview_AYuPGGJgpe17dlYiHJ_r
         -Dsonar.sources=src
         -Dsonar.language=js,vue
+        -Dsonar.javaScript.file.suffixes=.js,.vue
