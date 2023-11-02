@@ -5,7 +5,7 @@
       <div class="recheck-input" :class="{ 'recheck-input-focus': focus }">
         <el-input
           :placeholder="placeholder"
-          v-model="recheckInput"
+          v-model.trim="recheckInput"
           @focus="focusInput"
           @blur="blurInput"
           class="input-with-select"

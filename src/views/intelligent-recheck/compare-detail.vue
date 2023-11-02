@@ -137,7 +137,7 @@
       :before-close="handleCloseReDia"
     >
       <div class="include-record">
-        <record-dialog v-if="recordDialogVisible" :ocrId="compareItem.ocrId" />
+        <record-dialog v-if="recordDialogVisible" :ocrId="compareItem.ocrId" :recheckCount="Number(compareItem.recheckCount)" />
       </div>
     </el-dialog>
   </div>
