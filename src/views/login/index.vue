@@ -1360,7 +1360,6 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     next(async (vm) => {
-      console.log(to)
       if (
         from
         && !['login', 'loginAuto', 'microLogin'].includes(from.name)

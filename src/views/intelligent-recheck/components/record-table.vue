@@ -14,7 +14,7 @@
         </div>
       </template>
       <template #fullname="scope">
-        <div >
+        <div>
           {{ scope.row.fullname }}
         </div>
         <div class="people-id">工号: {{ scope.row.userId }}</div>
@@ -54,7 +54,6 @@
         <div class="center">{{ scope.row.org }}</div>
       </template>
     </TrsTable>
-
   </div>
 </template>
 <script>
@@ -138,7 +137,7 @@ export default {
           label: '回检次数',
           prop: 'recheckCount',
           bind: {
-            align: 'center',
+            align: 'center'
           }
         },
         {
@@ -154,40 +153,27 @@ export default {
     }
   },
   methods: {
-    sortChange({ column, prop, order }) {
-      console.log(column, prop, order)
-    },
-    handleClick(row) {
-      console.log(row)
-    },
-    submitEdit(row, beforeRow, prop) {
-      console.log(row)
-      console.log(beforeRow)
-      console.log(prop)
-    },
-    rowDragSort(data) {
-      console.log(data)
-    },
+    sortChange() {},
+    handleClick() {},
+    submitEdit() {},
+    rowDragSort() {},
     handleOpenOption(option) {
       this.$emit('openOption', option)
     },
     handleOpenRecord(ocrId, recheckCount) {
-      console.log(ocrId, recheckCount)
       this.$emit('openRecord', ocrId, recheckCount)
     },
-
     openFilePreview(fileUrl) {
       this.$emit('openFilePreview', fileUrl)
     },
     timeFormat(val) {
       return val ? dayjs(val).format('YYYY-MM-DD ') : '--'
-    },
+    }
   },
   created() {
     this.dataList = this.recordList
   },
-  mounted() {
-  }
+  mounted() {}
 }
 </script>
 
