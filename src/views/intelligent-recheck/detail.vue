@@ -13,7 +13,7 @@
           <div class="input-left" :class="{ 'input-left-focus': inputFocus }">
             <el-input
               :placeholder="placeholder"
-              v-model="recheckInput"
+              v-model.trim="recheckInput"
               class="input-with-select"
               @focus="inputFocusFun"
               @blur="inputBlurFun"
@@ -424,7 +424,7 @@ export default {
         localStorage.setItem('recheckItem', JSON.stringify(this.item));
         this.searchType = this.item.searchType;
         this.recheckInput = this.item.recheckInput ? this.item.recheckInput : '';
-        this.select = this.item.select ? this.select : '';
+        this.select = this.item.select ? this.select : '1';
         let activeSort = {};
         this.resetSearch();
         if (this.searchType === 1) {
