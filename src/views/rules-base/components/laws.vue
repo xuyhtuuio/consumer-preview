@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-02 18:06:44
+ * @LastEditTime: 2023-11-02 18:34:55
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -32,7 +32,7 @@
                 >
                   <ul>
                     <li @click="editRule(item, 'edit')">编辑</li>
-                    <li @click="editRule(item, 'update')">更新</li>
+                    <li @click="editRule(item, 'update')" v-if="role">更新</li>
                     <li @click="delRule(item)">删除</li>
                   </ul>
                   <i
@@ -564,7 +564,8 @@ export default {
         edit: '完成',
         update: '更新'
       },
-      type: 0
+      type: 0,
+      role: false,
     }
   },
   watch: {
@@ -582,10 +583,17 @@ export default {
     }
   },
   mounted() {
+    // 获取当前角色权限
+    this.getUserRole()
     this.nextPage(1)
   },
   computed: {},
   methods: {
+    getUserRole() {
+      const user = JSON.parse(window.localStorage.getItem('user_name'))
+      const role = user.roles.filter((item) => item.clientId === 'cpr')
+      this.role = role[0]?.code.indexOf('admin') !== -1
+    },
     showElPopover(item) {
       this.showPop = false
       this.reference = this.$refs['more-' + item.id]?.[0]
@@ -1009,6 +1017,15 @@ export default {
       this.$refs.form.validate(async (valid) => {
         this.checkMustValue()
         if (valid) {
+          // 共计可以添加8个标签
+          // eslint-disable-next-line
+          const tagsCounts =
+            this.tagsList?.length || 0 + this.relevancyTags?.length || 0
+          if (tagsCounts > 8) {
+            return this.$message.error(
+              '添加的标签和相关权益标签最多可以添加8个'
+            )
+          }
           // eslint-disable-next-line
           const attachmentList =
             this.form.relatedFile?.map((m) => {
@@ -1036,25 +1053,18 @@ export default {
           try {
             if (this.crtBehavior === 'increase') {
               res = await insertRegulation(params)
-            } else if (this.crtBehavior === 'edit') {
+            } else {
+              // 编辑和更新
               params.id = this.form.id
-              params.isEdit = 'edit'
               const newParams = {
                 ...this.form,
                 ...params
               }
-              delete newParams.newContent
-              delete newParams.uploadFile
-              delete newParams.content
-              delete newParams.loading
-              delete newParams.isRepeal
-              res = await updateRegulation(newParams)
-            } else {
-              params.id = this.form.id
-              params.status = this.form.isRepeal
-              const newParams = {
-                ...this.form,
-                ...params
+              if (this.crtBehavior === 'edit') {
+                params.isEdit = 'edit'
+              }
+              if (this.crtBehavior === 'update') {
+                params.status = this.form.isRepeal
               }
               delete newParams.newContent
               delete newParams.uploadFile
