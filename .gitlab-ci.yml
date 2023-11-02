@@ -17,4 +17,4 @@ cpr-web-sonar:
         -Dsonar.gitlab.project_id=$CI_PROJECT_ID
         -Dsonar.issuesReport.html.enable=true
         -Dsonar.projectKey=cpr_consumer-preview_AYuPGGJgpe17dlYiHJ_r
-        -Dsonar.language=vue
+        -Dsonar.language=js
