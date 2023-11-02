@@ -131,7 +131,7 @@
                     placeholder="点击输入验证码"
                   ></el-input>
                   <div class="verify_code">
-                    <img v-if="verCode" :src="verCode" @click="verCodeChange" />
+                    <img v-if="verCode" :src="verCode" alt="" @click="verCodeChange" />
                   </div>
                 </el-form-item>
               </el-form>
