@@ -408,24 +408,6 @@ export default {
       },
       deep: true
     },
-    word_lines: {
-      handler(val) {
-        if (val.length) {
-          this.toolView = false
-        } else {
-          this.toolView = true
-        }
-      }
-    },
-    high_light_lines: {
-      handler(val) {
-        if (val.length) {
-          this.toolView = false
-        } else {
-          this.toolView = true
-        }
-      }
-    },
     curMode() {
       // this.findIconPosition()
       if (this.isOrderDetail) {

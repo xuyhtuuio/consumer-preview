@@ -132,7 +132,9 @@ export default {
     // this.imgLoad()
   },
   watch: {
-
+    toolView(val) {
+      console.log(val)
+    }
   },
   methods: {
     changeSize(type) {

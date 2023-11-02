@@ -1071,8 +1071,6 @@ export default {
     },
     // 左侧OCR内容 触发连线操作
     showOpinionLine(obj, file) {
-      console.log('obj', obj)
-      console.log('file', file)
       const comment = {
         ...obj,
         files: obj.associatedAttachmentsIds.split(';')

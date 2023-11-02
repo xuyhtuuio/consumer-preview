@@ -222,8 +222,6 @@ export default {
       this.domInfo = obj
       this.keywordsInfo.content = obj.string
       this.comments_nodes = Array.from(nodes)
-      console.log('当前选中的文本', obj)
-      console.log('当前选中的节点', nodes)
     },
     addBg(nodes) {
       const popover = this.$refs.postilPopover.$refs.popper
@@ -500,6 +498,7 @@ export default {
         })
         return;
       }
+      this.toolView = false
       // 动画参数
       const animOptions = {
         duration: 2000,
@@ -720,6 +719,7 @@ export default {
       });
       this.word_lines = [];
       this.high_light_lines = []
+      this.toolView = true
     },
     // 移除连线
     lineRemove(activeWordType) {
