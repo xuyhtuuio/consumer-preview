@@ -216,7 +216,12 @@ export default {
         item.selected = item.selected || null;
         return item
       });
-      this.newFiles = [val.id]
+      if (val.parent) {
+        this.newFiles = [val.parent]
+      } else {
+        this.newFiles = [val.id]
+      }
+      // this.newFiles = [val.id]
       this.$emit('changeEditorialType', this.active)
     },
     inputFocus() {
@@ -256,7 +261,11 @@ export default {
         })
         this.collection = arr
         // this.collection.push(item)
-        this.newFiles = [this.approval.id];
+        if (this.approval.parent) {
+          this.newFiles = [this.approval.parent]
+        } else {
+          this.newFiles = [this.approval.id]
+        }
         this.newInput = '';
         this.$emit('upDateComments', 'upd', arr)
       }

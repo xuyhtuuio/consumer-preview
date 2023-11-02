@@ -1437,6 +1437,7 @@ export default {
         this.generateIcons()
         this.lisScroll()
       })
+      temp.parent = this.files[this.activeIndex].id
       this.approval = temp;
       this.fileloading = false;
       this.filePopoverShow = false;
@@ -1487,6 +1488,7 @@ export default {
             temp.recommends = []
           }
         }
+        temp.parent = this.files[this.activeIndex].id
         this.approval = temp
         this.$nextTick(() => {
           // this.findIconPosition()

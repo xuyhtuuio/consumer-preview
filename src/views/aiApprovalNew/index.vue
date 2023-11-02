@@ -90,7 +90,7 @@
                 切换模式</span>
             </div>
             <div class="cont-top-infos">
-              <span>提醒：共发现 {{ approval.numberOfRiskInfo }} 处风险信息，请认真核对</span>
+              <span>发现 {{ riskNum }}处风险信息，当前文件共 {{ approval.numberOfRiskInfo }} 处，请认真核对 </span>
               <el-input v-if="isOrderDetail" v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search" clearable @clear="search"
                 size="medium">
                 <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
