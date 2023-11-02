@@ -220,8 +220,6 @@ export default {
           const newOpinions = opinions.map((v) => {
             return v.substantiveopinion
           }).flat()
-          console.log('newOpinions', newOpinions)
-          console.log('opinions', opinions)
           this.$store.commit('setApprovedOpinionForm', newOpinions)
           this.$emit('sendOpinionInfo', opinions)
         })

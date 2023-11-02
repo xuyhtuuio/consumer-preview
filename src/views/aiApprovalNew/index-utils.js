@@ -385,8 +385,6 @@ export default {
         // this.dealIconWithComment()
         this.generateIcons()
       }
-      console.log('newComment', newComment)
-      console.log('comments', this.comments)
     },
     changeFileById(fileId) {
       const fileIndex = this.files.findIndex((file) => fileId === file.id)
@@ -395,7 +393,6 @@ export default {
     // 展示连线
     showCommentLine(obj, fileId) {
       if (fileId) {
-        console.log('showline', obj, fileId)
         this.changeFileById(fileId)
         // 过滤其他文件
         let curFileOcrIndex = []
@@ -1254,7 +1251,7 @@ export default {
               } else {
                 let conflict = false
                 this.icons.map((i) => {
-                  if (Math.abs(i.iconTop - iconTop) < 7.5) {
+                  if (Math.abs(i.iconTop - iconTop) < 15) {
                     i.ocrId.push(icon)
                     i.ocrId = Array.from(new Set(i.ocrId))
                     conflict = true
@@ -1274,7 +1271,6 @@ export default {
             })
           }
         })
-        console.log('icons', this.icons)
       })
     },
     // 展示 icon 的连线 - 重构版本
@@ -1473,7 +1469,6 @@ export default {
           this.files[this.activeIndex].child.push(...this.pdfInfo.list)
         }
         this.activePdfIndex = 0 + this.pdfInfo.pageSize * (pageNow - 1)
-        console.log('activePdfIndex', this.activePdfIndex)
         this.pdfInfo.list = this.files[this.activeIndex].child.slice(this.activePdfIndex, this.activePdfIndex + 10)
         const temp = this.files[this.activeIndex].child[this.activePdfIndex]
         if (!temp?.ocr) {
