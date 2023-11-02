@@ -25,7 +25,6 @@ export default {
       default: () => ({})
     },
     url: {
-      type: String,
       default: ''
     }
   },

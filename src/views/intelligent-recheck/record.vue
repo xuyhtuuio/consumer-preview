@@ -139,7 +139,7 @@
             :class="search.mechanism ? 'active' : ''"
             style="font-size: 14px"
           >
-            {{ search.approvalType ? search.approvalType : '事项类型' }}
+            事项类型
             <img
               src="../../assets/image/person-center/down.png"
               class="down"
@@ -270,10 +270,7 @@
         @click="fullScreen"
       ></i>
       <!-- 图片 -->
-      <fullImage
-        ref="imgPreview1"
-        :url="fileURL"
-      ></fullImage>
+      <fullImage ref="imgPreview1" :url="fileURL"></fullImage>
       <div class="tool" v-if="showFullScreen">
         <span @click="saveFile">
           <i
@@ -417,6 +414,10 @@ export default {
   methods: {
     handleChange() {},
     changeArrrovalType() {
+      if (document.querySelectorAll) {
+        const dom = document.querySelectorAll('.scrren-com')[2]
+        dom.style.color = this.search.approvalType ? '#2d5cf6' : '#1d2128'
+      }
       this.searchParm.formCategory = this.search.approvalType
       this.searchOnePage()
     },
