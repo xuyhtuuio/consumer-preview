@@ -174,6 +174,11 @@ export default {
       }
       this.loading = false;
       if (this.files.length) {
+        let riskNum = 0
+        this.files.forEach((f) => {
+          riskNum += f.numberOfRiskInfo
+        })
+        this.riskNum = riskNum
         this.$nextTick(() => {
           this.$refs.filePreview.init();
           this.filterFiles = this.files
@@ -214,6 +219,8 @@ export default {
       this.domInfo = obj
       this.keywordsInfo.content = obj.string
       this.comments_nodes = Array.from(nodes)
+      console.log('当前选中的文本', obj)
+      console.log('当前选中的节点', nodes)
     },
     addBg(nodes) {
       const popover = this.$refs.postilPopover.$refs.popper
@@ -377,7 +384,8 @@ export default {
         // this.dealIconWithComment()
         this.generateIcons()
       }
-      // console.log('comments', this.comments)
+      console.log('newComment', newComment)
+      console.log('comments', this.comments)
     },
     changeFileById(fileId) {
       const fileIndex = this.files.findIndex((file) => fileId === file.id)
@@ -386,6 +394,7 @@ export default {
     // 展示连线
     showCommentLine(obj, fileId) {
       if (fileId) {
+        console.log('showline', obj, fileId)
         this.changeFileById(fileId)
         // 过滤其他文件
         let curFileOcrIndex = []
@@ -1197,8 +1206,12 @@ export default {
         img.onload = function () {
           const realHeight = (img.scrollHeight || img.offsetHeight) || img.clientHeight
           const iconContainer = document.querySelector('.icons')
+          const iconsDom = document.querySelector('.results-div')
+          // const iconsDom = document.querySelector('.content-cont-icons')
           if (iconContainer) {
+            iconContainer.style.top = iconsDom.style.top
             iconContainer.style.height = realHeight + 'px'
+            // iconsDom.style.height = realHeight + 'px'
           }
         }
         const scale = img.naturalWidth / img.clientWidth;
@@ -1258,6 +1271,7 @@ export default {
             })
           }
         })
+        console.log('icons', this.icons)
       })
     },
     // 展示 icon 的连线 - 重构版本

@@ -34,7 +34,7 @@
               class="relevant-file"
               v-if="child.relevantfile && child.relevantfile.length"
             >
-              关联文件：<i class="file-name">{{ child.relevantfile[0] }} </i>
+              关联文件：<i class="file-name" @click="showOpinionLine(child, child.relevantfile[0])">{{ child.relevantfile[0] }} </i>
               <el-popover
                 placement="bottom"
                 popper-class="file-overview-popper"
@@ -44,6 +44,7 @@
                 <div class="file-list">
                   <div
                     class="file-list-item pointer ellipsis ellipsis_1"
+                    @click="showOpinionLine(child, file)"
                     v-for="(file, i) in child.relevantfile"
                     :key="i"
                   >
@@ -216,11 +217,11 @@ export default {
             opinions.push(obj)
           }
           this.opinions = opinions
-          const newOpinions = opinions
-            .map((v) => {
-              return v.substantiveopinion
-            })
-            .flat()
+          const newOpinions = opinions.map((v) => {
+            return v.substantiveopinion
+          }).flat()
+          console.log('newOpinions', newOpinions)
+          console.log('opinions', opinions)
           this.$store.commit('setApprovedOpinionForm', newOpinions)
           this.$emit('sendOpinionInfo', opinions)
         })
@@ -247,6 +248,9 @@ export default {
       } else {
         return inputArr.length < 1
       }
+    },
+    showOpinionLine(obj, file) {
+      this.$emit('showOpinionLine', obj, file)
     }
   }
 }

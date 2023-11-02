@@ -267,6 +267,7 @@ export default {
       filePopoverShow: false,
       isRel: false,
       preComment: {},
+      riskNum: 0,
       activePdfIndex: 0,
       pdfInfo: {
         pageSize: 10,
@@ -716,13 +717,15 @@ export default {
       }
 
       .content-cont-icons {
+        width: 32px;
         overflow: auto;
+        position: relative;
         display: flex;
         flex-direction: column;
         justify-content: center;
         .icons {
           width: 32px;
-          position: relative;
+          position: absolute;
           display: flex;
           align-items: center;
           flex-direction: column;

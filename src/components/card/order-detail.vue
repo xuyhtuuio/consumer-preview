@@ -92,7 +92,7 @@
         </div>
         <order-basic-info v-if="isOrderDetail" @preview="previewFile" :personInfo="item.initiator" :personOrg='item.institutional'
           @sendReviewMaterials="sendReviewMaterials" @sendFilledInByApprover="sendFilledInByApprover"></order-basic-info>
-        <OcrPreview ref="aiApprovalNew" v-else :ocrViewItem="ocrViewItem" :isOrderDetail="isOrderDetail" @changeOcrView="changeOcrView"></OcrPreview>
+        <OcrPreview ref="OcrPreview" v-else :ocrViewItem="ocrViewItem" :isOrderDetail="isOrderDetail" @changeOcrView="changeOcrView"></OcrPreview>
         </div>
       <div class="right" v-loading="loadings.initLoading">
         <!-- 消保审查/详情页/审批中预览 -->
@@ -155,6 +155,7 @@
           <keep-alive>
             <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus"
               @sendOpinionInfo="sendOpinionInfo" :reviewMaterial="reviewMaterials"
+              @showOpinionLine="showOpinionLine"
               :processInstanceId="item.processInstanceId" :taskId="item.taskId" @preview="previewFile"
               :formId="item.taskNumber" :filledInByApprover="filledInByApprover">
               <template slot="head">
@@ -1068,6 +1069,16 @@ export default {
     changeOcrView(boolean) {
       this.isOrderDetail = boolean
     },
+    // 左侧OCR内容 触发连线操作
+    showOpinionLine(obj, file) {
+      console.log('obj', obj)
+      console.log('file', file)
+      const comment = {
+        ...obj,
+        files: obj.associatedAttachmentsIds.split(';')
+      }
+      this.$refs.OcrPreview.showCommentLine(comment, file)
+    }
   }
 }
 </script>
