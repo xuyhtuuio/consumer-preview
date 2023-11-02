@@ -7,7 +7,7 @@ cpr-web-sonar:
   before_script:    
     - export MAVEN_HOME=/etc/gitlab-runner/apache-maven-3.9.4
     - export JAVA_HOME=/etc/gitlab-runner/jdk-11.0.2
-    - export LANG=C.UTF-8
+    - export LANG=UTF-8
   script:
     - $MAVEN_HOME/bin/mvn -e -X --batch-mode clean compile sonar:sonar
         -Dsonar.host.url=http://192.168.209.100:9000
