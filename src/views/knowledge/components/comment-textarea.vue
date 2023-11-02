@@ -38,7 +38,7 @@
       <el-popover
         placement="bottom-start"
         :width="260"
-        trigger="hover"
+        trigger="click"
         @show="showTagPopover"
       >
         <div class="content">
