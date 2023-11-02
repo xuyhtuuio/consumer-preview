@@ -13,7 +13,7 @@
             ">
             <div class="icon">
               <img :src="item.value == crtSign ? item.activeIcon : item.icon"
-                :class="item.value == crtSign ? 'active-icon' : 'default-icon'" />
+                :class="item.value == crtSign ? 'active-icon' : 'default-icon'" alt="" />
             </div>
             <div class="name-count">
               <span class="name">{{ item.name }}</span>

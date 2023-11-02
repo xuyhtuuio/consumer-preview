@@ -332,7 +332,7 @@
         custom-class="agreeDialog"
       >
         <div slot="title" class="title">
-          <img src="@/assets/image/tips.png" />提示
+          <img src="@/assets/image/tips.png" alt="" />提示
         </div>
         <div class="tips">
           请先同意
@@ -358,7 +358,7 @@
         custom-class="agreeDialog"
       >
         <div slot="title" class="title">
-          <img src="@/assets/image/tips.png" />提示
+          <img src="@/assets/image/tips.png" alt="" />提示
         </div>
         <div class="tips">
           本系统暂不支持主动找回账号，请
@@ -381,7 +381,7 @@
       >
         <div class="expiry-content">
           <div>
-            <img src="@/assets/image/expiry-tips.png" />
+            <img src="@/assets/image/expiry-tips.png" alt=""/>
             账号已到期
           </div>
           <p>可提交申请延期，待管理员审核！</p>
@@ -410,7 +410,7 @@
         :before-close="handleClose"
       >
         <div class="expiry-content">
-          <img src="@/assets/image/apply-success.png" />
+          <img src="@/assets/image/apply-success.png" alt="" />
           <p>已提交申请</p>
           <p>待管理员审核，请耐心等待</p>
         </div>
@@ -424,7 +424,7 @@
         :close-on-press-escape="false"
       >
         <div class="expiry-content">
-          <img src="@/assets/image/expiry-tips.png" />
+          <img src="@/assets/image/expiry-tips.png" alt=""/>
           <p class="register-status">待审核</p>
           <p class="register-msg">
             请耐心等待，账号审核通过后将发送账号信息至您的邮箱和短信

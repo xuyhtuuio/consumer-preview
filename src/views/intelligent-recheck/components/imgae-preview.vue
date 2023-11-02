@@ -1,7 +1,7 @@
 <template>
   <div class="preview" v-loading="!loaded">
     <div class="preview" v-show="!editImg" ref="contentDom">
-      <img id="picture" @click="fullImage" :src="url" @load="handleImageLoaded" ref="imgDom" />
+      <img id="picture" alt="" @click="fullImage" :src="url" @load="handleImageLoaded" ref="imgDom" />
     </div>
     <vueCropper
       v-if="editImg"
