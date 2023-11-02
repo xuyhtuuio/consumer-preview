@@ -24,6 +24,9 @@ export default {
       if (this.files[this.activeIndex].zip) {
         id = this.files[this.activeIndex].zip
       }
+      if (this.files[this.activeIndex].type === 'pdf') {
+        id = this.files[this.activeIndex].id
+      }
       const params = {
         formId: this.formId,
         key: id
@@ -1470,6 +1473,7 @@ export default {
           this.files[this.activeIndex].child.push(...this.pdfInfo.list)
         }
         this.activePdfIndex = 0 + this.pdfInfo.pageSize * (pageNow - 1)
+        console.log('activePdfIndex', this.activePdfIndex)
         this.pdfInfo.list = this.files[this.activeIndex].child.slice(this.activePdfIndex, this.activePdfIndex + 10)
         const temp = this.files[this.activeIndex].child[this.activePdfIndex]
         if (!temp?.ocr) {

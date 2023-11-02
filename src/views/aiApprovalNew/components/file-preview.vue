@@ -71,7 +71,6 @@
 <script>
 import 'swiper/css/swiper.css'
 import Swiper from 'swiper'
-import { downloadAllFiles } from '@/api/applyCenter'
 // import fileType from '@/components/common/file-type'
 import filePreview from '@/components/filePreview'
 // import imgEditor from './image-editor'
@@ -143,22 +142,7 @@ export default {
       this.imgEditorDialogVisible = true
     },
     saveFile() {
-      const params = {
-        formId: this.formId,
-        key: this.approval.id
-      }
-      this.$message.info('下载中，请稍等！')
-      downloadAllFiles(params).then((res) => {
-        const disposition = res.headers['content-disposition']
-        const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
-        const link = document.createElement('a');
-        link.style.display = 'none'
-        link.href = url
-        link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-      })
+      this.$emit('saveFile');
     },
     getProps(val) {
       this.$emit('getProps', val);
