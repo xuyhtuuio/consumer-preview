@@ -37,14 +37,15 @@
                   <use xlink:href="#icon-Frame2"></use>
                 </svg>
                 更多材料</span> -->
-                <span @click="changeItView" v-if="!isOrderDetail">
+              <span @click="changeItView" v-if="!isOrderDetail">
                 <i class="iconfont icon-close"></i>
                 退出预览</span>
-              <el-popover placement="bottom" popper-class="cont-top-popover" v-model="filePopoverShow" width="300" :offset="100" trigger="click"
-                :visible-arrow=false>
+              <el-popover placement="bottom" popper-class="cont-top-popover" v-model="filePopoverShow" width="300"
+                :offset="100" trigger="click" :visible-arrow=false>
                 <div class="cont-top-fileList">
                   <div class="fileList-search">
-                    <el-input v-model.trim="fileKeyWords" placeholder="请输入关键字" @change="fileSearch" @keyup.enter.native="fileSearch" @blur="fileSearch">
+                    <el-input v-model.trim="fileKeyWords" placeholder="请输入关键字" @change="fileSearch"
+                      @keyup.enter.native="fileSearch" @blur="fileSearch">
                       <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="fileSearch"></i>
                     </el-input>
                   </div>
@@ -53,13 +54,13 @@
                     </el-switch>
                     <span class="fileList-tip-text">仅看问题文件</span>
                   </div>
-                  <div class="fileList-list-item" @click="changeFile(index)" v-for="(file, index) in filterFiles" :key="index"
-                    :class="{
-                      'swiper-slide-img': ['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))
+                  <div class="fileList-list-item"
+                    @click="changeFile(index)" v-for="(file, index) in filterFiles" :key="index" :class="{
+                      'swiper-slide-img': ['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName)),
+                      'fileList-list-item-active': index === activeIndex
                     }">
                     <span class="file-index">{{ index + 1 }}.</span>
-                    <el-image v-if="['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))"
-                      :src="file.url">
+                    <el-image v-if="['jpeg', 'jpg', 'png'].includes(getfileType(file.fileName))" :src="file.url">
                     </el-image>
                     <file-type class="icon" v-else :fileName="file.fileName">
                     </file-type>
@@ -67,7 +68,8 @@
                     <span class="fileList-list-item-fileName">{{ getfileName(file.fileName) }}
                       <i class="fileList-list-item-fileSuf">.{{ getfileType(file.fileName) }}</i>
                     </span>
-                    <img class="file-risk" v-if="file.numberOfRiskInfo" src="@/assets/image/ai-approval/abnormal.svg" alt="">
+                    <img class="file-risk" v-if="file.numberOfRiskInfo" src="@/assets/image/ai-approval/abnormal.svg"
+                      alt="">
                   </div>
                 </div>
                 <span slot="reference">
@@ -91,25 +93,31 @@
             </div>
             <div class="cont-top-infos">
               <span>发现 {{ riskNum }}处风险信息，当前文件共 {{ approval.numberOfRiskInfo }} 处，请认真核对 </span>
-              <el-input v-if="isOrderDetail" v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search" clearable @clear="search"
-                size="medium">
+              <el-input v-if="isOrderDetail" v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search"
+                @blur="search" clearable @clear="search" size="medium">
                 <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
               </el-input>
             </div>
           </div>
           <div class="content-cont-body-bottom">
-            <fileChange :curMode="curMode" @toggleMode="toggleMode" @changeFile="changeFile" :activeIndex="activeIndex" :fileList="files" v-if="curMode !== 0 && files[activeIndex]?.type !== 'pdf'"></fileChange>
-            <pdfChange @changePdfPageNow="changePdfPageNow" @changePdfPage="changePdfPage" :pdfPageSize="pdfInfo.pageSize" :pdfTotal="pdfInfo.pdfTotal" :pdfPageNow="pdfInfo.pageNow" :pdfTotalPage="pdfInfo.pdfTotalPage" :activeIndex="activePdfIndex" :fileList="pdfInfo.list" v-if="files[activeIndex]?.type === 'pdf'"></pdfChange>
-            <file-preview ref="filePreview" :toolView="toolView" :files="files" :formId="formId" :activeIndex="activeIndex" v-if="curMode !== 2"
-              @changeFile="changeFile" @saveFile="saveFile" :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"
-              @getProps="getProps" @findIconPosition="generateIcons"></file-preview>
-            <orcTxtNew ref="ocrTxt" :approval="approval" @addWord="addWord"
-              @lineRemove="lineRemove" @checkEdit="checkEdit"
+            <fileChange :curMode="curMode" @toggleMode="toggleMode" @changeFile="changeFile" :activeIndex="activeIndex"
+              :fileList="files" v-if="curMode !== 0 && files[activeIndex]?.type !== 'pdf'"></fileChange>
+            <pdfChange @changePdfPageNow="changePdfPageNow" @changePdfPage="changePdfPage" :pdfPageSize="pdfInfo.pageSize"
+              :pdfTotal="pdfInfo.pdfTotal" :pdfPageNow="pdfInfo.pageNow" :pdfTotalPage="pdfInfo.pdfTotalPage"
+              :activeIndex="activePdfIndex" :fileList="pdfInfo.list" v-if="files[activeIndex]?.type === 'pdf'">
+            </pdfChange>
+            <file-preview ref="filePreview" :toolView="toolView" :files="files" :formId="formId"
+              :activeIndex="activeIndex" v-if="curMode !== 2" @changeFile="changeFile" @saveFile="saveFile"
+              :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval" @getProps="getProps"
+              @findIconPosition="generateIcons"></file-preview>
+            <orcTxtNew ref="ocrTxt" :approval="approval" @addWord="addWord" @lineRemove="lineRemove"
+              @checkEdit="checkEdit"
               v-if="specialFileType.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode !== 1"
-              @showLine="showLine" @showOcrCommentLine="showOcrCommentLine" :lineWordItem="lineWordItem" :styleProp="styleProp" @hasBg="hasBg">
+              @showLine="showLine" @showOcrCommentLine="showOcrCommentLine" :lineWordItem="lineWordItem"
+              :styleProp="styleProp" @hasBg="hasBg">
             </orcTxtNew>
-            <el-popover ref="postilPopover" class="postil-popover" v-model="popoverShow" popper-class="postil-popover" placement="right"
-              trigger="manual">
+            <el-popover ref="postilPopover" class="postil-popover" v-model="popoverShow" popper-class="postil-popover"
+              placement="right" trigger="manual">
               <div class="postil-header">
                 <div>
                   <!-- <span><img src="@/assets/image/ai-approval/ocr-postil.png" alt=""></span> -->
@@ -131,17 +139,14 @@
                 <el-radio v-model="postil.isKeyWord" label="1">是</el-radio>
                 <el-radio v-model="postil.isKeyWord" label="0">否</el-radio>
               </div>
-              <el-form ref="keywordsFrom" v-show="postil.isKeyWord==='1'" :rules="keywordsRules" :model="keywordsInfo" class="postil-keyword-form">
+              <el-form ref="keywordsFrom" v-show="postil.isKeyWord === '1'" :rules="keywordsRules" :model="keywordsInfo"
+                class="postil-keyword-form">
                 <el-form-item label="关键词内容" prop="content" class="postil-keyword-item">
                   <el-input v-model="keywordsInfo.content" placeholder="请输入关键词"></el-input>
                 </el-form-item>
                 <el-form-item label="关键词类型" prop="type" class="postil-keyword-item">
                   <el-select v-model="keywordsInfo.type" placeholder="请选择">
-                    <el-option
-                      v-for="item in keywordsOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
+                    <el-option v-for="item in keywordsOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -155,60 +160,63 @@
               v-if="specialFileType2.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr && curMode !== 1"
               @showLine="showLine" :lineWordItem="lineWordItem">
             </orcTxt> -->
-            <p class="content-cont-icons" v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr">
+            <p class="content-cont-icons"
+              v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length - 1]) && showOcr">
               <span class="icons">
-                <span v-for="(item,index) in icons" :style="{ position: 'absolute', top: (item.iconTop) + 'px' }" :key="index" @click="showIconLine(item)">
-                <!-- 单一评论 - 未激活 -->
-                <span :data-icon="index" v-if="item.ocrId?.length === 1 && item.showIndex === -1">
-                  <svg class="icon" aria-hidden="true">
-                    <use xlink:href="#icon-a-Component13"></use>
-                  </svg>
-                </span>
-                <!-- 多评论 - 未激活 -->
-                <span :data-icon="index" v-else-if="item.ocrId?.length > 1 && item.showIndex === -1">
-                  <svg class="icon" aria-hidden="true">
-                    <use xlink:href="#icon-a-Component132"></use>
-                  </svg>
-                </span>
-                <!-- 多评论 - 激活 -->
-                <span :data-icon="index" v-else-if="item.ocrId?.length > 1 && item.showIndex === 1">
-                  <svg class="icon" aria-hidden="true">
-                    <use xlink:href="#icon-a-Component131"></use>
-                  </svg>
-                </span>
-                <!-- 单一评论 - 激活 -->
-                <span :data-icon="index" v-else-if="item.ocrId?.length === 1 && item.showIndex === 1">
-                  <svg class="icon" aria-hidden="true">
-                    <use xlink:href="#icon-a-Component133"></use>
-                  </svg>
-                </span>
+                <span v-for="(item, index) in icons" :style="{ position: 'absolute', top: (item.iconTop) + 'px' }"
+                  :key="index" @click="showIconLine(item)">
+                  <!-- 单一评论 - 未激活 -->
+                  <span :data-icon="index" v-if="item.ocrId?.length === 1 && item.showIndex === -1">
+                    <svg class="icon" aria-hidden="true">
+                      <use xlink:href="#icon-a-Component13"></use>
+                    </svg>
+                  </span>
+                  <!-- 多评论 - 未激活 -->
+                  <span :data-icon="index" v-else-if="item.ocrId?.length > 1 && item.showIndex === -1">
+                    <svg class="icon" aria-hidden="true">
+                      <use xlink:href="#icon-a-Component132"></use>
+                    </svg>
+                  </span>
+                  <!-- 多评论 - 激活 -->
+                  <span :data-icon="index" v-else-if="item.ocrId?.length > 1 && item.showIndex === 1">
+                    <svg class="icon" aria-hidden="true">
+                      <use xlink:href="#icon-a-Component131"></use>
+                    </svg>
+                  </span>
+                  <!-- 单一评论 - 激活 -->
+                  <span :data-icon="index" v-else-if="item.ocrId?.length === 1 && item.showIndex === 1">
+                    <svg class="icon" aria-hidden="true">
+                      <use xlink:href="#icon-a-Component133"></use>
+                    </svg>
+                  </span>
                 </span>
               </span>
             </p>
           </div>
         </div>
         <div class="content-cont-editor" v-if="isOrderDetail">
-          <editorial ref="editorial" :activePdfIndex="activePdfIndex" :approval="approval" :files="files" :formId="formId" @linePosition="linePosition"
-            :lineWordItem="lineWordItem" @upDateComments="upDateComments" @showLine="showLine" :activeIndex="activeIndex"
-            :activeWordType="activeWordType" @addCommentWithPosition="addCommentWithPosition" @showCommentLine="showCommentLine" @changeEditorialType="changeEditorialType"
-            :showOcr="showOcr" :formBase="formBase" @changeFileById="changeFileById" :isRel="isRel" @changeRel="changeRel">
+          <editorial ref="editorial" :activePdfIndex="activePdfIndex" :approval="approval" :files="files" :formId="formId"
+            @linePosition="linePosition" :lineWordItem="lineWordItem" @upDateComments="upDateComments"
+            @showLine="showLine" :activeIndex="activeIndex" :activeWordType="activeWordType"
+            @addCommentWithPosition="addCommentWithPosition" @showCommentLine="showCommentLine"
+            @changeEditorialType="changeEditorialType" :showOcr="showOcr" :formBase="formBase"
+            @changeFileById="changeFileById" :isRel="isRel" @changeRel="changeRel">
           </editorial>
         </div>
       </div>
     </div>
     <add-review ref="addReview" @addRecommend="addRecommend"></add-review>
-    <submit-review ref="submitReview" :formId="formId" :formBase="formBase" :refuseOpiton="refuseOpiton" :approvalLetter="approvalLetter" :applyFormWithPermissions="applyFormWithPermissions" :nextStepObj="nextStepObj" :rejectOption="rejectOption" @submit="submit">
+    <submit-review ref="submitReview" :formId="formId" :formBase="formBase" :refuseOpiton="refuseOpiton"
+      :approvalLetter="approvalLetter" :applyFormWithPermissions="applyFormWithPermissions" :nextStepObj="nextStepObj"
+      :rejectOption="rejectOption" @submit="submit">
     </submit-review>
-    <reject-dialog ref="rejectDialog" :refuseDisabled="refuseDisabled" :refuseOpiton="refuseOpiton" :formBase="formBase" :nextStepObj="nextStepObj"  :rejectOption="rejectOption" @submit="submit"></reject-dialog>
+    <reject-dialog ref="rejectDialog" :refuseDisabled="refuseDisabled" :refuseOpiton="refuseOpiton" :formBase="formBase"
+      :nextStepObj="nextStepObj" :rejectOption="rejectOption" @submit="submit"></reject-dialog>
     <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog">
       <applyFormFilePreview :url="previewfileUrl"></applyFormFilePreview>
     </el-dialog>
-    <secondary-confirmation
-      :option="saveOption"
-      ref="confirmation"
-      @handleClose="goBack"
-      @handleConfirm="save"
-    ></secondary-confirmation>
+    <secondary-confirmation :option="saveOption" ref="confirmation" @handleClose="goBack"
+      @handleConfirm="save"></secondary-confirmation>
     <TurnDialog ref="turnDialog" :formBase="formBase" :nextStepObj="nextStepObj"></TurnDialog>
   </div>
 </template>
@@ -259,7 +267,7 @@ export default {
     },
     ocrViewItem: {
       type: Object,
-      default: () => {}
+      default: () => { }
     }
   },
   data() {
@@ -653,6 +661,7 @@ export default {
             width: 16px;
             height: 16px;
           }
+
           display: inline-flex;
           align-items: center;
           cursor: pointer;
@@ -666,6 +675,7 @@ export default {
           height: 14px;
           color: #86909C;
         }
+
         .icon-close {
           margin-right: 5px;
           display: inline-block;
@@ -697,20 +707,25 @@ export default {
           }
         }
       }
-      >.file-change{
+
+      >.file-change {
         flex: none !important;
         width: 60px;
       }
-      >.pdf-change{
+
+      >.pdf-change {
         flex: none !important;
         width: 116px;
       }
-      >.file-preview{
+
+      >.file-preview {
         flex: 1;
       }
-      >.ocr-txt{
+
+      >.ocr-txt {
         flex: 1;
       }
+
       >p {
         background: #ffffff;
         border-radius: 0px 0px 10px 10px;
@@ -724,6 +739,7 @@ export default {
         display: flex;
         flex-direction: column;
         justify-content: center;
+
         .icons {
           width: 32px;
           position: absolute;
@@ -819,16 +835,20 @@ export default {
     cursor: pointer;
     padding: 10px 24px 10px 24px;
     display: flex;
-    .file-index{
+
+    .file-index {
       width: 20px;
     }
-    .file-zip{
+
+    .file-zip {
       position: absolute;
       left: 54px;
     }
-    .file-risk{
+
+    .file-risk {
       margin-left: 4px;
     }
+
     /deep/ .el-image {
       width: 20px;
       height: 20px;
@@ -862,18 +882,34 @@ export default {
       background: #F2F3F5;
     }
   }
+
+  .fileList-list-item-active {
+    .fileList-list-item-fileName {
+      font-weight: 700;
+      color: #1D2128;
+    }
+
+    .fileList-list-item-fileSuf {
+      font-weight: 400;
+      color: #1D2128;
+    }
+
+    background: #F2F3F5;
+  }
 }
 
 .postil-popover {
   border-radius: 10px;
   height: calc(100% - 48px);
-  /deep/ .el-popover{
+
+  /deep/ .el-popover {
     display: flex;
     margin-left: 12px;
     flex-direction: column;
     height: calc(100% - 48px);
     width: 380px;
   }
+
   .postil-header {
     display: flex;
     margin-bottom: 16px;
@@ -920,12 +956,14 @@ export default {
         margin-right: 8px;
       }
     }
-    .postil-tab-rel{
+
+    .postil-tab-rel {
       color: #2D5CF6;
       text-decoration: underline;
       cursor: pointer;
     }
   }
+
   .postil-tipText {
     margin-top: 4px;
     color: #86909C;
@@ -933,15 +971,17 @@ export default {
     font-size: 12px;
     margin-bottom: 16px;
   }
+
   .postil-keyword {
-    span{
+    span {
       margin-right: 12px;
       color: #1d2128;
     }
   }
+
   .postil-keyword-form {
-    /deep/ .el-input{
-      .el-input__inner{
+    /deep/ .el-input {
+      .el-input__inner {
         border: none;
         width: 340px;
         height: 36px;
@@ -949,12 +989,15 @@ export default {
         background: #F7F8FA;
       }
     }
-    /deep/ .el-form-item__label{
+
+    /deep/ .el-form-item__label {
       color: #1D2128;
     }
+
     /deep/ .el-form-item__error {
       display: inline-flex;
       align-items: center;
+
       &::before {
         content: url(../../assets/image/ai-approval/error.svg);
         width: 15px;
@@ -964,11 +1007,13 @@ export default {
       }
     }
   }
-  .postil-btn-group{
+
+  .postil-btn-group {
     display: flex;
     flex: 1;
     justify-content: center;
     align-items: flex-end;
+
     .postil-btn {
       display: inline-flex;
       align-items: center;
@@ -996,14 +1041,15 @@ export default {
     }
   }
 }
+
 /deep/ .positil-popover-left {
   left: 0 !important;
 }
-/deep/ .commentNode{
+
+/deep/ .commentNode {
   background: #D1E2FF;
   cursor: pointer;
-}
-</style>
+}</style>
 
 <style lang="less">.cont-top-popover {
   padding: 16px 0px;
