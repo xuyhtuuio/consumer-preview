@@ -1,6 +1,6 @@
 stages:
   - scanner
-cpr-sonar:
+cpr-web-sonar:
   stage: scanner
   tags:
     - cpr
