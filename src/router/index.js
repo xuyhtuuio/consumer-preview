@@ -279,6 +279,12 @@ const router = new Router({
       meta: { title: '产品图谱', viewport },
     },
     {
+      path: '/file-preview',
+      name: 'file-preview',
+      component: () => import('@/views/file-preview/index'),
+      meta: { title: '文件预览', viewport },
+    },
+    {
       path: '/person-center',
       name: 'personCenter',
       component: () => import('@/views/personCenter/index'),
@@ -341,7 +347,7 @@ function handleAuth(to) {
   }
   const { permissionsPage } = store.state
   const auth = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(item => ((item.pathName === to.name) && item.type))
-  if (auth || to.name === 'login' || to.name === '404' || to.name === 'front') {
+  if (auth || to.name === 'login' || to.name === '404' || to.name === 'front' || to.name === 'file-preview') {
     return true
   }
   return false

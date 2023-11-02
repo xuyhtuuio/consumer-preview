@@ -2,13 +2,13 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:21:09
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-25 17:51:22
+ * @LastEditTime: 2023-10-31 16:48:42
  * @FilePath: /consumer-preview/src/views/rules-base/components/filters.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
   <div class="law-filters">
-    <div class="total">共 345 条</div>
+    <div class="total">共 {{ total }} 条</div>
     <div class="sort">
       <ul class="column">
         <li
@@ -27,31 +27,36 @@
       </ul>
       <el-button class="new-add" @click="addRule">
         <span class="flex"><i class="iconfont icon-add-law"></i>新增</span>
-        </el-button
-      >
+      </el-button>
     </div>
   </div>
 </template>
 <script>
 export default {
+  props: {
+    total: {
+      type: Number,
+      default: 0
+    }
+  },
   data() {
     return {
-      crtColumn: 'createTime',
+      crtColumn: 'pub_time',
       sorts: [
         {
           name: '按发布时间排序',
           order: 'desc',
-          orderColumn: 'createTime'
+          orderColumn: 'pub_time'
         },
         {
           name: '按更新时间排序',
           order: 'desc',
-          orderColumn: 'updateTime'
+          orderColumn: 'u_time'
         },
         {
           name: '按阅读次数排序',
           order: 'desc',
-          orderColumn: 'readCount'
+          orderColumn: 'read_count'
         }
       ]
     }
@@ -81,6 +86,7 @@ export default {
   color: #1d2128;
   line-height: 22px;
   justify-content: space-between;
+  align-items: center;
   .new-add {
     border-radius: 4px;
     background: #2d5cf6;

@@ -2,40 +2,38 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-30 15:56:33
+ * @LastEditTime: 2023-11-02 18:06:44
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
   <div class="laws" v-loading="search.loading">
-    <Filters @addRule="addRule" @sortChange="sortChange"></Filters>
+    <Filters @addRule="addRule" @sortChange="sortChange" :total="search.total">
+    </Filters>
     <div v-if="list.length" class="list-content">
       <div
         class="list"
-        v-for="(item, index) in list"
-        :key="index"
+        v-for="item in list"
+        :key="`${item.file_key}${Math.random()}`"
         @click="toDetail(item)"
       >
         <div class="cards pointer">
-          <fileType
-            :fileName="item.name || item.fileName"
-            class="file-icon"
-          ></fileType>
+          <fileType :fileName="item.file_key" class="file-icon"></fileType>
           <div class="file-info">
             <div class="name">
-              {{ item.fileName }}
+              {{ item.name }}
               <div @click.stop>
                 <el-popover
                   placement="bottom"
                   width="108"
                   popper-class="user-edit-popover"
                   trigger="click"
-                  v-model="lawEditPopover"
+                  :ref="`popover-${item._id}`"
                 >
                   <ul>
-                    <li @click="editRule">编辑</li>
-                    <li @click="updateRule">更新</li>
-                    <li @click="delRule">删除</li>
+                    <li @click="editRule(item, 'edit')">编辑</li>
+                    <li @click="editRule(item, 'update')">更新</li>
+                    <li @click="delRule(item)">删除</li>
                   </ul>
                   <i
                     class="more iconfont icon-quanburenwu-gengduocaozuo"
@@ -45,44 +43,70 @@
               </div>
             </div>
             <p class="tags">
-              <span class="effective">有效</span>
-              <span class="prod-type">产品类型-理财产品</span>
-              <span class="prod-type">事项类型-广告宣传</span>
-              <span class="word-type">消费者自主选择权</span>
-              <span class="word-type">公平交易权</span>
+              <span
+                :class="{
+                  effective: item.status == 1,
+                  ineffective: item.status == 0
+                }"
+                >{{ $msg('LawStatus')[item.status] }}</span
+              >
+              <span
+                class="prod-type"
+                v-for="item in item.tagList"
+                :key="`${item} +Math.random()`"
+                >{{ item }}</span
+              >
+              <span
+                class="word-type"
+                v-for="item in item.equityList"
+                :key="`${item} +Math.random()`"
+                >{{ item }}</span
+              >
             </p>
-            <p class="content ellipsis ellipsis_2">{{ item.content }}</p>
+            <p class="content ellipsis ellipsis_2" v-html="item.newContent"></p>
             <div class="detail">
               <div class="file-unit">
-                <span
+                <span v-if="item.type == 0"
                   >发文单位：<i>{{ wordEllipsis(item.unit, 20) }}</i></span
                 >
-                <span>发文字号：北证公告〔2023〕76号</span>
-                <span>发布时间：2023-11-23</span>
+                <span v-if="item.type == 0">发文字号：{{ item.doc_no }}</span>
+                <span v-if="item.type === 1"
+                  >拟稿部门：<i>{{ wordEllipsis(item.unit, 20) }}</i></span
+                >
+                <span v-if="item.type === 1">制度文号：{{ item.doc_no }}</span>
+                <span v-if="item.type === 2"
+                  >文件来源：{{ item.file_source }}</span
+                >
+
+                <span>发布时间：{{ item.pub_time | timeFilter }}</span>
               </div>
               <div class="share">
-                <span style="margin-right: 20px" @click="copyLink">
+                <span
+                  style="margin-right: 20px"
+                  @click.stop="copyLink(item.id)"
+                >
                   <i
                     class="iconfont icon-fenxiang"
                     style="margin-right: 4px"
                   ></i
                   >分享
                 </span>
-                <span>561次阅读</span>
+                <span>{{ item.read_count }}次阅读</span>
               </div>
             </div>
           </div>
         </div>
-        <trs-pagination
-          :total="search.total"
-          @getList="nextPage"
-          :pageNow="search.pageNow"
-        ></trs-pagination>
       </div>
+      <trs-pagination
+        :total="search.total"
+        @getList="nextPage"
+        :pageNow="search.pageNow"
+      ></trs-pagination>
     </div>
     <Empty v-else v-loading="search.loading" class="list"></Empty>
+
     <el-dialog
-      :title="dialogTitle[crtBehavior]"
+      :title="`${dialogTitle[crtBehavior]}${dialogName[type]}`"
       :visible.sync="dialogVisible"
       width="800px"
       center
@@ -97,53 +121,70 @@
           class="flex"
         >
           <el-radio-group v-model="form.isRepeal" style="margin-left: 8px">
-            <el-radio :label="1">是</el-radio>
-            <el-radio :label="0">否</el-radio>
+            <el-radio :label="0">废止</el-radio>
+            <el-radio :label="1">否</el-radio>
           </el-radio-group>
+          <div class="error-tip">
+            <el-popover
+              placement="top"
+              trigger="hover"
+              content="请选择是否废止当前法规文件"
+              v-if="validatorForm.isRepealError"
+            >
+              <i class="iconfont icon-a-tubiao1 pointer" slot="reference"></i>
+            </el-popover>
+          </div>
         </el-form-item>
-        <el-form-item label="法规名称" prop="name">
+        <el-form-item :label="`${$msg('lawNameType')[type]}`" prop="name">
           <el-input
             v-model="form.name"
             clearable
-            placeholder="请输入法规名称"
+            :placeholder="`请输入${$msg('lawNameType')[type]}`"
           ></el-input>
           <div class="error-tip">
             <el-popover
               placement="top"
               trigger="hover"
-              content="法规名称最多可输入50字"
+              :content="`${$msg('lawNameType')[type]}最多可输入50字`"
               v-if="validatorForm.nameError"
             >
               <i class="iconfont icon-a-tubiao1 pointer" slot="reference"></i>
             </el-popover>
           </div>
         </el-form-item>
-        <el-form-item label="发文单位" prop="unit">
-          <el-input v-model="form.unit" clearable placeholder="请输入发文单位">
+        <el-form-item :label="`${$msg('lawUnitType')[type]}`" prop="unit">
+          <el-input
+            v-model="form.unit"
+            clearable
+            :placeholder="`请输入${$msg('lawUnitType')[type]}`"
+          >
           </el-input>
           <div class="error-tip">
             <el-popover
               placement="top"
               trigger="hover"
-              content="发文单位最多可输入50字"
+              :content="`${$msg('lawUnitType')[type]}最多可输入50字`"
               v-if="validatorForm.unitError"
             >
               <i class="iconfont icon-a-tubiao1 pointer" slot="reference"></i>
             </el-popover>
           </div>
         </el-form-item>
-        <div class="flex form-item2">
-          <el-form-item label="发文字号" prop="documentNumber">
+        <div class="flex form-item2" v-if="[0, 1].includes(type)">
+          <el-form-item
+            :label="`${$msg('lawDocNoType')[type]}`"
+            prop="documentNumber"
+          >
             <el-input
               v-model="form.documentNumber"
               clearable
-              placeholder="请输入发文字号"
+              :placeholder="`请输入${$msg('lawDocNoType')[type]}`"
             ></el-input>
             <div class="error-tip">
               <el-popover
                 placement="top"
                 trigger="hover"
-                content="发文字号最多可输入50字"
+                :content="`${$msg('lawDocNoType')[type]}最多可输入50字`"
                 v-if="validatorForm.documentNumberError"
               >
                 <i class="iconfont icon-a-tubiao1 pointer" slot="reference"></i>
@@ -156,6 +197,8 @@
               placeholder="请选择日期"
               v-model="form.date"
               style="width: 100%"
+              value-format="yyyy-MM-dd"
+              :picker-options="optionsDisable"
             >
             </el-date-picker>
             <div class="error-tip">
@@ -170,10 +213,32 @@
             </div>
           </el-form-item>
         </div>
+        <el-form-item label="发布时间" prop="date" v-if="type == 2">
+          <el-date-picker
+            type="date"
+            placeholder="请选择日期"
+            v-model="form.date"
+            style="width: 100%"
+            value-format="yyyy-MM-dd"
+            :picker-options="optionsDisable"
+            class="type2-date"
+          >
+          </el-date-picker>
+          <div class="error-tip">
+            <el-popover
+              placement="top"
+              trigger="hover"
+              content="请选择发布时间"
+              v-if="validatorForm.dateError"
+            >
+              <i class="iconfont icon-a-tubiao1 pointer" slot="reference"></i>
+            </el-popover>
+          </div>
+        </el-form-item>
         <el-form-item label="添加标签" class="tag-item">
           <span
-            v-for="(item, index) in tagsList"
-            :key="index"
+            v-for="(item, idx) in tagsList"
+            :key="`${idx}+Math.random()`"
             class="add-relevancy-tag relevancy-tag"
             >{{ item }}
             <i class="el-icon-close" @click="delTag(item)"></i>
@@ -181,19 +246,21 @@
           <relevancyTag
             class="add-relevancy-tag"
             :handlerTag="tagsList"
+            tagType="tag"
             @passTag="addTag"
           ></relevancyTag>
         </el-form-item>
         <el-form-item label="相关权益" class="tag-item">
           <span
-            v-for="(item, index) in relevancyTags"
-            :key="index"
+            v-for="(item, idx) in relevancyTags"
+            :key="`${idx}`"
             class="add-relevancy-tag relevancy-tag"
             >{{ item }}
             <i class="el-icon-close" @click="delRelevancyTag(item)"></i>
           </span>
           <relevancyTag
             class="add-relevancy-tag"
+            tagType="benefit"
             @passTag="passTag"
             :handlerTag="relevancyTags"
             ref="relevancyTagRef"
@@ -212,12 +279,18 @@
               :on-change="handleUploadChange"
             >
               <i slot="default" class="el-icon-plus"></i>
-              <div slot="file" slot-scope="{ file }" class="upload-preview">
+              <div
+                slot="file"
+                slot-scope="{ file }"
+                class="upload-preview"
+                v-loading="file.loading"
+              >
                 <fileType
-                  :fileName="file.name || item.fileName"
+                  :fileName="file.name || file.fileName"
                   class="file-icon"
                 ></fileType>
                 <i
+                  v-if="file.key"
                   class="iconfont icon-baocuo1 el-upload-list__item-del pointer"
                   @click="handleRemoveUploadFile(file)"
                 ></i>
@@ -249,11 +322,12 @@
           <ul class="file-list">
             <li v-for="file in form.uploadFile" :key="file.uid">
               <fileType
-                :fileName="file.name || item.fileName"
+                :fileName="file.name || file.fileName"
                 class="file-icon"
               ></fileType>
               {{ file.name }}
               <i
+                v-if="file.key"
                 class="el-icon-error"
                 style="color: rgba(29, 33, 40, 0.4); cursor: pointer"
                 @click="handleRemoveUploadFile(file)"
@@ -274,12 +348,18 @@
               :file-list="form.relatedFile"
             >
               <i slot="default" class="el-icon-plus"></i>
-              <div slot="file" slot-scope="{ file }" class="upload-preview">
+              <div
+                slot="file"
+                slot-scope="{ file }"
+                class="upload-preview"
+                v-loading="file.loading"
+              >
                 <fileType
                   :fileName="file.name || item.fileName"
                   class="file-icon"
                 ></fileType>
                 <i
+                  v-if="file.key"
                   class="iconfont icon-baocuo1 el-upload-list__item-del pointer"
                   @click="removeRelatedFile(file)"
                 ></i>
@@ -297,13 +377,14 @@
             >
           </div>
           <ul class="file-list">
-            <li v-for="file in form.relatedFile" :key="file.uid">
+            <li v-for="(file, index) in form.relatedFile" :key="index">
               <fileType
                 :fileName="file.name || item.fileName"
                 class="file-icon"
               ></fileType>
               {{ file.name }}
               <i
+                v-if="file.key"
                 class="el-icon-error"
                 style="color: rgba(29, 33, 40, 0.4); cursor: pointer"
                 @click="removeRelatedFile(file)"
@@ -312,10 +393,8 @@
           </ul>
         </el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="default" @click="cancel" class="cancel"
-          >取消</el-button
-        >
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancel" class="cancel">取消</el-button>
         <el-button
           type="primary"
           @click="submit"
@@ -323,16 +402,26 @@
           :loading="form.loading"
           >{{ finishBtns[crtBehavior] }}</el-button
         >
-      </span>
+      </div>
     </el-dialog>
   </div>
 </template>
 <script>
+import dayjs from 'dayjs'
+import {
+  queryRegulationList,
+  insertRegulation,
+  updateRegulation,
+  deleteRegulation
+} from '@/api/knowledge/knowledgeCollect'
+import { getFormGroups, deleteFormGroups } from '@/api/front'
 import fileType from './file-type'
 import Filters from './filters'
 import relevancyTag from './relevancy-tag'
+
 export default {
   components: { Filters, fileType, relevancyTag },
+
   data() {
     // eslint-disable-next-line
     var checkIdInputName = (rule, value, callback) => {
@@ -384,26 +473,32 @@ export default {
         return cb()
       }
     }
+    // eslint-disable-next-line
+    var checkIsRepeal = (rule, value, cb) => {
+      if (![0, 1].includes(this.form.isRepeal)) {
+        this.validatorForm.isRepealError = true
+        return cb()
+      } else {
+        this.validatorForm.isRepealError = false
+        return cb()
+      }
+    }
     return {
       dialogVisible: false,
-      list: [
-        {
-          fileName: '《中国银行保险监督管理委员会[2021年第8号]》.doc',
-          unit: '北京证券交易所有限责任公司',
-          content:
-            '根据《理财公司理财产品销售管理暂行办法（银保监会令[2021]4号》，理财产品销售机构不得使用未说明选择原因。理财产品销售机构不得明选择原理财产品销售机构不得使用未说明选择原因。理财产品销售机构不得明选择原理财产品销售机构不得使用未说明选择原因。理财产品销售机构不得明选择原'
-        }
-      ],
+      list: [],
       uploadDisabled: '',
       uploadRelatedDisabled: '',
-      lawEditPopover: false,
+
       validatorForm: {
         nameError: false,
         unitError: false,
         documentNumberError: false,
         dateError: false,
-        uploadFileError: false
+        uploadFileError: false,
+        isRepealError: false
       },
+      showPop: false,
+      reference: {},
       uploadLimit: 1,
       form: {
         name: '',
@@ -413,10 +508,10 @@ export default {
         uploadFile: [],
         relatedFile: [],
         isRepeal: 0,
-        loading: true
+        loading: false
       },
       rules: {
-        isRepeal: [{ required: true, trigger: ['change'] }],
+        isRepeal: [{ validator: checkIsRepeal, trigger: ['change', 'blur'] }],
         name: [
           { required: true, trigger: ['change'] },
           { validator: checkIdInputName, trigger: ['change'] }
@@ -441,23 +536,35 @@ export default {
       search: {
         pageNow: 1,
         total: 0,
-        loading: true,
-        keyword: '',
-        effective: ''
+        loading: false,
+        name: '',
+        status: '',
+        sortField: '-pub_time'
+      },
+      optionsDisable: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7
+        }
       },
       relevancyTags: [],
       tagsList: [],
       crtBehavior: 'increase',
       dialogTitle: {
-        increase: '新增法规',
-        edit: '编辑法规',
-        update: '更新法规'
+        increase: '新增',
+        edit: '编辑',
+        update: '更新'
+      },
+      dialogName: {
+        0: '法律法规',
+        1: '内部制度',
+        2: '监督通报'
       },
       finishBtns: {
         increase: '发布',
         edit: '完成',
         update: '更新'
-      }
+      },
+      type: 0
     }
   },
   watch: {
@@ -473,31 +580,39 @@ export default {
     'form.date': function (val) {
       this.validatorForm.dateError = !val
     }
-    // 'form.uploadFile': function (val) {
-    //   this.validatorForm.uploadFileError = !val?.length > 0
-    //   console.log('gg3',this.validatorForm)
-    // }
   },
   mounted() {
-    // this.$nextTick(() => {
-    //   this.$refs.relevancyTagRef.initData(this.relevancyTags)
-    // })
     this.nextPage(1)
   },
   computed: {},
   methods: {
+    showElPopover(item) {
+      this.showPop = false
+      this.reference = this.$refs['more-' + item.id]?.[0]
+      this.$nextTick(() => {
+        // 等待显示的popover销毁后再 重新渲染新的popover
+        this.showPop = true
+        this.$nextTick(() => {
+          // 此时才能获取refs引用
+          this.$refs.pop.doShow()
+        })
+      })
+    },
     // 右上角关键词搜搜
     initData(keywords) {
-      const { keyword, effectiveValue } = keywords
-      this.search.keyword = keyword
-      this.search.effectiveValue = effectiveValue
+      const { keyword, effectiveValue, type } = keywords
+      this.search.name = keyword
+      this.search.status = effectiveValue
+      this.type = type
       this.nextPage(1)
     },
     /**
      * @description: 获取列表接口
      * @return {*}
      */
-    sortChange() {
+    sortChange(val) {
+      const { order, orderColumn } = val
+      this.search.sortField = order === 'desc' ? '-' + orderColumn : orderColumn
       this.nextPage(1)
     },
     /**
@@ -505,23 +620,121 @@ export default {
      * @param {*}
      * @return {*}
      */
-    toDetail() {
+    toDetail(item) {
       this.$router.push({
         name: 'RulesDetail',
         query: {
-          type: 'law'
+          law_id: item.id
         }
       })
     },
-    nextPage(val) {
+    async nextPage(val) {
+      const that = this
       this.search.pageNow = val || 1
       this.search.loading = true
-      setTimeout(() => {
+      const params = {
+        pageNow: val,
+        pageSize: 10,
+        status: this.search.status,
+        name: this.search.name,
+        sortField: this.search.sortField,
+        type: this.type
+      }
+      try {
+        const res = await queryRegulationList(params)
+        const { success, data } = res.data
+        if (success) {
+          const handleData = data.list?.map((m) => {
+            const content = m.content ? JSON.parse(m.content) : []
+            // eslint-disable-next-line
+            const suffix =
+              m.fileName.split('.')[m.fileName.split('.').length - 1]
+            let info = {}
+            if (suffix === 'pdf') {
+              const [first] = content
+              const keys = first
+              let arr = []
+              for (const i in keys) {
+                if (i.indexOf('jpg') !== -1) {
+                  const obj = {
+                    page: i,
+                    content: first[i],
+                    size: first['size'][i]
+                  }
+                  arr.push(obj)
+                }
+              }
+              // 排序
+              arr = arr.sort((a, b) => {
+                return a.page.split('-')[0] - b.page.split('-')[0]
+              })
+              // 组成字符串
+              const fileText = arr
+                .map((o) => {
+                  const text = o.content
+                    .map((v) => {
+                      return v.text
+                    })
+                    .join('')
+                  return text
+                })
+                .join('')
+              info = {
+                ...m,
+                newContent: fileText
+              }
+            } else {
+              const [first] = m.tableFileTag
+
+              let str = content
+                .map((o) => {
+                  return first?.length && first[o]
+                    ? that.formatTable(first[o])
+                    : o
+                })
+                ?.join('')
+              // console.log('fff', str)
+              str = str.replace(/\r/gi, '<br />')
+              info = {
+                ...m,
+                newContent: str
+              }
+            }
+            return info
+          })
+          this.list = handleData
+          this.search.total = data.totalCount
+        }
         this.search.loading = false
-      }, 1000)
+      } catch {
+        this.search.loading = false
+      }
+    },
+    formatTable(tableFile) {
+      const rows = {} // 计算一共多少行
+      tableFile.forEach((tr) => {
+        if (!rows[tr.row]) {
+          rows[tr.row] = []
+        }
+        rows[tr.row].push(tr)
+      })
+      // rows 转数组
+      const keys = Object.keys(rows)
+      const tableContent = []
+      for (const i in keys) {
+        let trs = ''
+        rows[keys[i]].forEach((tr) => {
+          trs += `<td>${tr.text}</td>`
+        })
+        const row = `<tr>${trs}</tr>` // 每行的要素
+        tableContent.push(row)
+      }
+      // 有多少行
+      const table = `<table border>${tableContent}</table>`
+      return table
     },
     wordEllipsis(str, len) {
-      if (!str.length) return false
+      if (!str?.length) return false
       return str.length > len ? str.substr(0, len) + '...' : str
       /**
        * @description: 获取相关权益的标签
@@ -543,7 +756,7 @@ export default {
      * @return {*}
      */
     delTag(tag) {
-      const index = this.tagsList.findIndex((v) => v === tag)
+      const index = this.tagsList.findIndex((v) => tag === v)
       this.tagsList.splice(index, 1)
     },
     /**
@@ -551,11 +764,19 @@ export default {
      * @return {*}
      */
     delRelevancyTag(tag) {
-      const index = this.relevancyTags.findIndex((v) => v === tag)
+      const index = this.relevancyTags.findIndex((v) => tag === v)
       this.relevancyTags.splice(index, 1)
     },
-    copyLink() {
-      const link = 'https://www.example.com'
+    copyLink(id) {
+      // eslint-disable-next-line
+      const link =
+        // eslint-disable-next-line
+        window.location.protocol +
+        // eslint-disable-next-line
+        '//' +
+        // eslint-disable-next-line
+        window.location.host +
+        `/knowledge/rulesDetail?law_id=${id}`
       const textarea = document.createElement('textarea')
       textarea.value = link
       document.body.appendChild(textarea)
@@ -570,15 +791,18 @@ export default {
      */
     addRule() {
       this.dialogVisible = true
-      this.$nextTick(() => {
+      setTimeout(() => {
         this.$refs.form.clearValidate()
+        this.$refs.form.resetFields()
+        this.tagsList = []
+        this.relevancyTags = []
         this.uploadDisabled = ''
         this.uploadRelatedDisabled = ''
         const keys = Object.keys(this.validatorForm)
         for (const i in keys) {
           this.validatorForm[keys[i]] = false
         }
-      })
+      }, 80)
     },
     closeDialog() {
       this.cancel()
@@ -588,10 +812,42 @@ export default {
      * @param {*} val
      * @return {*}
      */
-    uploadContent() {
+    uploadContent(param) {
+      const _that = this
       if (this.form.uploadFile.length > 0) {
         this.uploadDisabled = 'disabled'
       }
+      this.form.uploadFile.forEach((m) => {
+        if (m.uid === param.file.uid) {
+          m.loading = true
+        }
+      })
+      const formData = new FormData()
+      formData.append('mf', param.file) // 传入bpmn文件
+      getFormGroups(formData)
+        .then((res) => {
+          const { data, success } = res.data
+          const { uid: id } = param.file
+          if (success) {
+            this.form.uploadFile.forEach((item) => {
+              if (item.uid === id) {
+                item.loading = false
+                item.key = data.key
+                item.url = data.url
+              }
+            })
+            _that.$forceUpdate()
+          } else {
+            this.form.uploadFile = []
+            this.uploadDisabled = ''
+            this.$message.error(res.data.msg)
+          }
+          param.loading = false
+        })
+        .catch(() => {
+          this.form.uploadFile = []
+          this.uploadDisabled = ''
+        })
     },
     /**
      * @description: 上传法律文件change
@@ -610,34 +866,101 @@ export default {
      * @return {*}
      */
     handleRemoveUploadFile(file) {
-      const index = this.form.uploadFile.findIndex((m) => m.uid === file.uid)
-      this.form.uploadFile.splice(index, 1)
-      this.uploadDisabled = ''
+      const key = this.form.uploadFile.filter((m) => {
+        return m.key === file.key
+      })[0]?.key
+      // 接口删除文件
+      if (this.crtBehavior !== 'increase') {
+        const index = this.form.uploadFile.findIndex((m) => m.key === file.key)
+        this.form.uploadFile.splice(index, 1)
+        this.uploadDisabled = ''
+      } else {
+        deleteFormGroups({ key }).then((res) => {
+          const index = this.form.uploadFile.findIndex(
+            (m) => m.key === file.key
+          )
+          this.form.uploadFile.splice(index, 1)
+          this.uploadDisabled = ''
+          this.$message({ type: 'success', message: res.data.data })
+        })
+      }
     },
     /**
      * @description: 上传关联附件
      * @return {*}
      */
-    uploadRelatedFile() {
+    uploadRelatedFile(param) {
+      const _that = this
       if (this.form.relatedFile.length >= 8) {
         this.uploadRelatedDisabled = 'disabled'
       }
+      this.form.relatedFile.forEach((m) => {
+        if (m.uid === param.file.uid) {
+          m.loading = true
+        }
+      })
+      const formData = new FormData()
+      formData.append('mf', param.file) // 传入bpmn文件
+      getFormGroups(formData)
+        .then((res) => {
+          const { data, success } = res.data
+          const { uid: id } = param.file
+          if (success) {
+            this.form.relatedFile.forEach((item) => {
+              if (item.uid === id) {
+                item.loading = false
+                item.key = data.key
+                item.url = data.url
+              }
+            })
+            _that.$forceUpdate()
+          } else {
+            const index = this.form.relatedFile.findIndex(
+              (m) => m.uid === param.file.uid
+            )
+            this.form.relatedFile.splice(index, 1)
+            this.uploadRelatedDisabled = ''
+            this.$message.error(res.data.msg)
+          }
+        })
+        .catch(() => {
+          const index = this.form.relatedFile.findIndex(
+            (m) => m.uid === param.file.uid
+          )
+          this.form.relatedFile.splice(index, 1)
+          this.uploadRelatedDisabled = ''
+        })
     },
     /**
      * @description: 关联附件change
      * @return {*}
      */
-    handleRelatedChange(file, fileList) {
-      this.form.relatedFile = fileList
+    handleRelatedChange(file) {
+      this.form.relatedFile.push(file)
     },
     /**
      * @description: 移除关联附件
      * @return {*}
      */
     removeRelatedFile(file) {
-      const index = this.form.relatedFile.findIndex((m) => m.uid === file.uid)
-      this.form.relatedFile.splice(index, 1)
-      this.uploadRelatedDisabled = ''
+      const key = this.form.relatedFile.filter((m) => {
+        return m.key === file.key
+      })[0]?.key
+      // 接口删除文件
+      if (this.crtBehavior !== 'increase') {
+        const index = this.form.relatedFile.findIndex((m) => m.key === file.key)
+        this.form.relatedFile.splice(index, 1)
+        this.uploadRelatedDisabled = ''
+      } else {
+        deleteFormGroups({ key }).then((res) => {
+          const index = this.form.relatedFile.findIndex(
+            (m) => m.key === file.key
+          )
+          this.form.relatedFile.splice(index, 1)
+          this.uploadRelatedDisabled = ''
+          this.$message({ type: 'success', message: res.data.data })
+        })
+      }
     },
     /**
      * @description: 取消
@@ -646,6 +969,10 @@ export default {
     cancel() {
       this.$refs.form.resetFields()
       this.$refs.form.clearValidate()
+      this.tagsList = []
+      this.relevancyTags = []
+      this.form.uploadFile = []
+      this.form.relatedFile = []
       this.uploadDisabled = ''
       this.uploadRelatedDisabled = ''
       const keys = Object.keys(this.validatorForm)
@@ -678,41 +1005,152 @@ export default {
      * @return {*}
      */
     submit() {
-      this.$refs.form.validate(() => {
+      // 上传内容文件
+      this.$refs.form.validate(async (valid) => {
         this.checkMustValue()
-        // if (valid) {}
+        if (valid) {
+          // eslint-disable-next-line
+          const attachmentList =
+            this.form.relatedFile?.map((m) => {
+              return m.key
+            }) || []
+          const params = {
+            name: this.form.name,
+            pub_time: this.form.date,
+            file_key: this.form.uploadFile[0]?.key,
+            tagList: this.tagsList,
+            equityList: this.relevancyTags,
+            attachmentList,
+            type: this.type
+          }
+          // 法规和内部制度是单位字号，通报是文件来源
+          if ([0, 1].includes(this.type)) {
+            params.unit = this.form.unit
+            params.doc_no = this.form.documentNumber
+          } else {
+            params.file_source = this.form.unit
+          }
+          let res = null
+          this.form.loading = true
+          this.$forceUpdate()
+          try {
+            if (this.crtBehavior === 'increase') {
+              res = await insertRegulation(params)
+            } else if (this.crtBehavior === 'edit') {
+              params.id = this.form.id
+              params.isEdit = 'edit'
+              const newParams = {
+                ...this.form,
+                ...params
+              }
+              delete newParams.newContent
+              delete newParams.uploadFile
+              delete newParams.content
+              delete newParams.loading
+              delete newParams.isRepeal
+              res = await updateRegulation(newParams)
+            } else {
+              params.id = this.form.id
+              params.status = this.form.isRepeal
+              const newParams = {
+                ...this.form,
+                ...params
+              }
+              delete newParams.newContent
+              delete newParams.uploadFile
+              delete newParams.content
+              delete newParams.loading
+              delete newParams.isRepeal
+              res = await updateRegulation(newParams)
+            }
+            const { success } = res.data
+            this.form.loading = false
+            if (success) {
+              this.$message.success(
+                `${this.dialogTitle[this.crtBehavior]}${
+                  this.dialogName[this.type]
+                }成功`
+              )
+              this.cancel()
+              this.nextPage(1)
+            }
+          } catch {
+            this.form.loading = false
+          }
+        }
       })
     },
     /**
      * @description: 编辑法律
      * @return {*}
      */
-    editRule() {
-      this.lawEditPopover = false
-      this.crtBehavior = 'edit'
+    editRule(item, type) {
+      this.crtBehavior = type
       this.addRule()
-    },
-    /**
-     * @description: 更新法律
-     * @return {*}
-     */
-    updateRule() {
-      this.lawEditPopover = false
-      this.crtBehavior = 'update'
-      this.addRule()
+      setTimeout(() => {
+        // 回显内容
+        const file = {
+          key: item.file_key,
+          name: item.file_key
+        }
+        const relatedFile = item.attachmentList?.map((m) => {
+          return {
+            key: m,
+            name: m
+          }
+        })
+        this.form = {
+          ...item,
+          id: item.id,
+          name: item.name,
+          unit: item.unit,
+          content: item.content,
+          documentNumber: item.doc_no,
+          date: dayjs(item.pub_time).format('YYYY-MM-DD'),
+          uploadFile: [file],
+          relatedFile
+        }
+        if (this.form.uploadFile?.length > 0) {
+          this.uploadDisabled = 'disabled'
+        }
+        if (this.form.relatedFile?.length >= 8) {
+          this.uploadRelatedDisabled = 'disabled'
+        }
+        this.tagsList = item.tagList
+        this.relevancyTags = item.equityList
+      }, 200)
     },
     /**
      * @description: 删除法规
      * @return {*}
      */
-    delRule() {
-      this.lawEditPopover = false
+    delRule(item) {
+      const _that = this
+
       this.$confirm('一旦删除该法规内容不可恢复，请确认是否删除', '', {
         customClass: 'confirmBox',
         confirmButtonText: '取消',
         cancelButtonText: '删除',
         type: 'warning'
-      }).then(() => {})
+      }).then(async () => {
+        const params = {
+          id: item.id,
+          file_key: item.file_key
+        }
+        const res = await deleteRegulation(params)
+        const { success } = res.data
+        if (success) {
+          _that.$message.success('删除成功')
+          _that.nextPage(1)
+        }
+      })
+    }
+  },
+  filters: {
+    timeFilter(val) {
+      if (val) {
+        return dayjs(val).format('YYYY-MM-DD HH:mm:ss')
+      }
     }
   }
 }
@@ -838,10 +1276,10 @@ export default {
         line-height: 22px;
         color: #1d2128;
         cursor: pointer;
+        width: auto;
       }
       .cancel {
         margin-right: 20px;
-
         border-radius: 6px;
         border: 1px solid #cacdd3;
       }
@@ -901,6 +1339,9 @@ export default {
               content: '\e66e';
             }
           }
+          .type2-date .el-input__prefix {
+            left: 90%;
+          }
         }
       }
       .upload-item {
@@ -923,6 +1364,7 @@ export default {
           .upload-box {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             .el-upload-list {
               .el-upload-list__item {
                 border: 0.8px dashed #cacdd3;

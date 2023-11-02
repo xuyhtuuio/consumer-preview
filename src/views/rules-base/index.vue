@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-23 21:17:11
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-30 17:52:50
+ * @LastEditTime: 2023-11-02 18:09:15
  * @FilePath: /consumer-preview/src/views/rules-base/index.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -25,7 +25,7 @@
         @change="keywordSearch"
       >
         <el-option label="有效" value="1"></el-option>
-        <el-option label="无效" value="2"></el-option>
+        <el-option label="无效" value="0"></el-option>
       </el-select>
     </el-input>
     <ul class="left-menu">
@@ -47,20 +47,15 @@
       </li>
     </ul>
     <div class="right-content">
-      <component :is="component" ref="component"></component>
+     <laws ref="component"></laws>
     </div>
   </div>
 </template>
 <script>
 import laws from './components/laws'
-import system from './components/system'
-import notification from './components/notification'
-
 export default {
   components: {
     laws,
-    system,
-    notification
   },
   data() {
     return {
@@ -68,6 +63,7 @@ export default {
       component: 'laws',
       keyword: '',
       effectiveValue: '',
+      crtType: 0,
       menu: [
         {
           name: '法律法规',
@@ -79,14 +75,14 @@ export default {
         {
           name: '内部制度',
           id: 1,
-          component: 'system',
+          component: 'laws',
           activeIcon: 'icon-neibuzhidu1',
           icon: 'icon-neibuzhidu'
         },
         {
           name: '监管通报',
           id: 2,
-          component: 'notification',
+          component: 'laws',
           activeIcon: 'icon-jianguantongbao1',
           icon: 'icon-jianguantongbao'
         }
@@ -104,7 +100,8 @@ export default {
     keywordSearch() {
       this.$refs['component'].initData({
         keyword: this.keyword,
-        effectiveValue: this.effectiveValue
+        effectiveValue: this.effectiveValue,
+        type: this.activeMenuId
       })
     },
   }
@@ -113,7 +110,7 @@ export default {
 <style lang="less" scoped>
 .rules-base {
   display: flex;
-  height: calc(100% - 58px);
+
   position: relative;
   .keyword-input {
     position: absolute;
