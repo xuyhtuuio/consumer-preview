@@ -169,7 +169,7 @@
             <el-switch
               size="small"
               style="margin-right: 4px"
-              v-model="search.isBackCheck"
+              v-model="search.isPass"
               @change="handleBackCheck"
             />
             已回检
@@ -259,7 +259,7 @@
       :before-close="handleClose"
       :destroy-on-close="true"
     >
-      <record-dialog :ocrId="ocrId" :recheckCount="recheckCount" />
+      <record-dialog :ocrId="ocrIdR" :recheckCount="recheckCount" />
     </el-dialog>
 
     <div class="preview" :class="{ fullScreen: showFullScreen }">
@@ -351,16 +351,10 @@ export default {
           }
         ]
       },
-      ocrId: '',
-      dataPickerBill: '',
+      ocrIdR: '',
       recordDetailList: [],
       showFullScreen: false,
       agenciesList: [],
-      searchParm: {
-        // 默认回检通过
-        isPass: 1
-      },
-      searchParmO: {},
       search: {
         orgIds: '',
         searchInput: '',
@@ -369,24 +363,16 @@ export default {
         loading: true,
         orgName: '',
         approvalType: '',
-        isBackCheck: true
+        isPass: true
       },
       fileURL: '',
-      //  1-回检时间 2-提单时间 3-上线时间
-      sort: 1,
-      // 1-降序 2-升序
-      sortType: 2,
       recordList: [],
       page: {
         pageNow: 1,
         pageSize: 8,
         totalCount: 0
       },
-      pageO: {
-        pageNow: 1,
-        pageSize: 5,
-        totalCount: 0
-      },
+
       transactionTypes: [],
       isSortOl: false,
       isSortBill: false,
@@ -420,15 +406,10 @@ export default {
           dom.style.color = this.search.approvalType ? '#2d5cf6' : '#1d2128'
         })
       }
-      this.searchParm.formCategory = this.search.approvalType
       this.searchOnePage()
     },
     handlePopoverShow3() {
       this.$refs['org-cascader'].handleFocus()
-    },
-    handleSubmit() {
-      this.searchParm.text = this.search.searchInput
-      this.searchOnePage()
     },
 
     handleClose() {
@@ -443,7 +424,7 @@ export default {
     },
     async handleOpenRecord(ocrId, recheckCount) {
       this.recheckCount = recheckCount
-      this.ocrId = ocrId
+      this.ocrIdR = ocrId
       this.recordDialogVisible = true
     },
     fullScreen(fileUrl) {
@@ -517,45 +498,7 @@ export default {
     timeFormat(val) {
       return val ? dayjs(val).format('YYYY-MM-DD ') : '--'
     },
-    changeAgencies() {
-      // this.$refs['agencies'].dropDownVisible = false
-      if (this.agenciesList.length) {
-        this.search.orgName = this.queryTreeName(
-          this.search.orgIds,
-          this.agenciesList
-        )
-        this.searchParm.orgId = this.search.orgIds
-      }
-      this.searchOnePage()
-    },
-    changeOnlineDate() {
-      this.search.datePickerOnline = this.search.datePickerOnline.map((item) => this.timeFormat(item))
-      // eslint-disable-next-line prefer-destructuring
-      this.searchParm.startTime = this.search.datePickerOnline[0] + ' 00:00:00'
-      // eslint-disable-next-line prefer-destructuring
-      this.searchParm.endTime = this.search.datePickerOnline[1] + ' 23:59:59'
-      this.searchOnePage()
-    },
-    changeBillDate() {
-      this.search.datePickerBill = this.search.datePickerBill.map((item) => this.timeFormat(item))
-      // eslint-disable-next-line prefer-destructuring
-      this.searchParm.cStartTime = this.search.datePickerBill[0] + ' 00:00:00'
-      // eslint-disable-next-line prefer-destructuring
-      this.searchParm.cEndTime = this.search.datePickerBill[1] + ' 23:59:59'
-      this.searchOnePage()
-    },
 
-    handleBackCheck() {
-      if (
-        this.searchParm.isPass
-        && this.searchParm.isPass === this.PASSENU.pass
-      ) {
-        this.searchParm.isPass = this.PASSENU.unpass
-      } else {
-        this.searchParm.isPass = this.PASSENU.pass
-      }
-      this.searchOnePage()
-    },
     /**
      *
      * @param {*} id
@@ -598,18 +541,76 @@ export default {
       //    sort: 1,
       // // 1-降序 2-升序
       // sortType: 2,
+      this.page.pageNow = pageNow || this.page.pageNow
       this.search.loading = true
-      const mustParm = {
-        pageNow: pageNow || this.page.pageNow,
-        pageSize: this.page.pageSize,
-        sort: this.sort,
-        sortType: this.sortType
+      const param = {
+        ...this.search,
+        startTime: this.search.datePickerOnline
+          ? this.search.datePickerOnline?.map((item) => this.timeFormat(item))[0] + ' 00:00:00'
+          : '',
+        endTime: this.search.datePickerOnline
+          ? this.search.datePickerOnline?.map((item) => this.timeFormat(item))[1] + ' 23:59:59'
+          : '',
+        cStartTime: this.search.datePickerBill
+          ? this.search.datePickerBill?.map((item) => this.timeFormat(item))[0] + ' 00:00:00'
+          : '',
+
+        cEndTime: this.search.datePickerBill
+          ? this.search.datePickerBill?.map((item) => this.timeFormat(item))[1] + ' 23:59:59'
+          : '',
+        orgId: this.search.orgIds ? this.search.orgIds : '',
+        text: this.search.searchInput ? this.search.searchInput : '',
+        formCategory: this.search.approvalType ? this.search.approvalType : '',
+        isPass: this.search.isPass ? 1 : 0,
+        pageNow: this.page.pageNow,
+        pageSize: this.page.pageSize
       }
-      const parm = {
-        ...mustParm,
-        ...this.searchParm
+
+      // 保证sort以及sortType是可枚举的
+      Object.defineProperty(param, 'sort', {
+        value: 1,
+        writable: true,
+        enumerable: true,
+        configurable: true
+      })
+      Object.defineProperty(param, 'sortType', {
+        value: 2,
+        writable: true,
+        enumerable: true,
+        configurable: true
+      })
+      Reflect.deleteProperty(param, 'loading')
+      Reflect.deleteProperty(param, 'datePickerOnline')
+      Reflect.deleteProperty(param, 'datePickerBill')
+
+      // 如果param存在sort和sortType，说明是点击了排序，
+      // 需要把sort和sortType放到param里面
+      if (param.sort && param.sortType) {
+        const chooseSortBill = () => {
+          this.isSortOl ? (this.isSortOl = false) : ''
+          param.sortType = this.SORTTYPEENU.desc
+          param.sort = this.SORTENU.billTime
+        }
+
+        const chooseSortOl = () => {
+          this.isSortBill ? (this.isSortBill = false) : ''
+          param.sortType = this.SORTTYPEENU.desc
+          param.sort = this.SORTENU.onlineTime
+        }
+
+        const reset = () => {
+          param.sort = this.SORTENU.backcheckTime
+          param.sortType = this.SORTTYPEENU.asc
+        }
+        // eslint-disable-next-line no-nested-ternary
+        this.isSortBill
+          ? chooseSortBill()
+          : this.isSortOl
+            ? chooseSortOl()
+            : reset()
       }
-      const res = await getRecheckList(parm)
+
+      const res = await getRecheckList(param)
       const { data } = res
       if (data.status === 200) {
         const { list, totalCount } = data.data
@@ -620,44 +621,37 @@ export default {
     },
 
     handleCurrentChange(pageNow) {
-      this.page.pageNow = pageNow
-      this.searchList()
+      this.searchList(pageNow)
     },
 
     searchOnePage() {
-      this.page.pageNow = 1
       this.searchList(1)
     },
 
     onlineClick() {
       this.isSortOl = !this.isSortOl
-      if (this.isSortBill) {
-        this.isSortBill = false
-        this.searchParm.sort = this.SORTENU.onlineTime
-      } else if (this.isSortOl) {
-        this.searchParm.sort = this.SORTENU.onlineTime
-        this.searchParm.sortType = this.SORTTYPEENU.desc
-      } else {
-        // 复原
-        this.searchParm.sort = this.SORTENU.backcheckTime
-        this.searchParm.sortType = this.SORTTYPEENU.asc
-      }
       this.searchOnePage()
     },
     billClick() {
       this.isSortBill = !this.isSortBill
-      if (this.isSortOl) {
-        this.isSortOl = false
-        this.searchParm.sort = this.SORTENU.billTime
-      } else if (this.isSortBill) {
-        this.searchParm.sort = this.SORTENU.billTime
-        this.searchParm.sortType = this.SORTTYPEENU.desc
-      } else {
-        this.searchParm.sort = this.SORTENU.backcheckTime
-        this.searchParm.sortType = this.SORTTYPEENU.asc
-      }
       this.searchOnePage()
-    }
+    },
+    changeAgencies() {
+      this.searchOnePage()
+    },
+    changeOnlineDate() {
+      this.searchOnePage()
+    },
+    changeBillDate() {
+      this.searchOnePage()
+    },
+
+    handleBackCheck() {
+      this.searchOnePage()
+    },
+    handleSubmit() {
+      this.searchOnePage()
+    },
   },
 
   created() {
