@@ -316,6 +316,19 @@ export default {
         return item;
       })
       const user = JSON.parse(window.localStorage.getItem('user_name'))
+      // edit in this
+      opinionLetterRecordDtoList.forEach((o) => {
+        if (!o.commentId) {
+          o.commentId = o.id
+        }
+      })
+      editedCommentsDtoList.forEach((o) => {
+        if (!o.commentId) {
+          o.commentId = o.id
+        }
+      })
+      console.log('opinionLetterRecordDtoList', opinionLetterRecordDtoList)
+      console.log('editedCommentsDtoList', editedCommentsDtoList)
       const data = {
         approvalSubmissionDto: {
           opinionLetterRecordDtoList,

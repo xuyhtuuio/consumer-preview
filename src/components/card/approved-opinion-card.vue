@@ -18,6 +18,7 @@
             v-for="(child, idx) in item.substantiveopinion"
             :key="idx"
             class="opinions-item pointer"
+            :data-commenid="`c${child.commentId}`"
           >
             <div class="opinion-tag">
               <span v-if="child.substantiveOpinions == 1" class="guanzhu">

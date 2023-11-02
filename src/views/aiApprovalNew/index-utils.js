@@ -441,6 +441,11 @@ export default {
         return;
       }
       this.lineRemoveOnly();
+      // 详情页获取dom使用commentId
+      if (!this.isOrderDetail) {
+        const commenDom = document.querySelector(`div[data-commenid=c${obj.commentId}]`)
+        this.appendHighLightDom(obj, commenDom)
+      }
       const commenDom1 = document.querySelector(`div[data-commenid=c${obj.id}]`)
       if (commenDom1) {
         this.appendHighLightDom(obj, commenDom1)
