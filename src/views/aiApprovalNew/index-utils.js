@@ -578,6 +578,7 @@ export default {
       }
       this.activeWordType = 0;
       this.fileloading = true;
+      this.filePopoverShow = false
       this.showOcr = true;
       this.lineRemove();
       if (this.files?.[this.activeIndex]?.ocr) {
@@ -625,7 +626,6 @@ export default {
       })
       this.approval = temp;
       this.fileloading = false;
-      this.filePopoverShow = false
     },
     async getOcr(temp) {
       const ocr = [];
@@ -1411,7 +1411,7 @@ export default {
     // pdf 切换页码
     async changePdfPage(i) {
       this.fileloading = true;
-      this.filePopoverShow = true;
+      // this.filePopoverShow = true;
       this.activePdfIndex = i
       const temp = this.files[this.activeIndex].child[this.activePdfIndex]
       if (!temp.ocr) {
@@ -1444,7 +1444,7 @@ export default {
     },
     async changePdfPageNow(pageNow) {
       this.fileloading = true;
-      this.filePopoverShow = true;
+      // this.filePopoverShow = true;
       const params = {
         formId: this.formId,
         key: this.files?.[this.activeIndex].key,
