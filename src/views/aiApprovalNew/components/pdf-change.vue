@@ -13,7 +13,7 @@
           <div class="swiper-button-prev" :class="{ 'disabled': activeIndex === 0 }" @click="swiperTo(pdfPageNow - 1)">
           </div>
           <el-input v-model="curPdfPage" @keyup.enter.native="changePdfPageInput(curPdfPage)">
-            <template slot="append">/{{ 10 }}</template>
+            <template slot="append">/{{ pdfTotal }}</template>
           </el-input>
           <div class="swiper-button-next" :class="{ 'disabled': activeIndex === fileList.length - 1 }"
             @click="swiperTo(pdfPageNow + 1)">
@@ -67,6 +67,10 @@ export default {
       type: Number,
       default: 0
     },
+    pdfTotal: {
+      type: Number,
+      default: 0
+    },
     fileList: {
       type: Array,
       default: () => []
@@ -90,7 +94,7 @@ export default {
   },
   watch: {
     activeIndex(val) {
-      this.curPdfPage = (val + 1) - (this.pdfPageNow - 1) * this.pdfPageSize
+      this.curPdfPage = (val + 1)
     }
   },
   computed: {
@@ -141,14 +145,13 @@ export default {
         return;
       }
       const index = num + (this.pdfPageNow - 1) * this.pdfPageSize
-      console.log(index)
       this.$emit('changePdfPage', Number(index))
     },
     changePdfPageInput(i) {
       this.changePdfPage(i - 1)
     },
     swiperTo(pageNow) {
-      if (pageNow <= 1 || pageNow >= this.pdfTotalPage) {
+      if (pageNow < 1 || pageNow > this.pdfTotalPage) {
         return;
       }
       this.$emit('changePdfPageNow', pageNow)
@@ -215,7 +218,7 @@ export default {
           .el-input__inner{
             padding: 0px;
             height: 28px;
-            padding-left: 15px;
+            padding-left: 10px;
             font-size: 14px;
             color: #1D2128;
             border: 1px #86909C solid;
