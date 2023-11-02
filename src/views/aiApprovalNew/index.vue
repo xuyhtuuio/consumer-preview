@@ -100,7 +100,7 @@
           <div class="content-cont-body-bottom">
             <fileChange :curMode="curMode" @toggleMode="toggleMode" @changeFile="changeFile" :activeIndex="activeIndex" :fileList="files" v-if="curMode !== 0 && files[activeIndex]?.type !== 'pdf'"></fileChange>
             <pdfChange @changePdfPageNow="changePdfPageNow" @changePdfPage="changePdfPage" :pdfPageSize="pdfInfo.pageSize" :pdfTotal="pdfInfo.pdfTotal" :pdfPageNow="pdfInfo.pageNow" :pdfTotalPage="pdfInfo.pdfTotalPage" :activeIndex="activePdfIndex" :fileList="pdfInfo.list" v-if="files[activeIndex]?.type === 'pdf'"></pdfChange>
-            <file-preview ref="filePreview" :files="files" :formId="formId" :activeIndex="activeIndex" v-if="curMode !== 2"
+            <file-preview ref="filePreview" :toolView="toolView" :files="files" :formId="formId" :activeIndex="activeIndex" v-if="curMode !== 2"
               @changeFile="changeFile" @saveFile="saveFile" :lineWordItem="lineWordItem" @linePosition="linePosition" :approval="approval"
               @getProps="getProps" @findIconPosition="generateIcons"></file-preview>
             <orcTxtNew ref="ocrTxt" :approval="approval" @addWord="addWord"
@@ -266,6 +266,7 @@ export default {
     return {
       filePopoverShow: false,
       isRel: false,
+      toolView: true,
       preComment: {},
       riskNum: 0,
       activePdfIndex: 0,
@@ -406,6 +407,24 @@ export default {
         }
       },
       deep: true
+    },
+    word_lines: {
+      handler(val) {
+        if (val.length) {
+          this.toolView = false
+        } else {
+          this.toolView = true
+        }
+      }
+    },
+    high_light_lines: {
+      handler(val) {
+        if (val.length) {
+          this.toolView = false
+        } else {
+          this.toolView = true
+        }
+      }
     },
     curMode() {
       // this.findIconPosition()

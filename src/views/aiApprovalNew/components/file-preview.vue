@@ -47,7 +47,7 @@
         :lineWordItem="lineWordItem" @findIconPosition="findIconPosition" @linePosition="linePosition" @showFullScreen="fullScreen" :url="approval.url"></imgae-preview>
       <!-- 其他类型文件 -->
       <filePreview v-else :url="approval.url"></filePreview>
-      <div class="tool" v-show="['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))">
+      <div class="tool" v-if="(['jpeg', 'jpg', 'png'].includes(getfileType(approval.fileName))) && toolView">
         <span @click="saveFile">
           <i><img src="@/assets/image/ai-approval/download-white.png" alt=""></i>
           下载</span>
@@ -98,6 +98,10 @@ export default {
     formId: {
       type: String,
       default: () => ''
+    },
+    toolView: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
