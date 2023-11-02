@@ -52,7 +52,6 @@
           <div class="center">{{ scope.row.department }}</div>
         </template>
       </TrsTable>
-
     </div>
 
     <TrsPagination
@@ -139,20 +138,10 @@ export default {
     searchParmO: {}
   }),
   methods: {
-    sortChange({ column, prop, order }) {
-      console.log(column, prop, order)
-    },
-    handleClick(row) {
-      console.log(row)
-    },
-    submitEdit(row, beforeRow, prop) {
-      console.log(row)
-      console.log(beforeRow)
-      console.log(prop)
-    },
-    rowDragSort(data) {
-      console.log(data)
-    },
+    sortChange() {},
+    handleClick() {},
+    submitEdit() {},
+    rowDragSort() {},
     timeFormat(val) {
       return val ? dayjs(val).format('YYYY-MM-DD ') : '--'
     },
@@ -196,7 +185,6 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-
 .top-tabble {
   max-height: 450px;
   overflow-y: auto;
