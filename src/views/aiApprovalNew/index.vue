@@ -491,6 +491,12 @@ export default {
     }
   },
   mounted() {
+    if (!this.$route.params.item && this.isOrderDetail) {
+      this.$router.push({
+        name: 'approvalcenter',
+      })
+      return;
+    }
     let { item } = this.$route.params;
     if (!item) {
       item = this.ocrViewItem
