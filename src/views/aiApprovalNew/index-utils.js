@@ -445,6 +445,7 @@ export default {
       if (!this.isOrderDetail) {
         const commenDom = document.querySelector(`div[data-commenid=c${obj.commentId}]`)
         this.appendHighLightDom(obj, commenDom)
+        return;
       }
       const commenDom1 = document.querySelector(`div[data-commenid=c${obj.id}]`)
       if (commenDom1) {
@@ -565,7 +566,13 @@ export default {
           this.linePosition();
         });
       }
-      document.querySelector('.content-cont-editor').addEventListener('scroll', () => {
+      document.querySelector('.content-cont-editor') && document.querySelector('.content-cont-editor').addEventListener('scroll', () => {
+        this.linePosition();
+      });
+      document.querySelector('.left-info') && document.querySelector('.left-info').addEventListener('scroll', () => {
+        this.linePosition();
+      });
+      document.querySelector('.right-content') && document.querySelector('.right-content').addEventListener('scroll', () => {
         this.linePosition();
       });
       if (this.curMode !== 2) {
@@ -1214,7 +1221,7 @@ export default {
           const iconsDom = document.querySelector('.results-div')
           // const iconsDom = document.querySelector('.content-cont-icons')
           if (iconContainer) {
-            iconContainer.style.top = iconsDom.style.top
+            iconContainer.style.top = iconsDom?.style.top || 0
             iconContainer.style.height = realHeight + 'px'
             // iconsDom.style.height = realHeight + 'px'
           }
