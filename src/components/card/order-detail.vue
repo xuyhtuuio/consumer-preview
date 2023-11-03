@@ -85,7 +85,7 @@
                 }">{{ $msg('NodeStatus')[item.taskStatus] }}<i v-if="item.currentActivityName || item.nodeName">></i>{{
       item.currentActivityName || item.nodeName }}</i>
           </span>
-          <span class="check-detail" @click="changeOcrView(false)">
+          <span class="check-detail" @click="changeOcrView(false)" v-if="status == 5">
             <img src="@/assets/image/ai-approval/checkDetail.svg" alt="">
             <span>查看审批详情</span>
           </span>
