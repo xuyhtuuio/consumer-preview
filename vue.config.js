@@ -63,6 +63,7 @@ module.exports = {
         target: 'http://192.168.210.57:31602', // 开发环境
         // target: 'http://192.168.162.144:8324', // 吕强后台
         // target: 'http://10.8.0.57:8324', // 王意杨后台
+        // target: 'http://192.168.161.205:8324', // 郭子阳后台
         // target: 'http://10.8.1.148:8324', // 张延昭后台
         changeOrigin: true,
         ws: true,

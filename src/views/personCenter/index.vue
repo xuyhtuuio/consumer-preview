@@ -2,368 +2,279 @@
   <div class="person-center">
     <div class="center-scrren">
       <div class="tips">
-        <i class="iconfont icon-xiaoxi-tongzhi"></i>消保审查个人月报已生成 <span>立即查看 ↓</span>
+        <i class="iconfont icon-xiaoxi-tongzhi"></i>消保审查个人月报已生成
+        <span>立即查看 ↓</span>
       </div>
       <div class="scrren-right">
-        <div class="scrren-com" :class="billValue ? 'active' : ''">{{ billValue }}
-          <img src="../../assets/image/person-center/down.png" class="down" alt="">
-          <el-select v-model="billValue" placeholder="请选择" @change="billChange">
-            <el-option v-for="item in billOptions" :key="item.value" :label="item.label" :value="item.value">
+        <div class="scrren-com" :class="billValue ? 'active' : ''">
+          {{ billValue }}
+          <img
+            src="../../assets/image/person-center/down.png"
+            class="down"
+            alt=""
+          />
+          <el-select
+            v-model="billValue"
+            placeholder="请选择"
+            @change="handleSearchBlur"
+          >
+            <el-option
+              v-for="item in billOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
             </el-option>
           </el-select>
         </div>
-        <div class="scrren-com">
-          <div class="com-tit">选择机构
-            <img src="../../assets/image/person-center/down.png" class="down" alt="">
+        <div class="scrren-com" :class="searchData.orgId ? 'active' : ''">
+          <div class="com-tit">
+            选择机构
+            <img
+              src="../../assets/image/person-center/down.png"
+              class="down"
+              alt=""
+            />
           </div>
-          <el-cascader class="my-hidden" v-model="cascader" :options="agenciesList" :show-all-levels="false" :props="{
-            emitPath: false,
-            checkStrictly: true,
-            label: 'name',
-            value: 'id',
-            children: 'children'
-          }" @change="handleOrganChange"></el-cascader>
-          <el-tooltip class="item" effect="dark" content="选择机构提示文字" placement="top">
-            <img src="@/assets/image/person-center/hintIcon.png" alt="" class="hintIcon">
+          <el-cascader
+            class="my-hidden"
+            v-model="searchData.orgId"
+            :options="agenciesList"
+            :show-all-levels="false"
+            :props="{ label: 'name', value: 'id', checkStrictly: true }"
+            @change="handleSearchBlur"
+          ></el-cascader>
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="可筛选至任意层级"
+            placement="top"
+          >
+            <img
+              src="@/assets/image/person-center/hintIcon.png"
+              alt=""
+              class="hintIcon"
+            />
           </el-tooltip>
         </div>
-        <div class="scrren-com">
-          <el-popover placement="bottom-start" trigger="click" @show="handlePopoverShow" @hide="handlePopoverHide"
-            :width="400">
-            <el-date-picker ref="my-date-picker" v-model="datePicker" type="monthrange" align="right" range-separator="至"
-              start-placeholder="开始月份" end-placeholder="结束月份" :picker-options="pickerOptions">
+        <div
+          class="scrren-com"
+          :class="searchData.datePicker.length ? 'active' : ''"
+        >
+          <el-popover
+            placement="bottom-start"
+            trigger="click"
+            @show="handlePopoverShow"
+            @hide="handleSearchBlur"
+            :width="400"
+          >
+            <el-date-picker
+              ref="my-date-picker"
+              v-model="searchData.datePicker"
+              type="monthrange"
+              align="right"
+              value-format="yyyy-MM"
+              range-separator="至"
+              start-placeholder="开始月份"
+              end-placeholder="结束月份"
+              :picker-options="pickerOptions"
+            >
             </el-date-picker>
             <div slot="reference">
               提单时间
-              <img src="../../assets/image/person-center/down.png" class="down" alt="" />
+              <img
+                src="../../assets/image/person-center/down.png"
+                class="down"
+                alt=""
+              />
             </div>
           </el-popover>
         </div>
-        <div class="scrren-btn">
-          <img src="@/assets/image/person-center/reset.png" alt="" class="btnIcon">
+        <div class="scrren-btn" @click="resetSearchData()">
+          <img
+            src="@/assets/image/person-center/reset.png"
+            alt=""
+            class="btnIcon"
+          />
           重置
         </div>
         <div class="scrren-btn">
-          <img src="@/assets/image/person-center/share.png" alt="" class="btnIcon">
+          <img
+            src="@/assets/image/person-center/share.png"
+            alt=""
+            class="btnIcon"
+          />
           导出数据
         </div>
       </div>
     </div>
-    <div class="person-approval" v-if="billValue === '审批人员'">
-      <div class="approval-top">
-        <div class="top-com">
-          <div class="com-tit">贡献值分布</div>
-          <div class="com-echarts" id="contribution"></div>
-        </div>
-        <div class="top-com">
-          <div class="com-tit">接受率分布</div>
-          <div class="com-echarts">
-            <barEcharts :industryData="acceptanceData"></barEcharts>
-          </div>
-        </div>
-        <div class="top-com">
-          <div class="com-tit">平均处理时长分布</div>
-          <div class="com-echarts-wrap">
-            <div class="com-echarts" id="processing"></div>
-            <div class="com-lenged">
-
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="approval-table">
-        <div class="table-tit">
-          <div class="tit-left">
-            <div class="left-com">全部人员</div>
-            <div class="left-com black">共<span class="blue">1500</span>人</div>
-          </div>
-          <div class="tit-search">
-            <el-input v-model="keywords" placeholder="请输入审查人员姓名" clearable @clear="approvalList"
-              @keyup.enter.native="approvalList">
-              <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="approvalList"></i>
-            </el-input>
-          </div>
-        </div>
-        <div class="table-wrap  TRS-table-gray">
-          <el-table :header-cell-style="{ background: '#f5f6f6' }" :data="approvalTable" style="width: 100%;">
-            <el-table-column type="index" show-overflow-tooltip label="序号" align="center" width="75px">
-              <template slot-scope="scope">
-                <p class="black fs14">{{ scope.$index + 1 }}</p>
-              </template>
-            </el-table-column>
-            <el-table-column prop="name" show-overflow-tooltip label="审查人员" min-width="90px">
-              <template slot-scope="scope">
-                <p class="black fs14">{{ scope.row.name }}</p>
-                <p class="gray fs12">{{ scope.row.id }}</p>
-              </template>
-            </el-table-column>
-            <el-table-column prop="level" :sortable='true' show-overflow-tooltip label="等级" align="center"
-              min-width="130px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <img class="icon w24" v-if="scope.$index === 0" src="../../assets/image/person-center/level1.png"
-                    alt="">
-                  <img class="icon w24" v-else-if="scope.$index === 1" src="../../assets/image/person-center/level2.png"
-                    alt="">
-                  <img class="icon w24" v-else src="../../assets/image/person-center/level3.png" alt="">
-                  <p class="gray fs12 fw">Lv.{{ scope.row.level }}</p>
-                  <p class="black fs12">{{ scope.row.levelName }}</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="gxz" :sortable='true' show-overflow-tooltip label="贡献值" align="center"
-              min-width="90px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs14 fw">{{ scope.row.gxz }}</p>
-                  <img @click="rejectDialogShow('月度贡献值变化情况', scope.row)" class="icon pointer w16"
-                    src="../../assets/image/person-center/tc1.png" alt="">
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="scs" :sortable='true' show-overflow-tooltip label="审查数" align="center"
-              min-width="100px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.scs }}</p>
-                  <p class="gray fs12 pt6 flex-box ">项<img @click="rejectDialogShow('审批概览', scope.row)"
-                      class="icon pointer  w16" src="../../assets/image/person-center/tc2.png" alt=""></p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="yjts" :sortable='true' show-overflow-tooltip label="意见条数" align="center"
-              min-width="120px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.yjts }}</p>
-                  <p class="gray fs12 pt6">条</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="szxyj" :sortable='true' show-overflow-tooltip label="实质性意见" align="center"
-              min-width="130px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.szxyj }}</p>
-                  <p class="gray fs12 pt6">/{{ scope.row.szxyjRate }}</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="fszxyj" :sortable='true' show-overflow-tooltip label="非质性意见" align="center"
-              min-width="130px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.fszxyj }}</p>
-                  <p class="gray fs12 pt6">/{{ scope.row.fszxyjRate }}</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="mpbs" :sortable='true' show-overflow-tooltip label="秒批笔数" align="center"
-              min-width="130px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.mpbs }}</p>
-                  <p class="gray fs12 pt6">项</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="pjclsc" :sortable='true' show-overflow-tooltip label="平均处理时长" align="center"
-              min-width="130px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.pjclsc }}</p>
-                  <p class="gray fs12 pt6">h</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="jsl" :sortable='true' show-overflow-tooltip label="接受率" align="center"
-              min-width="90px">
-            </el-table-column>
-            <el-table-column prop="hjtgl" :sortable='true' show-overflow-tooltip label="回检通过率" align="center"
-              min-width="130px">
-            </el-table-column>
-          </el-table>
-          <trs-pagination :total="total" @getList="approvalList" :pageNow="pageNow"></trs-pagination>
-        </div>
-      </div>
-    </div>
-    <div class="person-approval" v-if="billValue === '提单人员'">
-      <div class="approval-top">
-        <div class="top-com">
-          <div class="com-tit">一次通过率分布</div>
-          <div class="com-echarts1">
-            <barEcharts :industryData="passData"></barEcharts>
-          </div>
-        </div>
-        <div class="top-com">
-          <div class="com-tit">接受率分布</div>
-          <div class="com-echarts1">
-            <barEcharts :industryData="acceptanceDataBill"></barEcharts>
-          </div>
-        </div>
-        <div class="top-com">
-          <div class="com-tit">驳回率分布</div>
-          <div class="com-echarts1">
-            <barEcharts :industryData="rejectionData"></barEcharts>
-          </div>
-        </div>
-      </div>
-      <div class="approval-table">
-        <div class="table-tit">
-          <div class="tit-left">
-            <div class="left-com">全部人员</div>
-            <div class="left-com black">共<span class="blue">1500</span>人</div>
-          </div>
-          <div class="tit-search">
-            <el-input v-model="keywords" placeholder="请输入提单人员姓名" clearable @clear="approvalList"
-              @keyup.enter.native="approvalList">
-              <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="approvalList"></i>
-            </el-input>
-          </div>
-        </div>
-        <div class="table-wrap  TRS-table-gray">
-          <el-table :header-cell-style="{ background: '#f5f6f6' }" :data="billTable" style="width: 100%;">
-            <el-table-column type="index" show-overflow-tooltip label="序号" align="center" width="75px">
-              <template slot-scope="scope">
-                <p class="black fs14">{{ scope.$index + 1 }}</p>
-              </template>
-            </el-table-column>
-            <el-table-column prop="name" show-overflow-tooltip label="提单人员" min-width="100px">
-              <template slot-scope="scope">
-                <p class="black fs14">{{ scope.row.name }}</p>
-                <p class="gray fs12">{{ scope.row.id }}</p>
-              </template>
-            </el-table-column>
-            <el-table-column prop="tds" :sortable='true' show-overflow-tooltip label="提单数" align="center"
-              min-width="90px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.tds }}</p>
-                  <p class="gray fs12 pt6 flex-box ">项<img class="icon pointer  w16"
-                      @click="rejectDialogShow('申请概览', scope.row)" src="../../assets/image/person-center/tc2.png" alt="">
-                  </p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="yjts" :sortable='true' show-overflow-tooltip label="意见条数" align="center"
-              min-width="120px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.yjts }}</p>
-                  <p class="gray fs12 pt6">条</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="szxyj" :sortable='true' show-overflow-tooltip label="实质性意见" align="center"
-              min-width="120px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.szxyj }}</p>
-                  <p class="gray fs12 pt6">/{{ scope.row.szxyjRate }}</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="fszxyj" :sortable='true' show-overflow-tooltip label="非质性意见" align="center"
-              min-width="120px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.fszxyj }}</p>
-                  <p class="gray fs12 pt6">/{{ scope.row.fszxyjRate }}</p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="jsl" :sortable='true' show-overflow-tooltip label="接受率" align="center"
-              min-width="90px">
-            </el-table-column>
-            <el-table-column prop="yctgl" :sortable='true' show-overflow-tooltip label="一次通过率" align="center"
-              min-width="120px">
-            </el-table-column>
-            <el-table-column prop="bhqk" :sortable='true' show-overflow-tooltip label="驳回情况" align="center"
-              min-width="120px">
-              <template slot-scope="scope">
-                <div class="flex-box">
-                  <p class="black fs16 ">{{ scope.row.bhqk }}</p>
-                  <p class="gray fs12 pt6 flex-box">/{{ scope.row.bhqkRate }}<img class="icon pointer  w16"
-                      @click="rejectDialogShow('驳回情况', scope.row)" src="../../assets/image/person-center/tc1.png" alt="">
-                  </p>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="hjtgl" :sortable='true' show-overflow-tooltip label="回检通过率" align="center"
-              min-width="120px">
-            </el-table-column>
-          </el-table>
-          <trs-pagination :total="total" @getList="approvalList" :pageNow="pageNow"></trs-pagination>
-        </div>
-      </div>
-    </div>
-    <el-dialog :visible.sync="rejectDialog" :before-close="rejectDialogClose"
-      :width="rejectDialogTit === '驳回情况' ? '800px' : '1000px'" center custom-class="transfer-dialog">
+    <personApproval
+      v-if="billValue === '审批人员'"
+      ref="personApproval"
+      @rejectDialogShow="rejectDialogShow"
+      :searchData="searchData"
+    >
+    </personApproval>
+    <personLading
+      v-if="billValue === '提单人员'"
+      ref="personLading"
+      @rejectDialogShow="rejectDialogShow"
+      :searchData="searchData"
+    >
+    </personLading>
+    <el-dialog
+      :visible.sync="rejectDialog"
+      :before-close="rejectDialogClose"
+      :width="rejectDialogTit === '驳回情况' ? '800px' : '1000px'"
+      center
+      custom-class="transfer-dialog"
+    >
       <span slot="title">{{ rejectDialogTit }}</span>
       <div class="dialog-cont">
-        <div class="cont-approve" v-if="rejectDialogTit === '审批概览' || rejectDialogTit === '申请概览'">
+        <div
+          class="cont-approve"
+          v-if="
+            rejectDialogTit === '审批概览' || rejectDialogTit === '申请概览'
+          "
+        >
           <div class="user">
             <div class="user-info">
               <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
               <span class="nickname">
-                谭新宇
+                {{ approvalUser.userName }}
               </span>
-              <span>总行 | 财富平台部 | 财富客群团队</span>
+              <div class="user-org" v-if="approvalUser.orgList.length">
+                <span
+                  v-for="(item, index) in approvalUser.orgList"
+                  :key="index"
+                >
+                  {{ item }}
+                  <i v-if="index < approvalUser.orgList.length - 1"> | </i>
+                </span>
+              </div>
             </div>
             <slot name="apply-modify"></slot>
           </div>
           <div class="filters">
             <div class="filters-content">
               <div class="floor1">
-                <el-select v-model="search.approvalType" placeholder="审批事项类型" @change="searchList" clearable>
-                  <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
-                    :value="item.value"></el-option>
+                <el-select
+                  v-model="approvalSearch.formManagementId"
+                  placeholder="审批事项类型"
+                  @change="getApprovaSearch(1)"
+                  clearable
+                >
+                  <el-option
+                    v-for="(item, index) in transactionTypes"
+                    :key="index"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
                 </el-select>
-                <el-select v-model="search.hasOpinions" placeholder="有/无实质意见" @change="searchList" clearable>
-                  <el-option v-for="(item, index) in $field('isOpinions')" :key="index" :label="item.label"
-                    :value="item.value"></el-option>
+                <el-select
+                  v-model="approvalSearch.hasOpinions"
+                  placeholder="有/无实质意见"
+                  @change="getApprovaSearch(1)"
+                  clearable
+                >
+                  <el-option
+                    v-for="(item, index) in $field('isOpinions')"
+                    :key="index"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
                 </el-select>
-                <el-select v-model="search.onceAdopt" placeholder="一次通过" @change="searchList" clearable>
-                  <el-option v-for="(item, index) in $field('isOncePass')" :key="index" :label="item.label"
-                    :value="item.value"></el-option>
+                <el-select
+                  v-model="approvalSearch.onceAdopt"
+                  placeholder="是否一次通过"
+                  @change="getApprovaSearch(1)"
+                  clearable
+                >
+                  <el-option
+                    v-for="(item, index) in $field('isOncePass')"
+                    :key="index"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
                 </el-select>
               </div>
               <div class="floor2">
                 <div class="floor2-item">
-                  <el-input v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
-                    @keyup.enter.native="searchList">
-                    <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
+                  <el-input
+                    v-model="approvalSearch.keywords"
+                    placeholder="请输入项目名称关键词查询"
+                    clearable
+                    @clear="getApprovaSearch(1)"
+                    @keyup.enter.native="getApprovaSearch(1)"
+                  >
+                    <i
+                      slot="suffix"
+                      class="el-input__icon el-icon-search pointer"
+                      @click="getApprovaSearch(1)"
+                    ></i>
                   </el-input>
                 </div>
                 <div class="floor2-item floor2-itemW">
                   <span>提单时间</span>
-                  <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
-                    value-format="yyyy-MM-dd" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间">
+                  <el-date-picker
+                    v-model="approvalSearch.startDate"
+                    type="daterange"
+                    clearable
+                    @change="getApprovaSearch(1)"
+                    value-format="yyyy-MM-dd"
+                    range-separator="-"
+                    start-placeholder="开始时间"
+                    end-placeholder="结束时间"
+                  >
                   </el-date-picker>
                 </div>
               </div>
             </div>
           </div>
-          <div class="list trs-scroll" v-loading="search.loading" ref="box">
+          <div
+            class="list trs-scroll"
+            v-loading="approvalSearch.loading"
+            ref="box"
+          >
             <div v-if="list.length">
               <div v-for="(item, index) in list" :key="index">
-                <approvalEventCard :item="item" :crtSign="crtSign"></approvalEventCard>
+                <approvalEventCard
+                  :item="item"
+                  :crtSign="crtSign"
+                  v-if="rejectDialogTit === '审批概览'"
+                ></approvalEventCard>
+                <applyEventCard
+                  :item="item"
+                  v-if="rejectDialogTit === '申请概览'"
+                ></applyEventCard>
               </div>
-              <trs-pagination :total="search.total" @getList="getList" :pageNow="pageNow"></trs-pagination>
+              <trs-pagination
+                :total="approvalSearch.total"
+                @getList="getApprovaSearch"
+                :pageNow="approvalSearch.pageNow"
+              ></trs-pagination>
             </div>
-            <div v-loading="search.loading" v-else>
+            <div v-else>
               <Empty></Empty>
             </div>
           </div>
         </div>
-        <div class="cont-echart" v-if="rejectDialogTit === '月度贡献值变化情况'">
-          <div class="stackBar-echarts" id="passing-echarts"></div>
+        <div
+          class="cont-echart"
+          v-if="rejectDialogTit === '月度贡献值变化情况'"
+        >
+          <div v-loading="passingLoading">
+            <div class="stackBar-echarts" id="passing-echarts"></div>
+          </div>
         </div>
         <div class="cont-reject" v-if="rejectDialogTit === '驳回情况'">
           <div class="reject-tab">
             <template v-for="(item, index) in tabList">
-              <div :class="['tab-name', currentTabListIndex === index && 'active']" :key="'total' + item.id"
-                @click="handleTabToggle(index)">
+              <div
+                :class="['tab-name', currentTabListIndex === index && 'active']"
+                :key="'total' + item.id"
+                @click="handleTabToggle(index)"
+              >
                 {{ item.name }}
               </div>
               <span v-if="index !== 1" class="line" :key="index"></span>
@@ -373,32 +284,60 @@
             <div class="filters-content">
               <div class="floor2">
                 <div class="floor2-item">
-                  <el-select v-model="search.approvalType" placeholder="审批事项类型" @change="searchList" clearable>
-                    <el-option v-for="(item, index) in transactionTypes" :key="index" :label="item.label"
-                      :value="item.value"></el-option>
+                  <el-select
+                    v-model="rejectSearch.recordId"
+                    placeholder="审批事项类型"
+                    @change="rejectSearchChange()"
+                    clearable
+                  >
+                    <el-option
+                      v-for="(item, index) in transactionTypes"
+                      :key="index"
+                      :label="item.label"
+                      :value="item.value"
+                    ></el-option>
                   </el-select>
                 </div>
                 <div class="floor2-item floor2-itemW">
                   <span>提单时间</span>
-                  <el-date-picker v-model="search.startDate" type="daterange" @clear="searchList" @change="searchList"
-                    value-format="yyyy-MM-dd" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间">
+                  <el-date-picker
+                    v-model="rejectSearch.seachTime"
+                    type="daterange"
+                    clearable
+                    :picker-options="rejectPickerOptions"
+                    @change="rejectSearchChange()"
+                    value-format="yyyy-MM-dd"
+                    range-separator="-"
+                    start-placeholder="开始时间"
+                    end-placeholder="结束时间"
+                  >
                   </el-date-picker>
                 </div>
               </div>
             </div>
           </div>
-          <div class="reject-echart">
+          <div class="reject-echart" v-loading="rejectLoading">
             <div class="echart-com" v-show="currentTabListIndex === 0">
               <div class="com-echart" id="reason-echart"></div>
               <div class="legend">
-                <div class="legend-item" v-for="(item, index) in reasonData.xData" :key="'legend' + index">
-                  <span class="legend-icon" :style="{ backgroundColor: reasonData.color[index] }"></span>
+                <div
+                  class="legend-item"
+                  v-for="(item, index) in reasonData.xData"
+                  :key="'legend' + index"
+                >
+                  <span
+                    class="legend-icon"
+                    :style="{ backgroundColor: reasonData.color[index] }"
+                  ></span>
                   <span>{{ item }}</span>
                 </div>
               </div>
             </div>
             <div class="echart-com" v-show="currentTabListIndex === 1">
-              <div class="com-echart com-echart-rate" id="reasonRate-echart"></div>
+              <div
+                class="com-echart com-echart-rate"
+                id="reasonRate-echart"
+              ></div>
             </div>
           </div>
         </div>
@@ -407,29 +346,37 @@
   </div>
 </template>
 <script>
+import { getApprovalType } from '@/api/approvalCenter'
+import { onlyBankOrgTree } from '@/api/statistical-center'
 import {
-  getApprovalType,
-  getApprovalListStation,
-  getOrgTree
-} from '@/api/approvalCenter'
-import { proposeAcceptRate, proposeOnePassRate } from '@/api/personCenter'
+  contributionChange,
+  rejectReason,
+  rejectRate,
+  oneApprovalList,
+  oneApplicationList
+} from '@/api/personCenter'
 import approvalEventCard from './components/approval-event-card'
-import barEcharts from './components/bar-echarts'
+import applyEventCard from './components/apply-event-card'
+import personApproval from './components/person-approval'
+import personLading from './components/person-lading'
 export default {
   components: {
-    barEcharts,
-    approvalEventCard
+    approvalEventCard,
+    personApproval,
+    applyEventCard,
+    personLading
   },
   name: 'person-center-index',
   data() {
     return {
-      total: 5,
-      pageNow: 1,
-      cascader: '',
+      searchData: {
+        orgId: '',
+        datePicker: []
+      },
       agenciesList: [],
       pickerOptions: {
         disabledDate(time) {
-          return time.getTime() > Date.now();
+          return time.getTime() > Date.now()
         },
         shortcuts: [
           {
@@ -458,237 +405,38 @@ export default {
           }
         ]
       },
-      datePicker: '',
-      contributionData: {
-        xData: ['＜100', '100(含)-200', '200(含)-300', '300(含)-400', '400(含)-500'],
-        yData: [800, 1200, 390, 200, 1500],
+      rejectPickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now()
+        }
       },
-      acceptanceData: {
-        name: '接受率（%）',
-        xData: ['＜20%', '20(含)-40%', '40(含)-60%', '60(含)-80%', '80(含)-100%'],
-        yData: [800, 1200, 390, 200, 1500],
-        rate: ['10%', '20%', '30%', '10%', '40%'],
-      },
-      processingData: [
-        { value: 200, name: '0-2h', rate: '12' },
-        { value: 400, name: '2-5h', rate: '14' },
-        { value: 300, name: '5-10h', rate: '16' },
-        { value: 100, name: '10-24h', rate: '20' },
-        { value: 100, name: '24-48h', rate: '40' },
-        { value: 100, name: '48h以上', rate: '10' },
+      billOptions: [
+        {
+          value: '审批人员',
+          label: '审批人员'
+        },
+        {
+          value: '提单人员',
+          label: '提单人员'
+        }
       ],
-      colorListTimes: ['#5773F9', '#249EFF', '#21CCFF', '#81E2FF', '#81DC74', '#B7DB57'],
-      approvalTable: [
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 1,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 2,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 3,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 4,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          level: 5,
-          levelName: '心领神会',
-          gxz: 120,
-          scs: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          mpbs: 319,
-          pjclsc: 2.5,
-          jsl: '90%',
-          hjtgl: '80%',
-        },
-      ],
-      billTable: [
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-        {
-          name: '谭新宇',
-          id: 'ID.34279811',
-          tds: 156,
-          yjts: 39,
-          szxyj: 2782,
-          szxyjRate: '38%',
-          fszxyj: 2782,
-          fszxyjRate: '38%',
-          jsl: '90%',
-          yctgl: '90%',
-          bhqk: 2378,
-          bhqkRate: '90%',
-          hjtgl: '80%',
-        },
-      ],
-      keywords: '',
-      billOptions: [{
-        value: '审批人员',
-        label: '审批人员'
-      }, {
-        value: '提单人员',
-        label: '提单人员'
-      }],
       billValue: '审批人员',
-      passData: {
-        name: '一次通过率分布（人）',
-        xData: ['＜20%', '20(含)-40%', '40(含)-60%', '60(含)-80%', '80(含)-100%'],
-        yData: [700, 1200, 390, 200, 1500],
-        rate: ['10%', '20%', '30%', '10%', '40%'],
-      },
-      acceptanceDataBill: {
-        name: '接受率分布（人）',
-        xData: ['＜20%', '20(含)-40%', '40(含)-60%', '60(含)-80%', '80(含)-100%'],
-        yData: [600, 1200, 390, 200, 1500],
-        rate: ['10%', '20%', '30%', '10%', '40%'],
-      },
-      rejectionData: {
-        name: '驳回率分布（人）',
-        xData: ['＜20%', '20(含)-40%', '40(含)-60%', '60(含)-80%', '80(含)-100%'],
-        yData: [100, 1100, 390, 200, 1500],
-        rate: ['10%', '20%', '30%', '10%', '40%'],
-        seriesItemStyle: ['rgba(255,221,100,0.6)', 'rgba(255,153,0,0.6)'],
-        emphasisItemStyle: ['#FFDD64', '#FF9900'],
-      },
       rejectDialog: false,
       rejectDialogTit: '',
       passingData: {
-        xData: ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01'],
-        yData: [10, 12, 30, 20, 15],
+        xData: [],
+        yData: []
       },
-      search: {
-        approvalType: '',
-        approvalStage: '',
-        urgent: '',
+      approvalSearch: {
+        formManagementId: '',
         hasOpinions: '',
-        adoptionStatus: '',
+        onceAdopt: '',
         keywords: '',
         startDate: [],
-        productLaunchDate: [],
+        pageNow: 1,
+        pageSize: 10,
         total: 0,
-        loading: false,
-        orgIds: []
+        loading: false
       },
       transactionTypes: [],
       crtSign: 'allTask',
@@ -697,293 +445,106 @@ export default {
         { id: 1, name: '驳回原因分布' },
         { id: 2, name: '驳回率' }
       ],
-      currentTabListIndex: 0,
+      currentTabListIndex: null,
       reasonData: {
-        xData: [
-          '文件预览失败（文件损坏/清晰度过低）',
-          '附件材料与审批项目不匹配',
-          '其他',
-        ],
-        yData: [10, 12, 30],
-        color: [
-          '#249EFF',
-          '#65CFE4',
-          '#74E4BD',
-        ],
-        yDataHint: [
-          {
-            cp: 210,
-            hd: 230,
-            kh: 220,
-            qt: 240,
-          },
-          {
-            cp: 210,
-            hd: 230,
-            kh: 220,
-            qt: 240,
-          },
-          {
-            cp: 210,
-            hd: 230,
-            kh: 220,
-            qt: 240,
-          }
-        ],
+        xData: [],
+        yData: [],
+        color: ['#249EFF', '#65CFE4', '#74E4BD'],
+        yDataHint: []
       },
       rejectionRateData: {
         name: '驳回率',
         xData: ['2022-11', '2022-12', '2023-01', '2023-02', '2023-03'],
-        yData: [800, 1200, 390, 200, 1500],
+        yData: [800, 1200, 390, 200, 1500]
       },
+      passingLoading: false,
+      rowData: {},
+      rejectLoading: false,
+      rejectSearch: {
+        recordId: '',
+        seachTime: []
+      },
+      approvalUser: {
+        userName: '',
+        orgList: []
+      }
     }
   },
   mounted() {
-    this.getProposeAcceptRate()
-    this.getProposeOnePassRate()
     this.getOrgTree()
-    this.billChange()
+    this.handleSearchBlur()
   },
-  watch: {
-  },
-  created() {
-  },
+  watch: {},
+  created() {},
   methods: {
-    getOrgTree() {
-      getOrgTree().then((res) => {
-        const { data } = res.data
-        if (data) {
-          const value = this.formatOrg(data.children)
-          this.agenciesList = [
-            {
-              ...data,
-              children: value
-            }
-          ]
-        }
-      })
+    resetSearchData() {
+      this.searchData.orgId = ''
+      this.searchData.datePicker = []
+      this.handleSearchBlur()
     },
-    formatOrg(data) {
-      data.forEach((m) => {
-        if (m.children && m.children.length) {
-          this.formatOrg(m.children)
-        } else {
-          m.children = null
-        }
+    getOrgTree() {
+      onlyBankOrgTree().then((res) => {
+        const { data } = res.data
+        this.agenciesList = data || []
       })
-      return data
     },
     rejectDialogClose() {
       this.rejectDialog = false
       this.rejectDialogTit = ''
+      this.currentTabListIndex = null
+      this.approvalSearch.formManagementId = ''
+      this.approvalSearch.hasOpinions = ''
+      this.approvalSearch.onceAdopt = ''
+      this.approvalSearch.keywords = ''
+      this.approvalSearch.startDate = []
     },
-    billChange() {
-      if (this.billValue === '审批人员') {
-        this.$nextTick(() => {
-          this.initContribuEcharts(this.contributionData)
-          this.initProcessingEcharts(this.processingData)
-        })
+    getApprovaSearch(pageNow) {
+      if (this.rejectDialogTit === '审批概览') {
+        this.getApprovaList(pageNow)
+      }
+      if (this.rejectDialogTit === '申请概览') {
+        this.getApplicatList(pageNow)
       }
     },
-    // eslint-disable-next-line no-unused-vars
-    rejectDialogShow(rejectDialogTit, rowData) {
-      this.rejectDialogTit = rejectDialogTit;
+    rejectDialogShow(rejectDialogData) {
+      // console.log('rejectDialogData', rejectDialogData);
+      this.rejectDialogTit = rejectDialogData.rejectDialogTit
+      this.rowData = rejectDialogData.rowData
       this.rejectDialog = true
       if (this.rejectDialogTit === '月度贡献值变化情况') {
         this.$nextTick(() => {
-          this.initPassingEcharts(this.passingData);
+          this.getContributionChange()
         })
       }
-      if (this.rejectDialogTit === '审批概览' || this.rejectDialogTit === '申请概览') {
+      if (this.rejectDialogTit === '审批概览') {
         this.getApprovalType()
-        this.getList(1)
+        this.getApprovaList(1)
+      }
+      if (this.rejectDialogTit === '申请概览') {
+        this.getApprovalType()
+        this.getApplicatList(1)
       }
       if (this.rejectDialogTit === '驳回情况') {
         this.$nextTick(() => {
-          this.initReasonEcharts(this.reasonData);
+          this.getApprovalType()
+          this.handleTabToggle(0)
         })
       }
     },
-    approvalList() {
-    },
-    // 贡献值分布
-    initContribuEcharts(industryDataVal) {
-      const option = {
-        tooltip: {
-          backgroundColor: 'rgba(255,255,255,0.8)',
-          trigger: 'axis',
-          formatter: (serie) => {
-            const name = serie[0].axisValueLabel
-            let params = `<p class="charts-tooltip-p fontw black"><span class="serieName"><span class="charts-tooltip-dot" style="background: #5773F9;"></span>${name}</span><span><span class="blue">${serie[0].data}</span>人</span></p>`
-            params += `<p class="charts-tooltip-p black">占全部人员  <span class="blue">${serie[0].data}</span>%</p>`
-            return params
-          },
-        },
-        grid: {
-          left: '0',
-          right: '0',
-          top: '14%',
-          bottom: '12%',
-          containLabel: true
-        },
-        legend: {
-          bottom: 0,
-          itemWidth: 8,
-          itemHeight: 8,
-          itemStyle: {
-            color: '#2D5CF6'
-          }
-        },
-        yAxis: {
-          type: 'value',
-          name: '人',
-          minInterval: 1,
-        },
-        xAxis: {
-          type: 'category',
-          data: industryDataVal.xData,
-        },
-        series: [
-          {
-            // barWidth: '16px',
-            name: '贡献值（分）',
-            type: 'bar',
-            label: {
-              show: false
-            },
-            itemStyle: {
-              normal: {
-                // borderRadius: [8, 8, 0, 0],
-                color: {
-                  type: 'linear',
-                  x: 0,
-                  y: 0,
-                  x2: 0,
-                  y2: 1,
-                  colorStops: [
-                    {
-                      offset: 0, color: 'rgba(33,204,255,0.6)', opacity: 0.6, // 100% 处的颜色
-                    },
-                    {
-                      offset: 1, color: 'rgba(45,92,246,0.6)', opacity: 0.6, // 0% 处的颜色
-                    }
-                  ],
-                },
-              },
-            },
-            emphasis: {
-              itemStyle: {
-                // borderRadius: [8, 8, 0, 0],
-                color: {
-                  type: 'linear',
-                  x: 0,
-                  y: 0,
-                  x2: 0,
-                  y2: 1,
-                  colorStops: [
-                    {
-                      offset: 0, color: '#21CCFF', opacity: 1, // 100% 处的颜色
-                    },
-                    {
-                      offset: 1, color: '#2D5CF6', opacity: 1, // 0% 处的颜色
-                    }
-                  ],
-                },
-              },
-            },
-            data: industryDataVal.yData.reverse(),
-          },
-        ]
-      };
-      this.initChart('contribution', option)
-    },
-    // 平均处理时长分布
-    initProcessingEcharts(industryDataVal) {
-      const option = {
-        color: this.colorListTimes,
-        tooltip: {
-          trigger: 'item',
-          backgroundColor: 'rgba(255,255,255,0.8)',
-          borderWidth: 0,
-          formatter: (serie) => {
-            const { name } = serie
-            let params = `<p class="charts-tooltip-p fontw black"><span class="serieName"><span class="charts-tooltip-dot" style="background: ${serie.color}"></span>平均处理时长${name}</span><span><span class="blue">${serie.value}</span>人</span></p>`
-            params += `<p class="charts-tooltip-p black">占全部人员  <span class="blue">${serie.data.rate}</span>%</p>`
-            return params
-          },
-        },
-        // legend: {
-        //   right: 0,
-        //   bottom: 0,
-        //   itemWidth: 12,
-        //   itemHeight: 8,
-        //   // itemStyle: {
-        //   //   color: '#2D5CF6'
-        //   // }
-        // },
-        legend: {
-          orient: 'vertical',
-          right: 25,
-          y: 'center',
-          // 设置图例形状
-          itemWidth: 12,
-          itemHeight: 8,
-          itemGap: 15,
-          textStyle: {
-            fontSize: 12,
-            rich: {
-              a: {
-                fontWeight: 400,
-              },
-              b: {
-                width: '200px',
-                lintHeight: '28px'
-              }
-            }
-          },
-          formatter(name) {
-            const { value } = industryDataVal.find((item) => item.name === name)
-            return `{b|${name}} {a| ${value}人}`
-          }
-        },
-        grid: {
-          left: '0',
-          right: '0',
-          bottom: '14%',
-          containLabel: true
-        },
-        series: [
-          {
-            name: '平均处理时长',
-            type: 'pie',
-            radius: [35, 80],
-            center: ['30%', '50%'],
-            label: {
-              show: false,
-              position: 'center'
-            },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: 12,
-                formatter({ name, value }) {
-                  return `{a|${name}项}\n{b| ${value}}`
-                },
-                rich: {
-                  a: {
-                    lineHeight: 20,
-                    fontWeight: '700'
-                  },
-                  b: {
-                    color: '#505968'
-                  }
-                }
-              }
-            },
-            data: this.processingData
-          }]
-      };
-      this.initChart('processing', option)
+    // 贡献值月度变化
+    async getContributionChange() {
+      this.passingData.xData = []
+      this.passingData.yData = []
+      await contributionChange({ userId: this.rowData.userId }).then((res) => {
+        this.passingLoading = true
+        const { data } = res
+        if (data) {
+          this.passingData.xData = data.data.titleList
+          this.passingData.yData = data.data.numList
+          this.initPassingEcharts(this.passingData)
+        }
+        this.passingLoading = false
+      })
     },
     // 月度贡献值变化情况
     initPassingEcharts(industryDataVal) {
@@ -996,7 +557,7 @@ export default {
             let params = '<p class="charts-tooltip-p fontw black">贡献值</p>'
             params += `<p class="charts-tooltip-p black"><span style="margin-right:12px">${name}</span><span>贡献值${serie[0].data}</span></p>`
             return params
-          },
+          }
         },
         grid: {
           left: '0',
@@ -1007,11 +568,11 @@ export default {
         yAxis: {
           type: 'value',
           name: '分',
-          minInterval: 1,
+          minInterval: 1
         },
         xAxis: {
           type: 'category',
-          data: industryDataVal.xData,
+          data: industryDataVal.xData
         },
         dataZoom: [
           {
@@ -1024,12 +585,13 @@ export default {
             fillerColor: '#E5F9FF',
             moveHandleSize: 0,
             handleSize: '180%',
-            handleIcon: 'image://data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAABCcAAAQnAEmzTo0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAIuSURBVHgBtVXBTttAEH2zDiZRixRoT1UrkgP3Vj311H5ApVb9gbZfAHwByReQP2i/oCpSP4CeekLlzgEjEHAJRAKU4MReZpI42qzXlmOJJ1nyjj1vdmZn3hJycKx1vTrCptb4wE+DTY3ppx4RDuMR9oaE380aBVkc5DJe9HVDe/ghxCgCws8wQtsVSNmGy1Bvxgr/C5MLNL757HM+0Fu5AS6GeifS6PBrHYujrgm7wmEaZyWSnU/JUwhj4OQeuIkm62dL/FSAp547Emlsv6hSZxZAai5lsXcuxP9ugaO+m2ijBrx94gzUY983cibjEjH5jk1+y7v9dZVNLpBvf64n/1qoL3OTjDOY7v7YJs9wdEIy+LIG+FbLhD5WFdf9s+1wcFecPNmQlNJGZYAtpSr4ZP+cV5YsiI+cmQnPw3vF/f7aNHZHKI3gfn4t0y9Vmzvc7hCl4ShrQ+GRoXjMA9Ow4qE01iopU0+Rmg+wXkVpPF+aX7N0HKoowl/T6PNsb5QIIj6piY6xR6L5fohr0x5qnuLuYoP2cTUdgNu2qZpEcnnsmx8kC5fDIuRyR4gW5YqdZHAgYjdwk0tZ3q2kJQKG2M3k+owvC85k10UkgWQAkxmRTltfdhKPwQO2/dKU6wSnfd1SE2UtjThG+1WNWsk6dSdPM0nJdwH0eOftZOeZAQRyJlyVFs/IVxQA9/v+MMJ316VPeY7jQCLnrLg0EcUkq4BJA80zNKqiI52YxfEArMjodcM5n8kAAAAASUVORK5CYII=',
+            handleIcon:
+              'image://data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAABCcAAAQnAEmzTo0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAIuSURBVHgBtVXBTttAEH2zDiZRixRoT1UrkgP3Vj311H5ApVb9gbZfAHwByReQP2i/oCpSP4CeekLlzgEjEHAJRAKU4MReZpI42qzXlmOJJ1nyjj1vdmZn3hJycKx1vTrCptb4wE+DTY3ppx4RDuMR9oaE380aBVkc5DJe9HVDe/ghxCgCws8wQtsVSNmGy1Bvxgr/C5MLNL757HM+0Fu5AS6GeifS6PBrHYujrgm7wmEaZyWSnU/JUwhj4OQeuIkm62dL/FSAp547Emlsv6hSZxZAai5lsXcuxP9ugaO+m2ijBrx94gzUY983cibjEjH5jk1+y7v9dZVNLpBvf64n/1qoL3OTjDOY7v7YJs9wdEIy+LIG+FbLhD5WFdf9s+1wcFecPNmQlNJGZYAtpSr4ZP+cV5YsiI+cmQnPw3vF/f7aNHZHKI3gfn4t0y9Vmzvc7hCl4ShrQ+GRoXjMA9Ow4qE01iopU0+Rmg+wXkVpPF+aX7N0HKoowl/T6PNsb5QIIj6piY6xR6L5fohr0x5qnuLuYoP2cTUdgNu2qZpEcnnsmx8kC5fDIuRyR4gW5YqdZHAgYjdwk0tZ3q2kJQKG2M3k+owvC85k10UkgWQAkxmRTltfdhKPwQO2/dKU6wSnfd1SE2UtjThG+1WNWsk6dSdPM0nJdwH0eOftZOeZAQRyJlyVFs/IVxQA9/v+MMJ316VPeY7jQCLnrLg0EcUkq4BJA80zNKqiI52YxfEArMjodcM5n8kAAAAASUVORK5CYII='
           },
           {
             type: 'inside',
             start: 5,
-            end: 95,
+            end: 95
           }
         ],
         series: [
@@ -1051,14 +613,20 @@ export default {
                   y2: 1,
                   colorStops: [
                     {
-                      offset: 0, color: industryDataVal.seriesItemStyle ? industryDataVal.seriesItemStyle[0] : 'rgba(33,204,255,0.6)' // 100% 处的颜色
+                      offset: 0,
+                      color: industryDataVal.seriesItemStyle
+                        ? industryDataVal.seriesItemStyle[0]
+                        : 'rgba(33,204,255,0.6)' // 100% 处的颜色
                     },
                     {
-                      offset: 1, color: industryDataVal.seriesItemStyle ? industryDataVal.seriesItemStyle[1] : 'rgba(33,204,255,0.6)' // 0% 处的颜色
+                      offset: 1,
+                      color: industryDataVal.seriesItemStyle
+                        ? industryDataVal.seriesItemStyle[1]
+                        : 'rgba(33,204,255,0.6)' // 0% 处的颜色
                     }
-                  ],
-                },
-              },
+                  ]
+                }
+              }
             },
             emphasis: {
               itemStyle: {
@@ -1071,94 +639,73 @@ export default {
                   y2: 1,
                   colorStops: [
                     {
-                      offset: 0, color: industryDataVal.emphasisItemStyle ? industryDataVal.emphasisItemStyle[0] : '#21CCFF' // 100% 处的颜色
+                      offset: 0,
+                      color: industryDataVal.emphasisItemStyle
+                        ? industryDataVal.emphasisItemStyle[0]
+                        : '#21CCFF' // 100% 处的颜色
                     },
                     {
-                      offset: 1, color: industryDataVal.emphasisItemStyle ? industryDataVal.emphasisItemStyle[1] : '#2D5CF6' // 0% 处的颜色
+                      offset: 1,
+                      color: industryDataVal.emphasisItemStyle
+                        ? industryDataVal.emphasisItemStyle[1]
+                        : '#2D5CF6' // 0% 处的颜色
                     }
-                  ],
-                },
-              },
+                  ]
+                }
+              }
             },
-            data: industryDataVal.yData,
-          },
+            data: industryDataVal.yData
+          }
         ]
-      };
+      }
       this.initChart('passing-echarts', option)
     },
     initChart(ref, option) {
-      const chart = document.getElementById(ref);
-      let myChart;
+      const chart = document.getElementById(ref)
+      let myChart
       if (chart) {
-        myChart = this.$echarts.init(chart);
-        myChart.setOption(option);
+        myChart = this.$echarts.init(chart)
+        myChart.setOption(option)
         window.addEventListener('resize', () => {
-          myChart.resize();
-        });
+          myChart.resize()
+        })
       }
       this.$on('hook:destroyed', () => {
         window.removeEventListener('resize', () => {
-          myChart.resize();
-        });
-      });
-    },
-    searchList() { },
-    getProposeAcceptRate() {
-      proposeAcceptRate({ dataFlag: 1 }).then((res) => {
-        console.log('res', res);
+          myChart.resize()
+        })
       })
     },
-    getProposeOnePassRate() {
-      proposeOnePassRate({ dataFlag: 1 }).then((res) => {
-        console.log('res', res);
-      })
-    },
-    getList(pageNow) {
-      const listType = '4'
-      this.pageNow = pageNow
+    // 审批列表
+    getApprovaList(pageNow) {
+      this.approvalSearch.pageNow = pageNow
       const param = {
-        pageNow,
-        pageSize: 10,
-        ...this.search,
-        listType,
-        formManagementId: this.search.approvalType,
-        nodeid: this.search.approvalStage,
-        orgIds: this.search.orgIds.length ? this.search.orgIds : null,
+        ...this.approvalSearch,
+        userId: this.rowData.userId,
         createTimeStart:
-          this.search.startDate && this.search.startDate.length > 0
-            ? this.search.startDate[0] + ' 00:00:00'
+          this.approvalSearch.startDate
+          && this.approvalSearch.startDate.length > 0
+            ? this.approvalSearch.startDate[0] + ' 00:00:00'
             : '',
         createTimeEnd:
-          this.search.startDate && this.search.startDate.length > 0
-            ? this.search.startDate[1] + ' 23:59:59'
-            : '',
+          this.approvalSearch.startDate
+          && this.approvalSearch.startDate.length > 0
+            ? this.approvalSearch.startDate[1] + ' 23:59:59'
+            : ''
       }
       Reflect.deleteProperty(param, 'total')
       Reflect.deleteProperty(param, 'loading')
-      Reflect.deleteProperty(param, 'productLaunchDate')
       Reflect.deleteProperty(param, 'startDate')
-      this.search.loading = true
-      const userInfo = JSON.parse(window.localStorage.getItem('user_name'))
-      const taskDTO = {
-        pageNo: 0,
-        pageSize: 10,
-        currentUserInfo: {
-          id: userInfo.id,
-          name: userInfo.fullname
-        }
-      }
-      // eslint-disable-next-line
-      const wait_param = {
-        ...param,
-        taskDTO
-      }
-      getApprovalListStation(wait_param)
+      this.approvalSearch.loading = true
+      oneApprovalList(param)
         .then((res) => {
           const { data } = res.data
-          this.search.total = data.totalCount
-          const flag = Array.isArray(data.list)
-          this.list = flag && data.list.length > 0
-            ? data.list.map((v) => {
+          this.approvalUser.userName = data.userName
+          this.approvalUser.orgList = data.orgList
+          this.approvalSearch.total = data.page.totalCount
+          const flag = Array.isArray(data.page.list)
+          this.list = flag && data.page.list.length > 0
+            ? data.page.list.map((v) => {
               return {
                 ...v,
                 taskNumber: v.recordId + '',
@@ -1171,64 +718,96 @@ export default {
               }
             })
             : []
-          this.search.loading = false
+          this.approvalSearch.loading = false
         })
         .catch(() => {
-          this.search.loading = false
-          this.search.total = 0
+          this.approvalSearch.loading = false
+          this.approvalSearch.total = 0
           this.list = []
         })
     },
-
+    // 申请列表
+    getApplicatList(pageNow) {
+      this.approvalSearch.pageNow = pageNow
+      const param = {
+        ...this.approvalSearch,
+        userId: this.rowData.userId,
+        createTimeStart:
+          this.approvalSearch.startDate
+          && this.approvalSearch.startDate.length > 0
+            ? this.approvalSearch.startDate[0] + ' 00:00:00'
+            : '',
+        createTimeEnd:
+          this.approvalSearch.startDate
+          && this.approvalSearch.startDate.length > 0
+            ? this.approvalSearch.startDate[1] + ' 23:59:59'
+            : ''
+      }
+      Reflect.deleteProperty(param, 'total')
+      Reflect.deleteProperty(param, 'loading')
+      Reflect.deleteProperty(param, 'startDate')
+      this.approvalSearch.loading = true
+      oneApplicationList(param)
+        .then((res) => {
+          const { data } = res.data
+          this.approvalUser.userName = data.userName
+          this.approvalUser.orgList = data.orgList
+          this.approvalSearch.total = data.page.totalCount
+          const flag = Array.isArray(data.page.list)
+          this.list = flag && data.page.list.length > 0
+            ? data.page.list.map((v) => {
+              return {
+                ...v,
+                taskNumber: v.recordId + '',
+                taskName: v.entryName,
+                initiator: {
+                  ...v.originator,
+                  label: v.institutional && v.institutional[1]
+                },
+                taskStatus: v.nodeStatus
+              }
+            })
+            : []
+          this.approvalSearch.loading = false
+        })
+        .catch(() => {
+          this.approvalSearch.loading = false
+          this.approvalSearch.total = 0
+          this.list = []
+        })
+    },
     // 驳回原因分布
     initReasonEcharts(industryDataVal) {
       const yData1 = JSON.parse(JSON.stringify(industryDataVal.yData))
       const xData1 = JSON.parse(JSON.stringify(industryDataVal.xData))
-      const color = JSON.parse(JSON.stringify(industryDataVal.colorBy)).reverse()
+      const yDataHint1 = JSON.parse(
+        JSON.stringify(industryDataVal.yDataHint?.reverse())
+      )
+      const color = JSON.parse(JSON.stringify(industryDataVal.color)).reverse()
       const option = {
         tooltip: {
           backgroundColor: 'rgba(255,255,255,0.8)',
           borderColor: 'rgba(255,255,255,0.8)',
           formatter(params) {
-            console.log('params', params);
-            const p = `
-            <div style="padding: 6px;display:flex;gap:8px;flex-direction:column;font-size:12px">
-            <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">驳回原因</div>
-            <div>
-              <div style="display:flex;align-items:center;gap:12px;color:#1D2128;">
-                <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;background-color: ${params.color};"></span>
-                <span>${params.name}</span>
-                <span>${params.data}项</span>
-              </div>
-              <div style="display:flex;gap:12px;">
-                <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;"></span>
-                <div style="flex:1;display:flex;justify-content: space-between;">
-                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                    <span>产品类</span>
-                    <span>230项</span>
+            let child = ''
+            const idx = params.dataIndex
+            yDataHint1[idx].forEach((item) => {
+              child += `<div style="width:45%;display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5"><span>${item.label}</span><span>${item.value}项</span></div>`
+            })
+            const p = `<div style="min-width:200px;padding: 6px;display:flex;gap:8px;flex-direction:column;font-size:12px">
+              <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">驳回原因分布</div>
+              <div>
+                <div style="display:flex;align-items:center;gap:12px;color:#1D2128;">
+                  <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;background-color: ${params.color};"></span>
+                  <span>${params.name}</span>
+                  <span>${params.data}项</span>
                   </div>
-                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                    <span>活动类</span>
-                    <span>23项</span>
+                  <div style="display:flex;gap:12px;">
+                    <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;"></span>
+                    <div style="flex:1;display:flex;justify-content: space-between;flex-wrap:wrap">${child}</div>
                   </div>
                 </div>
-              </div>
-              <div style="display:flex;gap:12px;">
-                <span style="margin-right:4px;border-radius:10px;width:10px;height:10px;"></span>
-                <div style="flex:1;display:flex;justify-content: space-between">
-                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                    <span>产品类</span>
-                    <span>230项</span>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:12px;font-size:20px;zoom:0.5">
-                    <span>活动类</span>
-                    <span>23项</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            </div>
-            `
+              </div>`
             return p
           }
         },
@@ -1242,25 +821,25 @@ export default {
         xAxis: {},
         yAxis: {
           type: 'category',
-          data: xData1,
+          data: xData1?.reverse(),
           axisLabel: {
             formatter(value) {
-              let str = '';
-              const num = 9; // 每行显示字数
-              const valLength = value.length; // 该项x轴字数
-              const rowNum = Math.ceil(valLength / num); // 行数
+              let str = ''
+              const num = 9 // 每行显示字数
+              const valLength = value.length // 该项x轴字数
+              const rowNum = Math.ceil(valLength / num) // 行数
               if (rowNum > 1) {
                 for (let i = 0; i < rowNum; i++) {
-                  let temp = '';
-                  const start = i * num;
-                  const end = start + num;
+                  let temp = ''
+                  const start = i * num
+                  const end = start + num
 
-                  temp = value.substring(start, end) + '\n';
-                  str += temp;
+                  temp = value.substring(start, end) + '\n'
+                  str += temp
                 }
-                return str;
+                return str
               } else {
-                return value;
+                return value
               }
             }
           }
@@ -1282,12 +861,17 @@ export default {
     handleTabToggle(index) {
       if (this.currentTabListIndex !== index) {
         this.currentTabListIndex = index
-        if (index === 0) {
-          this.initReasonEcharts(this.reasonData)
-        }
-        if (index === 1) {
-          this.initRejectionRateEcharts(this.rejectionRateData)
-        }
+        this.rejectSearch.recordId = ''
+        this.rejectSearch.seachTime = []
+        this.rejectSearchChange()
+      }
+    },
+    rejectSearchChange() {
+      if (this.currentTabListIndex === 0) {
+        this.getRejectReason()
+      }
+      if (this.currentTabListIndex === 1) {
+        this.getRejectRate()
       }
     },
     initRejectionRateEcharts(industryDataVal) {
@@ -1299,7 +883,7 @@ export default {
             const name = serie[0].axisValueLabel
             const params = `<p class="charts-tooltip-p fontw black">${name}</p><p class="charts-tooltip-p fontw black"><span class="serieName"><span class="charts-tooltip-dot" style="background: #21CCFF;"></span>驳回率</span><span><span class="blue">${serie[0].data}</span>%</span></p>`
             return params
-          },
+          }
         },
         grid: {
           left: '0',
@@ -1314,7 +898,7 @@ export default {
         },
         yAxis: {
           type: 'value',
-          name: '%',
+          name: '%'
         },
         series: [
           {
@@ -1342,24 +926,26 @@ export default {
             smooth: true
           }
         ]
-      };
-      this.initChart('reasonRate-echart', option)
-    },
-    handleOrganChange(item) {
-      if (!item && this.cascader.length) {
-        this.handleSearchBlur()
       }
+      this.initChart('reasonRate-echart', option)
     },
     handlePopoverShow() {
       this.$refs['my-date-picker'].handleFocus()
     },
-    handlePopoverHide() {
-      if (this.datePicker) {
-        this.handleSearchBlur()
-      }
-    },
     handleSearchBlur() {
-      console.log(this.search)
+      this.$nextTick(() => {
+        if (this.billValue === '审批人员') {
+          this.$refs.personApproval.getApproveContribution()
+          this.$refs.personApproval.getApproveAcceptRate()
+          this.$refs.personApproval.getApproveAvgTime()
+          this.$refs.personApproval.getApprovePersonList(1)
+        } else {
+          this.$refs.personLading.getProposeOnePassRate()
+          this.$refs.personLading.getProposeAcceptRate()
+          this.$refs.personLading.getProposeRejectRate()
+          this.$refs.personLading.getProposePersonList(1)
+        }
+      })
     },
     getApprovalType() {
       getApprovalType().then((res) => {
@@ -1371,7 +957,48 @@ export default {
         })
       })
     },
-  },
+    getRejectReason() {
+      this.rejectLoading = true
+      const getData = {
+        userId: this.rowData.userId, // 1416
+        recordId: this.rejectSearch.recordId,
+        startTime: this.rejectSearch.seachTime?.length
+          ? this.rejectSearch.seachTime[0]
+          : '',
+        endTime: this.rejectSearch.seachTime?.length
+          ? this.rejectSearch.seachTime[1]
+          : ''
+      }
+      rejectReason(getData).then((res) => {
+        const { data } = res.data
+        this.reasonData.xData = data.titleList?.reverse()
+        this.reasonData.yData = data.countList
+        this.reasonData.yDataHint = data.dataList
+        this.initReasonEcharts(this.reasonData)
+        this.rejectLoading = false
+      })
+    },
+    getRejectRate() {
+      this.rejectLoading = true
+      const getData = {
+        userId: this.rowData.userId,
+        recordId: this.rejectSearch.recordId,
+        startTime: this.rejectSearch.seachTime?.length
+          ? this.rejectSearch.seachTime[0]
+          : '',
+        endTime: this.rejectSearch.seachTime?.length
+          ? this.rejectSearch.seachTime[1]
+          : ''
+      }
+      rejectRate(getData).then((res) => {
+        const { data } = res.data
+        this.rejectionRateData.xData = data.titleList
+        this.rejectionRateData.yData = data.rateList
+        this.initRejectionRateEcharts(this.rejectionRateData)
+        this.rejectLoading = false
+      })
+    }
+  }
 }
 </script>
 <style lang="less" scoped>
@@ -1383,21 +1010,25 @@ export default {
 
     .tips {
       display: inline-block;
-      color: #FA8C16;
+      color: #fa8c16;
       font-size: 12px;
       font-style: normal;
       font-weight: 400;
       line-height: 22px;
       padding: 6px 12px;
       border-radius: 20px;
-      background: linear-gradient(90deg, #FFE7C0 0%, rgba(255, 213, 145, 0) 67.75%);
+      background: linear-gradient(
+        90deg,
+        #ffe7c0 0%,
+        rgba(255, 213, 145, 0) 67.75%
+      );
       margin-bottom: 8px;
       width: 400px;
       cursor: default;
       align-items: center;
 
       span {
-        border-bottom: 1px solid #FA8C16;
+        border-bottom: 1px solid #fa8c16;
         display: inline-block;
         cursor: pointer;
         margin-left: 5px;
@@ -1416,7 +1047,7 @@ export default {
 
       .scrren-com {
         cursor: pointer;
-        color: #1D2128;
+        color: #1d2128;
         font-size: 16px;
         line-height: 24px;
         width: fit-content;
@@ -1428,7 +1059,7 @@ export default {
         position: relative;
 
         &.active {
-          color: #2D5CF6;
+          color: #2d5cf6;
         }
 
         .my-hidden {
@@ -1448,6 +1079,8 @@ export default {
         .hintIcon {
           width: 20px;
           margin-left: 4px;
+          position: relative;
+          z-index: 111;
         }
       }
 
@@ -1460,186 +1093,12 @@ export default {
         padding: 6px 16px 6px 16px;
         border-radius: 4px;
         gap: 4px;
-        background: #2D5CF6;
-        color: #FFFFFF;
+        background: #2d5cf6;
+        color: #ffffff;
         font-size: 14px;
 
         .btnIcon {
           width: 20px;
-        }
-      }
-    }
-  }
-
-  .person-approval {
-    margin-top: 16px;
-
-    .approval-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      .top-com {
-        width: calc((100% - 32px) / 3);
-        height: 290px;
-        padding: 16px;
-        box-sizing: border-box;
-        border-radius: 10px;
-        background: #FFFFFF;
-
-        .com-tit {
-          position: relative;
-          padding-left: 13px;
-          font-size: 14px;
-          font-weight: 700;
-          line-height: 22px;
-          color: #1D2128;
-
-          &::before {
-            content: '';
-            display: block;
-            width: 5px;
-            height: 20px;
-            background: #306EF5;
-            border-radius: 0px 10px 0px 10px;
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-          }
-        }
-
-        .com-echarts {
-          width: 100%;
-          height: 220px;
-          margin-top: 16px;
-        }
-
-        .com-echarts1 {
-          width: 100%;
-          height: 220px;
-          margin-top: 16px;
-        }
-      }
-    }
-
-    .approval-table {
-      background: #fff;
-      padding: 16px;
-      box-sizing: border-box;
-      border-radius: 10px;
-      margin-top: 16px;
-
-      .table-tit {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .tit-left {
-          font-size: 14px;
-          font-weight: 400;
-          line-height: 22px;
-          text-align: left;
-          color: #1D2128;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-
-          .black {
-            color: #000000;
-          }
-
-          .blue {
-            color: #2D5CF6;
-            font-weight: 600;
-            margin: 0 5px;
-          }
-        }
-
-        .tit-search {
-          width: 280px;
-
-          /deep/ .el-input__inner {
-            border-radius: 4px;
-            border: none;
-            background: #f7f8fa;
-            color: #1d2128;
-            font-size: 14px;
-            font-weight: 400;
-            height: 36px;
-            line-height: 36px;
-          }
-        }
-      }
-
-      .table-wrap {
-        margin-top: 16px;
-
-        &.TRS-table-gray {
-          /deep/ .el-table {
-            border: none;
-
-            &::before {
-              display: none;
-            }
-
-            th.el-table__cell {
-              font-size: 14px;
-              font-weight: 700;
-              color: #1D2128;
-            }
-
-            td.el-table__cell {
-              border-right: none;
-              border-bottom: 1px dashed #E5E6EB;
-            }
-
-            .black {
-              color: #1D2128;
-            }
-
-            .gray {
-              color: #505968;
-            }
-
-            .fs12 {
-              font-size: 12px;
-            }
-
-            .fs14 {
-              font-size: 14px;
-            }
-
-            .fw {
-              font-weight: 700;
-            }
-
-            .w16 {
-              width: 16px;
-              height: 16px;
-            }
-
-            .w24 {
-              width: 24px;
-              height: 24px;
-              flex-shrink: 0;
-            }
-
-            .pt6 {
-              padding-top: 6px;
-            }
-
-            .flex-box {
-              display: flex;
-              gap: 0 3px;
-              align-items: center;
-              justify-content: center;
-            }
-
-            .pointer {
-              cursor: pointer;
-            }
-          }
         }
       }
     }
@@ -1755,7 +1214,7 @@ export default {
             }
 
             .floor2-itemW {
-              width: 40%;
+              width: 44%;
             }
 
             .floor2-item:last-of-type {
@@ -1853,6 +1312,15 @@ export default {
               line-height: 32px;
               margin-right: 16px;
             }
+
+            .user-org {
+              display: flex;
+              align-items: center;
+
+              i {
+                margin: 0 4px;
+              }
+            }
           }
         }
 
@@ -1902,12 +1370,12 @@ export default {
 
           .el-cascader .el-input .el-icon-arrow-down::before {
             font-family: element-icons !important;
-            content: "\e790";
+            content: '\e790';
           }
 
           .el-select .el-input .el-icon-arrow-up::before {
             font-family: element-icons !important;
-            content: "\e78f";
+            content: '\e78f';
           }
 
           .el-range-editor .el-icon-date {
@@ -1918,7 +1386,7 @@ export default {
           }
 
           .item-tit {
-            color: #1D2128;
+            color: #1d2128;
             font-size: 14px;
             font-weight: 400;
             line-height: 22px;
@@ -1927,7 +1395,7 @@ export default {
           }
 
           span {
-            color: #86909C;
+            color: #86909c;
           }
         }
 
@@ -1937,6 +1405,8 @@ export default {
           .hintIcon {
             width: 20px;
             margin-left: 4px;
+            position: relative;
+            z-index: 111;
           }
         }
 
@@ -1969,7 +1439,7 @@ export default {
 
           .el-icon-time::before {
             font-family: element-icons !important;
-            content: "\e78e";
+            content: '\e78e';
           }
 
           .el-input__suffix {
@@ -1994,7 +1464,7 @@ export default {
           gap: 12px;
           align-items: center;
           line-height: 22px;
-          color: #1D2128;
+          color: #1d2128;
           position: relative;
 
           .tab-name {
@@ -2002,14 +1472,14 @@ export default {
             cursor: pointer;
 
             &.active {
-              color: #2D5CF6;
+              color: #2d5cf6;
             }
           }
 
           .line {
             padding: 4px 0;
             width: 1px;
-            background-color: #CACDD3;
+            background-color: #cacdd3;
           }
         }
 
@@ -2081,6 +1551,11 @@ export default {
 <style lang="less">
 .el-range-editor.el-input__inner {
   width: 100%;
+  // display: block;
+}
+
+.el-date-editor .el-range__close-icon {
+  margin-right: 15px;
 }
 
 .charts-tooltip-p {
@@ -2108,8 +1583,8 @@ export default {
     display: inline-block;
     width: 10px;
     height: 10px;
-    background: #2D5CF6;
-    border: 2px solid #FFFFFF;
+    background: #2d5cf6;
+    border: 2px solid #ffffff;
     box-sizing: border-box;
     border-radius: 50%;
     margin-right: 8px;
@@ -2139,7 +1614,7 @@ export default {
   }
 
   .blue {
-    color: #2D5CF6;
+    color: #2d5cf6;
   }
 
   .bold {

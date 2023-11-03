@@ -1,5 +1,5 @@
 <template>
-  <div class="mission-trends">
+  <div class="mission-trends" v-loading="isShow">
     <g-table-card :title="title">
       <template #content>
         <div class="content">
@@ -11,34 +11,36 @@
 </template>
 
 <script>
+import { reviewTaskTrends } from '@/api/statistical-center'
 export default {
   data() {
     return {
-      title: '审查任务趋势'
+      title: '审查任务趋势',
+      isShow: true,
+      echartsData: {
+        year: [],
+        overallReviewTask: [],
+        tasksWithoutSubstantiveOpinions: [],
+        tasksWithSubstantiveOpinions: []
+      }
     }
   },
-  mounted() {
-    this.$nextTick(() => {
-      this.initEcharts();
-    })
-  },
   methods: {
-    initEcharts() {
-      const year = [
-        '2022-11',
-        '2022-12',
-        '2023-01',
-        '2023-02',
-        '2023-03',
-        '2023-04',
-        '2023-05',
-        '2023-06',
-        '2023-07',
-        '2023-08'
-      ]
-      const newQuickRatio = [4, 2, 3, 10, 5, 2, 6, 4, 2, 5]
-      const newCurrentRatio = [4, 5, 3, 1, 8, 5, 3, 8, 5, 2]
-      const newAssetLiabilityRadio = [7, 8, 9, 1, 7, 6, 2, 5, 3, 7]
+    async initData(data) {
+      this.isShow = true
+      const { data: res } = await reviewTaskTrends(data)
+      if (res.success) {
+        this.echartsData = res.data
+        this.initEcharts(this.echartsData)
+        this.isShow = false
+      }
+    },
+    initEcharts({
+      year,
+      overallReviewTask,
+      tasksWithSubstantiveOpinions,
+      tasksWithoutSubstantiveOpinions
+    }) {
       const option = {
         tooltip: {
           trigger: 'axis',
@@ -46,10 +48,10 @@ export default {
           borderColor: 'rgba(255,255,255,0.8)',
           extraCssText: 'width:240px;',
           formatter: (params) => {
-            const myColor = ['#2D5CF6', '#21CCFF', '#F7BA1E'];
+            const myColor = ['#2D5CF6', '#21CCFF', '#F7BA1E']
             const title = `<div style="display:flex;align-items: center;justify-content: space-between;font-size:10px;color:#1D2128">${params[0].axisValue}</div>`
             let p = ''
-            for (let i = params.length - 1; i > -1; i--) {
+            for (let i = 0; i < params.length; i++) {
               p += `<div style="display:flex;align-items: center;justify-content: space-between;margin-top:4px">
                         <div style="display:flex;align-items: center;">
                         <span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color: ${myColor[i]};"></span>
@@ -64,7 +66,7 @@ export default {
         },
         legend: {
           data: ['总审查任务', '无实质意见任务', '有实质意见任务'],
-          bottom: '-20px',
+          bottom: '-20px'
         },
         grid: {
           left: '3%',
@@ -98,7 +100,7 @@ export default {
             name: '总审查任务',
             type: 'line',
             smooth: true,
-            data: newQuickRatio,
+            data: overallReviewTask,
             areaStyle: { normal: {} },
             itemStyle: {
               normal: {
@@ -123,7 +125,7 @@ export default {
             name: '无实质意见任务',
             type: 'line',
             smooth: true,
-            data: newCurrentRatio,
+            data: tasksWithoutSubstantiveOpinions,
             areaStyle: { normal: {} },
             itemStyle: {
               normal: {
@@ -148,7 +150,7 @@ export default {
             name: '有实质意见任务',
             type: 'line',
             smooth: true,
-            data: newAssetLiabilityRadio,
+            data: tasksWithSubstantiveOpinions,
             areaStyle: { normal: {} },
             itemStyle: {
               normal: {

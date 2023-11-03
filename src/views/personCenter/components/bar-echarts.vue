@@ -1,5 +1,5 @@
 <template>
-  <div class="bar-echarts 22222222" ref="barEcharts"></div>
+  <div class="bar-echarts" ref="barEcharts"></div>
 </template>
 
 <script>
@@ -33,7 +33,9 @@ export default {
           formatter: (serie) => {
             const name = serie[0].axisValueLabel
             let params = `<p class="charts-tooltip-p fontw black"><span class="serieName"><span class="charts-tooltip-dot" style="background:${industryDataVal.emphasisItemStyle ? industryDataVal.emphasisItemStyle[1] : '#5773F9'}"></span>${name}</span><span><span class="blue">${serie[0].data}</span>人</span></p>`
-            params += `<p class="charts-tooltip-p black">占全部人员  <span class="blue">${serie[0].data}</span>%</p>`
+            if (industryDataVal.rate && industryDataVal.rate.length) {
+              params += `<p class="charts-tooltip-p black">占全部人员  <span class="blue">${industryDataVal.rate[serie[0].dataIndex]}</span>%</p>`
+            }
             return params
           },
         },
@@ -59,7 +61,7 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: industryDataVal.xData.reverse(),
+          data: industryDataVal.xData,
         },
         series: [
           {
@@ -83,7 +85,7 @@ export default {
                       offset: 0, color: industryDataVal.seriesItemStyle ? industryDataVal.seriesItemStyle[0] : 'rgba(33,204,255,0.6)' // 100% 处的颜色
                     },
                     {
-                      offset: 1, color: industryDataVal.seriesItemStyle ? industryDataVal.seriesItemStyle[1] : 'rgba(33,204,255,0.6)' // 0% 处的颜色
+                      offset: 1, color: industryDataVal.seriesItemStyle ? industryDataVal.seriesItemStyle[1] : 'rgba(45,92,246,0.6)' // 0% 处的颜色
                     }
                   ],
                 },
@@ -109,7 +111,7 @@ export default {
                 },
               },
             },
-            data: industryDataVal.yData.reverse(),
+            data: industryDataVal.yData,
           },
         ]
       };

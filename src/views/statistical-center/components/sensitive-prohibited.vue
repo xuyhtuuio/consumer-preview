@@ -1,5 +1,5 @@
 <template>
-  <div class="sensitive-prohibited">
+  <div class="sensitive-prohibited" v-loading="isShow">
     <g-table-card :title="title">
       <template #head-right>
         <el-tooltip placement="top">
@@ -9,40 +9,55 @@
       </template>
       <template #content>
         <div class="my-content">
-          <div
-            class="content-item"
-            v-for="(item, index) in list"
-            :key="'content' + index"
-          >
-            <div class="cnt-title">
-              <span class="iconfont icon-Frame1" :class="[ item.type === 2 && 'active']"></span>
-              {{ item.keywordContent }}
-            </div>
-            <div class="cnt-content my-ellipsis">
-              {{ item.recommendedOpinions }}
-            </div>
-            <div class="cnt-info">
-              <div class="flex">
+          <template v-if="list.length">
+            <div
+              class="content-item"
+              v-for="(item, index) in list"
+              :key="'content' + index"
+            >
+              <div class="cnt-title">
                 <span
-                  :class="[
-                    'left',
-                    'class-common',
-                    item.type === 1 ? 'class-zero' : 'class-one'
-                  ]"
-                  >{{ item.type === 1 ? '禁用词' : '敏感词' }}</span
-                >
-                <span class="center"
-                  ><g-icon
-                    class="left-icon"
-                    stylePx="18"
-                    href="#icon-yinyong"
-                  />已引用 : <i class="high">{{ item.count }}</i
-                  >次</span
-                >
+                  class="iconfont icon-Frame1"
+                  :class="[item.type === 2 && 'active']"
+                ></span>
+                {{ item.content }}
               </div>
-              <span class="right">更新时间：{{ item.updateTime }}</span>
+
+              <el-popover
+                placement="bottom"
+                trigger="hover"
+                :content="item.opinion"
+              >
+                <div slot="reference" class="cnt-content my-ellipsis">
+                {{ item.opinion }}
+              </div>
+              </el-popover>
+              <div class="cnt-info">
+                <div class="flex">
+                  <span
+                    :class="[
+                      'left',
+                      'class-common',
+                      item.type === 1 ? 'class-zero' : 'class-one'
+                    ]"
+                    >{{ item.type === 1 ? '禁用词' : '敏感词' }}</span
+                  >
+                  <span class="center"
+                    ><g-icon
+                      class="left-icon"
+                      stylePx="18"
+                      href="#icon-yinyong"
+                    />已引用 : <i class="high">{{ item.count }}</i
+                    >次</span
+                  >
+                </div>
+                <span class="right">更新时间：{{ item.updateTime }}</span>
+              </div>
             </div>
-          </div>
+          </template>
+          <template v-else>
+            <empty></empty>
+          </template>
           <TrsPagination
             class="my-pagination"
             :pageSize="page.pageSize"
@@ -58,55 +73,45 @@
 </template>
 
 <script>
+import { commonKeywordsPaginationList } from '@/api/statistical-center'
 export default {
   data() {
     return {
       title: '常见敏感词/禁用词',
+      isShow: true,
       titleInfo: '置顶>做多引用>最近更新',
       page: {
         pageNow: 1,
         pageSize: 3,
         total: 9
       },
-      list: [
-        {
-          count: 100,
-          createTime: '2023-07-22T18:55:57',
-          keywordContent: '最高',
-          recordId: 3,
-          status: 1,
-          type: 1,
-          recommendedOpinions:
-            '车险赔付未赔付至被保险人，如理赔环节未经过客户同意直赔至修理厂。在定损环节务必告知被保险人定损金额，包括三者财产、人伤的赔付金额，并在赔付后通过电话或者短信方式告知被保险人赔款已支付，严格遵守理赔流程，尽到告知义务。',
-          updateTime: '2023-08-09T10:32:31'
-        },
-        {
-          count: 100,
-          createTime: '2023-07-22T18:55:57',
-          keywordContent: '最高',
-          recordId: 3,
-          status: 1,
-          type: 2,
-          recommendedOpinions:
-            '车险赔付未赔付至被保险人，如理赔环节未经过客户同意直赔至修理厂。在定损环节务必告知被保险人定损金额，包括三者财产、人伤的赔付金额，并在赔付后通过电话或者短信方式告知被保险人赔款已支付，严格遵守理赔流程，尽到告知义务。',
-          updateTime: '2023-08-09T10:32:31'
-        },
-        {
-          count: 100,
-          createTime: '2023-07-22T18:55:57',
-          keywordContent: '最高',
-          recordId: 3,
-          status: 1,
-          type: 2,
-          recommendedOpinions:
-            '车险赔付未赔付至被保险人，如理赔环节未经过客户同意直赔至修理厂。在定损环节务必告知被保险人定损金额，包括三者财产、人伤的赔付金额，并在赔付后通过电话或者短信方式告知被保险人赔款已支付，严格遵守理赔流程，尽到告知义务。',
-          updateTime: '2023-08-09T10:32:31'
-        }
-      ]
+      list: [],
+      searchData: {}
     }
   },
   methods: {
-    handleCurrentChange() {}
+    async initData(data) {
+      this.isShow = true
+      if (data !== this.searchData) {
+        this.searchData = data
+        this.page.pageNow = 1
+        this.searchData = data
+      }
+      const { data: res } = await commonKeywordsPaginationList({
+        ...data,
+        pageNum: this.page.pageNow,
+        pageSize: this.page.pageSize
+      })
+      if (res.success) {
+        this.list = res.data.list
+        this.page.total = res.data.totalCount
+      }
+      this.isShow = false
+    },
+    handleCurrentChange(val) {
+      this.page.pageNow = val
+      this.initData(this.searchData)
+    }
   }
 }
 </script>
@@ -122,7 +127,6 @@ export default {
     top: 1px;
     font-size: 20px;
     color: rgba(172, 177, 185, 1);
-
   }
 
   .my-content {
@@ -141,10 +145,10 @@ export default {
         .iconfont {
           width: 16px;
           height: 16px;
-          color: #EB5757;
+          color: #eb5757;
           font-weight: 400;
           &.active {
-            color: #FA8C16;
+            color: #fa8c16;
           }
         }
       }

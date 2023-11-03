@@ -1,7 +1,8 @@
 <template>
-  <div class="reaching-consumers">
+  <div class="reaching-consumers" v-loading="isShow">
     <g-table-card :title="title">
       <template #content>
+        <template v-if="echartsData.length">
         <div class="my-echart" ref="my-chart"></div>
         <div class="right">
           <div class="right-main">
@@ -33,16 +34,21 @@
             </div>
           </div>
         </div>
+
+        </template>
+        <empty v-else></empty>
       </template>
     </g-table-card>
   </div>
 </template>
 
 <script>
+import { touchingConsumerChannels } from '@/api/statistical-center'
 export default {
   data() {
     return {
       title: '触达消费者渠道',
+      isShow: true,
       color: [
         '#2D5CF6',
         '#81E2FF',
@@ -56,51 +62,64 @@ export default {
       ],
       echartsTitle: '',
       echartsData: [
-        {
-          value: 1548,
-          name: '总行渠道',
-          rate: 25,
-          children: [
-            { name: '网点', value: 104 },
-            { name: '官网', value: 33 },
-            { name: '手机银行', value: 22 },
-            { name: '手机银行直播平台', value: 44 },
-            { name: '短信', value: 33 },
-            { name: '电话银行', value: 65 },
-            { name: '抖音，bilibili，小红书等视频等线上渠道', value: 23 }
-          ]
-        },
-        {
-          value: 775,
-          rate: 25,
-          name: '分行渠道',
-          children: [
-            { name: '网点(分行)', value: 104 },
-            { name: '官网(分行)', value: 33 },
-            { name: '抖音，bilibili，小红书等视频等线上渠道', value: 23 }
-          ]
-        },
-        {
-          value: 679,
-          rate: 25,
-          name: '支行渠道',
-          children: [
-            { name: '网点(支行)', value: 104 },
-            { name: '短信(支行)', value: 33 }
-          ]
-        }
+        // {
+        //   value: 1548,
+        //   name: '总行渠道',
+        //   rate: 25,
+        //   children: [
+        //     { name: '网点', value: 104 },
+        //     { name: '官网', value: 33 },
+        //     { name: '手机银行', value: 22 },
+        //     { name: '手机银行直播平台', value: 44 },
+        //     { name: '短信', value: 33 },
+        //     { name: '电话银行', value: 65 },
+        //     { name: '抖音，bilibili，小红书等视频等线上渠道', value: 23 }
+        //   ]
+        // },
+        // {
+        //   value: 775,
+        //   rate: 25,
+        //   name: '分行渠道',
+        //   children: [
+        //     { name: '网点(分行)', value: 104 },
+        //     { name: '官网(分行)', value: 33 },
+        //     { name: '抖音，bilibili，小红书等视频等线上渠道', value: 23 }
+        //   ]
+        // },
+        // {
+        //   value: 679,
+        //   rate: 25,
+        //   name: '支行渠道',
+        //   children: [
+        //     { name: '网点(支行)', value: 104 },
+        //     { name: '短信(支行)', value: 33 }
+        //   ]
+        // }
       ],
       currentEchartIndex: 0
     }
   },
   mounted() {
-    this.$nextTick(() => {
-      this.initEcharts()
-    })
+    // this.$nextTick(() => {
+    //   this.initEcharts()
+    // })
   },
   methods: {
-    initEcharts(title = '') {
-      const oneData = this.echartsData
+    async initData(data) {
+      this.isShow = true
+      const { data: res } = await touchingConsumerChannels(data)
+      if (res.success) {
+        this.echartsData = res.data
+        this.$nextTick(() => {
+          this.initEcharts(res.data)
+        })
+      } else {
+        this.echartsData = []
+      }
+      this.isShow = false
+    },
+    initEcharts(data = this.echartsData, title = '') {
+      const oneData = data
       const title1 = title || oneData[0].name
       this.echartsTitle = title1
       const twoData = oneData.find((item) => item.name === title1).children
@@ -113,13 +132,13 @@ export default {
           trigger: 'item',
           backgroundColor: 'rgba(255,255,255,0.8)',
           borderColor: 'rgba(255,255,255,0.8)',
-          formatter: ({ data, color }) => {
+          formatter: ({ data: res, color }) => {
             const box = `<div style="border-radius:6px;padding:6px;">
             <div style="font-size:12px">${title1}</div>
             <div style="display:flex;align-items: center;gap: 8px;font-size:14px;line-height:22px">
               <span style="border-radius:10px;width:8px;height:8px;background-color: ${color};"></span>
-              <span>${data.name} </span>
-              <span style="font-size:12px">${data.value}</span>
+              <span>${res.name} </span>
+              <span style="font-size:12px">${res.value}</span>
             </div>
             </div>`
             return box
@@ -198,7 +217,7 @@ export default {
       })
     },
     handleToggleEchartItem(data) {
-      this.initEcharts(data.name)
+      this.initEcharts(this.echartsData, data.name)
     }
   }
 }
