@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-25 17:05:44
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-03 14:30:21
+ * @LastEditTime: 2023-11-03 14:33:06
  * @FilePath: /consumer-preview/src/views/knowledge/components/header.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -77,20 +77,17 @@ export default {
           name: 'rulesBase',
           code: 'rulesBase'
         }
-      ]
+      ];
       this.menus = pathNames
         .map((item) => {
-          const exist = permissionsPage.funPerms?.find(
-            (f) => f.code === item.code
-          )
+          const exist = permissionsPage.funPerms?.find((f) => (f.code === item.code));
           if ((exist && exist?.type) || !exist) {
             return item
           } else {
-            return false
+            return false;
           }
-        })
-        .filter((e) => e)
-    }
+        }).filter((e) => e)
+    },
   }
 }
 </script>
