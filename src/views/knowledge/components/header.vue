@@ -37,7 +37,7 @@ export default {
     changeMenu(menu) {
       this.activeName = menu.name
       this.$router.push({
-        path: `/knowledge/${menu.name}`
+        name: menu.name
       })
     }
   }

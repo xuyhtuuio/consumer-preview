@@ -108,7 +108,7 @@ export const permissionList = [
         code: 'collectKnowledge',
         title: '知识库',
         type: '',
-        reflect: ['RulesBase', 'RulesDetail'],
+        reflect: ['rulesBase', 'RulesDetail'],
         props: [
           { label: 'view', value: '查看' },
           { label: 'edit', value: '查看并编辑' },

@@ -108,7 +108,8 @@ export default {
         { title: '智能回检', name: 'recheck-index', code: 'recheckIndex', pathName: 'recheck' },
         { title: '产品图谱', name: 'productmap', code: 'productmap', pathName: 'productmap' },
         { title: '统计中心', name: 'statistical-center', code: 'statisticsCenter', pathName: 'statistical-center' },
-        { title: '人员中心', name: 'personCenter', code: 'peopleCenter', pathName: 'personCenter' }
+        { title: '人员中心', name: 'personCenter', code: 'peopleCenter', pathName: 'personCenter' },
+        { title: '知识库', name: 'knowledge', code: 'knowledge', pathName: 'knowledge' }
       ]
       this.list = navList
         .map((item) => {
