@@ -694,6 +694,7 @@ export default {
       ];
       const imgLight = document.querySelector('#imgLight');
       imgLight && ends.push(imgLight);
+      this.toolView = false
       if (start) {
         ends.forEach((item, index) => {
           // 动画参数
