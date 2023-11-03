@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-03 14:07:25
+ * @LastEditTime: 2023-11-03 17:09:50
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -198,11 +198,11 @@
           </el-form-item>
           <el-form-item label="发布时间" prop="date">
             <el-date-picker
-              type="date"
+            type="datetime"
               placeholder="请选择日期"
               v-model="form.date"
               style="width: 100%"
-              value-format="yyyy-MM-dd"
+              value-format="yyyy-MM-dd HH:mm:ss"
               :picker-options="optionsDisable"
             >
             </el-date-picker>
@@ -220,11 +220,11 @@
         </div>
         <el-form-item label="发布时间" prop="date" v-if="type == 2">
           <el-date-picker
-            type="date"
+          type="datetime"
             placeholder="请选择日期"
             v-model="form.date"
             style="width: 100%"
-            value-format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd HH:mm:ss"
             :picker-options="optionsDisable"
             class="type2-date"
           >
@@ -460,7 +460,7 @@ export default {
     }
     // eslint-disable-next-line
     var checkDate = (rule, value, cb) => {
-      if (!value?.length || value.length > 50) {
+      if (!value?.length) {
         this.validatorForm.dateError = true
         return cb()
       } else {
@@ -626,7 +626,7 @@ export default {
      */
     sortChange(val) {
       const { order, orderColumn } = val
-      this.search.sortField = order === 'desc' ? '-' + orderColumn : orderColumn
+      this.search.sortField = order === 'desc' ? '-' + orderColumn : '+' + orderColumn
       this.nextPage(1)
     },
     /**
@@ -860,6 +860,7 @@ export default {
           param.loading = false
         })
         .catch(() => {
+          this.$message.error('上传文件失败，请重新上传')
           this.form.uploadFile = []
           this.uploadDisabled = ''
         })
@@ -939,6 +940,7 @@ export default {
           }
         })
         .catch(() => {
+          this.$message.error('上传文件失败，请重新上传')
           const index = this.form.relatedFile.findIndex(
             (m) => m.uid === param.file.uid
           )
@@ -1066,7 +1068,7 @@ export default {
               params.id = this.form.id
               const newParams = {
                 ...this.form,
-                ...params
+                ...params,
               }
               if (_that.crtBehavior === 'edit') {
                 newParams.isEdit = 'edit'
@@ -1076,9 +1078,12 @@ export default {
               }
               delete newParams.newContent
               delete newParams.uploadFile
+              delete newParams.c_time
+              delete newParams.u_time
               delete newParams.content
               delete newParams.tableFileTag
               delete newParams.loading
+              delete newParams.date
               delete newParams.isRepeal
               res = await updateRegulation(newParams)
             }
@@ -1094,7 +1099,8 @@ export default {
               this.nextPage(1)
             }
           } catch {
-            this.form.loading = false
+            _that.form.loading = false
+            _that.$forceUpdate()
           }
         }
       })
@@ -1124,7 +1130,7 @@ export default {
           unit: item.unit,
           content: item.content,
           documentNumber: item.doc_no,
-          date: dayjs(item.pub_time).format('YYYY-MM-DD'),
+          date: dayjs(item.pub_time).format('YYYY-MM-DD HH:mm:ss'),
           uploadFile: [file],
           relatedFile
         }
@@ -1352,7 +1358,7 @@ export default {
           }
           .el-input__prefix {
             left: 80%;
-            .el-icon-date::before {
+            .el-icon-time::before {
               font-family: 'iconfont' !important;
               content: '\e66e';
             }
