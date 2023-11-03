@@ -83,6 +83,13 @@
       "pathName": "",
       "path": "",
       "type": "view"
+    },
+    {
+      "code": "",
+      "name": "知识库",
+      "pathName": "",
+      "path": "",
+      "type": "view"
     }
   ],
   "dataPerm": ["all"],

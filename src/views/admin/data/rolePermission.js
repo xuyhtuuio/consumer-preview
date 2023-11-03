@@ -99,11 +99,36 @@ export const permissionList = [
     ],
   },
   {
+    code: 'knowledge',
+    title: '知识库',
+    type: '',
+    props: { trueLabel: 'edit', falseLabel: '' },
+    children: [
+      {
+        code: 'collectKnowledge',
+        title: '知识库',
+        type: '',
+        reflect: ['rulesBase', 'RulesDetail'],
+        props: [
+          { label: 'view', value: '查看' },
+          { label: 'edit', value: '查看并编辑' },
+        ],
+      },
+    ],
+  },
+  {
+    code: 'recheckIndex',
+    title: '智能回检',
+    type: '',
+    props: { trueLabel: 'edit', falseLabel: '' },
+  },
+  {
     code: 'statisticsCenter',
     title: '统计中心',
     type: '',
     props: { trueLabel: 'edit', falseLabel: '' },
   },
+
   {
     code: 'peopleCenter',
     title: '人员中心',

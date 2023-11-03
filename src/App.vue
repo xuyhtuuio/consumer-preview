@@ -28,7 +28,7 @@ export default {
         'user-agreement',
         'privacy-policy'
       ],
-      noBodyScroll: ['baseSetting', 'processDesign', 'proSetting'],
+      noBodyScroll: ['baseSetting', 'processDesign', 'proSetting', 'collectKnowledge'],
       noNavMenu: ['login', 'showReview', 'privacy-policy', 'user-agreement']
     }
   },
