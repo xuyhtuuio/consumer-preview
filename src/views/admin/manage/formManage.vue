@@ -284,7 +284,7 @@ export default {
   computed: {
     editAuth() {
       const { permissionsPage = {} } = this.$store.state
-      const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.pathName === 'FormManage') || {}
+      const flowManage = permissionsPage.funPerms.find(item => item.code === 'formManagement') || {}
       if (flowManage.type === 'edit') {
         return true
       }

@@ -441,10 +441,8 @@
 
 <script>
 import md5 from 'js-md5'
-import request from '@/api/request'
-import Qs from 'qs'
 import { toCode, fromCode } from '@/utils/utils'
-import { editThePermissionsPage } from '@/api/admin/role'
+import { getPermissionsPage } from '@/router/index'
 // eslint-disable-next-line
 import * as dayjs from 'dayjs'
 // eslint-disable-next-line
@@ -728,18 +726,13 @@ export default {
                   'userPermis',
                   JSON.stringify(userPermis)
                 )
-                await this.getPermissionsPage()
+                await getPermissionsPage()
                 this.$message.success('登录成功')
-                if (this.gohistory && this.gohistory !== '404') {
+                if (this.gohistory && this.gohistory !== 'error') {
                   this.$router.go(-1)
                 } else {
                   this.$router.push({ name: 'home' })
                 }
-                // this.sendMessage = {
-                //   uni__teis_Token: res.access_token,
-                //   uni__expires_in: res.expires_in
-                // }
-                // this.checkToken()
               }
             } catch (err) {
               this.loading = false
@@ -774,15 +767,6 @@ export default {
         return item.clientId === 'teisdata'
       })
       return role
-    },
-    async getPermissionsPage() {
-      // const user = JSON.parse(window.localStorage.getItem('user_name'))
-      const res = await editThePermissionsPage()
-      const data = res.data.data || {}
-      data.funPerms = data.funPerms.filter((item) => item.type)
-      data.defaultPerm = data.defaultPerm.filter((item) => item.type)
-      this.$store.state.permissionsPage = data
-      window.localStorage.setItem('permissionsPage', JSON.stringify(data))
     },
     // 判断账号是否过期
     async checkToken() {
@@ -1332,25 +1316,6 @@ export default {
     changeAreaCode(val) {
       this.areaCode = val
     },
-    async getTokenById() {
-      try {
-        const query = Qs.parse(window.location.search.slice(1))
-        if (query && query.id) {
-          const res = await request({
-            method: 'post',
-            url: `uaa/user/getToken?key=${query.id}`,
-            showErrorMsg: false
-          })
-          window.localStorage.setItem('AI_token', res.data.data.value)
-          window.localStorage.setItem('user_name', res.data.data.user_name)
-        }
-      // eslint-disable-next-line no-empty
-      } catch {
-      }
-    },
-    toHome() {
-
-    }
   },
   filters: {
     phoneFormat(val) {

@@ -2,14 +2,14 @@
   <div :class="['rolePermission', editAuth ? '' : 'noEdit']">
     <template>
       <div class="top">
-        <template v-if="level">
+        <template v-if="level && editAuth">
           <g-button
             type="primary"
             @click="handleClick({ roleId: -1, roleName: '新增角色' })"
             >新增</g-button
           >
         </template>
-        <template v-else>
+        <template v-else-if="!level">
           <span class="title"
             ><i class="top-back" @click="handleReturn"
               >{{ editAuth ? '编辑' : '查看' }}权限</i
@@ -257,9 +257,7 @@ export default {
   computed: {
     editAuth() {
       const { permissionsPage = {} } = this.$store.state
-      const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(
-        (item) => item.pathName === 'RolePermission'
-      ) || {}
+      const flowManage = permissionsPage.funPerms.find(item => item.code === 'rolePermManagement') || {}
       if (flowManage.type === 'edit') {
         return true
       }

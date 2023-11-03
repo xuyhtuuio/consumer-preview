@@ -193,10 +193,7 @@ export default {
     allTask() {
       const { permissionsPage = {} } = this.$store.state
       // eslint-disable-next-line
-      const approvalcenter =
-        [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(
-          (item) => item.pathName === 'approval-list'
-        ) || {}
+      const approvalcenter = permissionsPage.funPerms.find(item => item.code === 'approvalCenter') || {}
       const isExsit = approvalcenter.child?.find(
         (item) => item.name === '全部任务' && item.type
       )
@@ -208,10 +205,7 @@ export default {
     showExport() {
       const { permissionsPage = {} } = this.$store.state
       // eslint-disable-next-line
-      const approvalcenter =
-        [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(
-          (item) => item.pathName === 'approval-list'
-        ) || {}
+      const approvalcenter = permissionsPage.funPerms.find(item => item.code === 'approvalCenter') || {}
       const isExsit = approvalcenter.child?.find(
         (item) => item.name === '全部任务' && item.type === 'export'
       )
