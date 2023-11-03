@@ -10,8 +10,11 @@
     <el-upload
       class="upload-demo"
       drag
+      ref="uploadPic"
       :multiple="false"
       action
+      :show-file-list="false"
+      :disabled="uploading"
       :http-request="uploadFile"
     >
       <i class="el-icon-upload"></i>
@@ -51,7 +54,7 @@ export default {
     uploadFile(param) {
       const formData = new FormData()
       this.uploading = true
-      formData.append('mf', param.file) // 传入bpmn文件
+      formData.append('mf', param.file)
       getFormGroups(formData)
         .then((res) => {
           if (res.data.success) {
@@ -59,10 +62,20 @@ export default {
             this.$router.push({
               name: 'recheck-detail',
               params: {
-                item: res.data.data
+                item: {
+                  ...res.data.data,
+                  name: '',
+                  text: '',
+                  searchType: 2,
+                },
               }
             })
-            this.$emit('changeImgFun', res.data.data);
+            this.$emit('changeImgFun', {
+              ...res.data.data,
+              name: '',
+              text: '',
+              searchType: 2,
+            });
             this.turnDialog = false;
           } else {
             this.$message.error(res.data.msg)
@@ -70,7 +83,7 @@ export default {
           }
         })
         .catch(() => {
-          this.uploading = false
+          this.uploading = false;
           this.$message.error('上传失败')
         })
     }

@@ -2,13 +2,18 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-03 11:30:32
+ * @LastEditTime: 2023-11-03 14:07:25
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
   <div class="laws" v-loading="search.loading">
-    <Filters @addRule="addRule" @sortChange="sortChange" :total="search.total" ref="filter-comp">
+    <Filters
+      @addRule="addRule"
+      @sortChange="sortChange"
+      :total="search.total"
+      ref="filter-comp"
+    >
     </Filters>
     <div v-if="list.length" class="list-content">
       <div
@@ -22,7 +27,7 @@
           <div class="file-info">
             <div class="name">
               {{ item.name }}
-              <div @click.stop>
+              <div @click.stop v-if="role">
                 <el-popover
                   placement="bottom"
                   width="108"
@@ -32,7 +37,7 @@
                 >
                   <ul>
                     <li @click="editRule(item, 'edit')">编辑</li>
-                    <li @click="editRule(item, 'update')" v-if="role">更新</li>
+                    <li @click="editRule(item, 'update')" >更新</li>
                     <li @click="delRule(item)">删除</li>
                   </ul>
                   <i
@@ -565,7 +570,7 @@ export default {
         update: '更新'
       },
       type: 0,
-      role: false,
+      role: false
     }
   },
   watch: {
@@ -590,9 +595,8 @@ export default {
   computed: {},
   methods: {
     getUserRole() {
-      const user = JSON.parse(window.localStorage.getItem('user_name'))
-      const role = user.roles.filter((item) => item.clientId === 'cpr')
-      this.role = role[0]?.code.indexOf('admin') !== -1
+      const role = this.$store.getters.getPermissionByCode('knowledge')?.type
+      this.role = role === 'edit'
     },
     showElPopover(item) {
       this.showPop = false

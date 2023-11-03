@@ -119,6 +119,13 @@ export default new Vuex.Store({
     }
   },
   getters: {
+    // 获取含 指定code  的权限对象，再根据 type判断 是否有权限
+    getPermissionByCode(state) {
+      return code => {
+        const { funPerms } = state.permissionsPage
+        return funPerms.find(item => item.code === code) || {}
+      }
+    }
   },
   actions: {},
   modules: {}

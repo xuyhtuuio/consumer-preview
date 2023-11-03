@@ -9,10 +9,11 @@
               alt=""
             />
           </div>
+          <!-- <div class="input-left input-left-focus"> -->
           <div class="input-left" :class="{ 'input-left-focus': inputFocus }">
             <el-input
-              placeholder="请输入关键词或上传图片进行回检"
-              v-model="recheckInput"
+              :placeholder="placeholder"
+              v-model.trim="recheckInput"
               class="input-with-select"
               @focus="inputFocusFun"
               @blur="inputBlurFun"
@@ -23,6 +24,7 @@
                 slot="prepend"
                 placeholder="请选择"
                 popper-class="content-select"
+                @change="changeSearch"
               >
                 <el-option label="按文件名称" value="1"></el-option>
                 <el-option label="按文本内容" value="2"></el-option>
@@ -38,7 +40,7 @@
                   >
                     <i class="el-icon-camera" @click="showUpload"></i>
                   </div>
-                  <div v-show="inputFocus" class="append-btn">
+                  <div v-show="inputFocus" class="append-btn" @click="searchRecheck">
                     <i class="el-icon-search"></i>搜索
                   </div>
                 </div>
@@ -50,26 +52,43 @@
               src="@/assets/image/intelligent-recheck/show-more.png"
               alt=""
             />
-            <div class="right-tip">回检记录</div>
+            <div class="right-tip" @click="tpRecord">回检记录</div>
           </div>
         </div>
         <div class="list-select">
           <div class="select-left">
             <div class="select-item select-org">
-              <div class="select-set">
-                <div class="tip-style">选择机构</div>
-                <i class="el-icon-caret-bottom"></i>
-              </div>
-              <el-select
-                popper-class="content-select op-select"
-                v-model="searchForm.org"
-                slot="prepend"
-                placeholder="选择机构"
+              <el-popover
+                ref="ref-popover3"
+                width="400"
+                popper-class="org-date-style"
+                placement="bottom-start"
+                trigger="click"
+                @show="handlePopoverShow3"
               >
-                <el-option label="总行" value="1"></el-option>
-                <el-option label="分行" value="2"></el-option>
-              </el-select>
-              <img src="@/assets/image/intelligent-recheck/tip.png" alt="" />
+                <el-cascader
+                  placeholder="选择机构"
+                  v-model="searchForm.org"
+                  ref="org-cascader"
+                  :options="agenciesList"
+                  @change="changeSearchForm"
+                  clearable
+                  :props="{
+                    emitPath: false,
+                    checkStrictly: true,
+                    label: 'name',
+                    value: 'id',
+                    children: 'children'
+                  }"
+                  filterable></el-cascader>
+                <div slot="reference">
+                  <div class="select-set">
+                    <div class="tip-style" :class="{ 'tip-style-active': searchForm.org }">选择机构</div>
+                    <i class="el-icon-caret-bottom"></i>
+                    <img src="@/assets/image/intelligent-recheck/tip.png" alt="" />
+                  </div>
+                </div>
+              </el-popover>
             </div>
             <div class="select-item select-time">
               <el-popover
@@ -78,7 +97,7 @@
                 width="400"
                 placement="bottom-start"
                 trigger="click"
-                @show="handlePopoverShow"
+                @show="handlePopoverShow1"
               >
                 <el-date-picker
                   v-model="searchForm.setTime"
@@ -86,15 +105,19 @@
                   ref="my-date-picker"
                   align="right"
                   unlink-panels
+                  :picker-options="pickerOptions"
                   range-separator="至"
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
                   popper-class="date-style"
+                  clearable
+                  @change="changeSearchForm"
+                  value-format="yyyy-MM-dd"
                 >
                 </el-date-picker>
                 <div slot="reference">
                   <div class="select-set">
-                    <div class="tip-style">上线时间</div>
+                    <div class="tip-style" :class="{ 'tip-style-active': searchForm.setTime && searchForm.setTime.length > 0 }">上线时间</div>
                     <i class="el-icon-caret-bottom"></i>
                   </div>
                 </div>
@@ -107,30 +130,49 @@
                 popper-class="date-style"
                 placement="bottom-start"
                 trigger="click"
-                @show="handlePopoverShow"
+                @show="handlePopoverShow2"
               >
                 <el-date-picker
                   v-model="searchForm.getTime"
                   type="daterange"
-                  ref="my-date-picker"
+                  ref="my-date-picker2"
                   align="right"
                   unlink-panels
+                  clearable
+                  :picker-options="pickerOptions"
                   range-separator="至"
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
                   popper-class="date-style"
+                  @change="changeSearchForm"
+                  value-format="yyyy-MM-dd"
                 >
                 </el-date-picker>
                 <div slot="reference">
                   <div class="select-set">
-                    <div class="tip-style">提单时间</div>
+                    <div class="tip-style" :class="{ 'tip-style-active': searchForm.getTime && searchForm.getTime.length > 0 }">提单时间</div>
                     <i class="el-icon-caret-bottom"></i>
                   </div>
                 </div>
               </el-popover>
             </div>
+            <div class="select-item select-org">
+              <div class="select-set">
+                <div class="tip-style" :class="{ 'tip-style-active': searchForm.type }">事项类型</div>
+                <i class="el-icon-caret-bottom"></i>
+              </div>
+              <el-select
+                popper-class="content-select op-select"
+                v-model="searchForm.type"
+                slot="prepend"
+                @change="changeSearchForm"
+                placeholder="事项类型"
+              >
+                <el-option v-for="(item, index) in transactionTypes" :key="'type' + index" :label="item.label" :value="item.value"></el-option>
+              </el-select>
+            </div>
             <div class="select-item select-time" style="width: 92px">
-              <el-switch v-model="searchForm.recheck" active-text="已回检">
+              <el-switch v-model="searchForm.recheck" active-text="已回检" @change="changeSearchForm">
               </el-switch>
             </div>
           </div>
@@ -159,48 +201,50 @@
         </div>
       </div>
       <div class="detail-bottom">
-        <div class="bottom-left">
-          <!-- <div class="img-header">
-            <span class="header-btns">
-              <i class="iconfont">&#xe62e;</i>
-              <i class="iconfont" @click="fullScreen(1)">&#xe62f;</i>
-            </span>
-          </div> -->
+        <div class="bottom-left" v-if="searchType === 2">
           <div class="img-show">
-            <ImagePreview :url="item.url" ref="imgPreview" @fullImage="fullScreen" @changeImgFun="changeImgFun"></ImagePreview>
+            <ImagePreview :url="item.url" ref="imgPreview" @fullImage="fullScreen()" @changeImgFun="changeImgFun"></ImagePreview>
           </div>
         </div>
-        <div class="bottom-right" v-loading="loading">
-          <div class="total-list">
-            <el-row :gutter="16">
-              <el-col
-                :span="6"
-                v-for="(item, index) in totalList"
-                :key="'list' + index"
+        <div class="bottom-right" :class="{ 'bottom-right-border' : searchType === 1 }" v-loading="loading">
+          <div class="total-list" v-if="totalList.length > 0" @scroll="scrollGet" ref="listBody">
+            <Waterfall line="v" :line-gap="200"
+              :min-line-gap="100"
+              :max-line-gap="220"
+              :single-max-width="300"
+              :grow="select === '1' ? [1, 1, 1, 1] : [1, 1, 1, 1, 1]"
+              :watch="totalList">
+              <!-- each component is wrapped by a waterfall slot -->
+              <WaterfallSlot
+                v-for="(ite, index) in totalList"
+                :width="192"
+                :height="ite.height"
+                :order="index"
+                :key="ite.id"
+                move-class="item-move"
               >
-                <div class="list-item" @click="showScreen(item)">
-                  <div class="num">
-                    {{ (item.distance * 100).toFixed(2) }}%{{
-                      item.formCategoryName
-                    }}
+                <div class="list-item">
+                  <div class="num" v-if="searchType === 2">
+                    {{ (ite.distance * 100).toFixed(2) }}%
                   </div>
-                  <img :src="item.fileUrl" alt="" />
-                  <div class="item-title">{{ item.fileName }}</div>
+                  <div class="img-model">
+                    <img :src="ite.fileUrl" alt="" />
+                    <div class="img-up" @click="toCompare(ite, index, total)">
+                      <div class="recheck-num">回检{{ ite.recheckCount }}次</div>
+                    </div>
+                    <div class="show-more" @click="showDetail(ite)">
+                      <img src="@/assets/image/intelligent-recheck/see.png" alt="">
+                      <div>查看详情</div>
+                    </div>
+                  </div>
+                  <div class="item-title">{{ ite.fileName }}</div>
                 </div>
-              </el-col>
-            </el-row>
+              </WaterfallSlot>
+            </Waterfall>
+            <Loading v-if="scrollLoading && !loading"></Loading>
+            <div class="bottom-tip" v-if="!canScroll">已经到底啦 ~</div>
           </div>
-          <TrsPagination
-            v-if="total"
-            class="trs-pagination"
-            :pageSize="pageSize"
-            :pageNow="pageNum"
-            :total="total"
-            @getList="handleCurrentChange"
-            scrollType="scrollCom"
-            scrollName="scrollCom"
-          >
-          </TrsPagination>
+          <empty v-else></empty>
         </div>
       </div>
     </div>
@@ -238,38 +282,77 @@
       </div>
     </div>
     <UploadDialog ref="uploadDia" @changeImgFun="changeImgFun"></UploadDialog>
-    <!-- <ImgDialog
-      ref="imgDia"
-      :url="listItemActive.fileUrl"
-      :item="listItemActive"
-    ></ImgDialog> -->
+    <DetailDialog ref="detailDia" v-if="showDetailDia" :detailItem="detailItem" @handleClose="handleClose"></DetailDialog>
   </div>
 </template>
 
 <script>
+import Waterfall from 'vue-waterfall/lib/waterfall'
+import WaterfallSlot from 'vue-waterfall/lib/waterfall-slot'
+import { getOrgTree, getApprovalType } from '@/api/approvalCenter'
 import { getSimilarityComparisonList } from '@/api/intelligent-recheck'
-import { downloadAllFiles } from '@/api/applyCenter'
+import { downloadStream } from '@/api/applyCenter'
+import Empty from '@/components/common/empty'
+import Loading from './components/loading'
 import UploadDialog from './components/upload-dialog'
-// import ImgDialog from './components/img-dialog'
+import DetailDialog from './components/detail-dialog'
 import ImagePreview from './components/imgae-preview'
 import FullImage from './components/full-image'
+const sortListType1 = [
+  {
+    label: '按上线时间',
+    val: 3,
+    sort: 'desc'
+  },
+  {
+    label: '按提单时间',
+    val: 2,
+    sort: 'desc'
+  }
+];
+const sortListType2 = [
+  {
+    label: '按相似度',
+    val: 1,
+    sort: 'desc'
+  },
+  {
+    label: '按上线时间',
+    val: 3,
+    sort: 'desc'
+  },
+  {
+    label: '按提单时间',
+    val: 2,
+    sort: 'desc'
+  }
+];
 export default {
   components: {
+    Empty,
+    Loading,
     UploadDialog,
     // ImgDialog,
     ImagePreview,
-    FullImage
+    FullImage,
+    Waterfall,
+    WaterfallSlot,
+    DetailDialog
   },
+  name: 'recheck-detail',
   data: () => ({
     recheckInput: '',
     select: '1',
+    searchType: 2,
     searchForm: {
       org: '',
-      setTime: '',
-      getTime: '',
-      recheck: false
+      setTime: [],
+      getTime: [],
+      type: '',
+      recheck: null
     },
     showFullScreen: false,
+    detailDialogShow: false,
     sortList: [
       {
         label: '按相似度',
@@ -296,28 +379,126 @@ export default {
     pageSize: 8,
     pageNum: 1,
     item: {},
-    loading: false,
+    loading: true,
+    scrollLoading: false,
     totalList: [],
     listItemActive: {
       fileUrl: ''
     },
     inputFocus: false,
+    heightArr: [322, 262, 162],
+    pickerOptions: {
+      disabledDate(date) {
+        return date.getTime() > Date.now();
+      }
+    },
+    placeholder: '请输入文件名或上传图片进行回检',
+    agenciesList: [],
+    transactionTypes: [],
+    canScroll: true,
+    detailItem: {},
+    showDetailDia: false
   }),
   created() {
-    if (this.$route.params.item) {
-      this.item = this.$route.params.item
-      this.getSimilarityComparisonList()
-    } else {
-      // this.$router.go(-1)
+    this.init();
+  },
+  watch: {
+    $route: {
+      handler(val) {
+        if (!val.params.item) {
+          return
+        }
+        this.init();
+      },
+      // 深度观察监听
+      deep: true
     }
   },
   methods: {
+    init() {
+      this.getOrgTree();
+      this.getApprovalType();
+      const item = JSON.parse(localStorage.getItem('recheckItem'));
+      if (this.$route.params.item || item) {
+        this.item = this.$route.params.item || item;
+        localStorage.setItem('recheckItem', JSON.stringify(this.item));
+        this.searchType = this.item.searchType;
+        this.recheckInput = this.item.recheckInput ? this.item.recheckInput : '';
+        this.select = this.item.select ? this.select : '1';
+        let activeSort = {};
+        this.resetSearch();
+        if (this.searchType === 1) {
+          this.sortList = sortListType1;
+          activeSort = {
+            label: '按上线时间',
+            val: 3,
+            sort: 'desc'
+          };
+        } else {
+          this.sortList = sortListType2;
+          activeSort = {
+            label: '按相似度',
+            val: 1,
+            sort: 'desc'
+          };
+        }
+        this.activeSort = activeSort;
+        this.getSimilarityComparisonList()
+      } else {
+        this.$router.go(-1)
+      }
+    },
+    changeSearch(val) {
+      if (val === '1') {
+        this.placeholder = '请输入文件名或上传图片进行回检'
+      } else {
+        this.placeholder = '请输入关键词或上传图片进行回检'
+      }
+    },
+    tpRecord() {
+      this.$router.push({
+        name: 'recheck-record'
+      })
+    },
+    getApprovalType() {
+      getApprovalType().then((res) => {
+        this.transactionTypes = res.data.data.map((v) => {
+          return {
+            label: v.examineTypesName,
+            value: v.recordId
+          }
+        })
+      })
+    },
+    showDetail(ite) {
+      this.detailItem = ite;
+      this.showDetailDia = true;
+    },
+    handleClose() {
+      this.showDetailDia = false;
+    },
+    toCompare(ite, index, total) {
+      this.$router.push({
+        name: 'recheck-compare',
+        params: {
+          leftItem: {
+            ...this.item,
+            searchType: this.searchType
+          },
+          compareItem: {
+            ...ite,
+            itemIndex: index,
+            totalCount: total
+          }
+        }
+      })
+    },
     saveFile() {
       const params = {
         key: this.item.key
       }
       this.$message.info('下载中，请稍等！')
-      downloadAllFiles(params).then((res) => {
+      downloadStream(params).then((res) => {
         const disposition = res.headers['content-disposition']
         const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
         const link = document.createElement('a');
@@ -364,7 +545,10 @@ export default {
           sort: 'desc'
         }
       }
-      this.pageNum = 1
+      this.pageNum = 1;
+      this.loading = true;
+      this.canScroll = true;
+      this.totalList = [];
       this.getSimilarityComparisonList()
     },
     handleCurrentChange(val) {
@@ -375,50 +559,158 @@ export default {
       this.listItemActive = item
       this.$refs.imgDia.imgDialog = true
     },
+    resetSearch() {
+      this.pageNum = 1;
+      this.loading = true;
+      this.totalList = [];
+      let activeSort = {};
+      if (this.searchType === 1) {
+        activeSort = {
+          label: '按上线时间',
+          val: 3,
+          sort: 'desc'
+        };
+      } else {
+        activeSort = {
+          label: '按相似度',
+          val: 1,
+          sort: 'desc'
+        };
+      }
+      this.activeSort = activeSort;
+      this.searchForm = {
+        org: '',
+        setTime: '',
+        getTime: '',
+        type: '',
+        recheck: false
+      };
+    },
     changeImgFun(item) {
       this.item = item;
+      localStorage.setItem('recheckItem', JSON.stringify(this.item));
+      this.searchType = 2;
+      this.canScroll = true;
+      this.sortList = sortListType2;
+      this.resetSearch();
+      this.getSimilarityComparisonList()
+    },
+    changeSearchForm() {
       this.pageNum = 1;
-      this.activeSort = {
-        label: '按相似度',
-        val: 1,
-        sort: 'desc'
+      this.loading = true;
+      this.totalList = [];
+      this.canScroll = true;
+      this.getSimilarityComparisonList()
+    },
+    searchRecheck() {
+      if (this.recheckInput === '') {
+        this.$message.warning(this.placeholder)
+        return;
+      }
+      this.item = {
+        key: '',
+        name: this.select === '1' ? this.recheckInput : '',
+        text: this.select === '2' ? this.recheckInput : '',
+        searchType: 1
       };
+      this.canScroll = true;
+      localStorage.setItem('recheckItem', JSON.stringify(this.item));
+      this.searchType = 1;
+      this.sortList = sortListType1;
+      this.resetSearch();
       this.getSimilarityComparisonList()
     },
     getSimilarityComparisonList() {
-      this.loading = true
+      // this.loading = true
+      this.scrollLoading = true;
       const data = {
         fileKey: this.item.key,
+        name: this.item.name,
+        text: this.item.text,
         pageNow: this.pageNum,
-        pageSize: this.pageSize,
+        pageSize: this.searchType === 1 ? 40 : 20,
         sort: this.activeSort.val,
-        sortType: this.activeSort.sort === 'desc' ? 1 : 2
+        sortType: this.activeSort.sort === 'desc' ? 1 : 2,
+        cstartTime: this.searchForm.getTime && this.searchForm.getTime.length > 0 ? this.searchForm.getTime[0] : '',
+        cendTime: this.searchForm.getTime && this.searchForm.getTime.length > 0 ? this.searchForm.getTime[1] : '',
+        startTime: this.searchForm.setTime && this.searchForm.setTime.length > 0 ? this.searchForm.setTime[0] : '',
+        endTime: this.searchForm.setTime && this.searchForm.setTime.length > 0 ? this.searchForm.setTime[1] : '',
+        orgId: this.searchForm.org,
+        isRecheck: this.searchForm.recheck ? 1 : 0,
+        formCategory: this.searchForm.type
       }
+      // if (this.canScroll) {
       getSimilarityComparisonList(data)
         .then((res) => {
           if (res.data.status === 200) {
-            this.totalList = res.data.data.list.map((v) => {
+            const totalList = res.data.data.list.map((v) => {
               return {
                 ...v,
                 taskNumber: v.formId + '',
-                taskName: v.entryName,
+                taskName: v.formName,
+                processTemplateId: v.templateId,
                 initiator: {
                   ...v.originator,
                   label: v.institutional && v.institutional[1]
                 },
-                taskStatus: v.nodeStatus
+                taskStatus: v.nodeStatus,
+                height: this.heightArr[Math.floor(Math.random() * 3)]
               }
             })
-            this.total = res.data.data.totalCount
+            this.total = res.data.data.totalCount;
+            this.totalList = this.totalList.concat(totalList);
           }
-          this.loading = false
+          this.loading = false;
+          this.scrollLoading = false;
+          this.canScroll = !(this.totalList.length === this.total);
         })
         .catch(() => {
-          this.loading = false
+          this.loading = false;
+          this.scrollLoading = false;
         })
     },
-    handlePopoverShow() {
+    scrollGet() {
+      if (this.scrollLoading || !this.canScroll) {
+        return;
+      }
+      const { listBody } = this.$refs;
+      if (listBody.offsetHeight + listBody.scrollTop + 200 >= listBody.scrollHeight) {
+        this.pageNum += 1;
+        this.getSimilarityComparisonList();
+      }
+    },
+    handlePopoverShow1() {
       this.$refs['my-date-picker'].handleFocus()
+    },
+    handlePopoverShow2() {
+      this.$refs['my-date-picker2'].handleFocus()
+    },
+    getOrgTree() {
+      getOrgTree().then((res) => {
+        const { data } = res.data
+        if (data) {
+          const value = this.formatOrg(data.children)
+          this.agenciesList = [
+            {
+              ...data,
+              children: value
+            }
+          ]
+        }
+      })
+    },
+    formatOrg(data) {
+      data.forEach((m) => {
+        if (m.children && m.children.length) {
+          this.formatOrg(m.children)
+        } else {
+          m.children = null
+        }
+      })
+      return data
+    },
+    handlePopoverShow3() {
+      this.$refs['org-cascader'].handleFocus()
     },
     changeSize(type) {
       this.$refs.imgPreview1.changeSize(type)
@@ -451,6 +743,10 @@ export default {
       }
     }
     .input-left {
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      height: 44px;
       flex: 1;
       border-radius: 20px;
       overflow: hidden;
@@ -491,7 +787,7 @@ export default {
           }
         }
         .el-input__suffix {
-          height: 44px;
+          height: 40px;
         }
         .el-input-group__append {
           padding: 0;
@@ -550,7 +846,9 @@ export default {
       border: 2px solid #a8c5ff;
       background: #f9fbff;
       /deep/ .el-input {
+        // height: 40px;
         .el-input__inner {
+          // height: 40px;
           background: #f9fbff;
         }
         .el-input-group__append {
@@ -559,6 +857,9 @@ export default {
             background: #f9fbff !important;
           }
         }
+        // .el-select__caret {
+        //   // height: 40px;
+        // }
       }
     }
     .input-right {
@@ -610,12 +911,19 @@ export default {
         .select-set {
           display: flex;
           align-items: center;
+          cursor: pointer;
           .tip-style {
-            color: var(--gray-gray-9, #1d2128);
+            color: #1d2128;
             font-size: 14px;
             font-style: normal;
             font-weight: 400;
             line-height: 22px;
+          }
+          .el-icon-caret-bottom {
+            color: #88909B;
+          }
+          .tip-style-active {
+            color: #2D5CF6;
           }
         }
         /deep/.el-select {
@@ -712,7 +1020,7 @@ export default {
       border-radius: 10px;
       border: 1px solid #f2f3f5;
       background: #f7f8fa;
-      margin-right: 16px;
+      margin-right: 8px;
       display: flex;
       flex-direction: column;
       .img-header {
@@ -746,55 +1054,110 @@ export default {
       flex: 1;
       display: flex;
       flex-direction: column;
+      border-left: 1px solid #E5E6EB;
       .total-list {
+        position: relative;
         flex: 1;
         overflow: scroll;
-        /deep/.el-row {
-          height: 100%;
-          .el-col {
-            height: 50%;
-          }
-        }
         .list-item {
-          position: relative;
-          height: 95%;
-          margin-bottom: 24px;
+          position: absolute;
+          top: 0;
+          left: 8px;
+          right: 8px;
+          bottom: 28px;
           border-radius: 8px;
-          border: 1px solid #e5e6eb;
           background: #fff;
-          padding: 8px;
           display: flex;
           flex-direction: column;
           .num {
             position: absolute;
-            top: 8px;
-            left: 8px;
-            padding: 2px 10px;
-            border-radius: 6px 0px 8px 0px;
-            background: linear-gradient(90deg, #2f54eb 0%, #5196ff 100%);
-            color: #fff;
+            top: 7px;
+            left: 7px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: rgba(29, 33, 40, 0.40);
+            color: #FFF;
             font-size: 10px;
             font-style: normal;
-            font-weight: 400;
+            font-weight: 700;
             line-height: 18px;
+            z-index: 100;
           }
           img {
             width: 100%;
             flex: 1;
             object-fit: cover;
-            border-radius: 4px;
+            cursor: pointer;
+          }
+          .img-model {
+            display: flex;
+            position: relative;
+            width: 100%;
+            flex: 1;
+            border-radius: 12px;
+            border: 1.5px solid #E5E6EB;
             box-shadow: 0px 0px 10px 0px rgba(67, 67, 67, 0.1);
             overflow: hidden;
             cursor: pointer;
+            .img-up {
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              border-radius: 12px;
+              background: rgba(29, 33, 40, 0.30);
+              display: none;
+              .recheck-num {
+                position: absolute;
+                top: 7px;
+                right: 14px;
+                color: #FFF;
+                font-size: 12px;
+                font-style: normal;
+                font-weight: 700;
+                line-height: 20px;
+              }
+            }
+            .show-more {
+              display: none;
+              position: absolute;
+              bottom: 16px;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 86px;
+              height: 32px;
+              padding: 6px 8px;
+              border-radius: 4px;
+              background: #2D5CF6;
+              // display: flex;
+              align-items: center;
+              color: #FFF;
+              font-size: 12px;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 20px;
+              img {
+                width: 20px;
+                height: 20px;
+                margin-right: 2px;
+              }
+            }
+          }
+          .img-model:hover {
+            .img-up {
+              display: block;
+            }
+            .show-more {
+              display: flex;
+            }
           }
           .item-title {
-            height: 22px;
-            margin-top: 10px;
-            color: #1d2128;
-            font-size: 14px;
+            color: #505968;
+            font-size: 12px;
             font-style: normal;
             font-weight: 400;
-            line-height: 22px;
+            line-height: 20px;
             word-break: break-all;
             overflow: hidden;
             display: -webkit-box;
@@ -804,6 +1167,9 @@ export default {
           }
         }
       }
+    }
+    .bottom-right-border {
+      border-left: none;
     }
   }
 }
@@ -879,6 +1245,15 @@ export default {
     color: #FFFFFF;
   }
 }
+.item-move {
+  transition: all .5s cubic-bezier(.55,0,.1,1);
+  -webkit-transition: all .5s cubic-bezier(.55,0,.1,1);
+}
+.bottom-tip {
+  margin-left: 10px;
+  font-size: 14px;
+  text-align: center;
+}
 </style>
 <style lang="less">
 .content-select {
@@ -903,5 +1278,8 @@ export default {
   .el-input__inner {
     width: 100% !important;
   }
+}
+.org-date-style {
+  width: auto!important;
 }
 </style>

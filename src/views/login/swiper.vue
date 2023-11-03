@@ -1,34 +1,34 @@
 <template>
   <div class="swiper">
-    <div class="logo" @click="goMain">
+    <!-- <div class="logo" @click="goMain">
       <img src="@/assets/image/logo.png" alt="" />
       <span><i>消保管控</i>平台</span>
-    </div>
+    </div> -->
     <div class="swiper-container">
+      <div class="cover"></div>
       <div class="swiper-wrapper">
         <div class="swiper-slide">
-          <img src="@/assets/image/swiper1.png" alt="" />
-        </div>
-        <div class="swiper-slide"><img src="@/assets/image/swiper2.png" alt="" /></div>
-        <div class="swiper-slide">
-          <img src="@/assets/image/swiper4.png" alt="" />
+          <img src="@/assets/image/swiper7.png" alt="" />
         </div>
         <div class="swiper-slide">
-          <img src="@/assets/image/swiper3.png" alt="" />
+          <img src="@/assets/image/swiper6.png" alt="" />
+        </div>
+        <div class="swiper-slide">
+          <img src="@/assets/image/swiper5.png" alt="" />
         </div>
       </div>
 
-      <div class="swiper-pagination"></div>
+      <!-- <div class="swiper-pagination"></div> -->
     </div>
   </div>
 </template>
 
 <script>
-import Swiper from 'swiper';
-import 'swiper/css/swiper.min.css';
+import Swiper from 'swiper'
+import 'swiper/css/swiper.min.css'
 export default {
   data() {
-    return {};
+    return {}
   },
   mounted() {
     // eslint-disable-next-line
@@ -47,20 +47,20 @@ export default {
         delay: 3000, // 自动播放的间隔时间，单位ms，默认3000ms
         disableOnInteraction: false // 点击不会取消自动
       }
-    });
+    })
   },
   methods: {
     goMain() {
-      //   const page2 = this.$router.resolve({ name: 'homePage' })
+      //   const page2 = this.$router.resolve({ name: 'home' })
       //   window.open(page2.href, '_blank')
     }
   }
-};
+}
 </script>
 <style lang="less" scoped>
 .swiper {
   // height: 100vh;
-  margin-left: 100px;
+  // margin-left: 85px;
 
   .logo {
     cursor: pointer;
@@ -91,14 +91,16 @@ export default {
 
 .swiper-container {
   position: relative;
-  height: 500px;
-  width: 608px;
+  height: 580px;
+  width: 450px;
   z-index: -10;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
 }
 
 .swiper-slide {
-  width: 608px;
-  height: 500px;
+  height: 580px;
+  width: 450px;
 
   img {
     width: 100%;
@@ -147,19 +149,20 @@ export default {
 
 /deep/ .swiper-pagination {
   position: absolute;
-  bottom: 0;
+  bottom: 100px;
+  background-color:#277afb !important;
+  z-index: 333;
 
   .swiper-pagination-bullet-active {
-    background: #2d5cf6 !important;
+    background: rgba(209, 226, 255, 1) !important;
+    width: 40px;
+    height: 6px;
   }
 
   .swiper-pagination-bullet {
-    width: 32px;
-    height: 4px;
-    background: #9a9eb4;
+    background-color: rgba(209, 226, 255, 1) !important;
     border-radius: 20px;
     display: inline-block;
   }
 }
-
 </style>
