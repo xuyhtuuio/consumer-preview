@@ -53,7 +53,7 @@
               <!-- <span v-show="tag === serach || hoverText === tag" style="color:#2D5CF6;" @click="addTags(tag)">创建新标签</span> -->
             </li>
           </ul>
-          <el-empty v-if="serach && tagsList.length === 0" description="暂无数据"></el-empty>
+          <Empty v-if="serach && tagsList.length === 0"></Empty>
         </div>
         <template #reference>
           <span class="button pointer tags">

@@ -7,10 +7,10 @@
         <KnowledgeCard :data="k" @fetchList="getRecommendList(paramsDefalut)" @setLoading="loadingList=true"/>
       </div>
       <TrsPagination :pageSize="10" :pageNow="page.pageNow" :total="page.total" @getList="handleCurrentChange" scrollType="scrollCom" scrollName="scrollCom"
-        v-if="page.total">
+        v-if="page.total" style="margin: -16px 11px 0 0;">
       </TrsPagination>
     </div>
-    <el-empty description="暂无数据" v-if="kCardList.length === 0 && loadingList === false"></el-empty>
+    <Empty v-if="kCardList.length === 0 && loadingList === false"></Empty>
   </div>
 </template>
 <script>
