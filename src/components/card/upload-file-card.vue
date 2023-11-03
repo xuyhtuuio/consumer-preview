@@ -11,7 +11,7 @@
       请上传最终上线版本，且已审批通过的材料
     </p>
     <el-upload v-if="status !== 4 && radio == 1" class="upload-demo" drag action :http-request="uploadBpmn"
-      :file-list="fileList" :on-success="handleSuccess" :before-upload="checkFileLegal" :on-error="handleError"
+      :file-list="fileList" :on-success="handleSuccess" multiple  :before-upload="checkFileLegal" :on-error="handleError"
       :show-file-list="false">
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">
@@ -20,8 +20,8 @@
       </div>
     </el-upload>
     <div class="upload-demo" v-if="radio == 0">
-      <div class="el-upload">
-        <div class="el-upload-dragger">
+      <div class="el-upload" >
+        <div class="el-upload-dragger " style="cursor:default;">
           <i class="el-icon-upload"></i>
           <div class="el-upload__text">当前不需要上传材料</div>
         </div>

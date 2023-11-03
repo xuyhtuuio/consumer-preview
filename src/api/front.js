@@ -15,7 +15,7 @@ export function deleteFormGroups(params) {
   return request({
     url: '/cpr/file/remove',
     method: 'post',
-    params,
+    params
   })
 }
 
@@ -24,56 +24,69 @@ export function deleteFormGroups(params) {
  * @param identifier 文件md5
  * @returns {Promise<AxiosResponse<any>>}
  */
-export const taskInfo = (identifier) => {
+export const taskInfo = (identifier, fileName) => {
   return request({
     url: '/cpr/minioUpload/taskInfo',
+    method: 'post',
     params: {
+      fileName,
       identifier
     }
   })
 }
 
 /**
-* 初始化一个分片上传任务
-* @param identifier 文件md5
-* @param fileName 文件名称
-* @param totalSize 文件大小
-* @param chunkSize 分块大小
-* @returns {Promise<AxiosResponse<any>>}
-*/
+ * 初始化一个分片上传任务
+ * @param identifier 文件md5
+ * @param fileName 文件名称
+ * @param totalSize 文件大小
+ * @param chunkSize 分块大小
+ * @returns {Promise<AxiosResponse<any>>}
+ */
 export const initTask = ({ identifier, fileName, totalSize, chunkSize }) => {
-  return request.post('/cpr/minioUpload/initTask', { identifier, fileName, totalSize, chunkSize })
+  return request.post('/cpr/minioUpload/initTask', {
+    identifier,
+    fileName,
+    totalSize,
+    chunkSize
+  })
 }
 
 /**
-* 获取预签名分片上传地址
-* @param identifier 文件md5
-* @param partNumber 分片编号
-* @returns {Promise<AxiosResponse<any>>}
-*/
-export const preSignUrl = ({ identifier, partNumber }) => {
+ * 获取预签名分片上传地址
+ * @param identifier 文件md5
+ * @param partNumber 分片编号
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+// fileName, identifier,
+export const preSignUrl = ({ partNumber, task }) => {
+  const { uploadId, bucketName, objectKey } = task
   return request({
     url: '/cpr/minioUpload/preSignUploadUrl',
     params: {
-      identifier,
-      partNumber
+      // fileName,
+      // identifier,
+      partNumber,
+      uploadId,
+      bucketName,
+      objectKey
     }
   })
 }
 
 /**
-* 合并分片
-* @param identifier
-* @returns {Promise<AxiosResponse<any>>}
-*/
-export const merge = (identifier) => {
+ * 合并分片
+ * @param identifier
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const merge = (identifier, fileName) => {
   return request({
     url: '/cpr/minioUpload/merge',
     method: 'post',
     params: {
-      identifier
+      identifier,
+      fileName
     }
-
   })
 }
 

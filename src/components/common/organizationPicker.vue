@@ -136,7 +136,7 @@
             </div>
           </div>
           <div v-if="checkedTotal === 0" style="text-align: center;color:#86909C;margin-top:80px;">
-            <img src="../../assets/image/empty.png" style="width: 151px;" />
+            <img src="../../assets/image/empty.png" alt="图片加载错误" style="width: 151px;" />
             <p>请点击左侧列表选择数据</p>
           </div>
           <!-- <div v-for="(node, index) in select" :key="index" class="line">

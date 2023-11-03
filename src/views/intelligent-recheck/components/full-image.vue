@@ -1,6 +1,6 @@
 <template>
   <div class="preview" ref="contentDom" v-loading="!loaded">
-    <img id="picture" :src="url" @load="handleImageLoaded" ref="imgDom" />
+    <img id="picture" alt="" :src="url" @load="handleImageLoaded" ref="imgDom" />
   </div>
 </template>
 
@@ -25,7 +25,6 @@ export default {
       default: () => ({})
     },
     url: {
-      type: String,
       default: ''
     }
   },
