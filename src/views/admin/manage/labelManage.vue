@@ -227,8 +227,7 @@ export default {
   },
   computed: {
     editAuth() {
-      const { permissionsPage = {} } = this.$store.state
-      const flowManage = permissionsPage.funPerms.find(item => item.code === 'tagManagement') || {}
+      const flowManage = this.$store.getters.getPermissionByCode('tagManagement');
       if (flowManage.type === 'edit') {
         return true
       } else {

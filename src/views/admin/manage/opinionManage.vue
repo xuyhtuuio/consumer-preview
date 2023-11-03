@@ -280,8 +280,7 @@ export default {
   },
   computed: {
     editAuth() {
-      const { permissionsPage = {} } = this.$store.state
-      const flowManage = permissionsPage.funPerms.find(item => item.code === 'opinionManagement') || {}
+      const flowManage = this.$store.getters.getPermissionByCode('opinionManagement');
       if (flowManage.type === 'edit') {
         return true
       }

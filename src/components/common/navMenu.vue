@@ -73,8 +73,8 @@ export default {
   },
   computed: {
     manageAuth() {
-      const { permissionsPage = {} } = this.$store.state
-      return permissionsPage.funPerms.find(item => item.code === 'backManagement' && item.type)
+      const manage = this.$store.getters.getPermissionByCode('backManagement');
+      return Boolean(manage.type)
     },
     iconList() {
       if (this.manageAuth) {
@@ -101,8 +101,9 @@ export default {
     // 获取菜单
     getNav() {
       const { permissionsPage = {} } = this.$store.state
+      // 若导航对应模块，无需判断权限，则去掉code字段
       const navList = [
-        { title: '申请中心', name: 'apply-list', code: 'applycenter', pathName: 'applycenter' },
+        { title: '申请中心', name: 'apply-list', pathName: 'applycenter' },
         { title: '审批中心', name: 'approval-list', code: 'approvalCenter', pathName: 'approvalcenter' },
         { title: '智能回检', name: 'recheck-index', code: 'recheckIndex', pathName: 'recheck' },
         { title: '产品图谱', name: 'productmap', code: 'productmap', pathName: 'productmap' },
@@ -111,7 +112,7 @@ export default {
       ]
       this.list = navList
         .map((item) => {
-          const exist = permissionsPage.funPerms?.find((f) => (f.code === item.code));
+          const exist = permissionsPage.funPerms?.find((f) => (item.code && f.code === item.code));
           if ((exist && exist?.type) || !exist) {
             return item;
           } else {

@@ -191,9 +191,7 @@ export default {
   },
   computed: {
     allTask() {
-      const { permissionsPage = {} } = this.$store.state
-      // eslint-disable-next-line
-      const approvalcenter = permissionsPage.funPerms.find(item => item.code === 'approvalCenter') || {}
+      const approvalcenter = this.$store.getters.getPermissionByCode('approvalCenter');
       const isExsit = approvalcenter.child?.find(
         (item) => item.name === '全部任务' && item.type
       )
@@ -203,9 +201,7 @@ export default {
       return false
     },
     showExport() {
-      const { permissionsPage = {} } = this.$store.state
-      // eslint-disable-next-line
-      const approvalcenter = permissionsPage.funPerms.find(item => item.code === 'approvalCenter') || {}
+      const approvalcenter = this.$store.getters.getPermissionByCode('approvalCenter');
       const isExsit = approvalcenter.child?.find(
         (item) => item.name === '全部任务' && item.type === 'export'
       )

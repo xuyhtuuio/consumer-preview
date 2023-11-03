@@ -256,8 +256,7 @@ export default {
   },
   computed: {
     editAuth() {
-      const { permissionsPage = {} } = this.$store.state
-      const flowManage = permissionsPage.funPerms.find(item => item.code === 'rolePermManagement') || {}
+      const flowManage = this.$store.getters.getPermissionByCode('rolePermManagement');
       if (flowManage.type === 'edit') {
         return true
       }
