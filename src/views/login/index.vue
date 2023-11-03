@@ -805,7 +805,7 @@ export default {
         // 判断下一步是否跳转
         if (routeFrom === 'trs') {
           this.$router.push({
-            name: 'homePage'
+            name: 'home'
           })
         } else if (
           routeFrom
@@ -839,12 +839,12 @@ export default {
             )
           } else {
             this.$router.push({
-              name: 'homePage'
+              name: 'home'
             })
           }
         } else {
           this.$router.push({
-            name: 'homePage'
+            name: 'home'
           })
         }
       }
@@ -1097,7 +1097,7 @@ export default {
           // 先判断有没有过期
           this.checkToken()
           this.$router.push({
-            name: 'homePage'
+            name: 'home'
           })
         } else {
           return this.$message.error(res.data.error_description)

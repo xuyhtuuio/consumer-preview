@@ -265,7 +265,7 @@ const router = new Router({
         {
           path: '/home',
           name: 'home',
-          component: () => import('@/views/front/home'),
+          component: () => import('@/views/front/index'),
           meta: { title: '首页', viewport }
         }
       ]
