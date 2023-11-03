@@ -125,35 +125,6 @@ export default {
       const names = [to?.name, ...to?.matched.map(a => { return a.name })]
       // 判断 list和names是否有交叉
       this.activeMenu = this.list.find(item => names.includes(item.pathName))?.pathName
-      // this.activeMenu = names.includes(name) ?
-
-      // const { fullPath } = to;
-      /* if (fullPath.indexOf('home') !== -1) {
-        this.activeMenu = 'home'
-      }
-      if (fullPath.indexOf('applycenter') !== -1) {
-        this.activeMenu = 'applycenter'
-      }
-      if (fullPath.indexOf('recheck') !== -1) {
-        this.activeMenu = 'recheckIndex'
-      }
-      if (fullPath.indexOf('approvalcenter') !== -1) {
-        this.activeMenu = 'approvalCenter'
-      }
-      if (fullPath.indexOf('productmap') !== -1) {
-        this.activeMenu = 'productmap'
-      }
-      if (fullPath.indexOf('statistical-center') !== -1) {
-        this.activeMenu = 'statisticsCenter'
-      }
-      if (fullPath.indexOf('person-center') !== -1) {
-        this.activeMenu = 'personcenter'
-      }
-      if (fullPath.indexOf('knowledge') !== -1) {
-        this.activeMenu = 'knowledge'
-      }
-        this.activeMenu = 'peopleCenter'
-      } */
     },
     logout() {
       window.localStorage.clear()
@@ -195,7 +166,7 @@ export default {
       }
     },
     handleItem(item) {
-      this.activeMenu = item.code
+      this.activeMenu = item.pathName
       this.$router.push({
         name: item.name
       })

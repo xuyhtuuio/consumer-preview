@@ -20,15 +20,27 @@ export default {
   name: 'knowledge-header',
   data() {
     return {
-      activeName: 'collectKnowledge',
+      activeName: '',
       menus: []
     }
   },
   mounted() {
     this.getNav();
-    this.$route.name === 'knowledge' && this.$router.push({
-      name: this.menus[0].name
-    })
+    if (this.$route.name === 'knowledge') {
+      this.$router.push({
+        name: this.menus[0].name
+      })
+      this.activeName = this.menus[0].name
+    }
+  },
+  watch: {
+    $route(to) {
+      if (to.name === 'knowledge') {
+        this.$router.push({
+          name: this.activeName
+        })
+      }
+    }
   },
   methods: {
     changeMenu(menu) {
