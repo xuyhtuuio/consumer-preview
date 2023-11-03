@@ -317,7 +317,7 @@ export default {
       // console.log(item);
     },
     showMore() {
-      this.$router.push('/applycenter/apply-list');
+      this.$router.push({ name: 'apply-list' });
     },
     moveLeft() {
       if (this.canLeft) {
@@ -345,7 +345,7 @@ export default {
     },
     linkJump(type) {
       if (type === 0) {
-        this.$router.push('/applycenter/apply-list');
+        this.showMore()
       } else {
         window.open(this.linkAdress[type], '_blank');
       }
