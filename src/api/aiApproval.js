@@ -137,3 +137,14 @@ export function setAssignee(params) {
     data: params
   })
 }
+
+// OCR - 改版 - 获取 pdf 分页接口
+
+export function getPdfPage(params) {
+  return request({
+    url: '/cpr/OcrExamine/getPdfPageList',
+    method: 'get',
+    params,
+    contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+  })
+}
