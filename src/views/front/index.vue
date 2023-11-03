@@ -31,7 +31,7 @@
             </div>
             <div class="link-item swiper-slide" @click="linkJump(4)">
               <div class="item-header">
-                <!-- <img src="@/assets/image/home-index/aigc.png" alt="" /> -->
+                <img src="@/assets/image/home-index/aigc.png" alt="" />
                 <div class="project-name">AIGC-智能客服</div>
               </div>
               <div class="project-info">
@@ -58,7 +58,7 @@
             </div>
             <div class="link-item swiper-slide" @click="linkJump(7)">
               <div class="item-header">
-                <!-- <img src="@/assets/image/home-index/icon.png" alt="" /> -->
+                <img src="@/assets/image/home-index/icon.png" alt="" />
                 <div class="project-name">语义智能分析平台</div>
               </div>
               <div class="project-info">
@@ -76,7 +76,7 @@
             </div>
             <div class="link-item swiper-slide" @click="linkJump(5)">
               <div class="item-header">
-                <!-- <img src="@/assets/image/home-index/icon.png" alt="" /> -->
+                <img src="@/assets/image/home-index/icon.png" alt="" />
                 <div class="project-name">消保指标监控</div>
               </div>
               <div class="project-info">
