@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     goMain() {
-      //   const page2 = this.$router.resolve({ name: 'homePage' })
+      //   const page2 = this.$router.resolve({ name: 'home' })
       //   window.open(page2.href, '_blank')
     }
   }

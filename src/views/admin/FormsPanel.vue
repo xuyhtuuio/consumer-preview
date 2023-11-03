@@ -1,3 +1,4 @@
+<!-- 面板文件，当前未使用，如后续使用  $router.push，请传 name ,不要拼接  path!!!!!-->
 <template>
   <div class="from-panel" ref="panel">
     <div class="from-title">
