@@ -110,9 +110,7 @@ export default {
       return false
     },
     check() {
-      if (this.$store.state.isEdit === null) {
-        // this.$router.push("/workPanel");
-      }
+      // if (this.$store.state.isEdit === null) {}
     }
   }
 }
