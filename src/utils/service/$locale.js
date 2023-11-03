@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-08 10:55:16
+ * @LastEditTime: 2023-11-01 18:33:43
  * @FilePath: /consumer-preview/src/utils/service/$locale.js
  * @Description:
  */
@@ -74,6 +74,24 @@ export default (function () {
     4: '已完成',
     5: '待确认',
     6: '待比对'
+  }
+  messages['LawStatus'] = {
+    0: '失效',
+    1: '有效',
+  }
+  messages['lawNameType'] = {
+    0: '法规名称',
+    1: '制度名称',
+    2: '文件名称'
+  }
+  messages['lawUnitType'] = {
+    0: '发文单位',
+    1: '拟稿部门',
+    2: '文件来源'
+  }
+  messages['lawDocNoType'] = {
+    0: '发文字号',
+    1: '制度字号',
   }
   return locales
   // eslint-disable-next-line

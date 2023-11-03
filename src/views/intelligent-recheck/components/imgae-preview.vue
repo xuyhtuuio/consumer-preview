@@ -1,7 +1,7 @@
 <template>
   <div class="preview" v-loading="!loaded">
     <div class="preview" v-show="!editImg" ref="contentDom">
-      <img id="picture" @click="fullImage" :src="url" @load="handleImageLoaded" ref="imgDom" />
+      <img id="picture" alt="" @click="fullImage" :src="url" @load="handleImageLoaded" ref="imgDom" />
     </div>
     <vueCropper
       v-if="editImg"
@@ -25,7 +25,7 @@
       :enlarge="option.enlarge"
       :mode="option.mode"
     ></vueCropper>
-    <div class="edit-btn" @click="changeEdit">
+    <div class="edit-btn" @click="changeEdit" v-if="showEdit">
       <img v-if="!editImg" src="@/assets/image/intelligent-recheck/edit-no.png" alt="" />
       <img v-else src="@/assets/image/intelligent-recheck/edit-yes.png" alt="" />
     </div>
@@ -58,6 +58,10 @@ export default {
     url: {
       type: String,
       default: ''
+    },
+    showEdit: {
+      type: Boolean,
+      default: true
     }
   },
   components: {
@@ -125,11 +129,17 @@ export default {
             this.$router.push({
               name: 'recheck-detail',
               params: {
-                item: res.data.data
-              }
+                ...res.data.data,
+                name: '',
+                text: ''
+              },
             })
             this.editImg = false;
-            this.$emit('changeImgFun', res.data.data);
+            this.$emit('changeImgFun', {
+              ...res.data.data,
+              name: '',
+              text: ''
+            });
           } else {
             this.$message.error(res.data.msg)
             this.uploading = false
@@ -267,6 +277,7 @@ export default {
 .preview {
   width: 100%;
   height: 100%;
+  border-radius: 10px;
   overflow: scroll;
   position: relative;
   cursor: zoom-in;

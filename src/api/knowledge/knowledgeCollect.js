@@ -125,3 +125,111 @@ export function getPinYin() {
     contentType: 'application/x-www-form-urlencoded;charset=utf-8'
   })
 }
+
+// 查询法规库列表
+export function queryRegulationList(data) {
+  return request({
+    url: '/cpr/regulationController/queryRegulationList',
+    method: 'post',
+    data
+  })
+}
+// 查询法规标签
+export function queryTagCode(data) {
+  return request({
+    url: '/cpr/regulationController/queryTagCode',
+    method: 'post',
+    data
+  })
+}
+// 查询权益标签
+export function queryBenefitLabel(data) {
+  return request({
+    url: '/cpr/regulationController/queryBenefitLabel',
+    method: 'post',
+    data
+  })
+}
+// 添加法规标签
+export function insertTagCode(data) {
+  return request({
+    url: '/cpr/regulationController/insertTagCode',
+    method: 'post',
+    contentType: 'application/json',
+    data
+  })
+}
+// 添加权益标签
+export function insertBenefitLabel(data) {
+  return request({
+    url: '/cpr/regulationController/insertBenefitLabel',
+    method: 'post',
+    contentType: 'application/json',
+    data
+  })
+}
+// 添加法规
+export function insertRegulation(data) {
+  return request({
+    url: '/cpr/regulationController/insertRegulation',
+    method: 'post',
+    data
+  })
+}
+// 更新法规
+export function updateRegulation(data) {
+  return request({
+    url: '/cpr/regulationController/updateRegulation',
+    method: 'post',
+    data
+  })
+}
+// 删除法规
+export function deleteRegulation(data) {
+  return request({
+    url: '/cpr/regulationController/deleteRegulation',
+    method: 'post',
+    data
+  })
+}
+// 法规详情
+export function queryDetails(data) {
+  return request({
+    url: '/cpr/regulationController/queryDetails',
+    method: 'get',
+    params: data
+  })
+}
+// 增加阅读次数
+export function updateReadCount(data) {
+  return request({
+    url: '/cpr/regulationController/updateReadCount',
+    method: 'get',
+    params: data
+  })
+}
+// 查询历史沿革
+export function queryHistoryLogs(data) {
+  return request({
+    url: '/cpr/regulationController/queryHistoryLogs',
+    method: 'get',
+    params: data
+  })
+}
+// 查询最近浏览
+export function queryViewLogs(data) {
+  return request({
+    url: '/cpr/regulationController/queryViewLogs',
+    method: 'get',
+    params: data
+  })
+}
+// 预览文件、
+export function filePreview(data) {
+  return request({
+    url: '/cpr/file/preview',
+    method: 'post',
+    contentType: 'application/x-www-form-urlencoded',
+    data
+  })
+}

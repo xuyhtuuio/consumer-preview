@@ -9,7 +9,7 @@
       <el-popover
         placement="bottom-start"
         :width="260"
-        trigger="hover"
+        trigger="click"
       >
         <div class="content">
           <el-input v-model.trim="serach" @keypress.native.enter="changeJustCare" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>

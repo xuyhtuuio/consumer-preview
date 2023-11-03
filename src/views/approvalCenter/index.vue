@@ -1,6 +1,6 @@
 <template>
   <div class="approval-center" ref="box">
-    <p class="welcoming">欢迎来到消保管控平台！</p>
+    <p class="welcoming">欢迎来到消保智能审查平台！</p>
     <p class="tips" v-if="tipsMsg">
       <i class="iconfont icon-xiaoxi-tongzhi"></i>{{ tipsMsg }}
     </p>
@@ -13,7 +13,7 @@
             ">
             <div class="icon">
               <img :src="item.value == crtSign ? item.activeIcon : item.icon"
-                :class="item.value == crtSign ? 'active-icon' : 'default-icon'" />
+                :class="item.value == crtSign ? 'active-icon' : 'default-icon'" alt="" />
             </div>
             <div class="name-count">
               <span class="name">{{ item.name }}</span>
@@ -191,12 +191,7 @@ export default {
   },
   computed: {
     allTask() {
-      const { permissionsPage = {} } = this.$store.state
-      // eslint-disable-next-line
-      const approvalcenter =
-        [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(
-          (item) => item.pathName === 'approval-list'
-        ) || {}
+      const approvalcenter = this.$store.getters.getPermissionByCode('approvalCenter');
       const isExsit = approvalcenter.child?.find(
         (item) => item.name === '全部任务' && item.type
       )
@@ -206,12 +201,7 @@ export default {
       return false
     },
     showExport() {
-      const { permissionsPage = {} } = this.$store.state
-      // eslint-disable-next-line
-      const approvalcenter =
-        [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(
-          (item) => item.pathName === 'approval-list'
-        ) || {}
+      const approvalcenter = this.$store.getters.getPermissionByCode('approvalCenter');
       const isExsit = approvalcenter.child?.find(
         (item) => item.name === '全部任务' && item.type === 'export'
       )
@@ -277,6 +267,9 @@ export default {
       }
       getDataStatistics(param).then((res) => {
         const { data } = res.data
+        let total = 0
+        total = data['toPending']
+        this.tipsMsg = total > 0 ? `您有 ${total} 笔【消保审查】任务待审核哦，请尽快审核!` : '您当前无待审核任务'
         for (const i in data) {
           this.dataStatistics.forEach((v) => {
             if (v.value === i) {

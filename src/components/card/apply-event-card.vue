@@ -22,7 +22,7 @@
             'tag in-modify': ['3'].includes(item.taskStatus),
             'tag check': ['5', '6'].includes(item.taskStatus),
             'tag end-sign': ['4'].includes(item.taskStatus)
-          }">{{ $msg('NodeStatus')[item.taskStatus] }}>{{ item.currentActivityName }}</i>
+          }">{{ $msg('NodeStatus')[item.taskStatus] }} <i v-if="!['0'].includes(item.taskStatus)">>{{ item.currentActivityName }}</i></i>
           <!-- 有无意见 -->
           <i class="flex" v-if="['4', '5', '6'].includes(item.taskStatus) && [1, 0].includes(item.substantiveOpinions)">
             <i class="tag has-opinion" v-if="item.substantiveOpinions == 1">
@@ -168,9 +168,9 @@
   </div>
 </template>
 <script>
-// canRoved
-import { concernApplication } from '@/api/applyCenter'
-// import { revoked } from '../../api/applyCenter'
+//
+import { concernApplication, canRoved } from '@/api/applyCenter'
+// import {  } from '../../api/applyCenter'
 
 export default {
   props: {
@@ -229,17 +229,15 @@ export default {
     },
     popoverClick() {
     },
-    getCanBeRoved() {
-      // const params = {
-      //   nodeId: item.nodeId,
-      //   processInstanceId: item.process_instance_id
-      // }
-      this.revoked = false
-      // canRoved(params).then(res => {
-      //   // this.revoked = true
-      //   const {data} = res.data
-      //   this.revoked= data =='true'
-      // })
+    getCanBeRoved(item) {
+      const params = {
+        // nodeId: item.nodeId,
+        processInstanceId: item.process_instance_id
+      }
+      canRoved(params).then(res => {
+        const { data } = res.data
+        this.revoked = data === 'true'
+      })
     },
     /**
      * @description: 去比对
