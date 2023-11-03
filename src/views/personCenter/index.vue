@@ -412,7 +412,7 @@ import {
   getApprovalListStation,
   getOrgTree
 } from '@/api/approvalCenter'
-import { proposeAcceptRate, proposeOnePassRate } from '@/api/personCenter'
+// import { proposeAcceptRate, proposeOnePassRate } from '@/api/personCenter'
 import approvalEventCard from './components/approval-event-card'
 import barEcharts from './components/bar-echarts'
 export default {
@@ -1104,14 +1104,14 @@ export default {
     },
     searchList() { },
     getProposeAcceptRate() {
-      proposeAcceptRate({ dataFlag: 1 }).then((res) => {
-        console.log('res', res);
-      })
+      // proposeAcceptRate({ dataFlag: 1 }).then((res) => {
+      //   console.log('res', res);
+      // })
     },
     getProposeOnePassRate() {
-      proposeOnePassRate({ dataFlag: 1 }).then((res) => {
-        console.log('res', res);
-      })
+      // proposeOnePassRate({ dataFlag: 1 }).then((res) => {
+      //   console.log('res', res);
+      // })
     },
     getList(pageNow) {
       const listType = '4'
@@ -1190,7 +1190,6 @@ export default {
           backgroundColor: 'rgba(255,255,255,0.8)',
           borderColor: 'rgba(255,255,255,0.8)',
           formatter(params) {
-            console.log('params', params);
             const p = `
             <div style="padding: 6px;display:flex;gap:8px;flex-direction:column;font-size:12px">
             <div style="line-height: 20px;color:rgba(29, 33, 40, 1);font-weight:700">驳回原因</div>
@@ -1359,7 +1358,6 @@ export default {
       }
     },
     handleSearchBlur() {
-      console.log(this.search)
     },
     getApprovalType() {
       getApprovalType().then((res) => {
