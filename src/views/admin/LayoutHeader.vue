@@ -54,7 +54,7 @@ export default {
     },
     editAuth() {
       const { permissionsPage = {} } = this.$store.state
-      const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.pathName === 'FlowManage') || {}
+      const flowManage = permissionsPage.funPerms.find(item => item.code === 'flowableManagement') || {}
       if (flowManage.type === 'edit') {
         return true
       }

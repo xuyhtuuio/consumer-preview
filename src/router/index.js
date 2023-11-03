@@ -1,43 +1,31 @@
+/*
+  * 权限配置说明
+    code是数组,能找到配置code,则说明存在权限控制，无则说明  任何人可访问，code会向上查找，父路由存在，则子路由通用存在
+    父路由若无  单独控制权限，则 需 父路由的code需要包含子路由所有权限code
+    code 需要与  后端库中对应权限code一致
+ */
 import Vue from 'vue'
 import Router from 'vue-router'
-import Qs from 'qs'
 import store from '@/store/index'
-import request from '@/api/request'
 import { editThePermissionsPage } from '@/api/admin/role'
 Vue.use(Router)
 
 const viewport = {
   content: 'width=device-width, initial-scale=1.0, user-scalable=no'
 }
-// meta: { title: '新增详情' ,viewport: viewport ,pTitle: "首页",pPath: "/home"}
 const router = new Router({
-  // mode: 'history',
-  mode: 'history',
+  mode: 'hash',
   base: __dirname,
   routes: [
-    // {
-    //   path: '/',
-    //   redirect: '/applycenter'
-    // },
     {
       path: '/',
-      name: 'homePage',
-      meta: {
-        title: ''
-      },
-      redirect: '/front',
-      component: () => import('@/views/front/home')
+      redirect: '/applycenter'
     },
     {
       path: '/login',
       name: 'login',
       component: () => import('@/views/login'),
       meta: { title: '消保管控平台', viewport }
-    },
-    {
-      path: '/show-review',
-      name: 'showReview',
-      component: () => import('@/views/front/show-review')
     },
     {
       path: '/privacy-policy',
@@ -60,50 +48,49 @@ const router = new Router({
       path: '/admin/manage',
       name: 'manage',
       component: () => import('@/views/admin/manage/index'),
-      meta: { title: '后台管理', viewport },
-      redirect: '/admin/manage/flowManage',
+      meta: { code: ['backManagement'], title: '后台管理', viewport },
       children: [
         {
           path: 'userManage',
           name: 'UserManage',
           component: () => import('@/views/admin/manage/userManage'),
-          meta: { title: '用户管理' }
+          meta: { code: ['userManagement'], title: '用户管理' }
         },
         {
           path: 'rolePermission',
           name: 'RolePermission',
           component: () => import('@/views/admin/manage/rolePermission'),
-          meta: { title: '角色/权限' }
+          meta: { code: ['rolePermManagement'], title: '角色/权限' }
         },
         {
           path: 'flowManage',
           name: 'FlowManage',
           component: () => import('@/views/admin/manage/flowManage'),
-          meta: { title: '用户管理' }
+          meta: { code: ['flowableManagement'], title: '流程管理' }
         },
         {
           path: 'formManage',
           name: 'FormManage',
           component: () => import('@/views/admin/manage/formManage'),
-          meta: { title: '表单管理' }
+          meta: { code: ['formManagement'], title: '表单管理' }
         },
         {
           path: 'labelManage',
           name: 'LabelManage',
           component: () => import('@/views/admin/manage/labelManage'),
-          meta: { title: '标签管理' }
+          meta: { code: ['tagManagement'], title: '标签管理' }
         },
         {
           path: 'opinionManage',
           name: 'OpinionManage',
           component: () => import('@/views/admin/manage/opinionManage-1.0'),
-          meta: { title: '意见管理' }
+          meta: { code: ['opinionManagement'], title: '意见管理' }
         },
         {
           path: 'opinionManage-1.0',
           name: 'OpinionManageOne',
           component: () => import('@/views/admin/manage/opinionManage-1.0'),
-          meta: { title: '意见管理' }
+          meta: { code: ['opinionManagement'], title: '意见管理' }
         }
       ]
     },
@@ -112,7 +99,7 @@ const router = new Router({
       path: '/admin/design',
       name: 'design',
       component: () => import('@/views/admin/FormProcessDesign'),
-      meta: { title: '表单流程设计', viewport },
+      meta: { code: ['flowableManagement'], title: '表单流程设计', viewport },
       redirect: '/admin/design/baseSetting',
       children: [
         {
@@ -146,7 +133,7 @@ const router = new Router({
       path: '/recheck',
       name: 'recheck',
       component: () => import('@/views/intelligent-recheck/home'),
-      meta: { title: '智能回检', viewport },
+      meta: { code: ['recheckIndex'], title: '智能回检', viewport },
       redirect: '/recheck/recheck-index',
       children: [
         {
@@ -184,6 +171,7 @@ const router = new Router({
         }
       ]
     },
+    // 申请中心
     {
       path: '/applycenter',
       name: 'applycenter',
@@ -219,11 +207,12 @@ const router = new Router({
         }
       ]
     },
+    // 审批中心
     {
       path: '/approvalcenter',
       name: 'approvalcenter',
       component: () => import('@/views/approvalCenter/home'),
-      meta: { title: '审批中心', viewport },
+      meta: { code: ['approvalCenter'], title: '审批中心', viewport },
       redirect: '/approvalcenter/approval-list',
       children: [
         {
@@ -252,12 +241,14 @@ const router = new Router({
         }
       ]
     },
+    // 统计中心
     {
       path: '/statistical-center',
       name: 'statistical-center',
       component: () => import('@/views/statistical-center/index'),
-      meta: { title: '统计中心', viewport }
+      meta: { code: ['statisticsCenter'], title: '统计中心', viewport }
     },
+    // 首页
     {
       path: '/front',
       name: 'front',
@@ -272,33 +263,39 @@ const router = new Router({
         }
       ]
     },
+    // 产品图谱
     {
       path: '/productmap',
       name: 'productmap',
       component: () => import('@/views/product-map/index'),
       meta: { title: '产品图谱', viewport }
     },
+    // 人员中心
     {
       path: '/person-center',
       name: 'personCenter',
       component: () => import('@/views/personCenter/index'),
-      meta: { title: '人员中心', viewport }
+      meta: { code: ['peopleCenter'], title: '人员中心', viewport }
     },
     {
-      path: '/404',
-      name: '404',
-      component: () => import('@/views/404'),
+      path: '/error',
+      name: 'error',
+      component: () => import('@/views/error'),
       meta: { title: '404', viewport }
     }
   ]
 })
 
 router.beforeEach(async (to, from, next) => {
-  await getToken()
-  const auth = handleAuth(to)
+  let auth = handleAuth(to)
+  // 区分是没有 没有权限，还是 没有获取到权限
+  if (!auth && !store.state?.permissionsPage?.dataPerm?.length) {
+    await getUserRole();
+    auth = handleAuth(to)
+  }
   if (!auth) {
-    getUserRole()
-    return
+    next('/error')
+    return;
   }
   if (to.path.split('/').length > 1) {
     const data = [
@@ -334,7 +331,7 @@ Router.prototype.replace = function push(location, onResolve, onReject) {
   return originalReplace.call(this, location).catch((err) => err)
 }
 // 权限处理
-function handleAuth(to) {
+/* function handleAuth(to) {
   // 本地化持久存储
   if (!store.state?.permissionsPage?.funPerms?.length) {
     const permissionsPage = JSON.parse(
@@ -345,10 +342,7 @@ function handleAuth(to) {
     }
   }
   const { permissionsPage } = store.state
-  const auth = [
-    ...permissionsPage.funPerms,
-    ...permissionsPage.defaultPerm
-  ].find((item) => item.pathName === to.name && item.type)
+  const auth = permissionsPage.permition.find((item) => item.pathName === to.name && item.type)
   if (
     auth
     || to.name === 'login'
@@ -360,92 +354,48 @@ function handleAuth(to) {
     return true
   }
   return false
+} */
+// 权限处理V2
+function handleAuth(to) {
+  // 本地化持久存储
+  if (!store.state?.permissionsPage?.dataPerm?.length) {
+    const permissionsPage = JSON.parse(
+      window.localStorage.getItem('permissionsPage')
+    )
+    if (permissionsPage) {
+      store.state.permissionsPage = permissionsPage
+    }
+  }
+  // 判断权限
+  const { permissionsPage } = store.state;
+  // code是数组,能找到配置 code,则说明存在权限控制，无则说明  任何人可访问，code会向上查找，父路由存在，则子路由通用存在,   父路由若无  单独控制权限，则 需 父路由的code需要包含子路由所有权限code
+  const code = to?.meta?.code || to?.matched?.filter(item => item?.meta?.code)?.[0]?.meta?.code || [];
+  const auth = permissionsPage.funPerms.find((item) => code.includes(item.code) && item.type)
+  return code.length ? Boolean(auth) : true;
 }
-
 async function getUserRole() {
   const token = window.localStorage.getItem('AI_token')
   if (!token) {
-    const newWindow = window.open('', '_self')
-    if (window.location.host === '192.168.210.57:31603') {
-      newWindow.location = 'http://192.168.210.57:31963/#/login?from=cpr'
-    } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
-      newWindow.location = 'https://dataelite.trs.com.cn/#/login?from=cpr'
-    } else {
-      const name = window.self === window.top ? 'login' : 'loginAuto'
-      router.push({
-        name
-      })
-    }
-    return false
+    router.push({
+      name: 'login'
+    })
   } else {
     await getPermissionsPage()
   }
-  // try {
-  //   const res = await request({
-  //     method: 'post',
-  //     url: '/cpr/oauth/check_token',
-  //     contentType: 'application/x-www-form-urlencoded',
-  //     data: {
-  //       token
-  //     },
-  //     msg: false
-  //   });
-  //   const role = (res.data.client_id === 'cpr')
-  //   console.log('role', role)
-  //   if (!role) {
-  // const newWindow = window.open('', '_self');
-  // if (window.location.host === '192.168.210.57:31603') {
-  //   newWindow.location = 'http://192.168.210.57:31963/#/login?from=cpr';
-  // } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
-  //   newWindow.location = 'https://dataelite.trs.com.cn/#/login?from=cpr';
-  // } else {
-  //   const name = window.self === window.top ? 'login' : 'loginAuto';
-  //   router.push({
-  //     name,
-  //   });
-  // }
-  //     return
-  //   }
-  //   return role;
-  // } catch {
-  //   // router.push({ name: '404' })
-  // }
 }
-// 根据传递过来的id 解析token
-async function getToken() {
-  // let hasToken = false
-  try {
-    // hasToken = false
-    const searchObj = Qs.parse(window.location.search.slice(1))
-    if (searchObj && searchObj.id) {
-      const res = await request({
-        method: 'post',
-        url: `uaa/user/getToken?key=${searchObj.id}`,
-        showErrorMsg: false
-      })
-      if (res.data.data.scope.includes('cpr')) {
-        window.localStorage.setItem('AI_token', res.data.data.value)
-        window.localStorage.setItem('user_name', res.data.data.user_name)
-        await getPermissionsPage()
-        window.location.href = window.location.href.replace(
-          `id=${searchObj.id}`,
-          ''
-        )
-      } else {
-        // hasToken = true
-      }
-    } else {
-      // hasToken = true
-    }
-  } catch {
-    // hasToken = true
-  }
-}
-async function getPermissionsPage() {
+export async function getPermissionsPage() {
   const res = await editThePermissionsPage()
   const data = res.data.data || {}
-  data.funPerms = data.funPerms.filter((item) => item.type)
-  data.defaultPerm = data.defaultPerm.filter((item) => item.type)
+  // data.funPerms = data.funPerms.map(item => {
+  //   return {
+  //     name: item.name,
+  //     type: item.type,
+  //     code: item.code,
+  //     child: item.child
+  //   }
+  // })
+  // data.funPerms = data.funPerms.filter((item) => item.type)
+  // data.defaultPerm = data.defaultPerm.filter((item) => item.type)
   store.state.permissionsPage = data
   window.localStorage.setItem('permissionsPage', JSON.stringify(data))
 }
