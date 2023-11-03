@@ -5,7 +5,7 @@
       <div class="recheck-input" :class="{ 'recheck-input-focus': focus }">
         <el-input
           :placeholder="placeholder"
-          v-model="recheckInput"
+          v-model.trim="recheckInput"
           @focus="focusInput"
           @blur="blurInput"
           class="input-with-select"
@@ -19,7 +19,7 @@
               <div class="upload">
                 <i class="el-icon-camera" @click="showUpload"></i>
               </div>
-              <div class="recheck-btn">智能回检</div>
+              <div class="recheck-btn" @click="searchRecheck">智能回检</div>
             </div>
           </div>
         </el-input>
@@ -29,36 +29,18 @@
       <img src="@/assets/image/intelligent-recheck/compare.png" alt="" />
     </div>
     <div class="recheck-bottom">
-      <div class="bottom-tip">查看回检记录</div>
+      <div class="bottom-tip" @click="tpRecord">查看回检记录</div>
       <div class="bottom-list">
         <div class="swiper-container">
           <div class="swiper-wrapper">
-            <div class="swiper-slide list-item">
-              <div>· 2023/09/01</div>
-              <div class="middle-1">景顺长城集英成长月报景顺长城集英成长月报</div>
-          <div class="middle-2">未通过回检</div>
-          <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
-              <div class="middle-2">李阿慧/300592</div>
-              <div class="middle-2">北京银行天津分行</div>
-              <div class="middle-2">1小时前更新一条回检记录</div>
-            </div>
-            <div class="swiper-slide list-item">
-          <div>· 2023/09/01</div>
-          <div class="middle-1">景顺长城集英成长月报景顺长城集英成长月报</div>
-          <div class="middle-2">已通过回检</div>
-          <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
-          <div class="middle-2">李阿慧/300592</div>
-          <div class="middle-2">北京银行天津分行</div>
-          <div class="middle-2">18小时前更新一条回检记录</div>
-            </div>
-            <div class="swiper-slide list-item">
-          <div>· 2023/09/01</div>
-          <div class="middle-1">景顺长城集英成长月报景顺长城集英成长月报</div>
-          <div class="middle-2">已通过回检</div>
-          <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
-          <div class="middle-2">李阿慧/300592</div>
-          <div class="middle-2">总行</div>
-          <div class="middle-2">12天前更新一条回检记录</div>
+            <div class="swiper-slide list-item" v-for="(item, index) in recheckList" :key="'recheck' + index">
+              <div>· {{ item.createTime.slice(0, 10) }}</div>
+              <div class="middle-1">{{ item.fileName }}</div>
+              <div class="middle-2">{{ item.isPass === 1 ? '已通过回检' : '未通过回检' }}</div>
+              <img src="@/assets/image/ai-approval/ocr-avatar.png" alt="" />
+              <div class="middle-2">{{ item.fullname }}/{{ item.userId }}</div>
+              <div class="middle-2">{{ item.org }}</div>
+              <div class="middle-2">{{ returnTime(new Date(item.createTime)) }}更新一条回检记录</div>
             </div>
           </div>
         </div>
@@ -71,6 +53,8 @@
 <script>
 import 'swiper/css/swiper.css'
 import Swiper from 'swiper'
+import { getRecheckList } from '@/api/intelligent-recheck'
+import { formatterTime } from '@/utils/utils'
 import UploadDialog from './components/upload-dialog'
 export default {
   components: {
@@ -81,22 +65,50 @@ export default {
     select: '1',
     swiper: null,
     focus: false,
-    placeholder: '请输入文件名或上传图片进行回检'
+    placeholder: '请输入文件名或上传图片进行回检',
+    recheckList: []
   }),
+  created() {
+    this.checkBackList();
+  },
   mounted() {
-    const swiper = new Swiper('.swiper-container', {
-      loop: true, // 循环
-      direction: 'vertical',
-      slidesPerView: 3,
-      spaceBetween: 0, // swiper-slide 间的距离为30
-      autoplay: {
-        delay: 3000, // 自动播放的间隔时间，单位ms，默认3000ms
-        disableOnInteraction: false // 点击不会取消自动
-      }
-    });
-    this.swiper = swiper
   },
   methods: {
+    returnTime(time) {
+      return formatterTime(time)
+    },
+    checkBackList() {
+      const dataConfig = {
+        pageNow: 1,
+        pageSize: 20,
+        sort: 1,
+        sortType: 2
+      }
+      getRecheckList(dataConfig).then(res => {
+        const { data } = res.data;
+        if (data) {
+          this.recheckList = data.list;
+          this.$nextTick(() => {
+            const swiper = new Swiper('.swiper-container', {
+              loop: true, // 循环
+              direction: 'vertical',
+              slidesPerView: 3,
+              spaceBetween: 0, // swiper-slide 间的距离为30
+              autoplay: {
+                delay: 3000, // 自动播放的间隔时间，单位ms，默认3000ms
+                disableOnInteraction: false, // 点击不会取消自动
+              },
+              autoHeight: true,
+              observer: true,
+              observeParents: true
+            });
+            this.swiper = swiper
+          })
+        }
+      }).catch(() => {
+        this.recheckList = []
+      })
+    },
     changeSearch(val) {
       if (val === '1') {
         this.placeholder = '请输入文件名或上传图片进行回检'
@@ -112,6 +124,30 @@ export default {
     },
     blurInput() {
       this.focus = false;
+    },
+    tpRecord() {
+      this.$router.push({
+        name: 'recheck-record'
+      })
+    },
+    searchRecheck() {
+      if (this.recheckInput === '') {
+        this.$message.warning(this.placeholder)
+        return;
+      }
+      this.$router.push({
+        name: 'recheck-detail',
+        params: {
+          item: {
+            key: '',
+            name: this.select === '1' ? this.recheckInput : '',
+            text: this.select === '2' ? this.recheckInput : '',
+            searchType: 1,
+            select: this.select,
+            recheckInput: this.recheckInput
+          },
+        }
+      })
     }
   }
 }
@@ -233,6 +269,7 @@ export default {
       line-height: 24px;
       text-decoration-line: underline;
       margin-bottom: 4px;
+      cursor: pointer;
     }
     .bottom-list {
       .swiper-container {
@@ -240,6 +277,7 @@ export default {
       }
       .list-item {
         display: flex;
+        // height: 22px!important;
         align-items: center;
         color: #1d2128;
         font-size: 12px;
@@ -249,7 +287,7 @@ export default {
         opacity: 0.6;
         .middle-1 {
           margin-left: 8px;
-          width: 160px;
+          max-width: 160px;
           word-break: break-all;
           overflow: hidden;
           display: -webkit-box;

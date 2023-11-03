@@ -14,7 +14,7 @@
       <TrsTable theme="TRS-table-gray" :data="data" :colConfig="colConfig" @sort-change="changeSort" v-if="level === 1"
         @submitEdit="submitEdit" :row-class-name="tableRowClassName">
         <template #icon="scope">
-          <img v-if="scope.row.icon" :src="scope.row.icon" style="max-height: 30px;max-width: 120px;" />
+          <img v-if="scope.row.icon" :src="scope.row.icon" alt="" style="max-height: 30px;max-width: 120px;" />
           <span v-else>--</span>
         </template>
         <template #ladingBillTimeLimit="scope">
@@ -108,7 +108,7 @@
         <p><b>图标</b></p>
         <!-- <i class="icon-chanpin1"></i> -->
         <el-upload class="avatar-uploader" action="/cpr/file/upload" :http-request="uploadBpmn" :show-file-list="false">
-          <img v-if="imageUrl" :src="imageUrl" class="avatar">
+          <img v-if="imageUrl" :src="imageUrl" alt="" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           <el-button size="small" style="display: none;" id="icon-uploader" type="text">上传</el-button>
         </el-upload>
@@ -283,8 +283,7 @@ export default {
   },
   computed: {
     editAuth() {
-      const { permissionsPage = {} } = this.$store.state
-      const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.pathName === 'FormManage') || {}
+      const flowManage = this.$store.getters.getPermissionByCode('formManagement');
       if (flowManage.type === 'edit') {
         return true
       }

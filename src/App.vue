@@ -1,13 +1,6 @@
 <template>
   <div id="app">
-    <NavMenu
-      v-if="
-        $route.name !== 'login' &&
-        $route.name !== 'showReview' &&
-        $route.name !== 'privacy-policy' &&
-        $route.name !== 'user-agreement'
-      "
-    ></NavMenu>
+    <NavMenu v-if="!noNavMenu.includes($route.name)"></NavMenu>
     <transition name="router-fade" mode="out-in">
       <router-view
         v-if="!$route.meta.keepAlive"
@@ -28,8 +21,15 @@ export default {
   components: { NavMenu },
   data() {
     return {
-      noPaddingRoute: ['aiApproval', 'approval-aiApproval', 'compare', 'user-agreement', 'privacy-policy'],
-      noBodyScroll: ['baseSetting', 'processDesign', 'proSetting']
+      noPaddingRoute: [
+        'aiApproval',
+        'approval-aiApproval',
+        'compare',
+        'user-agreement',
+        'privacy-policy'
+      ],
+      noBodyScroll: ['baseSetting', 'processDesign', 'proSetting'],
+      noNavMenu: ['login', 'showReview', 'privacy-policy', 'user-agreement']
     }
   },
   methods: {}

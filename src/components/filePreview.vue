@@ -1,5 +1,5 @@
 <template>
-  <iframe v-if="url" class="iframe" id="iframe" frameborder="no" border="0" ref="iframe" :src="iframeUrl"></iframe>
+  <iframe v-if="url" title="file-preview" class="iframe" id="iframe" frameborder="no" border="0" ref="iframe" :src="iframeUrl"></iframe>
   <!-- <div v-else>暂无数据</div> -->
 </template>
 

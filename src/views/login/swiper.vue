@@ -60,7 +60,7 @@ export default {
 <style lang="less" scoped>
 .swiper {
   // height: 100vh;
-  margin-left: 85px;
+  // margin-left: 85px;
 
   .logo {
     cursor: pointer;

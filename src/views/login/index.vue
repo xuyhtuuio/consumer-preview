@@ -66,12 +66,11 @@
               </el-form>
               <!-- 服务协议 -->
               <div class="service-agreement-num">
-                <el-checkbox v-model="checked">
-                  <span style="color: rgb(80, 89, 104)">我已阅读并同意</span>
-                  <span class @click="toUserAgreement">用户协议</span>
-                  <span style="color: rgb(80, 89, 104)">和</span>
-                  <span @click="toPrivacypolicy">隐私政策</span>
-                </el-checkbox>
+                <el-checkbox v-model="checked"> </el-checkbox>
+                <span style="color: rgb(80, 89, 104)">我已阅读并同意</span>
+                <span class @click="toUserAgreement">用户协议</span>
+                <span style="color: rgb(80, 89, 104)">和</span>
+                <span @click="toPrivacypolicy">隐私政策</span>
               </div>
               <!-- 下一步 -->
               <el-button type="text" class="next" @click="next"
@@ -132,7 +131,7 @@
                     placeholder="点击输入验证码"
                   ></el-input>
                   <div class="verify_code">
-                    <img v-if="verCode" :src="verCode" @click="verCodeChange" />
+                    <img v-if="verCode" :src="verCode" alt="" @click="verCodeChange" />
                   </div>
                 </el-form-item>
               </el-form>
@@ -151,12 +150,11 @@
                 <span @click="forgetPsw">忘记密码?</span>
               </div>
               <div class="service-agreement-pwd">
-                <el-checkbox v-model="checked">
-                  <span style="color: rgb(80, 89, 104)">我已阅读并同意</span>
-                  <span class @click="toUserAgreement">用户协议</span>
-                  <span style="color: rgb(80, 89, 104)">和</span>
-                  <span @click="toPrivacypolicy">隐私政策</span>
-                </el-checkbox>
+                <el-checkbox v-model="checked"> </el-checkbox>
+                <span style="color: rgb(80, 89, 104)">我已阅读并同意</span>
+                <span class @click="toUserAgreement">用户协议</span>
+                <span style="color: rgb(80, 89, 104)">和</span>
+                <span @click="toPrivacypolicy">隐私政策</span>
               </div>
               <!-- 下一步 -->
               <!-- <p class="no-account">没有账号，去 <span class="register" @click="register">免费注册</span></p> -->
@@ -334,7 +332,7 @@
         custom-class="agreeDialog"
       >
         <div slot="title" class="title">
-          <img src="@/assets/image/tips.png" />提示
+          <img src="@/assets/image/tips.png" alt="" />提示
         </div>
         <div class="tips">
           请先同意
@@ -360,7 +358,7 @@
         custom-class="agreeDialog"
       >
         <div slot="title" class="title">
-          <img src="@/assets/image/tips.png" />提示
+          <img src="@/assets/image/tips.png" alt="" />提示
         </div>
         <div class="tips">
           本系统暂不支持主动找回账号，请
@@ -383,7 +381,7 @@
       >
         <div class="expiry-content">
           <div>
-            <img src="@/assets/image/expiry-tips.png" />
+            <img src="@/assets/image/expiry-tips.png" alt=""/>
             账号已到期
           </div>
           <p>可提交申请延期，待管理员审核！</p>
@@ -412,7 +410,7 @@
         :before-close="handleClose"
       >
         <div class="expiry-content">
-          <img src="@/assets/image/apply-success.png" />
+          <img src="@/assets/image/apply-success.png" alt="" />
           <p>已提交申请</p>
           <p>待管理员审核，请耐心等待</p>
         </div>
@@ -426,7 +424,7 @@
         :close-on-press-escape="false"
       >
         <div class="expiry-content">
-          <img src="@/assets/image/expiry-tips.png" />
+          <img src="@/assets/image/expiry-tips.png" alt=""/>
           <p class="register-status">待审核</p>
           <p class="register-msg">
             请耐心等待，账号审核通过后将发送账号信息至您的邮箱和短信
@@ -444,7 +442,7 @@
 <script>
 import md5 from 'js-md5'
 import { toCode, fromCode } from '@/utils/utils'
-import { editThePermissionsPage } from '@/api/admin/role'
+import { getPermissionsPage } from '@/router/index'
 // eslint-disable-next-line
 import * as dayjs from 'dayjs'
 // eslint-disable-next-line
@@ -546,7 +544,7 @@ export default {
       CodeMibleTime: 60,
       activeInput: 0,
       downTime: 5,
-      checked: true,
+      checked: false,
       regainShow: true,
       applyInfo: {},
       appeal: '',
@@ -584,7 +582,8 @@ export default {
       iframeSrc: [],
       iframeType: 'develop',
       gohistory: false,
-      loading: false
+      loading: false,
+      openNew: false
     }
   },
   watch: {
@@ -594,6 +593,13 @@ export default {
       } else {
         window.localStorage.removeItem('trsUserAgree')
       }
+    },
+    rememberPsd(val) {
+      if (val) {
+        window.localStorage.setItem('trsPsw', '1')
+      } else {
+        window.localStorage.removeItem('trsPsw')
+      }
     }
   },
   created() {
@@ -602,7 +608,9 @@ export default {
     const pwd = window.localStorage.getItem('AI_pwd')
     this.crtOp = this.$route.query.type || 'inputPsw'
     const trsUserAgree = window.localStorage.getItem('trsUserAgree')
+    const trsPsw = window.localStorage.getItem('trsPsw')
     this.checked = trsUserAgree === '1'
+    this.rememberPsd = trsPsw === '1'
     this.form.username = userName || ''
     if (pwd) {
       this.form.password = fromCode(pwd) || ''
@@ -649,11 +657,13 @@ export default {
     toPrivacypolicy() {
       const page1 = this.$router.resolve({ name: 'privacy-policy' })
       window.open(page1.href, '_blank')
+      this.openNew = true
     },
     // 用户协议
     toUserAgreement() {
       const page2 = this.$router.resolve({ name: 'user-agreement' })
       window.open(page2.href, '_blank')
+      this.openNew = true
     },
     async next() {
       if (this.activeName === '手机号') {
@@ -716,18 +726,13 @@ export default {
                   'userPermis',
                   JSON.stringify(userPermis)
                 )
-                await this.getPermissionsPage()
+                await getPermissionsPage()
                 this.$message.success('登录成功')
-                if (this.gohistory && this.gohistory !== '404') {
+                if (this.gohistory && this.gohistory !== 'error') {
                   this.$router.go(-1)
                 } else {
                   this.$router.push({ name: 'home' })
                 }
-                // this.sendMessage = {
-                //   uni__teis_Token: res.access_token,
-                //   uni__expires_in: res.expires_in
-                // }
-                // this.checkToken()
               }
             } catch (err) {
               this.loading = false
@@ -763,15 +768,6 @@ export default {
       })
       return role
     },
-    async getPermissionsPage() {
-      // const user = JSON.parse(window.localStorage.getItem('user_name'))
-      const res = await editThePermissionsPage()
-      const data = res.data.data || {}
-      data.funPerms = data.funPerms.filter((item) => item.type)
-      data.defaultPerm = data.defaultPerm.filter((item) => item.type)
-      this.$store.state.permissionsPage = data
-      window.localStorage.setItem('permissionsPage', JSON.stringify(data))
-    },
     // 判断账号是否过期
     async checkToken() {
       // 登录成功后本地存一个AI_token
@@ -787,7 +783,7 @@ export default {
       this.platlist = []
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.uaa + 'oauth/check_token',
+        url: this.$GLOBAL.cpr + 'oauth/check_token',
         contentType: 'application/x-www-form-urlencoded',
         data: {
           token: window.localStorage.getItem('AI_token')
@@ -983,7 +979,7 @@ export default {
               this.CodeMibleTxt = `剩余时间${this.CodeMibleTime}秒`
             }
           }, 1000)
-        } else if (['超出单日可使用上限'].includes(res.msg)) {
+        } else if (['验证码发送超当日上限'].includes(res.data.msg)) {
           this.regainShow = true
           this.CodeMibleTime = 60
           if (this.crtOp === 'inputPhone') {
@@ -1014,7 +1010,7 @@ export default {
           }, 1000)
         }
       } catch {
-        if (['验证码有效，请勿频繁发送'].includes(res.msg)) {
+        if (['验证码有效，请勿频繁发送'].includes(res.data.msg)) {
           this.CodeMibleTimer = setInterval(() => {
             // eslint-disable-next-line
             if (this.CodeMibleTime <= 0) {
@@ -1055,7 +1051,7 @@ export default {
           }
           const res = await this.$http({
             method: 'post',
-            url: this.$GLOBAL.uaa + 'user/update',
+            url: this.$GLOBAL.cpr + 'user/update',
             headers: {
               'Content-Type': 'application/json'
             },
@@ -1080,23 +1076,29 @@ export default {
         const res = await this.$http({
           method: 'post',
           contentType: 'application/x-www-form-urlencoded',
-          url: this.$GLOBAL.uaa + 'oauth/token',
+          url: this.$GLOBAL.cpr + 'oauth/token',
           data: {
             username: this.form.phone,
             smscode: this.code,
             grant_type: 'sms_code',
-            client_id: 'uaa',
+            client_id: 'cpr',
             client_secret: 'secret'
           },
           msg: false
         })
-        if (res.access_token) {
+        if (res.data.access_token) {
           this.$message.success('登录成功')
           this.sendMessage = {
-            uni__teis_Token: res.access_token,
-            uni__expires_in: res.expires_in
+            uni__teis_Token: res.data.access_token,
+            uni__expires_in: res.data.expires_in
           }
-          // this.checkToken()
+          this.sendMessage.uni__teis_Token
+            && localStorage.setItem('AI_token', this.sendMessage.uni__teis_Token)
+          // 先判断有没有过期
+          this.checkToken()
+          this.$router.push({
+            name: 'homePage'
+          })
         } else {
           return this.$message.error(res.data.error_description)
         }
@@ -1248,7 +1250,7 @@ export default {
       // if (this.crtOp === 'inputPsw') {}
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.uaa + 'user/requestAuth',
+        url: this.$GLOBAL.cpr + 'user/requestAuth',
         contentType: 'application/x-www-form-urlencoded',
         data
       })
@@ -1276,7 +1278,7 @@ export default {
       }
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.uaa + 'user/requestDelay',
+        url: this.$GLOBAL.cpr + 'user/requestDelay',
         contentType: 'application/x-www-form-urlencoded',
         data
       })
@@ -1313,24 +1315,38 @@ export default {
     },
     changeAreaCode(val) {
       this.areaCode = val
-    }
+    },
   },
   filters: {
     phoneFormat(val) {
       return val ? val.substring(0, 3) + '****' + val.substring(7) : ''
     }
   },
+
   beforeRouteEnter(to, from, next) {
-    next((vm) => {
+    next(async (vm) => {
       if (
         from
         && !['login', 'loginAuto', 'microLogin'].includes(from.name)
         && from.fullPath !== '/'
       ) {
         vm.gohistory = from.name || true
+      } else if (from && from.query && from.query.from === 'cpr') {
+        vm.getTokenById()
+        window.open(window.location.host + '/applycenter/apply-list', '_self')
+      } else if (from && from.query && from.query.from === 'cwo') {
+        vm.getTokenById()
+        // cwo.dataelite.trs.com.cn/#/?id=×××××××××
+        window.open(
+          'http://cwo.dataelite.trs.com.cn/#/'
+            + `?id= ${md5.hex(window.localStorage.getItem('AI_token'))}`
+        )
+      } else if (from && from.query) {
+        window.open(window.location.host + '/home', '_self')
       }
     })
-  }
+  },
+
 }
 </script>
 <style lang="less" scoped>
@@ -1368,13 +1384,14 @@ export default {
     height: 100%;
     display: flex;
     flex-direction: row;
+    position: relative;
 
     .left {
       flex: 1;
       width: 450px;
       display: flex;
-      position: relative;
-      left: 200px;
+      position: absolute;
+      right: 50%;
       border-radius: 4px;
 
       .swiper-container {
@@ -1388,12 +1405,11 @@ export default {
       width: 450px;
       background: #fff;
       margin-right: 160px;
-      margin-left: 10px;
       box-shadow: 0px 0px 10px rgba(67, 67, 67, 0.1);
       padding: 56px;
       text-align: left;
       position: absolute;
-      left: 725px;
+      left: 50%;
       border-top-right-radius: 4px;
       border-bottom-right-radius: 4px;
 

@@ -9,7 +9,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 
 Vue.prototype.$axios = axios;
 // 字体图标
-const noToken = ['uaa/oauth/token', 'uaa/captcha', 'uaa/loginByPwd', 'uaa/validCodeSms', 'uaa/user/getToken'];
+const noToken = ['uaa/oauth/token', 'uaa/captcha', 'uaa/loginByPwd', 'uaa/validCodeSms', 'cpr/user/getToken', '/uaa/validCodeSms'];
 let newPage = false;
 const service = axios.create({
   baseURL: process.env.BASE_API,
@@ -115,6 +115,8 @@ function getloginHref() {
     newWindow.location = 'http://192.168.210.57:31963/#/login?from=cpr';
   } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
     newWindow.location = 'https://dataelite.trs.com.cn/#/login?from=cpr';
+  } else if (window.location.host === 'cwo.dataelite.trs.com.cn') {
+    newWindow.location = 'https://cwo.dataelite.trs.com.cn/#/login?from=cwo';
   } else {
     const name = window.self === window.top ? 'login' : 'loginAuto';
     router.push({

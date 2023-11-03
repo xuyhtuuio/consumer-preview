@@ -9,18 +9,18 @@
     >
       <div class="detail-header">
         <div class="header-left">
-          <svg class="icon urgent-icon" aria-hidden="true">
+          <svg class="icon urgent-icon" aria-hidden="true" v-if="detailItem.urgent == 1">
             <use xlink:href="#icon-shenpiyemiantubiao"></use>
           </svg>
-          <svg class="icon urgent-icon" aria-hidden="true">
+          <svg class="icon urgent-icon" aria-hidden="true" v-if="detailItem.dismissalMark == 1">
             <use xlink:href="#icon-tongyongtubiao2"></use>
           </svg>
-          <div class="detail-title">睿远平衡18月产品宣传图审核</div>
-          <div class="titel-icon">产品类</div>
+          <div class="detail-title">{{ detailItem.formName }}</div>
+          <div class="titel-icon">{{ detailItem.formCategoryName }}</div>
         </div>
-        <div class="header-right">查看更多 ></div>
+        <div class="header-right" @click="toDetail">查看更多 ></div>
       </div>
-      <OrderBasicInfo></OrderBasicInfo>
+      <OrderBasicInfo :personInfo="detailItem.originator" :params="params"></OrderBasicInfo>
     </el-dialog>
   </div>
 </template>
@@ -28,15 +28,44 @@
 <script>
 import OrderBasicInfo from './order-basic-info'
 export default {
+  props: {
+    detailItem: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   components: {
     OrderBasicInfo
   },
   data: () => ({
-    show: false
+    show: true,
+    params: {}
   }),
+  created() {
+    this.params = {
+      formId: this.detailItem.formId,
+      taskName: this.detailItem.taskName,
+      processInstanceId: this.detailItem.processInstanceId,
+      formManagementId: this.detailItem.formCategoryId,
+      nodeId: this.detailItem.nodeId,
+      processTemplateId: this.detailItem.processTemplateId
+    }
+  },
   methods: {
     handleClose() {
-      this.show = false
+      this.$emit('handleClose')
+    },
+    toDetail() {
+      window.localStorage.setItem(
+        'order-detail',
+        JSON.stringify({
+          item: this.detailItem,
+        })
+      )
+      this.$router.push({
+        name: 'approval-details',
+        params: this.params
+      })
     }
   }
 }
@@ -44,6 +73,8 @@ export default {
 
 <style lang="less">
 .detail-dialog {
+  max-height: 70vh;
+  overflow: scroll;
   .el-dialog__header {
     padding: 12px 24px;
   }
