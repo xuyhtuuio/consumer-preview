@@ -315,6 +315,8 @@ export default {
         .el-image {
           height: 100%;
           width: 100%;
+          border: 1px solid #E5E6EB;
+          box-shadow: 0px 0px 10px 0px #4343431A;
         }
 
         &.swiper-slide-split {
