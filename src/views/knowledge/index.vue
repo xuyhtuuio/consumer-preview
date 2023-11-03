@@ -99,6 +99,6 @@ export default {
 }
 .main_right {
   max-height: calc(100vh - 130px);
-  // overflow: auto;
+  overflow: auto;
 }
 </style>
