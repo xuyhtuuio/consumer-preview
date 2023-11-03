@@ -377,7 +377,11 @@ export default {
         return item.id === id
       })
       if (this.files[this.activeIndex].type === 'pdf' && commenId[0]?.filesWithComment?.includes(this.files[this.activeIndex].child[this.activePdfIndex].id)) {
-        this.$emit('showCommentLine', commenId[0], fileId)
+        this.$emit('showCommentLine', commenId[0], commenId[0]?.filesWithComment[0])
+        return;
+      } else if (this.files[this.activeIndex].type === 'pdf') {
+        this.$emit('changeFileById', commenId[0]?.filesWithComment[0])
+        return;
       }
       if ((commenId[0]?.filesWithComment?.includes(fileId) && fileId === this.files[this.activeIndex].id)) {
         this.$emit('showCommentLine', commenId[0], fileId)

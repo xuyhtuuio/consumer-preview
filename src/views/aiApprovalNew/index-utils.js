@@ -387,6 +387,12 @@ export default {
       }
     },
     changeFileById(fileId) {
+      if (this.files[this.activeIndex].type === 'pdf') {
+        const fileIndex = this.files[this.activeIndex].child.findIndex((file) => fileId === file.id)
+        if (fileIndex === this.activePdfIndex) return;
+        this.changePdfPage(fileIndex)
+        return;
+      }
       const fileIndex = this.files.findIndex((file) => fileId === file.id)
       this.changeFile(fileIndex)
     },
@@ -603,11 +609,12 @@ export default {
       const temp = this.files[i];
       const suffer = ['jpeg', 'jpg', 'png', 'pdf'].includes(temp?.fileName?.split('.')[temp?.fileName?.split('.').length - 1]);
       // 当前文件为 pdf 处理
-      if (this.files?.[this.activeIndex].type === 'pdf') {
+      if (this.files?.[this.activeIndex]?.type === 'pdf') {
         this.pdfInfo.pageNow = 1
         this.changePdfPageNow(1)
         return;
-      } else if (!temp.ocr && !temp.recommends && suffer) {
+      }
+      if (!temp.ocr && !temp.recommends && suffer) {
         temp.ocr = await this.getOcr(temp);
         await getOcrExamineShow({
           formId: this.formId,
