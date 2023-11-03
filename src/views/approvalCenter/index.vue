@@ -13,7 +13,7 @@
             ">
             <div class="icon">
               <img :src="item.value == crtSign ? item.activeIcon : item.icon"
-                :class="item.value == crtSign ? 'active-icon' : 'default-icon'" />
+                :class="item.value == crtSign ? 'active-icon' : 'default-icon'" alt="" />
             </div>
             <div class="name-count">
               <span class="name">{{ item.name }}</span>
@@ -191,12 +191,7 @@ export default {
   },
   computed: {
     allTask() {
-      const { permissionsPage = {} } = this.$store.state
-      // eslint-disable-next-line
-      const approvalcenter =
-        [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(
-          (item) => item.pathName === 'approval-list'
-        ) || {}
+      const approvalcenter = this.$store.getters.getPermissionByCode('approvalCenter');
       const isExsit = approvalcenter.child?.find(
         (item) => item.name === '全部任务' && item.type
       )
@@ -206,12 +201,7 @@ export default {
       return false
     },
     showExport() {
-      const { permissionsPage = {} } = this.$store.state
-      // eslint-disable-next-line
-      const approvalcenter =
-        [...permissionsPage.funPerms, ...permissionsPage.defaultPerm].find(
-          (item) => item.pathName === 'approval-list'
-        ) || {}
+      const approvalcenter = this.$store.getters.getPermissionByCode('approvalCenter');
       const isExsit = approvalcenter.child?.find(
         (item) => item.name === '全部任务' && item.type === 'export'
       )

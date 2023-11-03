@@ -44,7 +44,6 @@ export function getApplicationList(param) {
   return request({
     url: '/cpr/applicationcenter/applicationList',
     method: 'post',
-
     data: param
   })
 }

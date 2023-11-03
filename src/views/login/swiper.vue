@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     goMain() {
-      //   const page2 = this.$router.resolve({ name: 'homePage' })
+      //   const page2 = this.$router.resolve({ name: 'home' })
       //   window.open(page2.href, '_blank')
     }
   }
@@ -60,7 +60,7 @@ export default {
 <style lang="less" scoped>
 .swiper {
   // height: 100vh;
-  margin-left: 85px;
+  // margin-left: 85px;
 
   .logo {
     cursor: pointer;

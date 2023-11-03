@@ -12,7 +12,7 @@
           :key="index"
           @click="handleItem(item)"
         >
-          <span :class="[activeMenu == item.sign ? 'active-menu' : '']">{{
+          <span :class="[activeMenu == item.pathName ? 'active-menu' : '']">{{
             item.title
           }}</span>
         </div>
@@ -67,43 +67,14 @@ export default {
   data() {
     return {
       activeMenu: 'home',
-      userInfo: {}
+      userInfo: {},
+      list: []
     }
   },
   computed: {
     manageAuth() {
-      const { permissionsPage = {} } = this.$store.state
-      return [
-        ...permissionsPage.funPerms,
-        ...permissionsPage.defaultPerm
-      ]?.find((item) => item.name === '后台管理' && item.type)
-    },
-    list() {
-      const { permissionsPage = {} } = this.$store.state
-      const navList = [
-        { title: '申请中心', name: 'apply-list', sign: 'applycenter' },
-        { title: '审批中心', name: 'approval-list', sign: 'approvalcenter' },
-        { title: '智能回检', name: 'recheck-index', sign: 'recheckIndex' },
-        { title: '产品图谱', name: 'productmap', sign: 'productmap' },
-        {
-          title: '统计中心',
-          name: 'statistical-center',
-          sign: 'statistical-center'
-        },
-        { title: '人员中心', name: 'personCenter', sign: 'personcenter' }
-      ]
-      return navList
-        .map((item) => {
-          const exist = [
-            ...permissionsPage.funPerms,
-            ...permissionsPage.defaultPerm
-          ]?.find((f) => f.pathName === item.name)
-          if (exist?.type) {
-            return item
-          }
-          return false
-        })
-        .filter((e) => e)
+      const manage = this.$store.getters.getPermissionByCode('backManagement');
+      return Boolean(manage.type)
     },
     iconList() {
       if (this.manageAuth) {
@@ -123,33 +94,36 @@ export default {
   },
   activated() {},
   mounted() {
+    this.getNav()
     this.routeActived(this.$route)
   },
   methods: {
-    routeActived(val) {
-      const { fullPath } = val
-      this.activeMenu = ''
-      if (fullPath.indexOf('home') !== -1) {
-        this.activeMenu = 'home'
-      }
-      if (fullPath.indexOf('applycenter') !== -1) {
-        this.activeMenu = 'applycenter'
-      }
-      if (fullPath.indexOf('recheck') !== -1) {
-        this.activeMenu = 'recheckIndex'
-      }
-      if (fullPath.indexOf('approvalcenter') !== -1) {
-        this.activeMenu = 'approvalcenter'
-      }
-      if (fullPath.indexOf('productmap') !== -1) {
-        this.activeMenu = 'productmap'
-      }
-      if (fullPath.indexOf('statistical-center') !== -1) {
-        this.activeMenu = 'statistical-center'
-      }
-      if (fullPath.indexOf('person-center') !== -1) {
-        this.activeMenu = 'personcenter'
-      }
+    // 获取菜单
+    getNav() {
+      const { permissionsPage = {} } = this.$store.state
+      // 若导航对应模块，无需判断权限，则去掉code字段
+      const navList = [
+        { title: '申请中心', name: 'apply-list', pathName: 'applycenter' },
+        { title: '审批中心', name: 'approval-list', code: 'approvalCenter', pathName: 'approvalcenter' },
+        { title: '智能回检', name: 'recheck-index', code: 'recheckIndex', pathName: 'recheck' },
+        { title: '产品图谱', name: 'productmap', code: 'productmap', pathName: 'productmap' },
+        { title: '统计中心', name: 'statistical-center', code: 'statisticsCenter', pathName: 'statistical-center' },
+        { title: '人员中心', name: 'personCenter', code: 'peopleCenter', pathName: 'personCenter' }
+      ]
+      this.list = navList
+        .map((item) => {
+          const exist = permissionsPage.funPerms?.find((f) => (item.code && f.code === item.code));
+          if ((exist && exist?.type) || !exist) {
+            return item;
+          } else {
+            return false;
+          }
+        }).filter((e) => e)
+    },
+    routeActived(to) {
+      const names = [to?.name, ...to?.matched.map(a => { return a.name })]
+      // 判断 list和names是否有交叉
+      this.activeMenu = this.list.find(item => names.includes(item.pathName))?.pathName
     },
     logout() {
       window.localStorage.clear()
@@ -158,6 +132,8 @@ export default {
         newWindow.location = 'http://192.168.210.57:31963'
       } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
         newWindow.location = 'https://dataelite.trs.com.cn/'
+      } else if (window.location.host === 'cwo.dataelite.trs.com.cn') {
+        newWindow.location = 'https://cwo.dataelite.trs.com.cn/#/login?from=cwo';
       } else {
         const name = window.self === window.top ? 'login' : 'loginAuto'
         this.$router.push({
@@ -166,7 +142,9 @@ export default {
       }
     },
     returnHome() {
-      this.$router.push('/home')
+      this.$router.push({
+        name: 'home'
+      })
     },
     updateInfo() {
       const user = JSON.parse(window.localStorage.getItem('user_name'))
@@ -187,23 +165,21 @@ export default {
       }
     },
     handleItem(item) {
-      this.activeMenu = item.sign
+      this.activeMenu = item.pathName
       this.$router.push({
         name: item.name
       })
     },
-    toManagePage(item) {
-      const { funPerms } = this.$store.state.permissionsPage
-      const rout = funPerms
-        .filter(
-          (item1) => item1.path?.indexOf('/admin/') !== -1 && item1.pathName !== 'manage'
-        )
-        .find((i) => i.type)
-      if (item.name && rout) {
-        this.$router.push({
-          name: rout.pathName
-        })
+    toManagePage(to) {
+      // 不在当前页下，再跳转，在则不处理
+      const route = this.$route
+      const names = [route.name, ...route?.matched.map(a => { return a.name })]
+      if (names.includes(to.name)) {
+        return;
       }
+      this.$router.push({
+        name: to.name
+      })
     }
   }
 }

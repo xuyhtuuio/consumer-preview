@@ -53,8 +53,7 @@ export default {
       return this.$store.state.design
     },
     editAuth() {
-      const { permissionsPage = {} } = this.$store.state
-      const flowManage = [...permissionsPage.funPerms, ...permissionsPage.defaultPerm]?.find(item => item.pathName === 'FlowManage') || {}
+      const flowManage = this.$store.getters.getPermissionByCode('flowableManagement');
       if (flowManage.type === 'edit') {
         return true
       }
@@ -111,9 +110,7 @@ export default {
       return false
     },
     check() {
-      if (this.$store.state.isEdit === null) {
-        // this.$router.push("/workPanel");
-      }
+      // if (this.$store.state.isEdit === null) {}
     }
   }
 }

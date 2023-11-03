@@ -1,140 +1,87 @@
 <template>
-  <div class="outter">
+  <div class="outter" v-loading="loading">
     <div class="top-tabble">
       <TrsTable
-      theme="TRS-table-gray"
-      :data="data"
-      :colConfig="colConfig"
-      @sort-change="sortChange"
-      @submitEdit="submitEdit"
-      @rowDragSort="rowDragSort"
-    >
-      <template #fileName="scope">
-        <div class="short">{{ scope.row.fileName }}</div>
-        <div class="people-id left">ID: {{ scope.row.fileID }}</div>
-      </template>
-      <template #people="scope">
-        <div style="position: relative; right: 20px">
-          {{ scope.row.people }}
-        </div>
-        <div class="people-id">工号: {{ scope.row.peopleID }}</div>
-      </template>
+        theme="TRS-table-gray"
+        :data="recordDetailList"
+        :colConfig="colConfig"
+        @sort-change="sortChange"
+        @submitEdit="submitEdit"
+        @rowDragSort="rowDragSort"
+      >
+        <template #fileName="scope">
+          <div class="short">{{ scope.row.fileName }}</div>
+        </template>
+        <template #userName="scope">
+          <div class="center">
+            {{ scope.row.userName }}
+          </div>
+        </template>
 
-      <template #backInspectionFrequency="scope">
-        <div class="center">
-          {{ scope.row.backInspectionFrequency }}
-          <span style="font-size: 12px">次</span>
-          <img
-            src="../../../assets/image/notice.png"
-            alt=""
-            style="width: 16px; height: 16px"
-            @click="handleOpenRecord"
-          />
-        </div>
-      </template>
-      <template #backInspectionOption="scope">
-        <div style="padding: 15px 0px">
-          {{ scope.row.backInspectionOption }}
-        </div>
-      </template>
+        <template #createTime="scope">
+          <div class="short">
+            {{ timeFormat(scope.row.createTime) }}
+          </div>
+        </template>
+        <template #backInspectionFrequency="scope">
+          <div class="center">
+            {{ scope.row.backInspectionFrequency }}
+            <span style="font-size: 12px">次</span>
+            <img
+              src="../../../assets/image/notice.png"
+              alt=""
+              style="width: 16px; height: 16px"
+              @click="handleOpenRecord"
+            />
+          </div>
+        </template>
+        <template #feedBack="scope">
+          <div style="padding: 15px 0px" class="center">
+            {{ scope.row.feedBack }}
+          </div>
+        </template>
 
-      <template #isRight="scope">
-        <div>{{ scope.row.isRight }}</div>
-      </template>
+        <template #isRight="scope">
+          <div>{{ scope.row.isRight }}</div>
+        </template>
 
-      <template #thingTpe="scope">
-        <div class="center">{{ scope.row.thingTpe }}</div>
-      </template>
-      <template #department="scope">
-        <div class="center">{{ scope.row.department }}</div>
-      </template>
-    </TrsTable>
-
+        <template #thingTpe="scope">
+          <div class="center">{{ scope.row.thingTpe }}</div>
+        </template>
+        <template #department="scope">
+          <div class="center">{{ scope.row.department }}</div>
+        </template>
+      </TrsTable>
     </div>
 
     <TrsPagination
-      :pageSize="10"
+      :pageSize="page.pageSize"
       :pageNow="page.pageNow"
       :total="page.totalCount"
       @getList="handleCurrentChange"
     >
     </TrsPagination>
   </div>
-
 </template>
 <script>
+import * as dayjs from 'dayjs'
+import { getRecheckDetailList } from '@/api/intelligent-recheck'
 export default {
   name: 'TestTrsTable',
+  props: {
+    ocrId: {
+      type: String,
+      default: ''
+    },
+    recheckCount: {
+      type: Number,
+      default: 0
+    }
+  },
   data: () => ({
+    loading: false,
     search: '',
-    data: [
-      {
-        fileName: '景顺长城七月报告七月七月',
-        fileID: '202308090023',
-        people: '谭新宇',
-        peopleID: '34279811',
-        backInspectionTime: '2023-8-31',
-        isRight: '是',
-        thingTpe: '产品类',
-        department: '财富平台部',
-        backInspectionFrequency: '8',
-        backInspectionOption:
-          '活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；'
-      },
-      {
-        fileName: '景顺长城七月报告七月七月',
-        fileID: '202308090023',
-        people: '谭新宇',
-        peopleID: '34279811',
-        backInspectionTime: '2023-8-31',
-        isRight: '是',
-        thingTpe: '产品类',
-        department: '财富平台部',
-        backInspectionFrequency: '8',
-        backInspectionOption:
-          '活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；'
-      },
-      {
-        fileName: '景顺长城七月报告七月七月',
-        fileID: '202308090023',
-        people: '谭新宇',
-        peopleID: '34279811',
-        backInspectionTime: '2023-8-31',
-        isRight: '是',
-        thingTpe: '产品类',
-        department: '财富平台部',
-        backInspectionFrequency: '8',
-        backInspectionOption:
-          '活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；'
-      },
-      {
-        fileName: '景顺长城七月报告七月七月',
-        fileID: '202308090023',
-        people: '谭新宇',
-        peopleID: '34279811',
-        backInspectionTime: '2023-8-31',
-        isRight: '是',
-        thingTpe: '产品类',
-        department: '财富平台部',
-        backInspectionFrequency: '8',
-        backInspectionOption:
-          '活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；'
-      },
-      {
-        fileName: '景顺长城七月报告七月七月',
-        fileID: '202308090023',
-        people: '谭新宇',
-        peopleID: '34279811',
-        backInspectionTime: '2023-8-31',
-        isRight: '是',
-        thingTpe: '产品类',
-        department: '财富平台部',
-        backInspectionFrequency: '8',
-        backInspectionOption:
-          '活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；活动应明确参与条件，如“达标私钻”专享，避免引起歧义，引发金融消费者不满；'
-      },
-
-    ],
+    recordDetailList: [],
     colConfig: [
       {
         label: '序号',
@@ -159,50 +106,44 @@ export default {
       },
       {
         label: '回检人员',
-        prop: 'people',
+        prop: 'userName',
         header: 'people-header',
         bind: {
-          align: 'center',
-          width: 150
+          align: 'center'
         }
       },
       {
         label: '回检时间',
-        prop: 'backInspectionTime',
+        prop: 'createTime',
         bind: {
           align: 'center',
-          width: 100
+          width: 130
         }
       },
 
       {
         label: '回检意见',
-        prop: 'backInspectionOption',
+        prop: 'feedBack',
         bind: {
           align: 'center',
-          width: 520
+          width: 490
         }
       }
     ],
     page: {
       pageNow: 1,
-      totalCount: 100
-    }
+      pageSize: 5,
+      totalCount: 0
+    },
+    searchParmO: {}
   }),
   methods: {
-    sortChange({ column, prop, order }) {
-      console.log(column, prop, order)
-    },
-    handleClick(row) {
-      console.log(row)
-    },
-    submitEdit(row, beforeRow, prop) {
-      console.log(row)
-      console.log(beforeRow)
-      console.log(prop)
-    },
-    rowDragSort(data) {
-      console.log(data)
+    sortChange() {},
+    handleClick() {},
+    submitEdit() {},
+    rowDragSort() {},
+    timeFormat(val) {
+      return val ? dayjs(val).format('YYYY-MM-DD ') : '--'
     },
     handleOpenOption(option) {
       this.$emit('openOption', option)
@@ -210,14 +151,42 @@ export default {
     handleOpenRecord(option) {
       this.$emit('openRecord', option)
     },
-    handleCurrentChange() {}
+    handleCurrentChange(pageNow) {
+      this.page.pageNow = pageNow
+      this.getList()
+    },
+    async getList() {
+      this.loading = true
+      this.searchParmO.ocrId = this.ocrId
+      this.searchParmO.recheckCount = this.recheckCount
+      this.searchParmO.pageNow = this.page.pageNow
+      this.searchParmO.pageSize = this.page.pageSize
+      const res = await getRecheckDetailList(this.searchParmO)
+      if (res.status === 200) {
+        const { list, totalCount } = res.data.data
+        this.loading = false
+        this.recordDetailList = list
+        this.page.totalCount = totalCount
+      }
+    },
+    getOnePage() {
+      this.page.pageNow = 1
+      this.getList()
+    }
+  },
+  created() {
+    this.getOnePage()
+  },
+  watch: {
+    ocrId() {
+      this.getOnePage()
+    }
   }
 }
 </script>
 <style lang="less" scoped>
-
 .top-tabble {
-  height: 530px;
+  max-height: 450px;
   overflow-y: auto;
 }
 .short {
@@ -264,5 +233,4 @@ export default {
 //   display: flex;
 //   flex-direction: column;
 // }
-
 </style>
