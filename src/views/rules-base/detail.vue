@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-26 13:51:55
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-02 18:05:00
+ * @LastEditTime: 2023-11-03 11:21:07
  * @FilePath: /consumer-preview/src/views/rules-base/detail.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -228,11 +228,13 @@ export default {
   },
   watch: {
     $route: {
-      async handler() {
-        this.queryViewLogs()
-        await this.searchDetails()
-        await this.historyLogs()
-        await this.readCount()
+      async handler(val) {
+        if (val.name === 'RulesDetail') {
+          this.queryViewLogs()
+          await this.searchDetails()
+          await this.historyLogs()
+          await this.readCount()
+        }
       }
     }
   },
@@ -454,7 +456,9 @@ export default {
       const params = {
         fileKey,
         id,
-        name
+        name,
+        taglist: this.lawInfo?.tagList || [],
+        bentaglist: this.lawInfo?.equityList || [],
       }
       updateReadCount(params)
     },

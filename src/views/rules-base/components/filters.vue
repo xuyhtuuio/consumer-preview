@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:21:09
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-31 16:48:42
+ * @LastEditTime: 2023-11-03 10:35:32
  * @FilePath: /consumer-preview/src/views/rules-base/components/filters.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -66,6 +66,12 @@ export default {
   methods: {
     addRule() {
       this.$emit('addRule')
+    },
+    initSort() {
+      this.crtColumn = 'pub_time'
+      this.sorts.forEach((m) => {
+        m.order = 'desc'
+      })
     },
     changeColumn(item) {
       // 切换排序

@@ -2,13 +2,13 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-02 18:34:55
+ * @LastEditTime: 2023-11-03 11:30:32
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
   <div class="laws" v-loading="search.loading">
-    <Filters @addRule="addRule" @sortChange="sortChange" :total="search.total">
+    <Filters @addRule="addRule" @sortChange="sortChange" :total="search.total" ref="filter-comp">
     </Filters>
     <div v-if="list.length" class="list-content">
       <div
@@ -612,6 +612,8 @@ export default {
       this.search.name = keyword
       this.search.status = effectiveValue
       this.type = type
+      this.$refs['filter-comp'].initSort()
+      this.search.sortField = '-pub_time'
       this.nextPage(1)
     },
     /**
@@ -797,7 +799,8 @@ export default {
      * @description: 新增法规
      * @return {*}
      */
-    addRule() {
+    addRule(type) {
+      this.crtBehavior = type || 'increase'
       this.dialogVisible = true
       setTimeout(() => {
         this.$refs.form.clearValidate()
@@ -1013,6 +1016,7 @@ export default {
      * @return {*}
      */
     submit() {
+      const _that = this
       // 上传内容文件
       this.$refs.form.validate(async (valid) => {
         this.checkMustValue()
@@ -1033,7 +1037,7 @@ export default {
             }) || []
           const params = {
             name: this.form.name,
-            pub_time: this.form.date,
+            pub_time: dayjs(this.form.date).format('YYYY-MM-DD HH:mm:ss'),
             file_key: this.form.uploadFile[0]?.key,
             tagList: this.tagsList,
             equityList: this.relevancyTags,
@@ -1051,7 +1055,7 @@ export default {
           this.form.loading = true
           this.$forceUpdate()
           try {
-            if (this.crtBehavior === 'increase') {
+            if (_that.crtBehavior === 'increase') {
               res = await insertRegulation(params)
             } else {
               // 编辑和更新
@@ -1060,21 +1064,22 @@ export default {
                 ...this.form,
                 ...params
               }
-              if (this.crtBehavior === 'edit') {
-                params.isEdit = 'edit'
+              if (_that.crtBehavior === 'edit') {
+                newParams.isEdit = 'edit'
               }
-              if (this.crtBehavior === 'update') {
-                params.status = this.form.isRepeal
+              if (_that.crtBehavior === 'update') {
+                newParams.status = _that.form.isRepeal
               }
               delete newParams.newContent
               delete newParams.uploadFile
               delete newParams.content
+              delete newParams.tableFileTag
               delete newParams.loading
               delete newParams.isRepeal
               res = await updateRegulation(newParams)
             }
             const { success } = res.data
-            this.form.loading = false
+            _that.form.loading = false
             if (success) {
               this.$message.success(
                 `${this.dialogTitle[this.crtBehavior]}${
@@ -1095,8 +1100,7 @@ export default {
      * @return {*}
      */
     editRule(item, type) {
-      this.crtBehavior = type
-      this.addRule()
+      this.addRule(type)
       setTimeout(() => {
         // 回显内容
         const file = {
@@ -1139,8 +1143,8 @@ export default {
 
       this.$confirm('一旦删除该法规内容不可恢复，请确认是否删除', '', {
         customClass: 'confirmBox',
-        confirmButtonText: '取消',
-        cancelButtonText: '删除',
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
         type: 'warning'
       }).then(async () => {
         const params = {

@@ -1,3 +1,11 @@
+/*
+ * @Author: nimeimix huo.linchun@trs.com.cn
+ * @Date: 2023-11-02 16:42:40
+ * @LastEditors: nimeimix huo.linchun@trs.com.cn
+ * @LastEditTime: 2023-11-03 10:22:56
+ * @FilePath: /consumer-preview/vue.config.js
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 // eslint-disable-next-line
 const path = require('path');
 // eslint-disable-next-line
@@ -60,8 +68,8 @@ module.exports = {
         },
       },
       '/cpr': {
-        target: 'http://192.168.210.57:31602',
-        // target: 'http://10.8.0.60:8324', // 吕强后台
+        // target: 'http://192.168.210.57:31602',
+        target: 'http://10.8.1.125:8324', // 吕强后台
         // target: 'http://10.8.0.57:8324', // 王意杨后台
         changeOrigin: true,
         ws: true,
