@@ -38,7 +38,7 @@
         <el-switch v-model="tag.isAttention" @change="changeAttention(tag)"></el-switch> 已关注
       </div>
     </div>
-    <el-empty description="暂无数据" v-if="list.length === 0 && loadingList === false" style="background: #fff;"></el-empty>
+    <Empty v-if="list.length === 0 && loadingList === false" style="background: #fff;">></Empty>
   </div>
 </template>
 <script>
