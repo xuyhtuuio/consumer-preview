@@ -102,8 +102,16 @@ export default {
             ...item.special
           }
         });
+        formItems.map(condition => {
+          if (condition.name === 'MultipleGroupsSelect') {
+            const options = []
+            condition.props.options.map(item => {
+              options.push(...item.children)
+            })
+            condition.props.options = options;
+          }
+        })
         this.$store.state.design.formItems = formItems
-        console.log(this.$store.state.design.formItems)
       }
     },
     async getObtainExamineTypeList() {

@@ -23,13 +23,13 @@
           v-model="form.crtDisavower"
           placeholder="请选择驳回节点/驳回人"
           popper-class="approver-select"
-          value-key="id"
+          value-key="targetNodeId_userId"
         >
           <el-option
             v-for="(item, index) in disavower"
             :key="index"
             :label="item.name + '/' + item.label + ' 【' + item.nodeName + '】'"
-            :value="item"
+            :value="item.targetNodeId_userId"
           >
             <div class="flex">
               <div class="item ellipsis ellipsis_1">{{ item.name }}</div>
@@ -78,16 +78,17 @@
           v-model="form.crtApprover"
           popper-class="approver-select"
           placeholder="需【下一节点名称】审批，请选择审批人"
+          value-key="id"
         >
           <el-option
             v-for="item in approver"
-            :key="item.id"
-            :label="item.name + '/' + item.label + ' 【' + item.nodeName + '】'"
-            :value="item.id"
+            :key="item.approval_targetNodeId_userId"
+            :label="item.name + '/' + item.org + ' 【' + item.nodeName + '】'"
+            :value="item"
           >
             <div class="flex">
               <div class="item ellipsis ellipsis_1">{{ item.name }}</div>
-              <div class="item ellipsis ellipsis_1">{{ item.label }}</div>
+              <div class="item ellipsis ellipsis_1">{{ item.org }}</div>
               <el-popover
                 placement="top-start"
                 trigger="hover"
@@ -422,7 +423,9 @@ export default {
           // 既不能大于当前日期 也不能小于结束日期
           if (value) {
             return (
-              time.getTime() > new Date(value).getTime() || time.getTime() < new Date() - 8.64e7
+              // eslint-disable-next-line
+              time.getTime() > new Date(value).getTime() ||
+              time.getTime() < new Date() - 8.64e7
             )
           }
           return time.getTime() < new Date() - 8.64e7
@@ -471,7 +474,11 @@ export default {
     },
     handlePickerChange(item) {
       if (
-        dayjs(new Date(item.value)).format('l') === dayjs(new Date()).format('l') && dayjs(item.value).format('HH:mm:ss') === '00:00:00'
+        // eslint-disable-next-line
+        dayjs(new Date(item.value)).format('l') ===
+          // eslint-disable-next-line
+          dayjs(new Date()).format('l') &&
+        dayjs(item.value).format('HH:mm:ss') === '00:00:00'
       ) {
         item.value = new Date()
       }
@@ -491,8 +498,19 @@ export default {
       const { taskId, processInstanceId } = data
       this.getEditById(taskId, processInstanceId)
       this.externalData = data
-      this.disavower = data.disavower
-      this.approver = data.approver
+      this.disavower = data.disavower?.map((m) => {
+        return {
+          ...m,
+          targetNodeId_userId: m.targetNodeId + '-' + m.id
+        }
+      })
+      this.approver = data.approver?.map((m) => {
+        return {
+          ...m,
+          approval_targetNodeId_userId: m.targetNodeId + '-' + m.id
+        }
+      })
+
       this.refuseWay = data.refuseWay
       this.assignedType = data.assignedType
     },
@@ -511,13 +529,15 @@ export default {
             this.$refs['form'].resetFields()
           } else {
             // 区分通过与驳回
-            const { success, msg, targetUser, reason } = data
+            const { success, msg, targetUser, reason, targetNodeId } = data
             this.form.isAccept = success ? '1' : '0'
             this.form.content = msg
             if (success) {
-              this.form.crtApprover = targetUser || ''
+              this.form.crtApprover = this.approver?.filters(
+                (m) => m.id === targetUser
+              )[0]
             } else {
-              this.form.crtDisavower = targetUser || ''
+              this.form.crtDisavower = targetNodeId + '-' + targetUser || ''
               this.form.reason = reason
             }
           }
@@ -549,7 +569,7 @@ export default {
       if (this.form.isAccept === '0') {
         params = {
           ...params,
-          ...this.form.crtDisavower
+          targetNodeId_userId: this.form.crtDisavower
         }
       }
       const customFlag = this.judgeWarnSave()
@@ -560,16 +580,22 @@ export default {
     },
     judgeWarnSave() {
       // eslint-disable-next-line
-        for(let i in this.filledInByApprover) {
+      for (let i in this.filledInByApprover) {
         const { props } = this.filledInByApprover[i]
         if (
-          (this.filledInByApprover[i].value.length === 0 || this.filledInByApprover[i].value.length > this.filledInByApprover[i].props.numberOfWords) && props.required
+          // eslint-disable-next-line
+          (this.filledInByApprover[i].value.length === 0 ||
+            // eslint-disable-next-line
+            this.filledInByApprover[i].value.length >
+              // eslint-disable-next-line
+              this.filledInByApprover[i].props.numberOfWords) &&
+          props.required
         ) {
           this.filledInByApprover[i].isWarning = true
         }
       }
       let flag = true
-      flag = !this.filledInByApprover.some(m => {
+      flag = !this.filledInByApprover.some((m) => {
         return m.isWarning
       })
       return flag
@@ -586,7 +612,9 @@ export default {
         if (!flag.length && typeof item.value !== 'number') {
           return item.warnInfo[0].message
         } else if (
-          item.props.numberOfWords && item.value.length > item.props.numberOfWords
+          // eslint-disable-next-line
+          item.props.numberOfWords &&
+          item.value.length > item.props.numberOfWords
         ) {
           item.isWarning = true
           return item.warnInfo[1].message

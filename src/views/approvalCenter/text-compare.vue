@@ -27,6 +27,9 @@
           <el-button type="tuihui" @click="reject"
             ><i class="iconfont icon-tuihui1"></i>退回/驳回</el-button
           >
+          <el-button @click="turnTo" v-if="nextStepObj.isChangeHandle !== null"
+            ><i class="iconfont icon-zhuanban1"></i>转办</el-button
+          >
           <el-button type="primary" @click="showSubmit"
             ><i class="iconfont icon-tijiao"></i>提交</el-button
           >
@@ -232,6 +235,7 @@
       @handleConfirm="endTaskSubmit"
       :disabled="disabled"
     ></SecondaryConfirmation>
+    <TurnDialog ref="turnDialog" :formBase="formBase" :nextStepObj="nextStepObj"></TurnDialog>
   </div>
 </template>
 
@@ -244,9 +248,10 @@ import {
   getNodeHandleUser
 } from '@/api/aiApproval'
 import { dualScreenPreview } from '@/api/approvalCenter'
-import { downloadAllFiles } from '@/api/applyCenter'
+import { downloadAllFiles, downloadAllFilesOther } from '@/api/applyCenter'
 import { getApplyForm } from '@/api/front'
 import FileType from '@/components/common/file-type'
+import TurnDialog from '@/components/common/turn-dialog'
 import FilePreview from '@/components/filePreview'
 import SideBar from '../aiApproval/sidebar/sidebar'
 import rejectDialog from '../aiApproval/dialogs/reject-dialog'
@@ -262,7 +267,8 @@ export default {
     SideBar,
     ImagePreview,
     FilePreview,
-    ImagePreview1
+    ImagePreview1,
+    TurnDialog
   },
   data() {
     return {
@@ -302,7 +308,8 @@ export default {
         selectObject: '',
         nodeSelectUserList: [],
         refuseWay: '',
-        nodeSelectList: []
+        nodeSelectList: [],
+        isChangeHandle: null
       },
       rejectOption: [
         {
@@ -451,7 +458,7 @@ export default {
             id: this.nextStepObj?.refuseWay === 'TO_BEFORE' ? prevUser.split('/')[1] : '',
           }
         ],
-        processInstanceId: this.formBase.processInstanceI,
+        processInstanceId: this.formBase.processInstanceId,
         templateId: this.formBase.processTemplateId,
         nodeId: this.formBase.nodeId
       }).catch(() => {
@@ -530,7 +537,7 @@ export default {
         nextNodeId: this.nextStepObj?.selectObject === '1' ? data.nextNodeId : '',
         nextUserInfo: this.nextStepObj?.selectObject === '1' ? data.nextUserInfo : [],
         templateId: this.formBase.processTemplateId,
-        processInstanceId: this.formBase.processInstanceI,
+        processInstanceId: this.formBase.processInstanceId,
         nodeId: this.formBase.nodeId
       }).catch(() => {
         updateRuleRes.data.status = 400
@@ -607,27 +614,42 @@ export default {
     },
     saveFile(type) {
       let key = '';
+      this.$message.info('下载中，请稍等！')
       if (type === 1) {
         key = this.activeItem.otherKey;
+        const params = {
+          formId: this.formId,
+          key
+        }
+        downloadAllFiles(params).then((res) => {
+          const disposition = res.headers['content-disposition']
+          const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
+          const link = document.createElement('a');
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        })
       } else if (type === 2) {
         key = this.activeItem.key;
+        const params = {
+          formId: this.formId,
+          key
+        }
+        downloadAllFilesOther(params).then((res) => {
+          const disposition = res.headers['content-disposition']
+          const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
+          const link = document.createElement('a');
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        })
       }
-      const params = {
-        formId: this.formId,
-        key
-      }
-      this.$message.info('下载中，请稍等！')
-      downloadAllFiles(params).then((res) => {
-        const disposition = res.headers['content-disposition']
-        const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf;charset=utf-8' }))
-        const link = document.createElement('a');
-        link.style.display = 'none'
-        link.href = url
-        link.setAttribute('download', decodeURI(disposition.replace('attachment;filename=', '')))
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-      })
     },
     fullScreen(type) {
       this.showFullScreen = !this.showFullScreen
@@ -641,6 +663,9 @@ export default {
           this.$refs.imageView2.handleImageLoaded()
         })
       }
+    },
+    turnTo() {
+      this.$refs.turnDialog.turnDialog = true;
     }
   },
   beforeDestroy() {

@@ -7,27 +7,22 @@
           {{ personInfo && personInfo.name }} /
           {{ personInfo && personInfo.id }}
         </span>
-        <span v-if="personOrg&&personOrg.length"> <i v-for="(item,index) in personOrg" :key="index">{{ item }}
-        <i v-if="index<personOrg.length-1"> | </i>
-        </i></span>
+        <span v-if="personOrg && personOrg.length"> <i v-for="(item, index) in personOrg" :key="index">{{ item }}
+            <i v-if="index < personOrg.length - 1"> | </i>
+          </i></span>
       </div>
+      <!-- 右侧插槽，可以放置一些按钮什么的 -->
       <slot name="apply-modify"></slot>
     </div>
     <p class="poppver-title">
-      <span
-        ><svg class="icon" aria-hidden="true">
+      <span><svg class="icon" aria-hidden="true">
           <use xlink:href="#icon-a-Rectangle143"></use>
         </svg>
-        基本信息</span
-      >
+        基本信息</span>
     </p>
     <!-- 项目基本信息-->
     <div v-if="orderInfo.newBaseInfo && orderInfo.newBaseInfo.length">
-      <div
-        v-for="(item, index) in orderInfo.newBaseInfo"
-        :key="index"
-        class="proj-info"
-      >
+      <div v-for="(item, index) in orderInfo.newBaseInfo" :key="index" class="proj-info">
         <div v-for="(child, idx) in item" :key="idx" class="proj-info-item">
           <div class="item">
             <span class="label">{{ child.title }}</span>
@@ -37,11 +32,7 @@
       </div>
     </div>
     <div class="proj-info pro-info-textarea">
-      <div
-        class="item"
-        v-for="(item, index) in orderInfo.textAreaBaseInfo"
-        :key="index"
-      >
+      <div class="item" v-for="(item, index) in orderInfo.textAreaBaseInfo" :key="index">
         <span class="label">{{ item.title }}</span>
         <span class="value">{{ item | valueFormat }}</span>
       </div>
@@ -49,11 +40,7 @@
     <!-- 发布渠道 -->
     <div v-if="orderInfo.promotionChannels">
       <div class="line"></div>
-      <div
-        class="channel-info"
-        v-for="(item, index) in orderInfo.promotionChannels"
-        :key="index"
-      >
+      <div class="channel-info" v-for="(item, index) in orderInfo.promotionChannels" :key="index">
         <div class="item" v-for="(child, idx) in item.props.options" :key="idx">
           <span class="label">{{ child.value }}</span>
           <span class="value">{{ multipleSelect(child, item) }}</span>
@@ -62,35 +49,29 @@
       </div>
     </div>
     <!-- 审查要点 -->
-    <div v-if="orderInfo.reviewPointer">
+    <div v-if="orderInfo.hasReviewpointer">
       <div class="line"></div>
       <p class="poppver-title">
         <span>
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#icon-a-Rectangle143"></use>
           </svg>
-          审查要点</span
-        >
+          审查要点</span>
       </p>
-      <div
-        class="proj-info review-pointer1"
-      >
-      <!-- v-for="(item, index) in orderInfo.reviewPointer" -->
+      <div class="proj-info review-pointer1">
+        <!-- v-for="(item, index) in orderInfo.reviewPointer" -->
         <div class="item" v-for="(item, index) in orderInfo.reviewPointer['MultipleSelect']" :key="index">
           <span class="label">{{ item.title }}</span>
-          <span style="padding-left: 14px;"  class="value">
-              <i
-              v-for="(points, index) in formatePoints(item)"
-              :key="index"
-            >
-              {{ points }}<i v-if="index<formatePoints(item).length-1">;</i></i>
+          <span style="padding-left: 14px;" class="value">
+            <i v-for="(points, index) in formatePoints(item)" :key="index">
+              {{ points }}<i v-if="index < formatePoints(item).length - 1">;</i></i>
           </span>
         </div>
         <div class="SelectInput-item">
-        <div  v-for="(item, index) in orderInfo.reviewPointer['SelectInput']" :key="index" class="item">
-            <i class="label ellipsis ellipsis_1" style="font-weight: 400;" >{{ formatePoints(item)['point']}}
-        </i>
-        <i style="padding-left: 14px;" class="value">{{ formatePoints(item)['isRelative'] }}</i>
+          <div v-for="(item, index) in orderInfo.reviewPointer['SelectInput']" :key="index" class="item">
+            <i class="label ellipsis ellipsis_1" style="font-weight: 400;">{{ formatePoints(item)['point'] }}
+            </i>
+            <i style="padding-left: 14px;" class="value">{{ formatePoints(item)['isRelative'] }}</i>
           </div>
         </div>
       </div>
@@ -100,24 +81,13 @@
     <p class="poppver-title">
       <span>
         <svg class="icon" aria-hidden="true">
-          <use xlink:href="#icon-a-Rectangle143"></use></svg>审查材料
-        <i class="total"
-          >共 {{ orderInfo.fileList && orderInfo.fileList.length }} 个</i
-        ></span
-      >
-      <span
-        class="download pointer"
-        v-if="orderInfo.fileList.length"
-        @click="download(orderInfo.fileList)"
-        >下载全部</span
-      >
+          <use xlink:href="#icon-a-Rectangle143"></use>
+        </svg>审查材料
+        <i class="total">共 {{ orderInfo.fileList && orderInfo.fileList.length }} 个</i></span>
+      <span class="download pointer" v-if="orderInfo.fileList.length" @click="download(orderInfo.fileList)">下载全部</span>
     </p>
     <div class="file-list">
-      <div
-        class="file-item pointer"
-        v-for="(item, index) in orderInfo.fileList"
-        :key="index"
-      >
+      <div class="file-item pointer" v-for="(item, index) in orderInfo.fileList" :key="index">
         <span class="left ellipsis ellipsis_1">
           <i class="indexes">{{ index + 1 }}.</i>
           <file-type :fileName="item.fileName"></file-type>
@@ -141,11 +111,11 @@ export default {
   props: {
     sidebarParam: {
       type: Object,
-      default: () => {}
+      default: () => { }
     },
     personInfo: {
       type: Object,
-      default: () => {}
+      default: () => { }
     },
     personOrg: {
       type: Array,
@@ -168,7 +138,7 @@ export default {
   mounted() {
     this.init()
   },
-  activated() {},
+  activated() { },
   watch: {
     sidebarParam: {
       handler(val) {
@@ -229,7 +199,7 @@ export default {
             this.$message.error({ offset: 40, title: '提醒', message })
           }
         })
-        .catch(() => {})
+        .catch(() => { })
         .finally(() => {
           this.loading = false
         })
@@ -275,11 +245,14 @@ export default {
       newKeyPointsForVerification['SelectInput'] = keyPointsForVerification.filter((v) => {
         return ['SelectInput'].includes(v.name)
       }) || []
+      // 判断reviewPointer 至少有一个属性key的长度>0
+      const hasReviewpointer = Object.values(newKeyPointsForVerification).some(m => m.length)
       this.orderInfo = {
         baseInfo: noTextAreaBeseInfo,
         textAreaBaseInfo,
         newBaseInfo: this.getMapping(noTextAreaBeseInfo),
         reviewPointer: newKeyPointsForVerification,
+        hasReviewpointer,
         promotionChannels: MultipleGroupsSelect,
         fileList: reviewMaterials && reviewMaterials[0].value
       }
@@ -371,7 +344,7 @@ export default {
         const array = []
         val.value.forEach((id) => {
           const strings = options.filter((v) => v.id === id)[0]
-          array.push(strings)
+          strings && array.push(strings)
         })
         const label = array
           .map((m) => {
@@ -479,7 +452,7 @@ export default {
     }
 
     .label::before {
-      content: '·';
+      content: '\00b7';
       font-size: 20px;
       padding-right: 4px;
       line-height: 20px;
@@ -506,13 +479,15 @@ export default {
     .proj-info-item:last-of-type {
       margin-right: 0;
     }
-    .SelectInput-item{
+
+    .SelectInput-item {
       display: flex;
       flex: 1;
-      .item{
+
+      .item {
         display: flex;
         flex-direction: column;
-        width: 25%;
+        width: 33.3%;
       }
 
     }
@@ -612,4 +587,5 @@ export default {
       }
     }
   }
-}</style>
+}
+</style>

@@ -3484,9 +3484,9 @@ bl@^4.1.0:
     inherits "^2.0.4"
     readable-stream "^3.4.0"
 
-bluebird@^3.1.1, bluebird@^3.5.5:
+bluebird@^3.0.0, bluebird@^3.1.1, bluebird@^3.5.5:
   version "3.7.2"
-  resolved "https://registry.npmjs.org/bluebird/-/bluebird-3.7.2.tgz"
+  resolved "https://registry.npmmirror.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
   integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
 
 bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.11.9:
@@ -5433,6 +5433,11 @@ eastasianwidth@^0.2.0:
   resolved "https://registry.npmjs.org/eastasianwidth/-/eastasianwidth-0.2.0.tgz"
   integrity sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==
 
+easy-promise@0.1.0:
+  version "0.1.0"
+  resolved "https://registry.npmmirror.com/easy-promise/-/easy-promise-0.1.0.tgz#a3c4215a0e221482b0421971cb005a2474fc1868"
+  integrity sha512-QfpuGzp/vH9m7j4DXjDWHhI4Ef/IJKQGkN/DsHoUjYAqTWSrIQ+yukwkz8tIvffsgLg2dFfvida0/s+eer220A==
+
 easy-stack@1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/easy-stack/-/easy-stack-1.0.1.tgz"
@@ -6106,6 +6111,11 @@ express@^4.16.3, express@^4.17.1:
     type-is "~1.6.18"
     utils-merge "1.0.1"
     vary "~1.1.2"
+
+extend-promise@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.npmmirror.com/extend-promise/-/extend-promise-0.0.7.tgz#037388c36f25e5f8ebc0fe38100b9e2ce7be3911"
+  integrity sha512-FLka6uzfpK6aPX0CYwb+wiWd6D/2W4Hg2GOD6j0QHAA/l6GCBUQ8MoWaFkvxyJiMpk92XeIgHgTLAsfcoZiIYg==
 
 extend-shallow@^2.0.1:
   version "2.0.1"
@@ -11181,6 +11191,15 @@ promise-inflight@^1.0.1:
   resolved "https://registry.npmjs.org/promise-inflight/-/promise-inflight-1.0.1.tgz"
   integrity sha512-6zWPyEOFaQBJYcGMHBKTKJ3u6TBsnMFOIZSa6ce1e/ZrrsOlnHRHbabMjLiBYKp+n44X9eUI6VUPaukCXHuG4g==
 
+promise-queue-plus@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.npmmirror.com/promise-queue-plus/-/promise-queue-plus-1.2.2.tgz#b64e7b55592e8c4791bce22f67835113812ac7a0"
+  integrity sha512-As9heS6Jv7BpPmNd8aUAOHwCsK6khqEIb5UqwXHHJia6KKrnSPNC4sQRhDEh8MnEIE7ydOygzCs6buPEsotwaQ==
+  dependencies:
+    bluebird "^3.0.0"
+    easy-promise "0.1.0"
+    extend-promise "^0.0.7"
+
 promise-retry@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npmjs.org/promise-retry/-/promise-retry-2.0.1.tgz"
@@ -12218,7 +12237,7 @@ sortablejs@1.10.2:
   resolved "https://registry.npmjs.org/sortablejs/-/sortablejs-1.10.2.tgz"
   integrity sha512-YkPGufevysvfwn5rfdlGyrGjt7/CRHwvRPogD/lC+TnvcN29jDpCifKP+rBqf+LRldfXSTh+0CGLcSg0VIxq3A==
 
-sortablejs@^1.14.0:
+sortablejs@^1.14.0, sortablejs@^1.15.0:
   version "1.15.0"
   resolved "https://registry.npmjs.org/sortablejs/-/sortablejs-1.15.0.tgz"
   integrity sha512-bv9qgVMjUMf89wAvM6AxVvS/4MX3sPeN0+agqShejLU5z5GX4C75ow1O2e5k4L6XItUyAK3gH6AxSbXrOM5e8w==
@@ -12271,6 +12290,11 @@ source-map@^0.7.3:
   version "0.7.4"
   resolved "https://registry.npmjs.org/source-map/-/source-map-0.7.4.tgz"
   integrity sha512-l3BikUxvPOcn5E74dZiq5BGsTb5yEwhaTSzccU6t4sDOH8NWJCstKO5QT2CvtFoK6F0saL7p9xHAqHOlCPJygA==
+
+spark-md5@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.npmmirror.com/spark-md5/-/spark-md5-3.0.2.tgz#7952c4a30784347abcee73268e473b9c0167e3fc"
+  integrity sha512-wcFzz9cDfbuqe0FZzfi2or1sgyIrsDwmPwfZC4hiNidPdPINjeUwNfv5kldczoEAcjl9Y1L3SM7Uz2PUEQzxQw==
 
 spdx-correct@^3.0.0:
   version "3.2.0"
@@ -13010,10 +13034,10 @@ trim-canvas@^0.1.2:
   resolved "https://registry.npmjs.org/trim-canvas/-/trim-canvas-0.1.2.tgz"
   integrity sha512-nd4Ga3iLFV94mdhW9JFMLpQbHUyCQuhFOD71PEAt1NjtMD5wbZctzhX8c3agHNybMR5zXD1XTGoIEWk995E6pQ==
 
-trs-web-components@^0.1.6:
-  version "0.1.6"
-  resolved "https://registry.npmmirror.com/trs-web-components/-/trs-web-components-0.1.6.tgz"
-  integrity sha512-NWh0Ho+/CwQaQGQZVN99qlfd1zMPwxuNh7S4SN3vDEzBveyc6xqGAzeFHmve41bjapEa0xjpTMNraH+v+W0ktg==
+trs-web-components@^0.1.12:
+  version "0.1.12"
+  resolved "https://registry.npmmirror.com/trs-web-components/-/trs-web-components-0.1.12.tgz#b7937b61c7c688a370bda8cad58336ff5d04d0d6"
+  integrity sha512-G2zXgand4jZzS6r2zBGmch5Y8LAsoU8+wNpJiXmvVganJ5xvxd32idPcM8YAbFkWM61X+8X3zXpkejU7TWibwQ==
   dependencies:
     "@better-scroll/observe-dom" "^2.5.0"
     "@element-plus/icons-vue" "^2.0.4"
@@ -13028,12 +13052,13 @@ trs-web-components@^0.1.6:
     js-md5 "^0.7.3"
     less "^4.1.3"
     loadsh "^0.0.4"
+    lodash "^4.17.21"
     mockjs "^1.1.0"
     moment "^2.29.4"
     npm "^8.18.0"
     qs "^6.11.0"
     query-string "^7.1.1"
-    sortablejs "^1.14.0"
+    sortablejs "^1.15.0"
     swiper "5.4.5"
     v-viewer "^1.6.4"
     validator "^13.7.0"
@@ -13558,6 +13583,11 @@ vue-cookies@^1.7.4:
   resolved "https://registry.npmjs.org/vue-cookies/-/vue-cookies-1.8.3.tgz"
   integrity sha512-VBRsyRMVdahBgFfh389TMHPmDdr4URDJNMk4FKSCfuNITs7+jitBDhwyL4RJd3WUsfOYNNjPAkfbehyH9AFuoA==
 
+vue-cropper@^0.6.4:
+  version "0.6.4"
+  resolved "https://registry.npmmirror.com/vue-cropper/-/vue-cropper-0.6.4.tgz#9ca841248e2f22aae0bc2533b13b4d8705152298"
+  integrity sha512-U3bm17Li/Xwfw2t3pr8/hFE/tYhvwIWqepHK9IFC1TnX1KFd64VyfCD9nMBhPY91RyvMC6jSQgT/DyDNKuTpIQ==
+
 vue-eslint-parser@^9.3.0:
   version "9.3.1"
   resolved "https://registry.npmjs.org/vue-eslint-parser/-/vue-eslint-parser-9.3.1.tgz"
@@ -13648,6 +13678,11 @@ vue-template-es2015-compiler@^1.9.0:
   version "1.9.1"
   resolved "https://registry.npmjs.org/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.9.1.tgz"
   integrity sha512-4gDntzrifFnCEvyoO8PqyJDmguXgVPxKiIxrBKjIowvL9l+N66196+72XVYR8BBf1Uv1Fgt3bGevJ+sEmxfZzw==
+
+vue-waterfall@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.npmmirror.com/vue-waterfall/-/vue-waterfall-1.0.6.tgz#00324a8f97f449bf6f8cdebb4974b60cffac9eed"
+  integrity sha512-jjOlFLj37SDoxoRQALZrXnEJ4JpQXwQbiz6upxdutpBaKbe/mA+SN+65S15fvm/WUZnVsPUc+vsXC+OXAlkSsw==
 
 vue@^2.1.8, vue@^2.5.2, vue@^2.6.9:
   version "2.7.14"

@@ -16,6 +16,9 @@ import { getApplyForm } from '@/api/front';
 
 export default {
   methods: {
+    turnTo() {
+      this.$refs.turnDialog.turnDialog = true;
+    },
     reject() {
       this.$refs.rejectDialog.init();
     },
@@ -529,7 +532,7 @@ export default {
             id: this.nextStepObj?.refuseWay === 'TO_BEFORE' ? prevUser.split('/')[1] : '',
           }
         ],
-        processInstanceId: this.formBase.processInstanceI,
+        processInstanceId: this.formBase.processInstanceId,
         templateId: this.formBase.processTemplateId,
         nodeId: this.formBase.nodeId
       }).catch(() => {

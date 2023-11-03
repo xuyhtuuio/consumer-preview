@@ -1,75 +1,43 @@
 <template>
   <div class="apply-event-card">
-    <div class="event-info">
+    <div class="event-info" @click.stop="toDetail(item)">
       <div class="event-name-status" ref="event-name-status">
         <!-- 加急 -->
         <span class="order-status" ref="order-status">
-        <svg
-          class="icon urgent-icon"
-          aria-hidden="true"
-          v-if="item.urgent == 1"
-        >
-          <use xlink:href="#icon-shenpiyemiantubiao"></use>
-        </svg>
-        <svg
-          class="icon urgent-icon"
-          aria-hidden="true"
-          v-if="item.dismissalMark == 1"
-        >
-          <use xlink:href="#icon-tongyongtubiao2"></use>
-        </svg>
-        <span class="id" v-if="item.orderNo">{{ item.orderNo }}</span>
-      </span>
-        <span class="event-name " @click="toDetail(item)" ref="event-name">{{
+          <svg class="icon urgent-icon" aria-hidden="true" v-if="item.urgent == 1">
+            <use xlink:href="#icon-shenpiyemiantubiao"></use>
+          </svg>
+          <svg class="icon urgent-icon" aria-hidden="true" v-if="item.dismissalMark == 1">
+            <use xlink:href="#icon-tongyongtubiao2"></use>
+          </svg>
+          <span class="id" v-if="item.orderNo">{{ item.orderNo }}</span>
+        </span>
+        <span class="event-name" ref="event-name">{{
           item.taskName
         }}</span>
         <span class="event-status" v-if="!item.errorStatus" ref="event-status">
-          <i v-if="item.taskStatus === '0'" class="tag draft">{{
-            $msg('NodeStatus')[item.taskStatus]
-          }}</i>
-          <i v-if="['1', '2'].includes(item.taskStatus)" class="tag in-approval"
-            >{{ $msg('NodeStatus')[item.taskStatus] }}>{{
-              item.currentActivityName
-            }}</i
-          >
-          <i v-if="item.taskStatus === '3'" class="tag in-modify"
-            >{{ $msg('NodeStatus')[item.taskStatus] }}>{{
-              item.currentActivityName
-            }}</i
-          >
-          <i v-if="['5', '6'].includes(item.taskStatus)" class="tag check"
-            >{{ $msg('NodeStatus')[item.taskStatus] }}>{{
-              item.currentActivityName
-            }}</i
-          >
-          <i v-if="item.taskStatus === '4'" class="end">
-            <i class="tag end-sign"
-              >{{ $msg('NodeStatus')[item.taskStatus] }}>{{
-                item.currentActivityName
-              }}
-            </i>
-          </i>
+          <i :class="{
+            'tag draft': ['0'].includes(item.taskStatus),
+            'tag in-approval': ['1', '2'].includes(item.taskStatus),
+            'tag in-modify': ['3'].includes(item.taskStatus),
+            'tag check': ['5', '6'].includes(item.taskStatus),
+            'tag end-sign': ['4'].includes(item.taskStatus)
+          }">{{ $msg('NodeStatus')[item.taskStatus] }} <i v-if="!['0'].includes(item.taskStatus)">>{{ item.currentActivityName }}</i></i>
           <!-- 有无意见 -->
-          <i class="flex" v-if="['4', '5', '6'].includes(item.taskStatus)">
+          <i class="flex" v-if="['4', '5', '6'].includes(item.taskStatus) && [1, 0].includes(item.substantiveOpinions)">
             <i class="tag has-opinion" v-if="item.substantiveOpinions == 1">
               <i class="iconfont icon-guanzhu2"></i>
               有实质性意见
             </i>
-            <i class="tag has-no-opinion" v-if="item.substantiveOpinions !== 1">
+            <i class="tag has-no-opinion" v-if="item.substantiveOpinions == 0">
               <i class="iconfont icon-guanzhu"></i>
               无实质性意见
             </i>
-            <i
-              class="tag check"
-              v-if="item.isAdopted == 0 && item.taskStatus != '5'"
-            >
+            <i class="tag check" v-if="item.isAdopted == 0 && item.taskStatus != '5'">
               <i class="iconfont icon-guanzhu2"></i>
               不采纳
             </i>
-            <i
-              class="tag adoption"
-              v-if="item.isAdopted == 1 && item.taskStatus != '5'"
-            >
+            <i class="tag adoption" v-if="item.isAdopted == 1 && item.taskStatus != '5'">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tubiao"></use>
               </svg>
@@ -84,46 +52,26 @@
       <div class="event-infos" v-if="!item.errorInfo">
         <span class="sDate date">发起时间：{{ item.create_time || '--' }}</span>
         <span class="sDate date">更新时间：{{ item.update_time || '--' }}</span>
-        <span class="sDate date"
-          >上线时间：{{ item.productLaunchDate || '--' }}</span
-        >
-        <span v-if="item.taskStatus!=='4' && item.submitted !== 0">
-        <el-popover
-          placement="bottom"
-          trigger="click"
-          popper-class="popper-persons"
-          v-if="item.currentAssignee && item.currentAssignee.length"
-        >
-          <div
-            style="max-height: 270px; overflow-y: auto"
-            class="trs-scroll assignee-content"
-          >
-            <div
-              v-for="(child, index) in item.currentAssignee"
-              :key="index"
-              class="person-item"
-            >
-              <span
-                >{{ child.fullname }}/{{ child.id }}<i v-show="child.Institution">/{{
-                  child.Institution
-                }}</i></span
-              >
-              <!-- <span class="reminder" @click="reminderItem(child)">{{
+        <span class="sDate date">上线时间：{{ item.productLaunchDate || '--' }}</span>
+        <span v-if="item.taskStatus !== '4' && item.submitted !== 0">
+          <el-popover placement="bottom" trigger="click" popper-class="popper-persons"
+            v-if="item.currentAssignee && item.currentAssignee.length">
+            <div style="max-height: 270px; overflow-y: auto" class="trs-scroll assignee-content">
+              <div v-for="(child, index) in item.currentAssignee" :key="index" class="person-item">
+                <span>{{ child.fullname }}/{{ child.id
+                }}<i v-show="child.Institution">/{{ child.Institution }}</i></span>
+                <!-- <span class="reminder" @click="reminderItem(child)">{{
                 child.hasReminder ? "已催单" : "催一下"
               }}</span> -->
+              </div>
             </div>
-          </div>
-          <span slot="reference" class="handler pointer">
-            当前处理人：{{
-              (item.currentAssignee && item.currentAssignee[0].fullname) || '--'
-            }}
-            <i v-if="item.currentAssignee && item.currentAssignee.length > 1"
-              >+{{ item.currentAssignee && item.currentAssignee.length - 1 }}</i
-            ></span
-          >
-        </el-popover>
-        <span class="handler" v-else>当前处理人：--</span>
-      </span>
+            <span slot="reference" class="handler pointer"  @click.stop="popoverClick">
+              处理人：{{ item.currentAssignee?.[0].fullname || '--' }}
+              <i v-if="item.currentAssignee && item.currentAssignee.length > 1">+{{
+                item.currentAssignee && item.currentAssignee.length - 1
+              }}</i></span>
+          </el-popover>
+        </span>
       </div>
       <div class="event-infos error" v-else>
         <svg class="icon urgent-icon" aria-hidden="true">
@@ -141,11 +89,7 @@
           撤销
         </span>
         <span class="attention icon-op" @click="showReminderDialog(item)">
-          <svg
-            class="icon urgent-icon"
-            aria-hidden="true"
-            @click="urgentOrder(item)"
-          >
+          <svg class="icon urgent-icon" aria-hidden="true" @click="urgentOrder(item)">
             <use xlink:href="#icon-guanzhu1"></use>
           </svg>
           催单
@@ -160,8 +104,7 @@
       <div class="flex" v-if="item.taskStatus == 6 && canCompared">
         <span class="attention check icon-op" @click="compare(item)">
           <span class="iconfont icon icon-compare urgent-icon"></span>
-          比对</span
-        >
+          比对</span>
       </div>
 
       <div v-if="item.taskStatus == '3'" class="flex" @click="modify(item)">
@@ -172,14 +115,17 @@
           修改
         </span>
       </div>
-      <div class="flex" v-if="(item.taskStatus == 0 || item.errorInfo)&&!item.errorStatus?.includes('智能解析中')">
+      <div class="flex" v-if="(item.taskStatus == 0 || item.errorInfo) &&
+        !item.errorStatus?.includes('智能解析中')
+        ">
         <span class="edit icon-op" @click="modify(item)">
-           <i class="iconfont icon-xianxingtubiao"></i>
-            编辑
+          <i class="iconfont icon-xianxingtubiao"></i>
+          编辑
         </span>
         <span class="del icon-op" @click="del(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
-            <use xlink:href="#icon-xianxingtubiao-1"></use></svg>删除
+            <use xlink:href="#icon-xianxingtubiao-1"></use>
+          </svg>删除
         </span>
       </div>
       <div class="flex" v-if="item.errorStatus?.includes('智能解析中')">
@@ -191,49 +137,28 @@
         </span>
       </div>
       <!-- 关注 -->
-      <div v-if="(item.taskStatus != 0 && !item.errorInfo)||item.errorStatus?.includes('智能解析中')">
-        <span
-          class="attention no-attention icon-op"
-          v-if="item.concernId != 1"
-          @click="concern(item)"
-        >
+      <div v-if="(item.taskStatus != 0 && !item.errorInfo) ||
+        item.errorStatus?.includes('智能解析中')
+        ">
+        <span class="attention no-attention icon-op" v-if="item.concernId != 1" @click="concern(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
             <use xlink:href="#icon-tubiao-1"></use>
           </svg>
-          关注</span
-        >
-        <span
-          class="attention icon-op has-attention"
-          v-else
-          @click="concern(item)"
-        >
+          关注</span>
+        <span class="attention icon-op has-attention" v-else @click="concern(item)">
           <svg class="icon urgent-icon" aria-hidden="true">
-            <use xlink:href="#icon-guanzhu-1"></use></svg>已关注</span>
+            <use xlink:href="#icon-guanzhu-1"></use>
+          </svg>已关注</span>
       </div>
     </div>
     <!-- 审批浮窗 - 催单对象 -->
-    <el-dialog
-      :visible.sync="reminderDialog"
-      align="center"
-      custom-class="reminderDialog"
-      :before-close="closeReminder"
-    >
+    <el-dialog :visible.sync="reminderDialog" align="center" custom-class="reminderDialog" :before-close="closeReminder">
       <p slot="title">请选择催单对象</p>
-      <div
-        style="max-height: 270px; overflow-y: auto"
-        class="trs-scroll assignee-content"
-      >
-        <div
-          v-for="(child, index) in persons"
-          :key="index"
-          class="person-item"
-          style="width: auto"
-        >
-          <span
-            >{{ child.name }}/{{ child.WorkId }}/{{ child.Institution }}/{{
-              child.Dep
-            }}</span
-          >
+      <div style="max-height: 270px; overflow-y: auto" class="trs-scroll assignee-content">
+        <div v-for="(child, index) in persons" :key="index" class="person-item" style="width: auto">
+          <span>{{ child.name }}/{{ child.WorkId }}/{{ child.Institution }}/{{
+            child.Dep
+          }}</span>
           <span class="reminder" @click="reminderItem(child)">{{
             child.hasReminder ? '已催单' : '催一下'
           }}</span>
@@ -243,21 +168,20 @@
   </div>
 </template>
 <script>
-// canRoved
-import { concernApplication, getTemplatedetail } from '@/api/applyCenter'
-// import { revoked } from '../../api/applyCenter'
+//
+import { concernApplication, canRoved } from '@/api/applyCenter'
+// import {  } from '../../api/applyCenter'
 
 export default {
   props: {
     item: {
       type: Object,
-      default: () => {}
+      default: () => { }
     }
   },
   data() {
     return {
       reminderDialog: false,
-      allowConcernClick: true,
       persons: [],
       revoked: false, // 是否可以撤销
       canCompared: false // 当前登录用户可以使用对比功能
@@ -273,7 +197,8 @@ export default {
         // 判断是否可以撤销
         val.taskStatus === '1' ? this.getCanBeRoved(val) : ''
         // 判断当前节点审批人是不是当前用户
-        val.taskStatus === '6' ? this.getTemplatedetail(val) : ''
+        this.handleUser(val)
+        val.taskStatus === '6' ? this.handleUser(val) : ''
         // 获取info的长度
         this.$nextTick(() => {
           const fatherWidth = this.$refs['event-name-status'].offsetWidth
@@ -281,6 +206,7 @@ export default {
           const taskWidth = this.$refs['event-status']?.offsetWidth || 0
           const nameWidth = fatherWidth - statusWidth - taskWidth
           this.$refs['event-name'].style.maxWidth = nameWidth + 'px'
+          this.$refs['event-name'].style.minWidth = 10 + 'px'
         })
       },
       immediate: true
@@ -291,31 +217,27 @@ export default {
      * @description: 查询当前节点的审批人是否包含当前登录用户
      * @return {*}
      */
-    async getTemplatedetail() {
-      const params = {
-        processInstanceId: this.item.processInstanceId
-      }
-      const res = await getTemplatedetail(params)
-      if (res.data) {
-        const { data } = res.data
-        const assignedUser = data[data.length - 1].props['assignedUser']
-          ?.filter((v) => v.type !== 'dept')
-          ?.map((v) => v.id)
+    async handleUser(val) {
+      const { currentAssignee } = val
+      if (currentAssignee?.length) {
+        const users = currentAssignee.map((v) => { return v.id })
         const user = JSON.parse(window.localStorage.getItem('user_name'))
-        this.canCompared = assignedUser.includes(user.id + '')
+        this.canCompared = users.includes(user.id + '')
+      } else {
+        this.canCompared = false
       }
     },
-    getCanBeRoved() {
-      // const params = {
-      //   nodeId: item.nodeId,
-      //   processInstanceId: item.process_instance_id
-      // }
-      this.revoked = false
-      // canRoved(params).then(res => {
-      //   // this.revoked = true
-      //   const {data} = res.data
-      //   this.revoked= data =='true'
-      // })
+    popoverClick() {
+    },
+    getCanBeRoved(item) {
+      const params = {
+        // nodeId: item.nodeId,
+        processInstanceId: item.process_instance_id
+      }
+      canRoved(params).then(res => {
+        const { data } = res.data
+        this.revoked = data === 'true'
+      })
     },
     /**
      * @description: 去比对
@@ -353,7 +275,7 @@ export default {
           processInstanceId: item.processInstanceId,
           formManagementId: item.form_management_id,
           processTemplateId: item.processTemplateId,
-          taskName: item.taskName,
+          taskName: item.taskName
         }
       })
     },
@@ -363,7 +285,6 @@ export default {
         JSON.stringify({
           item,
           pageFrom: 'apply',
-          op: 'check'
         })
       )
       this.$router.push({
@@ -371,7 +292,9 @@ export default {
         params: {
           formId: item.taskNumber,
           formManagementId: item.form_management_id,
-          taskName: item.taskName
+          taskName: item.taskName,
+          processInstanceId: item.processInstanceId,
+          processTemplateId: item.processTemplateId,
         }
       })
     },
@@ -480,7 +403,8 @@ export default {
       margin-bottom: 14px;
       display: flex;
       align-items: center;
-      .order-status{
+
+      .order-status {
         display: flex;
         flex-wrap: nowrap;
         align-items: center;
@@ -505,15 +429,16 @@ export default {
       line-height: 22px;
       /* 157.143% */
     }
+
     .id {
-        color: #2d5cf6;
-        font-size: 14px;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 22px;
-        margin-right: 12px;
-        /* 157.143% */
-      }
+      color: #1D2128;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 22px;
+      margin-right: 12px;
+      /* 157.143% */
+    }
 
     .event-status {
       display: flex;
@@ -521,9 +446,9 @@ export default {
       .tag {
         margin-left: 12px;
         display: inline-block;
-        padding: 2px 12px;
+        padding: 1px 6px;
         border-radius: 4px;
-        font-size: 14px;
+        font-size: 12px;
         font-style: normal;
         font-weight: 400;
         line-height: 22px;
@@ -609,7 +534,8 @@ export default {
         background: #e5e6eb;
         margin: 0 12px;
       }
-      .date:last-of-type::after{
+
+      .date:last-of-type::after {
         display: none;
       }
 
@@ -723,21 +649,25 @@ export default {
       background: #fff7e6;
       padding: 4px 8px 4px 4px;
     }
+
     .edit {
-      color: #2D5CF6;
+      color: #2d5cf6;
       font-size: 14px;
       font-style: normal;
       font-weight: 400;
       line-height: 22px;
-      .iconfont{
+
+      .iconfont {
         margin-right: 4px;
       }
     }
+
     .edit:hover {
       border-radius: 2px;
-      background: #E7F0FF;
+      background: #e7f0ff;
       padding: 4px 8px 4px 4px;
     }
+
     .del:hover {
       border-radius: 2px;
       background: #fff1f0;
@@ -773,11 +703,7 @@ export default {
 
 .apply-event-card:hover {
   background: #f7f8fa;
-
-  .event-name {
-    color: #2d5cf6;
-    cursor: pointer;
-  }
+  cursor: pointer;
 }
 </style>
 <style lang="less">
@@ -906,4 +832,5 @@ export default {
       background: linear-gradient(90deg, #2f54eb 0%, #5196ff 100%);
     }
   }
-}</style>
+}
+</style>

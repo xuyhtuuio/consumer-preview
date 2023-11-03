@@ -44,7 +44,6 @@ export function getApplicationList(param) {
   return request({
     url: '/cpr/applicationcenter/applicationList',
     method: 'post',
-
     data: param
   })
 }
@@ -125,6 +124,22 @@ export function instanceInfo(param) {
 export function downloadAllFiles(param) {
   return request({
     url: '/cpr/applicationForm/downloadAllFiles',
+    method: 'get',
+    responseType: 'blob',
+    params: param
+  })
+}
+export function downloadStream(param) {
+  return request({
+    url: '/cpr/file/downloadStream',
+    method: 'get',
+    responseType: 'blob',
+    params: param
+  })
+}
+export function downloadAllFilesOther(param) {
+  return request({
+    url: '/cpr//onlineComparison/downloadAllFiles',
     method: 'get',
     responseType: 'blob',
     params: param

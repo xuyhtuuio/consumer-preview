@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-09-18 11:22:52
+ * @LastEditTime: 2023-10-25 12:51:01
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -18,75 +18,39 @@
           <i class="btn">返回</i>
         </div>
         <!-- 只有有修改权限的人能看到 -->
-        <div v-if="((pagePath== 'approval'&&item?.approvedSign==0)||pagePath=='apply')&&hasAuth" class="flex">
-        <div
-          class="back flex white"
-          v-if="status == 5 && item.taskStatus == 3"
-          @click="toModify"
-        >
-          <i class="iconfont icon-xianxingtubiao"></i>
-          <i class="btn">去修改</i>
-        </div>
-        <el-button
-          class="back flex"
-          type="primary"
-          style="border: none"
-          :loading="loadings.storageLoading"
-          @click="submit('storage')"
-          v-if="(status == 3 || status == 5) && item.taskStatus != 3"
-        >
-          <span class="flex">
-            <i class="iconfont icon-baocun"></i> <i class="btn">保存</i></span
-          >
-        </el-button>
-        <el-button
-          class="back flex white"
-          type="primary"
-          :loading="loadings.submitLoading"
-          @click="submit('update')"
-          v-if="(status == 3 || status == 5) && item.taskStatus != 3"
-        >
-          <span class="flex">
-            <i class="iconfont icon-tijiao"></i> <i class="btn">确认</i></span
-          >
-        </el-button>
-        <el-button
-          class="back flex white"
-          type="primary"
-          @click="compare"
-          v-if="item.taskStatus == 6"
-        >
-          <span class="flex">
-            <i class="iconfont icon-tijiao"></i> <i class="btn">去比对</i></span
-          >
-        </el-button>
-      </div>
-        <div
-          v-if="item.taskStatus == 1 && pagePath && pagePath == 'approval'&&item?.approvedSign==0"
-          class="flex"
-        >
-          <!-- <div class="back flex" @click="transferDialog = true">
-            <i class="iconfont icon-zhuanban1"></i>
-            <i class="btn">转办</i>
-          </div> -->
-          <el-button
-            class="back flex"
-            style="border: none"
-            v-if="!isOCR"
-            :loading="loadings.storageLoading"
-            @click="submit('storage')"
-          >
+        <div v-if="((pagePath == 'approval' && item?.approvedSign == 0) || pagePath == 'apply') && hasAuth" class="flex">
+          <div class="back flex white" v-if="status == 5 && item.taskStatus == 3" @click="toModify">
+            <i class="iconfont icon-xianxingtubiao"></i>
+            <i class="btn">去修改</i>
+          </div>
+          <el-button class="back flex" type="primary" style="border: none" :loading="loadings.storageLoading"
+            @click="turnTo" v-if="nextStepObj.isChangeHandle !== null">
             <span class="flex">
-              <i class="iconfont icon-baocun"></i> <i class="btn">保存</i></span
-            >
+              <i class="iconfont icon-baocun"></i> <i class="btn">转办</i></span>
           </el-button>
-          <el-button
-            class="back flex white"
-            type="primary"
-            :loading="loadings.submitLoading"
-            @click="submit('update')"
-            v-if="!isOCR"
-          >
+          <el-button class="back flex" type="primary" style="border: none" :loading="loadings.storageLoading"
+            @click="submit('storage')" v-if="([3, 5].includes(status)) && item.taskStatus != 3">
+            <span class="flex">
+              <i class="iconfont icon-baocun"></i> <i class="btn">保存</i></span>
+          </el-button>
+          <el-button class="back flex white" type="primary" :loading="loadings.submitLoading" @click="submit('update')"
+            v-if="([3, 5].includes(status)) && item.taskStatus != 3">
+            <span class="flex">
+              <i class="iconfont icon-tijiao"></i> <i class="btn">确认</i></span>
+          </el-button>
+          <el-button class="back flex white" type="primary" @click="compare" v-if="item.taskStatus == 6">
+            <span class="flex">
+              <i class="iconfont icon-tijiao"></i> <i class="btn">去比对</i></span>
+          </el-button>
+        </div>
+        <div v-if="item.taskStatus == 1 && pagePath == 'approval' && item?.approvedSign == 0 && hasAuth" class="flex">
+          <el-button class="back flex" style="border: none" v-if="!isOCR" :loading="loadings.storageLoading"
+            @click="submit('storage')">
+            <span class="flex">
+              <i class="iconfont icon-baocun"></i> <i class="btn">保存</i></span>
+          </el-button>
+          <el-button class="back flex white" type="primary" :loading="loadings.submitLoading" @click="submit('update')"
+            v-if="!isOCR">
             <i class="iconfont icon-tijiao"></i>
             <i class="btn">提交</i>
           </el-button>
@@ -97,25 +61,14 @@
         </div>
       </div>
     </div>
-    <div
-      class="flex"
-      style="align-items: flex-start; height: calc(100% - 50px)"
-    >
+    <div class="flex" style="align-items: flex-start; height: calc(100% - 50px)">
       <!-- 左侧工单信息 -->
       <div class="left-info">
         <div class="order-name">
-          <svg
-            class="icon urgent-icon"
-            aria-hidden="true"
-            v-if="item.urgent == 1"
-          >
+          <svg class="icon urgent-icon" aria-hidden="true" v-if="item.urgent == 1">
             <use xlink:href="#icon-shenpiyemiantubiao"></use>
           </svg>
-          <svg
-            class="icon urgent-icon"
-            aria-hidden="true"
-            v-if="item.dismissalMark == 1"
-          >
+          <svg class="icon urgent-icon" aria-hidden="true" v-if="item.dismissalMark == 1">
             <use xlink:href="#icon-tongyongtubiao2"></use>
           </svg>
           {{ item.taskName }}
@@ -123,174 +76,87 @@
             item.formManagementName
           }}</span>
           <span class="event-status">
-            <i v-if="item.taskStatus === '0'" class="tag draft">草稿</i>
-            <i v-if="item.taskStatus === '1'" class="tag in-approval"
-              >审批中<i v-if="item.currentActivityName || item.nodeName"
-                >>{{ item.currentActivityName || item.nodeName }}</i
-              ></i
-            >
-            <i v-if="item.taskStatus === '2'" class="tag in-approval"
-              >撤销<i v-if="item.currentActivityName || item.nodeName"
-                >>{{ item.currentActivityName || item.nodeName }}</i
-              ></i
-            >
-            <i v-if="item.taskStatus === '3'" class="tag in-modify"
-              >待修改<i v-if="item.currentActivityName || item.nodeName"
-                >>{{ item.currentActivityName || item.nodeName }}</i
-              ></i
-            >
-            <i v-if="item.taskStatus === '5'" class="tag check"
-              >待确认<i v-if="item.currentActivityName || item.nodeName"
-                >>{{ item.currentActivityName || item.nodeName }}</i
-              ></i
-            >
-            <i v-if="item.taskStatus === '6'" class="tag check"
-              >待比对<i v-if="item.currentActivityName || item.nodeName"
-                >>{{ item.currentActivityName || item.nodeName }}</i
-              ></i
-            >
-            <i v-if="item.taskStatus === '4'" class="end">
-              <i class="tag end-sign"> 已结束 </i>
-            </i>
+            <i :class="{
+                  'tag draft': ['0'].includes(item.taskStatus),
+                  'tag in-approval': ['1', '2'].includes(item.taskStatus),
+                  'tag in-modify': ['3'].includes(item.taskStatus),
+                  'tag check': ['5', '6'].includes(item.taskStatus),
+                  'tag end': ['4'].includes(item.taskStatus)
+                }">{{ $msg('NodeStatus')[item.taskStatus] }}<i v-if="item.currentActivityName || item.nodeName">></i>{{
+      item.currentActivityName || item.nodeName }}</i>
           </span>
         </div>
-        <order-basic-info
-          @preview="previewFile"
-          :personInfo="item.initiator"
-          :personOrg = 'item.institutional'
-          @sendReviewMaterials="sendReviewMaterials"
-          @sendFilledInByApprover="sendFilledInByApprover"
-        ></order-basic-info>
+        <order-basic-info @preview="previewFile" :personInfo="item.initiator" :personOrg='item.institutional'
+          @sendReviewMaterials="sendReviewMaterials" @sendFilledInByApprover="sendFilledInByApprover"></order-basic-info>
       </div>
-      <div class="right">
+      <div class="right" v-loading="loadings.initLoading">
         <!-- 消保审查/详情页/审批中预览 -->
         <div class="right-nav">
           <nav class="nav active-nav" v-if="status == 0">
-            <span class="active-nav" style="text-align: left"
-              >审批记录明细</span
-            >
+            <span class="active-nav" style="text-align: left">审批记录明细</span>
           </nav>
           <!-- 消保审查/详情页/审批人审批（非消保 -->
           <nav class="nav" v-if="status == 2">
-            <span
-              :class="crtComp == 'leaderEditOpinion' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'leaderEditOpinion'
-                }
-              "
-              >编辑意见</span
-            >
-            <span
-              :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvalRecordCard'
-                }
-              "
-              >审批记录明细</span
-            >
+            <span :class="crtComp == 'leaderEditOpinion' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'leaderEditOpinion'
+            }
+              ">编辑意见</span>
+            <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvalRecordCard'
+            }
+              ">审批记录明细</span>
           </nav>
           <nav class="nav" v-if="status == 3">
-            <span
-              :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvedOpinionCard'
-                }
-              "
-              >审查意见书</span
-            >
-            <span
-              :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'uploadFileCard'
-                }
-              "
-              ><i style="color: #eb5757">*</i> 最终上线材料</span
-            >
-            <span
-              :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvalRecordCard'
-                }
-              "
-              >审批记录明细</span
-            >
+            <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvedOpinionCard'
+            }
+              ">审查意见书</span>
+            <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'uploadFileCard'
+            }
+              "><i style="color: #eb5757">*</i> 最终上线材料</span>
+            <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvalRecordCard'
+            }
+              ">审批记录明细</span>
           </nav>
           <!-- 已经结束-->
           <nav class="nav" v-if="status == 4">
-            <span
-              :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvedOpinionCard'
-                }
-              "
-              >审查意见书</span
-            >
-            <span
-              :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'uploadFileCard'
-                }
-              "
-              ><i style="color: #eb5757">*</i> 最终上线材料</span
-            >
-            <span
-              :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvalRecordCard'
-                }
-              "
-              >审批记录明细</span
-            >
+            <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvedOpinionCard'
+            }
+              ">审查意见书</span>
+            <span :class="crtComp == 'uploadFileCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'uploadFileCard'
+            }
+              "><i style="color: #eb5757">*</i> 最终上线材料</span>
+            <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvalRecordCard'
+            }
+              ">审批记录明细</span>
           </nav>
           <nav class="nav" v-if="status == 5">
-            <span
-              :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvedOpinionCard'
-                }
-              "
-              >审查意见书</span
-            >
-            <span
-              :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''"
-              @click="
-                () => {
-                  crtComp = 'approvalRecordCard'
-                }
-              "
-              >审批记录明细</span
-            >
+            <span :class="crtComp == 'approvedOpinionCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvedOpinionCard'
+            }
+              ">审查意见书</span>
+            <span :class="crtComp == 'approvalRecordCard' ? 'active-nav' : ''" @click="() => {
+              crtComp = 'approvalRecordCard'
+            }
+              ">审批记录明细</span>
           </nav>
         </div>
         <div class="right-content">
           <keep-alive>
-            <component
-              :is="crtComp"
-              :status="status"
-              ref="child"
-              :taskStatus="item.taskStatus"
-              @sendOpinionInfo="sendOpinionInfo"
-              :reviewMaterial="reviewMaterials"
-              :processInstanceId="item.processInstanceId"
-              :taskId="item.taskId"
-              @preview="previewFile"
-              :filledInByApprover="filledInByApprover"
-            >
+            <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus"
+              @sendOpinionInfo="sendOpinionInfo" :reviewMaterial="reviewMaterials"
+              :processInstanceId="item.processInstanceId" :taskId="item.taskId" @preview="previewFile"
+              :formId="item.taskNumber" :filledInByApprover="filledInByApprover">
               <template slot="head">
                 <div class="approved-opinion-head">
                   <h2>消保审查意见书</h2>
                   <p>
-                    <i>拟同意该申请项目，并提出以下消保审查意见，</i
-                    >请您确认是否采纳以下意见：
+                    <i>拟同意该申请项目，并提出以下消保审查意见，</i>请您确认是否采纳以下意见：
                   </p>
                 </div>
               </template>
@@ -311,59 +177,12 @@
         </div>
       </div>
     </div>
-    <el-dialog
-      :visible.sync="transferDialog"
-      width="800px"
-      center
-      custom-class="transfer-dialog"
-    >
-      <span slot="title">请选择转办对象</span>
-      <div>
-        <el-input
-          v-model="staff.keyword"
-          placeholder="搜索人员，支持拼音、姓名"
-        >
-          <i slot="prefix" class="el-input__icon el-icon-search pointer"></i
-        ></el-input>
-        <el-radio-group v-model="staff.people" class="trs-scroll">
-          <el-radio
-            :label="item.code"
-            v-for="(item, index) in peoples"
-            :key="index"
-          >
-            <span class="avatar"
-              ><img src="@/assets/image/apply-center/avatar.png" alt=""
-            /></span>
-            {{ item.name }}</el-radio
-          >
-        </el-radio-group>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="transferDialog = false" type="text" class="cancel"
-          >取消</el-button
-        >
-        <el-button
-          type="text"
-          @click="transferDialog = false"
-          class="submit-btn"
-          >确定</el-button
-        >
-      </span>
+    <el-dialog :visible.sync="previewDialog" width="800px" custom-class="preview-dialog" :before-close="()=>{previewDialog=false;previewUrl=''}">
+        <filePreview :url="previewUrl" v-if="previewUrl"></filePreview>
     </el-dialog>
-    <el-dialog
-      :visible.sync="previewDialog"
-      width="800px"
-      custom-class="preview-dialog"
-    >
-      <filePreview :url="previewUrl"></filePreview>
-    </el-dialog>
-    <SubmitDialog
-      :option="nextStepObj?.selectObject === '1' ? optionOther : option"
-      :nextStepObj="nextStepObj"
-      ref="confirmation"
-      @handleConfirm="endTaskSubmit"
-      :disabled="disabled"
-    ></SubmitDialog>
+    <SubmitDialog :option="nextStepObj?.selectObject === '1' ? optionOther : option" :nextStepObj="nextStepObj"
+      ref="confirmation" @handleConfirm="endTaskSubmit" :disabled="disabled"></SubmitDialog>
+    <TurnDialog ref="turnDialog" :formBase="item" :nextStepObj="nextStepObj"></TurnDialog>
   </div>
 </template>
 <script>
@@ -376,8 +195,9 @@ import approvedOpinionCard from '@/components/card/approved-opinion-card'
 import uploadFileCard from '@/components/card/upload-file-card'
 import filePreview from '@/components/filePreview'
 import SubmitDialog from '@/components/common/submit-dialog'
+import TurnDialog from '@/components/common/turn-dialog'
 import { leaderEdit, finalMaterial } from '@/api/approvalCenter'
-import { updateRuleCode, rollback, getNextUserOption } from '@/api/aiApproval';
+import { updateRuleCode, rollback, getNextUserOption, getNodeHandleUser } from '@/api/aiApproval';
 
 import {
   updateAdoptEditedComments,
@@ -393,7 +213,8 @@ export default {
     approvedOpinionCard,
     uploadFileCard,
     filePreview,
-    SubmitDialog
+    SubmitDialog,
+    TurnDialog
   },
   props: {
     pagePath: {
@@ -407,14 +228,12 @@ export default {
       status: 0,
       crtComp: '',
       item: {},
-      transferDialog: false,
       staff: {
         // 转办功能用的
         keyword: '',
         people: ''
       },
       timeNow: '',
-      info: {},
       previewDialog: false,
       previewUrl: '',
       orderBaseInfo: {},
@@ -422,20 +241,12 @@ export default {
       loadings: {
         // 点击保存、确认时候的loading状态
         submitLoading: false,
-        storageLoading: false
+        storageLoading: false,
+        initLoading: false
       },
       reviewMaterials: [], // 工单上已上传的文件
       filledInByApprover: [], // 审批模块配置项目
       hasAuth: false, // 是否有权限
-      peoples: [
-        { name: '王明明', code: 1 },
-        { name: '王明明', code: 2 },
-        { name: '王明明', code: 3 },
-        { name: '王明明', code: 4 },
-        { name: '王明明', code: 5 },
-        { name: '王明明', code: 6 },
-        { name: '王明明', code: 7 }
-      ],
       nextStepObj: {
         // 提交： selectObject：1 上一审批选择，nodeSelectUserList
         // 驳回：  "refuseWay": "TO_BEFORE" ： 调回指定节点  nodeSelectList
@@ -444,6 +255,7 @@ export default {
         nodeSelectUserList: [],
         refuseWay: '',
         nodeSelectList: [],
+        isChangeHandle: null
       },
       option: {
         message: '确认结束后该申请单结束流转，不可再进行修改',
@@ -452,7 +264,7 @@ export default {
         noClose: true
       },
       optionOther: {
-        message: '确认后该申请单进入下一审批阶段，不可再进行修改',
+        message: '采纳后该申请单进入下一审批阶段，不可再进行修改',
         cancelBtn: '取消',
         confirmBtn: '确认',
         noClose: true
@@ -475,6 +287,9 @@ export default {
   created() {
   },
   methods: {
+    turnTo() {
+      this.$refs.turnDialog.turnDialog = true;
+    },
     /**
      * description:  store置为默认值
      * return {*}
@@ -518,7 +333,7 @@ export default {
         nextNodeId: this.nextStepObj?.selectObject === '1' ? data.nextNodeId : '',
         nextUserInfo: this.nextStepObj?.selectObject === '1' ? data.nextUserInfo : [],
         templateId: this.item.processTemplateId,
-        processInstanceId: this.item.processInstanceI,
+        processInstanceId: this.item.processInstanceId,
         nodeId: this.item.nodeId
       }).catch(() => {
         updateRuleRes.data.status = 400
@@ -571,14 +386,17 @@ export default {
       const originRouter = path.match(/\/(\S*)\//)[1]
       // 一般进入详情页只：展示返回按钮 及 审批记录详细
       const { item } = JSON.parse(window.localStorage.getItem('order-detail'))
-      const info = JSON.parse(window.localStorage.getItem('order-detail'))
-      this.info = info
       this.item = item
-      // 抄送功能，能看不能做其他操作 判断一下是否已经审批过
-      if (this.pagePath === 'approval' && item.taskStatus !== '4') {
-        let { currentProcessor } = this.item
+      // 能看不能做其他操作 判断一下是否已经审批过
+      if ((this.pagePath === 'approval' && item.taskStatus !== '4') || (this.pagePath === 'apply' && item.taskStatus !== '4')) {
+        let currentProcessor = this.item.currentProcessor || this.item.currentAssignee
         currentProcessor = currentProcessor?.map((v) => {
-          return Object.keys(v)[0]
+          if (this.pagePath === 'approval') {
+            return Object.keys(v)[0]
+          }
+          if (this.pagePath === 'apply') {
+            return v.id
+          }
         })
         const { id } = JSON.parse(window.localStorage.getItem('user_name'))
         const hasAuth = currentProcessor?.includes(id + '') || false
@@ -589,11 +407,11 @@ export default {
           return
         }
       }
-
       // 工单状态: 草稿 待比对  taskStatus为6时，右上角增加去比对按钮
-      if (['0', '6'].includes(item.taskStatus)) {
+      if (['0', '6'].includes(item.taskStatus) || item.approvedSign === 1) {
         this.status = 0
         this.crtComp = 'approvalRecordCard'
+        return
       }
       // 工单-审批中状态 主要区分是否OCR审批、部门审批
       if (item.taskStatus === '1') {
@@ -604,6 +422,12 @@ export default {
         } else if (originRouter === 'approvalcenter') {
           // OCR审批或领导审批 由targetPage确认【 LEADER XIAOBAO 】  注：targetPage：[‘线上比对’ ，taskStatus=6，不在此判断]、[确认 taskStatus=5，也不在此判断]
           const res = await this.getTemplatedetail()
+          if (!res) {
+            this.status = 0
+            this.crtComp = 'approvalRecordCard'
+            this.hasAuth = false
+            return
+          }
           this.isOCR = res.targetPage !== 'LEADER'
           !this.isOCR
             ? ((this.status = 2), (this.crtComp = 'leaderEditOpinion'))
@@ -620,7 +444,7 @@ export default {
       }
       //  工单-待确认状态
       if (item.taskStatus === '5') {
-        this.getNextUserOption()
+        // this.getNextUserOption()
         // 工单-有实质性意见 status=5 ；无实质性意见：status=3，有无实质意见的区别在页面上表现为：是否要上传最终上线材料
         this.status = item.substantiveOpinions === 1 ? 5 : 3
         this.crtComp = 'approvedOpinionCard'
@@ -630,12 +454,16 @@ export default {
         this.status = 4
         this.crtComp = 'approvedOpinionCard'
       }
+      if (this.item.nodeId) {
+        this.getNextUserOption()
+      }
     },
     /**
      * @description: 获取申请单的所有节点信息，从root根节点一直到下一节点
      * @return {*}
      */
     async getTemplatedetail() {
+      this.loadings.initLoading = true;
       // 要传递给编辑意见组件的字段 ---start
       let targetPage = ''
       let refuseWay = ''
@@ -648,58 +476,55 @@ export default {
         processInstanceId: this.item.processInstanceId
       }
       const res = await getTemplatedetail(params)
-      if (res.data) {
+      this.loadings.initLoading = false
+      const { success } = res.data
+      if (success) {
         const { data } = res.data
-        targetPage = data[data.length - 1].props['targetPage']
-        refuseWay = data[data.length - 1].props['refuseWay']
-        assignedUser = data[data.length - 1].props['assignedUser']?.map((v) => v.id)
+        targetPage = data.props['targetPage']
+        refuseWay = data.props['refuseWay']
+        assignedUser = data.props['assignedUser']?.map((v) => v.id)
 
         if (targetPage === 'XIAOBAO') {
           // 如果是ocr审批,页面显示无需太多内容
           return { targetPage, refuseWay, assignedUser, taskId, formId }
         }
         // 如果是领导审批，走下面的判断
-        // 1、获取驳回人列表 disavower  1.1 第一个节点是发起人initiator
-        const { name, id } = this.item['originator']
-        const { institutional } = this.item
-        const initiator = {
-          label: institutional?.[institutional.length - 1],
-          name,
-          id,
-          nodeName: data[0].name,
-          targetNodeId: 'root'
+        // 1、获取驳回人列表 disavower
+        const disavowerparams = {
+          templateId: this.item.processTemplateId,
+          processInstanceId: this.item.processInstanceId,
+          nodeId: this.item.nodeId,
         }
-        disavower.push(initiator)
-        // 1.2 该接口返回当前流程的所有的节点[node_1,node_2,node_3...],
-        //    arr[0]虽然是发起节点，但是发起人信息要从该工单详情里获取，不通过 arr[0]，原因好像是手动加 targetNodeId='root'
-        //    arr[arr.length-1]为当前节点，不能驳回到当前节点，因此要获取 1～arr.length-1之间的节点assignedUser信息
-        if (data.length > 2) {
-          const othersArray = data.slice(1, data.length - 1)
-          // eslint-disable-next-line
-          let other_disavower = []
-          for (let i = 0; i < othersArray.length; i++) {
-            const arr = othersArray[i].props?.assignedUser?.map((m) => {
-              return {
-                ...m,
-                nodeName: othersArray[i].name,
-                targetNodeId: othersArray[i].id
-              }
-            }) || []
-            other_disavower.push(...arr)
-            disavower = disavower.concat(other_disavower)
-          }
+        const disavowerRes = await getNodeHandleUser(disavowerparams)
+        if (disavowerRes.data.success) {
+          disavower = disavowerRes.data?.data?.map((m) => {
+            return {
+              ...m,
+              id: m.userId,
+              label: m.orgName,
+              targetNodeId: m.nodeId,
+              name: m.userName
+            }
+          })
         }
         // 2.选中通过时的下一级审批人
         let approver = []
-        let nextApprovers = data[data.length - 1]?.children?.props?.assignedUser.filter((v) => v.type === 'user') || []
-        nextApprovers = nextApprovers?.map((v) => {
-          return {
-            ...v,
-            nodeName: data[data.length - 1]?.children?.name
-          }
+        const nextUsers = await getNextUserOption({
+          nodeId: this.item.nodeId,
+          templateId: this.item.processTemplateId,
+          processInstanceId: this.item.processInstanceId
         })
-        approver = nextApprovers
-        assignedType = data[data.length - 1]?.children?.props?.assignedType
+        if (nextUsers.data.success) {
+          const { data: nextUserData } = nextUsers.data
+          approver = nextUserData.nodeSelectUserList?.map(v => {
+            return {
+              ...v,
+              nodeName: nextUserData.nodeName,
+              targetNodeId: nextUserData.nextNodeId
+            }
+          })
+        }
+        assignedType = data?.children?.props?.assignedType
         return {
           targetPage,
           refuseWay,
@@ -711,6 +536,8 @@ export default {
           processInstanceId,
           formId
         }
+      } else {
+        return false
       }
     },
     /**
@@ -796,7 +623,7 @@ export default {
      * @param {*} isSave  true为保存，false提交
      * @return {*}
      */
-    saveEditOpinion(isSave) {
+    async saveEditOpinion(isSave) {
       const that = this
       const { editOpinionForm } = this.$store.state.checkApprovedForm
       const { assignedUser } = editOpinionForm
@@ -817,7 +644,7 @@ export default {
       if (
         editOpinionForm.isAccept === '1' && editOpinionForm.assignedType === 'SELF_SELECT'
       ) {
-        params.targetUser = editOpinionForm.crtApprover
+        params.targetUser = editOpinionForm.crtApprover.id
       }
       // 驳回并且是提交，调用新的接口
       if (editOpinionForm.isAccept === '0' && !isSave) {
@@ -826,8 +653,8 @@ export default {
         // 驳回保存的话，还用之前的接口
         if (editOpinionForm.isAccept === '0') {
           params.reason = editOpinionForm.reason
-          params.targetNodeId = editOpinionForm.targetNodeId
-          params.targetUser = editOpinionForm.id
+          params.targetNodeId = editOpinionForm.targetNodeId_userId?.split('-')[0]
+          params.targetUser = editOpinionForm.targetNodeId_userId?.split('-')[1]
         }
         // eslint-disable-next-line
         const end_submit = {
@@ -837,27 +664,53 @@ export default {
         isSave
           ? (this.loadings.storageLoading = true)
           : (this.loadings.submitLoading = true)
+        // 提交前需要加个接口
+        if (!isSave) {
+          const updateRuleRes = {
+            data: {
+              status: 200,
+              msg: '',
+              nextNodeId: '',
+              nextUserInfo: []
+            }
+          }
+          if (editOpinionForm.assignedType === 'SELF_SELECT') {
+            updateRuleRes.data.nextNodeId = editOpinionForm.crtApprover.targetNodeId
+            updateRuleRes.data.nextUserInfo = [{
+              ...editOpinionForm.crtApprover,
+            }]
+          }
+          const res = await updateRuleCode({
+            nextNodeId: updateRuleRes.data.nextNodeId,
+            nextUserInfo: updateRuleRes.data.nextUserInfo,
+            templateId: this.item.processTemplateId,
+            processInstanceId: this.item.processInstanceId,
+            nodeId: this.item.nodeId
+          })
+          const { success } = res?.data
+          if (!success) return false
+        }
         leaderEdit(end_submit)
           .then((res) => {
             const { success, msg } = res.data
             if (success) {
               if (isSave) {
-              // 保存-------start
+                // 保存-------start
                 this.loadings.storageLoading = false
                 this.$store.commit('setEditOpinionStorage', true)
                 this.$message.success('审查意见已保存')
                 setTimeout(() => {
                   this.$router.replace({ name: 'approvalcenter' })
                 }, 600)
-              // 保存---------end
+                // 保存---------end
               } else {
-              // 提交-------start
+                // 提交-------start
                 this.loadings.submitLoading = false
                 this.$message.success('审查意见已提交')
                 setTimeout(() => {
                   this.$router.replace({ name: 'approvalcenter' })
                 }, 600)
-              // 提交-------end
+                // 提交-------end
               }
             } else {
               this.loadings.submitLoading = false
@@ -887,9 +740,9 @@ export default {
         }
       }
       updateRuleRes = await updateRuleCode({
-        rollbackId: editOpinionForm.targetNodeId,
+        rollbackId: editOpinionForm.targetNodeId_userId?.split('-')[0],
         nextUserInfo: [{
-          id: editOpinionForm.refuseWay === 'TO_BEFORE' ? editOpinionForm.id : ''
+          id: editOpinionForm.refuseWay === 'TO_BEFORE' ? editOpinionForm.targetNodeId_userId?.split('-')[1] : ''
         }],
         templateId: this.item.processTemplateId,
         processInstanceId: this.item.processInstanceId,
@@ -905,7 +758,7 @@ export default {
           name: user.name
         },
         processInstanceId: this.item.processInstanceId,
-        rollbackId: editOpinionForm.refuseWay === 'TO_BEFORE' ? editOpinionForm.id : '',
+        rollbackId: editOpinionForm.refuseWay === 'TO_BEFORE' ? editOpinionForm.targetNodeId_userId?.split('-')[0] : '',
         nodeId: this.item.nodeId,
         taskId: this.item.taskId,
         templateId: this.item.processTemplateId
@@ -957,11 +810,14 @@ export default {
           .then(() => {
             that.saveOpinion()
           })
-          .catch(() => {})
+          .catch(() => { })
         return false
       }
       // 保存功能  状态-审批中；编辑意见
       if (this.status === 2 && way === 'storage') {
+      // 先切换当前的显示组件
+        this.crtComp = 'leaderEditOpinion'
+        this.$refs['child'].updateForm()
         this.$confirm('是否保存已编辑的意见确认信息？', '', {
           customClass: 'confirmBox',
           confirmButtonText: '保存',
@@ -971,7 +827,7 @@ export default {
           .then(() => {
             that.saveEditOpinion(true)
           })
-          .catch(() => {})
+          .catch(() => { })
         return false
       }
       // 提交功能   工单待确认状态，为无实质性意见的，需要提交审查意见书和最终上线材料

@@ -12,6 +12,9 @@
           <el-button type="tuihui" @click="reject" v-if="approvalLetter.permissions === 'passAllow'">
             <i class="iconfont icon-tuihui1"></i>退回/驳回</el-button
           >
+          <el-button @click="turnTo" v-if="nextStepObj.isChangeHandle !== null"
+            ><i class="iconfont icon-zhuanban1"></i>转办</el-button
+          >
           <el-button @click="save"><i class="iconfont icon-baocun"></i>保存</el-button>
           <el-button
             type="primary"
@@ -50,13 +53,25 @@
             :lineWordItem="lineWordItem"
             @linePosition="linePosition"
             :approval="approval"
+            @getProps="getProps"
           ></file-preview>
+          <orcTxtNew
+            ref="ocrTxt"
+            :approval="approval"
+            @addWord="addWord"
+            @lineRemove="lineRemove"
+            v-if="specialFileType1.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length-1]) && showOcr"
+            @showLine="showLine"
+            :lineWordItem="lineWordItem"
+            :styleProp="styleProp"
+          >
+          </orcTxtNew>
           <orcTxt
             ref="ocrTxt"
             :approval="approval"
             @addWord="addWord"
             @lineRemove="lineRemove"
-            v-if="specialFileType.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length-1]) && showOcr"
+            v-if="specialFileType2.includes(approval?.fileName?.split('.')[approval?.fileName?.split('.').length-1]) && showOcr"
             @showLine="showLine"
             :lineWordItem="lineWordItem"
           >
@@ -93,16 +108,19 @@
       @handleClose="goBack"
       @handleConfirm="save"
     ></secondary-confirmation>
+    <TurnDialog ref="turnDialog" :formBase="formBase" :nextStepObj="nextStepObj"></TurnDialog>
   </div>
 </template>
 
 <script>
 import applyFormFilePreview from '@/components/filePreview';
 import secondaryConfirmation from '@/components/common/secondaryConfirmation';
+import TurnDialog from '@/components/common/turn-dialog'
 
 import sidebar from './sidebar/sidebar';
 import filePreview from './components/file-preview';
 import orcTxt from './components/ocr-txt';
+import orcTxtNew from './components/ocr-txt-new';
 import editorial from './components/editorial';
 import addReview from './dialogs/add-review';
 import submitReview from './dialogs/submit-review';
@@ -117,11 +135,13 @@ export default {
     applyFormFilePreview,
     filePreview,
     orcTxt,
+    orcTxtNew,
     editorial,
     addReview,
     submitReview,
     secondaryConfirmation,
     rejectDialog,
+    TurnDialog,
     sidebar,
     ExaminePivot
   },
@@ -134,6 +154,8 @@ export default {
       fileloading: false,
       examineShow: false,
       specialFileType: ['jpeg', 'jpg', 'png', 'pdf'],
+      specialFileType1: ['jpeg', 'jpg', 'png'],
+      specialFileType2: ['pdf'],
       files: [], // 文件相关信息
       comments: [], // 编辑意见
       approval: {}, // 当前审批文件的相关内容
@@ -176,7 +198,8 @@ export default {
         selectObject: '',
         nodeSelectUserList: [],
         refuseWay: '',
-        nodeSelectList: []
+        nodeSelectList: [],
+        isChangeHandle: null
       },
       rejectOption: [
         {
@@ -194,11 +217,17 @@ export default {
       ],
       // 驳回人列表
       refuseOpiton: [],
-      refuseDisabled: false
+      refuseDisabled: false,
+      styleProp: {}
     };
   },
   created() {
     this.getElHeight();
+  },
+  methods: {
+    getProps(val) {
+      this.styleProp = val;
+    }
   },
   mounted() {
     if (!this.$route.params.item) {

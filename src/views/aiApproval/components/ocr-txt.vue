@@ -51,7 +51,8 @@ export default {
       seletTxt: '',
       askIsAddPosition: {
         left: '',
-        right: ''
+        right: '',
+        zIndex: 1
       }
     }
   },
@@ -90,7 +91,8 @@ export default {
           this.seletTxt = seletTxt;
           this.askIsAddPosition = {
             left: (event.clientX + 10) + 'px',
-            top: (event.clientY - 100) + 'px'
+            top: (event.clientY - 100) + 'px',
+            zIndex: 1
           }
         }, 300);
       }
@@ -223,6 +225,7 @@ export default {
 .ocr-txt {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .header {

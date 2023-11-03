@@ -306,7 +306,8 @@ export default {
         pageSize: this.page.pageSize,
         isAll: this.pageConfig.isAll !== undefined ? this.pageConfig.isAll : 1
       };
-      getPageList(pageData).then(({ totalCount, list }) => {
+      getPageList(pageData).then(({ pageNow, totalCount, list }) => {
+        this.page.pageNow = pageNow;
         this.page.total = totalCount;
         this.isLoading = false;
         this.data = list;
@@ -392,7 +393,7 @@ export default {
         !this.currentSort && (this.updateSort = !this.updateSort);
         this.currentSort && (this.currentSort = false);
       }
-      this.initData();
+      this.initData(1);
     },
     async changeIsTop(item) {
       this.isLoading = true;
@@ -413,7 +414,7 @@ export default {
     },
     handleClick(row) {
       this.titleDialog = row ? '编辑意见' : '新建意见';
-      this.dialogItem = row ? { ...row, keywordId: row.keywordType } : {};
+      this.dialogItem = row ? { ...row } : {};
       this.limitTimeVisible = true;
       this.initSearchData(true);
     },

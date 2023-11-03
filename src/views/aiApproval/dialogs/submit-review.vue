@@ -28,7 +28,7 @@
                 <el-form-item v-if="nextStepObj?.selectObject === '1' && params.isPasses" style="width: 100%;" required label="请选择审批人"
                     label-width="110px" prop="nextUser" class="params-nextUser params-nextUser">
                     <el-select v-model.trim="params.nextUser" multiple :multiple-limit="1"
-                        :placeholder="`需${nextStepObj.nextNodeName}审批，请选择审批人`" filterable>
+                        :placeholder="`需【${nextStepObj.nextNodeName}】审批，请选择审批人`" filterable>
                         <el-option v-for="item in nextStepObj?.nodeSelectUserList || []" :key="item.id" :label="item.name"
                             :value="item.id"></el-option>
                     </el-select>
@@ -41,6 +41,7 @@
                         placeholder="请选择驳回节点/驳回人"
                         popper-class="approver-select"
                         value-key="id"
+                        :popper-append-to-body="false"
                       >
                         <el-option
                           v-for="(item, index) in refuseOpiton"
@@ -95,9 +96,9 @@
             <template v-if="params.isPasses !== false">
                 <p class="title">消保审查意见书</p>
                 <div class="submission-content" v-if="submission.length">
-                    <!-- <p class="submission-name">
-                    拟同意该申请项目，并提出以下消保审查意见，<i style="color: #505968;">请您确认是否采纳以下意见：</i>
-                </p> -->
+                    <p class="submission-name">
+                      拟同意该产品/活动上线，并提出以下消保审查意见：
+                    </p>
                     <div class="submission-list">
                         <div class="submission-item" v-for="(item, index) in submission" :key="index"
                             @mouseleave="mouseleave" @mouseenter="mouseenter(item, index)">
@@ -362,7 +363,7 @@ export default {
         nextNodeId: this.nextStepObj?.selectObject === '1' ? data.nextNodeId : '',
         nextUserInfo: this.nextStepObj?.selectObject === '1' ? data.nextUserInfo : [],
         templateId: data.templateId,
-        processInstanceId: data.processInstanceI,
+        processInstanceId: data.processInstanceId,
         nodeId: data.nodeId
       }).catch(() => {
         updateRuleRes.data.status = 400;
@@ -740,5 +741,8 @@ export default {
   display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+}
+/deep/ .approver-select{
+  max-width: 500px;
 }
 </style>

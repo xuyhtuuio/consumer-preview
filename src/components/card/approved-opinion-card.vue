@@ -195,10 +195,7 @@ export default {
               _newInfo = _info.map((v) => {
                 return {
                   ...v,
-                  adoptOpinions:
-                    v.cacheFlag === '1' ? Number(v.adoptOpinions) : 1,
-                  notAdoptingReasons:
-                    v.cacheFlag === '1' ? v.notAdoptingReasons : '',
+                  adoptOpinions: Number(v.adoptOpinions),
                   relevantfile: v.associatedAttachmentsIds
                     ? v.associatedAttachmentsIds.split(';')
                     : []
@@ -208,9 +205,7 @@ export default {
               _newInfo = _info.map((v) => {
                 return {
                   ...v,
-                  adoptOpinions:
-                    v.cacheFlag === '1' ? Number(v.adoptOpinions) : 1,
-                  notAdoptingReasons: v.notAdoptingReasons,
+                  adoptOpinions: Number(v.adoptOpinions),
                   relevantfile: v.associatedAttachmentsIds
                     ? v.associatedAttachmentsIds.split(';')
                     : []

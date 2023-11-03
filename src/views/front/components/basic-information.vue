@@ -5,7 +5,7 @@
         <div class="cardInfo">
           <!-- <g-icon class="right-icon" stylePx="20" href="#icon-guanzhu1"/> -->
           <img class="img" src="@/assets/image/apply-center/focus.svg" alt="" />
-          {{ cardInfo }}
+          提醒：产品类内容审查，需于在产品上线/宣传前{{limitTime}}天进行提交。
         </div>
       </template>
       <template v-slot:content>
@@ -111,7 +111,7 @@
                 <el-option
                   v-for="(iten, indey) in item.props.options"
                   :key="indey"
-                  :label="iten.value"
+                  :label="iten.value || iten.name"
                   :value="iten.id"
                 ></el-option>
               </el-select>
@@ -260,6 +260,10 @@ export default {
     list: {
       typeof: Array,
       default: () => []
+    },
+    limitTime: {
+      typeof: String | Number,
+      default: ''
     }
   },
   created() {
@@ -269,7 +273,6 @@ export default {
     return {
       flag: 9999,
       title: '基本信息',
-      cardInfo: '提醒：产品类内容审查，需于在产品上线/宣传前14天进行提交。',
       checkBox: {},
       isAddPickerFoot: false,
       lastProps: {}
@@ -280,9 +283,14 @@ export default {
       return (item) => {
         if (item.name === 'SelectInput' && !item.props.expanding) {
           return ['form-item']
-        } else if (item.name === 'MultipleSelect' && !item.props.expanding) {
+        } else if (item.name === 'MultipleSelect' && !item.props.expanding && item.id !== '-1') {
           return ['form-item']
         } else if (item.name === 'TimePicker' || item.name === 'Cascader') {
+          return ['form-item']
+        } else if (
+          Object.keys(item.props).includes('exclusiveRowOrNot')
+            && !item.props.exclusiveRowOrNot
+        ) {
           return ['form-item']
         } else {
           return []
@@ -312,7 +320,6 @@ export default {
       let endDateTime = '23:59:59'
       // 关联的下线时间
       if (value) {
-        console.log(123, value, originVal)
         if (
           this.handleDate(value) === this.handleDate(originVal)
         ) {
@@ -437,7 +444,6 @@ export default {
       }
     },
     handleInput(val, item) {
-      // this.checkBox[item.id]= val
       this.$set(this.checkBox, item.id, val)
     },
     handlePickerMouse(item, action, refEl) {
@@ -500,7 +506,7 @@ export default {
         } else if (item.props.required) {
           if (item.value == null) return false
           else if (item.props.numberOfWords && item.value.length !== 0) {
-            return item.value.length < item.props.numberOfWords
+            return item.value.length <= item.props.numberOfWords
           } else return item.value.length !== 0
         } else if (item.props.numberOfWords && item.value.length !== 0) {
           return false

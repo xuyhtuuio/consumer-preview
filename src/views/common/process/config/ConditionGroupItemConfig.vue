@@ -245,6 +245,15 @@ export default {
             ...item.special
           }
         });
+        formItems.map(condition => {
+          if (condition.name === 'MultipleGroupsSelect') {
+            const options = []
+            condition.props.options.map(item => {
+              options.push(...item.children)
+            })
+            condition.props.options = options;
+          }
+        })
         this.$store.state.design.formItems = formItems
       }
     },
@@ -298,13 +307,13 @@ export default {
           const condition = { ...this.conditionList[index] }
           condition.compare = '';
           condition.value = [];
-          if (condition.name === 'MultipleGroupsSelect') {
+          /* if (condition.name === 'MultipleGroupsSelect') {
             const options = []
             condition.props.options.map(item => {
               options.push(...item.children)
             })
             condition.props.options = options;
-          }
+          } */
           group.conditions.push(condition)
         }
       })

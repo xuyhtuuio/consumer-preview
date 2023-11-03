@@ -7,24 +7,11 @@
           <div class="carousel-content">
             <img src="@/assets/image/home-index/banner.png" alt="" />
           </div>
-          <div class="btn-prev" :class="{ 'not-allow': canRight }">
-            <img
-              src="@/assets/image/home-index/prev.png"
-              alt=""
-              @click="moveLeft"
-            />
-          </div>
-          <div class="btn-next" :class="{ 'not-allow': canLeft }">
-            <img
-              src="@/assets/image/home-index/next.png"
-              alt=""
-              @click="moveRight"
-            />
-          </div>
         </div>
-        <div class="link-body">
-          <div class="item-body" id="itemBody">
-            <div class="link-item" @click="linkJump(0)">
+        <div class="file-header-swiper">
+          <div class="link-body swiper-container">
+            <div class="item-body swiper-wrapper" id="itemBody">
+            <div class="link-item swiper-slide" @click="linkJump(0)">
               <div class="item-header">
                 <img src="@/assets/image/home-index/new-list.png" alt="" />
                 <div class="project-name">消保审查</div>
@@ -33,7 +20,25 @@
                 辅助发现违规内容并推荐修改意见，构建消保专家知识库与产品知识图谱
               </div>
             </div>
-            <div class="link-item" @click="linkJump(1)">
+            <div class="link-item swiper-slide" @click="linkJump(6)">
+              <div class="item-header">
+                <img src="@/assets/image/home-index/xbyj.png" alt="" />
+                <div class="project-name">投诉处理</div>
+              </div>
+              <div class="project-info">
+                智能识别投诉特征与高危预警，建立投诉画像，挖掘热点问题与风险产品
+              </div>
+            </div>
+            <div class="link-item swiper-slide" @click="linkJump(4)">
+              <div class="item-header">
+                <!-- <img src="@/assets/image/home-index/aigc.png" alt="" /> -->
+                <div class="project-name">AIGC-智能客服</div>
+              </div>
+              <div class="project-info">
+                AIGC赋能客诉处理：实时处理语音内容，智能推荐话术/核查/定责方案
+              </div>
+            </div>
+            <div class="link-item swiper-slide" @click="linkJump(1)">
               <div class="item-header">
                 <img src="@/assets/image/home-index/xbyj.png" alt="" />
                 <div class="project-name">消保预警</div>
@@ -42,16 +47,7 @@
                 智能识别投诉特征与高危预警，建立投诉画像，挖掘热点问题与风险产品
               </div>
             </div>
-            <div class="link-item" @click="linkJump(4)">
-              <div class="item-header">
-                <img src="@/assets/image/home-index/bqpt.png" alt="" />
-                <div class="project-name">AIGC-智能客服</div>
-              </div>
-              <div class="project-info">
-                AIGC赋能客诉处理：实时处理语音内容，智能推荐话术/核查/定责方案
-              </div>
-            </div>
-            <div class="link-item" @click="linkJump(2)">
+            <div class="link-item swiper-slide" @click="linkJump(2)">
               <div class="item-header">
                 <img src="@/assets/image/home-index/BI.png" alt="" />
                 <div class="project-name">BI数据分析平台</div>
@@ -60,7 +56,16 @@
                 智能BI数据可视化分析，报表分析、可视化地图、领导驾驶舱...
               </div>
             </div>
-            <div class="link-item" @click="linkJump(3)">
+            <div class="link-item swiper-slide" @click="linkJump(7)">
+              <div class="item-header">
+                <!-- <img src="@/assets/image/home-index/icon.png" alt="" /> -->
+                <div class="project-name">语义智能分析平台</div>
+              </div>
+              <div class="project-info">
+                快速实现行业化、个性化的人工智能模型开发和构建
+              </div>
+            </div>
+            <div class="link-item swiper-slide" @click="linkJump(3)">
               <div class="item-header">
                 <img src="@/assets/image/home-index/bqpt.png" alt="" />
                 <div class="project-name">智能标签平台</div>
@@ -69,15 +74,40 @@
                 多维度业务场景的知识挖掘引擎，从数据资源到数据资产
               </div>
             </div>
-            <div class="link-item" @click="linkJump(5)">
+            <div class="link-item swiper-slide" @click="linkJump(5)">
               <div class="item-header">
-                <img src="@/assets/image/home-index/bqpt.png" alt="" />
+                <!-- <img src="@/assets/image/home-index/icon.png" alt="" /> -->
                 <div class="project-name">消保指标监控</div>
               </div>
               <div class="project-info">
                 实时监控模型指标数据，提供文本探查功能
               </div>
             </div>
+            </div>
+          </div>
+          <div class="btn-prev swiper-button-prev">
+            <!-- <img
+              class="no-hover"
+              src="@/assets/image/home-index/prev.png"
+              alt=""
+            />
+            <img
+              class="hover"
+              src="@/assets/image/home-index/btn-prev.png"
+              alt=""
+            /> -->
+          </div>
+          <div class="btn-next swiper-button-next">
+            <!-- <img
+              class="no-hover"
+              src="@/assets/image/home-index/next.png"
+              alt=""
+            />
+            <img
+              class="hover"
+              src="@/assets/image/home-index/btn-next.png"
+              alt=""
+            /> -->
           </div>
         </div>
       </div>
@@ -220,6 +250,9 @@
 </template>
 
 <script>
+import Swiper from 'swiper';
+import md5 from 'js-md5'
+import 'swiper/css/swiper.min.css';
 import OpinionManage from '../admin/manage/opinionManage';
 import { getList, getNum } from '../../api/home';
 export default {
@@ -237,23 +270,47 @@ export default {
       canRight: true,
       linkAdress: {
         0: '',
-        1: 'http://192.168.210.58:31808/index.html',
-        2: 'http://103.37.44.13:18855/',
-        3: 'http://192.168.210.57:30648/labelExtractionForDCU.html',
-        4: 'http://192.168.210.57:31588/aigc-static/intelligent-assistant',
-        5: 'http://192.168.210.57:31846/supervisory-control/index',
+        1: 'http://ccpw.dataelite.trs.com.cn',
+        2: 'http://103.37.44.13:18855',
+        3: 'https://rm.dataelite.trs.com.cn/labelExtractionForDCU.html',
+        4: 'http://ics.dataelite.trs.com.cn/aigc-static/intelligent-assistant',
+        5: 'http://bwh.dataelite.trs.com.cn',
+        6: `http://localhost:8080/login?id=${md5.hex(window.localStorage.getItem('AI_token'))}`,
+        7: 'https://dataelite.trs.com.cn/ckm/web/demo'
       },
       applyList: [],
       applyLoading: false,
       applyData: {},
       userInfo: {},
       numData: {},
+      translateNum: 0,
+      swiper: null
     };
   },
   created() {
     this.userInfo = JSON.parse(localStorage.getItem('user_name'));
     this.getListApi();
     this.getNumApi();
+  },
+  mounted() {
+    const swiper = new Swiper('.swiper-container', {
+      // loop: true, // 循环
+      slidesPerView: 5,
+      spaceBetween: 16, // swiper-slide 间的距离为30
+      // pagination: {
+      //   el: '.swiper-pagination',
+      //   clickable: true // 分页器点击
+      // }, // 分页器
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev'
+      },
+      // autoplay: {
+      //   delay: 3000, // 自动播放的间隔时间，单位ms，默认3000ms
+      //   disableOnInteraction: false // 点击不会取消自动
+      // }
+    });
+    this.swiper = swiper;
   },
   methods: {
     handleItem() {
@@ -264,20 +321,26 @@ export default {
     },
     moveLeft() {
       if (this.canLeft) {
+        this.translateNum += 243;
         const element = document.getElementById('itemBody');
-        element.style.transform = 'translateX(0px)';
+        element.style.transform = `translateX(${this.translateNum}px)`;
         element.style.transition = 'all 0.5s';
-        this.canLeft = false;
-        this.canRight = true;
+        if (this.translateNum >= 0) {
+          this.canLeft = false;
+          this.canRight = true;
+        }
       }
     },
     moveRight() {
       if (this.canRight) {
+        this.translateNum -= 243;
         const element = document.getElementById('itemBody');
-        element.style.transform = 'translateX(-243px)';
+        element.style.transform = `translateX(${this.translateNum}px)`;
         element.style.transition = 'all 0.5s';
-        this.canLeft = true;
-        this.canRight = false;
+        if (this.translateNum <= -729) {
+          this.canLeft = true;
+          this.canRight = false;
+        }
       }
     },
     linkJump(type) {
@@ -291,26 +354,19 @@ export default {
       this.applyLoading = true;
       const that = this;
       const data = {
-        adoptionStatus: '',
         approvalStage: '',
-        approvalType: '',
-        create_time: '',
-        currentActivityName: '',
-        hasOpinions: 0,
+        formManagementId: '',
+        hasOpinions: '',
         id: that.userInfo.id,
+        isOneTimePassed: '',
         keywords: '',
-        label: '',
-        launchDate: '',
         name: that.userInfo.fullname,
         pageNow: 1,
         pageSize: 5,
-        roleRange: '',
-        selected: true,
-        sex: '',
-        type: '',
-        urgent: 0,
+        productLaunchDate: '',
         sortType: 4,
-        form_management_id: 1,
+        startDate: '',
+        urgent: ''
       };
       getList(data)
         .then((res) => {
@@ -472,12 +528,60 @@ export default {
           right: 0;
         }
       }
+      .file-header-swiper {
+        padding: 0 40px;
+        height: 112px;
+        position: absolute;
+        height: 112px;
+        width: 1280px;
+        bottom: 4px;
+        .swiper-button-prev, .swiper-button-next {
+          position: absolute;
+          bottom: -12px;
+          width: 24px;
+          height: 24px;
+          opacity: 1;
+          .no-hover {
+            display: block;
+          }
+          .hover {
+            display: none;
+          }
+          cursor: pointer;
+          img {
+            width: 24px;
+            height: 24px;
+          }
+        }
+        .swiper-button-prev:hover {
+          .no-hover {
+            display: none;
+          }
+          .hover {
+            display: block;
+          }
+        }
+        .swiper-button-next:hover {
+          .no-hover {
+            display: none;
+          }
+          .hover {
+            display: block;
+          }
+        }
+        .swiper-button-prev::after{
+          content: '';
+        }
+        .swiper-button-next::after{
+          content: '';
+        }
+      }
       .link-body {
         position: absolute;
         width: 1200px;
         height: 112px;
         bottom: 4px;
-        margin: 0 40px;
+        // margin: 0 40px;
         display: flex;
         justify-content: space-between;
         overflow: hidden;
