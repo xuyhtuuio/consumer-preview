@@ -428,7 +428,7 @@ export default {
           }
           funPerms[key].child[0].type = originVal.children[0].type
         } else if (this.permissionList[key].children) {
-          funPerms[key].type = originVal.type
+          funPerms.find(item => item.code === originVal.code).type = originVal.type
           const { children } = originVal
           children.forEach((item) => {
             const funItem = funPerms.find(

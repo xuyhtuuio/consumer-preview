@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-25 17:05:44
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-03 10:49:02
+ * @LastEditTime: 2023-11-03 14:30:21
  * @FilePath: /consumer-preview/src/views/knowledge/components/header.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -28,25 +28,30 @@ export default {
   name: 'knowledge-header',
   data() {
     return {
-      activeName: 'collectKnowledge',
-      menus: [
-        {
-          label: '知识集市',
-          name: 'collectKnowledge'
-        },
-        {
-          label: '法规库',
-          name: 'rulesBase'
-        }
-      ]
+      activeName: '',
+      menus: []
+    }
+  },
+  mounted() {
+    this.getNav()
+
+    if (this.$route.name === 'knowledge') {
+      this.$router.push({
+        name: this.menus[0].name
+      })
+      this.activeName = this.menus[0].name
     }
   },
   watch: {
     $route: {
-      handler(val) {
-        const { name } = val
-
-        this.activeName = name === 'CollectKnowledge' ? 'collectKnowledge' : 'rulesBase'
+      handler(to) {
+        const { name } = to
+        this.activeName = name === 'collectKnowledge' ? 'collectKnowledge' : 'rulesBase'
+        if (to.name === 'knowledge') {
+          this.$router.push({
+            name: this.activeName
+          })
+        }
       },
       immediate: true
     }
@@ -55,8 +60,36 @@ export default {
     changeMenu(menu) {
       this.activeName = menu.name
       this.$router.push({
-        path: `/knowledge/${menu.name}`
+        name: menu.name
       })
+    },
+    getNav() {
+      const { permissionsPage = {} } = this.$store.state
+      // 按展示顺序增删 name
+      const pathNames = [
+        {
+          label: '知识集市',
+          name: 'collectKnowledge',
+          code: 'collectKnowledge'
+        },
+        {
+          label: '法规库',
+          name: 'rulesBase',
+          code: 'rulesBase'
+        }
+      ]
+      this.menus = pathNames
+        .map((item) => {
+          const exist = permissionsPage.funPerms?.find(
+            (f) => f.code === item.code
+          )
+          if ((exist && exist?.type) || !exist) {
+            return item
+          } else {
+            return false
+          }
+        })
+        .filter((e) => e)
     }
   }
 }
