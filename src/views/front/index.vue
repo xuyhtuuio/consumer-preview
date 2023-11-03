@@ -86,7 +86,7 @@
             </div>
           </div>
           <div class="btn-prev swiper-button-prev">
-            <!-- <img
+            <img
               class="no-hover"
               src="@/assets/image/home-index/prev.png"
               alt=""
@@ -95,10 +95,10 @@
               class="hover"
               src="@/assets/image/home-index/btn-prev.png"
               alt=""
-            /> -->
+            />
           </div>
           <div class="btn-next swiper-button-next">
-            <!-- <img
+            <img
               class="no-hover"
               src="@/assets/image/home-index/next.png"
               alt=""
@@ -107,7 +107,7 @@
               class="hover"
               src="@/assets/image/home-index/btn-next.png"
               alt=""
-            /> -->
+            />
           </div>
         </div>
       </div>
