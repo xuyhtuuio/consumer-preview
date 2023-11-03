@@ -21,7 +21,7 @@
           <span>{{ scope.row.ladingBillTimeLimit ? `上线前${scope.row.ladingBillTimeLimit}天` : '--' }}</span>
         </template>
         <template #operate="scope">
-          <el-button type="text" v-if="scope.row.run === '1'" @click="viewForm(scope.row)">查看</el-button>
+          <el-button type="text" v-if="scope.row.run === '1' || !editAuth" @click="viewForm(scope.row)">查看</el-button>
           <el-button type="text" v-if="editAuth && scope.row.run === '0'" @click="editForm(scope.row)">编辑</el-button>
           <el-dropdown v-if="editAuth">
             <el-button type="text" >更多</el-button>
@@ -292,6 +292,7 @@ export default {
   },
   created() {
     this.colConfig[0].edit = this.editAuth
+    this.colConfig[1].edit = this.editAuth
     this.colConfig1[0].edit = this.editAuth
     this.getItemType()
     this.getObtainExamineTypeList()
