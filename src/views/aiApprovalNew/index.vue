@@ -434,7 +434,7 @@ export default {
       }
       const curFileType = this.getfileType(this.files[this.activeIndex].fileName)
       this.$nextTick(() => {
-        if (!this.specialFileType1.includes(curFileType) || this.curMode === 2) {
+        if (!this.specialFileType.includes(curFileType) || this.curMode === 2) {
           return;
         }
         this.$refs.filePreview.imgLoad()
