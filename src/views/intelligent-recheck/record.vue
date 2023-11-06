@@ -401,8 +401,8 @@ export default {
     handleChange() {},
     changeArrrovalType() {
       if (document.querySelectorAll) {
+        const dom = document.querySelectorAll('.scrren-com')[2]
         this.$nextTick(() => {
-          const dom = document.querySelectorAll('.scrren-com')[2]
           dom.style.color = this.search.approvalType ? '#2d5cf6' : '#1d2128'
         })
       }
