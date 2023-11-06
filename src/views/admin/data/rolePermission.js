@@ -3,6 +3,7 @@ export const permissionList = [
     code: 'approvalCenter',
     title: '审批中心',
     type: '',
+    isNoWarn: true,
     props: { trueLabel: 'edit', falseLabel: '' },
     reflect: ['approval-details', 'aiApproval', 'compare'],
     children: [
@@ -103,6 +104,7 @@ export const permissionList = [
     code: 'knowledge',
     title: '知识库',
     type: '',
+    isShowWarn: false,
     props: { trueLabel: 'edit', falseLabel: '' },
     children: [
       {

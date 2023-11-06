@@ -28,7 +28,6 @@
               placeholder="全部"
               @change="onSearch"
               :loading="selectLoading"
-              @blur="handleSelectBlur"
               clearable
             >
               <el-option
@@ -45,7 +44,6 @@
               v-model="search.name"
               placeholder="请输入姓名或一事通ID"
               @keyup.enter.native="onSearch"
-              @blur="onSearch"
               clearable
             ></el-input>
           </el-form-item>
@@ -302,12 +300,6 @@ export default {
     },
     onSearch() {
       this.initData();
-    },
-    // 失去焦点重置数据
-    handleSelectBlur() {
-      // this.roleList = [];
-      this.pageRole.pageNow = 1;
-      // this.initRoleData();
     },
     handleClick(row) {
       this.limitTimeVisible = true;
