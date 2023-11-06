@@ -3,9 +3,9 @@ export const permissionList = [
     code: 'approvalCenter',
     title: '审批中心',
     type: '',
-    isNoWarn: true,
+    isNoWarn: true, // 去除警告
     props: { trueLabel: 'edit', falseLabel: '' },
-    reflect: ['approval-details', 'aiApproval', 'compare'],
+    reflect: ['approval-details', 'aiApproval', 'compare'], // 关联权限
     children: [
       {
         code: 'allTask',
