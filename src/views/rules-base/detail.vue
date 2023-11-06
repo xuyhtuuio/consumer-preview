@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-26 13:51:55
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-03 15:53:35
+ * @LastEditTime: 2023-11-06 11:10:12
  * @FilePath: /consumer-preview/src/views/rules-base/detail.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -172,6 +172,7 @@
           </li>
         </ul>
         <Empty
+        :imageSize="200"
           v-if="!overviewFileList?.length && activeMuneId == 0"
         ></Empty>
         <ul v-if="relatedFileList?.length && activeMuneId == 1">
@@ -187,9 +188,10 @@
             </div>
           </li>
         </ul>
-        <Eempty
+        <Empty
+          :imageSize="200"
           v-if="!relatedFileList?.length && activeMuneId == 1"
-        ></Eempty>
+        ></Empty>
       </div>
     </div>
   </div>
@@ -279,11 +281,11 @@ export default {
     },
     handleRelevanceFile() {
       const { attachmentList } = this.lawInfo
-      this.relatedFileList = attachmentList.map((m) => {
+      this.relatedFileList = attachmentList?.map((m) => {
         return {
           fileKey: m
         }
-      })
+      }) || []
     },
     currentChange(idx) {
       this.currentIdx = idx
@@ -346,6 +348,7 @@ export default {
       const params = {
         key: this.lawInfo.file_key
       }
+      this.$message.info('下载中，请等候')
       download(params).then((res) => {
         fetch(res.data.data, {
           method: 'get',
@@ -362,6 +365,7 @@ export default {
             document.body.appendChild(link)
             link.click()
             document.body.removeChild(link)
+            this.$message.success('下载完成')
           })
       })
     },
