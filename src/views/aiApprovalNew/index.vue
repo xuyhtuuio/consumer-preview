@@ -99,7 +99,10 @@
               </el-input>
             </div>
           </div>
-          <div class="content-cont-body-bottom">
+          <div v-if="isEmpty">
+            <el-empty></el-empty>
+          </div>
+          <div class="content-cont-body-bottom" v-else>
             <fileChange :curMode="curMode" @toggleMode="toggleMode" @changeFile="changeFile" :activeIndex="activeIndex"
               :fileList="files" v-if="curMode !== 0 && files[activeIndex]?.type !== 'pdf'"></fileChange>
             <pdfChange @changePdfPageNow="changePdfPageNow" @changePdfPage="changePdfPage" :pdfPageSize="pdfInfo.pageSize"
@@ -277,6 +280,7 @@ export default {
       toolView: true,
       preComment: {},
       riskNum: 0,
+      isEmpty: false,
       activePdfIndex: 0,
       pdfInfo: {
         pageSize: 10,

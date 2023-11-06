@@ -597,6 +597,7 @@ export default {
       this.fileloading = true;
       this.filePopoverShow = false
       this.showOcr = true;
+      this.isEmpty = false
       this.lineRemove();
       if (this.files?.[this.activeIndex]?.ocr) {
         this.files[this.activeIndex] = {
@@ -614,8 +615,13 @@ export default {
         this.changePdfPageNow(1)
         return;
       }
+      if (!temp) {
+        this.isEmpty = true
+        this.fileloading = false;
+        return;
+      }
       if (!temp.ocr && !temp.recommends && suffer) {
-        temp.ocr = await this.getOcr(temp);
+        temp.ocr = await this.getOcr(temp)
         await getOcrExamineShow({
           formId: this.formId,
           fileId: temp.id,
@@ -632,7 +638,7 @@ export default {
           });
       }
       // 更新图标
-      const curFileType = this.getfileType(this.files[this.activeIndex].fileName)
+      const curFileType = this.getfileType(this.files[this.activeIndex]?.fileName)
       this.$nextTick(() => {
         if (this.specialFileType1.includes(curFileType)) {
           // this.findIconPosition()
@@ -648,7 +654,7 @@ export default {
     async getOcr(temp) {
       const ocr = [];
       await getOCRAnalysisResults({
-        fileId: temp.id
+        fileId: temp?.id
       }).then(res => {
         const { data, status } = res.data;
         if (status === 200) {
@@ -1505,6 +1511,11 @@ export default {
         this.activePdfIndex = 0 + this.pdfInfo.pageSize * (pageNow - 1)
         this.pdfInfo.list = this.files[this.activeIndex].child.slice(this.activePdfIndex, this.activePdfIndex + 10)
         const temp = this.files[this.activeIndex].child[this.activePdfIndex]
+        if (!temp) {
+          this.isEmpty = true
+          this.fileloading = false;
+          return;
+        }
         if (!temp?.ocr) {
           temp.ocr = await this.getOcr(temp);
         }
