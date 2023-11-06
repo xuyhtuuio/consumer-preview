@@ -12,7 +12,7 @@
         <div class="swiper-top">
           <div class="swiper-button-prev" :class="{ 'disabled': activeIndex === 0 }" @click="swiperTo(pdfPageNow - 1)">
           </div>
-          <el-input v-model="curPdfPage" @keyup.enter.native="changePdfPageInput(curPdfPage)">
+          <el-input v-char v-model="curPdfPage" @keyup.enter.native="changePdfPageInput(curPdfPage)">
             <template slot="append">/{{ pdfTotal }}</template>
           </el-input>
           <div class="swiper-button-next" :class="{ 'disabled': activeIndex === fileList.length - 1 }"

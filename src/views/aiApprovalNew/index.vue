@@ -44,7 +44,7 @@
                 :offset="100" trigger="click" :visible-arrow=false>
                 <div class="cont-top-fileList">
                   <div class="fileList-search">
-                    <el-input v-model.trim="fileKeyWords" placeholder="请输入关键字" @change="fileSearch"
+                    <el-input v-char v-model.trim="fileKeyWords" placeholder="请输入关键字" @change="fileSearch"
                       @keyup.enter.native="fileSearch" @blur="fileSearch">
                       <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="fileSearch"></i>
                     </el-input>
@@ -93,7 +93,7 @@
             </div>
             <div class="cont-top-infos">
               <span>发现 {{ riskNum }}处风险信息，当前文件共 {{ approval.numberOfRiskInfo }} 处，请认真核对 </span>
-              <el-input v-if="isOrderDetail" v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search"
+              <el-input v-char v-if="isOrderDetail" v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search"
                 @blur="search" clearable @clear="search" size="medium">
                 <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
               </el-input>
@@ -130,7 +130,7 @@
                 <span class="postil-tab-rel" v-if="this.comments.length" @click="addRelComment">关联意见</span>
               </div>
               <div class="postil-input">
-                <el-input type="textarea" resize="none" placeholder="请输入批注意见描述" v-model="postil.textarea">
+                <el-input v-char type="textarea" resize="none" placeholder="请输入批注意见描述" v-model="postil.textarea">
                 </el-input>
               </div>
               <div class="postil-tipText">编辑完成后该条批注可在已编辑意见中查看</div>
@@ -142,7 +142,7 @@
               <el-form ref="keywordsFrom" v-show="postil.isKeyWord === '1'" :rules="keywordsRules" :model="keywordsInfo"
                 class="postil-keyword-form">
                 <el-form-item label="关键词内容" prop="content" class="postil-keyword-item">
-                  <el-input v-model="keywordsInfo.content" placeholder="请输入关键词"></el-input>
+                  <el-input v-char v-model="keywordsInfo.content" placeholder="请输入关键词"></el-input>
                 </el-form-item>
                 <el-form-item label="关键词类型" prop="type" class="postil-keyword-item">
                   <el-select v-model="keywordsInfo.type" placeholder="请选择">
