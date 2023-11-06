@@ -614,6 +614,7 @@ export default {
             : reset()
       }
 
+      // 锁定
       Reflect.preventExtensions(param)
       const res = await getRecheckList(param)
       const { data } = res
