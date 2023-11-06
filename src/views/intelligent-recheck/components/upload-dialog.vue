@@ -92,6 +92,11 @@ export default {
 </script>
 <style lang="less" scoped>
 /deep/.el-dialog {
+  position: absolute;
+  margin-top: 0!important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   .el-dialog__title {
     color: #999;
     font-size: 14px;
