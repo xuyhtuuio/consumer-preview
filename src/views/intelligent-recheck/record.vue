@@ -189,12 +189,12 @@
               <p
                 class="sort"
                 @click="onlineClick"
-                :class="{ active: this.sortName ==='ol' }"
+                :class="{ active: this.sortName === 'ol' }"
               >
                 按上线时间<img
                   src="../../assets/image/upup.png"
                   alt=""
-                  v-if="this.sortName !=='ol'"
+                  v-if="this.sortName !== 'ol'"
                 />
                 <img
                   src="../../assets/image/bluedown.png"
@@ -400,7 +400,10 @@ export default {
   methods: {
     handleChange() {},
     changeArrrovalType() {
-      if (document.querySelectorAll) {
+      if (
+        'querySelectorAll' in document
+        && typeof document.querySelectorAll === 'function'
+      ) {
         const dom = document.querySelectorAll('.scrren-com')[2]
         this.$nextTick(() => {
           dom.style.color = this.search.approvalType ? '#2d5cf6' : '#1d2128'
@@ -590,7 +593,11 @@ export default {
 
       // 如果param存在sort和sortType，说明是点击了排序，
       // 需要把sort和sortType放到param里面
-      if (this.sortName && Reflect.has(param, 'sort') && Reflect.has(param, 'sortType')) {
+      if (
+        this.sortName
+        && Reflect.has(param, 'sort')
+        && Reflect.has(param, 'sortType')
+      ) {
         const chooseSortBill = () => {
           param.sortType = this.SORTTYPEENU.desc
           param.sort = this.SORTENU.billTime
@@ -635,11 +642,11 @@ export default {
     },
 
     onlineClick() {
-      this.sortName === 'ol' ? this.sortName = '' : this.sortName = 'ol'
+      this.sortName === 'ol' ? (this.sortName = '') : (this.sortName = 'ol')
       this.searchOnePage()
     },
     billClick() {
-      this.sortName === 'bill' ? this.sortName = '' : this.sortName = 'bill'
+      this.sortName === 'bill' ? (this.sortName = '') : (this.sortName = 'bill')
       this.searchOnePage()
     },
     changeAgencies() {
@@ -651,7 +658,6 @@ export default {
     changeBillDate() {
       this.searchOnePage()
     },
-
     handleBackCheck() {
       this.searchOnePage()
     },
