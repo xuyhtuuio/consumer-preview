@@ -327,8 +327,6 @@ export default {
           o.commentId = o.id
         }
       })
-      console.log('opinionLetterRecordDtoList', opinionLetterRecordDtoList)
-      console.log('editedCommentsDtoList', editedCommentsDtoList)
       const data = {
         approvalSubmissionDto: {
           opinionLetterRecordDtoList,

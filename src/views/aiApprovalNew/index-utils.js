@@ -824,7 +824,6 @@ export default {
         }
       });
       this.comments = setArr;
-      console.log('comments', this.comments)
     },
     // 编辑意见后,同步更新  文件的推荐意见状态
     upDateComments(type, item, newVal) {
