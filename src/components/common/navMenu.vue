@@ -109,7 +109,7 @@ export default {
         { title: '产品图谱', name: 'productmap', code: 'productmap', pathName: 'productmap' },
         { title: '统计中心', name: 'statistical-center', code: 'statisticsCenter', pathName: 'statistical-center' },
         { title: '人员中心', name: 'personCenter', code: 'peopleCenter', pathName: 'personCenter' },
-        { title: '知识库', name: 'knowledge', code: 'knowledge', pathName: 'knowledge' }
+        { title: '知识库', name: 'knowledge', pathName: 'knowledge' }
       ]
       this.list = navList
         .map((item) => {
