@@ -195,7 +195,7 @@
         </el-tooltip>
       </el-form-item>
       <el-form-item v-if="!['SELF_SELECT', 'DEPT_USER_ROLE', 'SELECT_NODE'].includes(nodeProps.assignedType)" label="审批期限（为 0 则不生效）" prop="timeLimit">
-        <el-input style="width: 180px;" placeholder="时长" size="small" type="number" v-model="nodeProps.timeLimit.timeout.value">
+        <el-input v-char style="width: 180px;" placeholder="时长" size="small" type="number" v-model="nodeProps.timeLimit.timeout.value">
           <el-select style="width: 75px;" v-model="nodeProps.timeLimit.timeout.unit" slot="append" placeholder="请选择">
             <el-option label="天" value="D"></el-option>
             <el-option label="小时" value="H"></el-option>
