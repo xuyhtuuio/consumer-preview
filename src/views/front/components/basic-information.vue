@@ -71,7 +71,7 @@
                 <template v-for="(iten, indey) in item.props.options">
                   <!-- <template v-if="iten.id == 9999">
                      <el-checkbox :key="indey" @change="checked=>checkRow (checked, item)" :label="iten.id">{{iten.value}}</el-checkbox>
-                    <el-input class="checkbox-ipt" v-show="item.value.includes(iten.id)" :key="iten.id" :value="checkBox[item.id]" @input="(val)=>handleInput(val,item,iten.id)" placeholder="请补充具体内容"></el-input>
+                    <el-input v-char class="checkbox-ipt" v-show="item.value.includes(iten.id)" :key="iten.id" :value="checkBox[item.id]" @input="(val)=>handleInput(val,item,iten.id)" placeholder="请补充具体内容"></el-input>
                   </template> -->
                   <el-checkbox :key="indey" :label="iten.id">{{
                     iten.value

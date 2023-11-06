@@ -136,7 +136,7 @@
       <div class="dialog-item">
         <g-table-card :title="dialogTitle">
           <template #content>
-            <el-input v-model="dialogItem.keywordContent"></el-input>
+            <el-input v-char v-model="dialogItem.keywordContent"></el-input>
           </template>
         </g-table-card>
       </div>

@@ -1,10 +1,10 @@
 <template>
   <div style="max-width: 350px">
     <div v-if="mode === 'DESIGN'">
-      <el-input size="medium" disabled :placeholder="placeholder"/>
+      <el-input v-char size="medium" disabled :placeholder="placeholder"/>
     </div>
     <div v-else>
-      <el-input size="medium" clearable v-model="_value" :placeholder="placeholder"/>
+      <el-input v-char size="medium" clearable v-model="_value" :placeholder="placeholder"/>
     </div>
   </div>
 </template>

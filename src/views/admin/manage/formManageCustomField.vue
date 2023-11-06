@@ -2,7 +2,7 @@
   <div>
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" :disabled="viewDisable">
       <el-form-item label="字段名称" prop="title">
-        <el-input v-model="ruleForm.title" :disabled="titleDisable" placeholder="请输入字段名称" class="is-dark input"></el-input>
+        <el-input v-char v-model="ruleForm.title" :disabled="titleDisable" placeholder="请输入字段名称" class="is-dark input"></el-input>
       </el-form-item>
       <el-form-item label="所属模块" prop="module">
         <el-select v-model="ruleForm.module" :disabled="moudleDisable" @change="changeModule" placeholder="请选择所属模块" class="is-dark input" style="width: 100%">
@@ -23,7 +23,7 @@
         </el-select>
       </el-form-item> -->
       <el-form-item label="提示文字" prop="placeholder" class="is-dark input">
-        <el-input v-model="ruleForm.placeholder" placeholder="请输入提示文字"></el-input>
+        <el-input v-char v-model="ruleForm.placeholder" placeholder="请输入提示文字"></el-input>
       </el-form-item>
       <el-form-item v-if="ruleForm.name === 'Cascader'" label="选项设置" prop="cascaderItem" class="is-dark input">
         <!-- <el-button icon="el-icon-plus" type="text" size="mini" style="position: relative;left:260px;" @click="addCascaderOptions">新增选项</el-button> -->
@@ -38,7 +38,7 @@
         <SelectGroupField :data="selectGroupOptions" :viewDisable="viewDisable" class="cascader-content"/>
       </el-form-item>
       <el-form-item v-if="ruleForm.name === 'TextInput' || ruleForm.name === 'TextareaInput'" label="文字个数" prop="numberOfWords" class="is-dark input">
-        <el-input v-model="ruleForm.numberOfWords" maxlength="7" placeholder="请输入文字个数" oninput="value=value.replace(/^0|[^0-9]/g, '')" class="is-dark input"></el-input>
+        <el-input v-char v-model="ruleForm.numberOfWords" maxlength="7" placeholder="请输入文字个数" oninput="value=value.replace(/^0|[^0-9]/g, '')" class="is-dark input"></el-input>
       </el-form-item>
       <el-form-item v-if="ruleForm.name === 'TextInput' || (ruleForm.module === '核对要点' && ruleForm.name === 'SelectInput')" label="独占一行" prop="exclusiveRowOrNot" class="is-dark input">
         <el-switch v-model="ruleForm.exclusiveRowOrNot"></el-switch>

@@ -28,7 +28,7 @@
             active-text="且" inactive-text="或">
         </el-switch>
         <div style="display: inline-block;" v-show="conditionGroupsType === 'expression'">
-          <el-input size="mini" class="is-dark input" v-model="config.expression" placeholder="输入条件组关系表达式  &为与，|为或"/>
+          <el-input v-char size="mini" class="is-dark input" v-model="config.expression" placeholder="输入条件组关系表达式  &为与，|为或"/>
           <span class="item-desc">使用表达式构建复杂逻辑，例如: (A & B) | C</span>
         </div>
       </div>

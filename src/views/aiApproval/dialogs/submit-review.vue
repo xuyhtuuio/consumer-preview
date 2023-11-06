@@ -80,7 +80,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item class="params-txt">
-                        <el-input v-model="params.txt" placeholder="请补充说明具体原因描述"></el-input>
+                        <el-input v-char v-model="params.txt" placeholder="请补充说明具体原因描述"></el-input>
                     </el-form-item>
                 </template>
             </el-form>
@@ -105,7 +105,7 @@
                             <div class="submission-text" @dblclick="showEdit_collection(index)">
                                 <span class="sort">{{ index + 1 }}.</span>
                                 <span v-if="!item.showEdit">{{ item.str }}</span>
-                                <el-input v-else :ref="`input_${index}`" v-model.trim="item.str" placeholder="请输入意见"
+                                <el-input v-char v-else :ref="`input_${index}`" v-model.trim="item.str" placeholder="请输入意见"
                                     type="textarea" :rows="3" class="edit-input" resize="none" @blur="item.showEdit = false"
                                     @keyup.enter.native="item.showEdit = false"></el-input>
                             </div>

@@ -1,6 +1,6 @@
 <template>
   <div class="collect-knowledge">
-    <el-input placeholder="请输入标题、正文、标签等关键词查询" v-model.trim="searchText" @keypress.native.enter="changeSearch" size="mini">
+    <el-input v-char placeholder="请输入标题、正文、标签等关键词查询" v-model.trim="searchText" @keypress.native.enter="changeSearch" size="mini">
       <el-button slot="append" icon="el-icon-search" size="mini" type="primary" @click="changeSearch"></el-button>
     </el-input>
     <div class="manage">
@@ -48,13 +48,10 @@ export default {
 .manage {
   display: flex;
 }
-.collect-knowledge {
-  position: relative;
-}
 .el-input {
   position: absolute;
-  right: 0;
-  top: -51px;
+  right: 80px;
+  top: 55px;
   width: 400px;
   /deep/.el-input__inner {
     background-color: #f7f8fa;

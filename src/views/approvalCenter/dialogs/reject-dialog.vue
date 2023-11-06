@@ -9,7 +9,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="原因描述">
-        <el-input v-model="form.txt" placeholder="请输入驳回原因描述" type="textarea" :rows="5" class="edit-input"
+        <el-input v-char v-model="form.txt" placeholder="请输入驳回原因描述" type="textarea" :rows="5" class="edit-input"
           resize="none"></el-input>
       </el-form-item>
     </el-form>
