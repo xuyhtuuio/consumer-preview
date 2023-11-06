@@ -128,7 +128,10 @@ export default {
     },
     logout() {
       window.localStorage.clear()
-      const newWindow = window.open('', '_self')
+      this.$router.push({
+        name: 'login'
+      })
+      /* const newWindow = window.open('', '_self')
       if (window.location.host === '192.168.210.57:31603') {
         newWindow.location = 'http://192.168.210.57:31963'
       } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
@@ -140,7 +143,7 @@ export default {
         this.$router.push({
           name
         })
-      }
+      } */
     },
     returnHome() {
       this.$router.push({
