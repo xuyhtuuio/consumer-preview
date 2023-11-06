@@ -341,13 +341,6 @@ export default {
     },
     async handleSave() {
       // 红色警告
-      // if (
-      //   this.permissionList[1].type
-      //   && !this.permissionList[1].children.some((item) => item.type)
-      // ) {
-      //   this.permissionList[1].isShowWarn = true
-      //   return
-      // }
       let result = false
       this.permissionList.forEach(item => {
         if (item.type && !item.isNoWarn && item.children && !item.children.some((itemChild) => itemChild.type)) {
