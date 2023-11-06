@@ -108,7 +108,7 @@
         <div class="agree-label">是否通过<span>*</span></div>
         <div>
           <el-radio v-model="userAgree" label="1">通过</el-radio>
-          <el-radio v-model="userAgree" label="2">不通过</el-radio>
+          <el-radio v-model="userAgree" label="0">不通过</el-radio>
         </div>
       </div>
       <div class="agree-change">
@@ -195,7 +195,7 @@ export default {
         formCategory: this.compareItem.formCategoryName,
         formCreateTime: timestampToDateTime(this.compareItem.createTime * 1000),
         formId: this.compareItem.formId,
-        isPass: this.userAgree ? 1 : 0,
+        isPass: this.userAgree === '1' ? 1 : 0,
         launchTime: timestampToDateTime(this.compareItem.launchTime * 1000),
         ocrId: this.compareItem.ocrId,
         updateTime: '',
@@ -528,6 +528,11 @@ export default {
 </style>
 <style lang="less">
 .edit-dialog {
+  position: absolute;
+  margin-top: 0!important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   .el-dialog__header {
     padding: 40px 60px 24px;
     text-align: center;
@@ -609,6 +614,11 @@ export default {
   }
 }
 .record-list-dialog {
+  position: absolute;
+  margin-top: 0!important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   .el-dialog__header {
     padding: 36px 36px 16px;
     text-align: center;
