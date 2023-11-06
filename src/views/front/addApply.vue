@@ -88,7 +88,8 @@ import {
   saveDraft,
   externalLogicController,
   processStart,
-  getProcess
+  getProcess,
+  submit
 } from '@/api/front';
 import {
   getNextUserOption,
@@ -435,26 +436,30 @@ export default {
             nodeId: 'root'
           })
         }
-        res = await processStart({
-          templateId: this.templateId,
-          processDefinitionId: this.processDefinitionId,
-          startUserInfo: {
-            id,
-            name
-          },
-          submitDto: result
-        }).catch(() => {
-          this.submitDialogVisible = false;
-        });
-      }
-      const { success: sus, msg: message } = res.data;
-      if (sus) {
-        this.submitDialogVisible = false;
-        this.$message({ type: 'success', message: '提交成功' });
-        this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
-      } else {
-        this.$message({ type: 'error', message });
-        this.submitDialogVisible = false;
+        const { data: resData } = await submit(result)
+        if (resData.success) {
+          res = await processStart({
+            templateId: this.templateId,
+            processDefinitionId: this.processDefinitionId,
+            startUserInfo: {
+              id,
+              name
+            },
+            submitDto: { ...result, formId: resData.data }
+          }).catch(() => {
+            this.submitDialogVisible = false;
+          });
+
+          const { success: sus, msg: message } = res.data;
+          if (sus) {
+            this.submitDialogVisible = false;
+            this.$message({ type: 'success', message: '提交成功' });
+            this.$router.push({ name: 'apply-list', params: { isNoDialog: true } });
+          } else {
+            this.$message({ type: 'error', message });
+            this.submitDialogVisible = false;
+          }
+        }
       }
     },
     rollTo(offsetTop) {

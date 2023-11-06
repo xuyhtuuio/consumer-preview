@@ -66,6 +66,11 @@ export default {
         name: 'approval-details',
         params: this.params
       })
+      // const route = this.$router.resolve({
+      //   name: 'approval-details',
+      //   params: this.params
+      // })
+      // window.open(route.href, '_blank')
     }
   }
 }
@@ -75,6 +80,13 @@ export default {
 .detail-dialog {
   max-height: 70vh;
   overflow: scroll;
+  .el-dialog {
+    position: absolute;
+    margin-top: 0!important;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
   .el-dialog__header {
     padding: 12px 24px;
   }
