@@ -590,7 +590,7 @@ export default {
 
       // 如果param存在sort和sortType，说明是点击了排序，
       // 需要把sort和sortType放到param里面
-      if (param.sort && param.sortType) {
+      if (this.isSortBill || this.isSortOl) {
         const chooseSortBill = () => {
           this.isSortOl ? (this.isSortOl = false) : ''
           param.sortType = this.SORTTYPEENU.desc
