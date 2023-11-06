@@ -22,7 +22,7 @@
               <span class="tag-text ellipsis">#{{ tag.name }}</span>
             </li>
           </ul>
-          <el-empty v-if="serach && tagsList.length === 0" description="暂无数据"></el-empty>
+          <Empty v-if="serach && tagsList.length === 0"></Empty>
         </div>
         <template #reference>
           <span class="button pointer tags-select">

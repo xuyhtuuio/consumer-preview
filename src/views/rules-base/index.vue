@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-23 21:17:11
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-02 18:09:15
+ * @LastEditTime: 2023-11-03 15:58:13
  * @FilePath: /consumer-preview/src/views/rules-base/index.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -43,7 +43,7 @@
               : item.icon
           ]"
         ></i>
-        {{ item.name }}
+        <i class="menu-name">{{ item.name }}</i>
       </li>
     </ul>
     <div class="right-content">
@@ -231,6 +231,10 @@ export default {
       border-radius: 8px;
       background: #f0f6ff;
       color: #2d5cf6;
+      // font-weight: 700;
+      .menu-name{
+        font-weight: 700;
+      }
     }
   }
   .right-content {

@@ -2,13 +2,18 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-02 18:34:55
+ * @LastEditTime: 2023-11-03 17:09:50
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
   <div class="laws" v-loading="search.loading">
-    <Filters @addRule="addRule" @sortChange="sortChange" :total="search.total">
+    <Filters
+      @addRule="addRule"
+      @sortChange="sortChange"
+      :total="search.total"
+      ref="filter-comp"
+    >
     </Filters>
     <div v-if="list.length" class="list-content">
       <div
@@ -22,7 +27,7 @@
           <div class="file-info">
             <div class="name">
               {{ item.name }}
-              <div @click.stop>
+              <div @click.stop v-if="role">
                 <el-popover
                   placement="bottom"
                   width="108"
@@ -32,7 +37,7 @@
                 >
                   <ul>
                     <li @click="editRule(item, 'edit')">编辑</li>
-                    <li @click="editRule(item, 'update')" v-if="role">更新</li>
+                    <li @click="editRule(item, 'update')" >更新</li>
                     <li @click="delRule(item)">删除</li>
                   </ul>
                   <i
@@ -193,11 +198,11 @@
           </el-form-item>
           <el-form-item label="发布时间" prop="date">
             <el-date-picker
-              type="date"
+            type="datetime"
               placeholder="请选择日期"
               v-model="form.date"
               style="width: 100%"
-              value-format="yyyy-MM-dd"
+              value-format="yyyy-MM-dd HH:mm:ss"
               :picker-options="optionsDisable"
             >
             </el-date-picker>
@@ -215,11 +220,11 @@
         </div>
         <el-form-item label="发布时间" prop="date" v-if="type == 2">
           <el-date-picker
-            type="date"
+          type="datetime"
             placeholder="请选择日期"
             v-model="form.date"
             style="width: 100%"
-            value-format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd HH:mm:ss"
             :picker-options="optionsDisable"
             class="type2-date"
           >
@@ -455,7 +460,7 @@ export default {
     }
     // eslint-disable-next-line
     var checkDate = (rule, value, cb) => {
-      if (!value?.length || value.length > 50) {
+      if (!value?.length) {
         this.validatorForm.dateError = true
         return cb()
       } else {
@@ -565,7 +570,7 @@ export default {
         update: '更新'
       },
       type: 0,
-      role: false,
+      role: false
     }
   },
   watch: {
@@ -590,9 +595,8 @@ export default {
   computed: {},
   methods: {
     getUserRole() {
-      const user = JSON.parse(window.localStorage.getItem('user_name'))
-      const role = user.roles.filter((item) => item.clientId === 'cpr')
-      this.role = role[0]?.code.indexOf('admin') !== -1
+      const role = this.$store.getters.getPermissionByCode('knowledge')?.type
+      this.role = role === 'edit'
     },
     showElPopover(item) {
       this.showPop = false
@@ -612,6 +616,8 @@ export default {
       this.search.name = keyword
       this.search.status = effectiveValue
       this.type = type
+      this.$refs['filter-comp'].initSort()
+      this.search.sortField = '-pub_time'
       this.nextPage(1)
     },
     /**
@@ -620,7 +626,7 @@ export default {
      */
     sortChange(val) {
       const { order, orderColumn } = val
-      this.search.sortField = order === 'desc' ? '-' + orderColumn : orderColumn
+      this.search.sortField = order === 'desc' ? '-' + orderColumn : '+' + orderColumn
       this.nextPage(1)
     },
     /**
@@ -797,7 +803,8 @@ export default {
      * @description: 新增法规
      * @return {*}
      */
-    addRule() {
+    addRule(type) {
+      this.crtBehavior = type || 'increase'
       this.dialogVisible = true
       setTimeout(() => {
         this.$refs.form.clearValidate()
@@ -853,6 +860,7 @@ export default {
           param.loading = false
         })
         .catch(() => {
+          this.$message.error('上传文件失败，请重新上传')
           this.form.uploadFile = []
           this.uploadDisabled = ''
         })
@@ -932,6 +940,7 @@ export default {
           }
         })
         .catch(() => {
+          this.$message.error('上传文件失败，请重新上传')
           const index = this.form.relatedFile.findIndex(
             (m) => m.uid === param.file.uid
           )
@@ -1013,6 +1022,7 @@ export default {
      * @return {*}
      */
     submit() {
+      const _that = this
       // 上传内容文件
       this.$refs.form.validate(async (valid) => {
         this.checkMustValue()
@@ -1033,7 +1043,7 @@ export default {
             }) || []
           const params = {
             name: this.form.name,
-            pub_time: this.form.date,
+            pub_time: dayjs(this.form.date).format('YYYY-MM-DD HH:mm:ss'),
             file_key: this.form.uploadFile[0]?.key,
             tagList: this.tagsList,
             equityList: this.relevancyTags,
@@ -1051,30 +1061,34 @@ export default {
           this.form.loading = true
           this.$forceUpdate()
           try {
-            if (this.crtBehavior === 'increase') {
+            if (_that.crtBehavior === 'increase') {
               res = await insertRegulation(params)
             } else {
               // 编辑和更新
               params.id = this.form.id
               const newParams = {
                 ...this.form,
-                ...params
+                ...params,
               }
-              if (this.crtBehavior === 'edit') {
-                params.isEdit = 'edit'
+              if (_that.crtBehavior === 'edit') {
+                newParams.isEdit = 'edit'
               }
-              if (this.crtBehavior === 'update') {
-                params.status = this.form.isRepeal
+              if (_that.crtBehavior === 'update') {
+                newParams.status = _that.form.isRepeal
               }
               delete newParams.newContent
               delete newParams.uploadFile
+              delete newParams.c_time
+              delete newParams.u_time
               delete newParams.content
+              delete newParams.tableFileTag
               delete newParams.loading
+              delete newParams.date
               delete newParams.isRepeal
               res = await updateRegulation(newParams)
             }
             const { success } = res.data
-            this.form.loading = false
+            _that.form.loading = false
             if (success) {
               this.$message.success(
                 `${this.dialogTitle[this.crtBehavior]}${
@@ -1085,7 +1099,8 @@ export default {
               this.nextPage(1)
             }
           } catch {
-            this.form.loading = false
+            _that.form.loading = false
+            _that.$forceUpdate()
           }
         }
       })
@@ -1095,8 +1110,7 @@ export default {
      * @return {*}
      */
     editRule(item, type) {
-      this.crtBehavior = type
-      this.addRule()
+      this.addRule(type)
       setTimeout(() => {
         // 回显内容
         const file = {
@@ -1116,7 +1130,7 @@ export default {
           unit: item.unit,
           content: item.content,
           documentNumber: item.doc_no,
-          date: dayjs(item.pub_time).format('YYYY-MM-DD'),
+          date: dayjs(item.pub_time).format('YYYY-MM-DD HH:mm:ss'),
           uploadFile: [file],
           relatedFile
         }
@@ -1139,8 +1153,8 @@ export default {
 
       this.$confirm('一旦删除该法规内容不可恢复，请确认是否删除', '', {
         customClass: 'confirmBox',
-        confirmButtonText: '取消',
-        cancelButtonText: '删除',
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
         type: 'warning'
       }).then(async () => {
         const params = {
@@ -1344,7 +1358,7 @@ export default {
           }
           .el-input__prefix {
             left: 80%;
-            .el-icon-date::before {
+            .el-icon-time::before {
               font-family: 'iconfont' !important;
               content: '\e66e';
             }

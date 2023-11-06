@@ -204,8 +204,8 @@ export function queryDetails(data) {
 export function updateReadCount(data) {
   return request({
     url: '/cpr/regulationController/updateReadCount',
-    method: 'get',
-    params: data
+    method: 'post',
+    data
   })
 }
 // 查询历史沿革
