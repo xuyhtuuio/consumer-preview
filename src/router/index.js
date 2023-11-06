@@ -133,7 +133,7 @@ const router = new Router({
       path: '/recheck',
       name: 'recheck',
       component: () => import('@/views/intelligent-recheck/home'),
-      meta: { title: '智能回检', viewport },
+      meta: { code: ['recheckIndex'], title: '智能回检', viewport },
       redirect: '/recheck/recheck-index',
       children: [
         {
