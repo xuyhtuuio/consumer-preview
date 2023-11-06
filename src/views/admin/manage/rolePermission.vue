@@ -341,13 +341,14 @@ export default {
     },
     async handleSave() {
       // 红色警告
-      if (
-        this.permissionList[1].type
-        && !this.permissionList[1].children.some((item) => item.type)
-      ) {
-        this.permissionList[1].isShowWarn = true
-        return
-      }
+      let result = false
+      this.permissionList.forEach(item => {
+        if (item.type && !item.isNoWarn && item.children && !item.children.some((itemChild) => itemChild.type)) {
+          result = true
+          item.isShowWarn = true
+        }
+      })
+      if (result) return
       if (!this.newRoleName) {
         this.showNewRoleName = true
         return
@@ -389,24 +390,11 @@ export default {
       const { funPerms, dataPerm } = data
       this.rolePermission = data
       for (const key in this.permissionList) {
-        if (Number(key) === 0) {
-          this.permissionList[key].type = funPerms[key].type
-          this.permissionList[key].children[0].type = funPerms[key].child[0].type
-        } else if (Number(key) === 1) {
-          this.permissionList[key].type = funPerms[key].type
-          const { children } = this.permissionList[key]
-          children.forEach((item) => {
-            item.type = funPerms.find(
-              (funItem) => funItem.code === item.code
-            ).type
-          })
-        } else {
-          const item = this.permissionList[key]
-          const funPermsItem = funPerms.find(
-            (funItem) => funItem.code === item.code
-          )
-          if (funPermsItem) {
-            item.type = funPermsItem.type
+        const origin = this.permissionList[key]
+        origin.type = funPerms.find(item => item.code === origin.code).type
+        if (origin.children && origin.children.length) {
+          for (const originChild of origin.children) {
+            originChild.type = funPerms.find(item => item.code === originChild.code) ? funPerms.find(item => item.code === originChild.code).type : funPerms.filter(item => Array.isArray(item.child))[0].child.find(itemChild => itemChild.code === originChild.code).type
           }
         }
       }
@@ -427,21 +415,23 @@ export default {
             })
           }
           funPerms[key].child[0].type = originVal.children[0].type
-        } else if (Number(key) === 1) {
-          funPerms[key].type = originVal.type
+        } else if (this.permissionList[key].children) {
+          funPerms.find(item => item.code === originVal.code).type = originVal.type
           const { children } = originVal
           children.forEach((item) => {
             const funItem = funPerms.find(
               (funPermsItem) => funPermsItem.code === item.code
             )
-            if (item.title === '流程管理') {
+            if (item.reflect) {
               if (item.type !== funItem.type) {
                 funItem.type = item.type
                 item.reflect.forEach((reflectItem) => {
-                  // defaultPerm.find(item => item.pathName === reflectItem).type = item.type;
-                  defaultPerm.find(
+                  defaultPerm.find((defaultItem) => defaultItem.pathName === reflectItem) && (defaultPerm.find((defaultItem) => defaultItem.pathName === reflectItem).type = item.type)
+                  funPerms.find(
                     (defaultItem) => defaultItem.pathName === reflectItem
-                  ).type = 'edit'
+                  ) && (funPerms.find(
+                    (defaultItem) => defaultItem.pathName === reflectItem
+                  ).type = item.type)
                 })
               }
             } else {
@@ -624,7 +614,7 @@ export default {
                 flex: 1;
                 display: flex;
                 flex-wrap: wrap;
-                align-items: center;
+                align-items: flex-start;
                 &-item {
                   width: 50%;
                   display: flex;

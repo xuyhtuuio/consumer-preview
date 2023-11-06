@@ -110,7 +110,10 @@ service.interceptors.response.use(
 );
 // 退出登录或者登录失效
 function getloginHref() {
-  const newWindow = window.open('', '_self');
+  router.push({
+    name: 'login'
+  })
+  /* const newWindow = window.open('', '_self');
   if (window.location.host === '192.168.210.57:31603') {
     newWindow.location = 'http://192.168.210.57:31963/#/login?from=cpr';
   } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
@@ -122,6 +125,6 @@ function getloginHref() {
     router.push({
       name,
     });
-  }
+  } */
 }
 export default service;
