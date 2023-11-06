@@ -13,6 +13,7 @@
           placeholder="请输入关键词开始检索"
           @keyup.enter.native="handleSubmit"
           v-model.trim="search.searchInput"
+          v-char
         ></el-input>
       </div>
 
