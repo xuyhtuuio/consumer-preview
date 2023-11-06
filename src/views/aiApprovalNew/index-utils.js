@@ -1228,19 +1228,25 @@ export default {
     generateIcons() {
       // this.icons = []
       this.$nextTick(() => {
+        const ocrHeight = document.querySelector('.results').scrollHeight
         const img = document.getElementById('picture')
-        img.onload = function () {
-          const realHeight = (img.scrollHeight || img.offsetHeight) || img.clientHeight
-          const iconContainer = document.querySelector('.icons')
-          const iconsDom = document.querySelector('.results-div')
-          // const iconsDom = document.querySelector('.content-cont-icons')
-          if (iconContainer) {
-            iconContainer.style.top = iconsDom?.style.top || 0
-            iconContainer.style.height = realHeight + 'px'
-            // iconsDom.style.height = realHeight + 'px'
+        const iconContainer = document.querySelector('.icons')
+        const iconsDom = document.querySelector('.results-div')
+        if (img) {
+          img.onload = function () {
+            const realHeight = (img.scrollHeight || img.offsetHeight) || img.clientHeight
+            // const iconsDom = document.querySelector('.content-cont-icons')
+            if (iconContainer) {
+              iconContainer.style.top = iconsDom?.style.top || 0
+              iconContainer.style.height = realHeight + 'px'
+              // iconsDom.style.height = realHeight + 'px'
+            }
           }
+        } else {
+          iconContainer.style.top = iconsDom?.style.top || 0
+          iconContainer.style.height = ocrHeight + 'px'
         }
-        const scale = img.naturalWidth / img.clientWidth;
+        const scale = (img?.naturalWidth / img?.clientWidth) || this.styleProp.wordDomStyle.scale;
         // 过滤其他文件
         let curFileOcrIndex = []
         this.comments?.map((comment) => {
