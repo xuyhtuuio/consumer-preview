@@ -389,24 +389,11 @@ export default {
       const { funPerms, dataPerm } = data
       this.rolePermission = data
       for (const key in this.permissionList) {
-        if (Number(key) === 0) {
-          this.permissionList[key].type = funPerms[key].type
-          this.permissionList[key].children[0].type = funPerms[key].child[0].type
-        } else if (this.permissionList[key].children) {
-          this.permissionList[key].type = funPerms[key].type
-          const { children } = this.permissionList[key]
-          children.forEach((item) => {
-            item.type = funPerms.find(
-              (funItem) => funItem.code === item.code
-            ).type
-          })
-        } else {
-          const item = this.permissionList[key]
-          const funPermsItem = funPerms.find(
-            (funItem) => funItem.code === item.code
-          )
-          if (funPermsItem) {
-            item.type = funPermsItem.type
+        const origin = this.permissionList[key]
+        origin.type = funPerms.find(item => item.code === origin.code).type
+        if (origin.children && origin.children.length) {
+          for (const originChild of origin.children) {
+            originChild.type = funPerms.find(item => item.code === originChild.code) ? funPerms.find(item => item.code === originChild.code).type : funPerms.filter(item => Array.isArray(item.child))[0].child.find(itemChild => itemChild.code === originChild.code).type
           }
         }
       }

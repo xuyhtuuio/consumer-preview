@@ -7,6 +7,7 @@ export const permissionList = [
     reflect: ['approval-details', 'aiApproval', 'compare'],
     children: [
       {
+        code: 'allTask',
         title: '全部任务（审批中心）',
         type: '',
         props: [

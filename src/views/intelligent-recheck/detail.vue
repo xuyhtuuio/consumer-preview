@@ -212,7 +212,7 @@
               :min-line-gap="100"
               :max-line-gap="220"
               :single-max-width="300"
-              :grow="select === '1' ? [1, 1, 1, 1] : [1, 1, 1, 1, 1]"
+              :grow="searchType === 2 ? [1, 1, 1, 1] : [1, 1, 1, 1, 1]"
               :watch="totalList">
               <!-- each component is wrapped by a waterfall slot -->
               <WaterfallSlot

@@ -64,7 +64,7 @@ export default {
       })
     },
     getNav() {
-      // const { permissionsPage = {} } = this.$store.state
+      const { permissionsPage = {} } = this.$store.state
       // 按展示顺序增删 name
       const pathNames = [
         {
@@ -79,15 +79,14 @@ export default {
         }
       ];
       this.menus = pathNames
-      // this.menus = pathNames
-      //   .map((item) => {
-      //     const exist = permissionsPage.funPerms?.find((f) => (f.code === item.code));
-      //     if ((exist && exist?.type) || !exist) {
-      //       return item
-      //     } else {
-      //       return false;
-      //     }
-      //   }).filter((e) => e)
+        .map((item) => {
+          const exist = permissionsPage.funPerms?.find((f) => (f.code === item.code));
+          if ((exist && exist?.type) || !exist) {
+            return item
+          } else {
+            return false;
+          }
+        }).filter((e) => e)
     },
   }
 }
