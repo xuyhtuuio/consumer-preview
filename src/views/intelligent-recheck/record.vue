@@ -13,6 +13,7 @@
           placeholder="请输入关键词开始检索"
           @keyup.enter.native="handleSubmit"
           v-model.trim="search.searchInput"
+          v-char
         ></el-input>
       </div>
 
@@ -188,17 +189,17 @@
               <p
                 class="sort"
                 @click="onlineClick"
-                :class="{ active: this.isSortOl }"
+                :class="{ active: this.sortName === 'ol' }"
               >
                 按上线时间<img
                   src="../../assets/image/upup.png"
                   alt=""
-                  v-if="!this.isSortOl"
+                  v-if="this.sortName !== 'ol'"
                 />
                 <img
                   src="../../assets/image/bluedown.png"
                   alt=""
-                  v-else-if="this.isSortOl"
+                  v-else-if="this.sortName === 'ol'"
                 />
               </p>
             </el-col>
@@ -206,17 +207,17 @@
               <p
                 class="sort"
                 @click="billClick"
-                :class="{ active: this.isSortBill }"
+                :class="{ active: this.sortName === 'bill' }"
               >
                 按提单时间<img
                   src="../../assets/image/upup.png"
                   alt=""
-                  v-if="!this.isSortBill"
+                  v-if="this.sortName !== 'bill'"
                 />
                 <img
                   src="../../assets/image/bluedown.png"
                   alt=""
-                  v-else-if="this.isSortBill"
+                  v-else-if="this.sortName === 'bill'"
                 />
               </p>
             </el-col>
@@ -374,8 +375,7 @@ export default {
       },
 
       transactionTypes: [],
-      isSortOl: false,
-      isSortBill: false,
+      sortName: '',
 
       SORTENU: {
         backcheckTime: 1,
@@ -400,7 +400,10 @@ export default {
   methods: {
     handleChange() {},
     changeArrrovalType() {
-      if (document.querySelectorAll) {
+      if (
+        'querySelectorAll' in document
+        && typeof document.querySelectorAll === 'function'
+      ) {
         const dom = document.querySelectorAll('.scrren-com')[2]
         this.$nextTick(() => {
           dom.style.color = this.search.approvalType ? '#2d5cf6' : '#1d2128'
@@ -590,15 +593,17 @@ export default {
 
       // 如果param存在sort和sortType，说明是点击了排序，
       // 需要把sort和sortType放到param里面
-      if (param.sort && param.sortType) {
+      if (
+        this.sortName
+        && Reflect.has(param, 'sort')
+        && Reflect.has(param, 'sortType')
+      ) {
         const chooseSortBill = () => {
-          this.isSortOl ? (this.isSortOl = false) : ''
           param.sortType = this.SORTTYPEENU.desc
           param.sort = this.SORTENU.billTime
         }
 
         const chooseSortOl = () => {
-          this.isSortBill ? (this.isSortBill = false) : ''
           param.sortType = this.SORTTYPEENU.desc
           param.sort = this.SORTENU.onlineTime
         }
@@ -607,14 +612,17 @@ export default {
           param.sort = this.SORTENU.backcheckTime
           param.sortType = this.SORTTYPEENU.asc
         }
+
         // eslint-disable-next-line no-nested-ternary
-        this.isSortBill
+        this.sortName === 'bill'
           ? chooseSortBill()
-          : this.isSortOl
+          : this.sortName === 'ol'
             ? chooseSortOl()
             : reset()
       }
 
+      // 锁定
+      Reflect.preventExtensions(param)
       const res = await getRecheckList(param)
       const { data } = res
       if (data.status === 200) {
@@ -634,11 +642,11 @@ export default {
     },
 
     onlineClick() {
-      this.isSortOl = !this.isSortOl
+      this.sortName === 'ol' ? (this.sortName = '') : (this.sortName = 'ol')
       this.searchOnePage()
     },
     billClick() {
-      this.isSortBill = !this.isSortBill
+      this.sortName === 'bill' ? (this.sortName = '') : (this.sortName = 'bill')
       this.searchOnePage()
     },
     changeAgencies() {
@@ -650,13 +658,12 @@ export default {
     changeBillDate() {
       this.searchOnePage()
     },
-
     handleBackCheck() {
       this.searchOnePage()
     },
     handleSubmit() {
       this.searchOnePage()
-    },
+    }
   },
 
   created() {
