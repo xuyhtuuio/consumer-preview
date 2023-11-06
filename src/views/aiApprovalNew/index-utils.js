@@ -824,6 +824,7 @@ export default {
         }
       });
       this.comments = setArr;
+      console.log('comments', this.comments)
     },
     // 编辑意见后,同步更新  文件的推荐意见状态
     upDateComments(type, item, newVal) {
@@ -1433,6 +1434,14 @@ export default {
       // this.filePopoverShow = true;
       this.activePdfIndex = i
       const temp = this.files[this.activeIndex].child[this.activePdfIndex]
+      if (!temp) {
+        let pageNow = Math.floor((i + 1) / this.pdfInfo.pageSize)
+        if ((i + 1) % this.pdfInfo.pageSize) {
+          pageNow += 1
+        }
+        this.changePdfPageNow(pageNow, this.activePdfIndex)
+        return;
+      }
       if (!temp.ocr) {
         temp.ocr = await this.getOcr(temp);
       }
@@ -1461,7 +1470,7 @@ export default {
       this.fileloading = false;
       this.filePopoverShow = false;
     },
-    async changePdfPageNow(pageNow) {
+    async changePdfPageNow(pageNow, activePdfIndex) {
       this.fileloading = true;
       // this.filePopoverShow = true;
       const params = {
@@ -1486,7 +1495,13 @@ export default {
           this.files[this.activeIndex].child = this.pdfInfo.list
           // 不是第一页
         } else {
-          this.files[this.activeIndex].child.push(...this.pdfInfo.list)
+          this.pdfInfo.list.map((pdf, index) => {
+            this.files[this.activeIndex].child[index + this.pdfInfo.pageSize * (this.pdfInfo.pageNow - 1)] = pdf
+          })
+        }
+        if (activePdfIndex) {
+          this.changePdfPage(activePdfIndex)
+          return;
         }
         this.activePdfIndex = 0 + this.pdfInfo.pageSize * (pageNow - 1)
         this.pdfInfo.list = this.files[this.activeIndex].child.slice(this.activePdfIndex, this.activePdfIndex + 10)

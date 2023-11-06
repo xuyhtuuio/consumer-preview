@@ -148,7 +148,7 @@ export default {
       this.$emit('changePdfPage', Number(index))
     },
     changePdfPageInput(i) {
-      this.changePdfPage(i - 1)
+      this.$emit('changePdfPage', Number(i - 1))
     },
     swiperTo(pageNow) {
       if (pageNow < 1 || pageNow > this.pdfTotalPage) {
