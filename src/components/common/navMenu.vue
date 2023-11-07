@@ -126,10 +126,15 @@ export default {
       this.activeMenu = this.list.find(item => names.includes(item.pathName))?.pathName
     },
     logout() {
-      window.localStorage.clear()
-      this.$router.push({
-        name: 'login'
-      })
+      if (this.$hasMicro()) {
+        this.$routerPush('loginOut')
+      } else {
+        // 自己的退出登录逻辑
+        window.localStorage.clear()
+        this.$router.push({
+          name: 'login'
+        })
+      }
       /* const newWindow = window.open('', '_self')
       if (window.location.host === '192.168.210.57:31603') {
         newWindow.location = 'http://192.168.210.57:31963'
@@ -145,9 +150,13 @@ export default {
       } */
     },
     returnHome() {
-      this.$router.push({
-        name: 'home'
-      })
+      if (this.$hasMicro()) {
+        this.$routerPush('home')
+      } else {
+        this.$router.push({
+          name: 'home'
+        })
+      }
     },
     updateInfo() {
       const user = JSON.parse(window.localStorage.getItem('user_name'))
@@ -180,9 +189,13 @@ export default {
       if (names.includes(to.name)) {
         return;
       }
-      this.$router.push({
-        name: to.name
-      })
+      if (this.$hasMicro()) {
+        this.$routerPush('message')
+      } else {
+        this.$router.push({
+          name: to.name
+        })
+      }
     }
   }
 }
