@@ -5,7 +5,7 @@ export const permissionList = [
     type: '',
     isNoWarn: true, // 去除警告
     props: { trueLabel: 'edit', falseLabel: '' },
-    reflect: ['approval-details', 'aiApproval', 'compare'], // 关联权限
+    reflect: ['applicationFormDetails', 'smartApprovals', 'onlineComparison'], // 关联权限
     children: [
       {
         code: 'allTask',
@@ -55,7 +55,7 @@ export const permissionList = [
       {
         code: 'flowableManagement',
         title: '流程管理',
-        reflect: ['baseSetting', 'processDesign', 'proSetting'],
+        reflect: ['workflowBaseInfo', 'workflowProcessDesign', 'workflowConfiguration'],
         type: '',
         props: [
           { label: 'view', value: '查看' },
@@ -111,7 +111,7 @@ export const permissionList = [
         code: 'collectKnowledge',
         title: '知识库',
         type: '',
-        reflect: ['rulesBase', 'RulesDetail'],
+        reflect: ['rulesBase', 'rulesDetail', 'collectKnowledge'],
         props: [
           { label: 'view', value: '查看' },
           { label: 'edit', value: '查看并编辑' },
