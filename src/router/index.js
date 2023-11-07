@@ -425,17 +425,10 @@ async function getUserRole() {
 }
 export async function getPermissionsPage() {
   const res = await editThePermissionsPage()
-  const data = res.data.data || {}
-  // data.funPerms = data.funPerms.map(item => {
-  //   return {
-  //     name: item.name,
-  //     type: item.type,
-  //     code: item.code,
-  //     child: item.child
-  //   }
-  // })
-  // data.funPerms = data.funPerms.filter((item) => item.type)
-  // data.defaultPerm = data.defaultPerm.filter((item) => item.type)
+  const data = res.data.data || {
+    funPerms: [],
+    dataPerm: []
+  }
   store.state.permissionsPage = data
   window.localStorage.setItem('permissionsPage', JSON.stringify(data))
 }

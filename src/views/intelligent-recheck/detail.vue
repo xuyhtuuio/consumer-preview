@@ -92,7 +92,7 @@
             </div>
             <div class="select-item select-time">
               <el-popover
-                ref="ref-popover"
+                ref="ref-popover2"
                 popper-class="date-style"
                 width="400"
                 placement="bottom-start"
@@ -125,7 +125,7 @@
             </div>
             <div class="select-item select-time">
               <el-popover
-                ref="ref-popover"
+                ref="ref-popover1"
                 width="400"
                 popper-class="date-style"
                 placement="bottom-start"
@@ -162,6 +162,7 @@
                 <i class="el-icon-caret-bottom"></i>
               </div>
               <el-select
+                @focus="getFocus"
                 popper-class="content-select op-select"
                 v-model="searchForm.type"
                 slot="prepend"
@@ -711,6 +712,11 @@ export default {
     },
     handlePopoverShow3() {
       this.$refs['org-cascader'].handleFocus()
+    },
+    getFocus() {
+      this.$refs['ref-popover1'].handleBlur()
+      this.$refs['ref-popover2'].handleBlur()
+      this.$refs['ref-popover3'].handleBlur()
     },
     changeSize(type) {
       this.$refs.imgPreview1.changeSize(type)
