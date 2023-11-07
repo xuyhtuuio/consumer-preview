@@ -38,7 +38,7 @@
           </div>
         </div>
         <div>
-          <el-input v-if="type !== 'dept'" :placeholder="active === 'user' ? '搜索部门/人员' : '搜索系统角色'" prefix-icon="el-icon-search" size="medium"
+          <el-input v-char v-if="type !== 'dept'" :placeholder="active === 'user' ? '搜索部门/人员' : '搜索系统角色'" prefix-icon="el-icon-search" size="medium"
                     v-model="search" :maxlength="50" clearable>
           </el-input>
           <!-- <el-breadcrumb separator-class="el-icon-arrow-right" style="overflow-x: hidden">

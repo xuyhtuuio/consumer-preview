@@ -1,20 +1,24 @@
-<!--
- * @Author: nimeimix huo.linchun@trs.com.cn
- * @Date: 2023-10-25 17:05:44
- * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-30 18:24:28
- * @FilePath: /consumer-preview/src/views/knowledge/index.vue
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
--->
 <template>
   <div class="knowledge">
-    <KnowledgeHeader/>
+    <KnowledgeHeader />
     <el-backtop target=".main_right" :visibility-height="windowHeight">
-      <div class="show-top" :class="topBtnState ? 'active' : ''" @click="changeState(2)" @mouseenter="changeState(1)"
-        @mouseleave="changeState(0)">
-        <img v-if="!topBtnState" style="width: 12px;height: 18px;margin-bottom: 10px;"
-          src="@/assets/image/top-icon.png">
-        <img v-else style="width: 12px;height: 18px;margin-bottom: 10px;" src="@/assets/image/top-icon1.png">
+      <div
+        class="show-top"
+        :class="topBtnState ? 'active' : ''"
+        @click="changeState(2)"
+        @mouseenter="changeState(1)"
+        @mouseleave="changeState(0)"
+      >
+        <img
+          v-if="!topBtnState"
+          style="width: 12px; height: 18px; margin-bottom: 10px"
+          src="@/assets/image/top-icon.png"
+        />
+        <img
+          v-else
+          style="width: 12px; height: 18px; margin-bottom: 10px"
+          src="@/assets/image/top-icon1.png"
+        />
         置顶
       </div>
     </el-backtop>
@@ -33,7 +37,7 @@ import KnowledgeHeader from './components/header'
 export default {
   name: 'knowledge',
   components: {
-    KnowledgeHeader,
+    KnowledgeHeader
   },
   data() {
     return {
@@ -46,25 +50,34 @@ export default {
   created() {
     this.$store.commit('setWindowHeight')
   },
+  watch: {
+    $route: {
+      handler() {
+        const dom = document.getElementsByClassName('view-content')?.[0]
+        dom.scrollTop = 0
+      },
+      deep: true
+    }
+  },
   methods: {
     // 更改置顶状态
     changeState(type) {
       if (type === 2) {
         setTimeout(() => {
-          this.topBtnState = false;
-        }, 1000);
-        return;
+          this.topBtnState = false
+        }, 1000)
+        return
       }
-      this.topBtnState = Boolean(type);
-    },
+      this.topBtnState = Boolean(type)
+    }
   }
 }
 </script>
 <style lang="less" scoped>
-.knowledge{
+.knowledge {
   overflow: hidden;
 }
-.view-content{
+.view-content {
   height: calc(100% - 48px);
 }
 .manage {
@@ -84,7 +97,7 @@ export default {
 }
 
 .active {
-  color: #80A6FF;
+  color: #80a6ff;
 }
 /deep/.el-backtop {
   right: 0 !important;

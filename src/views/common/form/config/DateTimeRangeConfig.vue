@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-form-item label="提示文字">
-      <el-input size="small" v-model="value.placeholder[0]" placeholder="开始日期提示"/>
-      <el-input size="small" v-model="value.placeholder[1]" placeholder="结束日期提示"/>
+      <el-input v-char size="small" v-model="value.placeholder[0]" placeholder="开始日期提示"/>
+      <el-input v-char size="small" v-model="value.placeholder[1]" placeholder="结束日期提示"/>
     </el-form-item>
     <el-form-item label="日期格式">
       <el-select size="small" v-model="value.format">

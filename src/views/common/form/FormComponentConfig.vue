@@ -1,7 +1,7 @@
 <template>
   <el-form>
     <el-form-item label="表单名称">
-      <el-input size="small" clearable v-model="form.title"/>
+      <el-input v-char size="small" clearable v-model="form.title"/>
     </el-form-item>
     <component :is="form.name" v-model="form.props"/>
     <el-form-item label="必填项">

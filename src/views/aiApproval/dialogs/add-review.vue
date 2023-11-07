@@ -13,7 +13,7 @@
             <p class="mb12"><span
                     :class="params.type == 1 ? 'stop-word active-stop-word' : 'sensitive-word active-sensitive-word'">{{
                         params.keywords }}</span></p>
-            <el-input type="textarea" placeholder="请输入审查话术内容" v-model="params.content" resize="none"></el-input>
+            <el-input v-char type="textarea" placeholder="请输入审查话术内容" v-model="params.content" resize="none"></el-input>
         </div>
         <span slot="footer" class="dialog-footer">
             <el-button @click="handleClose">取 消</el-button>

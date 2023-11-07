@@ -12,7 +12,7 @@
         trigger="click"
       >
         <div class="content">
-          <el-input v-model.trim="serach" @keypress.native.enter="changeJustCare" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
+          <el-input v-char v-model.trim="serach" @keypress.native.enter="changeJustCare" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
           <div style="position: relative; top: 12px;font-size: 12px;">
             <el-switch v-model="justCare" @change="changeJustCare" size="mini" style="position: relative; bottom: 2px;"></el-switch>
             仅看我关注的

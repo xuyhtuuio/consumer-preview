@@ -1,8 +1,8 @@
 <template>
   <div class="comment">
     <div class="textarea">
-      <el-input v-model.trim="title" @focus="handleFocus" @blur="handleBlur" placeholder="请输入标题(选填)" :maxlength="50" :minlength="1"></el-input>
-      <el-input v-model.trim="content" @focus="handleFocus" @blur="handleBlur" type="textarea" placeholder="有什么新的案例分享给大家？" :rows="3" :maxlength="500" :minlength="1"></el-input>
+      <el-input v-char v-model.trim="title" @focus="handleFocus" @blur="handleBlur" placeholder="请输入标题(选填)" :maxlength="50" :minlength="1"></el-input>
+      <el-input v-char v-model.trim="content" @focus="handleFocus" @blur="handleBlur" type="textarea" placeholder="有什么新的案例分享给大家？" :rows="3" :maxlength="500" :minlength="1"></el-input>
       <img class="entry-dialog pointer" src="@/assets/image/knowledge/输入框弹框.svg" @click="openDialog" alt=""/>
     </div>
     <div class="option-area">
@@ -42,7 +42,7 @@
         @show="showTagPopover"
       >
         <div class="content">
-          <el-input v-model.trim="serach" @keypress.native.enter="changeSearchTag" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
+          <el-input v-char v-model.trim="serach" @keypress.native.enter="changeSearchTag" size="mini" class="is-dark" placeholder="请输入关键词搜索"></el-input>
           <ul class="tags-list trs-scroll" v-loading="loadingTag">
             <li class="tag-li pointer" v-if="showNewTag">
               <span class="tag-text ellipsis">#{{ serach }}</span>
