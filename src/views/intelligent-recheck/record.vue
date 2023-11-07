@@ -458,6 +458,7 @@ export default {
           decodeURI(disposition.replace('attachment;filename=', ''))
         )
         document.body.appendChild(link)
+        // TODO
         link.click()
         document.body.removeChild(link)
       })
@@ -598,27 +599,12 @@ export default {
         && Reflect.has(param, 'sort')
         && Reflect.has(param, 'sortType')
       ) {
-        const chooseSortBill = () => {
-          param.sortType = this.SORTTYPEENU.desc
-          param.sort = this.SORTENU.billTime
-        }
-
-        const chooseSortOl = () => {
-          param.sortType = this.SORTTYPEENU.desc
-          param.sort = this.SORTENU.onlineTime
-        }
-
-        const reset = () => {
-          param.sort = this.SORTENU.backcheckTime
-          param.sortType = this.SORTTYPEENU.asc
-        }
-
         // eslint-disable-next-line no-nested-ternary
         this.sortName === 'bill'
-          ? chooseSortBill()
+          ? this.judgeChoose(param, 'bill', this)
           : this.sortName === 'ol'
-            ? chooseSortOl()
-            : reset()
+            ? this.judgeChoose(param, 'ol', this)
+            : this.judgeChoose(param, 'reset', this)
       }
 
       // 锁定
@@ -631,6 +617,36 @@ export default {
         this.recordList = list
         this.search.loading = false
       }
+    },
+
+    judgeChoose(param, type = 'reset', thisObj) {
+      const _this = thisObj
+      const actions = new Map([
+        [
+          'bill',
+          () => {
+            param.sortType = this.SORTTYPEENU.desc
+            param.sort = this.SORTENU.billTime
+          }
+        ],
+        [
+          'ol',
+          () => {
+            param.sortType = this.SORTTYPEENU.desc
+            param.sort = this.SORTENU.onlineTime
+          }
+        ],
+        [
+          'reset',
+          () => {
+            param.sort = this.SORTENU.backcheckTime
+            param.sortType = this.SORTTYPEENU.asc
+          }
+        ]
+      ])
+      actions.get(type)
+        ? actions.get(type).call(_this)
+        : actions.get('reset').call(_this)
     },
 
     handleCurrentChange(pageNow) {
