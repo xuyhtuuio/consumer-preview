@@ -376,6 +376,10 @@ export default {
       const commenId = this.collection.filter((item) => {
         return item.id === id
       })
+      // 非批注
+      if (!commenId[0].id) {
+        return;
+      }
       if (this.files[this.activeIndex].type === 'pdf' && commenId[0]?.filesWithComment?.includes(this.files[this.activeIndex].child[this.activePdfIndex].id)) {
         this.$emit('showCommentLine', commenId[0], commenId[0]?.filesWithComment[0])
         return;
