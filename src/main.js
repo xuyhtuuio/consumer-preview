@@ -58,6 +58,18 @@ Vue.prototype.$getDefalut = function (obj, key, df) {
 
 Vue.prototype.$deepCopy = function (obj) { return JSON.parse(JSON.stringify(obj)) }
 
+Vue.prototype.$hasMicro = function () {
+  return window.microApp
+ }
+ Vue.prototype.$routerPush = function (type, paramsObj = {}) {
+   const data = {
+     message: '/admin/manage/', // 后台管理页面
+     home: '/', // 首页
+     loginOut: '/loginOut' // 退出登录
+   }
+   window.microApp.dispatch({ path: data[type], time: new Date().getTime() , ...paramsObj})
+ }
+
 new Vue({
   router,
   store,
