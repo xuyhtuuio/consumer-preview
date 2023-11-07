@@ -12,7 +12,7 @@
         <div class="swiper-top">
           <div class="swiper-button-prev" :class="{ 'disabled': activeIndex === 0 }" @click="swiperTo(pdfPageNow - 1)">
           </div>
-          <el-input v-model="curPdfPage" @keyup.enter.native="changePdfPageInput(curPdfPage)">
+          <el-input v-char v-model="curPdfPage" @keyup.enter.native="changePdfPageInput(curPdfPage)">
             <template slot="append">/{{ pdfTotal }}</template>
           </el-input>
           <div class="swiper-button-next" :class="{ 'disabled': activeIndex === fileList.length - 1 }"
@@ -148,7 +148,7 @@ export default {
       this.$emit('changePdfPage', Number(index))
     },
     changePdfPageInput(i) {
-      this.changePdfPage(i - 1)
+      this.$emit('changePdfPage', Number(i - 1))
     },
     swiperTo(pageNow) {
       if (pageNow < 1 || pageNow > this.pdfTotalPage) {
@@ -315,6 +315,8 @@ export default {
         .el-image {
           height: 100%;
           width: 100%;
+          border: 1px solid #E5E6EB;
+          box-shadow: 0px 0px 10px 0px #4343431A;
         }
 
         &.swiper-slide-split {
