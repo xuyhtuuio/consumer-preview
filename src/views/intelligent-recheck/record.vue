@@ -609,14 +609,11 @@ export default {
 
       // 锁定
       Reflect.preventExtensions(param)
-      const res = await getRecheckList(param)
-      const { data } = res
-      if (data.status === 200) {
-        const { list, totalCount } = data.data
-        this.page.totalCount = totalCount
-        this.recordList = list
-        this.search.loading = false
-      }
+      const { data } = await getRecheckList(param)
+      const { list, totalCount } = { ...(data.status === 200 && data.data) }
+      this.page.totalCount = totalCount
+      this.recordList = list
+      this.search.loading = false
     },
 
     judgeChoose(param, type = 'reset', thisObj) {
