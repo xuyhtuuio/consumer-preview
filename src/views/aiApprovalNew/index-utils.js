@@ -1086,15 +1086,10 @@ export default {
             }))
           } else {
             const pdf = this.files[this.activeIndex].child[this.activePdfIndex]
-            pdf.files.filter(file => item?.some((f) => {
-              if (f.files.includes(file.id)) {
-                if (!file.comments) {
-                  file.comments = []
-                }
-                // file.comments = [...new Set([...file.comments, f])]
-                file.comments.push(f)
-              }
-            }))
+            if (!pdf.comments) {
+              pdf.comments = []
+            }
+            pdf.comments.push(...item)
           }
           break;
         default:
@@ -1249,7 +1244,8 @@ export default {
         const scale = (img?.naturalWidth / img?.clientWidth) || this.styleProp.wordDomStyle.scale;
         // 过滤其他文件
         let curFileOcrIndex = []
-        this.comments?.map((comment) => {
+        const comments = this.comments.filter((c) => c.id)
+        comments?.map((comment) => {
           comment.filesWithBg.map((fwb) => {
             if (fwb.fileId === this.approval.id) {
               curFileOcrIndex.push(...fwb.fileBgs)
@@ -1257,7 +1253,7 @@ export default {
           })
         })
         curFileOcrIndex = curFileOcrIndex.flat()
-        this.comments?.map((comment) => {
+        comments?.map((comment) => {
           const commentIcons = []
           curFileOcrIndex.map((curIndex) => {
             for (const key in comment.iconsWithOcrIndex) {
