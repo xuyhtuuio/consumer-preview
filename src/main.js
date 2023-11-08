@@ -18,7 +18,6 @@ import "@/assets/global.css";
 import '@/assets/icon/iconfont.css';
 import '@/assets/icon/iconfont.js';
 import '@/assets/css/common.less';
-import '@/assets/css/element.less';
 import '@/mixins'
 import 'echarts-wordcloud'
 
