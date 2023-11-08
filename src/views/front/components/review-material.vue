@@ -127,7 +127,7 @@ export default {
       uploadTip1: '*&^%$_-+=',
       judgment: 'zip/jpeg/jpg/png/pdf/doc/docx/xls/xlsx/mp4/ppt/pptx/txt/',
       // judgment:this.list
-      action: 'http://192.168.210.57:31602/cpr/file/upload',
+      action: this.$GLOBAL.fileUploadUrl,
       fileList: [],
       info: {
         err: '您当前存在上传失败的材料，可能是文件名中包含特殊字符，请重新上传后再提交',

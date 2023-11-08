@@ -22,7 +22,7 @@ export default {
     iframeUrl() {
       // eslint-disable-next-line
       const encondeUrl = encodeURIComponent(Base64.encode(this.url))
-      return 'http://192.168.210.52:31400/onlinePreview?url=' + encondeUrl
+      return this.$GLOBAL.filePreviewUrl + '?url=' + encondeUrl
     }
   }
 }
