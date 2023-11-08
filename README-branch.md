@@ -13,3 +13,6 @@ main-show： 开发演示版本（基于mian,合并其他正在开发的分支�
 develop-ocr-recycle： ocr改版
 develop-knowledge：知识库：  知识集市、法规库
 main-backups: 统计中心产品中心接口联调版本
+
+环境说明
+https://alidocs.dingtalk.com/i/nodes/LeBq413JA2qDj752tMP5EK4q8DOnGvpb?utm_scene=team_space
