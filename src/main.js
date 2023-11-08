@@ -73,3 +73,33 @@ new Vue({
   store,
   render: h => h(App),
 }).$mount('#app')
+
+// 子应用接收 父应用数据
+function dataListener (data) {
+  switch (data.actionType) {
+    case 'routerPush':
+      router.push({
+        name: data.name,
+        params: data.params
+      });
+      break;
+    default:
+      break;
+  }
+  
+}
+/**
+ * 绑定监听函数，监听函数只有在数据变化时才会触发
+ * dataListener: 绑定函数
+ * autoTrigger: 在初次绑定监听函数时如果有缓存数据，是否需要主动触发一次，默认为false
+ * !!!重要说明: 因为子应用是异步渲染的，而基座发送数据是同步的，
+ * 如果在子应用渲染结束前基座应用发送数据，则在绑定监听函数前数据已经发送，在初始化后不会触发绑定函数，
+ * 但这个数据会放入缓存中，此时可以设置autoTrigger为true主动触发一次监听函数来获取数据。
+ */
+window.microApp.addDataListener(dataListener, true)
+
+// 解绑监听函数
+window.microApp.removeDataListener(dataListener)
+
+// 清空当前子应用的所有绑定函数(全局数据函数除外)
+window.microApp.clearDataListener()
