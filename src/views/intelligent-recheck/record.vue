@@ -609,8 +609,8 @@ export default {
 
       // 锁定
       Reflect.preventExtensions(param)
-      const { data } = await getRecheckList(param)
-      const { list, totalCount } = { ...(data.status === 200 && data.data) }
+      const { data: listData } = await getRecheckList(param)
+      const { list, totalCount } = { ...(listData.status === 200 && listData.data) }
       this.page.totalCount = totalCount
       this.recordList = list
       this.search.loading = false
