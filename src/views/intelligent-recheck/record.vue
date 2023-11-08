@@ -641,9 +641,7 @@ export default {
           }
         ]
       ])
-      actions.get(type)
-        ? actions.get(type).call(_this)
-        : actions.get('reset').call(_this)
+      actions.get(type) && actions.get(type).call(_this)
     },
 
     handleCurrentChange(pageNow) {
