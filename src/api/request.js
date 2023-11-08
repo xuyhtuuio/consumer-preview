@@ -113,18 +113,5 @@ function getloginHref() {
   router.push({
     name: 'login'
   })
-  /* const newWindow = window.open('', '_self');
-  if (window.location.host === '192.168.210.57:31603') {
-    newWindow.location = 'http://192.168.210.57:31963/#/login?from=cpr';
-  } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
-    newWindow.location = 'https://dataelite.trs.com.cn/#/login?from=cpr';
-  } else if (window.location.host === 'cwo.dataelite.trs.com.cn') {
-    newWindow.location = 'https://cwo.dataelite.trs.com.cn/#/login?from=cwo';
-  } else {
-    const name = window.self === window.top ? 'login' : 'loginAuto';
-    router.push({
-      name,
-    });
-  } */
 }
 export default service;

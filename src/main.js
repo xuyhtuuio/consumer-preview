@@ -41,8 +41,6 @@ Vue.prototype.$echarts = echarts
 
 Vue.config.productionTip = false
 
-Vue.prototype.BASE_URL = 'http://' + (process.env.NODE_ENV === 'development' ? "192.168.210.76" : "192.168.210.76");
-
 Vue.prototype.$isNotEmpty = function (obj) {
   return (obj !== undefined && obj !== null && obj !== '' && obj !== 'null')
 }
