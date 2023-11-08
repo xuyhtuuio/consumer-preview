@@ -349,11 +349,17 @@ export default {
     // 点击按钮缩放事件
     changeSize(type) {
       const size = 0.05
-      if (type) {
+      if (type === 1) {
         this.params.zoomVal += size
         this.$refs.imgDom.style.transform = 'scale(' + this.params.zoomVal + ')';
-      } else {
+      } else if (type === 0) {
+        if (this.params.zoomVal <= 0.2) {
+          return;
+        }
         this.params.zoomVal -= size
+        this.$refs.imgDom.style.transform = 'scale(' + this.params.zoomVal + ')';
+      } else if (type === 2) {
+        this.params.zoomVal = 1
         this.$refs.imgDom.style.transform = 'scale(' + this.params.zoomVal + ')';
       }
     },
