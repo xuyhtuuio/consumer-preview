@@ -368,6 +368,7 @@ export default {
       },
       fileURL: '',
       recordList: [],
+      clickSortType: ['ol', 'bill', 're'],
       page: {
         pageNow: 1,
         pageSize: 8,
@@ -599,24 +600,23 @@ export default {
         && Reflect.has(param, 'sort')
         && Reflect.has(param, 'sortType')
       ) {
-        // eslint-disable-next-line no-nested-ternary
-        this.sortName === 'bill'
-          ? this.judgeChoose(param, 'bill', this)
-          : this.sortName === 'ol'
-            ? this.judgeChoose(param, 'ol', this)
-            : this.judgeChoose(param, 'reset', this)
+        this.sortChoose(param, this)
       }
 
       // 锁定
       Reflect.preventExtensions(param)
-      const { data: listData } = await getRecheckList(param)
-      const { list, totalCount } = { ...(listData.status === 200 && listData.data) }
+      const {
+        data: { data, status }
+      } = await getRecheckList(param)
+      const { list, totalCount } = {
+        ...(status === 200 && data)
+      }
       this.page.totalCount = totalCount
       this.recordList = list
       this.search.loading = false
     },
 
-    judgeChoose(param, type = 'reset', thisObj) {
+    sortChoose(param, thisObj) {
       const _this = thisObj
       const actions = new Map([
         [
@@ -634,14 +634,15 @@ export default {
           }
         ],
         [
-          'reset',
+          'default',
           () => {
             param.sort = this.SORTENU.backcheckTime
             param.sortType = this.SORTTYPEENU.asc
           }
         ]
       ])
-      actions.get(type) && actions.get(type).call(_this)
+      const action = actions.get(this.sortName) || actions.get('default')
+      action.call(_this)
     },
 
     handleCurrentChange(pageNow) {
@@ -653,12 +654,18 @@ export default {
     },
 
     onlineClick() {
-      this.sortName === 'ol' ? (this.sortName = '') : (this.sortName = 'ol')
-      this.searchOnePage()
+      this.sortName === 'ol' ? (this.sortName = 're') : (this.sortName = 'ol')
+      if (this.clickSortType.includes(this.sortName)) {
+        this.searchOnePage()
+      }
     },
     billClick() {
-      this.sortName === 'bill' ? (this.sortName = '') : (this.sortName = 'bill')
-      this.searchOnePage()
+      this.sortName === 'bill'
+        ? (this.sortName = 're')
+        : (this.sortName = 'bill')
+      if (this.clickSortType.includes(this.sortName)) {
+        this.searchOnePage()
+      }
     },
     changeAgencies() {
       this.searchOnePage()

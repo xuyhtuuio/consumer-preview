@@ -26,7 +26,7 @@
               <svg class="icon urgent-icon" aria-hidden="true" v-if="compareItem.dismissalMark == 1">
                 <use xlink:href="#icon-tongyongtubiao2"></use>
               </svg>
-              <div class="detail-title">{{ compareItem.formName }}</div>
+              <div class="detail-title">{{ compareItem.fileName }}</div>
               <div class="line"></div>
               <div class="detail-title">{{ compareItem.formCategoryName }}</div>
               <div class="line"></div>
@@ -372,6 +372,10 @@ export default {
               font-weight: 700;
               line-height: 22px;
               margin-right: 4px;
+              display: -webkit-box;
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 1;
+              overflow: hidden;
             }
             .line {
               margin: 0 8px;
