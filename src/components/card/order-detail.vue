@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-08-29 13:49:23
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-10-25 12:51:01
+ * @LastEditTime: 2023-11-08 17:05:24
  * @FilePath: /consumer-preview/src/components/card/order-detail.vue
  * @Description: 左侧：工单详细信息   右侧：工单处于不同状态下，会回显不同的信息
 -->
@@ -61,7 +61,7 @@
         </div>
       </div>
     </div>
-    <div class="flex" style="align-items: flex-start; height: calc(100% - 50px)">
+    <div  style="display:flex; align-items: flex-start; height: calc(100% - 50px)">
       <!-- 左侧工单信息 -->
       <div class="left-info">
         <div class="order-name">
