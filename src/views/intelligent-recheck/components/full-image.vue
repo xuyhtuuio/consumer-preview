@@ -330,6 +330,9 @@ export default {
         this.zoomVal += size
         this.$refs.imgDom.style.transform = 'scale(' + this.zoomVal + ')';
       } else {
+        if (this.zoomVal <= 0.2) {
+          return
+        }
         this.zoomVal -= size
         this.$refs.imgDom.style.transform = 'scale(' + this.zoomVal + ')';
       }

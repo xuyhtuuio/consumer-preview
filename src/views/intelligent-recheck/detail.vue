@@ -105,7 +105,6 @@
                   ref="my-date-picker"
                   align="right"
                   unlink-panels
-                  :picker-options="pickerOptions"
                   range-separator="至"
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
@@ -139,7 +138,6 @@
                   align="right"
                   unlink-panels
                   clearable
-                  :picker-options="pickerOptions"
                   range-separator="至"
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
@@ -388,11 +386,11 @@ export default {
     },
     inputFocus: false,
     heightArr: [322, 262, 162],
-    pickerOptions: {
-      disabledDate(date) {
-        return date.getTime() > Date.now();
-      }
-    },
+    // pickerOptions: {
+    //   disabledDate(date) {
+    //     return date.getTime() > Date.now();
+    //   }
+    // },
     placeholder: '请输入文件名或上传图片进行回检',
     agenciesList: [],
     transactionTypes: [],
