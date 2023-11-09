@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-06 11:23:41
+ * @LastEditTime: 2023-11-09 14:14:05
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -37,7 +37,7 @@
                 >
                   <ul>
                     <li @click="editRule(item, 'edit')">编辑</li>
-                    <li @click="editRule(item, 'update')" >更新</li>
+                    <li @click="editRule(item, 'update')">更新</li>
                     <li @click="delRule(item)">删除</li>
                   </ul>
                   <i
@@ -198,7 +198,7 @@
           </el-form-item>
           <el-form-item label="发布时间" prop="date">
             <el-date-picker
-            type="datetime"
+              type="datetime"
               placeholder="请选择日期"
               v-model="form.date"
               style="width: 100%"
@@ -220,7 +220,7 @@
         </div>
         <el-form-item label="发布时间" prop="date" v-if="type == 2">
           <el-date-picker
-          type="datetime"
+            type="datetime"
             placeholder="请选择日期"
             v-model="form.date"
             style="width: 100%"
@@ -279,9 +279,13 @@
               :http-request="uploadContent"
               list-type="picture-card"
               :limit="uploadLimit"
-              accept=".pdf, .doc, .docx"
               :file-list="form.uploadFile"
               :on-change="handleUploadChange"
+              :before-upload="
+                (file) => {
+                  handleBefore(file, 'upload')
+                }
+              "
             >
               <i slot="default" class="el-icon-plus"></i>
               <div
@@ -346,11 +350,11 @@
               action="#"
               :http-request="uploadRelatedFile"
               list-type="picture-card"
-              accept=".pdf, .doc, .docx"
               multiple
               :class="[uploadRelatedDisabled]"
               :on-change="handleRelatedChange"
               :file-list="form.relatedFile"
+              :before-upload="(file) => handleBefore(file, 'related')"
             >
               <i slot="default" class="el-icon-plus"></i>
               <div
@@ -432,60 +436,60 @@ export default {
     var checkIdInputName = (rule, value, callback) => {
       if (!value?.length || value.length > 50) {
         this.validatorForm.nameError = true
-        return callback()
+        callback(new Error(''))
       } else {
         this.validatorForm.nameError = false
         callback()
       }
     }
     // eslint-disable-next-line
-    var checkIdInputUnit = (rule, value, cb) => {
+    var checkIdInputUnit = (rule, value, callback) => {
       if (!value?.length || value.length > 50) {
         this.validatorForm.unitError = true
-        return cb()
+        callback(new Error(''))
       } else {
         this.validatorForm.unitError = false
-        return cb()
+        return callback()
       }
     }
     // eslint-disable-next-line
-    var checkIdDocumentNumber = (rule, value, cb) => {
+    var checkIdDocumentNumber = (rule, value, callback) => {
       if (!value?.length || value.length > 50) {
         this.validatorForm.documentNumberError = true
-        return cb()
+        callback(new Error(''))
       } else {
         this.validatorForm.documentNumberError = false
-        return cb()
+        return callback()
       }
     }
     // eslint-disable-next-line
-    var checkDate = (rule, value, cb) => {
+    var checkDate = (rule, value, callback) => {
       if (!value?.length) {
         this.validatorForm.dateError = true
-        return cb()
+        callback(new Error(''))
       } else {
         this.validatorForm.dateError = false
-        return cb()
+        return callback()
       }
     }
     // eslint-disable-next-line
-    var checkFile = (rule, value, cb) => {
+    var checkFile = (rule, value, callback) => {
       if ((this.form.uploadFile?.length || 0) < 1) {
         this.validatorForm.uploadFileError = true
-        return cb()
+        callback(new Error(''))
       } else {
         this.validatorForm.uploadFileError = false
-        return cb()
+        return callback()
       }
     }
     // eslint-disable-next-line
-    var checkIsRepeal = (rule, value, cb) => {
+    var checkIsRepeal = (rule, value, callback) => {
       if (![0, 1].includes(this.form.isRepeal)) {
         this.validatorForm.isRepealError = true
-        return cb()
+        callback(new Error(''))
       } else {
         this.validatorForm.isRepealError = false
-        return cb()
+        return callback()
       }
     }
     return {
@@ -518,20 +522,20 @@ export default {
       rules: {
         isRepeal: [{ validator: checkIsRepeal, trigger: ['change', 'blur'] }],
         name: [
-          { required: true, trigger: ['change'] },
-          { validator: checkIdInputName, trigger: ['change'] }
+          { required: true, trigger: ['change', 'blur'] },
+          { validator: checkIdInputName, trigger: ['change', 'blur'] }
         ],
         documentNumber: [
           { required: true, trigger: ['change'] },
-          { validator: checkIdDocumentNumber, trigger: ['change'] }
+          { validator: checkIdDocumentNumber, trigger: ['change', 'blur'] }
         ],
         unit: [
           { required: true, trigger: ['change'] },
-          { validator: checkIdInputUnit, trigger: ['change'] }
+          { validator: checkIdInputUnit, trigger: ['change', 'blur'] }
         ],
         date: [
           { required: true, trigger: ['change'] },
-          { validator: checkDate, trigger: ['change'] }
+          { validator: checkDate, trigger: ['change', 'blur'] }
         ],
         uploadFile: [
           { required: true, trigger: ['change'] },
@@ -575,13 +579,13 @@ export default {
   },
   watch: {
     'form.name': function (val) {
-      this.validatorForm.nameError = !val?.length > 0
+      this.validatorForm.nameError = !val?.length > 0 || val.length > 50
     },
     'form.unit': function (val) {
-      this.validatorForm.unitError = !val?.length > 0
+      this.validatorForm.unitError = !val?.length > 0 || val.length > 50
     },
     'form.documentNumber': function (val) {
-      this.validatorForm.documentNumberError = !val?.length > 0
+      this.validatorForm.documentNumberError = !val?.length > 0 || val.length > 50
     },
     'form.date': function (val) {
       this.validatorForm.dateError = !val
@@ -701,13 +705,13 @@ export default {
               const [first] = m.tableFileTag
 
               let str = content
-                .map((o) => {
+                ?.map((o) => {
                   return first?.length && first[o]
                     ? that.formatTable(first[o])
                     : o
                 })
                 ?.join('')
-              str = str.replace(/\r/gi, '')
+              str = str?.replace(/\r/gi, '')
               info = {
                 ...m,
                 newContent: str
@@ -771,6 +775,23 @@ export default {
     delTag(tag) {
       const index = this.tagsList.findIndex((v) => tag === v)
       this.tagsList.splice(index, 1)
+    },
+    /**
+     * @description: 上传文件前的校验
+     * @return {*}
+     */
+    handleBefore(file) {
+      const judgment = ['pdf', 'doc', 'docx']
+      // 上传文件之前钩子
+      const type = file.name.replace(/.+\./, '')
+      const judgeRes = judgment.includes(type)
+      if (!judgeRes) {
+        this.$message({
+          type: 'error',
+          message: '只支持pdf/doc/docx格式的文件！'
+        })
+        return false
+      }
     },
     /**
      * @description: 删除当前的权益标签
@@ -869,12 +890,18 @@ export default {
      * @return {*}
      */
     handleUploadChange(file, fileList) {
-      const reg = /\.\w+$/
-      const fileName = file.name.replace(reg, '')
-      if (!this.form.name) {
-        this.form.name = fileName
+      const judgment = ['pdf', 'doc', 'docx']
+      // 上传文件之前钩子
+      const type = file.name.replace(/.+\./, '')
+      const judgeRes = judgment.includes(type)
+      if (judgeRes) {
+        const reg = /\.\w+$/
+        const fileName = file.name.replace(reg, '')
+        if (!this.form.name) {
+          this.form.name = fileName
+        }
+        this.form.uploadFile = fileList
       }
-      this.form.uploadFile = fileList
     },
     /**
      * @description: 移除内容文件
@@ -951,8 +978,18 @@ export default {
      * @description: 关联附件change
      * @return {*}
      */
-    handleRelatedChange(file) {
-      this.form.relatedFile.push(file)
+    handleRelatedChange(file, fileList) {
+      if (fileList.length > 8) {
+        this.$message.error('最多可上传8份附件')
+        return false
+      }
+      const judgment = ['pdf', 'doc', 'docx']
+      // 上传文件之前钩子
+      const type = file.name.replace(/.+\./, '')
+      const judgeRes = judgment.includes(type)
+      if (judgeRes || !judgeRes) {
+        this.form.relatedFile.push(file)
+      }
     },
     /**
      * @description: 移除关联附件
@@ -1067,7 +1104,7 @@ export default {
               params.id = this.form.id
               const newParams = {
                 ...this.form,
-                ...params,
+                ...params
               }
               if (_that.crtBehavior === 'edit') {
                 newParams.isEdit = 'edit'

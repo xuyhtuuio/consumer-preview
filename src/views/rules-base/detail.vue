@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-26 13:51:55
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-06 11:10:12
+ * @LastEditTime: 2023-11-09 13:34:33
  * @FilePath: /consumer-preview/src/views/rules-base/detail.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -87,7 +87,14 @@
               </i>
             </el-popover>
           </div>
-          <span v-if="lawInfo.type == '0'">发文字号：{{ lawInfo.doc_no }}</span>
+          <div v-if="lawInfo.type == '0'">
+            <el-popover placement="bottom" trigger="hover">
+              <p>{{ lawInfo.doc_no }}</p>
+              <i slot="reference" class="pointer">
+                {{ wordEllipsis(lawInfo.doc_no, 20) }}
+              </i>
+            </el-popover>
+          </div>
           <div v-if="lawInfo.type == '1'" class="flex">
             拟稿部门：
             <el-popover placement="bottom" trigger="hover">
