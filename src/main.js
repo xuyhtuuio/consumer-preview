@@ -75,7 +75,8 @@ new Vue({
 
 // 子应用接收 父应用数据
 function dataListener (data) {
-  switch (data.actionType) {
+  const { action } = data;
+  switch (action?.actionType) {
     case 'routerPush':
       router.push({
         name: data.name,
@@ -85,7 +86,6 @@ function dataListener (data) {
     default:
       break;
   }
-  
 }
 /**
  * 绑定监听函数，监听函数只有在数据变化时才会触发
@@ -102,3 +102,10 @@ window.microApp.removeDataListener(dataListener)
 
 // 清空当前子应用的所有绑定函数(全局数据函数除外)
 window.microApp.clearDataListener()
+
+window.addEventListener('appstate-change', function (e) {
+  if (e.detail.appState === 'beforeshow') {
+    console.log(window.microApp.getData())
+    // dataListener(window.microApp.getData())
+  } 
+})
