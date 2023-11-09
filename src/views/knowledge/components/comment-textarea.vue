@@ -2,7 +2,7 @@
   <div class="comment">
     <div class="textarea">
       <el-input v-char v-model.trim="title" @focus="handleFocus" @blur="handleBlur" placeholder="请输入标题(选填)" :maxlength="50" :minlength="1"></el-input>
-      <el-input v-char v-model.trim="content" @focus="handleFocus" @blur="handleBlur" type="textarea" placeholder="有什么新的案例分享给大家？" :rows="3" :maxlength="500" :minlength="1"></el-input>
+      <el-input v-char v-model="content" @focus="handleFocus" @blur="handleBlur" type="textarea" placeholder="有什么新的案例分享给大家？" :rows="3" :maxlength="500" :minlength="1"></el-input>
       <img class="entry-dialog pointer" src="@/assets/image/knowledge/输入框弹框.svg" @click="openDialog" alt=""/>
     </div>
     <div class="option-area">
@@ -224,6 +224,13 @@ export default {
       }
     }, 500),
     uploadBpmn(param) {
+      const accept = ['jpeg', 'jpg', 'png', 'pdf', 'word']
+      const name1 = param.file.name
+      const suffer = accept.includes(name1.split('.')[name1.split('.').length - 1]);
+      if (!suffer) {
+        this.$message.warning('请上传' + accept.join('/') + '格式的文件')
+        return;
+      }
       const formData = new FormData();
       formData.append('mf', param.file); // 传入bpmn文件
       getFormGroups(formData)
