@@ -13,6 +13,7 @@ import * as echarts from 'echarts'
 
 import 'trs-web-components/lib/common.less';
 import 'trs-web-components/lib/element.less';
+import '@/assets/css/element.less'
 import "@/assets/theme.less";
 import "@/assets/global.css";
 import '@/assets/icon/iconfont.css';

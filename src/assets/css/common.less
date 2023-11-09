@@ -1,0 +1,200 @@
+.hover {
+  cursor: pointer;
+}
+
+.el-select-dropdown__item {
+  font-weight: normal;
+}
+
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
+
+.confirmBox {
+  width: 500px;
+
+  padding: 0px 0px 24px;
+  border-radius: 10px;
+
+  .el-message-box__content {
+    height: 160px;
+
+    .el-message-box__container {
+      height: 100%;
+    }
+  }
+
+  .el-message-box__status {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .el-icon-success {
+    color: #14c9c9;
+  }
+
+  .el-message-box__message {
+    position: absolute;
+    top: 90px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .el-message-box__status::before {
+    font-size: 54px;
+  }
+
+  .el-message-box__btns {
+    .el-button {
+      width: 88px;
+      text-align: center;
+      height: 34px;
+      padding: 0;
+    }
+
+    .el-button--default {
+      border-radius: 6px;
+      border: 1px solid #cacdd3 !important;
+      color: #1d2128;
+      text-align: center;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 34px;
+      /* 157.143% */
+    }
+
+    .el-button--primary {
+      color: #fff;
+      border: none !important;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #2f54eb 0%, #5196ff 100%);
+    }
+  }
+}
+
+.el-tooltip__popper.is-dark {
+  background: #505968;
+}
+
+.el-tooltip__popper .popper__arrow {
+  border-color: #50596800;
+}
+
+.el-input.is-disabled .el-input__inner {
+  color: #86909c;
+}
+
+.el-autocomplete-suggestion {
+  min-width: 300px;
+  max-width: 600px;
+  width: auto !important;
+}
+
+.flex {
+  display: flex;
+  display: -webkit-box;
+  /* Chrome 4+, Safari 3.1, iOS Safari 3.2+ */
+  display: -moz-box;
+  /* Firefox 17- */
+  display: -webkit-flex;
+  /* Chrome 21+, Safari 6.1+, iOS Safari 7+, Opera 15/16 */
+  display: -moz-flex;
+  /* Firefox 18+ */
+  display: -ms-flexbox;
+  /* IE 10 */
+}
+
+.onlyInput {
+  background-color: #f7f8fa;
+
+  &.el-autocomplete {
+    width: 100%;
+
+    .el-input {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  &.el-input,
+  .el-input,
+  .el-input__inner {
+    display: flex;
+
+    >input {
+      padding-right: 10px !important;
+      flex: 1;
+      width: auto;
+    }
+
+    .el-input__suffix {
+      position: relative;
+    }
+  }
+}
+
+.el-dialog {
+  border-radius: 15px;
+}
+
+.approver-select .el-select-dropdown__list {
+  div {
+    justify-content: space-between;
+  }
+
+  .el-select-dropdown__item {
+    height: 36px;
+    width: 100%;
+
+    .item {
+      flex: 1;
+      display: inline-block;
+      height: 36px;
+      font-size: 14px;
+      line-height: 36px;
+      font-weight: 400;
+      color: #505968;
+      white-space: nowrap;
+      font-weight: 400;
+    }
+
+    .item:nth-of-type(1) {
+      color: #1d2128;
+      font-weight: 700;
+    }
+  }
+
+}
+
+.node-popover {
+  padding: 8px;
+  display: inline-block;
+}
+// 对elementUI部分样式通用修改
+.el-button {
+  font-size: 14px;
+  line-height: 24px;
+  padding: 5px 20px;
+  text-align: center;
+  &.el-button--text {
+    color: #2d5cf6;
+  
+    &:hover {
+      color: #2d5cf6;
+    }
+  }
+  
+  &.el-button--text.red {
+    color: #eb5d78;
+  
+    &:hover {
+      color: #eb5d78;
+    }
+  }
+}
