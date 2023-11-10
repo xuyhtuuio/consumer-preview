@@ -228,7 +228,7 @@ export default {
       }
     }, 500),
     uploadBpmn(param) {
-      const accept = ['jpeg', 'jpg', 'png', 'pdf', 'word']
+      const accept = ['jpeg', 'jpg', 'png', 'pdf', 'doc', 'docx']
       const name1 = param.file.name
       const suffer = accept.includes(name1.split('.')[name1.split('.').length - 1]);
       if (!suffer) {
