@@ -153,6 +153,10 @@ export default {
       }
     },
     async addTags() {
+      if (this.tags.length >= 8) {
+        this.$message.warning('最多关联8个标签')
+        return;
+      }
       const res = await addTag({ tagName: this.serach })
       if (res.data.success) {
         const { id } = res.data.data
