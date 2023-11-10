@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-10 14:58:58
+ * @LastEditTime: 2023-11-10 16:19:34
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -694,7 +694,7 @@ export default {
         const { success, data } = res.data
         if (success) {
           const handleData = data.list?.map((m) => {
-            const content = m.content ? JSON.parse(m.content) : []
+            const content = m.content && JSON.parse(m.content) ? JSON.parse(m.content) : []
             // eslint-disable-next-line
             const suffix =
               m.fileName.split('.')[m.fileName.split('.').length - 1]
@@ -734,7 +734,6 @@ export default {
               }
             } else {
               const [first] = m.tableFileTag
-
               let str = content
                 ?.map((o) => {
                   return first?.length && first[o]
@@ -755,6 +754,8 @@ export default {
         }
         this.search.loading = false
       } catch {
+        this.list = []
+        this.search.total = 0
         this.search.loading = false
       }
     },
