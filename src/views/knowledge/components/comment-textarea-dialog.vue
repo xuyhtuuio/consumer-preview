@@ -130,6 +130,10 @@ export default {
   },
   methods: {
     async addTags() {
+      if (this.tags.length >= 8) {
+        this.$message.warning('最多关联8个标签')
+        return;
+      }
       const res = await addTag({ tagName: this.serach })
       if (res.data.success) {
         const { id } = res.data.data
@@ -144,6 +148,10 @@ export default {
     changeCheckedTags(tag) {
       const index = this.tags.findIndex(item => item.id === tag.id);
       if (index === -1) {
+        if (this.tags.length >= 8) {
+          this.$message.warning('最多关联8个标签')
+          return;
+        }
         this.tags.push(tag)
       } else {
         this.tags.splice(index, 1)
