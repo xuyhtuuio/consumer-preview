@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-09 14:14:05
+ * @LastEditTime: 2023-11-10 09:38:44
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -118,6 +118,7 @@
       custom-class="add-rule"
       :before-close="closeDialog"
     >
+    <div class="trs-scroll">
       <el-form :model="form" :rules="rules" ref="form">
         <el-form-item
           label="是否废止当前法规文件"
@@ -402,6 +403,7 @@
           </ul>
         </el-form-item>
       </el-form>
+    </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancel" class="cancel">取消</el-button>
         <el-button
@@ -1351,6 +1353,12 @@ export default {
     }
     .el-dialog__body {
       padding: 0 60px;
+      margin: 10px 0;
+      overflow: hidden;
+      .trs-scroll{
+        overflow: auto;
+        max-height: 500px;
+      }
     }
     .el-form {
       .el-form-item__label {
