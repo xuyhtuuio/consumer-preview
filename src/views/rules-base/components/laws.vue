@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-10 14:19:28
+ * @LastEditTime: 2023-11-10 14:47:13
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -19,7 +19,7 @@
       <div
         class="list"
         v-for="item in list"
-        :key="`${item.file_key}${Math.random()}`"
+        :key="`${item.id}${Math.random()}`"
         @click="toDetail(item)"
       >
         <div class="cards pointer">
@@ -58,13 +58,13 @@
               <span
                 class="prod-type"
                 v-for="item in item.tagList"
-                :key="`${item} +Math.random()`"
+                :key="`${item}${Math.random()}`"
                 >{{ item }}</span
               >
               <span
                 class="word-type"
                 v-for="item in item.equityList"
-                :key="`${item} +Math.random()`"
+                :key="`${item}${Math.random()}${Math.random()}`"
                 >{{ item }}</span
               >
             </p>
@@ -540,7 +540,10 @@ export default {
         loading: false
       },
       rules: {
-        isRepeal: [{ validator: checkIsRepeal, trigger: ['change', 'blur'] }],
+        isRepeal: [
+          { required: true, trigger: ['change'] },
+          { validator: checkIsRepeal, trigger: ['change', 'blur'] }
+        ],
         name: [
           { required: true, trigger: ['change', 'blur'] },
           { validator: checkIdInputName, trigger: ['change', 'blur'] }
@@ -605,7 +608,9 @@ export default {
       this.validatorForm.unitError = !val?.length > 0 || val.length > 50
     },
     'form.documentNumber': function (val) {
-      this.validatorForm.documentNumberError = !val?.length > 0 || val.length > 50
+      // eslint-disable-next-line
+      this.validatorForm.documentNumberError =
+        !val?.length > 0 || val.length > 50
     },
     'form.date': function (val) {
       this.validatorForm.dateError = !val
@@ -650,7 +655,9 @@ export default {
      */
     sortChange(val) {
       const { order, orderColumn } = val
-      this.search.sortField = order === 'desc' ? '-' + orderColumn : '+' + orderColumn
+      // eslint-disable-next-line
+      this.search.sortField =
+        order === 'desc' ? '-' + orderColumn : '+' + orderColumn
       this.nextPage(1)
     },
     /**
@@ -1089,11 +1096,10 @@ export default {
           // 共计可以添加8个标签
           // eslint-disable-next-line
           const tagsCounts =
-            this.tagsList?.length || 0 + this.relevancyTags?.length || 0
+           (this.tagsList?.length || 0) + (this.relevancyTags?.length || 0)
           if (tagsCounts > 8) {
-            return this.$message.error(
-              '添加的标签和相关权益标签最多可以添加8个'
-            )
+            this.$message.error('添加的标签和相关权益标签最多可以添加8个')
+            return false
           }
           // eslint-disable-next-line
           const attachmentList =
@@ -1170,38 +1176,52 @@ export default {
      */
     editRule(item, type) {
       this.addRule(type)
-      setTimeout(() => {
-        // 回显内容
-        const file = {
-          key: item.file_key,
-          name: item.file_key
-        }
-        const relatedFile = item.attachmentList?.map((m) => {
-          return {
-            key: m,
-            name: m
+      if (type === 'edit') {
+        setTimeout(() => {
+          // 回显内容
+          const file = {
+            key: item.file_key,
+            name: item.file_key
           }
-        })
+          const relatedFile = item.attachmentList?.map((m) => {
+            return {
+              key: m,
+              name: m
+            }
+          })
+          this.form = {
+            ...item,
+            id: item.id,
+            name: item.name,
+            unit: item.unit,
+            content: item.content,
+            documentNumber: item.doc_no,
+            date: dayjs(item.pub_time).format('YYYY-MM-DD HH:mm:ss'),
+            uploadFile: [file],
+            relatedFile
+          }
+          if (this.form.uploadFile?.length > 0) {
+            this.uploadDisabled = 'disabled'
+          }
+          if (this.form.relatedFile?.length >= 8) {
+            this.uploadRelatedDisabled = 'disabled'
+          }
+          this.tagsList = item.tagList
+          this.relevancyTags = item.equityList
+        }, 200)
+      } else if (type === 'update') {
         this.form = {
-          ...item,
           id: item.id,
-          name: item.name,
-          unit: item.unit,
-          content: item.content,
-          documentNumber: item.doc_no,
-          date: dayjs(item.pub_time).format('YYYY-MM-DD HH:mm:ss'),
-          uploadFile: [file],
-          relatedFile
+          name: '',
+          unit: '',
+          documentNumber: '',
+          date: '',
+          uploadFile: [],
+          relatedFile: [],
+          isRepeal: '',
+          loading: false
         }
-        if (this.form.uploadFile?.length > 0) {
-          this.uploadDisabled = 'disabled'
-        }
-        if (this.form.relatedFile?.length >= 8) {
-          this.uploadRelatedDisabled = 'disabled'
-        }
-        this.tagsList = item.tagList
-        this.relevancyTags = item.equityList
-      }, 200)
+      }
     },
     /**
      * @description: 删除法规
