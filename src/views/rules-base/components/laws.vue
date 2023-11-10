@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-10 14:52:29
+ * @LastEditTime: 2023-11-10 14:58:58
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -1293,7 +1293,7 @@ export default {
           }
         }
         .tags {
-          margin-bottom: 8px;
+          margin-bottom: 4px;
 
           font-weight: 400;
           line-height: 20px;
@@ -1302,6 +1302,7 @@ export default {
             margin-right: 6px;
             padding: 1px 6px;
             display: inline-block;
+            margin-bottom: 4px;
           }
           .effective {
             border-radius: 3px;
