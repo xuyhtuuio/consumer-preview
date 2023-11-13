@@ -85,7 +85,7 @@
                   <div class="select-set">
                     <div class="tip-style" :class="{ 'tip-style-active': searchForm.org }">选择机构</div>
                     <i class="el-icon-caret-bottom"></i>
-                    <img src="@/assets/image/intelligent-recheck/tip.png" alt="" />
+                    <!-- <img src="@/assets/image/intelligent-recheck/tip.png" alt="" /> -->
                   </div>
                 </div>
               </el-popover>
@@ -157,7 +157,12 @@
             <div class="select-item select-org">
               <div class="select-set">
                 <div class="tip-style" :class="{ 'tip-style-active': searchForm.type }">事项类型</div>
-                <i class="el-icon-caret-bottom"></i>
+                <div v-if="!searchForm.type">
+                  <i class="el-icon-caret-bottom"></i>
+                </div>
+                <div v-if="searchForm.type">
+                  <i class="el-icon-circle-close"></i>
+                </div>
               </div>
               <el-select
                 @focus="getFocus"
@@ -165,6 +170,7 @@
                 v-model="searchForm.type"
                 slot="prepend"
                 @change="changeSearchForm"
+                clearable
                 placeholder="事项类型"
               >
                 <el-option v-for="(item, index) in transactionTypes" :key="'type' + index" :label="item.label" :value="item.value"></el-option>
@@ -719,6 +725,9 @@ export default {
     changeSize(type) {
       this.$refs.imgPreview1.changeSize(type)
     },
+    resetSearchType() {
+      this.searchForm.type = '';
+    }
   }
 }
 </script>
@@ -963,7 +972,7 @@ export default {
         }
       }
       .select-org {
-        width: 104px;
+        width: 76px;
         /deep/.el-select {
           width: 78px;
         }
