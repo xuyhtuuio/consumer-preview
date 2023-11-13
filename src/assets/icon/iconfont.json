@@ -6,6 +6,160 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "37918839",
+      "name": "close",
+      "font_class": "close",
+      "unicode": "e670",
+      "unicode_decimal": 58992
+    },
+    {
+      "icon_id": "37848134",
+      "name": "download",
+      "font_class": "download",
+      "unicode": "e66f",
+      "unicode_decimal": 58991
+    },
+    {
+      "icon_id": "37813355",
+      "name": "calendar",
+      "font_class": "calendar",
+      "unicode": "e66e",
+      "unicode_decimal": 58990
+    },
+    {
+      "icon_id": "37806379",
+      "name": "add-law",
+      "font_class": "add-law",
+      "unicode": "e665",
+      "unicode_decimal": 58981
+    },
+    {
+      "icon_id": "37805891",
+      "name": "更多操作",
+      "font_class": "quanburenwu-gengduocaozuo",
+      "unicode": "e66d",
+      "unicode_decimal": 58989
+    },
+    {
+      "icon_id": "37805330",
+      "name": "law-pdf",
+      "font_class": "law-pdf",
+      "unicode": "e66c",
+      "unicode_decimal": 58988
+    },
+    {
+      "icon_id": "37804341",
+      "name": "law-word",
+      "font_class": "law-word",
+      "unicode": "e66b",
+      "unicode_decimal": 58987
+    },
+    {
+      "icon_id": "37804074",
+      "name": "监管通报高亮",
+      "font_class": "jianguantongbao1",
+      "unicode": "e66a",
+      "unicode_decimal": 58986
+    },
+    {
+      "icon_id": "37804053",
+      "name": "内部制度高亮",
+      "font_class": "neibuzhidu1",
+      "unicode": "e669",
+      "unicode_decimal": 58985
+    },
+    {
+      "icon_id": "11372659",
+      "name": "更多",
+      "font_class": "gengduo2",
+      "unicode": "e8af",
+      "unicode_decimal": 59567
+    },
+    {
+      "icon_id": "577337",
+      "name": "分享",
+      "font_class": "fenxiang",
+      "unicode": "e739",
+      "unicode_decimal": 59193
+    },
+    {
+      "icon_id": "37801817",
+      "name": "法规高亮",
+      "font_class": "fagui1",
+      "unicode": "e666",
+      "unicode_decimal": 58982
+    },
+    {
+      "icon_id": "37801811",
+      "name": "监管通报默认",
+      "font_class": "jianguantongbao",
+      "unicode": "e667",
+      "unicode_decimal": 58983
+    },
+    {
+      "icon_id": "37801807",
+      "name": "内部制度默认",
+      "font_class": "neibuzhidu",
+      "unicode": "e668",
+      "unicode_decimal": 58984
+    },
+    {
+      "icon_id": "37801327",
+      "name": "法规默认",
+      "font_class": "fagui",
+      "unicode": "e664",
+      "unicode_decimal": 58980
+    },
+    {
+      "icon_id": "37723278",
+      "name": "Frame",
+      "font_class": "Frame3",
+      "unicode": "e663",
+      "unicode_decimal": 58979
+    },
+    {
+      "icon_id": "37597237",
+      "name": "Component 13",
+      "font_class": "a-Component133",
+      "unicode": "e65f",
+      "unicode_decimal": 58975
+    },
+    {
+      "icon_id": "37597190",
+      "name": "Component 13",
+      "font_class": "a-Component132",
+      "unicode": "e662",
+      "unicode_decimal": 58978
+    },
+    {
+      "icon_id": "37597209",
+      "name": "Component 13",
+      "font_class": "a-Component131",
+      "unicode": "e661",
+      "unicode_decimal": 58977
+    },
+    {
+      "icon_id": "37597171",
+      "name": "Component 13",
+      "font_class": "a-Component13",
+      "unicode": "e660",
+      "unicode_decimal": 58976
+    },
+    {
+      "icon_id": "37571723",
+      "name": "change",
+      "font_class": "dianjitianjiapizhu",
+      "unicode": "e65e",
+      "unicode_decimal": 58974
+    },
+    {
+      "icon_id": "37571693",
+      "name": "frame",
+      "font_class": "Frame2",
+      "unicode": "e65d",
+      "unicode_decimal": 58973
+    },
+    {
       "icon_id": "37335579",
       "name": "Frame",
       "font_class": "Frame1",

@@ -225,12 +225,19 @@ const router = new Router({
           path: 'approval-details',
           name: 'approval-details',
           component: () => import('@/views/approvalCenter/details'),
-          meta: { title: '申请单详情' }
+          meta: { title: '申请单详情', }
         },
         {
           path: 'aiApproval',
           name: 'aiApproval',
           component: () => import('@/views/aiApproval/index'),
+          meta: { title: '智能审批', viewport }
+        },
+        // OCR重构页
+        {
+          path: 'aiApprovalNew',
+          name: 'aiApprovalNew',
+          component: () => import('@/views/aiApprovalNew/index'),
           meta: { title: '智能审批', viewport }
         },
         {

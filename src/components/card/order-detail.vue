@@ -64,7 +64,7 @@
     <div  style="display:flex; align-items: flex-start; height: calc(100% - 50px)">
       <!-- 左侧工单信息 -->
       <div class="left-info">
-        <div class="order-name">
+        <div class="order-name" v-if="isOrderDetail">
           <svg class="icon urgent-icon" aria-hidden="true" v-if="item.urgent == 1">
             <use xlink:href="#icon-shenpiyemiantubiao"></use>
           </svg>
@@ -85,10 +85,15 @@
                 }">{{ $msg('NodeStatus')[item.taskStatus] }}<i v-if="item.currentActivityName || item.nodeName">></i>{{
       item.currentActivityName || item.nodeName }}</i>
           </span>
+          <span class="check-detail" @click="changeOcrView(false)" v-if="status === 5 || status === 3">
+            <img src="@/assets/image/ai-approval/checkDetail.svg" alt="">
+            <span>查看审批详情</span>
+          </span>
         </div>
-        <order-basic-info @preview="previewFile" :personInfo="item.initiator" :personOrg='item.institutional'
+        <order-basic-info v-if="isOrderDetail" @preview="previewFile" :personInfo="item.initiator" :personOrg='item.institutional'
           @sendReviewMaterials="sendReviewMaterials" @sendFilledInByApprover="sendFilledInByApprover"></order-basic-info>
-      </div>
+        <OcrPreview ref="OcrPreview" v-else :ocrViewItem="ocrViewItem" :isOrderDetail="isOrderDetail" @changeOcrView="changeOcrView"></OcrPreview>
+        </div>
       <div class="right" v-loading="loadings.initLoading">
         <!-- 消保审查/详情页/审批中预览 -->
         <div class="right-nav">
@@ -150,6 +155,7 @@
           <keep-alive>
             <component :is="crtComp" :status="status" ref="child" :taskStatus="item.taskStatus"
               @sendOpinionInfo="sendOpinionInfo" :reviewMaterial="reviewMaterials"
+              @showOpinionLine="showOpinionLine"
               :processInstanceId="item.processInstanceId" :taskId="item.taskId" @preview="previewFile"
               :formId="item.taskNumber" :filledInByApprover="filledInByApprover">
               <template slot="head">
@@ -194,6 +200,7 @@ import approvalRecordCard from '@/components/card/approval-record-card'
 import approvedOpinionCard from '@/components/card/approved-opinion-card'
 import uploadFileCard from '@/components/card/upload-file-card'
 import filePreview from '@/components/filePreview'
+import OcrPreview from '@/views/aiApprovalNew/index'
 import SubmitDialog from '@/components/common/submit-dialog'
 import TurnDialog from '@/components/common/turn-dialog'
 import { leaderEdit, finalMaterial } from '@/api/approvalCenter'
@@ -214,6 +221,7 @@ export default {
     uploadFileCard,
     filePreview,
     SubmitDialog,
+    OcrPreview,
     TurnDialog
   },
   props: {
@@ -225,6 +233,8 @@ export default {
   },
   data() {
     return {
+      ocrViewItem: {},
+      isOrderDetail: true,
       status: 0,
       crtComp: '',
       item: {},
@@ -283,6 +293,7 @@ export default {
     }
     this.clearStoreStatus()
     this.judgeStatus()
+    this.ocrViewItem = JSON.parse(window.localStorage.getItem('order-detail')).item
   },
   created() {
   },
@@ -1054,6 +1065,21 @@ export default {
         this.$message.error(error)
       }
     },
+    // 修改左侧OCR内容可视状态   false 为 可视  true 为 不可视
+    changeOcrView(boolean) {
+      this.isOrderDetail = boolean
+    },
+    // 左侧OCR内容 触发连线操作
+    showOpinionLine(obj, file) {
+      if (this.isOrderDetail) {
+        return;
+      }
+      const comment = {
+        ...obj,
+        files: obj.associatedAttachmentsIds.split(';')
+      }
+      this.$refs.OcrPreview.showCommentLine(comment, file)
+    }
   }
 }
 </script>
@@ -1111,6 +1137,8 @@ export default {
     overflow: auto;
 
     .order-name {
+      display: flex;
+      align-items: center;
       color: #1d2128;
       font-size: 14px;
       font-weight: 700;
@@ -1163,7 +1191,18 @@ export default {
         color: #eb5757;
       }
     }
-
+    .check-detail {
+      display: inline-block;
+      margin-left: auto;
+      cursor: pointer;
+      font-weight: 400;
+      font-size: 14px;
+      text-decoration: underline;
+      color: #306EF5;
+      img{
+        margin-right: 4px;
+      }
+    }
     .end {
       background: #ecfeec;
       color: #50b142;
