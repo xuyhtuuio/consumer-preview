@@ -17,7 +17,7 @@
             class="my-hidden"
             v-model="search.cascader"
             :options="organOptions"
-            :props="{ checkStrictly: true }"
+            :props="{ label: 'name',value: 'id',checkStrictly: true }"
             @change="handleOrganChange"
             @visible-change="handleOrganChange"
           ></el-cascader>
@@ -37,8 +37,8 @@
             <el-option
               v-for="item in billOptions"
               :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              :label="item.examineTypesName"
+              :value="item.recordId"
             >
             </el-option>
           </el-select>
@@ -58,6 +58,7 @@
               ref="my-date-picker"
               v-model="search.datePicker"
               type="monthrange"
+              value-format="yyyy-MM"
               align="right"
               range-separator="至"
               start-placeholder="开始月份"
@@ -96,49 +97,53 @@
     </div>
     <div class="main">
       <div class="main-item common" style="padding: 0">
-        <DataOverview />
+        <DataOverview ref="ref-data-overview" />
       </div>
       <div class="main-item flex" style="gap: 16px">
-        <TypeDistribution class="common" />
-        <MissionTrends class="common" />
+        <TypeDistribution class="common" ref="ref-type-distribution" />
+        <MissionTrends class="common" ref="ref-mission-trends" />
       </div>
       <div class="main-item common">
         <g-table-card title="审查任务分布">
           <template #content>
-            <RectTree></RectTree>
-            <ReviewForm></ReviewForm>
+            <RectTree ref="ref-rect-tree"></RectTree>
+            <ReviewForm ref="ref-review-form"></ReviewForm>
           </template>
         </g-table-card>
       </div>
       <div class="main-item common">
-        <ReachingConsumers />
+        <ReachingConsumers ref="ref-reaching-consumers"/>
       </div>
-      <div class="main-item flex" style="gap: 16px; height: 430px">
+      <div class="main-item flex" style="gap: 16px; min-height: 430px">
         <SystemConnection class="common" />
-        <TurnDown class="common" />
+        <TurnDown class="common" ref="ref-turn-down"/>
       </div>
-      <div class="main-item flex" style="gap: 16px">
+      <div class="main-item flex" style="gap: 16px;">
         <SensitiveProhibited
           class="common"
           style="width: 60%"
-        ></SensitiveProhibited>
-        <HighWord class="common" style="flex: 1"></HighWord>
+          ref="ref-sensitive-prohibited">
+        </SensitiveProhibited>
+        <HighWord class="common" style="flex: 1" ref="ref-high-word"></HighWord>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import dayjs from 'dayjs'
+import { onlyBankOrgTree, getFormCategoryArray } from '@/api/statistical-center'
 import HighWord from './components/high-word'
-import SensitiveProhibited from './components/sensitive-prohibited'
 import TurnDown from './components/turn-down'
-import SystemConnection from './components/system-connection'
-import ReachingConsumers from './components/reaching-consumers'
-import ReviewForm from './components/review-form'
 import RectTree from './components/rect-tree'
+import ReviewForm from './components/review-form'
 import DataOverview from './components/data-overview'
 import MissionTrends from './components/mission-trends'
 import TypeDistribution from './components/type-distribution'
+import SystemConnection from './components/system-connection'
+import ReachingConsumers from './components/reaching-consumers'
+import SensitiveProhibited from './components/sensitive-prohibited'
+
 export default {
   components: {
     HighWord,
@@ -152,12 +157,16 @@ export default {
     MissionTrends,
     TypeDistribution
   },
+  async created() {
+    await this.initData()
+    this.passData()
+  },
   data() {
     return {
       search: {
         billValue: '',
-        datePicker: '',
-        cascader: ''
+        datePicker: [],
+        cascader: []
       },
       pickerOptions: {
         disabledDate(time) {
@@ -193,310 +202,67 @@ export default {
           }
         ]
       },
-      billOptions: [
-        {
-          value: '全部',
-          label: '全部'
-        },
-        {
-          value: '产品类',
-          label: '产品类'
-        },
-        {
-          value: '活动类',
-          label: '活动类'
-        },
-        {
-          value: '客户类',
-          label: '客户类'
-        },
-        {
-          value: '其他',
-          label: '其他'
-        }
-      ],
-      organOptions: [
-        {
-          value: 'zhinan',
-          label: '指南',
-          children: [
-            {
-              value: 'shejiyuanze',
-              label: '设计原则',
-              children: [
-                {
-                  value: 'yizhi',
-                  label: '一致'
-                },
-                {
-                  value: 'fankui',
-                  label: '反馈'
-                },
-                {
-                  value: 'xiaolv',
-                  label: '效率'
-                },
-                {
-                  value: 'kekong',
-                  label: '可控'
-                }
-              ]
-            },
-            {
-              value: 'daohang',
-              label: '导航',
-              children: [
-                {
-                  value: 'cexiangdaohang',
-                  label: '侧向导航'
-                },
-                {
-                  value: 'dingbudaohang',
-                  label: '顶部导航'
-                }
-              ]
-            }
-          ]
-        },
-        {
-          value: 'zujian',
-          label: '组件',
-          children: [
-            {
-              value: 'basic',
-              label: 'Basic',
-              children: [
-                {
-                  value: 'layout',
-                  label: 'Layout 布局'
-                },
-                {
-                  value: 'color',
-                  label: 'Color 色彩'
-                },
-                {
-                  value: 'typography',
-                  label: 'Typography 字体'
-                },
-                {
-                  value: 'icon',
-                  label: 'Icon 图标'
-                },
-                {
-                  value: 'button',
-                  label: 'Button 按钮'
-                }
-              ]
-            },
-            {
-              value: 'form',
-              label: 'Form',
-              children: [
-                {
-                  value: 'radio',
-                  label: 'Radio 单选框'
-                },
-                {
-                  value: 'checkbox',
-                  label: 'Checkbox 多选框'
-                },
-                {
-                  value: 'input',
-                  label: 'Input 输入框'
-                },
-                {
-                  value: 'input-number',
-                  label: 'InputNumber 计数器'
-                },
-                {
-                  value: 'select',
-                  label: 'Select 选择器'
-                },
-                {
-                  value: 'cascader',
-                  label: 'Cascader 级联选择器'
-                },
-                {
-                  value: 'switch',
-                  label: 'Switch 开关'
-                },
-                {
-                  value: 'slider',
-                  label: 'Slider 滑块'
-                },
-                {
-                  value: 'time-picker',
-                  label: 'TimePicker 时间选择器'
-                },
-                {
-                  value: 'date-picker',
-                  label: 'DatePicker 日期选择器'
-                },
-                {
-                  value: 'datetime-picker',
-                  label: 'DateTimePicker 日期时间选择器'
-                },
-                {
-                  value: 'upload',
-                  label: 'Upload 上传'
-                },
-                {
-                  value: 'rate',
-                  label: 'Rate 评分'
-                },
-                {
-                  value: 'form',
-                  label: 'Form 表单'
-                }
-              ]
-            },
-            {
-              value: 'data',
-              label: 'Data',
-              children: [
-                {
-                  value: 'table',
-                  label: 'Table 表格'
-                },
-                {
-                  value: 'tag',
-                  label: 'Tag 标签'
-                },
-                {
-                  value: 'progress',
-                  label: 'Progress 进度条'
-                },
-                {
-                  value: 'tree',
-                  label: 'Tree 树形控件'
-                },
-                {
-                  value: 'pagination',
-                  label: 'Pagination 分页'
-                },
-                {
-                  value: 'badge',
-                  label: 'Badge 标记'
-                }
-              ]
-            },
-            {
-              value: 'notice',
-              label: 'Notice',
-              children: [
-                {
-                  value: 'alert',
-                  label: 'Alert 警告'
-                },
-                {
-                  value: 'loading',
-                  label: 'Loading 加载'
-                },
-                {
-                  value: 'message',
-                  label: 'Message 消息提示'
-                },
-                {
-                  value: 'message-box',
-                  label: 'MessageBox 弹框'
-                },
-                {
-                  value: 'notification',
-                  label: 'Notification 通知'
-                }
-              ]
-            },
-            {
-              value: 'navigation',
-              label: 'Navigation',
-              children: [
-                {
-                  value: 'menu',
-                  label: 'NavMenu 导航菜单'
-                },
-                {
-                  value: 'tabs',
-                  label: 'Tabs 标签页'
-                },
-                {
-                  value: 'breadcrumb',
-                  label: 'Breadcrumb 面包屑'
-                },
-                {
-                  value: 'dropdown',
-                  label: 'Dropdown 下拉菜单'
-                },
-                {
-                  value: 'steps',
-                  label: 'Steps 步骤条'
-                }
-              ]
-            },
-            {
-              value: 'others',
-              label: 'Others',
-              children: [
-                {
-                  value: 'dialog',
-                  label: 'Dialog 对话框'
-                },
-                {
-                  value: 'tooltip',
-                  label: 'Tooltip 文字提示'
-                },
-                {
-                  value: 'popover',
-                  label: 'Popover 弹出框'
-                },
-                {
-                  value: 'card',
-                  label: 'Card 卡片'
-                },
-                {
-                  value: 'carousel',
-                  label: 'Carousel 走马灯'
-                },
-                {
-                  value: 'collapse',
-                  label: 'Collapse 折叠面板'
-                }
-              ]
-            }
-          ]
-        },
-        {
-          value: 'ziyuan',
-          label: '资源',
-          children: [
-            {
-              value: 'axure',
-              label: 'Axure Components'
-            },
-            {
-              value: 'sketch',
-              label: 'Sketch Templates'
-            },
-            {
-              value: 'jiaohu',
-              label: '组件交互文档'
-            }
-          ]
-        }
-      ]
+      billOptions: [],
+      organOptions: []
     }
   },
   methods: {
+    async  initData() {
+      const newMonth = dayjs().format('YYYY-MM');
+      const oldMonth = newMonth.split('-')
+      oldMonth[oldMonth.length - 1] = `${oldMonth.at(-1) - 1}`.padStart(2, '0')
+      this.search.datePicker = [oldMonth.join('-'), newMonth]
+      const [{ data: res1 }, { data: res2 }] = await Promise.all([onlyBankOrgTree(), getFormCategoryArray()])
+      if (res1.success) {
+        this.organOptions = res1.data || []
+      }
+      if (res2.success) {
+        this.billOptions = res2.data[0] || []
+      }
+    },
+    passData() {
+      const { billValue, cascader, datePicker } = this.search
+      const data = {
+        orgId: '516' || billValue,
+        formCategoryId: cascader[cascader.length - 1] || '',
+        startTimeStr: datePicker[0],
+        endTimeStr: datePicker[1]
+      }
+      const componentRefs = [
+        'ref-data-overview',
+        'ref-type-distribution',
+        'ref-mission-trends',
+        'ref-rect-tree',
+        'ref-review-form',
+        'ref-reaching-consumers',
+        'ref-turn-down',
+        'ref-high-word',
+        'ref-sensitive-prohibited'
+      ];
+      const initDataPromises = componentRefs.map(refName => {
+        return this.$refs[refName].initData(JSON.parse(JSON.stringify(data)));
+      });
+
+      Promise.all(initDataPromises)
+        .then(() => {
+          // 所有异步调用都已完成
+        })
+        .catch(() => {
+          // 处理任何错误
+        });
+    },
     handleReset() {
       this.search = {
         billValue: '',
-        datePicker: '',
-        cascader: ''
+        datePicker: [],
+        cascader: []
       }
     },
     billChange() {
     },
     handleDatePicker() {
       this.$refs['ref-popover'].handleBlur()
+      this.passData()
     },
     handlePopoverHide() {
       if (this.search.datePicker) {
@@ -505,13 +271,14 @@ export default {
     },
     handleOrganChange(item) {
       if (!item && this.search.cascader.length) {
-        this.handleSearchBlur()
+        this.passData()
       }
     },
     handlePopoverShow() {
       this.$refs['my-date-picker'].handleFocus()
     },
     handleSearchBlur() {
+      this.passData()
     }
   }
 }

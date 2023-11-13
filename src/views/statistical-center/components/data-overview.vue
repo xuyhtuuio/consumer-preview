@@ -14,7 +14,7 @@
               </el-tooltip>
             </div>
             <div class="right-content">
-              <i class="content-number">{{ item.content.titleNum }}</i
+              <i class="content-number">{{ item.content.unifiedReturn }}</i
               >{{ item.title.unit }}
             </div>
           </span>
@@ -22,50 +22,50 @@
         <div class="bottom" v-if="index === 0">
           <div class="btn-item">
             有实质性意见
-            <i class="color-blue">{{ item.content.hasOption }}</i> 项 占
-            <i class="color-blue">{{ item.content.hasPercentage }}</i> %
+            <i class="color-blue">{{ item.content.haveSubstantiveOpinionFormRatio }}</i> 项 占
+            <i class="color-blue">{{ item.content.haveSubstantiveOpinionFormRatio }}</i> %
           </div>
           <div class="btn-item">
             无实质性意见
-            <i class="color-blue">{{ item.content.noPercentage }}</i> 项 占
-            <i class="color-blue">{{ item.content.noPercentage }}</i> %
+            <i class="color-blue">{{ item.content.noHaveSubstantiveOpinionForm }}</i> 项 占
+            <i class="color-blue">{{ item.content.noHaveSubstantiveOpinionFormRatio }}</i> %
           </div>
         </div>
         <div class="bottom" v-else-if="index === 1">
           <div class="btn-item">
             有实质性意见
-            <i class="color-blue">{{ item.content.hasOption }}</i> 项 总接受
-            <i class="color-blue">{{ item.content.hasAcceptance }} </i> 条
+            <i class="color-blue">{{ item.content.havingSubstantiveOpinion }}</i> 项 总接受
+            <i class="color-blue">{{ item.content.opinionAdoptTotal }} </i> 条
           </div>
           <div class="btn-item">
             无实质性意见
-            <i class="color-blue">{{ item.content.noOption }}</i> 条
+            <i class="color-blue">{{ item.content.nothingSubstantiveOpinion }}</i> 条
           </div>
         </div>
         <div class="bottom" v-else-if="index === 2">
           <div class="btn-item">
-            最长审查时长 <i class="color-blue">{{ item.content.longTime }}</i> h
+            最长审查时长 <i class="color-blue">{{ item.content.maximumReviewTime }}</i> h
           </div>
           <div class="btn-item">
             最短审查时长
-            <i class="color-blue">{{ item.content.shortTime }}</i> h
+            <i class="color-blue">{{ item.content.minimumReviewTime }}</i> h
           </div>
         </div>
         <div class="bottom" v-else-if="index === 3">
           <div class="btn-item">
             有实质性意见的接受条数
-            <i class="color-blue">{{ item.content.num }}</i> 项
+            <i class="color-blue">{{ item.content.receivingWorkOrdersCount }}</i> 项
           </div>
         </div>
         <div class="bottom" v-else-if="index === 4">
           <div class="btn-item">
             通过率最高的审查类型：<i class="color-blue">{{
-              item.content.highTitle
+              item.content.theHighestPassRateCategory
             }}</i>
           </div>
           <div class="btn-item">
             通过率最低的审查类型：<i class="color-blue">{{
-              item.content.lowerTitle
+              item.content.theLowestPassRateCategory
             }}</i>
           </div>
         </div>
@@ -76,10 +76,11 @@
 </template>
 
 <script>
+import { overviewOfReviewData } from '@/api/statistical-center'
 export default {
   data() {
     return {
-      isShow: false,
+      isShow: true,
       list: [
         {
           id: '134',
@@ -90,11 +91,11 @@ export default {
             unit: '项'
           },
           content: {
-            titleNum: 90,
-            hasOption: 112,
-            hasPercentage: 80,
-            noOption: 112,
-            noPercentage: 20
+            unifiedReturn: 0,
+            haveSubstantiveOpinionFormRatio: 0,
+            hasPercentage: 0,
+            noHaveSubstantiveOpinionForm: 0,
+            noHaveSubstantiveOpinionFormRatio: 0
           }
         },
         {
@@ -106,10 +107,10 @@ export default {
             unit: '条'
           },
           content: {
-            titleNum: 90,
-            hasOption: 112,
-            hasAcceptance: 879,
-            noOption: 112
+            unifiedReturn: 0,
+            havingSubstantiveOpinion: 0,
+            opinionAdoptTotal: 0,
+            nothingSubstantiveOpinion: 0
           }
         },
         {
@@ -121,9 +122,9 @@ export default {
             unit: 'h'
           },
           content: {
-            titleNum: 90,
-            longTime: 56,
-            shortTime: 1
+            unifiedReturn: 0,
+            maximumReviewTime: 0,
+            minimumReviewTime: 0
           }
         },
         {
@@ -132,12 +133,11 @@ export default {
             name: '接受率',
             info: '接受率为有实质性修改意见的接受率',
             src: require('@/assets/image/statistical-center/overview-4.svg'),
-
             unit: '%'
           },
           content: {
-            num: 111,
-            titleNum: 90,
+            receivingWorkOrdersCount: 0,
+            unifiedReturn: 0,
           }
         },
         {
@@ -149,65 +149,35 @@ export default {
             unit: '%'
           },
           content: {
-            titleNum: 90,
-            highTitle: '产品类',
-            lowerTitle: '活动类'
+            unifiedReturn: 0,
+            theHighestPassRateCategory: '',
+            theLowestPassRateCategory: ''
           }
         }
       ]
     }
   },
   mounted() {
-    this.initData()
   },
   watch: {
-    list(val) {
-      if (val) {
-        this.initData(val)
-      }
-    }
   },
   methods: {
-    initData() {
-      // const {
-      //   data
-      // } = {
-      //   status: 200,
-      //   success: true,
-      //   msg: 'success',
-      //   timestamp: '1694500929442',
-      //   exception: null,
-      //   data: {
-      //     reviewTotalAmount: {
-      //       haveSubstantiveOpinionForm: 0,
-      //       haveSubstantiveOpinionFormRate: '90%',
-      //       examineAllTotal: 0,
-      //       noHaveSubstantiveOpinionFormRate: '90%',
-      //       noHaveSubstantiveOpinionForm: 0
-      //     },
-      //     totalNumberOfReviewOpinions: {
-      //       nothingSubstantiveOpinion: 41,
-      //       opinionAdoptTotal: 28,
-      //       havingSubstantiveOpinion: 26,
-      //       examineOpinionTotal: 67
-      //     },
-      //     averageReviewFrequency: {
-      //       maximumReviewTime: 36324120,
-      //       averageReviewDuration: -1,
-      //       minimumReviewTime: 5019
-      //     },
-      //     acceptanceRate: {
-      //       viewAcceptanceRate: '42.31%'
-      //     },
-      //     oneTimePassRate: {
-      //       oneTimePassRate: '90%',
-      //       theLowestPassRateCategory: '活动类',
-      //       theHighestPassRateCategory: '产品类'
-      //     }
-      //   },
-      //   rtnEnum: null,
-      //   code: null
-      // }
+    async initData(data) {
+      this.isShow = true
+      const { data: res } = await overviewOfReviewData(data)
+      if (res.success) {
+        const res1 = [
+          res.data.reviewTotalAmount,
+          res.data.totalNumberOfReviewOpinions,
+          res.data.averageReviewFrequency,
+          res.data.acceptanceRate,
+          res.data.oneTimePassRate
+        ]
+        this.list.forEach((item, index) => {
+          item.content = res1[index]
+        })
+        this.isShow = false
+      }
     }
   }
 }

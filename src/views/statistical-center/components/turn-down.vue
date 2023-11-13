@@ -1,5 +1,5 @@
 <template>
-  <div class="turn-down">
+  <div class="turn-down" v-loading="isShow">
     <g-table-card :title="title">
       <template #content>
         <div class="tab">
@@ -14,64 +14,73 @@
             <span v-if="index !== 2" class="line" :key="item.id"></span>
           </template>
         </div>
-        <div class="main" v-show="currentTabListIndex === 0">
-          <div class="left">
-            <div class="top">
-              总驳回数: <span class="high">{{ 123 }}</span> 单
-            </div>
-            <div class="my-echart" ref="order-echart"></div>
+        <template>
+          <div class="main" v-show="currentTabListIndex === 0">
+            <template v-if="orderData.data.length">
+              <div class="left">
+                <div class="top" v-show="totalCount > 0">
+                  总驳回数: <span class="high">{{ totalCount }}</span> 单
+                </div>
+                <div class="my-echart" ref="order-echart"></div>
+              </div>
+              <div class="right">
+                <div class="my-table">
+                  <TrsTable
+                    theme="TRS-table-gray"
+                    :data="data"
+                    :colConfig="colConfig"
+                    @sort-change="sortChange"
+                    @submitEdit="submitEdit"
+                    :header-cell-style="{
+                      'text-align': 'center',
+                      'font-weight': 400,
+                      'font-size': '12px'
+                    }"
+                    :cell-style="{
+                      'text-align': 'center',
+                      'font-size': '12px'
+                    }"
+                  >
+                  </TrsTable>
+                  <TrsPagination
+                    :pageSize="page.pageSize"
+                    :pageNow="page.pageNow"
+                    :total="page.total"
+                    @getList="handleCurrentChange"
+                  >
+                  </TrsPagination>
+                </div>
+              </div>
+            </template>
+            <el-empty v-else style="width: 100%;"></el-empty>
           </div>
-          <div class="right">
-            <div class="my-table">
-              <TrsTable
-                theme="TRS-table-gray"
-                :data="data"
-                :colConfig="colConfig"
-                @sort-change="sortChange"
-                @submitEdit="submitEdit"
-                :header-cell-style="{
-                  'text-align': 'center',
-                  'font-weight': 400,
-                  'font-size': '12px'
-                }"
-                :cell-style="{ 'text-align': 'center', 'font-size': '12px' }"
+          <div class="main" v-show="currentTabListIndex === 1">
+            <div class="my-echart" ref="stackBar-echart"></div>
+          </div>
+          <div class="main main-legend" v-show="currentTabListIndex === 2">
+            <div class="my-echart" ref="reason-echart"></div>
+            <div class="legend">
+              <div
+                class="legend-item"
+                v-for="(item, index) in reasonData"
+                :key="'legend' + index"
               >
-              </TrsTable>
-              <TrsPagination
-                :pageSize="page.pageSize"
-                :pageNow="page.pageNow"
-                :total="page.total"
-                @getList="handleCurrentChange"
-              >
-              </TrsPagination>
+                <span
+                  class="legend-icon"
+                  :style="{ backgroundColor: reasonData.color[index] }"
+                ></span>
+                <span>{{ item.name }}</span>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="main" v-show="currentTabListIndex === 1">
-          <div class="my-echart" ref="stackBar-echart"></div>
-        </div>
-        <div class="main main-legend" v-show="currentTabListIndex === 2">
-          <div class="my-echart" ref="reason-echart"></div>
-          <div class="legend">
-            <div
-              class="legend-item"
-              v-for="(item, index) in reasonData.xData"
-              :key="'legend' + index"
-            >
-              <span
-                class="legend-icon"
-                :style="{ backgroundColor: reasonData.color[index] }"
-              ></span>
-              <span>{{ item }}</span>
-            </div>
-          </div>
-        </div>
+        </template>
       </template>
     </g-table-card>
   </div>
 </template>
 
 <script>
+import { rejectStatistics } from '@/api/statistical-center'
 import tableMixin from '../mixins/turn-down-table'
 import echartMixin from '../mixins/turn-down-echarts'
 export default {
@@ -79,15 +88,74 @@ export default {
   data() {
     return {
       title: '驳回统计',
+      isShow: true,
       tabList: [
-        { id: 1, name: '驳回单及驳回率' },
-        { id: 2, name: '驳回次数分布' },
-        { id: 3, name: '驳回原因分布' }
+        {
+          id: 1,
+          name: '驳回单及驳回率',
+          url: '/cpr/Statistics/refusalReceiptAndRejectionRate'
+        },
+        {
+          id: 2,
+          name: '驳回次数分布',
+          url: '/cpr/Statistics/distributionOfRejectionTimes'
+        },
+        {
+          id: 3,
+          name: '驳回原因分布',
+          url: '/cpr/Statistics/distributionOfRejectionReasons'
+        }
       ],
-      currentTabListIndex: 0
+      dataMap: ['orderData', 'stackBarData', 'reasonData'],
+      currentTabListIndex: 0,
+      totalCount: 0
     }
   },
   methods: {
+    async initData(data, sortSign, lineId) {
+      this.searchData = data
+      this.isShow = true
+      let requestArr = []
+      this.tabList.forEach((item) => {
+        if (item.id === 1) {
+          data.pageSize = this.page.pageSize
+          data.pageNow = this.page.pageNow
+          data = sortSign ? { ...data, sortSign, lineId } : data
+        }
+        requestArr.push(rejectStatistics(data, item.url))
+      })
+      if (sortSign) {
+        requestArr = [requestArr[0]]
+      }
+      const [{ value: res1 }, { value: res2 }, { value: res3 }] = await Promise.allSettled(requestArr)
+      if (res1.data && res1.data.success) {
+        if (res1.data.success) {
+          const { head, data: colData, chart } = res1.data.data
+          this.colConfig = head
+          this.data = colData.list
+          this.page.pageNow = colData.pageNow
+          this.page.total = colData.totalCount
+          this.orderData.data = chart
+          this.totalCount = colData.totalCount || 0
+        }
+      }
+      if (res2.data && res2.data.success) {
+        this.stackBarData = res2.data.data
+      }
+      if (res3.data && res3.data.data) {
+        this.reasonData = res3.data.data
+        this.reasonData.color = [
+          '#249EFF',
+          '#65CFE4',
+          '#74E4BD',
+          '#14C9C9',
+          '#2D5CF6',
+          '#21CCFF'
+        ]
+      }
+      this.isShow = false
+      this.handleEchartsToggle(this.currentTabListIndex)
+    },
     handleTabToggle(index) {
       if (this.currentTabListIndex !== index) {
         this.currentTabListIndex = index

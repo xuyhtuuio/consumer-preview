@@ -9,6 +9,7 @@
         <svg class="icon urgent-icon" aria-hidden="true" v-if="item.dismissalMark == 1">
           <use xlink:href="#icon-tongyongtubiao2"></use>
         </svg>
+        <span class="event-id">{{ item.orderNo }}</span>
         <span class="event-name pointer" @click="toDetail(item)">{{
           item.entryName
         }}</span>
@@ -51,14 +52,16 @@
         </span>
       </div>
       <div class="event-infos">
-        <span class="id">{{ item.orderNo }}</span>
-        <span class="sDate date">发起时间：{{ item.createTime | timeFormate }}</span>
-        <span class="sDate date">更新时间：{{ item.updateTime | timeFormate }}</span>
-        <span class="sDate date">上线时间：{{ item.uptime | timeFormate }}</span>
-        <span class="handler date">发起人：{{ item.originator && item.originator.name }}</span>
-        <span class="handler" v-if="item.institutional && item.institutional[1]">
-          <i class="iconfont icon-dept"></i>
-          {{ item.institutional && item.institutional[1] }}</span>
+        <span class="sDate date">发起时间：{{ item.createTime }}</span>
+        <span class="sDate date">更新时间：{{ item.updateTime }}</span>
+        <span class="sDate date">上线时间：{{ item.uptime }}</span>
+        <span class="handler">发起人：{{ item.originator && item.originator.name }}
+          <i  v-if="item.institutional?.length">
+            <template v-for="itemTag in item.institutional">
+              /{{ itemTag }}
+            </template>
+          </i>
+        </span>
       </div>
     </div>
   </div>
@@ -258,7 +261,7 @@ export default {
     width: 100%;
 
     .event-name-status {
-      margin-bottom: 17px;
+      margin-bottom: 15px;
       display: flex;
       align-items: center;
     }
@@ -267,6 +270,15 @@ export default {
       margin-right: 8px;
       width: 16px;
       height: 16px;
+    }
+
+    .event-id {
+      color: #2d5cf6;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 22px;
+      margin-right: 8px;
     }
 
     .event-name {
@@ -285,6 +297,7 @@ export default {
 
     .event-status {
       display: flex;
+
       .tag {
         margin-left: 12px;
         display: inline-block;
@@ -371,15 +384,6 @@ export default {
       display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 1;
-      .id {
-        color: #2d5cf6;
-        font-size: 14px;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 22px;
-        margin-right: 12px;
-        /* 157.143% */
-      }
 
       .date:after {
         content: '';
@@ -392,7 +396,7 @@ export default {
 
       .sDate {
         color: #86909c;
-        font-size: 14px;
+        font-size: 12px;
         font-style: normal;
         font-weight: 400;
         line-height: 22px;
@@ -402,15 +406,15 @@ export default {
       .handler {
         color: #1d2128;
         font-family: Microsoft YaHei;
-        font-size: 14px;
+        font-size: 12px;
         font-style: normal;
         font-weight: 400;
         line-height: 22px;
 
         /* 157.143% */
-        i {
-          color: #2d5cf6;
-        }
+        // i {
+        //   color: #2d5cf6;
+        // }
       }
     }
   }

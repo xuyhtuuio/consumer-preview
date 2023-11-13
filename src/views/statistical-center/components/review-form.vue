@@ -1,5 +1,5 @@
 <template>
-  <div class="review-form">
+  <div class="review-form" v-loading="isShow">
     <TrsTable
       theme="TRS-table-gray"
       :data="data"
@@ -15,10 +15,10 @@
         </div>
       </template>
       <template #org="scope">
-        <div class="org">
+        <div class="orgName">
           <span
             class="org-icon"
-            :style="{'background-color' : colorData[scope.$index%7]} "
+            :style="{ 'background-color': colorData[scope.$index % 7] }"
           ></span>
           {{ scope.row.org }}
         </div>
@@ -35,9 +35,12 @@
 </template>
 
 <script>
+import { reviewTaskDistribution } from '@/api/statistical-center'
 export default {
   data() {
     return {
+      isShow: true,
+      sortSign: 1,
       colConfig: [
         {
           label: '序号',
@@ -49,95 +52,48 @@ export default {
         },
         {
           label: '机构',
-          prop: 'org',
+          prop: 'orgName',
           bind: {
-            width: 140,
+            width: 80,
             align: 'center'
           }
         },
         {
           label: '审查项目数',
-          prop: 'project'
+          prop: 'examineAllTotal',
+          bind: {
+            width: 120,
+            align: 'center',
+            sortable: 'custom'
+          }
         },
         {
           label: '平均审查时长',
-          prop: 'average',
+          prop: 'averageReviewDuration',
           bind: {
-            width: 120,
-            align: 'center'
+            width: 140,
+            align: 'center',
+            sortable: 'custom'
           }
         },
         {
           label: '一次通过率',
-          prop: 'firstTime'
+          prop: 'formOneTimePassRate',
+          bind: {
+            width: 130,
+            sortable: 'custom'
+          }
         },
         {
           label: '接受率',
-          prop: 'acceptanceRate',
+          prop: 'viewAcceptanceRate',
           bind: {
             align: 'center',
             sortable: 'custom'
           }
         }
       ],
-      data: [
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-        {
-          org: '招商银行总行',
-          project: '13245',
-          average: '3h',
-          firstTime: '90.3%',
-          acceptanceRate: '89.3%'
-        },
-      ],
+      data: [],
       colorData: [
         '#2D5CF6',
         '#14C9C9',
@@ -151,11 +107,45 @@ export default {
         pageNow: 1,
         total: 20,
         pageSize: 8
-      }
+      },
+      searchData: null
     }
   },
   methods: {
-    sortChange() {},
+    async initData(data = this.searchData, sortSign) {
+      this.isShow = true
+      this.searchData = data
+      const { data: res } = await reviewTaskDistribution(sortSign ? { ...data, sortSign } : data)
+      if (res.success) {
+        this.data = res.data.list
+        this.page.total = res.data.totalCount
+        this.isShow = false
+      }
+    },
+    sortChange(data) {
+      if (data.order) {
+        const [asc, desc] = this.judgeSortSign(data.prop)
+        if (data.order && data.order.includes('asc')) {
+          this.initData(this.searchData, asc)
+        } else {
+          this.initData(this.searchData, desc)
+        }
+      }
+    },
+    judgeSortSign(origin) {
+      switch (origin) {
+        case 'examineAllTotal':
+          return [1, 2]
+        case 'averageReviewDuration':
+          return [3, 4]
+        case 'formOneTimePassRate':
+          return [5, 6]
+        case 'viewAcceptanceRate':
+          return [7, 8]
+        default:
+          return [1, 2]
+      }
+    },
     submitEdit() {},
     handleCurrentChange() {}
   }

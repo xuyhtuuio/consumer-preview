@@ -1,8 +1,8 @@
 <template>
-  <div class="type-distribution">
+  <div class="type-distribution" v-loading="isShow">
     <g-table-card :title="title">
       <template #head-right>
-        <div class="btns flex">
+        <div class="btns flex" v-if="timesData.length">
           <span
             :class="{ 'btn-item': true, active: currentEchartType === 1 }"
             @click="handleEchartsToggle(1)"
@@ -16,7 +16,7 @@
         </div>
       </template>
       <template v-slot:content>
-        <div class="content">
+        <div class="content" v-if="timesData.length">
           <div
             class="content-title"
             v-show="isToggleNext"
@@ -28,12 +28,14 @@
             <div class="echarts-box" ref="my-echarts"></div>
           </div>
         </div>
+        <el-empty v-else style="width:100%;padding:0"></el-empty>
       </template>
     </g-table-card>
   </div>
 </template>
 
 <script>
+import { distributionOfReviewTypes } from '@/api/statistical-center'
 export default {
   props: {
     list: {
@@ -44,32 +46,29 @@ export default {
   data() {
     return {
       title: '审查类型分布',
+      isShow: true,
       currentEchartType: 1,
       colorListTimes: ['#5773F9', '#249EFF', '#21CCFF', '#81E2FF'],
       colorListTimesTwo: ['#65CFE4', '#FADC6D', '#CF84CD'],
-      timesData: [
-        { value: 200, name: '产品类' },
-        { value: 400, name: '活动类' },
-        { value: 300, name: '客户类' },
-        { value: 100, name: '其他' }
-      ],
-      timesDataTwo: [
-        { value: 400, name: '有实质意见' },
-        { value: 300, name: '非实质意见' },
-        { value: 100, name: '活动未开展' }
-      ],
+      timesData: [],
       isToggleNext: false,
       isToggleNextData: null
     }
   },
-  mounted() {
-    this.initMyEcharts(this.timesData, this.colorListTimes)
-  },
   methods: {
-    initMyEcharts(timesData, colorListTimes) {
-      const all = timesData.reduce((item, next) => {
-        return item + next.value
-      }, 0)
+    async initData(data = this.searchData) {
+      this.isShow = true
+      this.searchData = data
+      const { data: res } = await distributionOfReviewTypes({ ...data, distributionOfReviewTypesSign: this.currentEchartType })
+      if (res.success) {
+        this.timesData = res.data
+        this.$nextTick(() => {
+          this.initMyEcharts(res.data)
+        })
+      }
+      this.isShow = false
+    },
+    initMyEcharts(timesData, colorListTimes = this.colorListTimes) {
       const option = {
         color: colorListTimes,
         tooltip: {
@@ -78,8 +77,7 @@ export default {
           extraCssText: 'backdrop-filter:blur(2px)',
           formatter(params) {
             const { value, name, color } = params
-
-            const rate = (value / all) * 100
+            const { rate } = params.data
             return `
               <div style="display:flex;gap: 12px; align-items: center;padding: 6px;font-size:12px;color:#1D2128;">
                 <span style="width:8px;height:8px;border-radius: 50%;background-color:${color}"></span>
@@ -90,8 +88,12 @@ export default {
           }
         },
         legend: {
+          type: 'scroll',
+          pageIconSize: 8,
+          pageIconColor: '#2d5cf6',
           orient: 'vertical',
-          right: 100,
+          right: 50,
+          top: 5,
           y: 'center',
           // 设置图例形状
           icon: 'circle',
@@ -110,9 +112,8 @@ export default {
             }
           },
           formatter(name) {
-            const { value } = timesData.find((item) => item.name === name)
-            const rate = (value / all) * 100
-            return `{b|${name}} {a| ${value}项 ${rate}%}`
+            const { value, rate } = timesData.find((item) => item.name === name)
+            return `{b|${name.length >= 10 ? name.slice(0, 10) + '...' : name}} {a| ${value}项 ${rate}%}`
           }
         },
         series: [
@@ -129,7 +130,7 @@ export default {
                 show: true,
                 fontSize: 12,
                 formatter({ name, value }) {
-                  return `{a|${value}项}\n{b| ${name}}`
+                  return `{a|${value}项}\n{b| ${name.length >= 10 ? name.slice(0, 5) + '...' : name}}`
                 },
                 rich: {
                   a: {
@@ -170,13 +171,15 @@ export default {
     handleEchartsToggle(type) {
       if (type !== this.currentEchartType) {
         this.currentEchartType = type
+        this.isToggleNext = false
+        this.initData()
       }
     },
     handleToggleEchartItem(data) {
       if (this.isToggleNext) return
       this.isToggleNext = true
       this.isToggleNextData = data
-      this.initMyEcharts(this.timesDataTwo, this.colorListTimesTwo)
+      this.initMyEcharts(data.children)
     },
     handleReturn() {
       this.isToggleNext = false
