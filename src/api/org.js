@@ -1,9 +1,11 @@
 import request from '@/api/request'
+import $GLOBAL from '@/utils/const'
+const { cpr } = $GLOBAL;
 
 // 查询人员，角色，部门列表
 export function queryUserList(param) {
   return request({
-    url: '/cpr/admin/queryUserList',
+    url: cpr + 'admin/queryUserList',
     method: 'get',
     params: param
   })

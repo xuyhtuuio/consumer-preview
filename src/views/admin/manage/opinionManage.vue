@@ -334,7 +334,7 @@ export default {
         pageSize: this.page.pageSize,
         isAll: this.pageConfig.isAll !== undefined ? this.pageConfig.isAll : 1
       };
-      getPageList(pageData, '/cpr/opinion/listZhongAn').then(({ totalCount, list }) => {
+      getPageList(pageData, this.$GLOBAL.cpr + 'opinion/listZhongAn').then(({ totalCount, list }) => {
         this.page.total = totalCount;
         this.isLoading = false;
         list.forEach((item) => {

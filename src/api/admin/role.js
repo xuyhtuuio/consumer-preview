@@ -1,8 +1,10 @@
 import request from '@/api/request'
+import $GLOBAL from '@/utils/const'
+const { cpr } = $GLOBAL;
 // 获取关键词列表
 export function getRoleList(data) {
   return request({
-    url: '/cpr/roleManagement/getRoleList',
+    url: cpr + 'roleManagement/getRoleList',
     method: 'post',
     data
   })
@@ -10,7 +12,7 @@ export function getRoleList(data) {
 
 export function getPermissionList(data) {
   return request({
-    url: '/cpr/roleManagement/getPermissionList',
+    url: cpr + 'roleManagement/getPermissionList',
     method: 'post',
     data
   })
@@ -18,7 +20,7 @@ export function getPermissionList(data) {
 
 export function deactivateRecoveryRole(params) {
   return request({
-    url: '/cpr/roleManagement/deactivateRecoveryRole',
+    url: cpr + 'roleManagement/deactivateRecoveryRole',
     method: 'post',
     params
   })
@@ -26,14 +28,14 @@ export function deactivateRecoveryRole(params) {
 
 export function editThePermissionsPage(params) {
   return request({
-    url: '/cpr/roleManagement/editThePermissionsPage',
+    url: cpr + 'roleManagement/editThePermissionsPage',
     method: 'post',
     params
   })
 }
 export function updateRolePermission(data) {
   return request({
-    url: '/cpr/roleManagement/updateRolePermission',
+    url: cpr + 'roleManagement/updateRolePermission',
     method: 'post',
     data
   })

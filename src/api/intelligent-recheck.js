@@ -1,7 +1,9 @@
 import request from '@/api/request';
+import $GLOBAL from '@/utils/const'
+const { cpr } = $GLOBAL;
 export function getSimilarityComparisonList(data) {
   return request({
-    url: '/cpr/recheck/similarityComparisonList',
+    url: cpr + 'recheck/similarityComparisonList',
     method: 'post',
     data
   })
@@ -9,7 +11,7 @@ export function getSimilarityComparisonList(data) {
 
 export function getRecheckList(data) {
   return request({
-    url: '/cpr/recheck/checkBackList',
+    url: cpr + 'recheck/checkBackList',
     method: 'post',
     data
   })
@@ -17,7 +19,7 @@ export function getRecheckList(data) {
 
 export function AddRecheck(data) {
   return request({
-    url: '/cpr/recheck/add',
+    url: cpr + 'recheck/add',
     method: 'post',
     data
   })
@@ -25,7 +27,7 @@ export function AddRecheck(data) {
 
 export function getOne(data) {
   return request({
-    url: '/cpr/recheck/getOne',
+    url: cpr + 'recheck/getOne',
     contentType: 'application/x-www-form-urlencoded',
     method: 'post',
     data
@@ -34,7 +36,7 @@ export function getOne(data) {
 
 export function getRecheckDetailList(data) {
   return request({
-    url: '/cpr/recheck/oneReCheck',
+    url: cpr + 'recheck/oneReCheck',
     method: 'post',
     data
   })

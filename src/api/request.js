@@ -2,14 +2,23 @@ import Vue from 'vue';
 import axios from 'axios';
 import Qs from 'qs';
 import router from '@/router';
+import $GLOBAL from '@/utils/const'
 
 import { Message } from 'element-ui';
 // 第三方插件
 import 'element-ui/lib/theme-chalk/index.css';
 
+const { uaa } = $GLOBAL;
+
 Vue.prototype.$axios = axios;
-// 字体图标
-const noToken = ['uaa/oauth/token', 'uaa/captcha', 'uaa/loginByPwd', 'uaa/validCodeSms', 'cpr/user/getToken', '/uaa/validCodeSms'];
+const noToken = [
+  `${uaa}oauth/token`,
+  `${uaa}captcha`,
+  `${uaa}loginByPwd`,
+  `${uaa}validCodeSms`,
+  `${uaa}user/getToken`,
+  `${uaa}validCodeSms`,
+]
 let newPage = false;
 const service = axios.create({
   baseURL: process.env.BASE_API,

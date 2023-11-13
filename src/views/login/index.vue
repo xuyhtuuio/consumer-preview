@@ -601,7 +601,7 @@ export default {
     async getUserRole() {
       const res = await this.$http({
         method: 'post',
-        url: '/cpr/oauth/check_token',
+        url: this.$GLOBAL.uaa + 'oauth/check_token',
         contentType: 'application/x-www-form-urlencoded',
         data: {
           token: window.localStorage.getItem('AI_token')
@@ -629,7 +629,7 @@ export default {
       this.platlist = []
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.cpr + 'oauth/check_token',
+        url: this.$GLOBAL.uaa + 'oauth/check_token',
         contentType: 'application/x-www-form-urlencoded',
         data: {
           token: window.localStorage.getItem('AI_token')
@@ -686,7 +686,7 @@ export default {
     // 获取账号验证码
     async codeFun() {
       const res = await this.$http({
-        url: '/cpr/captcha'
+        url: this.$GLOBAL.uaa + 'captcha'
       })
       if (res.data === undefined) {
         this.$message.error('网络错误，请稍后再试')
@@ -885,7 +885,7 @@ export default {
           }
           const res = await this.$http({
             method: 'post',
-            url: this.$GLOBAL.cpr + 'user/update',
+            url: this.$GLOBAL.uaa + 'user/update',
             headers: {
               'Content-Type': 'application/json'
             },
@@ -910,7 +910,7 @@ export default {
         const res = await this.$http({
           method: 'post',
           contentType: 'application/x-www-form-urlencoded',
-          url: this.$GLOBAL.cpr + 'oauth/token',
+          url: this.$GLOBAL.uaa + 'oauth/token',
           data: {
             username: this.form.phone,
             smscode: this.code,
@@ -955,7 +955,7 @@ export default {
     async loginByPwd() {
       const res = await this.$http({
         method: 'post',
-        url: '/cpr/oauth/token',
+        url: this.$GLOBAL.uaa + 'oauth/token',
         contentType: 'application/x-www-form-urlencoded',
         data: {
           username: this.form.username,
@@ -1084,7 +1084,7 @@ export default {
       // if (this.crtOp === 'inputPsw') {}
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.cpr + 'user/requestAuth',
+        url: this.$GLOBAL.uaa + 'user/requestAuth',
         contentType: 'application/x-www-form-urlencoded',
         data
       })
@@ -1112,7 +1112,7 @@ export default {
       }
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.cpr + 'user/requestDelay',
+        url: this.$GLOBAL.uaa + 'user/requestDelay',
         contentType: 'application/x-www-form-urlencoded',
         data
       })

@@ -107,7 +107,7 @@
       <div class="dialog-item">
         <p><b>图标</b></p>
         <!-- <i class="icon-chanpin1"></i> -->
-        <el-upload class="avatar-uploader" action="/cpr/file/upload" :http-request="uploadBpmn" :show-file-list="false">
+        <el-upload class="avatar-uploader" :action="$GLOBAL.cpr + 'file/upload'" :http-request="uploadBpmn" :show-file-list="false">
           <img v-if="imageUrl" :src="imageUrl" alt="" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           <el-button size="small" style="display: none;" id="icon-uploader" type="text">上传</el-button>
