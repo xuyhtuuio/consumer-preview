@@ -3,7 +3,7 @@
     <div class="header">
       <span :class="{ active: activeWordType === 1 }" @click="changeWorkType(1)">禁用词</span>
       <span :class="{ active: activeWordType === 2 }" @click="changeWorkType(2)">敏感词</span>
-      <el-input v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search" size="medium">
+      <el-input v-char v-model.trim="keyWords" placeholder="请输入关键字" @keyup.enter.native="search" @blur="search" size="medium">
         <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="search"></i>
       </el-input>
     </div>

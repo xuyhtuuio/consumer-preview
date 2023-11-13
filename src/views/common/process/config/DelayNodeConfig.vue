@@ -8,7 +8,7 @@
       </el-radio-group>
     </div>
     <div v-if="config.type === 'FIXED'">
-      <el-input style="width: 180px;" placeholder="时间单位" size="small" type="number" v-model="config.time">
+      <el-input v-char style="width: 180px;" placeholder="时间单位" size="small" type="number" v-model="config.time">
         <el-select style="width: 75px;" v-model="config.unit" slot="append" placeholder="请选择">
           <el-option label="天" value="D"></el-option>
           <el-option label="小时" value="H"></el-option>

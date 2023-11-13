@@ -8,7 +8,7 @@
           </svg>
           流程名称<span style="color: red">*</span>
         </template>
-        <el-input v-model.trim="setup.templateName" placeholder="请输入流程名称" class="is-dark input" size="medium"></el-input>
+        <el-input v-char v-model.trim="setup.templateName" placeholder="请输入流程名称" class="is-dark input" size="medium"></el-input>
         <template slot="error">
           <span class="custom-error">
             <i class="iconfont icon-a-tubiao1"></i>
@@ -47,7 +47,7 @@
           </svg>
           表单说明
         </template>
-        <el-input placeholder="请输入表单说明" v-model="setup.remark" type="textarea" class="is-dark input" show-word-limit
+        <el-input v-char placeholder="请输入表单说明" v-model="setup.remark" type="textarea" class="is-dark input" show-word-limit
                   :autosize="{ minRows: 3, maxRows: 8}"></el-input>
       </el-form-item>
     </el-form>

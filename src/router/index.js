@@ -255,6 +255,33 @@ const router = new Router({
       component: () => import('@/views/statistical-center/index'),
       meta: { code: ['statisticsCenter'], title: '统计中心', viewport }
     },
+    // 知识库
+    {
+      path: '/knowledge',
+      name: 'knowledge',
+      component: () => import('@/views/knowledge/index'),
+      meta: { code: ['knowledge'], title: '知识库', viewport },
+      children: [
+        {
+          path: 'rulesBase',
+          name: 'rulesBase',
+          component: () => import('@/views/rules-base/index'),
+          meta: { code: ['rulesBase'], title: '法规库', viewport },
+        },
+        {
+          path: 'rulesDetail',
+          name: 'RulesDetail',
+          meta: { code: ['rulesBase'], title: '法规详情页', viewport },
+          component: () => import('@/views/rules-base/detail'),
+        },
+        {
+          path: 'collectKnowledge',
+          name: 'collectKnowledge',
+          meta: { code: ['collectKnowledge'], title: '知识集市', viewport },
+          component: () => import('@/views/knowledge/collectKnowledge'),
+        }
+      ]
+    },
     // 首页
     {
       path: '/front',
@@ -283,6 +310,12 @@ const router = new Router({
       name: 'personCenter',
       component: () => import('@/views/personCenter/index'),
       meta: { code: ['peopleCenter'], title: '人员中心', viewport }
+    },
+    {
+      path: '/file-preview',
+      name: 'file-preview',
+      component: () => import('@/views/file-preview/index'),
+      meta: { title: '文件预览', viewport },
     },
     {
       path: '/error',

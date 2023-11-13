@@ -1,10 +1,10 @@
 <template>
   <div style="max-width: 500px">
     <div v-if="mode === 'DESIGN'">
-      <el-input size="medium" disabled :placeholder="placeholder" show-word-limit :rows="2" type="textarea"/>
+      <el-input v-char size="medium" disabled :placeholder="placeholder" show-word-limit :rows="2" type="textarea"/>
     </div>
     <div v-else>
-      <el-input size="medium" v-model="_value" clearable :maxlength="255" :placeholder="placeholder" show-word-limit :rows="3" type="textarea"/>
+      <el-input v-char size="medium" v-model="_value" clearable :maxlength="255" :placeholder="placeholder" show-word-limit :rows="3" type="textarea"/>
     </div>
   </div>
 </template>

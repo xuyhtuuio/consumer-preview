@@ -78,7 +78,7 @@
             <div class="left-com black">共<span class="blue">1500</span>人</div>
           </div>
           <div class="tit-search">
-            <el-input v-model="keywords" placeholder="请输入审查人员姓名" clearable @clear="approvalList"
+            <el-input v-char v-model="keywords" placeholder="请输入审查人员姓名" clearable @clear="approvalList"
               @keyup.enter.native="approvalList">
               <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="approvalList"></i>
             </el-input>
@@ -215,7 +215,7 @@
             <div class="left-com black">共<span class="blue">1500</span>人</div>
           </div>
           <div class="tit-search">
-            <el-input v-model="keywords" placeholder="请输入提单人员姓名" clearable @clear="approvalList"
+            <el-input v-char v-model="keywords" placeholder="请输入提单人员姓名" clearable @clear="approvalList"
               @keyup.enter.native="approvalList">
               <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="approvalList"></i>
             </el-input>
@@ -330,7 +330,7 @@
               </div>
               <div class="floor2">
                 <div class="floor2-item">
-                  <el-input v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
+                  <el-input v-char v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
                     @keyup.enter.native="searchList">
                     <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
                   </el-input>
