@@ -1,0 +1,192 @@
+.el-breadcrumb {
+    font-size: 14px;
+  }
+  .el-breadcrumb .el-breadcrumb__inner {
+    font-size: 14px;
+  }
+  
+  .my-form {
+    .form-item {
+      width: 50%;
+      border-radius: 4px;
+    }
+    .el-input {
+      height: 38px;
+      line-height: 38px;
+    }
+    .el-input__suffix,.el-input__suffix-inner {
+      display: flex;
+      right: 5px;
+    }
+    .el-input__inner {
+      padding: 0;
+      padding-right: 30px;
+      height: 38px;
+      line-height: 38px;
+      background: rgba(247, 248, 250, 1);
+      border: 0;
+    }
+  
+    .el-autocomplete {
+      width: 100%;
+    }
+  
+    .el-textarea__inner,
+    .el-form-item__content {
+      padding-left: 0;
+      background: rgba(247, 248, 250, 1);
+      border: 0;
+  
+      .warn {
+        background: transparent;
+      }
+    }
+    .el-textarea {
+      .el-textarea__inner {
+      }
+    }
+    .el-form-item {
+      margin-bottom: 16px;
+    }
+    .el-form-item__content {
+      padding-left: 16px;
+  
+      .el-select {
+        width: 100%;
+      }
+      .el-select .el-input .el-select__caret.el-icon-arrow-up::before {
+        content: '\e790';
+        position: absolute;
+        width: 100%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotateZ(180deg);
+      }
+      .el-icon-arrow-down {
+        &::before {
+          content: '\e790';
+        }
+      }
+      .el-input__suffix-inner,.el-input__icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  
+    .el-date-editor {
+      display: flex;
+      .el-input__inner {
+        flex: 1;
+      }
+      .el-input__prefix {
+        position: static;
+        margin-right: 5px;
+        .el-input__icon {
+          &::before {
+            content: '\e78e';
+          }
+        }
+      }
+      .el-input__suffix {
+        right: 20px;
+      }
+    }
+  
+    .el-radio {
+      margin-right: 32px;
+    }
+  
+    .el-radio__input.is-checked + .el-radio__label {
+      color: black;
+    }
+  
+    .el-checkbox {
+      margin-right: 20px;
+      min-width: 100px;
+      font-size: 0;
+      display: flex;
+      align-items: center;
+      height: 38px;
+    }
+    .el-checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      line-height: 38px;
+    }
+    .el-checkbox__input.is-checked + .el-checkbox__label {
+      color: black;
+    }
+  
+    // 多选框文字过多自动换行
+    .el-checkbox__label {
+      display: inline-grid;
+      white-space: pre-line;
+      word-wrap: break-word;
+      overflow: hidden;
+      line-height: 20px;
+    }
+  
+    .el-form-item__label,
+    .el-form-item__content {
+      line-height: 38px;
+    }
+  
+    .el-cascader {
+      display: block;
+    }
+  }
+  .el-breadcrumb {
+    .el-breadcrumb__separator {
+      margin: 0 2px;
+    }
+    .el-breadcrumb__item .el-breadcrumb__inner .item {
+      font-weight: 500;
+      color: #86909c !important;
+    }
+    .el-breadcrumb__inner a,
+    .el-breadcrumb__inner.is-link {
+      font-weight: 500;
+      color: #86909c;
+      font-size: 14px;
+    }
+    .el-breadcrumb__item:last-of-type {
+      .el-breadcrumb__inner .item {
+        font-weight: 400;
+        color: #000 !important;
+        font-size: 14px;
+      }
+    }
+  }
+  // 红色警告
+  .el-icon-warning-one {
+    .el-icon-warning {
+      &::before {
+        color: #f76560;
+      }
+    }
+  }
+  // success 蓝色小丑
+  .el-message--success {
+    .el-icon-success {
+      &::before {
+        color: #14C9C9;
+      }
+    }
+  }
+  /**
+   * @description:  popper-class="my-cascader"
+   */
+  
+  .my-cascader {
+    .el-cascader-menu {
+      .el-cascader-menu__wrap {
+        .el-scrollbar__view {
+          .in-active-path {
+            color: #2d5cf6;
+          }
+        }
+      }
+    }
+  }
+  
