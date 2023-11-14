@@ -95,7 +95,7 @@
     </div>
     <DetailDialog ref="detailDia" v-if="showDetailDia" :detailItem="compareItem" @handleClose="handleClose"></DetailDialog>
     <el-dialog
-      title="提示"
+      title="回检意见"
       :visible.sync="editDialog"
       custom-class="edit-dialog"
       width="600"
