@@ -11,6 +11,7 @@ import http from '@/api/request'; /* eslint-disable */
 import bus from '@/utils/bus';
 import * as echarts from 'echarts'
 import Char from '@/directive/char'
+import { message } from '@/utils/resetMessage';
 
 import 'trs-web-components/lib/common.less';
 import 'trs-web-components/lib/element.less';
@@ -40,6 +41,8 @@ Vue.use(bus);
 Vue.prototype.$GLOBAL = $GLOBAL; // 全局常量
 Vue.prototype.$http = http; // 请求库
 Vue.prototype.$echarts = echarts
+Vue.prototype.$message = message;
+
 
 
 Vue.config.productionTip = false
