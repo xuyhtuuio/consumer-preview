@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-10 16:19:34
+ * @LastEditTime: 2023-11-16 12:26:49
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -26,7 +26,7 @@
           <fileType :fileName="item.file_key" class="file-icon"></fileType>
           <div class="file-info">
             <div class="name">
-              {{ item.name }}
+              <i>{{ item.name }} </i>
               <div @click.stop v-if="role">
                 <el-popover
                   placement="bottom"
@@ -1277,18 +1277,24 @@ export default {
       border-bottom: 1px dashed #e5e6eb;
       .file-icon {
         width: 40px;
+        flex-shrink: 0;
         height: 40px;
         margin-right: 16px;
         border-radius: 6px;
       }
       .file-info {
+        // width: calc(100% - 56px);
         flex: 1;
         line-height: 22px;
         font-size: 14px;
+        word-break: break-all;
         .name {
           color: #1d2128;
           font-weight: 700;
           margin-bottom: 6px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
           .more {
             float: right;
           }
