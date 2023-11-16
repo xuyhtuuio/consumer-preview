@@ -1,9 +1,11 @@
 import request from '@/api/request'
+import $GLOBAL from '@/utils/const'
+const { cpr } = $GLOBAL;
 
 // 上传文件
 export function getFormGroups(formData) {
   return request({
-    url: '/cpr/file/upload',
+    url: cpr + 'file/upload',
     method: 'post',
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }
@@ -13,7 +15,7 @@ export function getFormGroups(formData) {
 // 删除文件
 export function deleteFormGroups(params) {
   return request({
-    url: '/cpr/file/remove',
+    url: cpr + 'file/remove',
     method: 'post',
     params
   })
@@ -26,7 +28,7 @@ export function deleteFormGroups(params) {
  */
 export const taskInfo = (identifier, fileName) => {
   return request({
-    url: '/cpr/minioUpload/taskInfo',
+    url: cpr + 'minioUpload/taskInfo',
     method: 'post',
     params: {
       fileName,
@@ -44,7 +46,7 @@ export const taskInfo = (identifier, fileName) => {
  * @returns {Promise<AxiosResponse<any>>}
  */
 export const initTask = ({ identifier, fileName, totalSize, chunkSize }) => {
-  return request.post('/cpr/minioUpload/initTask', {
+  return request.post(cpr + 'minioUpload/initTask', {
     identifier,
     fileName,
     totalSize,
@@ -62,7 +64,7 @@ export const initTask = ({ identifier, fileName, totalSize, chunkSize }) => {
 export const preSignUrl = ({ partNumber, task }) => {
   const { uploadId, bucketName, objectKey } = task
   return request({
-    url: '/cpr/minioUpload/preSignUploadUrl',
+    url: cpr + 'minioUpload/preSignUploadUrl',
     params: {
       // fileName,
       // identifier,
@@ -81,7 +83,7 @@ export const preSignUrl = ({ partNumber, task }) => {
  */
 export const merge = (identifier, fileName) => {
   return request({
-    url: '/cpr/minioUpload/merge',
+    url: cpr + 'minioUpload/merge',
     method: 'post',
     params: {
       identifier,
@@ -92,7 +94,7 @@ export const merge = (identifier, fileName) => {
 
 export function getFormCategoryArray(params) {
   return request({
-    url: '/cpr/applicationForm/getFormCategoryAssociated',
+    url: cpr + 'applicationForm/getFormCategoryAssociated',
     method: 'get',
     params
   })
@@ -100,7 +102,7 @@ export function getFormCategoryArray(params) {
 
 export function getApplyForm(params) {
   return request({
-    url: '/cpr/applicationForm/getApplyForm',
+    url: cpr + 'applicationForm/getApplyForm',
     method: 'get',
     params
   })
@@ -109,7 +111,7 @@ export function getApplyForm(params) {
 // 提交表单
 export function submit(data) {
   return request({
-    url: '/cpr/applicationForm/submit',
+    url: cpr + 'applicationForm/submit',
     method: 'post',
     data
   })
@@ -117,7 +119,7 @@ export function submit(data) {
 // 保存草稿
 export function saveDraft(data) {
   return request({
-    url: '/cpr/applicationForm/saveDraft',
+    url: cpr + 'applicationForm/saveDraft',
     method: 'post',
     data
   })
@@ -125,7 +127,7 @@ export function saveDraft(data) {
 // 查询工单详情
 export function workOrderTaskInfo(params) {
   return request({
-    url: '/cpr/applicationForm/workOrderTaskInfo',
+    url: cpr + 'applicationForm/workOrderTaskInfo',
     method: 'get',
     params
   })
@@ -133,7 +135,7 @@ export function workOrderTaskInfo(params) {
 // 查询工单详情
 export function externalLogicController(params) {
   return request({
-    url: '/cpr/externalLogicController/getProcessDefinitionId',
+    url: cpr + 'externalLogicController/getProcessDefinitionId',
     method: 'post',
     params
   })
@@ -141,7 +143,7 @@ export function externalLogicController(params) {
 
 export function processStart(data) {
   return request({
-    url: '/cpr/workspace/process/start',
+    url: cpr + 'workspace/process/start',
     method: 'post',
     data
   })
@@ -149,14 +151,14 @@ export function processStart(data) {
 // 获取当前登录用户信息
 export function getCurrentUserInfo() {
   return request({
-    url: '/cpr/user/getCurrentUser',
+    url: cpr + 'user/getCurrentUser',
     method: 'get'
   })
 }
 // 单个流程
 export function getProcess(params) {
   return request({
-    url: '/cpr/admin/form/list',
+    url: cpr + 'admin/form/list',
     method: 'get',
     params: {
       ...params,

@@ -1,8 +1,10 @@
-import request from '@/api/request'
+import request from '@/api/request';
+import $GLOBAL from '@/utils/const'
+const { cpr } = $GLOBAL;
 // 获取关键词列表
 export function getList(param) {
   return request({
-    url: '/cpr/keyword/search',
+    url: cpr + 'keyword/search',
     method: 'get',
     params: param
   })
@@ -10,7 +12,7 @@ export function getList(param) {
 // 编辑关键词
 export function edit(param) {
   return request({
-    url: '/cpr/keyword/edit',
+    url: cpr + 'keyword/edit',
     method: 'post',
     data: param
   })
@@ -18,7 +20,7 @@ export function edit(param) {
 // 添加关键词
 export function add(param) {
   return request({
-    url: '/cpr/keyword/add',
+    url: cpr + 'keyword/add',
     method: 'post',
     data: param
   })

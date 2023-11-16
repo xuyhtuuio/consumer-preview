@@ -95,12 +95,12 @@
     </div>
     <DetailDialog ref="detailDia" v-if="showDetailDia" :detailItem="compareItem" @handleClose="handleClose"></DetailDialog>
     <el-dialog
-      title="提示"
+      title="回检意见"
       :visible.sync="editDialog"
       custom-class="edit-dialog"
       width="600"
       :before-close="editClose">
-      <div class="show-num">
+      <div class="show-num" v-if="compareItem.recheckCount > 0">
         <div class="num-left">该文件已被回检{{ compareItem.recheckCount }}次</div>
         <div class="num-left num-right" @click="seeAllRecheck">查看回检内容</div>
       </div>
@@ -118,6 +118,8 @@
             type="textarea"
             resize="none"
             :rows="3"
+            maxlength="200"
+            show-word-limit
             placeholder="请输入回检意见"
             v-model="agreeInput">
           </el-input>
@@ -170,7 +172,8 @@ export default {
     chooseItem: {},
     nowIndex: 0,
     totalCount: 0,
-    getItemLoading: false
+    getItemLoading: false,
+    userInfo: {}
   }),
   created() {
     if (this.$route.params.leftItem && this.$route.params.compareItem) {
@@ -178,6 +181,7 @@ export default {
       this.compareItem = this.$route.params.compareItem;
       this.nowIndex = this.$route.params.compareItem.itemIndex;
       this.totalCount = this.$route.params.compareItem.totalCount;
+      this.userInfo = JSON.parse(window.localStorage.getItem('user_name'))
     } else {
       this.$router.go(-1)
     }
@@ -199,7 +203,7 @@ export default {
         launchTime: timestampToDateTime(this.compareItem.launchTime * 1000),
         ocrId: this.compareItem.ocrId,
         updateTime: '',
-        userId: this.compareItem.userId,
+        userId: this.userInfo.id,
       }
       AddRecheck(data).then(res => {
         if (res.data.status === 200) {

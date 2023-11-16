@@ -1,8 +1,10 @@
 import request from '@/api/request'
+import $GLOBAL from '@/utils/const'
+const { cpr } = $GLOBAL;
 // 提单人员-接受率分布
 export function proposeAcceptRate(data) {
   return request({
-    url: '/cpr/personController/proposeAcceptRate',
+    url: cpr + 'personController/proposeAcceptRate',
     method: 'POST',
     data
   })
@@ -11,7 +13,7 @@ export function proposeAcceptRate(data) {
 // 提单人员-一次通过率分布
 export function proposeOnePassRate(data) {
   return request({
-    url: '/cpr/personController/proposeOnePassRate',
+    url: cpr + 'personController/proposeOnePassRate',
     method: 'POST',
     data
   })

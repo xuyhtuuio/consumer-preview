@@ -85,7 +85,7 @@
                   <div class="select-set">
                     <div class="tip-style" :class="{ 'tip-style-active': searchForm.org }">选择机构</div>
                     <i class="el-icon-caret-bottom"></i>
-                    <img src="@/assets/image/intelligent-recheck/tip.png" alt="" />
+                    <!-- <img src="@/assets/image/intelligent-recheck/tip.png" alt="" /> -->
                   </div>
                 </div>
               </el-popover>
@@ -157,7 +157,12 @@
             <div class="select-item select-org">
               <div class="select-set">
                 <div class="tip-style" :class="{ 'tip-style-active': searchForm.type }">事项类型</div>
-                <i class="el-icon-caret-bottom"></i>
+                <div v-if="!searchForm.type">
+                  <i class="el-icon-caret-bottom"></i>
+                </div>
+                <div v-if="searchForm.type">
+                  <i class="el-icon-circle-close"></i>
+                </div>
               </div>
               <el-select
                 @focus="getFocus"
@@ -165,6 +170,7 @@
                 v-model="searchForm.type"
                 slot="prepend"
                 @change="changeSearchForm"
+                clearable
                 placeholder="事项类型"
               >
                 <el-option v-for="(item, index) in transactionTypes" :key="'type' + index" :label="item.label" :value="item.value"></el-option>
@@ -630,10 +636,10 @@ export default {
         pageSize: this.searchType === 1 ? 40 : 20,
         sort: this.activeSort.val,
         sortType: this.activeSort.sort === 'desc' ? 1 : 2,
-        cstartTime: this.searchForm.getTime && this.searchForm.getTime.length > 0 ? this.searchForm.getTime[0] : '',
-        cendTime: this.searchForm.getTime && this.searchForm.getTime.length > 0 ? this.searchForm.getTime[1] : '',
-        startTime: this.searchForm.setTime && this.searchForm.setTime.length > 0 ? this.searchForm.setTime[0] : '',
-        endTime: this.searchForm.setTime && this.searchForm.setTime.length > 0 ? this.searchForm.setTime[1] : '',
+        cstartTime: this.searchForm.getTime && this.searchForm.getTime.length > 0 ? this.searchForm.getTime[0] + ' 00:00:00' : '',
+        cendTime: this.searchForm.getTime && this.searchForm.getTime.length > 0 ? this.searchForm.getTime[1] + ' 23:59:59' : '',
+        startTime: this.searchForm.setTime && this.searchForm.setTime.length > 0 ? this.searchForm.setTime[0] + ' 00:00:00' : '',
+        endTime: this.searchForm.setTime && this.searchForm.setTime.length > 0 ? this.searchForm.setTime[1] + ' 23:59:59' : '',
         orgId: this.searchForm.org,
         isRecheck: this.searchForm.recheck ? 1 : 0,
         formCategory: this.searchForm.type
@@ -719,6 +725,9 @@ export default {
     changeSize(type) {
       this.$refs.imgPreview1.changeSize(type)
     },
+    resetSearchType() {
+      this.searchForm.type = '';
+    }
   }
 }
 </script>
@@ -963,7 +972,7 @@ export default {
         }
       }
       .select-org {
-        width: 104px;
+        width: 76px;
         /deep/.el-select {
           width: 78px;
         }

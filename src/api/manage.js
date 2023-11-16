@@ -1,10 +1,12 @@
 import request from '@/api/request'
+import $GLOBAL from '@/utils/const'
+const { cpr } = $GLOBAL;
 
 /* 表单管理start */
 // 表单管理-获取审查事项类型列表
 export function obtainExamineTypeList(param) {
   return request({
-    url: '/cpr/FormManagement/getFormCategoryList',
+    url: cpr + 'FormManagement/getFormCategoryList',
     method: 'get',
     params: param
   })
@@ -12,7 +14,7 @@ export function obtainExamineTypeList(param) {
 // 表单管理-新增表单
 export function addFormCategory(param) {
   return request({
-    url: '/cpr/FormManagement/addFormCategory',
+    url: cpr + 'FormManagement/addFormCategory',
     method: 'get',
     params: param
   })
@@ -20,7 +22,7 @@ export function addFormCategory(param) {
 // 修改表单类别的 名称
 export function modifyNameFormCategory(param) {
   return request({
-    url: '/cpr/FormManagement/modifyNameFormCategory',
+    url: cpr + 'FormManagement/modifyNameFormCategory',
     method: 'get',
     params: param
   })
@@ -28,7 +30,7 @@ export function modifyNameFormCategory(param) {
 // 修改表单类别的 时限、图标
 export function modifyTimeLimitFormCategory(param) {
   return request({
-    url: '/cpr/FormManagement/modifyTimeLimitFormCategory',
+    url: cpr + 'FormManagement/modifyTimeLimitFormCategory',
     method: 'get',
     params: param
   })
@@ -36,7 +38,7 @@ export function modifyTimeLimitFormCategory(param) {
 // 修改表单类别 停用 恢复
 export function switchFormCategoryState(param) {
   return request({
-    url: '/cpr/FormManagement/switchFormCategoryState',
+    url: cpr + 'FormManagement/switchFormCategoryState',
     method: 'get',
     params: param
   })
@@ -44,7 +46,7 @@ export function switchFormCategoryState(param) {
 // 表单管理-复制表单
 export function copyFormCategory(formCategoryId) {
   return request({
-    url: '/cpr/FormManagement/copyFormCategory',
+    url: cpr + 'FormManagement/copyFormCategory',
     method: 'get',
     params: {
       formCategoryId
@@ -54,7 +56,7 @@ export function copyFormCategory(formCategoryId) {
 // 删除表单
 export function deleteForm(params) {
   return request({
-    url: '/cpr/FormManagement/deleteForm',
+    url: cpr + 'FormManagement/deleteForm',
     method: 'get',
     params
   })
@@ -62,7 +64,7 @@ export function deleteForm(params) {
 // 修改表单排序
 export function formListChangeSort(params) {
   return request({
-    url: '/cpr/FormManagement/formListChangeSort',
+    url: cpr + 'FormManagement/formListChangeSort',
     method: 'get',
     params
   })
@@ -70,7 +72,7 @@ export function formListChangeSort(params) {
 // 表单管理-表单字段类型
 export function getItemType() {
   return request({
-    url: '/cpr/FormManagement/getItemType',
+    url: cpr + 'FormManagement/getItemType',
     method: 'get',
     params: {}
   })
@@ -78,7 +80,7 @@ export function getItemType() {
 // 表单管理-新增字段
 export function addFormField(param) {
   return request({
-    url: '/cpr/FormManagement/addItem',
+    url: cpr + 'FormManagement/addItem',
     method: 'post',
     data: param
   })
@@ -86,7 +88,7 @@ export function addFormField(param) {
 // 表单管理-编辑表单项
 export function editItem(param) {
   return request({
-    url: '/cpr/FormManagement/editItem',
+    url: cpr + 'FormManagement/editItem',
     method: 'post',
     data: param
   })
@@ -94,7 +96,7 @@ export function editItem(param) {
 // 表单管理-根据表单类别id找到字段详情
 export function itemPagingList(param) {
   return request({
-    url: '/cpr/FormManagement/itemPagingList',
+    url: cpr + 'FormManagement/itemPagingList',
     method: 'get',
     params: param
   })
@@ -102,7 +104,7 @@ export function itemPagingList(param) {
 // 表单管理-修改表单字段序号
 export function modifyOrder(param) {
   return request({
-    url: '/cpr/FormManagement/modifyOrder',
+    url: cpr + 'FormManagement/modifyOrder',
     method: 'post',
     contentType: 'application/x-www-form-urlencoded;charset=utf-8',
     data: param
@@ -111,7 +113,7 @@ export function modifyOrder(param) {
 // 表单管理-删除表单项
 export function deletedFormItem(param) {
   return request({
-    url: '/cpr/FormManagement/deletedFormItem',
+    url: cpr + 'FormManagement/deletedFormItem',
     method: 'get',
     params: param
   })
@@ -119,7 +121,7 @@ export function deletedFormItem(param) {
 // 表单管理-停用或重新启用表单项
 export function switchFormItemState(param) {
   return request({
-    url: '/cpr/FormManagement/switchFormItemState',
+    url: cpr + 'FormManagement/switchFormItemState',
     method: 'get',
     params: param
   })
@@ -130,7 +132,7 @@ export function switchFormItemState(param) {
 // 流程列表
 export function getProcessList(param) {
   return request({
-    url: '/cpr/admin/form/list',
+    url: cpr + 'admin/form/list',
     method: 'get',
     params: param
   })

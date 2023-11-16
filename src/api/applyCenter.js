@@ -1,9 +1,11 @@
 import request from '@/api/request'
+import $GLOBAL from '@/utils/const'
+const { cpr } = $GLOBAL;
 /* 申请中心start */
 // 表单管理-获取审查事项类型列表
 export function getDataStatistics(param) {
   return request({
-    url: '/cpr/applicationcenter/header',
+    url: cpr + 'applicationcenter/header',
     method: 'get',
     params: param
   })
@@ -11,7 +13,7 @@ export function getDataStatistics(param) {
 // 数量预览
 export function getsTheNumberOfHeaders(param) {
   return request({
-    url: '/cpr/applicationcenter/getsTheNumberOfHeaders',
+    url: cpr + 'applicationcenter/getsTheNumberOfHeaders',
     method: 'post',
     data: param
   })
@@ -19,7 +21,7 @@ export function getsTheNumberOfHeaders(param) {
 
 export function getUserStatus(param) {
   return request({
-    url: '/cpr/applicationcenter/user-status',
+    url: cpr + 'applicationcenter/user-status',
     method: 'get',
     params: param
   })
@@ -27,7 +29,7 @@ export function getUserStatus(param) {
 // 审批类型下拉列表
 export function getApprovalType(param) {
   return request({
-    url: '/cpr/applicationcenter/approvalType',
+    url: cpr + 'applicationcenter/approvalType',
     method: 'get',
     params: param
   })
@@ -35,14 +37,14 @@ export function getApprovalType(param) {
 // 审批阶段下拉列表
 export function getApprovalStage(param) {
   return request({
-    url: `/cpr/applicationcenter/approvalPhase/${param}`,
+    url: `${cpr}applicationcenter/approvalPhase/${param}`,
     method: 'get',
   })
 }
 // 获取申请列表
 export function getApplicationList(param) {
   return request({
-    url: '/cpr/applicationcenter/applicationList',
+    url: cpr + 'applicationcenter/applicationList',
     method: 'post',
     data: param
   })
@@ -50,7 +52,7 @@ export function getApplicationList(param) {
 // 获取关注列表
 export function concernedList(param) {
   return request({
-    url: '/cpr/applicationcenter/concernedList',
+    url: cpr + 'applicationcenter/concernedList',
     method: 'post',
     data: param
   })
@@ -59,7 +61,7 @@ export function concernedList(param) {
 // 待确认
 export function toBeConfirmed(param) {
   return request({
-    url: '/cpr/applicationcenter/toBeConfirmed',
+    url: cpr + 'applicationcenter/toBeConfirmed',
     method: 'post',
     data: param
   })
@@ -67,7 +69,7 @@ export function toBeConfirmed(param) {
 // 待修改
 export function toReviseList(param) {
   return request({
-    url: '/cpr/applicationcenter/toReviseList',
+    url: cpr + 'applicationcenter/toReviseList',
     method: 'post',
     data: param
   })
@@ -76,7 +78,7 @@ export function toReviseList(param) {
 // 草稿
 export function revoked(param) {
   return request({
-    url: '/cpr/applicationcenter/revoked',
+    url: cpr + 'applicationcenter/revoked',
     method: 'post',
     data: param
   })
@@ -84,7 +86,7 @@ export function revoked(param) {
 // 审批中
 export function Approval(param) {
   return request({
-    url: '/cpr/applicationcenter/approval',
+    url: cpr + 'applicationcenter/approval',
     method: 'post',
     data: param
   })
@@ -94,7 +96,7 @@ export function Approval(param) {
 
 export function delApplication(param) {
   return request({
-    url: '/cpr/applicationcenter/del',
+    url: cpr + 'applicationcenter/del',
     method: 'post',
     contentType: 'application/x-www-form-urlencoded',
     data: param
@@ -104,7 +106,7 @@ export function delApplication(param) {
 
 export function concernApplication(param) {
   return request({
-    url: '/cpr/censor/follow',
+    url: cpr + 'censor/follow',
     method: 'post',
     contentType: 'application/x-www-form-urlencoded',
     data: param
@@ -113,7 +115,7 @@ export function concernApplication(param) {
 
 export function instanceInfo(param) {
   return request({
-    url: '/cpr/workProcessQuery/instanceInfo',
+    url: cpr + 'workProcessQuery/instanceInfo',
     method: 'post',
     // contentType:'application/x-www-form-urlencoded',
     data: param
@@ -123,7 +125,7 @@ export function instanceInfo(param) {
 
 export function downloadAllFiles(param) {
   return request({
-    url: '/cpr/applicationForm/downloadAllFiles',
+    url: cpr + 'applicationForm/downloadAllFiles',
     method: 'get',
     responseType: 'blob',
     params: param
@@ -131,7 +133,7 @@ export function downloadAllFiles(param) {
 }
 export function downloadStream(param) {
   return request({
-    url: '/cpr/file/downloadStream',
+    url: cpr + 'file/downloadStream',
     method: 'get',
     responseType: 'blob',
     params: param
@@ -139,7 +141,7 @@ export function downloadStream(param) {
 }
 export function downloadAllFilesOther(param) {
   return request({
-    url: '/cpr//onlineComparison/downloadAllFiles',
+    url: cpr + '/onlineComparison/downloadAllFiles',
     method: 'get',
     responseType: 'blob',
     params: param
@@ -148,7 +150,7 @@ export function downloadAllFilesOther(param) {
 // 用id获取意见详情
 export function getEditedCommentsByFormId(param) {
   return request({
-    url: '/cpr/approvalrecord/getOpinionLetterByFormId',
+    url: cpr + 'approvalrecord/getOpinionLetterByFormId',
     contentType: 'application/x-www-form-urlencoded',
     method: 'post',
     data: param
@@ -157,7 +159,7 @@ export function getEditedCommentsByFormId(param) {
 // 审查意见书 保存
 export function insertApprovalRecordAndEditedComments(param) {
   return request({
-    url: '/cpr/approvalrecord/insertApprovalRecordAndEditedComments',
+    url: cpr + 'approvalrecord/insertApprovalRecordAndEditedComments',
     method: 'post',
     data: param
   })
@@ -165,7 +167,7 @@ export function insertApprovalRecordAndEditedComments(param) {
 // 审查意见书 提交
 export function updateAdoptEditedComments(param, id) {
   return request({
-    url: `/cpr/approvalrecord/opinionConfirmation?taskId=${id}`,
+    url: `${cpr}approvalrecord/opinionConfirmation?taskId=${id}`,
     method: 'post',
     data: param
   })
@@ -173,7 +175,7 @@ export function updateAdoptEditedComments(param, id) {
 // 保存审查意见书
 export function updateEditedComments(param) {
   return request({
-    url: '/cpr/approvalrecord/temporaryOpinions',
+    url: cpr + 'approvalrecord/temporaryOpinions',
     method: 'post',
     contentType: 'application/json',
     data: param
@@ -182,7 +184,7 @@ export function updateEditedComments(param) {
 
 export function quashApplication(param) {
   return request({
-    url: '/cpr/workspace/revoke',
+    url: cpr + 'workspace/revoke',
     method: 'post',
     data: param
   })
@@ -190,7 +192,7 @@ export function quashApplication(param) {
 
 export function canRoved(param) {
   return request({
-    url: '/cpr/externalLogicController/rove',
+    url: cpr + 'externalLogicController/rove',
     method: 'GET',
     contentType: 'application/x-www-form-urlencoded',
     params: param
@@ -200,7 +202,7 @@ export function canRoved(param) {
 // 获取当前process-id对应的流程配置信息
 export function getTemplatedetail(param) {
   return request({
-    url: '/cpr/workspace/process/templateDetail',
+    url: cpr + 'workspace/process/templateDetail',
     method: 'post',
     contentType: 'application/x-www-form-urlencoded',
     data: param

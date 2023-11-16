@@ -1,7 +1,7 @@
 <template>
   <div class="input" v-if="defaultShow">
     <div class="title">
-      <el-input v-char v-if="textarea" v-model.trim="textarea" ref="textareaCommon" @focus="handleFocus" type="textarea" @blur="handleBlur" :placeholder="placeholder" :rows="3" :maxlength="500" :minlength="1"></el-input>
+      <el-input v-char v-if="textarea" v-model="textarea" ref="textareaCommon" @focus="handleFocus" type="textarea" @blur="handleBlur" :placeholder="placeholder" :rows="3" :maxlength="500" :minlength="1"></el-input>
       <el-input v-char v-else v-model.trim="textarea" :ref="`inputCommon${id}`" :id="`inputCommon${id}`" @focus="handleFocus" @blur="handleBlur" :placeholder="placeholder"></el-input>
     </div>
     <el-button :loading="loading" type="primary" style="width:88px; margin-top: 10px;float: right;" :disabled="!textarea || loading" @click="handleConfirm">发 布</el-button>
