@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-24 11:19:25
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-16 12:26:49
+ * @LastEditTime: 2023-11-16 14:05:43
  * @FilePath: /consumer-preview/src/views/rules-base/components/laws.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -293,11 +293,6 @@
                 accept=".docx,.pdf,.doc"
                 :file-list="form.uploadFile"
                 :on-change="handleUploadChange"
-                :before-upload="
-                  (file) => {
-                    handleBefore(file, 'upload')
-                  }
-                "
               >
                 <i slot="default" class="el-icon-plus"></i>
                 <div
@@ -373,7 +368,6 @@
                 :class="[uploadRelatedDisabled]"
                 :on-change="handleRelatedChange"
                 :file-list="form.relatedFile"
-                :before-upload="(file) => handleBefore(file, 'related')"
               >
                 <i slot="default" class="el-icon-plus"></i>
                 <div
@@ -543,7 +537,7 @@ export default {
       rules: {
         isRepeal: [
           { validator: checkIsRepeal, trigger: ['change', 'blur'] },
-          { required: true, trigger: ['change'] },
+          { required: true, trigger: ['change'] }
         ],
         name: [
           { required: true, trigger: ['change', 'blur'] },
@@ -884,6 +878,13 @@ export default {
       if (this.form.uploadFile.length > 0) {
         this.uploadDisabled = 'disabled'
       }
+      const judgment = ['pdf', 'doc', 'docx']
+      // 上传文件之前钩子
+      const type = param.file.name.replace(/.+\./, '')
+      const judgeRes = judgment.includes(type)
+      if (!judgeRes) {
+        return false
+      }
       this.form.uploadFile.forEach((m) => {
         if (m.uid === param.file.uid) {
           m.loading = true
@@ -934,6 +935,10 @@ export default {
         }
         this.form.uploadFile = fileList
       } else {
+        this.$message({
+          type: 'error',
+          message: '只支持pdf/doc/docx格式的文件！'
+        })
         fileList = []
         this.form.uploadFile = fileList
       }
@@ -971,11 +976,13 @@ export default {
       if (this.form.relatedFile.length >= 8) {
         this.uploadRelatedDisabled = 'disabled'
       }
-      this.form.relatedFile.forEach((m) => {
-        if (m.uid === param.file.uid) {
-          m.loading = true
-        }
-      })
+      const judgment = ['pdf', 'doc', 'docx']
+      // 上传文件之前钩子
+      const type = param.file.name.replace(/.+\./, '')
+      const judgeRes = judgment.includes(type)
+      if (!judgeRes) {
+        return false
+      }
       const formData = new FormData()
       formData.append('mf', param.file) // 传入bpmn文件
       getFormGroups(formData)
@@ -1022,9 +1029,17 @@ export default {
       // 上传文件之前钩子
       const type = file.name.replace(/.+\./, '')
       const judgeRes = judgment.includes(type)
-      if (judgeRes) {
-        this.form.relatedFile.push(file)
+      if (!judgeRes) {
+        this.$message({
+          type: 'error',
+          message: '只支持pdf/doc/docx格式的文件！'
+        })
+        this.form.relatedFile = this.form.relatedFile.filter(
+          (list) => list.uid !== file.uid
+        )
+        return false
       }
+      this.form.relatedFile = fileList
     },
     /**
      * @description: 移除关联附件
@@ -1101,7 +1116,7 @@ export default {
           // 共计可以添加8个标签
           // eslint-disable-next-line
           const tagsCounts =
-           (this.tagsList?.length || 0) + (this.relevancyTags?.length || 0)
+            (this.tagsList?.length || 0) + (this.relevancyTags?.length || 0)
           if (tagsCounts > 8) {
             this.$message.error('添加的标签和相关权益标签最多可以添加8个')
             return false
