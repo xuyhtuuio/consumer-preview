@@ -1,10 +1,10 @@
-import { Message } from 'element-ui';
+import { Message } from 'element-ui'
 const resetMessage = (options) => {
-  const doms = document.getElementsByClassName('el-message');
-  let canShow = true;
+  const doms = document.getElementsByClassName('el-message')
+  let canShow = true
   for (let i = 0; i < doms.length; i++) {
     if (options.message === doms[i].getElementsByClassName('el-message__content')[0].innerHTML) {
-      canShow = false;
+      canShow = false
     }
   }
   if (doms.length === 0 || canShow) {
