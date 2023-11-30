@@ -2,17 +2,11 @@
   <div class="unity-login">
     <div class="main">
       <!-- 登录 -->
-      <div
-        :class="
-          crtOp !== 'register'
-            ? 'container-noregister container'
-            : 'container-normal container'
-        "
-      >
-        <div
-          class="container-top"
-          :class="crtOp === 'register' ? 'pt52' : 'pt80'"
-        >
+      <div :class="crtOp !== 'register'
+          ? 'container-noregister container'
+          : 'container-normal container'
+        ">
+        <div class="container-top" :class="crtOp === 'register' ? 'pt52' : 'pt80'">
           <div class="left">
             <swiperContent></swiperContent>
           </div>
@@ -26,39 +20,19 @@
               </div>
             </div>
             <div class="login-way">
-              <span
-                v-for="item in loginWay"
-                :key="item.key"
-                :class="item.name == activeName ? 'activeName' : ''"
-                @click="changeLoginWays(item)"
-                >{{ item.name }}</span
-              >
+              <span v-for="item in loginWay" :key="item.key" :class="item.name == activeName ? 'activeName' : ''"
+                @click="changeLoginWays(item)">{{ item.name }}</span>
             </div>
             <!-- 输入手机号 -->
             <!--输入框 -->
             <div>
               <el-form :model="form" ref="form" :rules="rules">
                 <el-form-item prop="phone" class="phone_input">
-                  <el-input
-                    v-model.trim="form.phone"
-                    placeholder="请输入你的手机号"
-                    maxlength="11"
-                    onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"
-                    style="height: 50px"
-                  >
-                    <el-select
-                      v-model="areaCode"
-                      slot="prepend"
-                      placeholder="请选择"
-                    >
-                      <el-option
-                        v-for="(item, index) in areaCodes"
-                        :key="index"
-                        :value="item.value"
-                      >
-                        <span style="float: left"
-                          >{{ item.value }} {{ item.label }}</span
-                        >
+                  <el-input v-model.trim="form.phone" placeholder="请输入你的手机号" maxlength="11"
+                    onkeyup="this.value=this.value.replace(/[^\d.]/g,'');" style="height: 50px">
+                    <el-select v-model="areaCode" slot="prepend" placeholder="请选择">
+                      <el-option v-for="(item, index) in areaCodes" :key="index" :value="item.value">
+                        <span style="float: left">{{ item.value }} {{ item.label }}</span>
                       </el-option>
                     </el-select>
                   </el-input>
@@ -73,9 +47,7 @@
                 <span @click="toPrivacypolicy">隐私政策</span>
               </div>
               <!-- 下一步 -->
-              <el-button type="text" class="next" @click="next"
-                >下一步</el-button
-              >
+              <el-button type="text" class="next" @click="next">下一步</el-button>
               <!-- <p class="no-account">没有账号，去 <span class="register">免费注册</span></p> -->
             </div>
           </div>
@@ -90,46 +62,29 @@
               </div>
             </div>
             <div class="login-way">
-              <span
-                v-for="item in loginWay"
-                :key="item.key"
-                :class="item.name == activeName ? 'activeName' : ''"
-                @click="changeLoginWays(item)"
-                >{{ item.name }}</span
-              >
+              <span v-for="item in loginWay" :key="item.key" :class="item.name == activeName ? 'activeName' : ''"
+                @click="changeLoginWays(item)">{{ item.name }}</span>
             </div>
             <!--输入框 -->
             <div>
               <el-form :model="form" ref="form" :rules="rules">
                 <el-form-item prop="username">
-                  <el-input
-                    v-model="form.username"
-                    placeholder="请输入用户名"
-                    class="password-input"
-                  >
+                  <el-input v-model="form.username" placeholder="请输入用户名" class="password-input">
                     <template slot="prepend">
                       <img src="@/assets/image/username.png" alt />
                     </template>
                   </el-input>
                 </el-form-item>
                 <el-form-item prop="password">
-                  <el-input
-                    v-model="form.password"
-                    placeholder="请输入密码"
-                    type="password"
-                    show-password
-                    class="password-input"
-                  >
+                  <el-input v-model="form.password" placeholder="请输入密码" type="password" show-password
+                    class="password-input">
                     <template slot="prepend">
                       <img src="@/assets/image/password.png" alt />
                     </template>
                   </el-input>
                 </el-form-item>
                 <el-form-item prop="verify" v-if="firstVerCode">
-                  <el-input
-                    v-model="form.verify"
-                    placeholder="点击输入验证码"
-                  ></el-input>
+                  <el-input v-model="form.verify" placeholder="点击输入验证码"></el-input>
                   <div class="verify_code">
                     <img v-if="verCode" :src="verCode" alt="" @click="verCodeChange" />
                   </div>
@@ -160,15 +115,8 @@
               <!-- <p class="no-account">没有账号，去 <span class="register" @click="register">免费注册</span></p> -->
             </div>
             <div class="pwd-login">
-              <el-button
-                type="text"
-                class="nextPwd"
-                @click="next"
-                :loading="loading"
-                :disabled="loading"
-                v-once-click
-                >登录</el-button
-              >
+              <el-button type="text" class="nextPwd" @click="next" :loading="loading" :disabled="loading"
+                v-once-click>登录</el-button>
               <!-- 服务协议 -->
             </div>
           </div>
@@ -182,26 +130,12 @@
               <span>6</span> 位验证码， 有效期 5 分钟
             </p>
             <div class="code-container">
-              <div
-                v-for="(item, index) in captchas"
-                :key="index"
-                class
-                :id="'captcha0' + index"
-              >
-                <input
-                  v-model="item.num"
-                  :id="'captcha' + index"
-                  @input="inputFinash(index)"
-                  @focus="adjust(index)"
-                  @keydown="inputDirection(index)"
-                  :class="
-                    activeInput == index
+              <div v-for="(item, index) in captchas" :key="index" class :id="'captcha0' + index">
+                <input v-model="item.num" :id="'captcha' + index" @input="inputFinash(index)" @focus="adjust(index)"
+                  @keydown="inputDirection(index)" :class="activeInput == index
                       ? 'captcha_input_box row-center activeInput'
                       : 'captcha_input_box row-center'
-                  "
-                  type="tel"
-                  maxlength="1"
-                />
+                    " type="tel" maxlength="1" />
               </div>
             </div>
             <div class="regain" v-if="regainShow">
@@ -230,10 +164,7 @@
             <el-button @click="login" class="login" type="text">登录</el-button>
           </div>
           <div class="register-box" v-if="crtOp === 'register'">
-            <register
-              @showAgreeDialog="showAgreeDialog"
-              @tologin="tologin"
-            ></register>
+            <register @showAgreeDialog="showAgreeDialog" @tologin="tologin"></register>
           </div>
           <!-- 找回密码 -->
           <div class="right" v-if="crtOp === 'forget-pwd'">
@@ -246,91 +177,43 @@
               </div>
             </div>
             <div class="forget_pwd">
-              <el-form
-                :model="changePwdform"
-                ref="changePwdform"
-                :rules="rules"
-                label-width="90px"
-                class="login_form"
-              >
+              <el-form :model="changePwdform" ref="changePwdform" :rules="rules" label-width="90px" class="login_form">
                 <el-form-item label="手机" prop="phone" class="phone_input2">
-                  <el-input
-                    v-model.trim="changePwdform.phone"
-                    placeholder="请输入你的手机号"
-                  >
-                    <el-select
-                      v-model="areaCode"
-                      slot="prepend"
-                      placeholder="请选择"
-                      class="phone_input-select"
-                      style="width: 87px"
-                    >
-                      <el-option
-                        v-for="(item, index) in areaCodes"
-                        :key="index"
-                        :value="item.value"
-                      >
-                        <span style="float: left"
-                          >{{ item.value }} {{ item.label }}</span
-                        >
+                  <el-input v-model.trim="changePwdform.phone" placeholder="请输入你的手机号">
+                    <el-select v-model="areaCode" slot="prepend" placeholder="请选择" class="phone_input-select"
+                      style="width: 87px">
+                      <el-option v-for="(item, index) in areaCodes" :key="index" :value="item.value">
+                        <span style="float: left">{{ item.value }} {{ item.label }}</span>
                       </el-option>
                     </el-select>
                   </el-input>
                 </el-form-item>
                 <el-form-item label="验证码" prop="code">
-                  <el-input
-                    v-model.trim="changePwdform.code"
-                    placeholder="请输入6位验证码"
-                  ></el-input>
+                  <el-input v-model.trim="changePwdform.code" placeholder="请输入6位验证码"></el-input>
                   <div class="verify_code get_code">
                     <span @click="getCodeMible">{{ CodeMibleTxt }}</span>
                   </div>
                 </el-form-item>
                 <el-form-item label="新密码" prop="newPwd" class="pwd-eye">
-                  <el-input
-                    v-model.trim="changePwdform.newPwd"
-                    placeholder="请输入新密码"
-                    type="password"
-                    show-password
-                  ></el-input>
+                  <el-input v-model.trim="changePwdform.newPwd" placeholder="请输入新密码" type="password"
+                    show-password></el-input>
                 </el-form-item>
-                <el-form-item
-                  label="确认密码"
-                  prop="confirmPwd"
-                  class="pwd-eye"
-                >
-                  <el-input
-                    v-model.trim="changePwdform.confirmPwd"
-                    placeholder="请输入确认密码"
-                    type="password"
-                    show-password
-                  ></el-input>
+                <el-form-item label="确认密码" prop="confirmPwd" class="pwd-eye">
+                  <el-input v-model.trim="changePwdform.confirmPwd" placeholder="请输入确认密码" type="password"
+                    show-password></el-input>
                 </el-form-item>
               </el-form>
-              <el-button type="text" @click="submit" class="next edit_pwd"
-                >提交</el-button
-              >
+              <el-button type="text" @click="submit" class="next edit_pwd">提交</el-button>
             </div>
           </div>
         </div>
-        <div
-          :class="
-            crtOp === 'register' ? 'container-bottom-left' : 'container-bottom'
-          "
-        >
-          <img
-            src="@/assets/image/trs_logo.png"
-            alt
-          />@2022拓尔思信息技术股份有限公司 版权所有 京ICP备11022871号-7
+        <div :class="crtOp === 'register' ? 'container-bottom-left' : 'container-bottom'
+          ">
+          <img src="@/assets/image/trs_logo.png" alt />@2022拓尔思信息技术股份有限公司 版权所有 京ICP备11022871号-7
         </div>
       </div>
       <!-- 协议弹窗 -->
-      <el-dialog
-        :visible.sync="checkAgreement"
-        :before-close="handleClose"
-        width="500px"
-        custom-class="agreeDialog"
-      >
+      <el-dialog :visible.sync="checkAgreement" :before-close="handleClose" width="500px" custom-class="agreeDialog">
         <div slot="title" class="title">
           <img src="@/assets/image/tips.png" alt="" />提示
         </div>
@@ -340,23 +223,11 @@
           <span>隐私政策</span>
         </div>
         <span slot="footer" class="dialog-footer">
-          <el-button type="text" class="cancel" @click="checkAgreement = false"
-            >取 消</el-button
-          >
-          <el-button
-            type="text"
-            class="submitCheck"
-            @click="checkAgreement = false"
-            >确 定</el-button
-          >
+          <el-button type="text" class="cancel" @click="checkAgreement = false">取 消</el-button>
+          <el-button type="text" class="submitCheck" @click="checkAgreement = false">确 定</el-button>
         </span>
       </el-dialog>
-      <el-dialog
-        :visible.sync="findPwd"
-        :before-close="handleClose"
-        width="500px"
-        custom-class="agreeDialog"
-      >
+      <el-dialog :visible.sync="findPwd" :before-close="handleClose" width="500px" custom-class="agreeDialog">
         <div slot="title" class="title">
           <img src="@/assets/image/tips.png" alt="" />提示
         </div>
@@ -365,50 +236,28 @@
           <span style="font-wight: 700; color: #1d2128">联系管理员</span>
         </div>
         <span slot="footer" class="dialog-footer">
-          <el-button type="text" class="cancel" @click="findPwd = false"
-            >取 消</el-button
-          >
-          <el-button type="text" class="submitCheck" @click="findPwd = false"
-            >确 定</el-button
-          >
+          <el-button type="text" class="cancel" @click="findPwd = false">取 消</el-button>
+          <el-button type="text" class="submitCheck" @click="findPwd = false">确 定</el-button>
         </span>
       </el-dialog>
-      <el-dialog
-        :visible.sync="expirydialog"
-        :before-close="handleClose"
-        width="600px"
-        custom-class="expiryDialog"
-      >
+      <el-dialog :visible.sync="expirydialog" :before-close="handleClose" width="600px" custom-class="expiryDialog">
         <div class="expiry-content">
           <div>
-            <img src="@/assets/image/expiry-tips.png" alt=""/>
+            <img src="@/assets/image/expiry-tips.png" alt="" />
             账号已到期
           </div>
           <p>可提交申请延期，待管理员审核！</p>
-          <el-input
-            v-model="appeal"
-            placeholder="请输入您的诉求"
-            class="appeal-input"
-          ></el-input>
+          <el-input v-model="appeal" placeholder="请输入您的诉求" class="appeal-input"></el-input>
           <!-- 于 {{ expirytime }}  -->
         </div>
 
         <span slot="footer" class="dialog-footer">
-          <el-button type="text" class="cancel" @click="applicationCancel"
-            >取消</el-button
-          >
-          <el-button type="text" class="submitCheck" @click="applicationExpiry"
-            >申请延期</el-button
-          >
+          <el-button type="text" class="cancel" @click="applicationCancel">取消</el-button>
+          <el-button type="text" class="submitCheck" @click="applicationExpiry">申请延期</el-button>
         </span>
       </el-dialog>
       <!-- 提交申请成功 -->
-      <el-dialog
-        :visible.sync="applySuccessdialog"
-        width="600px"
-        custom-class="applyDialog"
-        :before-close="handleClose"
-      >
+      <el-dialog :visible.sync="applySuccessdialog" width="600px" custom-class="applyDialog" :before-close="handleClose">
         <div class="expiry-content">
           <img src="@/assets/image/apply-success.png" alt="" />
           <p>已提交申请</p>
@@ -416,15 +265,10 @@
         </div>
       </el-dialog>
       <!-- 注册申请成功 -->
-      <el-dialog
-        :visible.sync="registerSuccessdialog"
-        width="600px"
-        custom-class="registerDialog"
-        :before-close="handleClose"
-        :close-on-press-escape="false"
-      >
+      <el-dialog :visible.sync="registerSuccessdialog" width="600px" custom-class="registerDialog"
+        :before-close="handleClose" :close-on-press-escape="false">
         <div class="expiry-content">
-          <img src="@/assets/image/expiry-tips.png" alt=""/>
+          <img src="@/assets/image/expiry-tips.png" alt="" />
           <p class="register-status">待审核</p>
           <p class="register-msg">
             请耐心等待，账号审核通过后将发送账号信息至您的邮箱和短信
@@ -440,7 +284,6 @@
 </template>
 
 <script>
-import md5 from 'js-md5'
 import { toCode, fromCode } from '@/utils/utils'
 import { getPermissionsPage } from '@/router/index'
 // eslint-disable-next-line
@@ -603,6 +446,9 @@ export default {
     }
   },
   created() {
+    if (this.$hasMicro()) {
+      this.$routerPush('loginOut')
+    }
     this.env = process.env.NODE_ENV
     const userName = window.localStorage.getItem('AI_name')
     const pwd = window.localStorage.getItem('AI_pwd')
@@ -755,7 +601,7 @@ export default {
     async getUserRole() {
       const res = await this.$http({
         method: 'post',
-        url: '/cpr/oauth/check_token',
+        url: this.$GLOBAL.uaa + 'oauth/check_token',
         contentType: 'application/x-www-form-urlencoded',
         data: {
           token: window.localStorage.getItem('AI_token')
@@ -783,7 +629,7 @@ export default {
       this.platlist = []
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.cpr + 'oauth/check_token',
+        url: this.$GLOBAL.uaa + 'oauth/check_token',
         contentType: 'application/x-www-form-urlencoded',
         data: {
           token: window.localStorage.getItem('AI_token')
@@ -827,21 +673,9 @@ export default {
           && routeFrom !== 'trs'
         ) {
           // 未到期 & 有权限
-          const plat = this.iframeSrc.filter((item) => item.value === routeFrom)
-          // 来源为存在平台
-          if (plat.length) {
-            window.opener = null
-            window.open(
-              plat[0][this.iframeType].replace(plat[0].route, '')
-                + `?id=
-              ${md5.hex(window.localStorage.getItem('AI_token'))}`,
-              '_self'
-            )
-          } else {
-            this.$router.push({
-              name: 'home'
-            })
-          }
+          this.$router.push({
+            name: 'home'
+          })
         } else {
           this.$router.push({
             name: 'home'
@@ -852,7 +686,7 @@ export default {
     // 获取账号验证码
     async codeFun() {
       const res = await this.$http({
-        url: '/cpr/captcha'
+        url: this.$GLOBAL.uaa + 'captcha'
       })
       if (res.data === undefined) {
         this.$message.error('网络错误，请稍后再试')
@@ -1051,7 +885,7 @@ export default {
           }
           const res = await this.$http({
             method: 'post',
-            url: this.$GLOBAL.cpr + 'user/update',
+            url: this.$GLOBAL.uaa + 'user/update',
             headers: {
               'Content-Type': 'application/json'
             },
@@ -1076,7 +910,7 @@ export default {
         const res = await this.$http({
           method: 'post',
           contentType: 'application/x-www-form-urlencoded',
-          url: this.$GLOBAL.cpr + 'oauth/token',
+          url: this.$GLOBAL.uaa + 'oauth/token',
           data: {
             username: this.form.phone,
             smscode: this.code,
@@ -1121,7 +955,7 @@ export default {
     async loginByPwd() {
       const res = await this.$http({
         method: 'post',
-        url: '/cpr/oauth/token',
+        url: this.$GLOBAL.uaa + 'oauth/token',
         contentType: 'application/x-www-form-urlencoded',
         data: {
           username: this.form.username,
@@ -1204,7 +1038,7 @@ export default {
       } else {
         document
           .getElementsByTagName('html')[0]
-          .removeEventListener('mouseup', () => {})
+          .removeEventListener('mouseup', () => { })
       }
       document.getElementsByClassName('drag_text')[0].style.color = '#fff'
       document.getElementsByClassName('handler')[0].style.left = this.maxwidth + 'px'
@@ -1250,7 +1084,7 @@ export default {
       // if (this.crtOp === 'inputPsw') {}
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.cpr + 'user/requestAuth',
+        url: this.$GLOBAL.uaa + 'user/requestAuth',
         contentType: 'application/x-www-form-urlencoded',
         data
       })
@@ -1278,7 +1112,7 @@ export default {
       }
       const res = await this.$http({
         method: 'post',
-        url: this.$GLOBAL.cpr + 'user/requestDelay',
+        url: this.$GLOBAL.uaa + 'user/requestDelay',
         contentType: 'application/x-www-form-urlencoded',
         data
       })
@@ -1323,30 +1157,6 @@ export default {
     }
   },
 
-  beforeRouteEnter(to, from, next) {
-    next(async (vm) => {
-      if (
-        from
-        && !['login', 'loginAuto', 'microLogin'].includes(from.name)
-        && from.fullPath !== '/'
-      ) {
-        vm.gohistory = from.name || true
-      } else if (from && from.query && from.query.from === 'cpr') {
-        vm.getTokenById()
-        window.open(window.location.host + '/applycenter/apply-list', '_self')
-      } else if (from && from.query && from.query.from === 'cwo') {
-        vm.getTokenById()
-        // cwo.dataelite.trs.com.cn/#/?id=×××××××××
-        window.open(
-          'http://cwo.dataelite.trs.com.cn/#/'
-            + `?id= ${md5.hex(window.localStorage.getItem('AI_token'))}`
-        )
-      } else if (from && from.query) {
-        window.open(window.location.host + '/home', '_self')
-      }
-    })
-  },
-
 }
 </script>
 <style lang="less" scoped>
@@ -1364,6 +1174,7 @@ export default {
   .main {
     margin: 64px -80px auto;
   }
+
   .iframe-container {
     position: absolute;
     z-index: -100;
@@ -1638,8 +1449,9 @@ export default {
                   border-color: #2d5cf6 !important;
                 }
               }
+
               /deep/ .el-checkbox {
-                .el-checkbox__input.is-checked + .el-checkbox__label {
+                .el-checkbox__input.is-checked+.el-checkbox__label {
                   color: #505968 !important;
                 }
               }
@@ -1720,6 +1532,7 @@ export default {
       .login_form {
         .phone_input2 {
           width: 30px;
+
           /deep/ .el-input-group__prepend {
             background: #fff;
           }
@@ -1790,6 +1603,7 @@ export default {
           cursor: pointer;
         }
       }
+
       .service-agreement-num {
         text-align: left;
         font-weight: 400;
@@ -1999,11 +1813,9 @@ export default {
         height: 50px;
         border-radius: 0px 6px 6px 0px;
         cursor: move;
-        background: linear-gradient(
-            0deg,
+        background: linear-gradient(0deg,
             rgba(255, 255, 255, 0.2),
-            rgba(255, 255, 255, 0.2)
-          ),
+            rgba(255, 255, 255, 0.2)),
           linear-gradient(90deg, #7b61ff 0%, #61a0ff 107.5%);
 
         img {
@@ -2013,11 +1825,9 @@ export default {
       }
 
       .drag_bg {
-        background: linear-gradient(
-            0deg,
+        background: linear-gradient(0deg,
             rgba(255, 255, 255, 0.2),
-            rgba(255, 255, 255, 0.2)
-          ),
+            rgba(255, 255, 255, 0.2)),
           linear-gradient(90deg, #7b61ff 0%, #61a0ff 107.5%);
         height: 50px;
         width: 0px;
@@ -2041,7 +1851,7 @@ export default {
         justify-content: space-between;
 
         /deep/ .el-checkbox {
-          .el-checkbox__input.is-checked + .el-checkbox__label {
+          .el-checkbox__input.is-checked+.el-checkbox__label {
             color: #1d2128 !important;
           }
 
@@ -2321,11 +2131,9 @@ export default {
 
     .circle {
       position: absolute;
-      background: linear-gradient(
-        90deg,
-        rgba(123, 97, 255, 0.2) 0%,
-        rgba(97, 160, 255, 0.2) 107.5%
-      );
+      background: linear-gradient(90deg,
+          rgba(123, 97, 255, 0.2) 0%,
+          rgba(97, 160, 255, 0.2) 107.5%);
       width: 16px;
       height: 16px;
       border-radius: 50%;
@@ -2512,6 +2320,7 @@ export default {
     }
   }
 }
+
 /deep/ .registerDialog {
   background: #fff;
   height: 260px;
@@ -2520,11 +2329,13 @@ export default {
   background-repeat: no-repeat;
   box-shadow: 0px 0px 10px rgba(67, 67, 67, 0.1);
   border-radius: 10px;
+
   .expiry-content {
     img {
       width: 35px;
       height: 35px;
     }
+
     .register-status {
       color: #1d2128;
       font-weight: 700;
@@ -2532,17 +2343,20 @@ export default {
       line-height: 28px;
       margin: 15px 0 12px;
     }
+
     .register-msg {
       font-weight: 400;
       font-size: 14px;
       line-height: 22px;
       color: #1d2128;
     }
+
     .to-trs {
       font-weight: 400;
       font-size: 14px;
       line-height: 22px;
       color: #1d2128;
+
       span {
         color: #2d5cf6;
       }

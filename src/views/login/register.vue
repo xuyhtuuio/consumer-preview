@@ -7,16 +7,16 @@
     </div>
     <el-form :model="registerForm" :rules="registerRule" ref="registerForm" label-width="90px" class="login_form">
       <el-form-item label="公司" prop="entname">
-        <el-input v-model.trim="registerForm.entname" placeholder="请填写您的公司名称"></el-input>
+        <el-input v-char v-model.trim="registerForm.entname" placeholder="请填写您的公司名称"></el-input>
       </el-form-item>
       <el-form-item label="姓名" prop="user">
-        <el-input v-model.trim="registerForm.user" placeholder="请填写您的姓名"></el-input>
+        <el-input v-char v-model.trim="registerForm.user" placeholder="请填写您的姓名"></el-input>
       </el-form-item>
       <el-form-item label="邮箱" prop="email">
-        <el-input v-model.trim="registerForm.email" placeholder="请填写您的企业邮箱"></el-input>
+        <el-input v-char v-model.trim="registerForm.email" placeholder="请填写您的企业邮箱"></el-input>
       </el-form-item>
       <el-form-item label="手机" prop="phone" class="phone_input">
-        <el-input v-model.trim="registerForm.phone" placeholder="请输入您的手机号">
+        <el-input v-char v-model.trim="registerForm.phone" placeholder="请输入您的手机号">
           <el-select v-model="areaCode" slot="prepend" placeholder="请选择" class="phone_input-select" style="width:87px;">
             <el-option v-for="(item, index) in areaCodes" :key="index" :value="item.value">
               <span style="float: left">{{ item.value }} {{ item.label }}</span>
@@ -25,7 +25,7 @@
         </el-input>
       </el-form-item>
       <el-form-item label="验证码" prop="code" class="verify_code_content">
-        <el-input v-model="registerForm.code" placeholder="请输入6位验证码"></el-input>
+        <el-input v-char v-model="registerForm.code" placeholder="请输入6位验证码"></el-input>
         <div class="verify_code get_code">
           <span @click="getCodeMible">{{ CodeMibleTxt }}</span>
         </div>
@@ -36,10 +36,10 @@
         </el-checkbox-group>
       </el-form-item> -->
       <el-form-item label="职务">
-        <el-input v-model.trim="registerForm.post" placeholder="请填写您目前的职务"></el-input>
+        <el-input v-char v-model.trim="registerForm.post" placeholder="请填写您目前的职务"></el-input>
       </el-form-item>
       <el-form-item label="需求">
-        <el-input v-model="registerForm.des" placeholder="请填写您的需求"></el-input>
+        <el-input v-char v-model="registerForm.des" placeholder="请填写您的需求"></el-input>
       </el-form-item>
       <div class="service-agreement">
       <el-checkbox v-model="checkAgreement"> <span style="color:rgb(80, 89, 104)">我已阅读并同意</span> <span class="" @click="toUserAgreement">用户协议</span>

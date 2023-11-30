@@ -1,13 +1,13 @@
 <template>
   <div>
     <el-form-item label="提示文字">
-      <el-input size="small" v-model="value.placeholder" placeholder="请设置提示语"/>
+      <el-input v-char size="small" v-model="value.placeholder" placeholder="请设置提示语"/>
     </el-form-item>
     <el-form-item label="选项设置" class="options">
       <draggable :list="value.options" group="option" handler=".el-icon-rank" :options="{animation: 300, sort: true}">
         <div v-for="(op, index) in value.options" :key="index">
           <i class="el-icon-rank"></i>
-          <el-input v-model="value.options[index]" size="medium" style="width: 260px; float:right;"
+          <el-input v-char v-model="value.options[index]" size="medium" style="width: 260px; float:right;"
                     placeholder="请设置选项值" clearable>
             <el-button icon="el-icon-delete" slot="append" type="danger" size="medium"
                        @click="value.options.splice(index, 1)"></el-button>

@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-23 21:17:11
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-03 15:58:13
+ * @LastEditTime: 2023-11-16 11:44:41
  * @FilePath: /consumer-preview/src/views/rules-base/index.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -47,7 +47,7 @@
       </li>
     </ul>
     <div class="right-content">
-     <laws ref="component"></laws>
+      <laws ref="component"></laws>
     </div>
   </div>
 </template>
@@ -55,7 +55,7 @@
 import laws from './components/laws'
 export default {
   components: {
-    laws,
+    laws
   },
   data() {
     return {
@@ -89,8 +89,7 @@ export default {
       ]
     }
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     changeMenu(item) {
       if (item.id === this.activeMenuId) return
@@ -103,20 +102,20 @@ export default {
         effectiveValue: this.effectiveValue,
         type: this.activeMenuId
       })
-    },
-  }
+    }
+  },
 }
 </script>
 <style lang="less" scoped>
 .rules-base {
   display: flex;
 
-  position: relative;
+  // position: relative;
   .keyword-input {
     position: absolute;
     width: 376px;
-    top: -51px;
-    right: 0;
+    top: 54px;
+    right: 80px;
     height: 28px;
     /deep/ .el-input__inner {
       height: 28px;
@@ -232,17 +231,16 @@ export default {
       background: #f0f6ff;
       color: #2d5cf6;
       // font-weight: 700;
-      .menu-name{
+      .menu-name {
         font-weight: 700;
       }
     }
   }
   .right-content {
-    flex: 1;
+  width: calc(100% - 208px);
     padding: 16px;
     border-radius: 10px;
     background: #fff;
   }
 }
-
 </style>

@@ -45,7 +45,7 @@ export default {
         data: { data }
       } = await this.$http({
         method: 'get',
-        url: '/cpr/user/getCurrentUser'
+        url: this.$GLOBAL.cpr + 'user/getCurrentUser'
       });
       this.userId = data.id;
       this.fullname = data.fullname;

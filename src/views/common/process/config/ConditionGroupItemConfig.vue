@@ -38,7 +38,7 @@
                     <el-select v-if="condition.name === 'SelectInput'" style="width: 260px;" filterable allow-create size="small" v-model="condition.value" placeholder="输入可能包含的值">
                       <el-option v-for="item in selectOptions(condition.id)" :label="item.value" :value="item.id" :key="item.id"></el-option>
                     </el-select>
-                     <el-input v-else style="width: 260px;" placeholder="输入比较值" size="small" v-model="condition.value[0]"/>
+                     <el-input v-char v-else style="width: 260px;" placeholder="输入比较值" size="small" v-model="condition.value[0]"/>
                    </span>
                    <span v-else>
                     <el-select style="width: 260px;" multiple filterable allow-create size="small" v-model="condition.value" placeholder="输入可能包含的值"></el-select>
@@ -56,7 +56,7 @@
                     <el-select style="width: 260px;" filterable allow-create size="small" v-model="condition.value[0]" placeholder="输入可能包含的值">
                       <el-option v-for="item in selectOptions(condition.id)" :label="item.value" :value="item.id" :key="item.id"></el-option>
                     </el-select>
-                     <!-- <el-input style="width: 260px;" placeholder="输入比较值" size="small" v-model="condition.value[0]"/> -->
+                     <!-- <el-input v-char style="width: 260px;" placeholder="输入比较值" size="small" v-model="condition.value[0]"/> -->
                    </span>
                    <span v-else>
                     <el-select style="width: 260px;" multiple collapse-tags filterable allow-create size="small" v-model="condition.value" placeholder="输入可能包含的值">
@@ -71,12 +71,12 @@
                   <el-option :label="exp.label" :value="exp.value" :key="exp.value" v-for="exp in explains"></el-option>
                 </el-select>
                 <span style="margin-left: 10px">
-                  <el-input style="width: 260px;" v-if="conditionValType(condition.compare) === 0" size="small" placeholder="输入比较值" type="number" v-model="condition.value[0]"/>
+                  <el-input v-char style="width: 260px;" v-if="conditionValType(condition.compare) === 0" size="small" placeholder="输入比较值" type="number" v-model="condition.value[0]"/>
                   <el-select style="width: 260px;" multiple filterable allow-create v-else-if="conditionValType(condition.compare) === 1" size="small" v-model="condition.value" placeholder="输入可能包含的值"></el-select>
                   <span v-else>
-                    <el-input style="width: 130px;" size="small" type="number" placeholder="输入比较值" v-model="condition.value[0]"/>
+                    <el-input v-char style="width: 130px;" size="small" type="number" placeholder="输入比较值" v-model="condition.value[0]"/>
                     <span> ~
-                      <el-input size="small" style="width: 130px;" type="number" placeholder="输入比较值" v-model="condition.value[1]"/>
+                      <el-input v-char size="small" style="width: 130px;" type="number" placeholder="输入比较值" v-model="condition.value[1]"/>
                     </span>
                   </span>
                 </span>
@@ -125,7 +125,7 @@
                 </el-select>
                 <span style="margin-left: 10px">
                   <span v-if="condition.compare === '='">
-                    <el-input style="width: 260px;" placeholder="输入比较值" size="small" v-model="condition.value[0]"/>
+                    <el-input v-char style="width: 260px;" placeholder="输入比较值" size="small" v-model="condition.value[0]"/>
                   </span>
                   <span v-else>
                     <el-select style="width: 260px;" multiple filterable allow-create size="small" v-model="condition.value" placeholder="输入可能包含的值"></el-select>

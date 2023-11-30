@@ -13,6 +13,7 @@
           placeholder="请输入关键词开始检索"
           @keyup.enter.native="handleSubmit"
           v-model.trim="search.searchInput"
+          v-char
         ></el-input>
       </div>
 
@@ -188,17 +189,17 @@
               <p
                 class="sort"
                 @click="onlineClick"
-                :class="{ active: this.isSortOl }"
+                :class="{ active: this.sortName === 'ol' }"
               >
                 按上线时间<img
                   src="../../assets/image/upup.png"
                   alt=""
-                  v-if="!this.isSortOl"
+                  v-if="this.sortName !== 'ol'"
                 />
                 <img
                   src="../../assets/image/bluedown.png"
                   alt=""
-                  v-else-if="this.isSortOl"
+                  v-else-if="this.sortName === 'ol'"
                 />
               </p>
             </el-col>
@@ -206,17 +207,17 @@
               <p
                 class="sort"
                 @click="billClick"
-                :class="{ active: this.isSortBill }"
+                :class="{ active: this.sortName === 'bill' }"
               >
                 按提单时间<img
                   src="../../assets/image/upup.png"
                   alt=""
-                  v-if="!this.isSortBill"
+                  v-if="this.sortName !== 'bill'"
                 />
                 <img
                   src="../../assets/image/bluedown.png"
                   alt=""
-                  v-else-if="this.isSortBill"
+                  v-else-if="this.sortName === 'bill'"
                 />
               </p>
             </el-col>
@@ -367,6 +368,7 @@ export default {
       },
       fileURL: '',
       recordList: [],
+      clickSortType: ['ol', 'bill', 're'],
       page: {
         pageNow: 1,
         pageSize: 8,
@@ -374,8 +376,7 @@ export default {
       },
 
       transactionTypes: [],
-      isSortOl: false,
-      isSortBill: false,
+      sortName: '',
 
       SORTENU: {
         backcheckTime: 1,
@@ -400,7 +401,10 @@ export default {
   methods: {
     handleChange() {},
     changeArrrovalType() {
-      if (document.querySelectorAll) {
+      if (
+        'querySelectorAll' in document
+        && typeof document.querySelectorAll === 'function'
+      ) {
         const dom = document.querySelectorAll('.scrren-com')[2]
         this.$nextTick(() => {
           dom.style.color = this.search.approvalType ? '#2d5cf6' : '#1d2128'
@@ -455,6 +459,7 @@ export default {
           decodeURI(disposition.replace('attachment;filename=', ''))
         )
         document.body.appendChild(link)
+        // TODO
         link.click()
         document.body.removeChild(link)
       })
@@ -590,39 +595,54 @@ export default {
 
       // 如果param存在sort和sortType，说明是点击了排序，
       // 需要把sort和sortType放到param里面
-      if (this.isSortBill || this.isSortOl) {
-        const chooseSortBill = () => {
-          this.isSortOl ? (this.isSortOl = false) : ''
-          param.sortType = this.SORTTYPEENU.desc
-          param.sort = this.SORTENU.billTime
-        }
-
-        const chooseSortOl = () => {
-          this.isSortBill ? (this.isSortBill = false) : ''
-          param.sortType = this.SORTTYPEENU.desc
-          param.sort = this.SORTENU.onlineTime
-        }
-
-        const reset = () => {
-          param.sort = this.SORTENU.backcheckTime
-          param.sortType = this.SORTTYPEENU.asc
-        }
-        // eslint-disable-next-line no-nested-ternary
-        this.isSortBill
-          ? chooseSortBill()
-          : this.isSortOl
-            ? chooseSortOl()
-            : reset()
+      if (
+        this.sortName
+        && Reflect.has(param, 'sort')
+        && Reflect.has(param, 'sortType')
+      ) {
+        this.sortChoose(param, this)
       }
 
-      const res = await getRecheckList(param)
-      const { data } = res
-      if (data.status === 200) {
-        const { list, totalCount } = data.data
-        this.page.totalCount = totalCount
-        this.recordList = list
-        this.search.loading = false
+      // 锁定
+      Reflect.preventExtensions(param)
+      const {
+        data: { data, status }
+      } = await getRecheckList(param)
+      const { list, totalCount } = {
+        ...(status === 200 && data)
       }
+      this.page.totalCount = totalCount
+      this.recordList = list
+      this.search.loading = false
+    },
+
+    sortChoose(param, thisObj) {
+      const _this = thisObj
+      const actions = new Map([
+        [
+          'bill',
+          () => {
+            param.sortType = this.SORTTYPEENU.desc
+            param.sort = this.SORTENU.billTime
+          }
+        ],
+        [
+          'ol',
+          () => {
+            param.sortType = this.SORTTYPEENU.desc
+            param.sort = this.SORTENU.onlineTime
+          }
+        ],
+        [
+          'default',
+          () => {
+            param.sort = this.SORTENU.backcheckTime
+            param.sortType = this.SORTTYPEENU.asc
+          }
+        ]
+      ])
+      const action = actions.get(this.sortName) || actions.get('default')
+      action.call(_this)
     },
 
     handleCurrentChange(pageNow) {
@@ -634,12 +654,18 @@ export default {
     },
 
     onlineClick() {
-      this.isSortOl = !this.isSortOl
-      this.searchOnePage()
+      this.sortName === 'ol' ? (this.sortName = 're') : (this.sortName = 'ol')
+      if (this.clickSortType.includes(this.sortName)) {
+        this.searchOnePage()
+      }
     },
     billClick() {
-      this.isSortBill = !this.isSortBill
-      this.searchOnePage()
+      this.sortName === 'bill'
+        ? (this.sortName = 're')
+        : (this.sortName = 'bill')
+      if (this.clickSortType.includes(this.sortName)) {
+        this.searchOnePage()
+      }
     },
     changeAgencies() {
       this.searchOnePage()
@@ -650,13 +676,12 @@ export default {
     changeBillDate() {
       this.searchOnePage()
     },
-
     handleBackCheck() {
       this.searchOnePage()
     },
     handleSubmit() {
       this.searchOnePage()
-    },
+    }
   },
 
   created() {

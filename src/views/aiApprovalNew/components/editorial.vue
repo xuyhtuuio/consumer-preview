@@ -17,7 +17,7 @@
               v-for="(item, i) in recommend.list.slice(0, recommend.hideMore ? 3 : recommend.list.length)" :key="i"
               :class="{ active: item.id === recommend.selected, edit: item.showEdit }">
               <p style="cursor: pointer;" @dblclick="showEdit(a, i)" v-if="!item.showEdit">{{ item.str }}</p>
-              <el-input v-else :ref="`input_${a}_${i}`" @blur="hideEdit(a, i, true)" v-model.trim="input"
+              <el-input v-char v-else :ref="`input_${a}_${i}`" @blur="hideEdit(a, i, true)" v-model.trim="input"
                 placeholder="请输入意见" type="textarea" :rows="3" class="edit-input" resize="none"
                 @keyup.enter.native="hideEdit(a, i, true)"></el-input>
               <i class="iconfont icon-tubiao3 previousApprover"  v-if="item.previousApprover"></i>
@@ -45,7 +45,7 @@
       <div v-else class="recommend">
         <div class="list-item list-item2" :data-commenid="`c${item.id}`" v-for="(item, i) in collection" :key="i" :class="{ edit: item.showEdit }">
           <p style="cursor: pointer;" @dblclick="showEdit_collection(i)" v-if="!item.showEdit">{{ item.str }}</p>
-          <el-input v-else :ref="`input_${i}`" @blur="hideEdit_collection(i)" v-model.trim="input" placeholder="请输入意见"
+          <el-input v-char v-else :ref="`input_${i}`" @blur="hideEdit_collection(i)" v-model.trim="input" placeholder="请输入意见"
             type="textarea" :rows="3" class="edit-input" resize="none"
             @keyup.enter.native="hideEdit_collection(i)"></el-input>
           <i v-if="!isRel" class="el-icon-close" @click="removeItem(item, i)"></i>
@@ -93,7 +93,7 @@
         </div>
         <!-- 可手动新增 -->
         <div class="list-item list-item2 list-edit" :class="{ edit: newFocus }">
-          <el-input ref="input_edit" v-model.trim="newInput" placeholder="可以输入新的意见，按Enter键确认" type="textarea" :rows="3"
+          <el-input v-char ref="input_edit" v-model.trim="newInput" placeholder="可以输入新的意见，按Enter键确认" type="textarea" :rows="3"
             class="edit-input" resize="none" @blur="addNewComment(true)" @focus="inputFocus"
             @keyup.enter.native="addNewComment(true)"></el-input>
           <div class="item-files">
@@ -376,8 +376,16 @@ export default {
       const commenId = this.collection.filter((item) => {
         return item.id === id
       })
+      // 非批注
+      if (!commenId[0].id) {
+        return;
+      }
       if (this.files[this.activeIndex].type === 'pdf' && commenId[0]?.filesWithComment?.includes(this.files[this.activeIndex].child[this.activePdfIndex].id)) {
-        this.$emit('showCommentLine', commenId[0], fileId)
+        this.$emit('showCommentLine', commenId[0], commenId[0]?.filesWithComment[0])
+        return;
+      } else if (this.files[this.activeIndex].type === 'pdf') {
+        this.$emit('changeFileById', commenId[0]?.filesWithComment[0])
+        return;
       }
       if ((commenId[0]?.filesWithComment?.includes(fileId) && fileId === this.files[this.activeIndex].id)) {
         this.$emit('showCommentLine', commenId[0], fileId)

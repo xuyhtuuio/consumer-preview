@@ -26,7 +26,7 @@
               <svg class="icon urgent-icon" aria-hidden="true" v-if="compareItem.dismissalMark == 1">
                 <use xlink:href="#icon-tongyongtubiao2"></use>
               </svg>
-              <div class="detail-title">{{ compareItem.formName }}</div>
+              <div class="detail-title">{{ compareItem.fileName }}</div>
               <div class="line"></div>
               <div class="detail-title">{{ compareItem.formCategoryName }}</div>
               <div class="line"></div>
@@ -95,12 +95,12 @@
     </div>
     <DetailDialog ref="detailDia" v-if="showDetailDia" :detailItem="compareItem" @handleClose="handleClose"></DetailDialog>
     <el-dialog
-      title="提示"
+      title="回检意见"
       :visible.sync="editDialog"
       custom-class="edit-dialog"
       width="600"
       :before-close="editClose">
-      <div class="show-num">
+      <div class="show-num" v-if="compareItem.recheckCount > 0">
         <div class="num-left">该文件已被回检{{ compareItem.recheckCount }}次</div>
         <div class="num-left num-right" @click="seeAllRecheck">查看回检内容</div>
       </div>
@@ -108,7 +108,7 @@
         <div class="agree-label">是否通过<span>*</span></div>
         <div>
           <el-radio v-model="userAgree" label="1">通过</el-radio>
-          <el-radio v-model="userAgree" label="2">不通过</el-radio>
+          <el-radio v-model="userAgree" label="0">不通过</el-radio>
         </div>
       </div>
       <div class="agree-change">
@@ -118,6 +118,8 @@
             type="textarea"
             resize="none"
             :rows="3"
+            maxlength="200"
+            show-word-limit
             placeholder="请输入回检意见"
             v-model="agreeInput">
           </el-input>
@@ -170,7 +172,8 @@ export default {
     chooseItem: {},
     nowIndex: 0,
     totalCount: 0,
-    getItemLoading: false
+    getItemLoading: false,
+    userInfo: {}
   }),
   created() {
     if (this.$route.params.leftItem && this.$route.params.compareItem) {
@@ -178,6 +181,7 @@ export default {
       this.compareItem = this.$route.params.compareItem;
       this.nowIndex = this.$route.params.compareItem.itemIndex;
       this.totalCount = this.$route.params.compareItem.totalCount;
+      this.userInfo = JSON.parse(window.localStorage.getItem('user_name'))
     } else {
       this.$router.go(-1)
     }
@@ -195,11 +199,11 @@ export default {
         formCategory: this.compareItem.formCategoryName,
         formCreateTime: timestampToDateTime(this.compareItem.createTime * 1000),
         formId: this.compareItem.formId,
-        isPass: this.userAgree ? 1 : 0,
+        isPass: this.userAgree === '1' ? 1 : 0,
         launchTime: timestampToDateTime(this.compareItem.launchTime * 1000),
         ocrId: this.compareItem.ocrId,
         updateTime: '',
-        userId: this.compareItem.userId,
+        userId: this.userInfo.id,
       }
       AddRecheck(data).then(res => {
         if (res.data.status === 200) {
@@ -372,6 +376,10 @@ export default {
               font-weight: 700;
               line-height: 22px;
               margin-right: 4px;
+              display: -webkit-box;
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 1;
+              overflow: hidden;
             }
             .line {
               margin: 0 8px;
@@ -528,6 +536,11 @@ export default {
 </style>
 <style lang="less">
 .edit-dialog {
+  position: absolute;
+  margin-top: 0!important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   .el-dialog__header {
     padding: 40px 60px 24px;
     text-align: center;
@@ -609,6 +622,11 @@ export default {
   }
 }
 .record-list-dialog {
+  position: absolute;
+  margin-top: 0!important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   .el-dialog__header {
     padding: 36px 36px 16px;
     text-align: center;

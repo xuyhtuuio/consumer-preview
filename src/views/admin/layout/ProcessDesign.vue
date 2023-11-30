@@ -19,7 +19,7 @@
                direction="rtl" :modal="false" destroy-on-close @close="closeConfigDrawer">
       <div slot="title">
         <template v-if="selectedNode.name !== '二次会签' && selectedNode.id !== 'root'">
-          <el-input v-model.trim="selectedNode.name" size="medium" v-show="showInput"
+          <el-input v-char v-model.trim="selectedNode.name" size="medium" v-show="showInput"
                     style="width: 300px">
             <i
               class="el-icon-success el-input__icon"

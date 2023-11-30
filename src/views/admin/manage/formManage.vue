@@ -48,7 +48,7 @@
       <!-- 表单管理二级表格 -->
       <div v-else>
         <div style="margin-bottom: 24px;">
-          <el-input class="is-dark input" v-model="search.title" @keypress.native.enter="changeSearch" size="small"
+          <el-input v-char class="is-dark input" v-model="search.title" @keypress.native.enter="changeSearch" size="small"
             placeholder="请输入字段名称搜索" style="width: 254px;">
             <i slot="suffix" class="el-input__icon el-icon-search" @click="changeSearch"></i>
           </el-input>
@@ -95,19 +95,19 @@
     <el-dialog title="修改" :visible.sync="limitTimeVisible" width="40%" center>
       <!-- <div class="dialog-item">
         <p><b>审查事项类型</b></p>
-        <el-input v-model.trim="checkType" size="small" class="is-dark input" oninput="value=value.slice(0, 8)" placeholder="请输入审查事项类型" style="width: 150px; display: inline-block;"></el-input><span class="gray">{{ checkType.length }}/8</span>
+        <el-input v-char v-model.trim="checkType" size="small" class="is-dark input" oninput="value=value.slice(0, 8)" placeholder="请输入审查事项类型" style="width: 150px; display: inline-block;"></el-input><span class="gray">{{ checkType.length }}/8</span>
       </div> -->
       <div class="dialog-item">
         <p><b>提单时限（加急单）</b></p>
         上线前
-        <el-input v-model="limitTime" size="small" class="is-dark input" oninput="value=value.replace(/^0|[^0-9]/g, '')"
+        <el-input v-char v-model="limitTime" size="small" class="is-dark input" oninput="value=value.replace(/^0|[^0-9]/g, '')"
           placeholder="请输入数字" style="width: 150px; display: inline-block;"></el-input>
         天 视为加急
       </div>
       <div class="dialog-item">
         <p><b>图标</b></p>
         <!-- <i class="icon-chanpin1"></i> -->
-        <el-upload class="avatar-uploader" action="/cpr/file/upload" :http-request="uploadBpmn" :show-file-list="false">
+        <el-upload class="avatar-uploader" :action="$GLOBAL.cpr + 'file/upload'" :http-request="uploadBpmn" :show-file-list="false">
           <img v-if="imageUrl" :src="imageUrl" alt="" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           <el-button size="small" style="display: none;" id="icon-uploader" type="text">上传</el-button>

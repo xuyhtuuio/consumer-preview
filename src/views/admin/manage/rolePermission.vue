@@ -341,13 +341,14 @@ export default {
     },
     async handleSave() {
       // 红色警告
-      if (
-        this.permissionList[1].type
-        && !this.permissionList[1].children.some((item) => item.type)
-      ) {
-        this.permissionList[1].isShowWarn = true
-        return
-      }
+      let result = false
+      this.permissionList.forEach(item => {
+        if (item.type && !item.isNoWarn && item.children && !item.children.some((itemChild) => itemChild.type)) {
+          result = true
+          item.isShowWarn = true
+        }
+      })
+      if (result) return
       if (!this.newRoleName) {
         this.showNewRoleName = true
         return
@@ -388,60 +389,50 @@ export default {
     formatDataZero(data) {
       const { funPerms, dataPerm } = data
       this.rolePermission = data
-      for (const key in this.permissionList) {
-        const origin = this.permissionList[key]
-        origin.type = funPerms.find(item => item.code === origin.code).type
-        if (origin.children && origin.children.length) {
-          for (const originChild of origin.children) {
-            originChild.type = funPerms.find(item => item.code === originChild.code) ? funPerms.find(item => item.code === originChild.code).type : funPerms.filter(item => Array.isArray(item.child))[0].child.find(itemChild => itemChild.code === originChild.code).type
-          }
-        }
+      const originArr = this.permissionList.reduce((item, next) => {
+        next.children && (item = [...item, ...next.children])
+        return [...item, next]
+      }, [])
+
+      const resultArr = funPerms.reduce((item, next) => {
+        next.child && (item = [...item, ...next.child])
+        return [...item, next]
+      }, [])
+      for (const originItem of originArr) {
+        const resultItem = resultArr.find(item => item.code === originItem.code)
+        originItem.type = resultItem.type
       }
+
       this.dataPerm = Array.isArray(this.dataPerm) ? dataPerm : dataPerm[0]
     },
     formatData() {
-      const { funPerms, defaultPerm } = this.rolePermission
+      const { funPerms } = this.rolePermission
       this.rolePermission.dataPerm = Array.isArray(this.dataPerm)
         ? this.dataPerm
         : [this.dataPerm]
-      for (const key in this.permissionList) {
-        const originVal = this.permissionList[key]
-        if (Number(key) === 0) {
-          if (originVal.type !== funPerms[key].type) {
-            funPerms[key].type = originVal.type
-            this.permissionList[key].reflect.forEach((reflectItem) => {
-              defaultPerm.find((item) => item.pathName === reflectItem).type = originVal.type
-            })
-          }
-          funPerms[key].child[0].type = originVal.children[0].type
-        } else if (this.permissionList[key].children) {
-          funPerms.find(item => item.code === originVal.code).type = originVal.type
-          const { children } = originVal
-          children.forEach((item) => {
-            const funItem = funPerms.find(
-              (funPermsItem) => funPermsItem.code === item.code
-            )
-            if (item.reflect) {
-              if (item.type !== funItem.type) {
-                funItem.type = item.type
-                item.reflect.forEach((reflectItem) => {
-                  defaultPerm.find((defaultItem) => defaultItem.pathName === reflectItem) && (defaultPerm.find((defaultItem) => defaultItem.pathName === reflectItem).type = item.type)
-                  funPerms.find(
-                    (defaultItem) => defaultItem.pathName === reflectItem
-                  ) && (funPerms.find(
-                    (defaultItem) => defaultItem.pathName === reflectItem
-                  ).type = item.type)
-                })
-              }
-            } else {
-              funItem.type = item.type
+        // 展开item以及item.children
+      const originArr = this.permissionList.reduce((item, next) => {
+        next.children && (item = [...item, ...next.children])
+        return [...item, next]
+      }, [])
+      const resultArr = funPerms.reduce((item, next) => {
+        next.child && (item = [...item, ...next.child])
+        return [...item, next]
+      }, [])
+      for (const originItem of originArr) {
+        const resultItem = resultArr.find(item => item.code === originItem.code)
+        if (resultItem.type !== originItem.type) {
+          // item.type修改
+          resultItem.type = originItem.type
+        }
+        // 映射item.type修改
+        if (originItem.reflect) {
+          originItem.reflect.forEach(reflectItem => {
+            const reflectResultItem = resultArr.find(item => item.code === reflectItem)
+            if (reflectResultItem) {
+              reflectResultItem.type = originItem.type
             }
           })
-        } else {
-          const funItem = funPerms.find(
-            (funPermsItem) => funPermsItem.code === originVal.code
-          )
-          funItem.type = originVal.type
         }
       }
     },
@@ -613,7 +604,7 @@ export default {
                 flex: 1;
                 display: flex;
                 flex-wrap: wrap;
-                align-items: center;
+                align-items: flex-start;
                 &-item {
                   width: 50%;
                   display: flex;

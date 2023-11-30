@@ -127,25 +127,18 @@ export default {
       this.activeMenu = this.list.find(item => names.includes(item.pathName))?.pathName
     },
     logout() {
-      window.localStorage.clear()
-      const newWindow = window.open('', '_self')
-      if (window.location.host === '192.168.210.57:31603') {
-        newWindow.location = 'http://192.168.210.57:31963'
-      } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
-        newWindow.location = 'https://dataelite.trs.com.cn/'
-      } else if (window.location.host === 'cwo.dataelite.trs.com.cn') {
-        newWindow.location = 'https://cwo.dataelite.trs.com.cn/#/login?from=cwo';
-      } else {
-        const name = window.self === window.top ? 'login' : 'loginAuto'
-        this.$router.push({
-          name
-        })
-      }
+      this.$router.push({
+        name: 'login'
+      })
     },
     returnHome() {
-      this.$router.push({
-        name: 'home'
-      })
+      if (this.$hasMicro()) {
+        this.$routerPush('home')
+      } else {
+        this.$router.push({
+          name: 'home'
+        })
+      }
     },
     updateInfo() {
       const user = JSON.parse(window.localStorage.getItem('user_name'))
@@ -178,9 +171,13 @@ export default {
       if (names.includes(to.name)) {
         return;
       }
-      this.$router.push({
-        name: to.name
-      })
+      if (this.$hasMicro()) {
+        this.$routerPush('message')
+      } else {
+        this.$router.push({
+          name: to.name
+        })
+      }
     }
   }
 }

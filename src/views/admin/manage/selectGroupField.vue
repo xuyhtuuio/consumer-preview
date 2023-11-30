@@ -1,7 +1,7 @@
 <template>
   <div class="groups">
     <div class="groups-item" v-for="(item, index) in data" :key="item.id">
-      <el-input v-model="item.value" size="medium" v-show="item.showInput"
+      <el-input v-char v-model="item.value" size="medium" v-show="item.showInput"
         maxlength="40"
         minlength="1"
         style="width: 300px"
@@ -26,7 +26,7 @@
       <draggable :list="item.children" group="option" handler=".el-icon-rank" :options="{animation: 300, sort: true, disabled: viewDisable}">
         <div v-for="(op, index) in item.children" :key="op.id">
           <i class="el-icon-rank" style="margin-right: 6px;color:#bbb;"></i>
-          <el-input v-model="item.children[index].value" size="small" style="width: 260px;"
+          <el-input v-char v-model="item.children[index].value" size="small" style="width: 260px;"
                     placeholder="请设置选项值">
             <i slot="suffix" class="el-input__icon el-icon-delete" @click="deleteOptions(item.children, index)"></i>
           </el-input>

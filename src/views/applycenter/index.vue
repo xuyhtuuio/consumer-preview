@@ -69,7 +69,7 @@
             </div>
             <div class="floor2">
               <div class="floor2-item">
-                <el-input v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
+                <el-input v-char v-model="search.keywords" placeholder="请输入项目名称关键词查询" clearable @clear="searchList"
                   @keyup.enter.native="searchList">
                   <i slot="suffix" class="el-input__icon el-icon-search pointer" @click="searchList"></i>
                 </el-input>

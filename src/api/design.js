@@ -1,8 +1,10 @@
 import request from '@/api/request'
+import $GLOBAL from '@/utils/const'
+const { cpr } = $GLOBAL;
 
 export function getFormCategoryNotAssociated() {
   return request({
-    url: '/cpr/applicationForm/getFormCategoryNotAssociated',
+    url: cpr + 'applicationForm/getFormCategoryNotAssociated',
     method: 'get',
     params: {}
   })
@@ -11,7 +13,7 @@ export function getFormCategoryNotAssociated() {
 // 根据id 查询表单详情
 export function getFormTemplateById(formId) {
   return request({
-    url: `/cpr/admin/form/detail/${formId}`,
+    url: `${cpr}admin/form/detail/${formId}`,
     method: 'get',
     params: {}
   })
@@ -20,7 +22,7 @@ export function getFormTemplateById(formId) {
 // 发布
 export function publishProcess(data) {
   return request({
-    url: '/cpr/admin/form',
+    url: cpr + 'admin/form',
     method: 'post',
     data
   })
@@ -28,7 +30,7 @@ export function publishProcess(data) {
 // 保存
 export function saveProcess(data) {
   return request({
-    url: '/cpr/admin/insert',
+    url: cpr + 'admin/insert',
     method: 'post',
     data
   })
@@ -36,7 +38,7 @@ export function saveProcess(data) {
 // 删除
 export function deleteProcess(templateId) {
   return request({
-    url: '/cpr/admin/delete',
+    url: cpr + 'admin/delete',
     method: 'get',
     params: {
       templateId
@@ -46,7 +48,7 @@ export function deleteProcess(templateId) {
 // 通过模板id查看流程信息 会附带流程定义id
 export function getProcessDetailByTemplateId(templateId) {
   return request({
-    url: '/cpr/workspace/process/detail',
+    url: cpr + 'workspace/process/detail',
     method: 'get',
     params: {
       templateId
@@ -56,7 +58,7 @@ export function getProcessDetailByTemplateId(templateId) {
 // 通过流程定义id停用流程
 export function stopProcess(processDefinitionId, templateId) {
   return request({
-    url: '/cpr/workspace/process/stop',
+    url: cpr + 'workspace/process/stop',
     method: 'post',
     contentType: 'application/x-www-form-urlencoded',
     data: {
@@ -68,7 +70,7 @@ export function stopProcess(processDefinitionId, templateId) {
 // 查询模版详情
 export function getProcessDetail(templateId) {
   return request({
-    url: '/cpr/admin/form/detail',
+    url: cpr + 'admin/form/detail',
     method: 'get',
     params: {
       templateId

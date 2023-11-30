@@ -387,6 +387,12 @@ export default {
       }
     },
     changeFileById(fileId) {
+      if (this.files[this.activeIndex].type === 'pdf') {
+        const fileIndex = this.files[this.activeIndex].child.findIndex((file) => fileId === file.id)
+        if (fileIndex === this.activePdfIndex) return;
+        this.changePdfPage(fileIndex)
+        return;
+      }
       const fileIndex = this.files.findIndex((file) => fileId === file.id)
       this.changeFile(fileIndex)
     },
@@ -591,6 +597,7 @@ export default {
       this.fileloading = true;
       this.filePopoverShow = false
       this.showOcr = true;
+      this.isEmpty = false
       this.lineRemove();
       if (this.files?.[this.activeIndex]?.ocr) {
         this.files[this.activeIndex] = {
@@ -603,12 +610,18 @@ export default {
       const temp = this.files[i];
       const suffer = ['jpeg', 'jpg', 'png', 'pdf'].includes(temp?.fileName?.split('.')[temp?.fileName?.split('.').length - 1]);
       // 当前文件为 pdf 处理
-      if (this.files?.[this.activeIndex].type === 'pdf') {
+      if (this.files?.[this.activeIndex]?.type === 'pdf') {
         this.pdfInfo.pageNow = 1
         this.changePdfPageNow(1)
         return;
-      } else if (!temp.ocr && !temp.recommends && suffer) {
-        temp.ocr = await this.getOcr(temp);
+      }
+      if (!temp) {
+        this.isEmpty = true
+        this.fileloading = false;
+        return;
+      }
+      if (!temp.ocr && !temp.recommends && suffer) {
+        temp.ocr = await this.getOcr(temp)
         await getOcrExamineShow({
           formId: this.formId,
           fileId: temp.id,
@@ -625,7 +638,7 @@ export default {
           });
       }
       // 更新图标
-      const curFileType = this.getfileType(this.files[this.activeIndex].fileName)
+      const curFileType = this.getfileType(this.files[this.activeIndex]?.fileName)
       this.$nextTick(() => {
         if (this.specialFileType1.includes(curFileType)) {
           // this.findIconPosition()
@@ -641,7 +654,7 @@ export default {
     async getOcr(temp) {
       const ocr = [];
       await getOCRAnalysisResults({
-        fileId: temp.id
+        fileId: temp?.id
       }).then(res => {
         const { data, status } = res.data;
         if (status === 200) {
@@ -687,6 +700,7 @@ export default {
       ];
       const imgLight = document.querySelector('#imgLight');
       imgLight && ends.push(imgLight);
+      this.toolView = false
       if (start) {
         ends.forEach((item, index) => {
           // 动画参数
@@ -1072,15 +1086,10 @@ export default {
             }))
           } else {
             const pdf = this.files[this.activeIndex].child[this.activePdfIndex]
-            pdf.files.filter(file => item?.some((f) => {
-              if (f.files.includes(file.id)) {
-                if (!file.comments) {
-                  file.comments = []
-                }
-                // file.comments = [...new Set([...file.comments, f])]
-                file.comments.push(f)
-              }
-            }))
+            if (!pdf.comments) {
+              pdf.comments = []
+            }
+            pdf.comments.push(...item)
           }
           break;
         default:
@@ -1214,22 +1223,29 @@ export default {
     generateIcons() {
       // this.icons = []
       this.$nextTick(() => {
+        const ocrHeight = document.querySelector('.results').scrollHeight
         const img = document.getElementById('picture')
-        img.onload = function () {
-          const realHeight = (img.scrollHeight || img.offsetHeight) || img.clientHeight
-          const iconContainer = document.querySelector('.icons')
-          const iconsDom = document.querySelector('.results-div')
-          // const iconsDom = document.querySelector('.content-cont-icons')
-          if (iconContainer) {
-            iconContainer.style.top = iconsDom?.style.top || 0
-            iconContainer.style.height = realHeight + 'px'
-            // iconsDom.style.height = realHeight + 'px'
+        const iconContainer = document.querySelector('.icons')
+        const iconsDom = document.querySelector('.results-div')
+        if (img) {
+          img.onload = function () {
+            const realHeight = (img.scrollHeight || img.offsetHeight) || img.clientHeight
+            // const iconsDom = document.querySelector('.content-cont-icons')
+            if (iconContainer) {
+              iconContainer.style.top = iconsDom?.style.top || 0
+              iconContainer.style.height = realHeight + 'px'
+              // iconsDom.style.height = realHeight + 'px'
+            }
           }
+        } else {
+          iconContainer.style.top = iconsDom?.style.top || 0
+          iconContainer.style.height = ocrHeight + 'px'
         }
-        const scale = img.naturalWidth / img.clientWidth;
+        const scale = (img?.naturalWidth / img?.clientWidth) || this.styleProp.wordDomStyle.scale;
         // 过滤其他文件
         let curFileOcrIndex = []
-        this.comments?.map((comment) => {
+        const comments = this.comments.filter((c) => c.id)
+        comments?.map((comment) => {
           comment.filesWithBg.map((fwb) => {
             if (fwb.fileId === this.approval.id) {
               curFileOcrIndex.push(...fwb.fileBgs)
@@ -1237,7 +1253,7 @@ export default {
           })
         })
         curFileOcrIndex = curFileOcrIndex.flat()
-        this.comments?.map((comment) => {
+        comments?.map((comment) => {
           const commentIcons = []
           curFileOcrIndex.map((curIndex) => {
             for (const key in comment.iconsWithOcrIndex) {
@@ -1425,6 +1441,14 @@ export default {
       // this.filePopoverShow = true;
       this.activePdfIndex = i
       const temp = this.files[this.activeIndex].child[this.activePdfIndex]
+      if (!temp) {
+        let pageNow = Math.floor((i + 1) / this.pdfInfo.pageSize)
+        if ((i + 1) % this.pdfInfo.pageSize) {
+          pageNow += 1
+        }
+        this.changePdfPageNow(pageNow, this.activePdfIndex)
+        return;
+      }
       if (!temp.ocr) {
         temp.ocr = await this.getOcr(temp);
       }
@@ -1453,7 +1477,7 @@ export default {
       this.fileloading = false;
       this.filePopoverShow = false;
     },
-    async changePdfPageNow(pageNow) {
+    async changePdfPageNow(pageNow, activePdfIndex) {
       this.fileloading = true;
       // this.filePopoverShow = true;
       const params = {
@@ -1478,11 +1502,22 @@ export default {
           this.files[this.activeIndex].child = this.pdfInfo.list
           // 不是第一页
         } else {
-          this.files[this.activeIndex].child.push(...this.pdfInfo.list)
+          this.pdfInfo.list.map((pdf, index) => {
+            this.files[this.activeIndex].child[index + this.pdfInfo.pageSize * (this.pdfInfo.pageNow - 1)] = pdf
+          })
+        }
+        if (activePdfIndex) {
+          this.changePdfPage(activePdfIndex)
+          return;
         }
         this.activePdfIndex = 0 + this.pdfInfo.pageSize * (pageNow - 1)
         this.pdfInfo.list = this.files[this.activeIndex].child.slice(this.activePdfIndex, this.activePdfIndex + 10)
         const temp = this.files[this.activeIndex].child[this.activePdfIndex]
+        if (!temp) {
+          this.isEmpty = true
+          this.fileloading = false;
+          return;
+        }
         if (!temp?.ocr) {
           temp.ocr = await this.getOcr(temp);
         }

@@ -16,7 +16,7 @@
       :show-file-list="false"
       :disabled="uploading"
       :http-request="uploadFile"
-    >
+      :before-upload="beforeAvatarUpload">
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">
         <div class="tip">将文件拖到此处</div>
@@ -50,6 +50,13 @@ export default {
   methods: {
     handleClose() {
       this.turnDialog = false
+    },
+    beforeAvatarUpload(file) {
+      const isImg = ['image/png', 'image/jpeg'].includes(file.type);
+      if (!isImg) {
+        this.$message.warning('上传图片仅支持jpg/png格式！');
+      }
+      return isImg;
     },
     uploadFile(param) {
       const formData = new FormData()
@@ -92,6 +99,11 @@ export default {
 </script>
 <style lang="less" scoped>
 /deep/.el-dialog {
+  position: absolute;
+  margin-top: 0!important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   .el-dialog__title {
     color: #999;
     font-size: 14px;

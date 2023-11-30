@@ -1,369 +1,192 @@
-// el-form
-.el-form.required-right {
-  .el-form-item.is-required {
-    position: relative;
-    .el-form-item__label:before {
-      position: absolute;
-      right: -15px;
-    }
+.el-breadcrumb {
+    font-size: 14px;
   }
-}
-// 按钮宽度
-.view-config.el-button {
-  color: #1d2128;
-  height: 36px;
-  background: #ffffff;
-  border: 1px solid #e5e6eb;
-  color: #1d2128;
-  font-weight: 400;
-}
-.el-button.submit,
-.el-button.cancel {
-  width: 140px;
-  font-size: 14px;
-  line-height: 24px;
-  padding: 6px 50px;
-}
-.dialog-cancel {
-  width: 140px;
-  color: #1d2128;
-  border-color: #e5e6eb;
-  font-weight: 400;
-  border: 1px solid #e5e6eb;
-}
-.el-button.test {
-  background: #ffffff;
-  border-color: #2d5cf6;
-  color: #2d5cf6;
-  font-weight: 400;
-}
-// dialog
-.el-dialog__footer {
-  padding: 0 20px 30px;
-}
-
-.el-breadcrumb .el-breadcrumb__inner {
-  font-size: 12px;
-}
-// el-form
-.el-form.is-dark {
-  .el-form-item__content {
-    .el-input__inner {
-      background: #f3f3f5;
+  .el-breadcrumb .el-breadcrumb__inner {
+    font-size: 14px;
+  }
+  
+  .my-form {
+    .form-item {
+      width: 50%;
       border-radius: 4px;
-      border: none;
     }
-  }
-}
-.input.is-dark {
-  .el-input__inner {
-    background: #f3f3f5;
-    border-radius: 4px;
-    border: none;
-  }
-}
-// 搜索input
-.search-input {
-  input {
-    border: none;
-  }
-  .el-input-group__append {
-    border: none !important;
-    background: #ffffff;
-    .el-button {
-      padding: 6px 12px;
-      color: #88909b !important;
-      border: none !important;
-    }
-  }
-}
-// 排序select
-.order-select-box {
-  // margin: 15px 0 !important;
-  text-align: left;
-  .el-select {
-    width: 160px;
-    margin-right: 12px;
     .el-input {
-      .el-input-group__append {
-        border-color: #ffffff;
-        .el-button {
-          width: auto;
-          background: #ffffff !important;
-          border-color: #ffffff;
-          color: #88909b !important;
-          border-radius: 0 4px 4px 0;
-        }
-      }
+      height: 38px;
+      line-height: 38px;
     }
-  }
-  .el-input__inner {
-    height: 36px;
-    line-height: 36px;
-    border: none;
-  }
-  .order-select.el-select {
-    margin: 0;
-    width: 110px;
-    .el-input--mini {
-      .el-input__inner {
-        background: none;
-        color: #505968;
-        height: 36px;
-        line-height: 36px;
-        padding-left: 0;
-      }
-      .el-input__icon {
-        line-height: 36px;
-      }
-    }
-  }
-}
-// el-popover
-.el-popover {
-  .search-list {
-    li {
-      padding: 6px;
-    }
-    li:hover {
-      background: #f6f7fb;
-    }
-  }
-}
-
-// 下拉框
-.el-input__icon,
-.el-input--small .el-input__icon {
-  line-height: 100%;
-}
-
-/* ************自定义组件的通用样式***************************** */
-// trs-descriptions
-.descriptions {
-  &-header-title {
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 24px;
-  }
-}
-.el-table-filter {
-  max-height: 500px;
-  overflow: auto;
-}
-// el-dropdown
-.header-dropdown {
-  max-height: 300px;
-  overflow-y: auto;
-  .el-dropdown-menu__item {
-    position: relative;
-    padding: 0 20px 0 30px;
-    &:hover {
-      color: #2d5cf6;
-      span {
-        color: #2d5cf6;
-      }
-    }
-    .el-icon-check {
-      position: absolute;
-      left: 10px;
-      top: 11px;
-      color: #2d5cf6;
-      font-weight: 700;
-    }
-  }
-  .el-dropdown-menu__item--divided {
-    padding: 0 20px;
-  }
-}
-
-.el-breadcrumb {
-  font-size: 14px;
-}
-.el-breadcrumb .el-breadcrumb__inner {
-  font-size: 14px;
-}
-
-.my-form {
-  .form-item {
-    width: 50%;
-    border-radius: 4px;
-  }
-  .el-input {
-    height: 38px;
-    line-height: 38px;
-  }
-  .el-input__suffix,.el-input__suffix-inner {
-    display: flex;
-    right: 5px;
-  }
-  .el-input__inner {
-    padding: 0;
-    padding-right: 30px;
-    height: 38px;
-    line-height: 38px;
-    background: rgba(247, 248, 250, 1);
-    border: 0;
-  }
-
-  .el-autocomplete {
-    width: 100%;
-  }
-
-  .el-textarea__inner,
-  .el-form-item__content {
-    padding-left: 0;
-    background: rgba(247, 248, 250, 1);
-    border: 0;
-
-    .warn {
-      background: transparent;
-    }
-  }
-  .el-textarea {
-    .el-textarea__inner {
-    }
-  }
-  .el-form-item {
-    margin-bottom: 16px;
-  }
-  .el-form-item__content {
-    padding-left: 16px;
-
-    .el-select {
-      width: 100%;
-    }
-    .el-select .el-input .el-select__caret.el-icon-arrow-up::before {
-      content: '\e790';
-      position: absolute;
-      width: 100%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotateZ(180deg);
-    }
-    .el-icon-arrow-down {
-      &::before {
-        content: '\e790';
-      }
-    }
-    .el-input__suffix-inner,.el-input__icon {
+    .el-input__suffix,.el-input__suffix-inner {
       display: flex;
-      justify-content: center;
-      align-items: center;
+      right: 5px;
     }
-  }
-
-  .el-date-editor {
-    display: flex;
     .el-input__inner {
-      flex: 1;
+      padding: 0;
+      padding-right: 30px;
+      height: 38px;
+      line-height: 38px;
+      background: rgba(247, 248, 250, 1);
+      border: 0;
     }
-    .el-input__prefix {
-      position: static;
-      margin-right: 5px;
-      .el-input__icon {
-        &::before {
-          content: '\e78e';
-        }
+  
+    .el-autocomplete {
+      width: 100%;
+    }
+  
+    .el-textarea__inner,
+    .el-form-item__content {
+      padding-left: 0;
+      background: rgba(247, 248, 250, 1);
+      border: 0;
+  
+      .warn {
+        background: transparent;
       }
     }
-    .el-input__suffix {
-      right: 20px;
+    .el-textarea {
+      .el-textarea__inner {
+      }
+    }
+    .el-form-item {
+      margin-bottom: 16px;
+    }
+    .el-form-item__content {
+      padding-left: 16px;
+  
+      .el-select {
+        width: 100%;
+      }
+      .el-select .el-input .el-select__caret.el-icon-arrow-up::before {
+        content: '\e790';
+        position: absolute;
+        width: 100%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotateZ(180deg);
+      }
+      .el-icon-arrow-down {
+        &::before {
+          content: '\e790';
+        }
+      }
+      .el-input__suffix-inner,.el-input__icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  
+    .el-date-editor {
+      display: flex;
+      .el-input__inner {
+        flex: 1;
+      }
+      .el-input__prefix {
+        position: static;
+        margin-right: 5px;
+        .el-input__icon {
+          &::before {
+            content: '\e78e';
+          }
+        }
+      }
+      .el-input__suffix {
+        right: 20px;
+      }
+    }
+  
+    .el-radio {
+      margin-right: 32px;
+    }
+  
+    .el-radio__input.is-checked + .el-radio__label {
+      color: black;
+    }
+  
+    .el-checkbox {
+      margin-right: 20px;
+      min-width: 100px;
+      font-size: 0;
+      display: flex;
+      align-items: center;
+      height: 38px;
+    }
+    .el-checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      line-height: 38px;
+    }
+    .el-checkbox__input.is-checked + .el-checkbox__label {
+      color: black;
+    }
+  
+    // 多选框文字过多自动换行
+    .el-checkbox__label {
+      display: inline-grid;
+      white-space: pre-line;
+      word-wrap: break-word;
+      overflow: hidden;
+      line-height: 20px;
+    }
+  
+    .el-form-item__label,
+    .el-form-item__content {
+      line-height: 38px;
+    }
+  
+    .el-cascader {
+      display: block;
     }
   }
-
-  .el-radio {
-    margin-right: 32px;
-  }
-
-  .el-radio__input.is-checked + .el-radio__label {
-    color: black;
-  }
-
-  .el-checkbox {
-    margin-right: 20px;
-    min-width: 100px;
-    font-size: 0;
-    display: flex;
-    align-items: center;
-    height: 38px;
-  }
-  .el-checkbox-group {
-    display: flex;
-    flex-wrap: wrap;
-    line-height: 38px;
-  }
-  .el-checkbox__input.is-checked + .el-checkbox__label {
-    color: black;
-  }
-
-  // 多选框文字过多自动换行
-  .el-checkbox__label {
-    display: inline-grid;
-    white-space: pre-line;
-    word-wrap: break-word;
-    overflow: hidden;
-    line-height: 20px;
-  }
-
-  .el-form-item__label,
-  .el-form-item__content {
-    line-height: 38px;
-  }
-
-  .el-cascader {
-    display: block;
-  }
-}
-.el-breadcrumb {
-  .el-breadcrumb__separator {
-    margin: 0 2px;
-  }
-  .el-breadcrumb__item .el-breadcrumb__inner .item {
-    font-weight: 500;
-    color: #86909c !important;
-  }
-  .el-breadcrumb__inner a,
-  .el-breadcrumb__inner.is-link {
-    font-weight: 500;
-    color: #86909c;
-    font-size: 14px;
-  }
-  .el-breadcrumb__item:last-of-type {
-    .el-breadcrumb__inner .item {
-      font-weight: 400;
-      color: #000 !important;
+  .el-breadcrumb {
+    .el-breadcrumb__separator {
+      margin: 0 2px;
+    }
+    .el-breadcrumb__item .el-breadcrumb__inner .item {
+      font-weight: 500;
+      color: #86909c !important;
+    }
+    .el-breadcrumb__inner a,
+    .el-breadcrumb__inner.is-link {
+      font-weight: 500;
+      color: #86909c;
       font-size: 14px;
     }
-  }
-}
-// 红色警告
-.el-icon-warning-one {
-  .el-icon-warning {
-    &::before {
-      color: #f76560;
+    .el-breadcrumb__item:last-of-type {
+      .el-breadcrumb__inner .item {
+        font-weight: 400;
+        color: #000 !important;
+        font-size: 14px;
+      }
     }
   }
-}
-// success 蓝色小丑
-.el-message--success {
-  .el-icon-success {
-    &::before {
-      color: #14C9C9;
+  // 红色警告
+  .el-icon-warning-one {
+    .el-icon-warning {
+      &::before {
+        color: #f76560;
+      }
     }
   }
-}
-/**
- * @description:  popper-class="my-cascader"
- */
-
-.my-cascader {
-  .el-cascader-menu {
-    .el-cascader-menu__wrap {
-      .el-scrollbar__view {
-        .in-active-path {
-          color: #2d5cf6;
+  // success 蓝色小丑
+  .el-message--success {
+    .el-icon-success {
+      &::before {
+        color: #14C9C9;
+      }
+    }
+  }
+  /**
+   * @description:  popper-class="my-cascader"
+   */
+  
+  .my-cascader {
+    .el-cascader-menu {
+      .el-cascader-menu__wrap {
+        .el-scrollbar__view {
+          .in-active-path {
+            color: #2d5cf6;
+          }
         }
       }
     }
   }
-}
+  

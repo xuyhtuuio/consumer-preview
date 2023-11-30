@@ -275,7 +275,7 @@ export default {
         3: 'https://rm.dataelite.trs.com.cn/labelExtractionForDCU.html',
         4: 'http://ics.dataelite.trs.com.cn/aigc-static/intelligent-assistant',
         5: 'http://bwh.dataelite.trs.com.cn',
-        6: `http://localhost:8080/login?id=${md5.hex(window.localStorage.getItem('AI_token'))}`,
+        6: `http://192.168.210.57:31705/login?id=${md5.hex(window.localStorage.getItem('AI_token'))}`,
         7: 'https://dataelite.trs.com.cn/ckm/web/demo'
       },
       applyList: [],

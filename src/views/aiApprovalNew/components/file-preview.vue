@@ -60,6 +60,9 @@
         <span @click="changeSize(0)">
           <i><img src="@/assets/image/ai-approval/size-down.png" alt=""></i>
           缩小</span>
+          <span @click="changeSize(2)">
+          <i><img src="@/assets/image/ai-approval/reset.png" alt=""></i>
+          恢复</span>
       </div>
     </div>
     <el-dialog class="imgEditor" title="图片编辑" width="1200px" :visible.sync="imgEditorDialogVisible">
@@ -442,7 +445,7 @@ export default {
   left: 50%;
   transform: translate(-50%);
   z-index: 1;
-  width: 248px;
+  width: 275px;
   box-shadow: 0px 0px 10px 0px #4343431A;
   height: 38px;
   border-radius: 8px;

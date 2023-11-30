@@ -2,7 +2,7 @@
  * @Author: nimeimix huo.linchun@trs.com.cn
  * @Date: 2023-10-26 13:51:55
  * @LastEditors: nimeimix huo.linchun@trs.com.cn
- * @LastEditTime: 2023-11-03 15:53:35
+ * @LastEditTime: 2023-11-10 14:02:41
  * @FilePath: /consumer-preview/src/views/rules-base/detail.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -82,28 +82,43 @@
             发文单位：
             <el-popover placement="bottom" trigger="hover">
               <p>{{ lawInfo.unit }}</p>
-              <i slot="reference" class="pointer">
-                {{ wordEllipsis(lawInfo.unit, 20) }}
+              <i slot="reference">
+                {{ wordEllipsis(lawInfo.unit, 15) }}
               </i>
             </el-popover>
           </div>
-          <span v-if="lawInfo.type == '0'">发文字号：{{ lawInfo.doc_no }}</span>
+          <div v-if="lawInfo.type == '0'" class="flex">
+            发文字号：
+            <el-popover placement="bottom" trigger="hover">
+              <p>{{ lawInfo.doc_no }}</p>
+              <i slot="reference">
+                {{ wordEllipsis(lawInfo.doc_no, 15) }}
+              </i>
+            </el-popover>
+          </div>
           <div v-if="lawInfo.type == '1'" class="flex">
             拟稿部门：
             <el-popover placement="bottom" trigger="hover">
               <p>{{ lawInfo.unit }}</p>
-              <i slot="reference" class="pointer">
-                {{ wordEllipsis(lawInfo.unit, 20) }}
+              <i slot="reference">
+                {{ wordEllipsis(lawInfo.unit, 15) }}
               </i>
             </el-popover>
           </div>
-          <span v-if="lawInfo.type == '1'">制度文号：{{ lawInfo.doc_no }}</span>
-          <span v-if="lawInfo.type == '2'"
+          <span v-if="lawInfo.type == '1'" class="flex"
+            >制度文号：<el-popover placement="bottom" trigger="hover">
+              <p>{{ lawInfo.doc_no }}</p>
+              <i slot="reference">
+                {{ wordEllipsis(lawInfo.doc_no, 15) }}
+              </i>
+            </el-popover></span
+          >
+          <span v-if="lawInfo.type == '2'" class="flex"
             >发文单位：
             <el-popover placement="bottom" trigger="hover">
               <p>{{ lawInfo.unit }}</p>
-              <i slot="reference" class="pointer">
-                {{ wordEllipsis(lawInfo.unit, 20) }}
+              <i slot="reference">
+                {{ wordEllipsis(lawInfo.unit, 15) }}
               </i>
             </el-popover>
           </span>
@@ -119,7 +134,7 @@
               <i class="iconfont icon-fenxiang"></i>
               分享</i
             >
-            <i class="pointer">{{ lawInfo.read_count }}次阅读</i>
+            <i>{{ lawInfo.read_count }}次阅读</i>
           </span>
         </div>
       </div>
@@ -166,12 +181,13 @@
             <div class="file-name">
               <p>{{ item.fileKey | handleName }}</p>
               <p v-if="item.tagList?.length" class="tags ellipsis ellipsis_1">
-                <i v-for="(tag,idx) in item.tagList" :key="idx">{{ tag }}</i>
+                <i v-for="(tag, idx) in item.tagList" :key="idx">{{ tag }}</i>
               </p>
             </div>
           </li>
         </ul>
         <Empty
+          :imageSize="200"
           v-if="!overviewFileList?.length && activeMuneId == 0"
         ></Empty>
         <ul v-if="relatedFileList?.length && activeMuneId == 1">
@@ -187,9 +203,10 @@
             </div>
           </li>
         </ul>
-        <Eempty
+        <Empty
+          :imageSize="200"
           v-if="!relatedFileList?.length && activeMuneId == 1"
-        ></Eempty>
+        ></Empty>
       </div>
     </div>
   </div>
@@ -279,11 +296,11 @@ export default {
     },
     handleRelevanceFile() {
       const { attachmentList } = this.lawInfo
-      this.relatedFileList = attachmentList.map((m) => {
+      this.relatedFileList = attachmentList?.map((m) => {
         return {
           fileKey: m
         }
-      })
+      }) || []
     },
     currentChange(idx) {
       this.currentIdx = idx
@@ -295,13 +312,14 @@ export default {
     copyLink() {
       // eslint-disable-next-line
       const link =
+
         // eslint-disable-next-line
         window.location.protocol +
         // eslint-disable-next-line
         '//' +
         // eslint-disable-next-line
         window.location.host +
-        `/knowledge/rulesDetail?law_id=${this.lawInfo.id}`
+        `/#/knowledge/rulesDetail?law_id=${this.lawInfo.id}`
       const textarea = document.createElement('textarea')
       textarea.value = link
       document.body.appendChild(textarea)
@@ -346,6 +364,7 @@ export default {
       const params = {
         key: this.lawInfo.file_key
       }
+      this.$message.info('下载中，请等候')
       download(params).then((res) => {
         fetch(res.data.data, {
           method: 'get',
@@ -362,6 +381,7 @@ export default {
             document.body.appendChild(link)
             link.click()
             document.body.removeChild(link)
+            this.$message.success('下载完成')
           })
       })
     },
@@ -461,32 +481,41 @@ export default {
         id,
         name,
         tagList: this.lawInfo?.tagList || [],
-        beTagList: this.lawInfo?.equityList || [],
+        beTagList: this.lawInfo?.equityList || []
       }
       updateReadCount(params)
     },
     // 查询历史沿革
     async historyLogs() {
-      const res = await queryHistoryLogs({ id: this.lawInfo.id })
-      const { success, data } = res.data
-      if (success) {
-        let newData = data?.reverse()
-        newData = newData.map((m, index) => {
-          return {
-            ...m,
-            color: index === 0 ? 'rgba(235, 87, 87, 1)' : ''
-          }
-        })
-        this.activities = newData
+      try {
+        const res = await queryHistoryLogs({ id: this.lawInfo.id })
+        const { success, data } = res.data
+        if (success) {
+          let newData = data?.reverse()
+          newData = newData.map((m, index) => {
+            return {
+              ...m,
+              color: index === 0 ? 'rgba(235, 87, 87, 1)' : ''
+            }
+          })
+          this.activities = newData
+        }
+      } catch {
+        this.activities = []
       }
     },
     // 查询最近浏览
     async queryViewLogs() {
       this.rightLoading = true
-      const res = await queryViewLogs()
-      const { success, data } = res.data
-      if (success) this.overviewFileList = data
-      this.rightLoading = false
+      try {
+        const res = await queryViewLogs()
+        const { success, data } = res.data
+        if (success) this.overviewFileList = data
+        this.rightLoading = false
+      } catch {
+        this.overviewFileList = []
+        this.rightLoading = false
+      }
     }
   },
   filters: {

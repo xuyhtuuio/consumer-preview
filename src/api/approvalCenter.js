@@ -1,16 +1,18 @@
 import request from '@/api/request'
+import $GLOBAL from '@/utils/const'
+const { cpr } = $GLOBAL;
 /* 申请中心start */
 // 表单管理-获取审查事项类型列表
 export function getDataStatistics(param) {
   return request({
-    url: '/cpr/censor/header',
+    url: cpr + 'censor/header',
     method: 'post',
     data: param
   })
 }
 export function getUserStatus(param) {
   return request({
-    url: '/cpr/censor/user-status',
+    url: cpr + 'censor/user-status',
     method: 'get',
     params: param
   })
@@ -18,7 +20,7 @@ export function getUserStatus(param) {
 // 审批类型下拉列表
 export function getApprovalType(param) {
   return request({
-    url: '/cpr/applicationcenter/approvalType',
+    url: cpr + 'applicationcenter/approvalType',
     method: 'get',
     params: param
   })
@@ -26,7 +28,7 @@ export function getApprovalType(param) {
 // 审批阶段下拉列表
 export function getApprovalStage(param) {
   return request({
-    url: '/cpr/applicationcenter/approvalStage',
+    url: cpr + 'applicationcenter/approvalStage',
     method: 'post',
     data: param
   })
@@ -34,7 +36,7 @@ export function getApprovalStage(param) {
 // 获取申请列表
 export function censorList(param) {
   return request({
-    url: '/cpr/censor/censorList',
+    url: cpr + 'censor/censorList',
     method: 'post',
     data: param
   })
@@ -44,7 +46,7 @@ export function censorList(param) {
 
 export function concernApplication(param) {
   return request({
-    url: '/cpr/censor/follow',
+    url: cpr + 'censor/follow',
     method: 'post',
     contentType: 'application/x-www-form-urlencoded',
     data: param
@@ -54,7 +56,7 @@ export function concernApplication(param) {
 // 驳回
 export function overrule(param) {
   return request({
-    url: '/cpr/censor/overrule',
+    url: cpr + 'censor/overrule',
     method: 'post',
     contentType: 'application/x-www-form-urlencoded',
     data: param
@@ -64,14 +66,14 @@ export function overrule(param) {
 // 提单机构
 export function billOfLadingAgenciesList() {
   return request({
-    url: '/cpr/censor/billOfLadingAgenciesList',
+    url: cpr + 'censor/billOfLadingAgenciesList',
     method: 'get',
   })
 }
 // 详情页领导审批通过驳回
 export function workSpaceAgree(param) {
   return request({
-    url: '/cpr/workspace/agree',
+    url: cpr + 'workspace/agree',
     method: 'post',
     contentType: 'multipart/form-data',
     data: param
@@ -80,7 +82,7 @@ export function workSpaceAgree(param) {
 }
 export function toDoList(param) {
   return request({
-    url: '/cpr/workspace/process/toDoList',
+    url: cpr + 'workspace/process/toDoList',
     method: 'post',
     data: param,
 
@@ -89,7 +91,7 @@ export function toDoList(param) {
 
 export function getApprovalListStation(param) {
   return request({
-    url: '/cpr/censor/getApprovalListStation',
+    url: cpr + 'censor/getApprovalListStation',
     method: 'post',
     data: param,
     contentType: 'application/json'
@@ -97,7 +99,7 @@ export function getApprovalListStation(param) {
 }
 export function exportApprovalList(param) {
   return request({
-    url: '/cpr/censor/exportApprovalList',
+    url: cpr + 'censor/exportApprovalList',
     method: 'post',
     data: param,
     responseType: 'blob',
@@ -106,7 +108,7 @@ export function exportApprovalList(param) {
 // 领导审批通过
 export function leaderEdit(param) {
   return request({
-    url: '/cpr/workspace/process/edit',
+    url: cpr + 'workspace/process/edit',
     method: 'post',
     contentType: 'application/json',
     data: param,
@@ -115,7 +117,7 @@ export function leaderEdit(param) {
 // 领导审批保存后的查询
 export function getEditById(param) {
   return request({
-    url: '/cpr/workspace/process/getEditById',
+    url: cpr + 'workspace/process/getEditById',
     method: 'post',
     contentType: 'application/json',
     data: param,
@@ -124,7 +126,7 @@ export function getEditById(param) {
 // 上线材料 提交
 export function finalMaterial(param, processInstanceId, taskId, formId) {
   return request({
-    url: `/cpr/workspace/finalMaterial/${processInstanceId}/${taskId}/${formId}`,
+    url: `${cpr}workspace/finalMaterial/${processInstanceId}/${taskId}/${formId}`,
     method: 'post',
     contentType: 'application/json',
     data: param,
@@ -136,7 +138,7 @@ export function finalMaterial(param, processInstanceId, taskId, formId) {
  */
 export function uploadCompareFile(param) {
   return request({
-    url: '/cpr/onlineComparison/uploadCompareFile',
+    url: cpr + 'onlineComparison/uploadCompareFile',
     method: 'post',
     contentType: 'application/json',
     data: param,
@@ -146,7 +148,7 @@ export function uploadCompareFile(param) {
 // 上线材料查询
 export function findFinalMaterial(processInstanceId, taskId) {
   return request({
-    url: `/cpr/workspace/findFinalMaterial/${processInstanceId}/${taskId}`,
+    url: `${cpr}workspace/findFinalMaterial/${processInstanceId}/${taskId}`,
     method: 'get',
   })
 }
@@ -154,7 +156,7 @@ export function findFinalMaterial(processInstanceId, taskId) {
 // 获取线上对比数据
 export function dualScreenPreview(param) {
   return request({
-    url: '/cpr/onlineComparison/dualScreenPreview',
+    url: cpr + 'onlineComparison/dualScreenPreview',
     method: 'post',
     contentType: 'application/x-www-form-urlencoded',
     data: param,
@@ -164,7 +166,7 @@ export function dualScreenPreview(param) {
 // 对比结束接口
 export function endTask(param) {
   return request({
-    url: '/cpr/workspace/endTask',
+    url: cpr + 'workspace/endTask',
     method: 'post',
     contentType: 'application/x-www-form-urlencoded',
     data: param,
@@ -174,7 +176,7 @@ export function endTask(param) {
 // 获取提单机构
 export function getOrgTree() {
   return request({
-    url: '/cpr/censor/getOrgTree',
+    url: cpr + 'censor/getOrgTree',
     method: 'post',
   })
 }
@@ -182,7 +184,7 @@ export function getOrgTree() {
 // 管理员删除工单
 export function del(param) {
   return request({
-    url: '/cpr/censor/delete',
+    url: cpr + 'censor/delete',
     method: 'get',
     params: param
   })

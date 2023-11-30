@@ -2,14 +2,23 @@ import Vue from 'vue';
 import axios from 'axios';
 import Qs from 'qs';
 import router from '@/router';
+import $GLOBAL from '@/utils/const'
 
 import { Message } from 'element-ui';
 // 第三方插件
 import 'element-ui/lib/theme-chalk/index.css';
 
+const { uaa } = $GLOBAL;
+
 Vue.prototype.$axios = axios;
-// 字体图标
-const noToken = ['uaa/oauth/token', 'uaa/captcha', 'uaa/loginByPwd', 'uaa/validCodeSms', 'cpr/user/getToken', '/uaa/validCodeSms'];
+const noToken = [
+  `${uaa}oauth/token`,
+  `${uaa}captcha`,
+  `${uaa}loginByPwd`,
+  `${uaa}validCodeSms`,
+  `${uaa}user/getToken`,
+  `${uaa}validCodeSms`,
+]
 let newPage = false;
 const service = axios.create({
   baseURL: process.env.BASE_API,
@@ -110,18 +119,8 @@ service.interceptors.response.use(
 );
 // 退出登录或者登录失效
 function getloginHref() {
-  const newWindow = window.open('', '_self');
-  if (window.location.host === '192.168.210.57:31603') {
-    newWindow.location = 'http://192.168.210.57:31963/#/login?from=cpr';
-  } else if (window.location.host === 'cpr.dataelite.trs.com.cn') {
-    newWindow.location = 'https://dataelite.trs.com.cn/#/login?from=cpr';
-  } else if (window.location.host === 'cwo.dataelite.trs.com.cn') {
-    newWindow.location = 'https://cwo.dataelite.trs.com.cn/#/login?from=cwo';
-  } else {
-    const name = window.self === window.top ? 'login' : 'loginAuto';
-    router.push({
-      name,
-    });
-  }
+  router.push({
+    name: 'login'
+  })
 }
 export default service;
